@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/qa4fdrfkn6p54zsw524lhlrl6ddq4m19-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/wasm-bindgen-backend-0.2.83/src/codegen.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>codegen.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../wasm_bindgen_backend/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jkqwh4wzhjr4a0qpyfm8mk6dhiqny008-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/wasm-bindgen-backend-0.2.84/src/codegen.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>codegen.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-93196c7a1c3542a8.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../wasm_bindgen_backend/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1387,9 +1387,85 @@
 <a href="#1387" id="1387">1387</a>
 <a href="#1388" id="1388">1388</a>
 <a href="#1389" id="1389">1389</a>
+<a href="#1390" id="1390">1390</a>
+<a href="#1391" id="1391">1391</a>
+<a href="#1392" id="1392">1392</a>
+<a href="#1393" id="1393">1393</a>
+<a href="#1394" id="1394">1394</a>
+<a href="#1395" id="1395">1395</a>
+<a href="#1396" id="1396">1396</a>
+<a href="#1397" id="1397">1397</a>
+<a href="#1398" id="1398">1398</a>
+<a href="#1399" id="1399">1399</a>
+<a href="#1400" id="1400">1400</a>
+<a href="#1401" id="1401">1401</a>
+<a href="#1402" id="1402">1402</a>
+<a href="#1403" id="1403">1403</a>
+<a href="#1404" id="1404">1404</a>
+<a href="#1405" id="1405">1405</a>
+<a href="#1406" id="1406">1406</a>
+<a href="#1407" id="1407">1407</a>
+<a href="#1408" id="1408">1408</a>
+<a href="#1409" id="1409">1409</a>
+<a href="#1410" id="1410">1410</a>
+<a href="#1411" id="1411">1411</a>
+<a href="#1412" id="1412">1412</a>
+<a href="#1413" id="1413">1413</a>
+<a href="#1414" id="1414">1414</a>
+<a href="#1415" id="1415">1415</a>
+<a href="#1416" id="1416">1416</a>
+<a href="#1417" id="1417">1417</a>
+<a href="#1418" id="1418">1418</a>
+<a href="#1419" id="1419">1419</a>
+<a href="#1420" id="1420">1420</a>
+<a href="#1421" id="1421">1421</a>
+<a href="#1422" id="1422">1422</a>
+<a href="#1423" id="1423">1423</a>
+<a href="#1424" id="1424">1424</a>
+<a href="#1425" id="1425">1425</a>
+<a href="#1426" id="1426">1426</a>
+<a href="#1427" id="1427">1427</a>
+<a href="#1428" id="1428">1428</a>
+<a href="#1429" id="1429">1429</a>
+<a href="#1430" id="1430">1430</a>
+<a href="#1431" id="1431">1431</a>
+<a href="#1432" id="1432">1432</a>
+<a href="#1433" id="1433">1433</a>
+<a href="#1434" id="1434">1434</a>
+<a href="#1435" id="1435">1435</a>
+<a href="#1436" id="1436">1436</a>
+<a href="#1437" id="1437">1437</a>
+<a href="#1438" id="1438">1438</a>
+<a href="#1439" id="1439">1439</a>
+<a href="#1440" id="1440">1440</a>
+<a href="#1441" id="1441">1441</a>
+<a href="#1442" id="1442">1442</a>
+<a href="#1443" id="1443">1443</a>
+<a href="#1444" id="1444">1444</a>
+<a href="#1445" id="1445">1445</a>
+<a href="#1446" id="1446">1446</a>
+<a href="#1447" id="1447">1447</a>
+<a href="#1448" id="1448">1448</a>
+<a href="#1449" id="1449">1449</a>
+<a href="#1450" id="1450">1450</a>
+<a href="#1451" id="1451">1451</a>
+<a href="#1452" id="1452">1452</a>
+<a href="#1453" id="1453">1453</a>
+<a href="#1454" id="1454">1454</a>
+<a href="#1455" id="1455">1455</a>
+<a href="#1456" id="1456">1456</a>
+<a href="#1457" id="1457">1457</a>
+<a href="#1458" id="1458">1458</a>
+<a href="#1459" id="1459">1459</a>
+<a href="#1460" id="1460">1460</a>
+<a href="#1461" id="1461">1461</a>
+<a href="#1462" id="1462">1462</a>
+<a href="#1463" id="1463">1463</a>
+<a href="#1464" id="1464">1464</a>
+<a href="#1465" id="1465">1465</a>
+<a href="#1466" id="1466">1466</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast;
 <span class="kw">use </span><span class="kw">crate</span>::encode;
-<span class="kw">use </span><span class="kw">crate</span>::util::ShortHash;
 <span class="kw">use </span><span class="kw">crate</span>::Diagnostic;
 <span class="kw">use </span>once_cell::sync::Lazy;
 <span class="kw">use </span>proc_macro2::{Ident, Literal, Span, TokenStream};
@@ -1519,6 +1595,29 @@
     }
 }
 
+<span class="kw">impl </span>TryToTokens <span class="kw">for </span>ast::LinkToModule {
+    <span class="kw">fn </span>try_to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) -&gt; <span class="prelude-ty">Result</span>&lt;(), Diagnostic&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>program = TokenStream::new();
+        <span class="self">self</span>.<span class="number">0</span>.try_to_tokens(<span class="kw-2">&amp;mut </span>program)<span class="question-mark">?</span>;
+        <span class="kw">let </span>link_function_name = <span class="self">self</span>.<span class="number">0</span>.link_function_name(<span class="number">0</span>);
+        <span class="kw">let </span>name = Ident::new(<span class="kw-2">&amp;</span>link_function_name, Span::call_site());
+        <span class="kw">let </span>abi_ret = <span class="macro">quote! </span>{ &lt;std::string::String <span class="kw">as </span>wasm_bindgen::convert::FromWasmAbi&gt;::Abi };
+        <span class="kw">let </span>extern_fn = extern_fn(<span class="kw-2">&amp;</span>name, <span class="kw-2">&amp;</span>[], <span class="kw-2">&amp;</span>[], <span class="kw-2">&amp;</span>[], abi_ret);
+        (<span class="macro">quote! </span>{
+            {
+                #program
+                #extern_fn
+
+                <span class="kw">unsafe </span>{
+                    &lt;std::string::String <span class="kw">as </span>wasm_bindgen::convert::FromWasmAbi&gt;::from_abi(#name())
+                }
+            }
+        })
+        .to_tokens(tokens);
+        <span class="prelude-val">Ok</span>(())
+    }
+}
+
 <span class="kw">impl </span>ToTokens <span class="kw">for </span>ast::Struct {
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
         <span class="kw">let </span>name = <span class="kw-2">&amp;</span><span class="self">self</span>.rust_name;
@@ -1527,7 +1626,6 @@
         <span class="kw">let </span>name_chars = name_str.chars().map(|c| c <span class="kw">as </span>u32);
         <span class="kw">let </span>new_fn = Ident::new(<span class="kw-2">&amp;</span>shared::new_function(<span class="kw-2">&amp;</span>name_str), Span::call_site());
         <span class="kw">let </span>free_fn = Ident::new(<span class="kw-2">&amp;</span>shared::free_function(<span class="kw-2">&amp;</span>name_str), Span::call_site());
-        <span class="kw">let </span>free_fn_const = Ident::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}__const&quot;</span>, free_fn), free_fn.span());
         (<span class="macro">quote! </span>{
             <span class="attr">#[automatically_derived]
             </span><span class="kw">impl </span>wasm_bindgen::describe::WasmDescribe <span class="kw">for </span>#name {
@@ -1600,12 +1698,12 @@
 
             <span class="attr">#[cfg(all(target_arch = <span class="string">&quot;wasm32&quot;</span>, not(target_os = <span class="string">&quot;emscripten&quot;</span>)))]
             #[automatically_derived]
-            </span><span class="kw">const </span>#free_fn_const: () = {
+            </span><span class="kw">const _</span>: () = {
                 <span class="attr">#[no_mangle]
                 #[doc(hidden)]
                 </span><span class="kw">pub unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>#free_fn(ptr: u32) {
-                    drop(&lt;#name <span class="kw">as </span>wasm_bindgen::convert::FromWasmAbi&gt;::from_abi(ptr));
-                }
+                    <span class="kw">let _ </span>= &lt;#name <span class="kw">as </span>wasm_bindgen::convert::FromWasmAbi&gt;::from_abi(ptr); <span class="comment">//implicit `drop()`
+                </span>}
             };
 
             <span class="attr">#[automatically_derived]
@@ -1629,6 +1727,16 @@
                     <span class="kw">let </span>js = js <span class="kw">as </span><span class="kw-2">*mut </span>wasm_bindgen::__rt::WasmRefCell&lt;#name&gt;;
                     wasm_bindgen::__rt::assert_not_null(js);
                     (<span class="kw-2">*</span>js).borrow_mut()
+                }
+            }
+
+            <span class="attr">#[automatically_derived]
+            </span><span class="kw">impl </span>wasm_bindgen::convert::LongRefFromWasmAbi <span class="kw">for </span>#name {
+                <span class="kw">type </span>Abi = u32;
+                <span class="kw">type </span>Anchor = wasm_bindgen::__rt::Ref&lt;<span class="lifetime">&#39;static</span>, #name&gt;;
+
+                <span class="kw">unsafe fn </span>long_ref_from_abi(js: <span class="self">Self</span>::Abi) -&gt; <span class="self">Self</span>::Anchor {
+                    &lt;<span class="self">Self </span><span class="kw">as </span>wasm_bindgen::convert::RefFromWasmAbi&gt;::ref_from_abi(js)
                 }
             }
 
@@ -1673,11 +1781,9 @@
             <span class="macro">quote! </span>{}
         };
 
-        <span class="kw">let </span>getter_const = Ident::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}__const&quot;</span>, getter), getter.span());
-
         (<span class="macro">quote! </span>{
             <span class="attr">#[automatically_derived]
-            </span><span class="kw">const </span>#getter_const: () = {
+            </span><span class="kw">const _</span>: () = {
                 <span class="attr">#[cfg_attr(all(target_arch = <span class="string">&quot;wasm32&quot;</span>, not(target_os = <span class="string">&quot;emscripten&quot;</span>)), no_mangle)]
                 #[doc(hidden)]
                 </span><span class="kw">pub unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>#getter(js: u32)
@@ -1711,12 +1817,10 @@
             <span class="kw">return</span>;
         }
 
-        <span class="kw">let </span>setter_const = Ident::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}__const&quot;</span>, setter), setter.span());
-
         (<span class="macro">quote! </span>{
             <span class="attr">#[cfg(all(target_arch = <span class="string">&quot;wasm32&quot;</span>, not(target_os = <span class="string">&quot;emscripten&quot;</span>)))]
             #[automatically_derived]
-            </span><span class="kw">const </span>#setter_const: () = {
+            </span><span class="kw">const _</span>: () = {
                 <span class="attr">#[no_mangle]
                 #[doc(hidden)]
                 </span><span class="kw">pub unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>#setter(
@@ -1794,7 +1898,7 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>argtys = Vec::new();
         <span class="kw">for </span>(i, arg) <span class="kw">in </span><span class="self">self</span>.function.arguments.iter().enumerate() {
-            argtys.push(<span class="kw-2">&amp;</span>arg.ty);
+            argtys.push(<span class="kw-2">&amp;*</span>arg.ty);
             <span class="kw">let </span>i = i + offset;
             <span class="kw">let </span>ident = Ident::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;arg{}&quot;</span>, i), Span::call_site());
             <span class="kw">let </span>ty = <span class="kw-2">&amp;</span>arg.ty;
@@ -1816,16 +1920,31 @@
                     });
                 }
                 syn::Type::Reference(syn::TypeReference { elem, .. }) =&gt; {
-                    args.push(<span class="macro">quote! </span>{
-                        #ident: &lt;#elem <span class="kw">as </span>wasm_bindgen::convert::RefFromWasmAbi&gt;::Abi
-                    });
-                    arg_conversions.push(<span class="macro">quote! </span>{
-                        <span class="kw">let </span>#ident = <span class="kw">unsafe </span>{
-                            &lt;#elem <span class="kw">as </span>wasm_bindgen::convert::RefFromWasmAbi&gt;
-                                ::ref_from_abi(#ident)
-                        };
-                        <span class="kw">let </span>#ident = <span class="kw-2">&amp;*</span>#ident;
-                    });
+                    <span class="kw">if </span><span class="self">self</span>.function.r#async {
+                        args.push(<span class="macro">quote! </span>{
+                            #ident: &lt;#elem <span class="kw">as </span>wasm_bindgen::convert::LongRefFromWasmAbi&gt;::Abi
+                        });
+                        arg_conversions.push(<span class="macro">quote! </span>{
+                            <span class="kw">let </span>#ident = <span class="kw">unsafe </span>{
+                                &lt;#elem <span class="kw">as </span>wasm_bindgen::convert::LongRefFromWasmAbi&gt;
+                                    ::long_ref_from_abi(#ident)
+                            };
+                            <span class="kw">let </span>#ident = &lt;&lt;#elem <span class="kw">as </span>wasm_bindgen::convert::LongRefFromWasmAbi&gt;
+                                ::Anchor <span class="kw">as </span>core::borrow::Borrow&lt;#elem&gt;&gt;
+                                ::borrow(<span class="kw-2">&amp;</span>#ident);
+                        });
+                    } <span class="kw">else </span>{
+                        args.push(<span class="macro">quote! </span>{
+                            #ident: &lt;#elem <span class="kw">as </span>wasm_bindgen::convert::RefFromWasmAbi&gt;::Abi
+                        });
+                        arg_conversions.push(<span class="macro">quote! </span>{
+                            <span class="kw">let </span>#ident = <span class="kw">unsafe </span>{
+                                &lt;#elem <span class="kw">as </span>wasm_bindgen::convert::RefFromWasmAbi&gt;
+                                    ::ref_from_abi(#ident)
+                            };
+                            <span class="kw">let </span>#ident = <span class="kw-2">&amp;*</span>#ident;
+                        });
+                    }
                 }
                 <span class="kw">_ </span>=&gt; {
                     args.push(<span class="macro">quote! </span>{
@@ -1920,11 +2039,9 @@
             <span class="macro">quote! </span>{}
         };
 
-        <span class="kw">let </span>generated_name_const =
-            Ident::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}__const&quot;</span>, generated_name), generated_name.span());
         (<span class="macro">quote! </span>{
             <span class="attr">#[automatically_derived]
-            </span><span class="kw">const </span>#generated_name_const: () = {
+            </span><span class="kw">const _</span>: () = {
                 #(#attrs)*
                 <span class="attr">#[cfg_attr(
                     all(target_arch = <span class="string">&quot;wasm32&quot;</span>, not(target_os = <span class="string">&quot;emscripten&quot;</span>)),
@@ -1939,6 +2056,22 @@
             };
         })
         .to_tokens(into);
+
+        <span class="kw">let </span>describe_args: TokenStream = argtys
+            .iter()
+            .map(|ty| <span class="kw">match </span>ty {
+                syn::Type::Reference(reference)
+                    <span class="kw">if </span><span class="self">self</span>.function.r#async &amp;&amp; reference.mutability.is_none() =&gt;
+                {
+                    <span class="kw">let </span>inner = <span class="kw-2">&amp;</span>reference.elem;
+                    <span class="macro">quote! </span>{
+                        inform(LONGREF);
+                        &lt;#inner <span class="kw">as </span>WasmDescribe&gt;::describe();
+                    }
+                }
+                <span class="kw">_ </span>=&gt; <span class="macro">quote! </span>{ &lt;#ty <span class="kw">as </span>WasmDescribe&gt;::describe(); },
+            })
+            .collect();
 
         <span class="comment">// In addition to generating the shim function above which is what
         // our generated JS will invoke, we *also* generate a &quot;descriptor&quot;
@@ -1963,7 +2096,7 @@
                 inform(FUNCTION);
                 inform(<span class="number">0</span>);
                 inform(#nargs);
-                #(&lt;#argtys <span class="kw">as </span>WasmDescribe&gt;::describe();)*
+                #describe_args
                 #describe_ret
             },
             attrs: attrs.clone(),
@@ -1996,8 +2129,6 @@
             <span class="prelude-val">None </span>=&gt; <span class="string">&quot;&quot;</span>,
             <span class="prelude-val">Some</span>(comment) =&gt; comment,
         };
-        <span class="kw">let </span>const_name = <span class="macro">format!</span>(<span class="string">&quot;__wbg_generated_const_{}&quot;</span>, rust_name);
-        <span class="kw">let </span>const_name = Ident::new(<span class="kw-2">&amp;</span>const_name, Span::call_site());
         <span class="kw">let </span>instanceof_shim = Ident::new(<span class="kw-2">&amp;</span><span class="self">self</span>.instanceof_shim, Span::call_site());
 
         <span class="kw">let </span>internal_obj = <span class="kw">match </span><span class="self">self</span>.extends.first() {
@@ -2046,10 +2177,10 @@
             }
 
             <span class="attr">#[automatically_derived]
-            </span><span class="kw">const </span>#const_name: () = {
+            </span><span class="kw">const _</span>: () = {
                 <span class="kw">use </span>wasm_bindgen::convert::{IntoWasmAbi, FromWasmAbi};
                 <span class="kw">use </span>wasm_bindgen::convert::{OptionIntoWasmAbi, OptionFromWasmAbi};
-                <span class="kw">use </span>wasm_bindgen::convert::RefFromWasmAbi;
+                <span class="kw">use </span>wasm_bindgen::convert::{RefFromWasmAbi, LongRefFromWasmAbi};
                 <span class="kw">use </span>wasm_bindgen::describe::WasmDescribe;
                 <span class="kw">use </span>wasm_bindgen::{JsValue, JsCast, JsObject};
                 <span class="kw">use </span>wasm_bindgen::__rt::core;
@@ -2118,6 +2249,17 @@
                         core::mem::ManuallyDrop::new(#rust_name {
                             obj: core::mem::ManuallyDrop::into_inner(tmp).into(),
                         })
+                    }
+                }
+
+                <span class="kw">impl </span>LongRefFromWasmAbi <span class="kw">for </span>#rust_name {
+                    <span class="kw">type </span>Abi = &lt;JsValue <span class="kw">as </span>LongRefFromWasmAbi&gt;::Abi;
+                    <span class="kw">type </span>Anchor = #rust_name;
+
+                    <span class="attr">#[inline]
+                    </span><span class="kw">unsafe fn </span>long_ref_from_abi(js: <span class="self">Self</span>::Abi) -&gt; <span class="self">Self</span>::Anchor {
+                        <span class="kw">let </span>tmp = &lt;JsValue <span class="kw">as </span>LongRefFromWasmAbi&gt;::long_ref_from_abi(js);
+                        #rust_name { obj: tmp.into() }
                     }
                 }
 
@@ -2465,8 +2607,8 @@
         <span class="kw">let </span>import_name = <span class="kw-2">&amp;</span><span class="self">self</span>.shim;
         <span class="kw">let </span>attrs = <span class="kw-2">&amp;</span><span class="self">self</span>.function.rust_attrs;
         <span class="kw">let </span>arguments = <span class="kw-2">&amp;</span>arguments;
-        <span class="kw">let </span>abi_arguments = <span class="kw-2">&amp;</span>abi_arguments;
-        <span class="kw">let </span>abi_argument_names = <span class="kw-2">&amp;</span>abi_argument_names;
+        <span class="kw">let </span>abi_arguments = <span class="kw-2">&amp;</span>abi_arguments[..];
+        <span class="kw">let </span>abi_argument_names = <span class="kw-2">&amp;</span>abi_argument_names[..];
 
         <span class="kw">let </span>doc_comment = <span class="kw-2">&amp;</span><span class="self">self</span>.doc_comment;
         <span class="kw">let </span>me = <span class="kw">if </span>is_method {
@@ -2491,23 +2633,13 @@
         // like rustc itself doesn&#39;t do great in that regard so let&#39;s just do
         // the best we can in the meantime.
         </span><span class="kw">let </span>extern_fn = respan(
-            <span class="macro">quote! </span>{
-                <span class="attr">#[cfg(all(target_arch = <span class="string">&quot;wasm32&quot;</span>, not(target_os = <span class="string">&quot;emscripten&quot;</span>)))]
-                </span>#(#attrs)*
-                <span class="attr">#[link(wasm_import_module = <span class="string">&quot;__wbindgen_placeholder__&quot;</span>)]
-                </span><span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
-                    <span class="kw">fn </span>#import_name(#(#abi_arguments),<span class="kw-2">*</span>) -&gt; #abi_ret;
-                }
-
-                <span class="attr">#[cfg(not(all(target_arch = <span class="string">&quot;wasm32&quot;</span>, not(target_os = <span class="string">&quot;emscripten&quot;</span>))))]
-                </span><span class="kw">unsafe fn </span>#import_name(#(#abi_arguments),<span class="kw-2">*</span>) -&gt; #abi_ret {
-                    #(
-                        drop(#abi_argument_names);
-                    )*
-                    <span class="macro">panic!</span>(<span class="string">&quot;cannot call wasm-bindgen imported functions on \
-                            non-wasm targets&quot;</span>);
-                }
-            },
+            extern_fn(
+                import_name,
+                attrs,
+                abi_arguments,
+                abi_argument_names,
+                abi_ret,
+            ),
             <span class="kw-2">&amp;</span><span class="self">self</span>.rust_name,
         );
 
@@ -2725,16 +2857,12 @@
         }
 
         <span class="kw">let </span>name = Ident::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;__wbindgen_describe_{}&quot;</span>, ident), ident.span());
-        <span class="kw">let </span>const_name = Ident::new(
-            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;__wbindgen_const_describe_{}&quot;</span>, ident),
-            ident.span(),
-        );
         <span class="kw">let </span>inner = <span class="kw-2">&amp;</span><span class="self">self</span>.inner;
         <span class="kw">let </span>attrs = <span class="kw-2">&amp;</span><span class="self">self</span>.attrs;
         (<span class="macro">quote! </span>{
             <span class="attr">#[cfg(all(target_arch = <span class="string">&quot;wasm32&quot;</span>, not(target_os = <span class="string">&quot;emscripten&quot;</span>)))]
             #[automatically_derived]
-            </span><span class="kw">const </span>#const_name: () = {
+            </span><span class="kw">const _</span>: () = {
                 #(#attrs)*
                 <span class="attr">#[no_mangle]
                 #[doc(hidden)]
@@ -2747,6 +2875,32 @@
             };
         })
         .to_tokens(tokens);
+    }
+}
+
+<span class="kw">fn </span>extern_fn(
+    import_name: <span class="kw-2">&amp;</span>Ident,
+    attrs: <span class="kw-2">&amp;</span>[syn::Attribute],
+    abi_arguments: <span class="kw-2">&amp;</span>[TokenStream],
+    abi_argument_names: <span class="kw-2">&amp;</span>[Ident],
+    abi_ret: TokenStream,
+) -&gt; TokenStream {
+    <span class="macro">quote! </span>{
+        <span class="attr">#[cfg(all(target_arch = <span class="string">&quot;wasm32&quot;</span>, not(target_os = <span class="string">&quot;emscripten&quot;</span>)))]
+        </span>#(#attrs)*
+        <span class="attr">#[link(wasm_import_module = <span class="string">&quot;__wbindgen_placeholder__&quot;</span>)]
+        </span><span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+            <span class="kw">fn </span>#import_name(#(#abi_arguments),<span class="kw-2">*</span>) -&gt; #abi_ret;
+        }
+
+        <span class="attr">#[cfg(not(all(target_arch = <span class="string">&quot;wasm32&quot;</span>, not(target_os = <span class="string">&quot;emscripten&quot;</span>))))]
+        </span><span class="kw">unsafe fn </span>#import_name(#(#abi_arguments),<span class="kw-2">*</span>) -&gt; #abi_ret {
+            #(
+                drop(#abi_argument_names);
+            )*
+            <span class="macro">panic!</span>(<span class="string">&quot;cannot call wasm-bindgen imported functions on \
+                    non-wasm targets&quot;</span>);
+        }
     }
 }
 
@@ -2777,4 +2931,4 @@
     new_tokens.into_iter().collect()
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wasm_bindgen_backend" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wasm_bindgen_backend" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>

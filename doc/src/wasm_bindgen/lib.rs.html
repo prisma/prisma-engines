@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/qa4fdrfkn6p54zsw524lhlrl6ddq4m19-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/wasm-bindgen-0.2.83/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-6827029ac823cab7.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-ebce58d0a40c3431.css"><link rel="stylesheet" disabled href="../../static.files/dark-f23faae4a2daf9a6.css"><link rel="stylesheet" disabled href="../../static.files/ayu-8af5e100b21cd173.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-c55e1eb52e1886b4.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../wasm_bindgen/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jkqwh4wzhjr4a0qpyfm8mk6dhiqny008-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/wasm-bindgen-0.2.84/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-93196c7a1c3542a8.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../wasm_bindgen/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1798,6 +1798,54 @@
 <a href="#1798" id="1798">1798</a>
 <a href="#1799" id="1799">1799</a>
 <a href="#1800" id="1800">1800</a>
+<a href="#1801" id="1801">1801</a>
+<a href="#1802" id="1802">1802</a>
+<a href="#1803" id="1803">1803</a>
+<a href="#1804" id="1804">1804</a>
+<a href="#1805" id="1805">1805</a>
+<a href="#1806" id="1806">1806</a>
+<a href="#1807" id="1807">1807</a>
+<a href="#1808" id="1808">1808</a>
+<a href="#1809" id="1809">1809</a>
+<a href="#1810" id="1810">1810</a>
+<a href="#1811" id="1811">1811</a>
+<a href="#1812" id="1812">1812</a>
+<a href="#1813" id="1813">1813</a>
+<a href="#1814" id="1814">1814</a>
+<a href="#1815" id="1815">1815</a>
+<a href="#1816" id="1816">1816</a>
+<a href="#1817" id="1817">1817</a>
+<a href="#1818" id="1818">1818</a>
+<a href="#1819" id="1819">1819</a>
+<a href="#1820" id="1820">1820</a>
+<a href="#1821" id="1821">1821</a>
+<a href="#1822" id="1822">1822</a>
+<a href="#1823" id="1823">1823</a>
+<a href="#1824" id="1824">1824</a>
+<a href="#1825" id="1825">1825</a>
+<a href="#1826" id="1826">1826</a>
+<a href="#1827" id="1827">1827</a>
+<a href="#1828" id="1828">1828</a>
+<a href="#1829" id="1829">1829</a>
+<a href="#1830" id="1830">1830</a>
+<a href="#1831" id="1831">1831</a>
+<a href="#1832" id="1832">1832</a>
+<a href="#1833" id="1833">1833</a>
+<a href="#1834" id="1834">1834</a>
+<a href="#1835" id="1835">1835</a>
+<a href="#1836" id="1836">1836</a>
+<a href="#1837" id="1837">1837</a>
+<a href="#1838" id="1838">1838</a>
+<a href="#1839" id="1839">1839</a>
+<a href="#1840" id="1840">1840</a>
+<a href="#1841" id="1841">1841</a>
+<a href="#1842" id="1842">1842</a>
+<a href="#1843" id="1843">1843</a>
+<a href="#1844" id="1844">1844</a>
+<a href="#1845" id="1845">1845</a>
+<a href="#1846" id="1846">1846</a>
+<a href="#1847" id="1847">1847</a>
+<a href="#1848" id="1848">1848</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Runtime support for the `wasm-bindgen` tool
 //!
 //! This crate contains the runtime support necessary for `wasm-bindgen` the
@@ -1844,12 +1892,13 @@
     )
 }
 
-<span class="doccomment">/// A module which is typically glob imported from:
+<span class="doccomment">/// A module which is typically glob imported.
 ///
 /// ```
 /// use wasm_bindgen::prelude::*;
 /// ```
 </span><span class="kw">pub mod </span>prelude {
+    <span class="kw">pub use </span><span class="kw">crate</span>::JsCast;
     <span class="kw">pub use </span><span class="kw">crate</span>::JsValue;
     <span class="kw">pub use </span><span class="kw">crate</span>::UnwrapThrowExt;
     <span class="attr">#[doc(hidden)]
@@ -1862,6 +1911,8 @@
 
     <span class="kw">pub use </span><span class="kw">crate</span>::JsError;
 }
+
+<span class="kw">pub use </span>wasm_bindgen_macro::link_to;
 
 <span class="kw">pub mod </span>convert;
 <span class="kw">pub mod </span>describe;
@@ -1891,7 +1942,7 @@
     _marker: marker::PhantomData&lt;<span class="kw-2">*mut </span>u8&gt;, <span class="comment">// not at all threadsafe
 </span>}
 
-<span class="kw">const </span>JSIDX_OFFSET: u32 = <span class="number">32</span>; <span class="comment">// keep in sync with js/mod.rs
+<span class="kw">const </span>JSIDX_OFFSET: u32 = <span class="number">128</span>; <span class="comment">// keep in sync with js/mod.rs
 </span><span class="kw">const </span>JSIDX_UNDEFINED: u32 = JSIDX_OFFSET + <span class="number">0</span>;
 <span class="kw">const </span>JSIDX_NULL: u32 = JSIDX_OFFSET + <span class="number">1</span>;
 <span class="kw">const </span>JSIDX_TRUE: u32 = JSIDX_OFFSET + <span class="number">2</span>;
@@ -2146,6 +2197,12 @@
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>is_object(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">unsafe </span>{ __wbindgen_is_object(<span class="self">self</span>.idx) == <span class="number">1 </span>}
+    }
+
+    <span class="doccomment">/// Tests whether this JS value is an instance of Array.
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub fn </span>is_array(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">unsafe </span>{ __wbindgen_is_array(<span class="self">self</span>.idx) == <span class="number">1 </span>}
     }
 
     <span class="doccomment">/// Tests whether the type of this JS value is `function`.
@@ -2579,6 +2636,20 @@
     }
 }
 
+<span class="kw">impl</span>&lt;T&gt; From&lt;<span class="kw-2">*mut </span>T&gt; <span class="kw">for </span>JsValue {
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>from(s: <span class="kw-2">*mut </span>T) -&gt; JsValue {
+        JsValue::from(s <span class="kw">as </span>usize)
+    }
+}
+
+<span class="kw">impl</span>&lt;T&gt; From&lt;<span class="kw-2">*const </span>T&gt; <span class="kw">for </span>JsValue {
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>from(s: <span class="kw-2">*const </span>T) -&gt; JsValue {
+        JsValue::from(s <span class="kw">as </span>usize)
+    }
+}
+
 <span class="macro">if_std! </span>{
     <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String&gt; <span class="kw">for </span>JsValue {
         <span class="attr">#[inline]
@@ -2803,6 +2874,7 @@
         <span class="kw">fn </span>__wbindgen_is_undefined(idx: u32) -&gt; u32;
         <span class="kw">fn </span>__wbindgen_is_symbol(idx: u32) -&gt; u32;
         <span class="kw">fn </span>__wbindgen_is_object(idx: u32) -&gt; u32;
+        <span class="kw">fn </span>__wbindgen_is_array(idx: u32) -&gt; u32;
         <span class="kw">fn </span>__wbindgen_is_function(idx: u32) -&gt; u32;
         <span class="kw">fn </span>__wbindgen_is_string(idx: u32) -&gt; u32;
         <span class="kw">fn </span>__wbindgen_is_bigint(idx: u32) -&gt; u32;
@@ -2853,6 +2925,8 @@
         <span class="kw">fn </span>__wbindgen_json_serialize(idx: u32) -&gt; WasmSlice;
         <span class="kw">fn </span>__wbindgen_jsval_eq(a: u32, b: u32) -&gt; u32;
         <span class="kw">fn </span>__wbindgen_jsval_loose_eq(a: u32, b: u32) -&gt; u32;
+
+        <span class="kw">fn </span>__wbindgen_copy_to_typed_array(ptr: <span class="kw-2">*const </span>u8, len: usize, idx: u32) -&gt; ();
 
         <span class="kw">fn </span>__wbindgen_not(idx: u32) -&gt; u32;
 
@@ -3146,6 +3220,7 @@
 <span class="attr">#[doc(hidden)]
 </span><span class="kw">pub mod </span>__rt {
     <span class="kw">use </span><span class="kw">crate</span>::JsValue;
+    <span class="kw">use </span>core::borrow::{Borrow, BorrowMut};
     <span class="kw">use </span>core::cell::{Cell, UnsafeCell};
     <span class="kw">use </span>core::ops::{Deref, DerefMut};
 
@@ -3265,6 +3340,13 @@
         }
     }
 
+    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;b</span>, T: <span class="question-mark">?</span>Sized&gt; Borrow&lt;T&gt; <span class="kw">for </span>Ref&lt;<span class="lifetime">&#39;b</span>, T&gt; {
+        <span class="attr">#[inline]
+        </span><span class="kw">fn </span>borrow(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+            <span class="self">self</span>.value
+        }
+    }
+
     <span class="kw">impl</span>&lt;<span class="lifetime">&#39;b</span>, T: <span class="question-mark">?</span>Sized&gt; Drop <span class="kw">for </span>Ref&lt;<span class="lifetime">&#39;b</span>, T&gt; {
         <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
             <span class="self">self</span>.borrow.set(<span class="self">self</span>.borrow.get() - <span class="number">1</span>);
@@ -3288,6 +3370,20 @@
     <span class="kw">impl</span>&lt;<span class="lifetime">&#39;b</span>, T: <span class="question-mark">?</span>Sized&gt; DerefMut <span class="kw">for </span>RefMut&lt;<span class="lifetime">&#39;b</span>, T&gt; {
         <span class="attr">#[inline]
         </span><span class="kw">fn </span>deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>T {
+            <span class="self">self</span>.value
+        }
+    }
+
+    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;b</span>, T: <span class="question-mark">?</span>Sized&gt; Borrow&lt;T&gt; <span class="kw">for </span>RefMut&lt;<span class="lifetime">&#39;b</span>, T&gt; {
+        <span class="attr">#[inline]
+        </span><span class="kw">fn </span>borrow(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+            <span class="self">self</span>.value
+        }
+    }
+
+    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;b</span>, T: <span class="question-mark">?</span>Sized&gt; BorrowMut&lt;T&gt; <span class="kw">for </span>RefMut&lt;<span class="lifetime">&#39;b</span>, T&gt; {
+        <span class="attr">#[inline]
+        </span><span class="kw">fn </span>borrow_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>T {
             <span class="self">self</span>.value
         }
     }
@@ -3599,4 +3695,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wasm_bindgen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0 (fc594f156 2023-01-24)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wasm_bindgen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
