@@ -136,6 +136,12 @@ fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut Comple
             {
                 datasource::schemas_completion(completion_list);
             }
+
+            if ctx.connector().provider_name() == "postgresql"
+                && ctx.preview_features().contains(PreviewFeature::PostgresqlExtensions)
+            {
+                datasource::extensions_completion(completion_list);
+            }
         }
 
         ast::SchemaPosition::DataSource(
