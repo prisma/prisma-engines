@@ -4,7 +4,7 @@ use lsp_types::{
     CompletionItem, CompletionItemKind, CompletionList, Documentation, InsertTextFormat, MarkupContent, MarkupKind,
 };
 
-use super::generate_pretty_doc;
+use super::{add_quotes, generate_pretty_doc, CompletionContext};
 
 pub(super) fn schemas_completion(completion_list: &mut CompletionList) {
     completion_list.items.push(CompletionItem {
@@ -172,7 +172,7 @@ pub(super) fn url_quotes_completion(completion_list: &mut CompletionList) {
     })
 }
 
-pub(super) fn url_env_db_completion(completion_list: &mut CompletionList, kind: &str) {
+pub(super) fn url_env_db_completion(completion_list: &mut CompletionList, kind: &str, ctx: CompletionContext<'_>) {
     let text = match kind {
         "url" => "DATABASE_URL",
         "directUrl" => "DIRECT_URL",
@@ -180,9 +180,15 @@ pub(super) fn url_env_db_completion(completion_list: &mut CompletionList, kind: 
         _ => unreachable!(),
     };
 
+    let insert_text = if add_quotes(ctx.params, ctx.db.source()) {
+        format!(r#""{text}""#)
+    } else {
+        text.to_owned()
+    };
+
     completion_list.items.push(CompletionItem {
         label: text.to_owned(),
-        insert_text: Some(text.to_owned()),
+        insert_text: Some(insert_text),
         insert_text_format: Some(InsertTextFormat::PLAIN_TEXT),
         kind: Some(CompletionItemKind::CONSTANT),
         ..Default::default()

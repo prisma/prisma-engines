@@ -164,17 +164,17 @@ fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut Comple
         ast::SchemaPosition::DataSource(
             _source_id,
             ast::SourcePosition::Property("url", ast::PropertyPosition::FunctionValue("env")),
-        ) => datasource::url_env_db_completion(completion_list, "url"),
+        ) => datasource::url_env_db_completion(completion_list, "url", ctx),
 
         ast::SchemaPosition::DataSource(
             _source_id,
             ast::SourcePosition::Property("directUrl", ast::PropertyPosition::FunctionValue("env")),
-        ) => datasource::url_env_db_completion(completion_list, "directUrl"),
+        ) => datasource::url_env_db_completion(completion_list, "directUrl", ctx),
 
         ast::SchemaPosition::DataSource(
             _source_id,
             ast::SourcePosition::Property("shadowDatabaseUrl", ast::PropertyPosition::FunctionValue("env")),
-        ) => datasource::url_env_db_completion(completion_list, "shadowDatabaseUrl"),
+        ) => datasource::url_env_db_completion(completion_list, "shadowDatabaseUrl", ctx),
 
         ast::SchemaPosition::DataSource(_source_id, ast::SourcePosition::Property("url", _))
         | ast::SchemaPosition::DataSource(_source_id, ast::SourcePosition::Property("directUrl", _))
