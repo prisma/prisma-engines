@@ -2,6 +2,7 @@ use enumflags2::BitFlags;
 use log::*;
 use lsp_types::*;
 use psl::{
+    builtin_connectors::PostgresDatasourceProperties,
     datamodel_connector::Connector,
     diagnostics::Span,
     parse_configuration,
@@ -122,23 +123,39 @@ fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut Comple
         }
 
         ast::SchemaPosition::DataSource(_source_id, ast::SourcePosition::Source) => {
-            datasource::provider_completion(completion_list);
-            datasource::url_completion(completion_list);
-            datasource::shadow_db_completion(completion_list);
-            datasource::direct_url_completion(completion_list);
-            datasource::relation_mode_completion(completion_list);
+            if !ds_has_prop(ctx, "provider") {
+                datasource::provider_completion(completion_list);
+            }
+
+            if !ds_has_prop(ctx, "url") {
+                datasource::url_completion(completion_list);
+            }
+
+            if !ds_has_prop(ctx, "shadowDatabaseUrl") {
+                datasource::shadow_db_completion(completion_list);
+            }
+
+            if !ds_has_prop(ctx, "directUrl") {
+                datasource::direct_url_completion(completion_list);
+            }
+
+            if !ds_has_prop(ctx, "relationMode") {
+                datasource::relation_mode_completion(completion_list);
+            }
 
             if ctx
                 .connector()
                 .has_capability(psl::datamodel_connector::ConnectorCapability::MultiSchema)
                 && ctx.namespaces().is_empty()
                 && ctx.preview_features().contains(PreviewFeature::MultiSchema)
+                && !ds_has_prop(ctx, "schemas")
             {
                 datasource::schemas_completion(completion_list);
             }
 
             if ctx.connector().provider_name() == "postgresql"
                 && ctx.preview_features().contains(PreviewFeature::PostgresqlExtensions)
+                && !ds_has_prop(ctx, "extensions")
             {
                 datasource::extensions_completion(completion_list);
             }
@@ -167,6 +184,27 @@ fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut Comple
         }
 
         position => ctx.connector().push_completions(ctx.db, position, completion_list),
+    }
+}
+
+fn ds_has_prop(ctx: CompletionContext<'_>, prop: &str) -> bool {
+    let Some(ds) = ctx.datasource() else { return false };
+
+    match prop {
+        "schemas" => ds.schemas_span.is_some(),
+        "relationMode" => ds.relation_mode.is_some(),
+        "directurl" => ds.direct_url.is_some(),
+        "shadowDatabaseUrl" => ds.shadow_database_url.is_some(),
+        "url" => ds.url_span.end > ds.url_span.start,
+        "provider" => !ds.provider.is_empty(),
+        "extensions" => {
+            if let Some(connector_data) = ds.connector_data.downcast_ref::<PostgresDatasourceProperties>() {
+                return connector_data.extensions().is_some();
+            }
+
+            false
+        }
+        _ => false,
     }
 }
 
