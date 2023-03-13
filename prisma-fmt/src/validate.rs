@@ -120,10 +120,15 @@ mod tests {
           }
         "#;
 
+        let request = json!({
+            "prismaSchema": schema,
+        });
+
         let expected = expect![[
             r#"{"error_code":"P1012","message":"\u001b[1;91merror\u001b[0m: \u001b[1mThe `referentialIntegrity` and `relationMode` attributes cannot be used together. Please use only `relationMode` instead.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:6\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m              relationMode = \"prisma\"\n\u001b[1;94m 6 | \u001b[0m              \u001b[1;91mreferentialIntegrity = \"foreignKeys\"\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\nValidation Error Count: 1"}"#
         ]];
-        let response = run(schema).unwrap_err();
+
+        let response = validate(&request.to_string()).unwrap_err();
         expected.assert_eq(&response);
     }
 }
