@@ -107,7 +107,6 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
     // @@unique compound fields.
     let compound_uniques: Vec<_> = model
         .unique_indexes()
-        .into_iter()
         .filter(|index| index.fields().len() > 1)
         .map(|index| {
             let fields = index
@@ -255,7 +254,7 @@ pub(crate) fn composite_equality_object(ctx: &mut BuilderContext, cf: &Composite
     let mut fields = vec![];
 
     let composite_type = cf.typ();
-    let input_fields = composite_type.fields().into_iter().map(|f| match f {
+    let input_fields = composite_type.fields().map(|f| match f {
         ModelField::Scalar(sf) => input_field(sf.name(), map_scalar_input_type_for_field(ctx, &sf), None)
             .optional_if(!sf.is_required())
             .nullable_if(!sf.is_required() && !sf.is_list()),

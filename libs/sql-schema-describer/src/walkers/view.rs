@@ -26,9 +26,7 @@ impl<'a> ViewWalker<'a> {
 
     /// Traverse the view's columns.
     pub fn columns(self) -> impl ExactSizeIterator<Item = ViewColumnWalker<'a>> {
-        self.columns_range()
-            .into_iter()
-            .map(move |idx| self.walk(ViewColumnId(idx as u32)))
+        self.columns_range().map(move |idx| self.walk(ViewColumnId(idx as u32)))
     }
 
     fn columns_range(self) -> Range<usize> {

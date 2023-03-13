@@ -161,7 +161,6 @@ impl Record {
     ) -> crate::Result<SelectionResult> {
         let pairs: Vec<_> = extraction_selection
             .selections()
-            .into_iter()
             .map(|selection| {
                 self.get_field_value(field_names, selection.db_name())
                     .and_then(|val| Ok((selection.clone(), selection.coerce_value(val.clone())?)))
@@ -178,7 +177,6 @@ impl Record {
     ) -> crate::Result<Vec<&PrismaValue>> {
         let x: Vec<&PrismaValue> = model_projection
             .fields()
-            .into_iter()
             .flat_map(|field| {
                 field
                     .scalar_fields()

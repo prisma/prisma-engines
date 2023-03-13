@@ -47,7 +47,6 @@ impl IdFragment {
         let field_name = field_name.into_value_string()?;
         let field_type = field_type.into_value_string()?;
         let directives = args
-            .into_iter()
             .map(|arg| arg.into_directive())
             .collect::<TemplatingResult<Vec<_>>>()?;
 

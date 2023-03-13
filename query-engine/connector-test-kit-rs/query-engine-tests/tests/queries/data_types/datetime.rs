@@ -13,7 +13,7 @@ mod datetime {
                 let res = run_query!(runner, r#"{ findUniqueTestModel(where: { id: 1 }) { dt } }"#);
 
                 insta::assert_snapshot!(
-                  res.to_string(),
+                  res,
                   @r###"{"data":{"findUniqueTestModel":{"dt":"1900-10-10T01:10:10.001Z"}}}"###
                 );
             }
@@ -54,7 +54,7 @@ mod datetime {
                 let res = run_query!(runner, r#"{ findManyTestModel { dt } }"#);
 
                 insta::assert_snapshot!(
-                  res.to_string(),
+                  res,
                   @r###"{"data":{"findManyTestModel":[{"dt":"1900-10-10T01:10:10.001Z"},{"dt":"1969-01-01T10:33:59.000Z"},{"dt":null}]}}"###
                 );
             }

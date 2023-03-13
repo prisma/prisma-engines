@@ -165,7 +165,7 @@ pub(crate) async fn create_records(
 
     // Compute the set of fields affected by the createMany.
     let mut fields = HashSet::new();
-    args.iter().for_each(|arg| fields.extend(arg.keys().into_iter()));
+    args.iter().for_each(|arg| fields.extend(arg.keys()));
 
     #[allow(clippy::mutable_key_type)]
     let affected_fields: HashSet<ScalarFieldRef> = fields

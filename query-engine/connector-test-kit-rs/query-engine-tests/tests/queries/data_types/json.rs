@@ -13,7 +13,7 @@ mod json {
                 let res = run_query!(runner, r#"{ findUniqueTestModel(where: { id: 1 }) { json } }"#);
 
                 insta::assert_snapshot!(
-                  res.to_string(),
+                  res,
                   @r###"{"data":{"findUniqueTestModel":{"json":"{}"}}}"###
                 );
             }
@@ -54,7 +54,7 @@ mod json {
                 let res = run_query!(runner, r#"{ findManyTestModel { json } }"#);
 
                 insta::assert_snapshot!(
-                  res.to_string(),
+                  res,
                   @r###"{"data":{"findManyTestModel":[{"json":"{}"},{"json":"{\"a\":\"b\"}"},{"json":"1"},{"json":"\"hello\""},{"json":"[1,\"a\",{\"b\":true}]"}]}}"###
                 );
             }
@@ -93,7 +93,7 @@ mod json {
                 let res = run_query!(runner, r#"{ findManyTestModel { json } }"#);
 
                 insta::assert_snapshot!(
-                  res.to_string(),
+                  res,
                   @r###"{"data":{"findManyTestModel":[{"json":null},{"json":"null"}]}}"###
                 );
             }
@@ -123,11 +123,11 @@ mod json {
     }
 
     async fn create_test_data(runner: &Runner) -> TestResult<()> {
-        create_row(&runner, r#"{ id: 1, json: "{}" }"#).await?;
-        create_row(&runner, r#"{ id: 2, json: "{\"a\":\"b\"}" }"#).await?;
-        create_row(&runner, r#"{ id: 3, json: "1" }"#).await?;
-        create_row(&runner, r#"{ id: 4, json: "\"hello\"" }"#).await?;
-        create_row(&runner, r#"{ id: 5, json: "[1, \"a\", {\"b\": true}]" }"#).await?;
+        create_row(runner, r#"{ id: 1, json: "{}" }"#).await?;
+        create_row(runner, r#"{ id: 2, json: "{\"a\":\"b\"}" }"#).await?;
+        create_row(runner, r#"{ id: 3, json: "1" }"#).await?;
+        create_row(runner, r#"{ id: 4, json: "\"hello\"" }"#).await?;
+        create_row(runner, r#"{ id: 5, json: "[1, \"a\", {\"b\": true}]" }"#).await?;
 
         Ok(())
     }

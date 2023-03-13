@@ -84,7 +84,7 @@ source .test_database_urls/mysql_5_6
         database_url = format!("{}.db", sqlite_test_url(test_function_name));
 
         let file = database_url.trim_start_matches("file:");
-        std::fs::remove_file(&file).ok();
+        std::fs::remove_file(file).ok();
     }
 
     let conn = tok(Quaint::new(&database_url)).unwrap();

@@ -26,13 +26,12 @@ impl<'a> TableWalker<'a> {
     /// Traverse the table's columns.
     pub fn columns(self) -> impl ExactSizeIterator<Item = TableColumnWalker<'a>> {
         self.columns_range()
-            .into_iter()
             .map(move |idx| self.walk(TableColumnId(idx as u32)))
     }
 
     /// The number of foreign key constraints on the table.
     pub fn foreign_key_count(self) -> usize {
-        self.foreign_keys_range().into_iter().len()
+        self.foreign_keys_range().len()
     }
 
     /// Traverse the indexes on the table.

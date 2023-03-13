@@ -31,7 +31,7 @@ mod enum_type {
                 let res = run_query!(runner, r#"{ findUniqueTestModel(where: { id: 1 }) { my_enum } }"#);
 
                 insta::assert_snapshot!(
-                  res.to_string(),
+                  res,
                   @r###"{"data":{"findUniqueTestModel":{"my_enum":"A"}}}"###
                 );
             }
@@ -72,7 +72,7 @@ mod enum_type {
                 let res = run_query!(runner, r#"{ findManyTestModel { my_enum } }"#);
 
                 insta::assert_snapshot!(
-                  res.to_string(),
+                  res,
                   @r###"{"data":{"findManyTestModel":[{"my_enum":"A"},{"my_enum":"B"},{"my_enum":null}]}}"###
                 );
             }
