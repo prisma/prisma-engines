@@ -115,9 +115,27 @@ pub(super) fn provider_completion(completion_list: &mut CompletionList) {
     })
 }
 
+pub(super) fn extensions_completion(completion_list: &mut CompletionList) {
+    completion_list.items.push(CompletionItem {
+        label: "extensions".to_owned(),
+        insert_text: Some("extensions = [$0]".to_owned()),
+        insert_text_format: Some(InsertTextFormat::SNIPPET),
+        kind: Some(CompletionItemKind::FIELD),
+        documentation: Some(Documentation::MarkupContent(MarkupContent {
+            kind: MarkupKind::Markdown,
+            value: generate_pretty_doc(
+                r#"extensions = [pg_trgm, postgis(version: "2.1")]"#,
+                r#"Enable PostgreSQL extensions. [Learn more](https://pris.ly/d/postgresql-extensions)"#,
+                None,
+            ),
+        })),
+        ..Default::default()
+    })
+}
+
 pub(super) fn url_env_completion(completion_list: &mut CompletionList) {
     completion_list.items.push(CompletionItem {
-        label: "env".to_owned(),
+        label: "env()".to_owned(),
         insert_text: Some(r#"env($0)"#.to_owned()),
         insert_text_format: Some(InsertTextFormat::SNIPPET),
         kind: Some(CompletionItemKind::PROPERTY),
@@ -166,7 +184,7 @@ pub(super) fn url_env_db_completion(completion_list: &mut CompletionList, kind: 
         label: text.to_owned(),
         insert_text: Some(text.to_owned()),
         insert_text_format: Some(InsertTextFormat::PLAIN_TEXT),
-        kind: Some(CompletionItemKind::PROPERTY),
+        kind: Some(CompletionItemKind::CONSTANT),
         ..Default::default()
     })
 }
