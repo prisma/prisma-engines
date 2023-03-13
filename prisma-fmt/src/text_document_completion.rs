@@ -188,23 +188,25 @@ fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut Comple
 }
 
 fn ds_has_prop(ctx: CompletionContext<'_>, prop: &str) -> bool {
-    let Some(ds) = ctx.datasource() else { return false };
+    if let Some(ds) = ctx.datasource() {
+        match prop {
+            "schemas" => ds.schemas_span.is_some(),
+            "relationMode" => ds.relation_mode.is_some(),
+            "directurl" => ds.direct_url.is_some(),
+            "shadowDatabaseUrl" => ds.shadow_database_url.is_some(),
+            "url" => ds.url_span.end > ds.url_span.start,
+            "provider" => !ds.provider.is_empty(),
+            "extensions" => {
+                if let Some(connector_data) = ds.connector_data.downcast_ref::<PostgresDatasourceProperties>() {
+                    return connector_data.extensions().is_some();
+                }
 
-    match prop {
-        "schemas" => ds.schemas_span.is_some(),
-        "relationMode" => ds.relation_mode.is_some(),
-        "directurl" => ds.direct_url.is_some(),
-        "shadowDatabaseUrl" => ds.shadow_database_url.is_some(),
-        "url" => ds.url_span.end > ds.url_span.start,
-        "provider" => !ds.provider.is_empty(),
-        "extensions" => {
-            if let Some(connector_data) = ds.connector_data.downcast_ref::<PostgresDatasourceProperties>() {
-                return connector_data.extensions().is_some();
+                false
             }
-
-            false
+            _ => false,
         }
-        _ => false,
+    } else {
+        false
     }
 }
 
