@@ -3,7 +3,7 @@
   "items": [
     {
       "label": "DATABASE_URL",
-      "kind": 10,
+      "kind": 21,
       "insertText": "DATABASE_URL",
       "insertTextFormat": 1
     }
