@@ -3,7 +3,7 @@
   "items": [
     {
       "label": "SHADOW_DATABASE_URL",
-      "kind": 10,
+      "kind": 21,
       "insertText": "SHADOW_DATABASE_URL",
       "insertTextFormat": 1
     }
