@@ -8,7 +8,7 @@ use prisma_models::{FieldSelection, ManyRecords, Record, RelationFieldRef, Selec
 use prisma_value::PrismaValue;
 use std::collections::HashMap;
 
-pub async fn m2m(
+pub(crate) async fn m2m(
     tx: &mut dyn ConnectionLike,
     query: &RelatedRecordsQuery,
     parent_result: Option<&ManyRecords>,

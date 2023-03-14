@@ -12,14 +12,15 @@ mod internal;
 mod ir_serializer;
 mod response;
 
+pub use response::*;
+
+pub(crate) use ir_serializer::*;
+
 use crate::ArgumentValue;
 use indexmap::IndexMap;
 use prisma_models::PrismaValue;
 use serde::ser::{Serialize, SerializeMap, SerializeSeq, Serializer};
 use std::{collections::HashMap, fmt, sync::Arc};
-
-pub use ir_serializer::*;
-pub use response::*;
 
 /// A `key -> value` map to an IR item
 pub type Map = IndexMap<String, Item>;

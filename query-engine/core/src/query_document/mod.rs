@@ -22,13 +22,13 @@ mod parser;
 mod selection;
 mod transformers;
 
-pub use argument_value::*;
-pub use error::*;
-pub use operation::*;
-pub use parse_ast::*;
-pub use parser::*;
-pub use selection::*;
-pub use transformers::*;
+pub use argument_value::{ArgumentValue, ArgumentValueObject};
+pub use operation::Operation;
+pub use selection::{In, Selection, SelectionArgument, SelectionSet};
+
+pub(crate) use error::*;
+pub(crate) use parse_ast::*;
+pub(crate) use parser::*;
 
 use crate::query_graph_builder::resolve_compound_field;
 use prisma_models::ModelRef;
@@ -36,7 +36,7 @@ use schema::QuerySchemaRef;
 use schema_builder::constants::*;
 use std::collections::HashMap;
 
-pub type QueryParserResult<T> = std::result::Result<T, QueryParserError>;
+pub(crate) type QueryParserResult<T> = std::result::Result<T, QueryParserError>;
 
 #[derive(Debug)]
 pub enum QueryDocument {

@@ -8,14 +8,14 @@ use std::borrow::Borrow;
 pub struct IrSerializer {
     /// Serialization key for root DataItem
     /// Note: This will change
-    pub key: String,
+    pub(crate) key: String,
 
     /// Output field describing the possible shape of the result
-    pub output_field: OutputFieldRef,
+    pub(crate) output_field: OutputFieldRef,
 }
 
 impl IrSerializer {
-    pub fn serialize(&self, result: ExpressionResult) -> crate::Result<ResponseData> {
+    pub(crate) fn serialize(&self, result: ExpressionResult) -> crate::Result<ResponseData> {
         let _span = info_span!("prisma:engine:serialize", user_facing = true);
         match result {
             ExpressionResult::Query(QueryResult::Json(json)) => {
