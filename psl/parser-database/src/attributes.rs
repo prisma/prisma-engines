@@ -12,12 +12,17 @@ use crate::{
         EnumAttributes, FieldWithArgs, IndexAlgorithm, IndexAttribute, IndexFieldPath, IndexType, ModelAttributes,
         OperatorClassStore, RelationField, ScalarField, ScalarFieldType, SortOrder,
     },
+    walkers::RelationFieldId,
     DatamodelError, StringId,
 };
 use diagnostics::Span;
 use std::borrow::Cow;
 
 pub(super) fn resolve_attributes(ctx: &mut Context<'_>) {
+    for rfid in ctx.types.iter_relation_field_ids() {
+        visit_relation_field_attributes(rfid, ctx);
+    }
+
     for top in ctx.ast.iter_tops() {
         match top {
             (ast::TopId::Model(model_id), ast::Top::Model(model)) => resolve_model_attributes(model_id, model, ctx),
@@ -126,15 +131,6 @@ fn resolve_model_attributes<'db>(model_id: ast::ModelId, ast_model: &'db ast::Mo
             );
 
             ctx.types.scalar_fields.insert((model_id, field_id), scalar_field);
-        } else if let Some(mut rf) = ctx.types.take_relation_field(model_id, field_id) {
-            visit_relation_field_attributes(model_id, field_id, ast_field, &mut rf, ctx);
-            ctx.types.relation_fields.insert((model_id, field_id), rf);
-        } else {
-            unreachable!(
-                "{}.{} is neither a scalar field nor a relation field",
-                ast_model.name(),
-                ast_field.name()
-            )
         }
     }
 
@@ -327,19 +323,15 @@ fn visit_field_unique(field_id: ast::FieldId, model_attributes: &mut ModelAttrib
     ))
 }
 
-fn visit_relation_field_attributes<'db>(
-    model_id: ast::ModelId,
-    field_id: ast::FieldId,
-    ast_field: &'db ast::Field,
-    relation_field: &mut RelationField,
-    ctx: &mut Context<'db>,
-) {
+fn visit_relation_field_attributes(rfid: RelationFieldId, ctx: &mut Context<'_>) {
+    let RelationField { model_id, field_id, .. } = ctx.types[rfid];
+    let ast_field = &ctx.ast[model_id][field_id];
     ctx.visit_attributes((model_id, field_id).into());
 
     // @relation
     // Relation attributes are not required at this stage.
     if ctx.visit_optional_single_attr("relation") {
-        visit_relation(model_id, relation_field, ctx);
+        visit_relation(model_id, rfid, ctx);
         ctx.validate_visited_arguments();
     }
 
@@ -355,7 +347,7 @@ fn visit_relation_field_attributes<'db>(
 
     // @ignore
     if ctx.visit_optional_single_attr("ignore") {
-        relation_field.is_ignored = true;
+        ctx.types[rfid].is_ignored = true;
         ctx.validate_visited_arguments();
     }
 
@@ -379,7 +371,7 @@ fn visit_relation_field_attributes<'db>(
     if ctx.visit_optional_single_attr("unique") {
         let mut suggested_fields = Vec::new();
 
-        for underlying_field in relation_field.fields.iter().flatten() {
+        for underlying_field in ctx.types[rfid].fields.iter().flatten() {
             suggested_fields.push(ctx.ast[model_id][*underlying_field].name());
         }
 
@@ -641,8 +633,16 @@ fn common_index_validations(
                 let mut suggested_fields = Vec::new();
 
                 for (_, field_id) in &relation_fields {
-                    let relation_field = &ctx.types.relation_fields[&(model_id, *field_id)];
-                    for underlying_field in relation_field.fields.iter().flatten() {
+                    let fields = ctx
+                        .types
+                        .range_model_relation_fields(model_id)
+                        .find(|(_, rf)| rf.field_id == *field_id)
+                        .unwrap()
+                        .1
+                        .fields
+                        .iter()
+                        .flatten();
+                    for underlying_field in fields {
                         suggested_fields.push(ctx.ast[model_id][*underlying_field].name());
                     }
                 }
@@ -674,9 +674,9 @@ fn common_index_validations(
 }
 
 /// @relation validation for relation fields.
-fn visit_relation(model_id: ast::ModelId, relation_field: &mut RelationField, ctx: &mut Context<'_>) {
+fn visit_relation(model_id: ast::ModelId, relation_field_id: RelationFieldId, ctx: &mut Context<'_>) {
     let attr = ctx.current_attribute();
-    relation_field.relation_attribute = Some(ctx.current_attribute_id());
+    ctx.types[relation_field_id].relation_attribute = Some(ctx.current_attribute_id());
 
     if let Some(fields) = ctx.visit_optional_arg("fields") {
         let fields = match resolve_field_array_without_args(fields, attr.span, model_id, ctx) {
@@ -714,14 +714,14 @@ fn visit_relation(model_id: ast::ModelId, relation_field: &mut RelationField, ct
             }
         };
 
-        relation_field.fields = Some(fields);
+        ctx.types[relation_field_id].fields = Some(fields);
     }
 
     if let Some(references) = ctx.visit_optional_arg("references") {
         let references = match resolve_field_array_without_args(
             references,
             attr.span,
-            relation_field.referenced_model,
+            ctx.types[relation_field_id].referenced_model,
             ctx,
         ) {
             Ok(references) => references,
@@ -731,7 +731,7 @@ fn visit_relation(model_id: ast::ModelId, relation_field: &mut RelationField, ct
                 unknown_fields,
             }) => {
                 if !unknown_fields.is_empty() {
-                    let model_name = ctx.ast[relation_field.referenced_model].name();
+                    let model_name = ctx.ast[ctx.types[relation_field_id].referenced_model].name();
 
                     let field_names = unknown_fields
                         .into_iter()
@@ -749,7 +749,7 @@ fn visit_relation(model_id: ast::ModelId, relation_field: &mut RelationField, ct
                 if !relation_fields.is_empty() {
                     let msg = format!(
                         "The argument `references` must refer only to scalar fields in the related model `{}`. But it is referencing the following relation fields: {}",
-                        ctx.ast[relation_field.referenced_model].name(),
+                        ctx.ast[ctx.types[relation_field_id].referenced_model].name(),
                         relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", "),
                     );
                     ctx.push_error(DatamodelError::new_validation_error(&msg, attr.span));
@@ -759,7 +759,7 @@ fn visit_relation(model_id: ast::ModelId, relation_field: &mut RelationField, ct
             }
         };
 
-        relation_field.references = Some(references);
+        ctx.types[relation_field_id].references = Some(references);
     }
 
     // Validate the `name` argument if present.
@@ -771,7 +771,7 @@ fn visit_relation(model_id: ast::ModelId, relation_field: &mut RelationField, ct
         Some("") => ctx.push_attribute_validation_error("A relation cannot have an empty name."),
         Some(name) => {
             let interned_name = ctx.interner.intern(name);
-            relation_field.name = Some(interned_name);
+            ctx.types[relation_field_id].name = Some(interned_name);
         }
         None => (),
     }
@@ -779,13 +779,13 @@ fn visit_relation(model_id: ast::ModelId, relation_field: &mut RelationField, ct
     // Validate referential actions.
     if let Some(on_delete) = ctx.visit_optional_arg("onDelete") {
         if let Some(action) = crate::ReferentialAction::try_from_expression(on_delete, ctx.diagnostics) {
-            relation_field.on_delete = Some((action, on_delete.span()));
+            ctx.types[relation_field_id].on_delete = Some((action, on_delete.span()));
         }
     }
 
     if let Some(on_update) = ctx.visit_optional_arg("onUpdate") {
         if let Some(action) = crate::ReferentialAction::try_from_expression(on_update, ctx.diagnostics) {
-            relation_field.on_update = Some((action, on_update.span()));
+            ctx.types[relation_field_id].on_update = Some((action, on_update.span()));
         }
     }
 
@@ -805,7 +805,7 @@ fn visit_relation(model_id: ast::ModelId, relation_field: &mut RelationField, ct
         mapped_name
     };
 
-    relation_field.mapped_name = fk_name;
+    ctx.types[relation_field_id].mapped_name = fk_name;
 }
 
 #[derive(Debug)]

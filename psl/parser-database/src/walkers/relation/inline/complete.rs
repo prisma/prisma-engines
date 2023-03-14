@@ -1,16 +1,15 @@
-use schema_ast::ast;
-
 use crate::{
-    walkers::{ModelWalker, RelationFieldWalker, ScalarFieldId, ScalarFieldWalker},
+    walkers::{ModelWalker, RelationFieldId, RelationFieldWalker, ScalarFieldId, ScalarFieldWalker},
     ParserDatabase, ReferentialAction,
 };
+use schema_ast::ast;
 
 /// Represents a relation that has fields and references defined in one of the
 /// relation fields. Includes 1:1 and 1:n relations that are defined from both sides.
 #[derive(Copy, Clone)]
 pub struct CompleteInlineRelationWalker<'db> {
-    pub(crate) side_a: (ast::ModelId, ast::FieldId),
-    pub(crate) side_b: (ast::ModelId, ast::FieldId),
+    pub(crate) side_a: RelationFieldId,
+    pub(crate) side_b: RelationFieldId,
     pub(crate) db: &'db ParserDatabase,
 }
 
@@ -18,22 +17,20 @@ pub struct CompleteInlineRelationWalker<'db> {
 impl<'db> CompleteInlineRelationWalker<'db> {
     /// The model that defines the relation fields and actions.
     pub fn referencing_model(self) -> ModelWalker<'db> {
-        self.db.walk(self.side_a.0)
+        self.db.walk(self.side_a).model()
     }
 
     /// The implicit relation side.
     pub fn referenced_model(self) -> ModelWalker<'db> {
-        self.db.walk(self.side_b.0)
+        self.db.walk(self.side_b).model()
     }
 
     pub fn referencing_field(self) -> RelationFieldWalker<'db> {
-        self.db
-            .walk(crate::walkers::RelationFieldId(self.side_a.0, self.side_a.1))
+        self.db.walk(self.side_a)
     }
 
     pub fn referenced_field(self) -> RelationFieldWalker<'db> {
-        self.db
-            .walk(crate::walkers::RelationFieldId(self.side_b.0, self.side_b.1))
+        self.db.walk(self.side_b)
     }
 
     /// The scalar fields defining the relation on the referenced model.

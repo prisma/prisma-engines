@@ -6,8 +6,8 @@ pub use primary_key::*;
 pub(crate) use unique_criteria::*;
 
 use super::{
-    CompleteInlineRelationWalker, FieldWalker, IndexWalker, InlineRelationWalker, RelationFieldId, RelationFieldWalker,
-    RelationWalker, ScalarFieldWalker,
+    CompleteInlineRelationWalker, FieldWalker, IndexWalker, InlineRelationWalker, RelationFieldWalker, RelationWalker,
+    ScalarFieldWalker,
 };
 use crate::{
     ast::{self, WithName},
@@ -184,9 +184,8 @@ impl<'db> ModelWalker<'db> {
 
         self.db
             .types
-            .relation_fields
-            .range((model_id, ast::FieldId::MIN)..=(model_id, ast::FieldId::MAX))
-            .map(move |((_, field_id), _)| self.walk(RelationFieldId(model_id, *field_id)))
+            .range_model_relation_fields(model_id)
+            .map(move |(id, _)| self.walk(id))
     }
 
     /// All relations that start from this model.
