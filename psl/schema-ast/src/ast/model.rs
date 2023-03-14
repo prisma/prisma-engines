@@ -76,8 +76,6 @@ pub struct Model {
     pub(crate) is_view: bool,
     /// The location of this model in the text representation.
     pub(crate) span: Span,
-    // The span of the inner contents.
-    // pub(crate) inner_span: Span,
 }
 
 impl Model {
