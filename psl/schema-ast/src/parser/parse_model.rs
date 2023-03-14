@@ -13,7 +13,6 @@ pub(crate) fn parse_model(pair: Pair<'_>, doc_comment: Option<Pair<'_>>, diagnos
     let mut name: Option<Identifier> = None;
     let mut attributes: Vec<Attribute> = Vec::new();
     let mut fields: Vec<Field> = Vec::new();
-    let mut inner_span: Option<Span> = None;
 
     for current in pair.into_inner() {
         match current.as_rule() {
@@ -21,7 +20,6 @@ pub(crate) fn parse_model(pair: Pair<'_>, doc_comment: Option<Pair<'_>>, diagnos
             Rule::identifier => name = Some(current.into()),
             Rule::model_contents => {
                 let mut pending_field_comment: Option<Pair<'_>> = None;
-                inner_span = Some(current.as_span().into());
 
                 for item in current.into_inner() {
                     match item.as_rule() {
@@ -57,7 +55,6 @@ pub(crate) fn parse_model(pair: Pair<'_>, doc_comment: Option<Pair<'_>>, diagnos
             documentation: doc_comment.and_then(parse_comment_block),
             is_view: false,
             span: Span::from(pair_span),
-            inner_span: inner_span.unwrap(),
         },
         _ => panic!("Encountered impossible model declaration during parsing",),
     }

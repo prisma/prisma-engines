@@ -6,14 +6,13 @@ use super::{
     Rule,
 };
 use crate::ast::{self, Attribute};
-use diagnostics::{DatamodelError, Diagnostics, Span};
+use diagnostics::{DatamodelError, Diagnostics};
 
 pub(crate) fn parse_view(pair: Pair<'_>, doc_comment: Option<Pair<'_>>, diagnostics: &mut Diagnostics) -> ast::Model {
     let pair_span = pair.as_span();
     let mut name: Option<ast::Identifier> = None;
     let mut fields: Vec<ast::Field> = vec![];
     let mut attributes: Vec<Attribute> = Vec::new();
-    let mut inner_span: Option<Span> = None;
 
     for current in pair.into_inner() {
         match current.as_rule() {
@@ -21,7 +20,6 @@ pub(crate) fn parse_view(pair: Pair<'_>, doc_comment: Option<Pair<'_>>, diagnost
             Rule::identifier => name = Some(current.into()),
             Rule::model_contents => {
                 let mut pending_field_comment: Option<Pair<'_>> = None;
-                inner_span = Some(current.as_span().into());
 
                 for item in current.into_inner() {
                     match item.as_rule() {
@@ -57,7 +55,6 @@ pub(crate) fn parse_view(pair: Pair<'_>, doc_comment: Option<Pair<'_>>, diagnost
             documentation: doc_comment.and_then(parse_comment_block),
             is_view: true,
             span: ast::Span::from(pair_span),
-            inner_span: inner_span.unwrap(),
         },
         _ => panic!("Encountered impossible model declaration during parsing",),
     }
