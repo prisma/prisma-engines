@@ -528,12 +528,6 @@
 <a href="#528" id="528">528</a>
 <a href="#529" id="529">529</a>
 <a href="#530" id="530">530</a>
-<a href="#531" id="531">531</a>
-<a href="#532" id="532">532</a>
-<a href="#533" id="533">533</a>
-<a href="#534" id="534">534</a>
-<a href="#535" id="535">535</a>
-<a href="#536" id="536">536</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::{<span class="self">self</span>, WithName},
     interner::StringId,
@@ -551,7 +545,7 @@
 </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>infer_relations(ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
     <span class="kw">let </span><span class="kw-2">mut </span>relations = Relations::default();
 
-    <span class="kw">for </span>rf <span class="kw">in </span>ctx.types.relation_fields.iter() {
+    <span class="kw">for </span>rf <span class="kw">in </span>ctx.types.iter_relation_fields() {
         <span class="kw">let </span>evidence = relation_evidence(rf, ctx);
         ingest_relation(evidence, <span class="kw-2">&amp;mut </span>relations, ctx);
     }
@@ -672,33 +666,33 @@
 
 <span class="attr">#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
 </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum </span>OneToManyRelationFields {
-    Forward(ast::FieldId),
-    Back(ast::FieldId),
-    Both(ast::FieldId, ast::FieldId),
+    Forward(RelationFieldId),
+    Back(RelationFieldId),
+    Both(RelationFieldId, RelationFieldId),
 }
 
 <span class="attr">#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
 </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum </span>OneToOneRelationFields {
-    Forward(ast::FieldId),
-    Both(ast::FieldId, ast::FieldId),
+    Forward(RelationFieldId),
+    Both(RelationFieldId, RelationFieldId),
 }
 
 <span class="attr">#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
 </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum </span>RelationAttributes {
     ImplicitManyToMany {
-        field_a: ast::FieldId,
-        field_b: ast::FieldId,
+        field_a: RelationFieldId,
+        field_b: RelationFieldId,
     },
     TwoWayEmbeddedManyToMany {
-        field_a: ast::FieldId,
-        field_b: ast::FieldId,
+        field_a: RelationFieldId,
+        field_b: RelationFieldId,
     },
     OneToOne(OneToOneRelationFields),
     OneToMany(OneToManyRelationFields),
 }
 
 <span class="kw">impl </span>RelationAttributes {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="prelude-ty">Option</span>&lt;ast::FieldId&gt;, <span class="prelude-ty">Option</span>&lt;ast::FieldId&gt;) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="prelude-ty">Option</span>&lt;RelationFieldId&gt;, <span class="prelude-ty">Option</span>&lt;RelationFieldId&gt;) {
         <span class="kw">match </span><span class="self">self </span>{
             RelationAttributes::ImplicitManyToMany { field_a, field_b }
             | RelationAttributes::TwoWayEmbeddedManyToMany { field_a, field_b }
@@ -727,7 +721,7 @@
         <span class="macro">matches!</span>(<span class="self">self</span>.attributes, RelationAttributes::ImplicitManyToMany { .. })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>as_complete_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(ast::FieldId, ast::FieldId)&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>as_complete_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(RelationFieldId, RelationFieldId)&gt; {
         <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.attributes {
             RelationAttributes::ImplicitManyToMany { field_a, field_b } =&gt; <span class="prelude-val">Some</span>((<span class="kw-2">*</span>field_a, <span class="kw-2">*</span>field_b)),
             RelationAttributes::TwoWayEmbeddedManyToMany { field_a, field_b } =&gt; <span class="prelude-val">Some</span>((<span class="kw-2">*</span>field_a, <span class="kw-2">*</span>field_b)),
@@ -749,35 +743,34 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) ast_model: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Model,
     <span class="kw">pub</span>(<span class="kw">super</span>) model_id: ast::ModelId,
     <span class="kw">pub</span>(<span class="kw">super</span>) ast_field: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Field,
-    <span class="kw">pub</span>(<span class="kw">super</span>) field_id: ast::FieldId,
+    <span class="kw">pub</span>(<span class="kw">super</span>) field_id: RelationFieldId,
     <span class="kw">pub</span>(<span class="kw">super</span>) is_self_relation: bool,
     <span class="kw">pub</span>(<span class="kw">super</span>) is_two_way_embedded_many_to_many_relation: bool,
     <span class="kw">pub</span>(<span class="kw">super</span>) relation_field: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>RelationField,
     <span class="kw">pub</span>(<span class="kw">super</span>) opposite_model: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Model,
-    <span class="kw">pub</span>(<span class="kw">super</span>) opposite_relation_field: <span class="prelude-ty">Option</span>&lt;(ast::FieldId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Field, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>RelationField)&gt;,
+    <span class="kw">pub</span>(<span class="kw">super</span>) opposite_relation_field: <span class="prelude-ty">Option</span>&lt;(RelationFieldId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Field, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>RelationField)&gt;,
 }
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>relation_evidence&lt;<span class="lifetime">&#39;db</span>&gt;(
-    ((model_id, field_id), relation_field): (<span class="kw-2">&amp;</span>(ast::ModelId, ast::FieldId), <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>RelationField),
+    (relation_field_id, relation_field): (RelationFieldId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>RelationField),
     ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>Context&lt;<span class="lifetime">&#39;db</span>&gt;,
 ) -&gt; RelationEvidence&lt;<span class="lifetime">&#39;db</span>&gt; {
     <span class="kw">let </span>ast = ctx.ast;
-    <span class="kw">let </span>ast_model = <span class="kw-2">&amp;</span>ast[<span class="kw-2">*</span>model_id];
-    <span class="kw">let </span>ast_field = <span class="kw-2">&amp;</span>ast_model[<span class="kw-2">*</span>field_id];
+    <span class="kw">let </span>ast_model = <span class="kw-2">&amp;</span>ast[relation_field.model_id];
+    <span class="kw">let </span>ast_field = <span class="kw-2">&amp;</span>ast_model[relation_field.field_id];
     <span class="kw">let </span>opposite_model = <span class="kw-2">&amp;</span>ast[relation_field.referenced_model];
-    <span class="kw">let </span>is_self_relation = <span class="kw-2">*</span>model_id == relation_field.referenced_model;
-    <span class="kw">let </span>opposite_relation_field: <span class="prelude-ty">Option</span>&lt;(ast::FieldId, <span class="kw-2">&amp;</span>ast::Field, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>RelationField)&gt; = ctx
+    <span class="kw">let </span>is_self_relation = relation_field.model_id == relation_field.referenced_model;
+    <span class="kw">let </span>opposite_relation_field: <span class="prelude-ty">Option</span>&lt;(RelationFieldId, <span class="kw-2">&amp;</span>ast::Field, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>RelationField)&gt; = ctx
         .types
-        .relation_fields
-        .range(
-            (relation_field.referenced_model, ast::FieldId::MIN)..(relation_field.referenced_model, ast::FieldId::MAX),
-        )
+        .range_model_relation_fields(relation_field.referenced_model)
         <span class="comment">// Only considers relations between the same models
-        </span>.filter(|(<span class="kw">_</span>, opposite_relation_field)| opposite_relation_field.referenced_model == <span class="kw-2">*</span>model_id)
+        </span>.filter(|(<span class="kw">_</span>, opposite_relation_field)| opposite_relation_field.referenced_model == relation_field.model_id)
         <span class="comment">// Filter out the field itself, in case of self-relations
-        </span>.filter(|((<span class="kw">_</span>, opp_relation_field_id), <span class="kw">_</span>)| !is_self_relation || opp_relation_field_id != field_id)
+        </span>.filter(|(<span class="kw">_</span>, opposite_relation_field)| {
+            !is_self_relation || opposite_relation_field.field_id != relation_field.field_id
+        })
         .find(|(<span class="kw">_</span>, opposite_relation_field)| opposite_relation_field.name == relation_field.name)
-        .map(|((opp_model_id, opp_field_id), opp_rf)| (<span class="kw-2">*</span>opp_field_id, <span class="kw-2">&amp;</span>ast[<span class="kw-2">*</span>opp_model_id][<span class="kw-2">*</span>opp_field_id], opp_rf));
+        .map(|(opp_field_id, opp_rf)| (opp_field_id, <span class="kw-2">&amp;</span>ast[opp_rf.model_id][opp_rf.field_id], opp_rf));
 
     <span class="kw">let </span>is_two_way_embedded_many_to_many_relation = <span class="kw">match </span>(relation_field, opposite_relation_field) {
         (left, <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="kw">_</span>, right))) =&gt; left.fields.is_some() || right.fields.is_some(),
@@ -786,9 +779,9 @@
 
     RelationEvidence {
         ast_model,
-        model_id: <span class="kw-2">*</span>model_id,
+        model_id: relation_field.model_id,
         ast_field,
-        field_id: <span class="kw-2">*</span>field_id,
+        field_id: relation_field_id,
         relation_field,
         opposite_model,
         is_self_relation,
@@ -936,14 +929,9 @@
     <span class="kw">let </span>relation_id = RelationId(relations.relations_storage.len() <span class="kw">as </span>u32);
 
     relations.relations_storage.push(relation);
-    relations
-        .fields
-        .insert(RelationFieldId(evidence.model_id, evidence.field_id), relation_id);
+    relations.fields.insert(evidence.field_id, relation_id);
     <span class="kw">if let </span><span class="prelude-val">Some</span>((opposite_field_id, <span class="kw">_</span>, <span class="kw">_</span>)) = evidence.opposite_relation_field {
-        relations.fields.insert(
-            RelationFieldId(evidence.relation_field.referenced_model, opposite_field_id),
-            relation_id,
-        );
+        relations.fields.insert(opposite_field_id, relation_id);
     }
 
     relations

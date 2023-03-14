@@ -134,10 +134,6 @@
 <a href="#134" id="134">134</a>
 <a href="#135" id="135">135</a>
 <a href="#136" id="136">136</a>
-<a href="#137" id="137">137</a>
-<a href="#138" id="138">138</a>
-<a href="#139" id="139">139</a>
-<a href="#140" id="140">140</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>complete;
 
 <span class="kw">pub use </span>complete::CompleteInlineRelationWalker;
@@ -180,8 +176,8 @@
         <span class="kw">match </span>(<span class="self">self</span>.forward_relation_field(), <span class="self">self</span>.back_relation_field()) {
             (<span class="prelude-val">Some</span>(field_a), <span class="prelude-val">Some</span>(field_b)) =&gt; {
                 <span class="kw">let </span>walker = CompleteInlineRelationWalker {
-                    side_a: (<span class="self">self</span>.referencing_model().id, field_a.field_id()),
-                    side_b: (<span class="self">self</span>.referenced_model().id, field_b.field_id()),
+                    side_a: field_a.id,
+                    side_b: field_b.id,
                     db: <span class="self">self</span>.<span class="number">0</span>.db,
                 };
 
@@ -225,9 +221,7 @@
             RelationAttributes::OneToOne(OneToOneRelationFields::Forward(a))
             | RelationAttributes::OneToOne(OneToOneRelationFields::Both(a, <span class="kw">_</span>))
             | RelationAttributes::OneToMany(OneToManyRelationFields::Both(a, <span class="kw">_</span>))
-            | RelationAttributes::OneToMany(OneToManyRelationFields::Forward(a)) =&gt; {
-                <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="number">0</span>.walk(RelationFieldId(rel.model_a, a)))
-            }
+            | RelationAttributes::OneToMany(OneToManyRelationFields::Forward(a)) =&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="number">0</span>.walk(a)),
             RelationAttributes::OneToMany(OneToManyRelationFields::Back(<span class="kw">_</span>)) =&gt; <span class="prelude-val">None</span>,
             RelationAttributes::ImplicitManyToMany { field_a: <span class="kw">_</span>, field_b: <span class="kw">_ </span>} =&gt; <span class="macro">unreachable!</span>(),
             RelationAttributes::TwoWayEmbeddedManyToMany { field_a: <span class="kw">_</span>, field_b: <span class="kw">_ </span>} =&gt; <span class="macro">unreachable!</span>(),
@@ -245,9 +239,7 @@
         <span class="kw">match </span>rel.attributes {
             RelationAttributes::OneToOne(OneToOneRelationFields::Both(<span class="kw">_</span>, b))
             | RelationAttributes::OneToMany(OneToManyRelationFields::Both(<span class="kw">_</span>, b))
-            | RelationAttributes::OneToMany(OneToManyRelationFields::Back(b)) =&gt; {
-                <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="number">0</span>.walk(RelationFieldId(rel.model_b, b)))
-            }
+            | RelationAttributes::OneToMany(OneToManyRelationFields::Back(b)) =&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="number">0</span>.walk(b)),
             RelationAttributes::OneToMany(OneToManyRelationFields::Forward(<span class="kw">_</span>))
             | RelationAttributes::OneToOne(OneToOneRelationFields::Forward(<span class="kw">_</span>)) =&gt; <span class="prelude-val">None</span>,
             RelationAttributes::ImplicitManyToMany { field_a: <span class="kw">_</span>, field_b: <span class="kw">_ </span>} =&gt; <span class="macro">unreachable!</span>(),

@@ -105,11 +105,8 @@
 <a href="#105" id="105">105</a>
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
-<a href="#108" id="108">108</a>
-<a href="#109" id="109">109</a>
-<a href="#110" id="110">110</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{CompositeTypeFieldWalker, ModelWalker, RelationFieldWalker, ScalarFieldWalker, Walker};
-<span class="kw">use </span><span class="kw">crate</span>::ScalarType;
+<span class="kw">use crate</span>::{types::RelationField, ScalarType};
 <span class="kw">use </span>schema_ast::ast;
 
 <span class="doccomment">/// A model field, scalar or relation.
@@ -133,13 +130,9 @@
 
     <span class="doccomment">/// Find out which kind of field this is.
     </span><span class="kw">pub fn </span>refine(<span class="self">self</span>) -&gt; RefinedFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
-        <span class="kw">let </span>(model_id, field_id) = <span class="self">self</span>.id;
-        <span class="kw">if </span><span class="self">self</span>.db.types.relation_fields.contains_key(<span class="kw-2">&amp;</span><span class="self">self</span>.id) {
-            RefinedFieldWalker::Relation(<span class="self">self</span>.walk(<span class="kw">super</span>::RelationFieldId(model_id, field_id)))
-        } <span class="kw">else if </span><span class="self">self</span>.db.types.scalar_fields.contains_key(<span class="kw-2">&amp;</span><span class="self">self</span>.id) {
-            RefinedFieldWalker::Scalar(<span class="self">self</span>.walk(<span class="kw">super</span>::ScalarFieldId(model_id, field_id)))
-        } <span class="kw">else </span>{
-            <span class="macro">unreachable!</span>(<span class="string">&quot;{:?} is neither a scalar field nor a relation field&quot;</span>, <span class="self">self</span>.id)
+        <span class="kw">match </span><span class="self">self</span>.db.types.refine_field(<span class="self">self</span>.id) {
+            either::Either::Left(id) =&gt; RefinedFieldWalker::Relation(<span class="self">self</span>.walk(id)),
+            either::Either::Right(id) =&gt; RefinedFieldWalker::Scalar(<span class="self">self</span>.walk(id)),
         }
     }
 }
@@ -164,9 +157,10 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; From&lt;RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; <span class="kw">for </span>FieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
     <span class="kw">fn </span>from(w: RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>RelationField { model_id, field_id, .. } = w.db.types[w.id];
         Walker {
             db: w.db,
-            id: (w.id.<span class="number">0</span>, w.id.<span class="number">1</span>),
+            id: (model_id, field_id),
         }
     }
 }

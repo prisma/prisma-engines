@@ -286,7 +286,6 @@
 <a href="#286" id="286">286</a>
 <a href="#287" id="287">287</a>
 <a href="#288" id="288">288</a>
-<a href="#289" id="289">289</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>primary_key;
 <span class="kw">mod </span>unique_criteria;
 
@@ -295,8 +294,8 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>unique_criteria::<span class="kw-2">*</span>;
 
 <span class="kw">use super</span>::{
-    CompleteInlineRelationWalker, FieldWalker, IndexWalker, InlineRelationWalker, RelationFieldId, RelationFieldWalker,
-    RelationWalker, ScalarFieldWalker,
+    CompleteInlineRelationWalker, FieldWalker, IndexWalker, InlineRelationWalker, RelationFieldWalker, RelationWalker,
+    ScalarFieldWalker,
 };
 <span class="kw">use crate</span>::{
     ast::{<span class="self">self</span>, WithName},
@@ -473,9 +472,8 @@
 
         <span class="self">self</span>.db
             .types
-            .relation_fields
-            .range((model_id, ast::FieldId::MIN)..=(model_id, ast::FieldId::MAX))
-            .map(<span class="kw">move </span>|((<span class="kw">_</span>, field_id), <span class="kw">_</span>)| <span class="self">self</span>.walk(RelationFieldId(model_id, <span class="kw-2">*</span>field_id)))
+            .range_model_relation_fields(model_id)
+            .map(<span class="kw">move </span>|(id, <span class="kw">_</span>)| <span class="self">self</span>.walk(id))
     }
 
     <span class="doccomment">/// All relations that start from this model.

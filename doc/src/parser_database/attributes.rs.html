@@ -1108,12 +1108,17 @@
         EnumAttributes, FieldWithArgs, IndexAlgorithm, IndexAttribute, IndexFieldPath, IndexType, ModelAttributes,
         OperatorClassStore, RelationField, ScalarField, ScalarFieldType, SortOrder,
     },
+    walkers::RelationFieldId,
     DatamodelError, StringId,
 };
 <span class="kw">use </span>diagnostics::Span;
 <span class="kw">use </span>std::borrow::Cow;
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>resolve_attributes(ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">for </span>rfid <span class="kw">in </span>ctx.types.iter_relation_field_ids() {
+        visit_relation_field_attributes(rfid, ctx);
+    }
+
     <span class="kw">for </span>top <span class="kw">in </span>ctx.ast.iter_tops() {
         <span class="kw">match </span>top {
             (ast::TopId::Model(model_id), ast::Top::Model(model)) =&gt; resolve_model_attributes(model_id, model, ctx),
@@ -1222,15 +1227,6 @@
             );
 
             ctx.types.scalar_fields.insert((model_id, field_id), scalar_field);
-        } <span class="kw">else if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>rf) = ctx.types.take_relation_field(model_id, field_id) {
-            visit_relation_field_attributes(model_id, field_id, ast_field, <span class="kw-2">&amp;mut </span>rf, ctx);
-            ctx.types.relation_fields.insert((model_id, field_id), rf);
-        } <span class="kw">else </span>{
-            <span class="macro">unreachable!</span>(
-                <span class="string">&quot;{}.{} is neither a scalar field nor a relation field&quot;</span>,
-                ast_model.name(),
-                ast_field.name()
-            )
         }
     }
 
@@ -1423,19 +1419,15 @@
     ))
 }
 
-<span class="kw">fn </span>visit_relation_field_attributes&lt;<span class="lifetime">&#39;db</span>&gt;(
-    model_id: ast::ModelId,
-    field_id: ast::FieldId,
-    ast_field: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Field,
-    relation_field: <span class="kw-2">&amp;mut </span>RelationField,
-    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;db</span>&gt;,
-) {
+<span class="kw">fn </span>visit_relation_field_attributes(rfid: RelationFieldId, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>RelationField { model_id, field_id, .. } = ctx.types[rfid];
+    <span class="kw">let </span>ast_field = <span class="kw-2">&amp;</span>ctx.ast[model_id][field_id];
     ctx.visit_attributes((model_id, field_id).into());
 
     <span class="comment">// @relation
     // Relation attributes are not required at this stage.
     </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;relation&quot;</span>) {
-        visit_relation(model_id, relation_field, ctx);
+        visit_relation(model_id, rfid, ctx);
         ctx.validate_visited_arguments();
     }
 
@@ -1451,7 +1443,7 @@
 
     <span class="comment">// @ignore
     </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;ignore&quot;</span>) {
-        relation_field.is_ignored = <span class="bool-val">true</span>;
+        ctx.types[rfid].is_ignored = <span class="bool-val">true</span>;
         ctx.validate_visited_arguments();
     }
 
@@ -1475,7 +1467,7 @@
     </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;unique&quot;</span>) {
         <span class="kw">let </span><span class="kw-2">mut </span>suggested_fields = Vec::new();
 
-        <span class="kw">for </span>underlying_field <span class="kw">in </span>relation_field.fields.iter().flatten() {
+        <span class="kw">for </span>underlying_field <span class="kw">in </span>ctx.types[rfid].fields.iter().flatten() {
             suggested_fields.push(ctx.ast[model_id][<span class="kw-2">*</span>underlying_field].name());
         }
 
@@ -1737,8 +1729,16 @@
                 <span class="kw">let </span><span class="kw-2">mut </span>suggested_fields = Vec::new();
 
                 <span class="kw">for </span>(<span class="kw">_</span>, field_id) <span class="kw">in </span><span class="kw-2">&amp;</span>relation_fields {
-                    <span class="kw">let </span>relation_field = <span class="kw-2">&amp;</span>ctx.types.relation_fields[<span class="kw-2">&amp;</span>(model_id, <span class="kw-2">*</span>field_id)];
-                    <span class="kw">for </span>underlying_field <span class="kw">in </span>relation_field.fields.iter().flatten() {
+                    <span class="kw">let </span>fields = ctx
+                        .types
+                        .range_model_relation_fields(model_id)
+                        .find(|(<span class="kw">_</span>, rf)| rf.field_id == <span class="kw-2">*</span>field_id)
+                        .unwrap()
+                        .<span class="number">1
+                        </span>.fields
+                        .iter()
+                        .flatten();
+                    <span class="kw">for </span>underlying_field <span class="kw">in </span>fields {
                         suggested_fields.push(ctx.ast[model_id][<span class="kw-2">*</span>underlying_field].name());
                     }
                 }
@@ -1770,9 +1770,9 @@
 }
 
 <span class="doccomment">/// @relation validation for relation fields.
-</span><span class="kw">fn </span>visit_relation(model_id: ast::ModelId, relation_field: <span class="kw-2">&amp;mut </span>RelationField, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+</span><span class="kw">fn </span>visit_relation(model_id: ast::ModelId, relation_field_id: RelationFieldId, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
     <span class="kw">let </span>attr = ctx.current_attribute();
-    relation_field.relation_attribute = <span class="prelude-val">Some</span>(ctx.current_attribute_id());
+    ctx.types[relation_field_id].relation_attribute = <span class="prelude-val">Some</span>(ctx.current_attribute_id());
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(fields) = ctx.visit_optional_arg(<span class="string">&quot;fields&quot;</span>) {
         <span class="kw">let </span>fields = <span class="kw">match </span>resolve_field_array_without_args(fields, attr.span, model_id, ctx) {
@@ -1810,14 +1810,14 @@
             }
         };
 
-        relation_field.fields = <span class="prelude-val">Some</span>(fields);
+        ctx.types[relation_field_id].fields = <span class="prelude-val">Some</span>(fields);
     }
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(references) = ctx.visit_optional_arg(<span class="string">&quot;references&quot;</span>) {
         <span class="kw">let </span>references = <span class="kw">match </span>resolve_field_array_without_args(
             references,
             attr.span,
-            relation_field.referenced_model,
+            ctx.types[relation_field_id].referenced_model,
             ctx,
         ) {
             <span class="prelude-val">Ok</span>(references) =&gt; references,
@@ -1827,7 +1827,7 @@
                 unknown_fields,
             }) =&gt; {
                 <span class="kw">if </span>!unknown_fields.is_empty() {
-                    <span class="kw">let </span>model_name = ctx.ast[relation_field.referenced_model].name();
+                    <span class="kw">let </span>model_name = ctx.ast[ctx.types[relation_field_id].referenced_model].name();
 
                     <span class="kw">let </span>field_names = unknown_fields
                         .into_iter()
@@ -1845,7 +1845,7 @@
                 <span class="kw">if </span>!relation_fields.is_empty() {
                     <span class="kw">let </span>msg = <span class="macro">format!</span>(
                         <span class="string">&quot;The argument `references` must refer only to scalar fields in the related model `{}`. But it is referencing the following relation fields: {}&quot;</span>,
-                        ctx.ast[relation_field.referenced_model].name(),
+                        ctx.ast[ctx.types[relation_field_id].referenced_model].name(),
                         relation_fields.iter().map(|(f, <span class="kw">_</span>)| f.name()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;().join(<span class="string">&quot;, &quot;</span>),
                     );
                     ctx.push_error(DatamodelError::new_validation_error(<span class="kw-2">&amp;</span>msg, attr.span));
@@ -1855,7 +1855,7 @@
             }
         };
 
-        relation_field.references = <span class="prelude-val">Some</span>(references);
+        ctx.types[relation_field_id].references = <span class="prelude-val">Some</span>(references);
     }
 
     <span class="comment">// Validate the `name` argument if present.
@@ -1867,7 +1867,7 @@
         <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) =&gt; ctx.push_attribute_validation_error(<span class="string">&quot;A relation cannot have an empty name.&quot;</span>),
         <span class="prelude-val">Some</span>(name) =&gt; {
             <span class="kw">let </span>interned_name = ctx.interner.intern(name);
-            relation_field.name = <span class="prelude-val">Some</span>(interned_name);
+            ctx.types[relation_field_id].name = <span class="prelude-val">Some</span>(interned_name);
         }
         <span class="prelude-val">None </span>=&gt; (),
     }
@@ -1875,13 +1875,13 @@
     <span class="comment">// Validate referential actions.
     </span><span class="kw">if let </span><span class="prelude-val">Some</span>(on_delete) = ctx.visit_optional_arg(<span class="string">&quot;onDelete&quot;</span>) {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(action) = <span class="kw">crate</span>::ReferentialAction::try_from_expression(on_delete, ctx.diagnostics) {
-            relation_field.on_delete = <span class="prelude-val">Some</span>((action, on_delete.span()));
+            ctx.types[relation_field_id].on_delete = <span class="prelude-val">Some</span>((action, on_delete.span()));
         }
     }
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(on_update) = ctx.visit_optional_arg(<span class="string">&quot;onUpdate&quot;</span>) {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(action) = <span class="kw">crate</span>::ReferentialAction::try_from_expression(on_update, ctx.diagnostics) {
-            relation_field.on_update = <span class="prelude-val">Some</span>((action, on_update.span()));
+            ctx.types[relation_field_id].on_update = <span class="prelude-val">Some</span>((action, on_update.span()));
         }
     }
 
@@ -1901,7 +1901,7 @@
         mapped_name
     };
 
-    relation_field.mapped_name = fk_name;
+    ctx.types[relation_field_id].mapped_name = fk_name;
 }
 
 <span class="attr">#[derive(Debug)]

@@ -1363,6 +1363,63 @@
 <a href="#1363" id="1363">1363</a>
 <a href="#1364" id="1364">1364</a>
 <a href="#1365" id="1365">1365</a>
+<a href="#1366" id="1366">1366</a>
+<a href="#1367" id="1367">1367</a>
+<a href="#1368" id="1368">1368</a>
+<a href="#1369" id="1369">1369</a>
+<a href="#1370" id="1370">1370</a>
+<a href="#1371" id="1371">1371</a>
+<a href="#1372" id="1372">1372</a>
+<a href="#1373" id="1373">1373</a>
+<a href="#1374" id="1374">1374</a>
+<a href="#1375" id="1375">1375</a>
+<a href="#1376" id="1376">1376</a>
+<a href="#1377" id="1377">1377</a>
+<a href="#1378" id="1378">1378</a>
+<a href="#1379" id="1379">1379</a>
+<a href="#1380" id="1380">1380</a>
+<a href="#1381" id="1381">1381</a>
+<a href="#1382" id="1382">1382</a>
+<a href="#1383" id="1383">1383</a>
+<a href="#1384" id="1384">1384</a>
+<a href="#1385" id="1385">1385</a>
+<a href="#1386" id="1386">1386</a>
+<a href="#1387" id="1387">1387</a>
+<a href="#1388" id="1388">1388</a>
+<a href="#1389" id="1389">1389</a>
+<a href="#1390" id="1390">1390</a>
+<a href="#1391" id="1391">1391</a>
+<a href="#1392" id="1392">1392</a>
+<a href="#1393" id="1393">1393</a>
+<a href="#1394" id="1394">1394</a>
+<a href="#1395" id="1395">1395</a>
+<a href="#1396" id="1396">1396</a>
+<a href="#1397" id="1397">1397</a>
+<a href="#1398" id="1398">1398</a>
+<a href="#1399" id="1399">1399</a>
+<a href="#1400" id="1400">1400</a>
+<a href="#1401" id="1401">1401</a>
+<a href="#1402" id="1402">1402</a>
+<a href="#1403" id="1403">1403</a>
+<a href="#1404" id="1404">1404</a>
+<a href="#1405" id="1405">1405</a>
+<a href="#1406" id="1406">1406</a>
+<a href="#1407" id="1407">1407</a>
+<a href="#1408" id="1408">1408</a>
+<a href="#1409" id="1409">1409</a>
+<a href="#1410" id="1410">1410</a>
+<a href="#1411" id="1411">1411</a>
+<a href="#1412" id="1412">1412</a>
+<a href="#1413" id="1413">1413</a>
+<a href="#1414" id="1414">1414</a>
+<a href="#1415" id="1415">1415</a>
+<a href="#1416" id="1416">1416</a>
+<a href="#1417" id="1417">1417</a>
+<a href="#1418" id="1418">1418</a>
+<a href="#1419" id="1419">1419</a>
+<a href="#1420" id="1420">1420</a>
+<a href="#1421" id="1421">1421</a>
+<a href="#1422" id="1422">1422</a>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>index_fields;
 
 <span class="kw">use crate</span>::{context::Context, interner::StringId, walkers::IndexFieldWalker, DatamodelError};
@@ -1392,7 +1449,7 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) scalar_fields: BTreeMap&lt;(ast::ModelId, ast::FieldId), ScalarField&gt;,
     <span class="doccomment">/// This contains only the relation fields actually present in the schema
     /// source text.
-    </span><span class="kw">pub</span>(<span class="kw">super</span>) relation_fields: BTreeMap&lt;(ast::ModelId, ast::FieldId), RelationField&gt;,
+    </span>relation_fields: Vec&lt;RelationField&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) enum_attributes: HashMap&lt;ast::EnumId, EnumAttributes&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) model_attributes: HashMap&lt;ast::ModelId, ModelAttributes&gt;,
     <span class="doccomment">/// Sorted array of scalar fields that have an `@default()` attribute with a function that is
@@ -1415,12 +1472,72 @@
         <span class="self">self</span>.scalar_fields.remove(<span class="kw-2">&amp;</span>(model_id, field_id))
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>take_relation_field(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>iter_relation_field_ids(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RelationFieldId&gt; + <span class="lifetime">&#39;static </span>{
+        (<span class="number">0</span>..<span class="self">self</span>.relation_fields.len()).map(|idx| RelationFieldId(idx <span class="kw">as </span>u32))
+    }
+
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>iter_relation_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = (RelationFieldId, <span class="kw-2">&amp;</span>RelationField)&gt; {
+        <span class="self">self</span>.relation_fields
+            .iter()
+            .enumerate()
+            .map(|(idx, rf)| (RelationFieldId(idx <span class="kw">as </span>u32), rf))
+    }
+
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>range_model_relation_fields(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
         model_id: ast::ModelId,
-        field_id: ast::FieldId,
-    ) -&gt; <span class="prelude-ty">Option</span>&lt;RelationField&gt; {
-        <span class="self">self</span>.relation_fields.remove(<span class="kw-2">&amp;</span>(model_id, field_id))
+    ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = (RelationFieldId, <span class="kw-2">&amp;</span>RelationField)&gt; + Clone {
+        <span class="self">self</span>.relation_fields
+            .binary_search_by_key(<span class="kw-2">&amp;</span>model_id, |rf| rf.model_id)
+            .into_iter()
+            .flat_map(<span class="kw">move </span>|anchor| {
+                <span class="kw">let </span>back = <span class="self">self</span>.relation_fields[..anchor]
+                    .iter()
+                    .rev()
+                    .take_while(<span class="kw">move </span>|rf| rf.model_id == model_id)
+                    .enumerate()
+                    .map(<span class="kw">move </span>|(idx, rf)| (RelationFieldId((anchor.saturating_sub(<span class="number">1</span>) - idx) <span class="kw">as </span>u32), rf));
+
+                <span class="kw">let </span>forward = <span class="self">self</span>.relation_fields[anchor..]
+                    .iter()
+                    .take_while(<span class="kw">move </span>|rf| rf.model_id == model_id)
+                    .enumerate()
+                    .map(<span class="kw">move </span>|(idx, rf)| (RelationFieldId((anchor + idx) <span class="kw">as </span>u32), rf));
+
+                back.chain(forward)
+            })
+    }
+
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>refine_field(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        id: (ast::ModelId, ast::FieldId),
+    ) -&gt; Either&lt;RelationFieldId, <span class="kw">crate</span>::walkers::ScalarFieldId&gt; {
+        <span class="self">self</span>.relation_fields
+            .binary_search_by_key(<span class="kw-2">&amp;</span>id, |rf| (rf.model_id, rf.field_id))
+            .map(|idx| Either::Left(RelationFieldId(idx <span class="kw">as </span>u32)))
+            <span class="comment">// INVARIANT: every field is either a relation field or a scalar field, so we don&#39;t
+            // need to check.
+            </span>.unwrap_or_else(|<span class="kw">_</span>| Either::Right(<span class="kw">crate</span>::walkers::ScalarFieldId(id.<span class="number">0</span>, id.<span class="number">1</span>)))
+    }
+
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>push_relation_field(<span class="kw-2">&amp;mut </span><span class="self">self</span>, relation_field: RelationField) -&gt; RelationFieldId {
+        <span class="kw">let </span>id = RelationFieldId(<span class="self">self</span>.relation_fields.len() <span class="kw">as </span>u32);
+        <span class="self">self</span>.relation_fields.push(relation_field);
+        id
+    }
+}
+
+<span class="kw">impl </span>std::ops::Index&lt;RelationFieldId&gt; <span class="kw">for </span>Types {
+    <span class="kw">type </span>Output = RelationField;
+
+    <span class="kw">fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: RelationFieldId) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Output {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.relation_fields[index.<span class="number">0 </span><span class="kw">as </span>usize]
+    }
+}
+
+<span class="kw">impl </span>std::ops::IndexMut&lt;RelationFieldId&gt; <span class="kw">for </span>Types {
+    <span class="kw">fn </span>index_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: RelationFieldId) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Output {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.relation_fields[index.<span class="number">0 </span><span class="kw">as </span>usize]
     }
 }
 
@@ -1563,6 +1680,8 @@
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>RelationField {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) model_id: ast::ModelId,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) field_id: ast::FieldId,
     <span class="kw">pub</span>(<span class="kw">crate</span>) referenced_model: ast::ModelId,
     <span class="kw">pub</span>(<span class="kw">crate</span>) on_delete: <span class="prelude-ty">Option</span>&lt;(<span class="kw">crate</span>::ReferentialAction, ast::Span)&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) on_update: <span class="prelude-ty">Option</span>&lt;(<span class="kw">crate</span>::ReferentialAction, ast::Span)&gt;,
@@ -1579,8 +1698,10 @@
 }
 
 <span class="kw">impl </span>RelationField {
-    <span class="kw">fn </span>new(referenced_model: ast::ModelId) -&gt; <span class="self">Self </span>{
+    <span class="kw">fn </span>new(model_id: ast::ModelId, field_id: ast::FieldId, referenced_model: ast::ModelId) -&gt; <span class="self">Self </span>{
         RelationField {
+            model_id,
+            field_id,
             referenced_model,
             on_delete: <span class="prelude-val">None</span>,
             on_update: <span class="prelude-val">None</span>,
@@ -1912,8 +2033,8 @@
     <span class="kw">for </span>(field_id, ast_field) <span class="kw">in </span>ast_model.iter_fields() {
         <span class="kw">match </span>field_type(ast_field, ctx) {
             <span class="prelude-val">Ok</span>(FieldType::Model(referenced_model)) =&gt; {
-                <span class="kw">let </span>rf = RelationField::new(referenced_model);
-                ctx.types.relation_fields.insert((model_id, field_id), rf);
+                <span class="kw">let </span>rf = RelationField::new(model_id, field_id, referenced_model);
+                ctx.types.push_relation_field(rf);
             }
             <span class="prelude-val">Ok</span>(FieldType::Scalar(scalar_field_type)) =&gt; {
                 <span class="kw">let </span>field_data = ScalarField {
@@ -2719,14 +2840,7 @@
 }
 
 <span class="doccomment">/// An opaque identifier for a model relation field in a schema.
-</span><span class="attr">#[derive(Copy, Clone, PartialEq, Debug, Hash, Eq)]
-</span><span class="kw">pub struct </span>RelationFieldId(<span class="kw">pub</span>(<span class="kw">crate</span>) ast::ModelId, <span class="kw">pub</span>(<span class="kw">crate</span>) ast::FieldId);
-
-<span class="kw">impl </span>RelationFieldId {
-    <span class="doccomment">/// Coarsen the relation field identifier to a generic field identifier.
-    </span><span class="kw">pub fn </span>coarsen(<span class="self">self</span>) -&gt; (ast::ModelId, ast::FieldId) {
-        (<span class="self">self</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">1</span>)
-    }
-}
+</span><span class="attr">#[derive(Copy, Clone, PartialEq, Debug, Hash, Eq, PartialOrd, Ord)]
+</span><span class="kw">pub struct </span>RelationFieldId(u32);
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="parser_database" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>

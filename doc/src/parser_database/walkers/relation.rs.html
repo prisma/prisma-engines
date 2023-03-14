@@ -113,10 +113,6 @@
 <a href="#113" id="113">113</a>
 <a href="#114" id="114">114</a>
 <a href="#115" id="115">115</a>
-<a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>implicit_many_to_many;
 <span class="kw">mod </span>inline;
 <span class="kw">mod </span>two_way_embedded_many_to_many;
@@ -140,12 +136,8 @@
 
     <span class="doccomment">/// The relation fields that define the relation. A then B.
     </span><span class="kw">pub fn </span>relation_fields(<span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
-        <span class="kw">let </span>relation = <span class="self">self</span>.get();
-        <span class="kw">let </span>(a, b) = relation.attributes.fields();
-        [(relation.model_a, a), (relation.model_b, b)]
-            .into_iter()
-            .filter_map(|(model_id, field_id)| field_id.map(|f| (model_id, f)))
-            .map(<span class="kw">move </span>|(model, field)| <span class="self">self</span>.walk(RelationFieldId(model, field)))
+        <span class="kw">let </span>(a, b) = <span class="self">self</span>.get().attributes.fields();
+        [a, b].into_iter().flatten().map(<span class="kw">move </span>|field| <span class="self">self</span>.walk(field))
     }
 
     <span class="doccomment">/// Is any field part of the relation ignored (`@ignore`) or unsupported?

@@ -254,11 +254,6 @@
 <a href="#254" id="254">254</a>
 <a href="#255" id="255">255</a>
 <a href="#256" id="256">256</a>
-<a href="#257" id="257">257</a>
-<a href="#258" id="258">258</a>
-<a href="#259" id="259">259</a>
-<a href="#260" id="260">260</a>
-<a href="#261" id="261">261</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::{<span class="self">self</span>, FieldArity},
     types::{RelationField, RelationFieldId},
@@ -271,11 +266,6 @@
 </span><span class="kw">pub type </span>RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; = Walker&lt;<span class="lifetime">&#39;db</span>, RelationFieldId&gt;;
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
-    <span class="doccomment">/// The ID of the AST node of the field.
-    </span><span class="kw">pub fn </span>field_id(<span class="self">self</span>) -&gt; ast::FieldId {
-        <span class="self">self</span>.id.<span class="number">1
-    </span>}
-
     <span class="doccomment">/// The relation starts or ends to a view.
     </span><span class="kw">pub fn </span>one_side_is_view(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.model().ast_model().is_view() || <span class="self">self</span>.related_model().ast_model().is_view()
@@ -293,11 +283,12 @@
 
     <span class="doccomment">/// The AST node of the field.
     </span><span class="kw">pub fn </span>ast_field(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Field {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.db.ast[<span class="self">self</span>.id.<span class="number">0</span>][<span class="self">self</span>.id.<span class="number">1</span>]
+        <span class="kw">let </span>RelationField { model_id, field_id, .. } = <span class="self">self</span>.db.types[<span class="self">self</span>.id];
+        <span class="kw-2">&amp;</span><span class="self">self</span>.db.ast[model_id][field_id]
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>attributes(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>RelationField {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.db.types.relation_fields[<span class="kw-2">&amp;</span><span class="self">self</span>.id.coarsen()]
+        <span class="kw-2">&amp;</span><span class="self">self</span>.db.types[<span class="self">self</span>.id]
     }
 
     <span class="doccomment">/// The onDelete argument on the relation.
@@ -337,7 +328,7 @@
 
     <span class="doccomment">/// The model containing the field.
     </span><span class="kw">pub fn </span>model(<span class="self">self</span>) -&gt; ModelWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
-        <span class="self">self</span>.db.walk(<span class="self">self</span>.id.<span class="number">0</span>)
+        <span class="self">self</span>.walk(<span class="self">self</span>.attributes().model_id)
     }
 
     <span class="doccomment">/// A valid relation is defined by two relation fields. This method returns the _other_
@@ -421,12 +412,11 @@
 
     <span class="doccomment">/// The fields in the `fields: [...]` argument in the forward relation field.
     </span><span class="kw">pub fn </span>fields(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>ExactSizeIterator&lt;Item = ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; + Clone&gt; {
-        <span class="kw">let </span>model_id = <span class="self">self</span>.id.<span class="number">0</span>;
-        <span class="kw">let </span>attributes = <span class="self">self</span>.attributes();
+        <span class="kw">let </span>attributes = <span class="kw-2">&amp;</span><span class="self">self</span>.db.types[<span class="self">self</span>.id];
         attributes.fields.as_ref().map(<span class="kw">move </span>|fields| {
             fields
                 .iter()
-                .map(<span class="kw">move </span>|field_id| <span class="self">self</span>.db.walk(<span class="kw">super</span>::ScalarFieldId(model_id, <span class="kw-2">*</span>field_id)))
+                .map(<span class="kw">move </span>|field_id| <span class="self">self</span>.db.walk(<span class="kw">super</span>::ScalarFieldId(attributes.model_id, <span class="kw-2">*</span>field_id)))
         })
     }
 }

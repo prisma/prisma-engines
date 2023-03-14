@@ -79,22 +79,18 @@
 <a href="#79" id="79">79</a>
 <a href="#80" id="80">80</a>
 <a href="#81" id="81">81</a>
-<a href="#82" id="82">82</a>
-<a href="#83" id="83">83</a>
-<a href="#84" id="84">84</a>
-</pre><pre class="rust"><code><span class="kw">use </span>schema_ast::ast;
-
-<span class="kw">use crate</span>::{
-    walkers::{ModelWalker, RelationFieldWalker, ScalarFieldId, ScalarFieldWalker},
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    walkers::{ModelWalker, RelationFieldId, RelationFieldWalker, ScalarFieldId, ScalarFieldWalker},
     ParserDatabase, ReferentialAction,
 };
+<span class="kw">use </span>schema_ast::ast;
 
 <span class="doccomment">/// Represents a relation that has fields and references defined in one of the
 /// relation fields. Includes 1:1 and 1:n relations that are defined from both sides.
 </span><span class="attr">#[derive(Copy, Clone)]
 </span><span class="kw">pub struct </span>CompleteInlineRelationWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) side_a: (ast::ModelId, ast::FieldId),
-    <span class="kw">pub</span>(<span class="kw">crate</span>) side_b: (ast::ModelId, ast::FieldId),
+    <span class="kw">pub</span>(<span class="kw">crate</span>) side_a: RelationFieldId,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) side_b: RelationFieldId,
     <span class="kw">pub</span>(<span class="kw">crate</span>) db: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ParserDatabase,
 }
 
@@ -102,22 +98,20 @@
 </span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; CompleteInlineRelationWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
     <span class="doccomment">/// The model that defines the relation fields and actions.
     </span><span class="kw">pub fn </span>referencing_model(<span class="self">self</span>) -&gt; ModelWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
-        <span class="self">self</span>.db.walk(<span class="self">self</span>.side_a.<span class="number">0</span>)
+        <span class="self">self</span>.db.walk(<span class="self">self</span>.side_a).model()
     }
 
     <span class="doccomment">/// The implicit relation side.
     </span><span class="kw">pub fn </span>referenced_model(<span class="self">self</span>) -&gt; ModelWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
-        <span class="self">self</span>.db.walk(<span class="self">self</span>.side_b.<span class="number">0</span>)
+        <span class="self">self</span>.db.walk(<span class="self">self</span>.side_b).model()
     }
 
     <span class="kw">pub fn </span>referencing_field(<span class="self">self</span>) -&gt; RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
-        <span class="self">self</span>.db
-            .walk(<span class="kw">crate</span>::walkers::RelationFieldId(<span class="self">self</span>.side_a.<span class="number">0</span>, <span class="self">self</span>.side_a.<span class="number">1</span>))
+        <span class="self">self</span>.db.walk(<span class="self">self</span>.side_a)
     }
 
     <span class="kw">pub fn </span>referenced_field(<span class="self">self</span>) -&gt; RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
-        <span class="self">self</span>.db
-            .walk(<span class="kw">crate</span>::walkers::RelationFieldId(<span class="self">self</span>.side_b.<span class="number">0</span>, <span class="self">self</span>.side_b.<span class="number">1</span>))
+        <span class="self">self</span>.db.walk(<span class="self">self</span>.side_b)
     }
 
     <span class="doccomment">/// The scalar fields defining the relation on the referenced model.

@@ -84,10 +84,6 @@
 <a href="#84" id="84">84</a>
 <a href="#85" id="85">85</a>
 <a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
-<a href="#90" id="90">90</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::fmt::Display;
 
 <span class="kw">use crate</span>::{
@@ -125,9 +121,7 @@
     </span><span class="kw">pub fn </span>field_a(<span class="self">self</span>) -&gt; RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
         <span class="kw">let </span>rel = <span class="self">self</span>.get();
         <span class="kw">match </span>rel.attributes {
-            RelationAttributes::ImplicitManyToMany { field_a, field_b: <span class="kw">_ </span>} =&gt; {
-                <span class="self">self</span>.walk(<span class="kw">crate</span>::walkers::RelationFieldId(rel.model_a, field_a))
-            }
+            RelationAttributes::ImplicitManyToMany { field_a, field_b: <span class="kw">_ </span>} =&gt; <span class="self">self</span>.walk(field_a),
             <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         }
     }
@@ -136,9 +130,7 @@
     </span><span class="kw">pub fn </span>field_b(<span class="self">self</span>) -&gt; RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
         <span class="kw">let </span>rel = <span class="self">self</span>.get();
         <span class="kw">match </span>rel.attributes {
-            RelationAttributes::ImplicitManyToMany { field_a: <span class="kw">_</span>, field_b } =&gt; {
-                <span class="self">self</span>.walk(<span class="kw">crate</span>::walkers::RelationFieldId(rel.model_b, field_b))
-            }
+            RelationAttributes::ImplicitManyToMany { field_a: <span class="kw">_</span>, field_b } =&gt; <span class="self">self</span>.walk(field_b),
             <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         }
     }
