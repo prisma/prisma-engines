@@ -4,8 +4,8 @@ use crate::{
     attributes::resolve_field_array_with_args,
     coerce,
     context::Context,
-    types::{FieldWithArgs, IdAttribute, IndexFieldPath, ModelAttributes, SortOrder},
-    DatamodelError, StringId,
+    types::{FieldWithArgs, IdAttribute, IndexFieldPath, ModelAttributes, ScalarField, SortOrder},
+    DatamodelError, ScalarFieldId, StringId,
 };
 use std::borrow::Cow;
 
@@ -74,27 +74,24 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: ast::ModelId, ct
     // ID attribute fields must reference only required fields.
     let fields_that_are_not_required: Vec<&str> = resolved_fields
         .iter()
-        .filter_map(|field| {
-            let field_id = field.path.field_in_index();
+        .filter_map(|field| match field.path.field_in_index() {
+            either::Either::Left(id) => {
+                let ScalarField { model_id, field_id, .. } = ctx.types[id];
+                let field = &ctx.ast[model_id][field_id];
 
-            match field.path.type_holding_the_indexed_field() {
-                None => {
-                    let field = &ctx.ast[model_id][field_id];
-
-                    if field.arity.is_required() {
-                        None
-                    } else {
-                        Some(field.name())
-                    }
+                if field.arity.is_required() {
+                    None
+                } else {
+                    Some(field.name())
                 }
-                Some(ctid) => {
-                    let field = &ctx.ast[ctid][field_id];
+            }
+            either::Either::Right((ctid, field_id)) => {
+                let field = &ctx.ast[ctid][field_id];
 
-                    if field.arity.is_required() {
-                        None
-                    } else {
-                        Some(field.name())
-                    }
+                if field.arity.is_required() {
+                    None
+                } else {
+                    Some(field.name())
                 }
             }
         })
@@ -146,56 +143,57 @@ pub(super) fn model(model_data: &mut ModelAttributes, model_id: ast::ModelId, ct
 
 pub(super) fn field<'db>(
     ast_model: &'db ast::Model,
+    scalar_field_id: ScalarFieldId,
     field_id: ast::FieldId,
     model_attributes: &mut ModelAttributes,
     ctx: &mut Context<'db>,
 ) {
-    match model_attributes.primary_key {
-        Some(_) => ctx.push_error(DatamodelError::new_model_validation_error(
+    if model_attributes.primary_key.is_some() {
+        ctx.push_error(DatamodelError::new_model_validation_error(
             "At most one field must be marked as the id field with the `@id` attribute.",
             "model",
             ast_model.name(),
             ast_model.span(),
-        )),
-        None => {
-            let mapped_name = primary_key_mapped_name(ctx);
+        ))
+    } else {
+        let mapped_name = primary_key_mapped_name(ctx);
 
-            let length = ctx
-                .visit_optional_arg("length")
-                .and_then(|length| coerce::integer(length, ctx.diagnostics))
-                .map(|len| len as u32);
+        let length = ctx
+            .visit_optional_arg("length")
+            .and_then(|length| coerce::integer(length, ctx.diagnostics))
+            .map(|len| len as u32);
 
-            let sort_order = match ctx
-                .visit_optional_arg("sort")
-                .and_then(|sort| coerce::constant(sort, ctx.diagnostics))
-            {
-                Some("Desc") => Some(SortOrder::Desc),
-                Some("Asc") => Some(SortOrder::Asc),
-                Some(other) => {
-                    ctx.push_attribute_validation_error(&format!(
-                        "The `sort` argument can only be `Asc` or `Desc` you provided: {other}."
-                    ));
-                    None
-                }
-                None => None,
-            };
+        let sort_order = match ctx
+            .visit_optional_arg("sort")
+            .and_then(|sort| coerce::constant(sort, ctx.diagnostics))
+        {
+            Some("Desc") => Some(SortOrder::Desc),
+            Some("Asc") => Some(SortOrder::Asc),
+            Some(other) => {
+                ctx.push_attribute_validation_error(&format!(
+                    "The `sort` argument can only be `Asc` or `Desc` you provided: {other}."
+                ));
+                None
+            }
+            None => None,
+        };
 
-            let clustered = super::validate_clustering_setting(ctx);
+        let clustered = super::validate_clustering_setting(ctx);
 
-            model_attributes.primary_key = Some(IdAttribute {
-                name: None,
-                mapped_name,
-                source_attribute: ctx.current_attribute_id(),
-                fields: vec![FieldWithArgs {
-                    path: IndexFieldPath::new(field_id),
-                    sort_order,
-                    length,
-                    operator_class: None,
-                }],
-                source_field: Some(field_id),
-                clustered,
-            })
-        }
+        let source_attribute = ctx.current_attribute_id();
+        model_attributes.primary_key = Some(IdAttribute {
+            name: None,
+            mapped_name,
+            source_attribute,
+            fields: vec![FieldWithArgs {
+                path: IndexFieldPath::new(scalar_field_id),
+                sort_order,
+                length,
+                operator_class: None,
+            }],
+            source_field: Some(field_id),
+            clustered,
+        })
     }
 }
 

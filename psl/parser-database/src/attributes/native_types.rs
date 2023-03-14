@@ -1,29 +1,28 @@
-use crate::{
-    ast,
-    types::{CompositeTypeField, ScalarField},
-    StringId,
-};
+use crate::{ast, context::Context, ScalarFieldId, StringId};
 
 pub(super) fn visit_model_field_native_type_attribute(
+    id: ScalarFieldId,
     datasource_name: StringId,
     type_name: StringId,
     attr: &ast::Attribute,
-    scalar_field: &mut ScalarField,
+    ctx: &mut Context<'_>,
 ) {
     let args = &attr.arguments;
     let args: Vec<String> = args.arguments.iter().map(|arg| arg.value.to_string()).collect();
 
-    scalar_field.native_type = Some((datasource_name, type_name, args, attr.span))
+    ctx.types[id].native_type = Some((datasource_name, type_name, args, attr.span))
 }
 
 pub(super) fn visit_composite_type_field_native_type_attribute(
+    id: (ast::CompositeTypeId, ast::FieldId),
     datasource_name: StringId,
     type_name: StringId,
     attr: &ast::Attribute,
-    composite_type_field: &mut CompositeTypeField,
+    ctx: &mut Context<'_>,
 ) {
     let args = &attr.arguments;
     let args: Vec<String> = args.arguments.iter().map(|arg| arg.value.to_string()).collect();
 
+    let mut composite_type_field = ctx.types.composite_type_fields.get_mut(&id).unwrap();
     composite_type_field.native_type = Some((datasource_name, type_name, args, attr.span))
 }

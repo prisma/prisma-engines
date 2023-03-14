@@ -1,11 +1,11 @@
 use crate::{parent_container::ParentContainer, CompositeType};
 use dml::FieldArity;
-use psl::{parser_database::walkers, schema_ast::ast};
+use psl::{parser_database::ScalarFieldId, schema_ast::ast};
 use std::fmt::{Debug, Display};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum CompositeFieldId {
-    InModel(walkers::ScalarFieldId),
+    InModel(ScalarFieldId),
     InCompositeType((ast::CompositeTypeId, ast::FieldId)),
 }
 

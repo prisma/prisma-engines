@@ -1,7 +1,6 @@
 use crate::{
-    ast,
     types::FieldWithArgs,
-    walkers::{IndexFieldWalker, ScalarFieldId, ScalarFieldWalker},
+    walkers::{IndexFieldWalker, ScalarFieldWalker},
     ParserDatabase,
 };
 
@@ -9,26 +8,15 @@ use crate::{
 /// key, or a unique index.
 #[derive(Copy, Clone)]
 pub struct UniqueCriteriaWalker<'db> {
-    pub(crate) model_id: ast::ModelId,
     pub(crate) fields: &'db [FieldWithArgs],
     pub(crate) db: &'db ParserDatabase,
 }
 
 impl<'db> UniqueCriteriaWalker<'db> {
     pub fn fields(self) -> impl ExactSizeIterator<Item = IndexFieldWalker<'db>> + 'db {
-        self.fields.iter().map(move |field| {
-            let field_id = field.path.field_in_index();
-
-            match field.path.type_holding_the_indexed_field() {
-                None => {
-                    let walker = self.db.walk(ScalarFieldId(self.model_id, field_id));
-                    IndexFieldWalker::new(walker)
-                }
-                Some(ctid) => {
-                    let walker = self.db.walk((ctid, field_id));
-                    IndexFieldWalker::new(walker)
-                }
-            }
+        self.fields.iter().map(move |field| match field.path.field_in_index() {
+            either::Either::Left(id) => IndexFieldWalker::new(self.db.walk(id)),
+            either::Either::Right(id) => IndexFieldWalker::new(self.db.walk(id)),
         })
     }
 
