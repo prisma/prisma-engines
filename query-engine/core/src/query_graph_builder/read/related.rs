@@ -2,7 +2,7 @@ use super::*;
 use crate::{query_document::ParsedField, ReadQuery, RelatedRecordsQuery};
 use prisma_models::{ModelRef, RelationFieldRef};
 
-pub fn find_related(
+pub(crate) fn find_related(
     field: ParsedField,
     parent: RelationFieldRef,
     model: ModelRef,

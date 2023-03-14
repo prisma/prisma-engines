@@ -5,7 +5,7 @@ use crate::{
 };
 use connector::{ConnectionLike, NativeUpsert, QueryArguments};
 
-pub async fn execute(
+pub(crate) async fn execute(
     tx: &mut dyn ConnectionLike,
     write_query: WriteQuery,
     trace_id: Option<String>,

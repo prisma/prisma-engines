@@ -12,7 +12,7 @@ use std::{collections::HashMap, fmt};
 use tracing::Instrument;
 
 #[derive(Debug, Clone)]
-pub enum ExpressionResult {
+pub(crate) enum ExpressionResult {
     /// A result from a query execution.
     Query(QueryResult),
 
@@ -119,20 +119,20 @@ impl ExpressionResult {
 }
 
 #[derive(Default, Debug, Clone)]
-pub struct Env {
+pub(crate) struct Env {
     env: HashMap<String, ExpressionResult>,
 }
 
 impl Env {
-    pub fn get(&self, key: &str) -> Option<&ExpressionResult> {
+    pub(crate) fn get(&self, key: &str) -> Option<&ExpressionResult> {
         self.env.get(key)
     }
 
-    pub fn insert(&mut self, key: String, value: ExpressionResult) {
+    pub(crate) fn insert(&mut self, key: String, value: ExpressionResult) {
         self.env.insert(key, value);
     }
 
-    pub fn remove(&mut self, key: &str) -> InterpretationResult<ExpressionResult> {
+    pub(crate) fn remove(&mut self, key: &str) -> InterpretationResult<ExpressionResult> {
         match self.env.remove(key) {
             Some(val) => Ok(val),
             None => Err(InterpreterError::EnvVarNotFound(key.to_owned())),
@@ -166,7 +166,7 @@ impl<'conn> QueryInterpreter<'conn> {
         Self { conn, log }
     }
 
-    pub fn interpret(
+    pub(crate) fn interpret(
         &mut self,
         exp: Expression,
         env: Env,

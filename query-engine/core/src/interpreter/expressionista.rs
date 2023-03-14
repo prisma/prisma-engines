@@ -4,7 +4,7 @@ use super::{
 use crate::{query_graph::*, Query};
 use std::{collections::VecDeque, convert::TryInto};
 
-pub struct Expressionista;
+pub(crate) struct Expressionista;
 
 /// Helper accumulator struct.
 #[derive(Default)]

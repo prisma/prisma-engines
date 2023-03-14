@@ -4,9 +4,8 @@ mod expressionista;
 mod interpreter;
 mod query_interpreters;
 
-pub use error::*;
-pub use expression::*;
-pub use expressionista::*;
-pub use interpreter::*;
+pub(crate) use error::*;
+pub(crate) use expressionista::*;
+pub(crate) use interpreter::*;
 
 type InterpretationResult<T> = std::result::Result<T, InterpreterError>;

@@ -7,11 +7,10 @@ mod one;
 mod related;
 mod utils;
 
-pub use aggregations::*;
-pub use first::*;
-pub use many::*;
-pub use one::*;
-pub use related::*;
+pub(crate) use aggregations::*;
+pub(crate) use first::*;
+pub(crate) use many::*;
+pub(crate) use one::*;
 
 use super::*;
 use crate::{Query, QueryGraph, ReadQuery};

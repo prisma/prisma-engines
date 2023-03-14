@@ -70,7 +70,10 @@ fn extract_composite_selection(pf: ParsedField, cf: CompositeFieldRef) -> Select
     })
 }
 
-pub fn collect_nested_queries(from: Vec<FieldPair>, model: &ModelRef) -> QueryGraphBuilderResult<Vec<ReadQuery>> {
+pub(crate) fn collect_nested_queries(
+    from: Vec<FieldPair>,
+    model: &ModelRef,
+) -> QueryGraphBuilderResult<Vec<ReadQuery>> {
     from.into_iter()
         .filter_map(|pair| {
             if is_aggr_selection(&pair) {
@@ -97,7 +100,7 @@ pub fn collect_nested_queries(from: Vec<FieldPair>, model: &ModelRef) -> QueryGr
 /// to resolve the nested queries.
 /// A lookback on the parent is also performed to ensure that fields required for
 /// resolving the parent relation are present.
-pub fn merge_relation_selections(
+pub(crate) fn merge_relation_selections(
     selected_fields: FieldSelection,
     parent_relation: Option<RelationFieldRef>,
     nested_queries: &[ReadQuery],

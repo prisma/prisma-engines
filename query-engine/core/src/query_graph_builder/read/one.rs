@@ -4,17 +4,17 @@ use prisma_models::ModelRef;
 use schema_builder::constants::args;
 use std::convert::TryInto;
 
-pub fn find_unique(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
+pub(crate) fn find_unique(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
     find_unique_with_options(field, model, QueryOptions::none())
 }
 
-pub fn find_unique_or_throw(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
+pub(crate) fn find_unique_or_throw(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
     find_unique_with_options(field, model, QueryOption::ThrowOnEmpty.into())
 }
 
 /// Builds a read query from a parsed incoming read query field.
 #[inline]
-pub fn find_unique_with_options(
+fn find_unique_with_options(
     mut field: ParsedField,
     model: ModelRef,
     options: QueryOptions,

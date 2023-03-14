@@ -9,7 +9,7 @@ use prisma_models::ManyRecords;
 use std::collections::HashMap;
 use user_facing_errors::KnownError;
 
-pub fn execute<'conn>(
+pub(crate) fn execute<'conn>(
     tx: &'conn mut dyn ConnectionLike,
     query: ReadQuery,
     parent_result: Option<&'conn ManyRecords>,
@@ -242,7 +242,7 @@ fn process_nested<'conn>(
 /// This means the SQL result we get back from the database contains additional aggregation data that needs to be remapped according to the schema
 /// This function takes care of removing the aggregation data from the database result and collects it separately
 /// so that it can be serialized separately later according to the schema
-pub fn extract_aggregation_rows_from_scalars(
+pub(crate) fn extract_aggregation_rows_from_scalars(
     mut scalars: ManyRecords,
     aggr_selections: Vec<RelAggregationSelection>,
 ) -> (ManyRecords, Option<Vec<RelAggregationRow>>) {

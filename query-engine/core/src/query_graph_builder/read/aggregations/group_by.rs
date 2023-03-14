@@ -6,7 +6,7 @@ use connector::Filter;
 use prisma_models::{ModelRef, OrderBy, ScalarFieldRef};
 use schema_builder::constants::args;
 
-pub fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
+pub(crate) fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
     let name = field.name;
     let alias = field.alias;
     let model = model;

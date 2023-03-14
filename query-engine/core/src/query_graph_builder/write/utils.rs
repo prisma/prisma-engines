@@ -11,7 +11,7 @@ use schema::ConnectorContext;
 
 /// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.
 /// Simply unpacks `ParsedInputValue::List`.
-pub fn coerce_vec(val: ParsedInputValue) -> Vec<ParsedInputValue> {
+pub(crate) fn coerce_vec(val: ParsedInputValue) -> Vec<ParsedInputValue> {
     match val {
         ParsedInputValue::List(l) => l,
         m @ ParsedInputValue::Map(_) => vec![m],
@@ -19,7 +19,7 @@ pub fn coerce_vec(val: ParsedInputValue) -> Vec<ParsedInputValue> {
     }
 }
 
-pub fn node_is_create(graph: &QueryGraph, node: &NodeRef) -> bool {
+pub(crate) fn node_is_create(graph: &QueryGraph, node: &NodeRef) -> bool {
     matches!(
         graph.node_content(node).unwrap(),
         Node::Query(Query::Write(WriteQuery::CreateRecord(_)))
@@ -27,7 +27,7 @@ pub fn node_is_create(graph: &QueryGraph, node: &NodeRef) -> bool {
 }
 
 /// Produces a non-failing read query that fetches the requested selection of records for a given filterable.
-pub fn read_ids_infallible<T>(model: ModelRef, selection: FieldSelection, filter: T) -> Query
+pub(crate) fn read_ids_infallible<T>(model: ModelRef, selection: FieldSelection, filter: T) -> Query
 where
     T: Into<Filter>,
 {

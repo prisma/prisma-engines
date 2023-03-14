@@ -2,11 +2,11 @@ use super::*;
 use crate::{query_document::ParsedField, ManyRecordsQuery, QueryOption, QueryOptions, ReadQuery};
 use prisma_models::ModelRef;
 
-pub fn find_many(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
+pub(crate) fn find_many(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
     find_many_with_options(field, model, QueryOptions::none())
 }
 
-pub fn find_many_or_throw(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
+pub(crate) fn find_many_or_throw(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
     find_many_with_options(field, model, QueryOption::ThrowOnEmpty.into())
 }
 

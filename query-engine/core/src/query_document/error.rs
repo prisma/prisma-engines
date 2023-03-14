@@ -65,6 +65,7 @@ impl fmt::Display for QueryPath {
 }
 
 #[derive(Debug)]
+#[allow(clippy::enum_variant_names)]
 pub enum QueryParserErrorKind {
     AssertionError(String),
     RequiredValueNotSetError,

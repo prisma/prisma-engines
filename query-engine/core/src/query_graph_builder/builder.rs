@@ -10,7 +10,7 @@ pub static PRISMA_RENDER_DOT_FILE: Lazy<bool> = Lazy::new(|| match std::env::var
 });
 
 pub struct QueryGraphBuilder {
-    pub query_schema: QuerySchemaRef,
+    query_schema: QuerySchemaRef,
 }
 
 impl fmt::Debug for QueryGraphBuilder {

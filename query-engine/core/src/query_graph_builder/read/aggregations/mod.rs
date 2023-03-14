@@ -5,8 +5,8 @@ use super::*;
 mod aggregate;
 mod group_by;
 
-pub use aggregate::*;
-pub use group_by::*;
+pub(crate) use aggregate::*;
+pub(crate) use group_by::*;
 
 use connector::AggregationSelection;
 use itertools::Itertools;

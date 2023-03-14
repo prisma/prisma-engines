@@ -34,7 +34,7 @@ type UncheckedItemsWithParents = IndexMap<Option<SelectionResult>, Vec<Item>>;
 /// // todo more here
 ///
 /// Returns a map of pairs of (parent ID, response)
-pub fn serialize_internal(
+pub(crate) fn serialize_internal(
     result: QueryResult,
     field: &OutputFieldRef,
     is_list: bool,

@@ -6,7 +6,7 @@ use prisma_models::prelude::*;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
-pub enum WriteQuery {
+pub(crate) enum WriteQuery {
     CreateRecord(CreateRecord),
     CreateManyRecords(CreateManyRecords),
     UpdateRecord(UpdateRecord),
