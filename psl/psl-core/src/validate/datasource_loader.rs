@@ -155,7 +155,10 @@ fn lift_datasource(
     };
 
     let (direct_url, direct_url_span) = match args.remove(DIRECT_URL_KEY) {
-        Some((direct_url_arg, direct_url)) => (StringFromEnvVar::coerce(direct_url, diagnostics), Some(direct_url_arg)),
+        Some((_, direct_url)) => (
+            StringFromEnvVar::coerce(direct_url, diagnostics),
+            Some(direct_url.span()),
+        ),
 
         None => (None, None),
     };
