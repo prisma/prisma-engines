@@ -94,6 +94,10 @@ impl PostgresDatasourceProperties {
             span: ast::Span::empty(),
         });
     }
+    // Validation for property existence
+    pub fn extensions_defined(&self) -> bool {
+        self.extensions.is_some()
+    }
 }
 
 /// An extension defined in the extensions array of the datasource.
