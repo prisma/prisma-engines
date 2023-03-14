@@ -65,7 +65,7 @@ impl NativeUpsert {
                 .collect();
         }
 
-        if let Some(ids) = self.model.fields().compound_id() {
+        if let Some(ids) = self.model.compound_id() {
             if ids.fields().iter().all(|f| scalars.contains(f)) {
                 return ids.fields();
             }

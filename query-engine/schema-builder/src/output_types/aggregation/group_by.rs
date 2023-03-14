@@ -23,7 +23,7 @@ pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &Mode
             ctx,
             UNDERSCORE_COUNT,
             model,
-            model.fields().scalar(),
+            model.scalar_fields(),
             |_, _| OutputType::int(),
             |mut obj| {
                 obj.add_field(field("_all", vec![], OutputType::int(), None));
@@ -92,7 +92,7 @@ pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &Mode
 }
 
 fn scalar_output_fields(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<OutputField> {
-    let fields = model.fields().scalar();
+    let fields = model.scalar_fields();
 
     fields
         .into_iter()

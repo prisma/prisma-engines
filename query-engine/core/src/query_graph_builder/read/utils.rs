@@ -80,7 +80,7 @@ pub(crate) fn collect_nested_queries(
                 return None;
             }
 
-            let model_field = model.fields().find_from_all(&pair.parsed_field.name).unwrap();
+            let model_field = model.find_from_all(&pair.parsed_field.name).unwrap();
 
             match model_field {
                 Field::Scalar(_) => None,
@@ -148,10 +148,7 @@ pub fn collect_relation_aggr_selections(
                 let nested_fields = pair.parsed_field.nested_fields.unwrap();
 
                 for mut nested_pair in nested_fields.fields {
-                    let rf = model
-                        .fields()
-                        .find_from_relation_fields(&nested_pair.parsed_field.name)
-                        .unwrap();
+                    let rf = model.find_from_relation_fields(&nested_pair.parsed_field.name).unwrap();
                     let filter = match nested_pair.parsed_field.arguments.lookup(args::WHERE) {
                         Some(where_arg) => Some(extract_filter(where_arg.value.try_into()?, rf.related_model())?),
                         _ => None,

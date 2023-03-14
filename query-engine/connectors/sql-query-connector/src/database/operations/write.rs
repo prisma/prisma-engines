@@ -172,8 +172,7 @@ pub(crate) async fn create_records(
         .into_iter()
         .map(|dsfn| {
             model
-                .fields()
-                .scalar()
+                .scalar_fields()
                 .into_iter()
                 .find(|sf| sf.db_name() == dsfn.deref())
                 .unwrap()

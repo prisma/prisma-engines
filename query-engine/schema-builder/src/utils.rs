@@ -13,7 +13,7 @@ pub fn object_type(ident: Identifier, fields: Vec<OutputField>, model: Option<Mo
 }
 
 /// Input object type convenience wrapper function.
-pub fn input_object_type(ident: Identifier, fields: Vec<InputField>) -> InputObjectType {
+pub fn input_object_type(ident: Identifier, fields: impl Iterator<Item = InputField>) -> InputObjectType {
     let object_type = init_input_object_type(ident);
 
     object_type.set_fields(fields);

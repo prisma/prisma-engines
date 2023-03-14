@@ -20,7 +20,7 @@ pub(crate) fn initialize_fields(ctx: &mut BuilderContext) {
         let mut fields = compute_model_object_type_fields(ctx, &model);
 
         // Add _count field. Only include to-many fields.
-        let relation_fields = model.fields().relation().into_iter().filter(|f| f.is_list()).collect();
+        let relation_fields = model.relation_fields().into_iter().filter(|f| f.is_list()).collect();
 
         append_opt(
             &mut fields,
@@ -49,10 +49,5 @@ pub(crate) fn map_type(ctx: &mut BuilderContext, model: &ModelRef) -> ObjectType
 /// Computes model output type fields.
 /// Requires an initialized cache.
 fn compute_model_object_type_fields(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<OutputField> {
-    model
-        .fields()
-        .filter_all(|_| true)
-        .into_iter()
-        .map(|f| field::map_output_field(ctx, &f))
-        .collect()
+    model.fields().map(|f| field::map_output_field(ctx, &f)).collect()
 }

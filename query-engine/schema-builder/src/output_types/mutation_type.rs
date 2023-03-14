@@ -64,7 +64,8 @@ fn create_nested_inputs(ctx: &mut BuilderContext) {
             }
 
             fields.push(input_fields::nested_connect_input_field(ctx, &rf));
-            input_object.set_fields(fields);
+
+            input_object.set_fields(fields.into_iter());
         }
 
         // Update inputs.
@@ -89,7 +90,7 @@ fn create_nested_inputs(ctx: &mut BuilderContext) {
             append_opt(&mut fields, input_fields::nested_update_many_field(ctx, &rf));
             append_opt(&mut fields, input_fields::nested_delete_many_field(ctx, &rf));
 
-            input_object.set_fields(fields);
+            input_object.set_fields(fields.into_iter());
         }
 
         std::mem::swap(&mut nested_create_inputs_queue, &mut ctx.nested_create_inputs_queue);

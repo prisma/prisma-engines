@@ -45,8 +45,7 @@ pub(crate) fn model_field_enum(ctx: &mut BuilderContext, model: &ModelRef) -> En
     return_cached_enum!(ctx, &ident);
 
     let values = model
-        .fields()
-        .scalar()
+        .scalar_fields()
         .into_iter()
         .map(|field| (field.name().to_owned(), field))
         .collect();

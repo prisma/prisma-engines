@@ -26,6 +26,10 @@ impl RelationField {
         matches!(self.arity(), FieldArity::Required)
     }
 
+    pub fn is_ignored(&self) -> bool {
+        self.walker().is_ignored()
+    }
+
     /// Returns the `FieldSelection` used for this relation fields model.
     ///
     /// ## What is the field selection of a relation field?

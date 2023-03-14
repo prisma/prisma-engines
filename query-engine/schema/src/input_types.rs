@@ -52,9 +52,9 @@ impl InputObjectType {
         self.fields.get().unwrap()
     }
 
-    pub fn set_fields(&self, fields: Vec<InputField>) {
+    pub fn set_fields(&self, fields: impl Iterator<Item = InputField>) {
         self.fields
-            .set(fields.into_iter().map(Arc::new).collect())
+            .set(fields.map(Arc::new).collect())
             .unwrap_or_else(|_| panic!("Fields of {:?} are already set", self.identifier));
     }
 

@@ -29,7 +29,7 @@ pub fn extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -> Que
     let (unique_map, rest_map): (IndexMap<_, _>, IndexMap<_, _>) =
         value_map
             .into_iter()
-            .partition(|(field_name, _)| match model.fields().find_from_scalar(&field_name) {
+            .partition(|(field_name, _)| match model.find_from_scalar(&field_name) {
                 Ok(field) => field.unique(),
                 Err(_) => utils::resolve_compound_field(&field_name, &model).is_some(),
             });
@@ -51,7 +51,7 @@ fn internal_extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -
         .into_iter()
         .map(|(field_name, value): (String, ParsedInputValue)| {
             // Always try to resolve regular fields first. If that fails, try to resolve compound fields.
-            match model.fields().find_from_scalar(&field_name) {
+            match model.find_from_scalar(&field_name) {
                 Ok(field) => {
                     let value: PrismaValue = value.try_into()?;
                     Ok(field.equals(value))

@@ -260,7 +260,7 @@ impl JsonProtocolAdapter {
     ) -> crate::Result<()> {
         match container {
             ParentContainer::Model(model) => {
-                for cf in model.fields().composite() {
+                for cf in model.composite_fields() {
                     let schema_field = schema_object.find_field(cf.name());
 
                     if let Some(schema_field) = schema_field {

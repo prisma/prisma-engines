@@ -26,13 +26,12 @@ pub(crate) fn checked_update_many_input_type(ctx: &mut BuilderContext, model: &M
     let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
 
-    let filtered_fields: Vec<_> = update_one_objects::filter_checked_update_fields(ctx, model, None)
+    let filtered_fields = update_one_objects::filter_checked_update_fields(ctx, model, None)
         .into_iter()
-        .filter(|field| matches!(field, ModelField::Scalar(_) | ModelField::Composite(_)))
-        .collect();
+        .filter(|field| matches!(field, ModelField::Scalar(_) | ModelField::Composite(_)));
 
     let field_mapper = UpdateDataInputFieldMapper::new_checked();
-    let input_fields = field_mapper.map_all(ctx, &filtered_fields);
+    let input_fields = field_mapper.map_all(ctx, filtered_fields);
 
     input_object.set_fields(input_fields);
     Arc::downgrade(&input_object)
@@ -59,13 +58,11 @@ pub(crate) fn unchecked_update_many_input_type(
     let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
 
-    let filtered_fields: Vec<_> = update_one_objects::filter_unchecked_update_fields(ctx, model, parent_field)
-        .into_iter()
-        .filter(|field| matches!(field, ModelField::Scalar(_) | ModelField::Composite(_)))
-        .collect();
+    let filtered_fields = update_one_objects::filter_unchecked_update_fields(ctx, model, parent_field)
+        .filter(|field| matches!(field, ModelField::Scalar(_) | ModelField::Composite(_)));
 
     let field_mapper = UpdateDataInputFieldMapper::new_unchecked();
-    let input_fields = field_mapper.map_all(ctx, &filtered_fields);
+    let input_fields = field_mapper.map_all(ctx, filtered_fields);
 
     input_object.set_fields(input_fields);
     Arc::downgrade(&input_object)
@@ -93,10 +90,13 @@ pub(crate) fn update_many_where_combination_object(
     let where_input_object = filter_objects::scalar_filter_object_type(ctx, &related_model, false);
     let update_types = update_many_input_types(ctx, &related_model, Some(parent_field));
 
-    input_object.set_fields(vec![
-        input_field(args::WHERE, InputType::object(where_input_object), None),
-        input_field(args::DATA, update_types, None),
-    ]);
+    input_object.set_fields(
+        [
+            input_field(args::WHERE, InputType::object(where_input_object), None),
+            input_field(args::DATA, update_types, None),
+        ]
+        .into_iter(),
+    );
 
     Arc::downgrade(&input_object)
 }

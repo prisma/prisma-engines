@@ -61,14 +61,14 @@ fn resolve_query(
         UNDERSCORE_MIN => AggregationSelection::Min(resolve_fields(model, field)),
         UNDERSCORE_MAX => AggregationSelection::Max(resolve_fields(model, field)),
 
-        name => AggregationSelection::Field(model.fields().find_from_scalar(name).unwrap()),
+        name => AggregationSelection::Field(model.find_from_scalar(name).unwrap()),
     };
 
     Ok(query)
 }
 
 fn resolve_fields(model: &ModelRef, field: FieldPair) -> Vec<ScalarFieldRef> {
-    let scalars = model.fields().scalar();
+    let scalars = model.scalar_fields();
     let fields = field
         .parsed_field
         .nested_fields
