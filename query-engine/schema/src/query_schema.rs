@@ -269,18 +269,33 @@ impl From<String> for QueryTag {
 #[derive(PartialEq, Hash, Eq, Debug, Clone)]
 pub struct Identifier {
     name: String,
-    namespace: String,
+    namespace: IdentifierNamespace,
+}
+
+#[derive(PartialEq, Eq, Hash, Debug, Clone)]
+enum IdentifierNamespace {
+    Prisma,
+    Model,
 }
 
 impl Identifier {
-    pub fn new<T, U>(name: T, namespace: U) -> Self
+    pub fn new_prisma<T>(name: T) -> Self
     where
         T: Into<String>,
-        U: Into<String>,
     {
         Self {
             name: name.into(),
-            namespace: namespace.into(),
+            namespace: IdentifierNamespace::Prisma,
+        }
+    }
+
+    pub fn new_model<T>(name: T) -> Self
+    where
+        T: Into<String>,
+    {
+        Self {
+            name: name.into(),
+            namespace: IdentifierNamespace::Model,
         }
     }
 
@@ -289,7 +304,10 @@ impl Identifier {
     }
 
     pub fn namespace(&self) -> &str {
-        &self.namespace
+        match self.namespace {
+            IdentifierNamespace::Prisma => "prisma",
+            IdentifierNamespace::Model => "model",
+        }
     }
 }
 

@@ -29,7 +29,7 @@ fn checked_update_one_input_type(
         _ => format!("{}UpdateInput", model.name()),
     };
 
-    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));
@@ -54,7 +54,7 @@ fn unchecked_update_one_input_type(
         _ => format!("{}UncheckedUpdateInput", model.name()),
     };
 
-    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));
@@ -178,14 +178,11 @@ pub(crate) fn update_one_where_combination_object(
 ) -> InputObjectTypeWeakRef {
     let related_model = parent_field.related_model();
     let where_input_object = filter_objects::where_unique_object_type(ctx, &related_model);
-    let ident = Identifier::new(
-        format!(
-            "{}UpdateWithWhereUniqueWithout{}Input",
-            related_model.name(),
-            capitalize(parent_field.related_field().name())
-        ),
-        PRISMA_NAMESPACE,
-    );
+    let ident = Identifier::new_prisma(format!(
+        "{}UpdateWithWhereUniqueWithout{}Input",
+        related_model.name(),
+        capitalize(parent_field.related_field().name())
+    ));
 
     return_cached_input!(ctx, &ident);
 
@@ -209,14 +206,11 @@ pub(crate) fn update_to_one_rel_where_combination_object(
     parent_field: &RelationFieldRef,
 ) -> InputObjectTypeWeakRef {
     let related_model = parent_field.related_model();
-    let ident = Identifier::new(
-        format!(
-            "{}UpdateToOneWithWhereWithout{}Input",
-            related_model.name(),
-            capitalize(parent_field.related_field().name())
-        ),
-        PRISMA_NAMESPACE,
-    );
+    let ident = Identifier::new_prisma(format!(
+        "{}UpdateToOneWithWhereWithout{}Input",
+        related_model.name(),
+        capitalize(parent_field.related_field().name())
+    ));
 
     return_cached_input!(ctx, &ident);
 

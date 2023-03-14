@@ -7,8 +7,8 @@ use psl::datamodel_connector::ConnectorCapability;
 /// Builds the root `Mutation` type.
 pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRef) {
     let mut fields: Vec<OutputField> = ctx
+        .internal_data_model
         .models()
-        .into_iter()
         .flat_map(|model| {
             let mut vec = vec![];
 
@@ -40,7 +40,7 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
         fields.push(create_mongodb_run_command_raw());
     }
 
-    let ident = Identifier::new("Mutation".to_owned(), PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma("Mutation".to_owned());
     let strong_ref = Arc::new(object_type(ident, fields, None));
 
     (OutputType::Object(Arc::downgrade(&strong_ref)), strong_ref)

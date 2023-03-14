@@ -37,10 +37,7 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
 
     fn map_scalar_list(&self, ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputField {
         let typ = map_scalar_input_type_for_field(ctx, sf);
-        let ident = Identifier::new(
-            format!("{}Create{}Input", sf.container().name(), sf.name()),
-            PRISMA_NAMESPACE,
-        );
+        let ident = Identifier::new_prisma(format!("{}Create{}Input", sf.container().name(), sf.name()));
 
         let input_object = match ctx.get_input_type(&ident) {
             Some(cached) => cached,
@@ -70,16 +67,13 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
         let arity_part = if rf.is_list() { "NestedMany" } else { "NestedOne" };
         let without_part = format!("Without{}", capitalize(related_field.name()));
         let unchecked_part = if self.unchecked { "Unchecked" } else { "" };
-        let ident = Identifier::new(
-            format!(
-                "{}{}Create{}{}Input",
-                related_model.name(),
-                unchecked_part,
-                arity_part,
-                without_part
-            ),
-            PRISMA_NAMESPACE,
-        );
+        let ident = Identifier::new_prisma(format!(
+            "{}{}Create{}{}Input",
+            related_model.name(),
+            unchecked_part,
+            arity_part,
+            without_part
+        ));
 
         let input_object = match ctx.get_input_type(&ident) {
             Some(t) => t,
@@ -159,7 +153,7 @@ fn composite_create_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
 
     let name = format!("{}{}CreateEnvelopeInput", cf.typ().name(), arity);
 
-    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
@@ -190,7 +184,7 @@ pub(crate) fn composite_create_object_type(ctx: &mut BuilderContext, cf: &Compos
     // It's called "Create" input because it's used across multiple create-type operations, not only "set".
     let name = format!("{}CreateInput", cf.typ().name());
 
-    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));

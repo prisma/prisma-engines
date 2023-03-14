@@ -4,10 +4,7 @@ use std::convert::identity;
 
 /// Builds group by aggregation object type for given model (e.g. GroupByUserOutputType).
 pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> ObjectTypeWeakRef {
-    let ident = Identifier::new(
-        format!("{}GroupByOutputType", capitalize(model.name())),
-        PRISMA_NAMESPACE,
-    );
+    let ident = Identifier::new_prisma(format!("{}GroupByOutputType", capitalize(model.name())));
     return_cached_output!(ctx, &ident);
 
     let object = Arc::new(ObjectType::new(ident.clone(), Some(ModelRef::clone(model))));

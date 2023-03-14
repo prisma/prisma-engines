@@ -13,10 +13,7 @@ use crate::{
 };
 use prisma_models::{ModelRef, RelationFieldRef};
 use psl::datamodel_connector::ConnectorCapability;
-use schema::{
-    Identifier, InputField, InputObjectTypeWeakRef, InputType, OutputField, OutputType, QueryInfo, QueryTag,
-    PRISMA_NAMESPACE,
-};
+use schema::{Identifier, InputField, InputObjectTypeWeakRef, InputType, OutputField, OutputType, QueryInfo, QueryTag};
 
 /// Builds a create many mutation field (e.g. createManyUsers) for given model.
 pub(crate) fn create_many(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
@@ -66,7 +63,7 @@ pub(crate) fn create_many_object_type(
         _ => format!("{}CreateManyInput", model.name()),
     };
 
-    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));

@@ -4,8 +4,8 @@ use input_types::fields::arguments;
 /// Builds the root `Query` type.
 pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRef) {
     let fields: Vec<_> = ctx
+        .internal_data_model
         .models()
-        .into_iter()
         .flat_map(|model| {
             let mut vec = vec![
                 find_first_field(ctx, &model),
@@ -27,7 +27,7 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
         })
         .collect();
 
-    let ident = Identifier::new("Query".to_owned(), PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma("Query");
     let strong_ref = Arc::new(object_type(ident, fields, None));
 
     (OutputType::Object(Arc::downgrade(&strong_ref)), strong_ref)

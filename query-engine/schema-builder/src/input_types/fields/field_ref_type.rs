@@ -18,7 +18,7 @@ impl WithFieldRefInputExt for InputType {
 }
 
 fn field_ref_input_object_type(ctx: &mut BuilderContext, allow_type: InputType) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new(field_ref_input_type_name(&allow_type), PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma(field_ref_input_type_name(&allow_type));
 
     return_cached_input!(ctx, &ident);
 

@@ -9,10 +9,7 @@ use crate::{
     BuilderContext, ModelField,
 };
 use prisma_models::{ModelRef, RelationFieldRef};
-use schema::{
-    Identifier, InputField, InputObjectTypeWeakRef, InputType, OutputField, OutputType, QueryInfo, QueryTag,
-    PRISMA_NAMESPACE,
-};
+use schema::{Identifier, InputField, InputObjectTypeWeakRef, InputType, OutputField, OutputType, QueryInfo, QueryTag};
 
 /// Builds a create mutation field (e.g. createUser) for given model.
 pub(crate) fn create_one(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
@@ -77,7 +74,7 @@ fn checked_create_input_type(
         _ => format!("{}CreateInput", model.name()),
     };
 
-    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));
@@ -108,7 +105,7 @@ fn unchecked_create_input_type(
         _ => format!("{}UncheckedCreateInput", model.name()),
     };
 
-    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));

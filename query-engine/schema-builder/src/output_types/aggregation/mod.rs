@@ -80,10 +80,11 @@ where
     F: Fn(&mut BuilderContext, &ScalarFieldRef) -> OutputType,
     G: Fn(ObjectType) -> ObjectType,
 {
-    let ident = Identifier::new(
-        format!("{}{}AggregateOutputType", capitalize(model.name()), capitalize(suffix)),
-        PRISMA_NAMESPACE,
-    );
+    let ident = Identifier::new_prisma(format!(
+        "{}{}AggregateOutputType",
+        capitalize(model.name()),
+        capitalize(suffix)
+    ));
     return_cached_output!(ctx, &ident);
 
     // Non-numerical fields are always set as nullable
