@@ -95,9 +95,11 @@ impl fmt::Display for QueryParserError {
     }
 }
 
+pub type SelectionPath = QueryPath;
+pub type ArgumentPath = QueryPath;
 #[derive(Debug, Clone, Default)]
 pub struct QueryPath {
-    pub segments: Vec<String>,
+    segments: Vec<String>,
 }
 
 impl QueryPath {
@@ -116,9 +118,13 @@ impl QueryPath {
     pub fn last(&self) -> Option<&str> {
         self.segments.last().map(|s| s.as_str())
     }
+
+    pub fn segments(&self) -> Vec<String> {
+        self.segments.clone()
+    }
 }
 
-impl fmt::Display for QueryPath {
+impl fmt::Display for ArgumentPath {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.segments.join("."))
     }
@@ -231,7 +237,7 @@ impl Display for FieldCountError {
 impl From<prisma_models::DomainError> for QueryParserError {
     fn from(err: prisma_models::DomainError) -> Self {
         QueryParserError::Legacy {
-            path: QueryPath::default(),
+            path: ArgumentPath::default(),
             error_kind: QueryParserErrorKind::AssertionError(format!("Domain error occurred: {err}")),
         }
     }

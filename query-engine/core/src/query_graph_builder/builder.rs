@@ -41,6 +41,8 @@ impl QueryGraphBuilder {
         let mut selections = vec![selection];
         let mut parsed_object = QueryDocumentParser::new(crate::executor::get_request_now()).parse_object(
             QueryPath::default(),
+            SelectionPath::default(),
+            ArgumentPath::default(),
             &selections,
             root_object,
         )?;
