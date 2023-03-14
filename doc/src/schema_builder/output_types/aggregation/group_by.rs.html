@@ -102,19 +102,13 @@
 <a href="#102" id="102">102</a>
 <a href="#103" id="103">103</a>
 <a href="#104" id="104">104</a>
-<a href="#105" id="105">105</a>
-<a href="#106" id="106">106</a>
-<a href="#107" id="107">107</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::constants::aggregations::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::convert::identity;
 
 <span class="doccomment">/// Builds group by aggregation object type for given model (e.g. GroupByUserOutputType).
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>group_by_output_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; ObjectTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new(
-        <span class="macro">format!</span>(<span class="string">&quot;{}GroupByOutputType&quot;</span>, capitalize(model.name())),
-        PRISMA_NAMESPACE,
-    );
+    <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}GroupByOutputType&quot;</span>, capitalize(model.name())));
     <span class="macro">return_cached_output!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span>object = Arc::new(ObjectType::new(ident.clone(), <span class="prelude-val">Some</span>(ModelRef::clone(model))));

@@ -166,7 +166,7 @@
 <span class="kw">use </span>schema::EnumType;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>sort_order_enum(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; EnumTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new(ordering::SORT_ORDER, PRISMA_NAMESPACE);
+    <span class="kw">let </span>ident = Identifier::new_prisma(ordering::SORT_ORDER);
     <span class="macro">return_cached_enum!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span>typ = Arc::new(EnumType::string(
@@ -179,7 +179,7 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nulls_order_enum(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; EnumTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new(ordering::NULLS_ORDER, PRISMA_NAMESPACE);
+    <span class="kw">let </span>ident = Identifier::new_prisma(ordering::NULLS_ORDER);
     <span class="macro">return_cached_enum!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span>typ = Arc::new(EnumType::string(
@@ -192,7 +192,7 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_schema_enum_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, enum_id: ast::EnumId) -&gt; EnumTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new(ctx.internal_data_model.walk(enum_id).name(), MODEL_NAMESPACE);
+    <span class="kw">let </span>ident = Identifier::new_model(ctx.internal_data_model.walk(enum_id).name());
     <span class="macro">return_cached_enum!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span>schema_enum = ctx.internal_data_model.clone().zip(enum_id);
@@ -204,7 +204,7 @@
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>model_field_enum(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; EnumTypeWeakRef {
     <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}ScalarFieldEnum&quot;</span>, capitalize(model.name()));
-    <span class="kw">let </span>ident = Identifier::new(name, PRISMA_NAMESPACE);
+    <span class="kw">let </span>ident = Identifier::new_prisma(name);
     <span class="macro">return_cached_enum!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span>values = model
@@ -221,7 +221,7 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>json_null_filter_enum(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; EnumTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new(json_null::FILTER_ENUM_NAME, PRISMA_NAMESPACE);
+    <span class="kw">let </span>ident = Identifier::new_prisma(json_null::FILTER_ENUM_NAME);
     <span class="macro">return_cached_enum!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span>typ = Arc::new(EnumType::string(
@@ -239,9 +239,9 @@
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>json_null_input_enum(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, nullable: bool) -&gt; EnumTypeWeakRef {
     <span class="kw">let </span>ident = <span class="kw">if </span>nullable {
-        Identifier::new(json_null::NULLABLE_INPUT_ENUM_NAME, PRISMA_NAMESPACE)
+        Identifier::new_prisma(json_null::NULLABLE_INPUT_ENUM_NAME)
     } <span class="kw">else </span>{
-        Identifier::new(json_null::INPUT_ENUM_NAME, PRISMA_NAMESPACE)
+        Identifier::new_prisma(json_null::INPUT_ENUM_NAME)
     };
 
     <span class="macro">return_cached_enum!</span>(ctx, <span class="kw-2">&amp;</span>ident);
@@ -265,7 +265,7 @@
     values: Vec&lt;String&gt;,
 ) -&gt; EnumTypeWeakRef {
     <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{container}OrderByRelevanceFieldEnum&quot;</span>);
-    <span class="kw">let </span>ident = Identifier::new(name, PRISMA_NAMESPACE);
+    <span class="kw">let </span>ident = Identifier::new_prisma(name);
     <span class="macro">return_cached_enum!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span>typ = Arc::new(EnumType::string(ident.clone(), values));
@@ -275,7 +275,7 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>query_mode_enum(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; EnumTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new(<span class="string">&quot;QueryMode&quot;</span>, PRISMA_NAMESPACE);
+    <span class="kw">let </span>ident = Identifier::new_prisma(<span class="string">&quot;QueryMode&quot;</span>);
     <span class="macro">return_cached_enum!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span>typ = Arc::new(EnumType::string(
@@ -288,7 +288,7 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>itx_isolation_levels(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; <span class="prelude-ty">Option</span>&lt;EnumTypeWeakRef&gt; {
-    <span class="kw">let </span>ident = Identifier::new(<span class="string">&quot;TransactionIsolationLevel&quot;</span>, PRISMA_NAMESPACE);
+    <span class="kw">let </span>ident = Identifier::new_prisma(<span class="string">&quot;TransactionIsolationLevel&quot;</span>);
     <span class="kw">if let </span>e @ <span class="prelude-val">Some</span>(<span class="kw">_</span>) = ctx.get_enum_type(<span class="kw-2">&amp;</span>ident) {
         <span class="kw">return </span>e;
     }

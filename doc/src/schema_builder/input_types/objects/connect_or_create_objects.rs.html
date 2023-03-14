@@ -38,9 +38,6 @@
 <a href="#38" id="38">38</a>
 <a href="#39" id="39">39</a>
 <a href="#40" id="40">40</a>
-<a href="#41" id="41">41</a>
-<a href="#42" id="42">42</a>
-<a href="#43" id="43">43</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>constants::args;
 <span class="kw">use </span>mutations::create_one;
@@ -57,14 +54,11 @@
         <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">let </span>ident = Identifier::new(
-        <span class="macro">format!</span>(
-            <span class="string">&quot;{}CreateOrConnectWithout{}Input&quot;</span>,
-            related_model.name(),
-            capitalize(parent_field.related_field().name())
-        ),
-        PRISMA_NAMESPACE,
-    );
+    <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(
+        <span class="string">&quot;{}CreateOrConnectWithout{}Input&quot;</span>,
+        related_model.name(),
+        capitalize(parent_field.related_field().name())
+    ));
 
     <span class="kw">let </span>create_types = create_one::create_one_input_types(ctx, <span class="kw-2">&amp;</span>related_model, <span class="prelude-val">Some</span>(parent_field));
 

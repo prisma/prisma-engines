@@ -306,7 +306,7 @@
     <span class="kw">let </span>nested_ident = <span class="kw-2">&amp;</span>create_type.into_arc().identifier;
     <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}Envelope&quot;</span>, nested_ident.name());
 
-    <span class="kw">let </span>ident = Identifier::new(name, PRISMA_NAMESPACE);
+    <span class="kw">let </span>ident = Identifier::new_prisma(name);
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));

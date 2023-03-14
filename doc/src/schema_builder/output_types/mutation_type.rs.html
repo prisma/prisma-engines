@@ -242,8 +242,8 @@
 <span class="doccomment">/// Builds the root `Mutation` type.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; (OutputType, ObjectTypeStrongRef) {
     <span class="kw">let </span><span class="kw-2">mut </span>fields: Vec&lt;OutputField&gt; = ctx
+        .internal_data_model
         .models()
-        .into_iter()
         .flat_map(|model| {
             <span class="kw">let </span><span class="kw-2">mut </span>vec = <span class="macro">vec!</span>[];
 
@@ -275,7 +275,7 @@
         fields.push(create_mongodb_run_command_raw());
     }
 
-    <span class="kw">let </span>ident = Identifier::new(<span class="string">&quot;Mutation&quot;</span>.to_owned(), PRISMA_NAMESPACE);
+    <span class="kw">let </span>ident = Identifier::new_prisma(<span class="string">&quot;Mutation&quot;</span>.to_owned());
     <span class="kw">let </span>strong_ref = Arc::new(object_type(ident, fields, <span class="prelude-val">None</span>));
 
     (OutputType::Object(Arc::downgrade(<span class="kw-2">&amp;</span>strong_ref)), strong_ref)

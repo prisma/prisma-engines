@@ -113,9 +113,6 @@
 <a href="#113" id="113">113</a>
 <a href="#114" id="114">114</a>
 <a href="#115" id="115">115</a>
-<a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use crate</span>::{
@@ -131,10 +128,7 @@
 };
 <span class="kw">use </span>prisma_models::{ModelRef, RelationFieldRef};
 <span class="kw">use </span>psl::datamodel_connector::ConnectorCapability;
-<span class="kw">use </span>schema::{
-    Identifier, InputField, InputObjectTypeWeakRef, InputType, OutputField, OutputType, QueryInfo, QueryTag,
-    PRISMA_NAMESPACE,
-};
+<span class="kw">use </span>schema::{Identifier, InputField, InputObjectTypeWeakRef, InputType, OutputField, OutputType, QueryInfo, QueryTag};
 
 <span class="doccomment">/// Builds a create many mutation field (e.g. createManyUsers) for given model.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_many(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;OutputField&gt; {
@@ -184,7 +178,7 @@
         <span class="kw">_ </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;{}CreateManyInput&quot;</span>, model.name()),
     };
 
-    <span class="kw">let </span>ident = Identifier::new(name, PRISMA_NAMESPACE);
+    <span class="kw">let </span>ident = Identifier::new_prisma(name);
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));

@@ -337,6 +337,24 @@
 <a href="#337" id="337">337</a>
 <a href="#338" id="338">338</a>
 <a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
+<a href="#352" id="352">352</a>
+<a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>fmt::Debug;
 <span class="kw">use </span>prisma_models::{InternalDataModelRef, ModelRef};
@@ -608,18 +626,33 @@
 <span class="attr">#[derive(PartialEq, Hash, Eq, Debug, Clone)]
 </span><span class="kw">pub struct </span>Identifier {
     name: String,
-    namespace: String,
+    namespace: IdentifierNamespace,
+}
+
+<span class="attr">#[derive(PartialEq, Eq, Hash, Debug, Clone)]
+</span><span class="kw">enum </span>IdentifierNamespace {
+    Prisma,
+    Model,
 }
 
 <span class="kw">impl </span>Identifier {
-    <span class="kw">pub fn </span>new&lt;T, U&gt;(name: T, namespace: U) -&gt; <span class="self">Self
+    <span class="kw">pub fn </span>new_prisma&lt;T&gt;(name: T) -&gt; <span class="self">Self
     </span><span class="kw">where
         </span>T: Into&lt;String&gt;,
-        U: Into&lt;String&gt;,
     {
         <span class="self">Self </span>{
             name: name.into(),
-            namespace: namespace.into(),
+            namespace: IdentifierNamespace::Prisma,
+        }
+    }
+
+    <span class="kw">pub fn </span>new_model&lt;T&gt;(name: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: Into&lt;String&gt;,
+    {
+        <span class="self">Self </span>{
+            name: name.into(),
+            namespace: IdentifierNamespace::Model,
         }
     }
 
@@ -628,7 +661,10 @@
     }
 
     <span class="kw">pub fn </span>namespace(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.namespace
+        <span class="kw">match </span><span class="self">self</span>.namespace {
+            IdentifierNamespace::Prisma =&gt; <span class="string">&quot;prisma&quot;</span>,
+            IdentifierNamespace::Model =&gt; <span class="string">&quot;model&quot;</span>,
+        }
     }
 }
 

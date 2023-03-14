@@ -247,7 +247,7 @@
     </span>F: Fn(<span class="kw-2">&amp;mut </span>BuilderContext, <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; OutputType,
     G: Fn(ObjectType) -&gt; ObjectType,
 {
-    <span class="kw">let </span>ident = Identifier::new(<span class="macro">format!</span>(<span class="string">&quot;{}CountOutputType&quot;</span>, capitalize(model.name())), PRISMA_NAMESPACE);
+    <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}CountOutputType&quot;</span>, capitalize(model.name())));
     <span class="macro">return_cached_output!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span>fields: Vec&lt;OutputField&gt; = fields
