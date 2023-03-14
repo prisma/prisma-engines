@@ -56,17 +56,17 @@
 <span class="kw">use </span>schema_builder::constants::args;
 <span class="kw">use </span>std::convert::TryInto;
 
-<span class="kw">pub fn </span>find_unique(field: ParsedField, model: ModelRef) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_unique(field: ParsedField, model: ModelRef) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
     find_unique_with_options(field, model, QueryOptions::none())
 }
 
-<span class="kw">pub fn </span>find_unique_or_throw(field: ParsedField, model: ModelRef) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_unique_or_throw(field: ParsedField, model: ModelRef) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
     find_unique_with_options(field, model, QueryOption::ThrowOnEmpty.into())
 }
 
 <span class="doccomment">/// Builds a read query from a parsed incoming read query field.
 </span><span class="attr">#[inline]
-</span><span class="kw">pub fn </span>find_unique_with_options(
+</span><span class="kw">fn </span>find_unique_with_options(
     <span class="kw-2">mut </span>field: ParsedField,
     model: ModelRef,
     options: QueryOptions,

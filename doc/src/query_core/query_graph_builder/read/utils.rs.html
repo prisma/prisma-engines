@@ -163,6 +163,9 @@
 <a href="#163" id="163">163</a>
 <a href="#164" id="164">164</a>
 <a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
 <span class="kw">use </span>connector::RelAggregationSelection;
@@ -235,7 +238,10 @@
     })
 }
 
-<span class="kw">pub fn </span>collect_nested_queries(from: Vec&lt;FieldPair&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; QueryGraphBuilderResult&lt;Vec&lt;ReadQuery&gt;&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>collect_nested_queries(
+    from: Vec&lt;FieldPair&gt;,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+) -&gt; QueryGraphBuilderResult&lt;Vec&lt;ReadQuery&gt;&gt; {
     from.into_iter()
         .filter_map(|pair| {
             <span class="kw">if </span>is_aggr_selection(<span class="kw-2">&amp;</span>pair) {
@@ -262,7 +268,7 @@
 /// to resolve the nested queries.
 /// A lookback on the parent is also performed to ensure that fields required for
 /// resolving the parent relation are present.
-</span><span class="kw">pub fn </span>merge_relation_selections(
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>merge_relation_selections(
     selected_fields: FieldSelection,
     parent_relation: <span class="prelude-ty">Option</span>&lt;RelationFieldRef&gt;,
     nested_queries: <span class="kw-2">&amp;</span>[ReadQuery],

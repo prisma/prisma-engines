@@ -67,14 +67,14 @@
 </span><span class="kw">pub struct </span>IrSerializer {
     <span class="doccomment">/// Serialization key for root DataItem
     /// Note: This will change
-    </span><span class="kw">pub </span>key: String,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) key: String,
 
     <span class="doccomment">/// Output field describing the possible shape of the result
-    </span><span class="kw">pub </span>output_field: OutputFieldRef,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) output_field: OutputFieldRef,
 }
 
 <span class="kw">impl </span>IrSerializer {
-    <span class="kw">pub fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, result: ExpressionResult) -&gt; <span class="kw">crate</span>::Result&lt;ResponseData&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, result: ExpressionResult) -&gt; <span class="kw">crate</span>::Result&lt;ResponseData&gt; {
         <span class="kw">let </span>_span = <span class="macro">info_span!</span>(<span class="string">&quot;prisma:engine:serialize&quot;</span>, user_facing = <span class="bool-val">true</span>);
         <span class="kw">match </span>result {
             ExpressionResult::Query(QueryResult::Json(json)) =&gt; {

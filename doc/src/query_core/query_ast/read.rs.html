@@ -223,7 +223,7 @@
 
 <span class="attr">#[allow(clippy::enum_variant_names)]
 #[derive(Debug, Clone)]
-</span><span class="kw">pub enum </span>ReadQuery {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>ReadQuery {
     RecordQuery(RecordQuery),
     ManyRecordsQuery(ManyRecordsQuery),
     RelatedRecordsQuery(RelatedRecordsQuery),
@@ -362,7 +362,7 @@
     <span class="kw">pub </span>model: ModelRef,
     <span class="kw">pub </span>filter: <span class="prelude-ty">Option</span>&lt;Filter&gt;,
     <span class="kw">pub </span>selected_fields: FieldSelection,
-    <span class="kw">pub </span>nested: Vec&lt;ReadQuery&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) nested: Vec&lt;ReadQuery&gt;,
     <span class="kw">pub </span>selection_order: Vec&lt;String&gt;,
     <span class="kw">pub </span>aggregation_selections: Vec&lt;RelAggregationSelection&gt;,
     <span class="kw">pub </span>options: QueryOptions,
@@ -375,7 +375,7 @@
     <span class="kw">pub </span>model: ModelRef,
     <span class="kw">pub </span>args: QueryArguments,
     <span class="kw">pub </span>selected_fields: FieldSelection,
-    <span class="kw">pub </span>nested: Vec&lt;ReadQuery&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) nested: Vec&lt;ReadQuery&gt;,
     <span class="kw">pub </span>selection_order: Vec&lt;String&gt;,
     <span class="kw">pub </span>aggregation_selections: Vec&lt;RelAggregationSelection&gt;,
     <span class="kw">pub </span>options: QueryOptions,
@@ -388,7 +388,7 @@
     <span class="kw">pub </span>parent_field: RelationFieldRef,
     <span class="kw">pub </span>args: QueryArguments,
     <span class="kw">pub </span>selected_fields: FieldSelection,
-    <span class="kw">pub </span>nested: Vec&lt;ReadQuery&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) nested: Vec&lt;ReadQuery&gt;,
     <span class="kw">pub </span>selection_order: Vec&lt;String&gt;,
     <span class="kw">pub </span>aggregation_selections: Vec&lt;RelAggregationSelection&gt;,
 

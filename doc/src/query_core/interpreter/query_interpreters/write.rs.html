@@ -164,7 +164,7 @@
 };
 <span class="kw">use </span>connector::{ConnectionLike, NativeUpsert, QueryArguments};
 
-<span class="kw">pub async fn </span>execute(
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>execute(
     tx: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>ConnectionLike,
     write_query: WriteQuery,
     trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,

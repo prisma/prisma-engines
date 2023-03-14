@@ -45,7 +45,7 @@
 </pre><pre class="rust"><code><span class="kw">use super</span>::{Env, ExpressionResult, InterpretationResult};
 <span class="kw">use </span><span class="kw">crate</span>::Query;
 
-<span class="kw">pub enum </span>Expression {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Expression {
     Sequence {
         seq: Vec&lt;Expression&gt;,
     },
@@ -82,7 +82,7 @@
     },
 }
 
-<span class="kw">pub struct </span>Binding {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Binding {
     <span class="kw">pub </span>name: String,
     <span class="kw">pub </span>expr: Expression,
 }

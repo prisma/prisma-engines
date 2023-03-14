@@ -1182,7 +1182,7 @@
 
 <span class="doccomment">/// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.
 /// Simply unpacks `ParsedInputValue::List`.
-</span><span class="kw">pub fn </span>coerce_vec(val: ParsedInputValue) -&gt; Vec&lt;ParsedInputValue&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>coerce_vec(val: ParsedInputValue) -&gt; Vec&lt;ParsedInputValue&gt; {
     <span class="kw">match </span>val {
         ParsedInputValue::List(l) =&gt; l,
         m @ ParsedInputValue::Map(<span class="kw">_</span>) =&gt; <span class="macro">vec!</span>[m],
@@ -1190,7 +1190,7 @@
     }
 }
 
-<span class="kw">pub fn </span>node_is_create(graph: <span class="kw-2">&amp;</span>QueryGraph, node: <span class="kw-2">&amp;</span>NodeRef) -&gt; bool {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>node_is_create(graph: <span class="kw-2">&amp;</span>QueryGraph, node: <span class="kw-2">&amp;</span>NodeRef) -&gt; bool {
     <span class="macro">matches!</span>(
         graph.node_content(node).unwrap(),
         Node::Query(Query::Write(WriteQuery::CreateRecord(<span class="kw">_</span>)))
@@ -1198,7 +1198,7 @@
 }
 
 <span class="doccomment">/// Produces a non-failing read query that fetches the requested selection of records for a given filterable.
-</span><span class="kw">pub fn </span>read_ids_infallible&lt;T&gt;(model: ModelRef, selection: FieldSelection, filter: T) -&gt; Query
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>read_ids_infallible&lt;T&gt;(model: ModelRef, selection: FieldSelection, filter: T) -&gt; Query
 <span class="kw">where
     </span>T: Into&lt;Filter&gt;,
 {

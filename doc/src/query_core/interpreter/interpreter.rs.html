@@ -322,7 +322,7 @@
 <span class="kw">use </span>tracing::Instrument;
 
 <span class="attr">#[derive(Debug, Clone)]
-</span><span class="kw">pub enum </span>ExpressionResult {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>ExpressionResult {
     <span class="doccomment">/// A result from a query execution.
     </span>Query(QueryResult),
 
@@ -429,20 +429,20 @@
 }
 
 <span class="attr">#[derive(Default, Debug, Clone)]
-</span><span class="kw">pub struct </span>Env {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Env {
     env: HashMap&lt;String, ExpressionResult&gt;,
 }
 
 <span class="kw">impl </span>Env {
-    <span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ExpressionResult&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ExpressionResult&gt; {
         <span class="self">self</span>.env.get(key)
     }
 
-    <span class="kw">pub fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: String, value: ExpressionResult) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: String, value: ExpressionResult) {
         <span class="self">self</span>.env.insert(key, value);
     }
 
-    <span class="kw">pub fn </span>remove(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; InterpretationResult&lt;ExpressionResult&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>remove(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; InterpretationResult&lt;ExpressionResult&gt; {
         <span class="kw">match </span><span class="self">self</span>.env.remove(key) {
             <span class="prelude-val">Some</span>(val) =&gt; <span class="prelude-val">Ok</span>(val),
             <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(InterpreterError::EnvVarNotFound(key.to_owned())),
@@ -476,7 +476,7 @@
         <span class="self">Self </span>{ conn, log }
     }
 
-    <span class="kw">pub fn </span>interpret(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>interpret(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         exp: Expression,
         env: Env,

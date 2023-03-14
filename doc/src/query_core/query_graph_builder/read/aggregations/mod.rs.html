@@ -124,8 +124,8 @@
 <span class="kw">mod </span>aggregate;
 <span class="kw">mod </span>group_by;
 
-<span class="kw">pub use </span>aggregate::<span class="kw-2">*</span>;
-<span class="kw">pub use </span>group_by::<span class="kw-2">*</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>aggregate::<span class="kw-2">*</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>group_by::<span class="kw-2">*</span>;
 
 <span class="kw">use </span>connector::AggregationSelection;
 <span class="kw">use </span>itertools::Itertools;

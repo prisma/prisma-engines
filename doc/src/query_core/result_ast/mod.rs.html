@@ -55,7 +55,7 @@
 <span class="kw">use </span>prisma_models::{ManyRecords, ModelRef, SelectionResult};
 
 <span class="attr">#[derive(Debug, Clone)]
-</span><span class="kw">pub enum </span>QueryResult {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>QueryResult {
     Id(<span class="prelude-ty">Option</span>&lt;SelectionResult&gt;),
     Count(usize),
     RecordSelection(Box&lt;RecordSelection&gt;),
@@ -78,7 +78,7 @@
 
     <span class="doccomment">/// Nested query results
     </span><span class="comment">// Todo this is only here because reads are still resolved in one go
-    </span><span class="kw">pub </span>nested: Vec&lt;QueryResult&gt;,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) nested: Vec&lt;QueryResult&gt;,
 
     <span class="doccomment">/// Required for result processing
     </span><span class="kw">pub </span>query_arguments: QueryArguments,
@@ -97,12 +97,12 @@
 }
 
 <span class="attr">#[derive(Debug, Clone)]
-</span><span class="kw">pub struct </span>RecordAggregations {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>RecordAggregations {
     <span class="doccomment">/// Ordered list of selected fields as defined by the original incoming query.
-    </span><span class="kw">pub </span>selection_order: Vec&lt;(String, <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;)&gt;,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) selection_order: Vec&lt;(String, <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;)&gt;,
 
     <span class="doccomment">/// Actual aggregation results.
-    </span><span class="kw">pub </span>results: Vec&lt;AggregationRow&gt;,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) results: Vec&lt;AggregationRow&gt;,
 }
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="query_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>

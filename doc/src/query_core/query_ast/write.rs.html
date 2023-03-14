@@ -326,7 +326,7 @@
 <span class="kw">use </span>std::collections::HashMap;
 
 <span class="attr">#[derive(Debug, Clone)]
-</span><span class="kw">pub enum </span>WriteQuery {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>WriteQuery {
     CreateRecord(CreateRecord),
     CreateManyRecords(CreateManyRecords),
     UpdateRecord(UpdateRecord),

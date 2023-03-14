@@ -121,20 +121,20 @@
 
 <span class="attr">#[derive(Debug, Clone)]
 #[allow(clippy::large_enum_variant)]
-</span><span class="kw">pub enum </span>Query {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Query {
     Read(ReadQuery),
     Write(WriteQuery),
 }
 
 <span class="kw">impl </span>Query {
-    <span class="kw">pub fn </span>returns(<span class="kw-2">&amp;</span><span class="self">self</span>, fields: <span class="kw-2">&amp;</span>FieldSelection) -&gt; bool {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>returns(<span class="kw-2">&amp;</span><span class="self">self</span>, fields: <span class="kw-2">&amp;</span>FieldSelection) -&gt; bool {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Read(rq) =&gt; rq.returns(fields),
             <span class="self">Self</span>::Write(wq) =&gt; wq.returns(fields),
         }
     }
 
-    <span class="kw">pub fn </span>model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModelRef {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModelRef {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Read(rq) =&gt; rq.model(),
             <span class="self">Self</span>::Write(wq) =&gt; wq.model(),

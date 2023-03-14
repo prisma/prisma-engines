@@ -178,7 +178,7 @@
 <span class="kw">use </span>prisma_models::{ModelRef, OrderBy, ScalarFieldRef};
 <span class="kw">use </span>schema_builder::constants::args;
 
-<span class="kw">pub fn </span>group_by(<span class="kw-2">mut </span>field: ParsedField, model: ModelRef) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>group_by(<span class="kw-2">mut </span>field: ParsedField, model: ModelRef) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
     <span class="kw">let </span>name = field.name;
     <span class="kw">let </span>alias = field.alias;
     <span class="kw">let </span>model = model;

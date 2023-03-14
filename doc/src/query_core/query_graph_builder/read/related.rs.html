@@ -37,7 +37,7 @@
 <span class="kw">use crate</span>::{query_document::ParsedField, ReadQuery, RelatedRecordsQuery};
 <span class="kw">use </span>prisma_models::{ModelRef, RelationFieldRef};
 
-<span class="kw">pub fn </span>find_related(
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_related(
     field: ParsedField,
     parent: RelationFieldRef,
     model: ModelRef,

@@ -40,7 +40,7 @@
 <span class="kw">use crate</span>::{query_document::ParsedField, AggregateRecordsQuery};
 <span class="kw">use </span>prisma_models::ModelRef;
 
-<span class="kw">pub fn </span>aggregate(field: ParsedField, model: ModelRef) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>aggregate(field: ParsedField, model: ModelRef) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
     <span class="kw">let </span>name = field.name;
     <span class="kw">let </span>alias = field.alias;
     <span class="kw">let </span>model = model;

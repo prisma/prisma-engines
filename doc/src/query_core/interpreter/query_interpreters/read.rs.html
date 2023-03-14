@@ -311,7 +311,7 @@
 <span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>user_facing_errors::KnownError;
 
-<span class="kw">pub fn </span>execute&lt;<span class="lifetime">&#39;conn</span>&gt;(
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>execute&lt;<span class="lifetime">&#39;conn</span>&gt;(
     tx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn </span><span class="kw-2">mut </span><span class="kw">dyn </span>ConnectionLike,
     query: ReadQuery,
     parent_result: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;conn </span>ManyRecords&gt;,
@@ -544,7 +544,7 @@
 /// This means the SQL result we get back from the database contains additional aggregation data that needs to be remapped according to the schema
 /// This function takes care of removing the aggregation data from the database result and collects it separately
 /// so that it can be serialized separately later according to the schema
-</span><span class="kw">pub fn </span>extract_aggregation_rows_from_scalars(
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>extract_aggregation_rows_from_scalars(
     <span class="kw-2">mut </span>scalars: ManyRecords,
     aggr_selections: Vec&lt;RelAggregationSelection&gt;,
 ) -&gt; (ManyRecords, <span class="prelude-ty">Option</span>&lt;Vec&lt;RelAggregationRow&gt;&gt;) {

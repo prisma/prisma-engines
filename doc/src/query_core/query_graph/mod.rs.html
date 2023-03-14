@@ -891,16 +891,12 @@
 <a href="#891" id="891">891</a>
 <a href="#892" id="892">892</a>
 <a href="#893" id="893">893</a>
-<a href="#894" id="894">894</a>
-<a href="#895" id="895">895</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>error;
 <span class="kw">mod </span>formatters;
 <span class="kw">mod </span>guard;
 <span class="kw">mod </span>transformers;
 
-<span class="kw">pub use </span>error::<span class="kw-2">*</span>;
-<span class="kw">pub use </span>formatters::<span class="kw-2">*</span>;
-<span class="kw">pub use </span>transformers::<span class="kw-2">*</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>error::<span class="kw-2">*</span>;
 
 <span class="kw">use crate</span>::{
     interpreter::ExpressionResult, FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderResult, QueryOptions,
@@ -920,7 +916,7 @@
 <span class="kw">pub type </span>QueryGraphResult&lt;T&gt; = std::result::Result&lt;T, QueryGraphError&gt;;
 
 <span class="attr">#[allow(clippy::large_enum_variant)]
-</span><span class="kw">pub enum </span>Node {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Node {
     <span class="doccomment">/// Nodes representing actual queries to the underlying connector.
     </span>Query(Query),
 
@@ -964,7 +960,7 @@
 }
 
 <span class="comment">// Current limitation: We need to narrow it down to ID diffs for Hash and EQ.
-</span><span class="kw">pub enum </span>Computation {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Computation {
     Diff(DiffNode),
 }
 
@@ -1006,15 +1002,15 @@
     }
 }
 
-<span class="kw">pub type </span>ProjectedDataDependencyFn =
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>ProjectedDataDependencyFn =
     Box&lt;<span class="kw">dyn </span>FnOnce(Node, Vec&lt;SelectionResult&gt;) -&gt; QueryGraphBuilderResult&lt;Node&gt; + Send + Sync + <span class="lifetime">&#39;static</span>&gt;;
 
-<span class="kw">pub type </span>DataDependencyFn =
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>DataDependencyFn =
     Box&lt;<span class="kw">dyn </span>FnOnce(Node, <span class="kw-2">&amp;</span>ExpressionResult) -&gt; QueryGraphBuilderResult&lt;Node&gt; + Send + Sync + <span class="lifetime">&#39;static</span>&gt;;
 
 <span class="doccomment">/// Stored on the edges of the QueryGraph, a QueryGraphDependency contains information on how children are connected to their parents,
 /// expressing for example the need for additional information from the parent to be able to execute at runtime.
-</span><span class="kw">pub enum </span>QueryGraphDependency {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>QueryGraphDependency {
     <span class="doccomment">/// Simple dependency indicating order of execution. Effectively an ordering and reachability tool for now.
     </span>ExecutionOrder,
 
@@ -1183,7 +1179,7 @@
 
     <span class="doccomment">/// Creates a node with content `t` and adds it to the graph.
     /// Returns a `NodeRef` to the newly added node.
-    </span><span class="kw">pub fn </span>create_node&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, t: T) -&gt; NodeRef
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_node&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, t: T) -&gt; NodeRef
     <span class="kw">where
         </span>T: Into&lt;Node&gt;,
     {
@@ -1196,7 +1192,7 @@
     /// Checks are run after edge creation to ensure validity of the query graph.
     /// Returns an `EdgeRef` to the newly added edge.
     /// Todo currently panics, change interface to result type.
-    </span><span class="kw">pub fn </span>create_edge(
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_edge(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         from: <span class="kw-2">&amp;</span>NodeRef,
         to: <span class="kw-2">&amp;</span>NodeRef,
@@ -1209,33 +1205,33 @@
     }
 
     <span class="doccomment">/// Mark the query graph to need a transaction.
-    </span><span class="kw">pub fn </span>flag_transactional(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>flag_transactional(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="self">self</span>.needs_transaction = <span class="bool-val">true</span>;
     }
 
     <span class="doccomment">/// If true, the graph should be executed inside of a transaction.
-    </span><span class="kw">pub fn </span>needs_transaction(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>needs_transaction(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.needs_transaction
     }
 
     <span class="doccomment">/// Returns a reference to the content of `node`, if the content is still present.
-    </span><span class="kw">pub fn </span>node_content(<span class="kw-2">&amp;</span><span class="self">self</span>, node: <span class="kw-2">&amp;</span>NodeRef) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Node&gt; {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>node_content(<span class="kw-2">&amp;</span><span class="self">self</span>, node: <span class="kw-2">&amp;</span>NodeRef) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Node&gt; {
         <span class="self">self</span>.graph.node_weight(node.node_ix).unwrap().borrow()
     }
 
     <span class="doccomment">/// Returns a reference to the content of `edge`, if the content is still present.
-    </span><span class="kw">pub fn </span>edge_content(<span class="kw-2">&amp;</span><span class="self">self</span>, edge: <span class="kw-2">&amp;</span>EdgeRef) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>QueryGraphDependency&gt; {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>edge_content(<span class="kw-2">&amp;</span><span class="self">self</span>, edge: <span class="kw-2">&amp;</span>EdgeRef) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>QueryGraphDependency&gt; {
         <span class="self">self</span>.graph.edge_weight(edge.edge_ix).unwrap().borrow()
     }
 
     <span class="doccomment">/// Returns the node from where `edge` originates (e.g. source).
-    </span><span class="kw">pub fn </span>edge_source(<span class="kw-2">&amp;</span><span class="self">self</span>, edge: <span class="kw-2">&amp;</span>EdgeRef) -&gt; NodeRef {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>edge_source(<span class="kw-2">&amp;</span><span class="self">self</span>, edge: <span class="kw-2">&amp;</span>EdgeRef) -&gt; NodeRef {
         <span class="kw">let </span>(node_ix, <span class="kw">_</span>) = <span class="self">self</span>.graph.edge_endpoints(edge.edge_ix).unwrap();
         NodeRef { node_ix }
     }
 
     <span class="doccomment">/// Returns the node to which `edge` points (e.g. target).
-    </span><span class="kw">pub fn </span>edge_target(<span class="kw-2">&amp;</span><span class="self">self</span>, edge: <span class="kw-2">&amp;</span>EdgeRef) -&gt; NodeRef {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>edge_target(<span class="kw-2">&amp;</span><span class="self">self</span>, edge: <span class="kw-2">&amp;</span>EdgeRef) -&gt; NodeRef {
         <span class="kw">let </span>(<span class="kw">_</span>, node_ix) = <span class="self">self</span>.graph.edge_endpoints(edge.edge_ix).unwrap();
         NodeRef { node_ix }
     }
@@ -1252,19 +1248,19 @@
 
     <span class="doccomment">/// Removes the edge from the graph but leaves the graph intact by keeping the empty
     /// edge in the graph by plucking the content of the edge, but not the edge itself.
-    </span><span class="kw">pub fn </span>pluck_edge(<span class="kw-2">&amp;mut </span><span class="self">self</span>, edge: <span class="kw-2">&amp;</span>EdgeRef) -&gt; QueryGraphDependency {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>pluck_edge(<span class="kw-2">&amp;mut </span><span class="self">self</span>, edge: <span class="kw-2">&amp;</span>EdgeRef) -&gt; QueryGraphDependency {
         <span class="self">self</span>.graph.edge_weight_mut(edge.edge_ix).unwrap().unset()
     }
 
     <span class="doccomment">/// Removes the node from the graph but leaves the graph intact by keeping the empty
     /// node in the graph by plucking the content of the node, but not the node itself.
-    </span><span class="kw">pub fn </span>pluck_node(<span class="kw-2">&amp;mut </span><span class="self">self</span>, node: <span class="kw-2">&amp;</span>NodeRef) -&gt; Node {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>pluck_node(<span class="kw-2">&amp;mut </span><span class="self">self</span>, node: <span class="kw-2">&amp;</span>NodeRef) -&gt; Node {
         <span class="self">self</span>.graph.node_weight_mut(node.node_ix).unwrap().unset()
     }
 
     <span class="doccomment">/// Completely removes the edge from the graph, returning it&#39;s content.
     /// This operation is destructive on the underlying graph and invalidates references.
-    </span><span class="kw">pub fn </span>remove_edge(<span class="kw-2">&amp;mut </span><span class="self">self</span>, edge: EdgeRef) -&gt; <span class="prelude-ty">Option</span>&lt;QueryGraphDependency&gt; {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>remove_edge(<span class="kw-2">&amp;mut </span><span class="self">self</span>, edge: EdgeRef) -&gt; <span class="prelude-ty">Option</span>&lt;QueryGraphDependency&gt; {
         <span class="self">self</span>.graph.remove_edge(edge.edge_ix).unwrap().into_inner()
     }
 
