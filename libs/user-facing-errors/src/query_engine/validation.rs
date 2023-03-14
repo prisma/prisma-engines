@@ -21,11 +21,12 @@ pub struct LegacyQueryValidationFailed {
 /// A validation error is a Serializable object that contains the path where the validation error
 /// of a certain `kind` ocurred, and an optional and arbitrary piece of `meta`-information.
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ValidationError {
     kind: ValidationErrorKind,
     #[serde(skip)]
     message: String,
-    path: Vec<String>,
+    selection_path: Vec<String>,
     #[serde(flatten)]
     meta: Option<serde_json::Value>,
 }
@@ -98,12 +99,12 @@ impl ValidationError {
             kind: ValidationErrorKind::EmptySelection,
             meta: Some(json!({ "outputType": output_type_description })),
             message,
-            path,
+            selection_path: path,
         }
     }
 
     /// Creates an [`ValidationErrorKind::RequiredArgumentMissing`] kind of error, which happens
-    /// when the selection of fields is empty for a query.
+    /// when there is a missing argument for a field missing, like the `where` field below.
     ///
     /// Example json query:
     ///
@@ -114,13 +115,17 @@ impl ValidationError {
     ///         "selection": {}
     ///     }
     /// }
-    pub fn required_argument_missing(path: Vec<String>) -> Self {
-        let message = format!("`{}`: A value is required but not set", path.join("."));
+    pub fn required_argument_missing(
+        selection_path: Vec<String>,
+        argument_path: Vec<String>,
+        input_type_description: InputTypeDescription,
+    ) -> Self {
+        let message = format!("`{}`: A value is required but not set", argument_path.join("."));
         ValidationError {
             kind: ValidationErrorKind::RequiredArgumentMissing,
-            meta: None,
+            meta: Some(json!({ "inputType": input_type_description, "argumentPath": argument_path })),
             message,
-            path,
+            selection_path,
         }
     }
 
@@ -151,7 +156,7 @@ impl ValidationError {
             kind: ValidationErrorKind::UnkownArgument,
             meta: Some(json!({"argumentPath": argument_path, "arguments": arguments})),
             message,
-            path,
+            selection_path: path,
         }
     }
 
@@ -189,7 +194,7 @@ impl ValidationError {
             kind: ValidationErrorKind::UnknownInputField,
             meta: Some(json!({ "inputType": input_type_description })),
             message,
-            path,
+            selection_path: path,
         }
     }
 
@@ -221,7 +226,7 @@ impl ValidationError {
             kind: ValidationErrorKind::UnknownSelectionField,
             meta: Some(json!({ "outputType": output_type_description })),
             message,
-            path,
+            selection_path: path,
         }
     }
 
@@ -249,12 +254,13 @@ impl ValidationError {
             kind: ValidationErrorKind::SelectionSetOnScalar,
             meta: None,
             message,
-            path,
+            selection_path: path,
         }
     }
 }
 
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct OutputTypeDescription {
     name: String,
     fields: Vec<OutputTypeDescriptionField>,
@@ -267,6 +273,7 @@ impl OutputTypeDescription {
 }
 
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct OutputTypeDescriptionField {
     name: String,
     type_name: String,
@@ -282,7 +289,7 @@ impl OutputTypeDescriptionField {
         }
     }
 }
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct InputTypeDescription {
     name: String,
     fields: Vec<InputTypeDescriptionField>,
@@ -294,7 +301,8 @@ impl InputTypeDescription {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct InputTypeDescriptionField {
     name: String,
     type_names: Vec<String>,
@@ -312,6 +320,7 @@ impl InputTypeDescriptionField {
 }
 
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ArgumentDescription {
     name: String,
     type_names: Vec<String>,

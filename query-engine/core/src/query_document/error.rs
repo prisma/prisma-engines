@@ -1,4 +1,7 @@
-use crate::{schema::InputType, ArgumentValue};
+use crate::{
+    schema::{InputType, OutputType},
+    ArgumentValue,
+};
 use fmt::Display;
 use itertools::Itertools;
 use std::fmt;
@@ -18,7 +21,7 @@ pub(crate) mod conversions {
             .iter()
             .map(|field| {
                 let name = field.name.to_owned();
-                let type_name = field.field_type.to_string();
+                let type_name = to_simplified_output_type_name(field.field_type.as_ref());
                 let is_relation = field.field_type.is_relation();
 
                 validation::OutputTypeDescriptionField::new(name, type_name, is_relation)
@@ -36,10 +39,36 @@ pub(crate) mod conversions {
             .iter()
             .map(|field| {
                 let name = field.name.clone();
-                let type_names: Vec<String> = field.field_types.iter().map(|typ| typ.to_string()).collect();
+                let type_names: Vec<String> = field
+                    .field_types
+                    .iter()
+                    .map(|typ| to_simplified_input_type_name(typ))
+                    .collect();
                 validation::InputTypeDescriptionField::new(name, type_names, field.is_required)
             })
             .collect();
+        validation::InputTypeDescription::new(name, fields)
+    }
+
+    pub(crate) fn schema_output_field_to_input_type_description(
+        o: &schema::OutputFieldRef,
+    ) -> validation::InputTypeDescription {
+        let name = o.name.clone();
+
+        let fields = o
+            .arguments
+            .iter()
+            .map(|field| {
+                let name = field.name.clone();
+                let type_names: Vec<String> = field
+                    .field_types
+                    .iter()
+                    .map(|typ| to_simplified_input_type_name(typ))
+                    .collect();
+                validation::InputTypeDescriptionField::new(name, type_names, field.is_required)
+            })
+            .collect();
+
         validation::InputTypeDescription::new(name, fields)
     }
 
@@ -51,10 +80,38 @@ pub(crate) mod conversions {
             .map(|input_field_ref| {
                 validation::ArgumentDescription::new(
                     input_field_ref.name.to_string(),
-                    input_field_ref.field_types.iter().map(|typ| typ.to_string()).collect(),
+                    input_field_ref
+                        .field_types
+                        .iter()
+                        .map(|typ| to_simplified_input_type_name(typ))
+                        .collect(),
                 )
             })
             .collect::<Vec<_>>()
+    }
+
+    pub fn to_simplified_input_type_name(typ: &InputType) -> String {
+        match typ {
+            InputType::Enum(_) => String::from("enum"),
+            InputType::List(o) => format!("{}[]", to_simplified_input_type_name(o.as_ref())),
+            InputType::Object(o) => o
+                .upgrade()
+                .map(|f| f.identifier.name().to_owned())
+                .unwrap_or_else(|| String::from("Object")),
+            InputType::Scalar(s) => s.to_string(),
+        }
+    }
+
+    pub fn to_simplified_output_type_name(typ: &OutputType) -> String {
+        match typ {
+            OutputType::Enum(_) => String::from("enum"),
+            OutputType::List(o) => format!("{}[]", to_simplified_output_type_name(o)),
+            OutputType::Object(o) => o
+                .upgrade()
+                .map(|f| f.identifier.name().to_owned())
+                .unwrap_or_else(|| String::from("Object")),
+            OutputType::Scalar(s) => s.to_string(),
+        }
     }
 }
 

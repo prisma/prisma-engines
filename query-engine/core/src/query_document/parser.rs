@@ -6,7 +6,7 @@ use indexmap::IndexSet;
 use prisma_models::dml::{self, ValueGeneratorFn};
 use prisma_value::PrismaValue;
 use std::{borrow::Borrow, convert::TryFrom, str::FromStr, sync::Arc};
-use user_facing_errors::query_engine::validation::ValidationError;
+use user_facing_errors::query_engine::validation::{self, ValidationError};
 use uuid::Uuid;
 
 pub struct QueryDocumentParser {
@@ -33,7 +33,6 @@ impl QueryDocumentParser {
         schema_object: &ObjectTypeStrongRef,
     ) -> QueryParserResult<ParsedObject> {
         let path = parent_path.add(schema_object.identifier.name().to_owned());
-        let selection_path = selection_path.add(schema_object.identifier.name().to_owned());
 
         if selections.is_empty() {
             return Err(ValidationError::empty_selection(
@@ -170,16 +169,25 @@ impl QueryDocumentParser {
                 // If not present but required, throw a validation error.
                 match selection_arg {
                     Some((_, value)) => Some(
-                        self.parse_input_value(path, argument_path, value, &schema_input_arg.field_types)
-                            .map(|value| ParsedArgument {
-                                name: schema_input_arg.name.clone(),
-                                value,
-                            }),
+                        self.parse_input_value(
+                            path,
+                            selection_path.clone(),
+                            argument_path,
+                            value,
+                            &schema_input_arg.field_types,
+                            conversions::schema_output_field_to_input_type_description(schema_field),
+                        )
+                        .map(|value| ParsedArgument {
+                            name: schema_input_arg.name.clone(),
+                            value,
+                        }),
                     ),
 
                     None if !schema_input_arg.is_required => None,
                     _ => Some(Err(ValidationError::required_argument_missing(
+                        selection_path.segments(),
                         argument_path.segments(),
+                        conversions::schema_output_field_to_input_type_description(&schema_field),
                     )
                     .into())),
                 }
@@ -194,9 +202,11 @@ impl QueryDocumentParser {
     fn parse_input_value(
         &self,
         parent_path: QueryPath,
+        selection_path: SelectionPath,
         argument_path: ArgumentPath,
         value: ArgumentValue,
         possible_input_types: &[InputType],
+        input_type_description: validation::InputTypeDescription,
     ) -> QueryParserResult<ParsedInputValue> {
         let mut parse_results = vec![];
 
@@ -233,9 +243,12 @@ impl QueryDocumentParser {
                     (PrismaValue::Null, InputType::Scalar(ScalarType::Null)) => {
                         Ok(ParsedInputValue::Single(PrismaValue::Null))
                     }
-                    (PrismaValue::Null, _) => {
-                        Err(ValidationError::required_argument_missing(parent_path.segments()).into())
-                    }
+                    (PrismaValue::Null, _) => Err(ValidationError::required_argument_missing(
+                        parent_path.segments(),
+                        argument_path.segments(),
+                        input_type_description.clone(),
+                    )
+                    .into()),
                     // Scalar handling
                     (value, InputType::Scalar(scalar)) => self
                         .parse_scalar(&parent_path, value, &scalar)
@@ -263,12 +276,25 @@ impl QueryDocumentParser {
 
                 // List handling.
                 (ArgumentValue::List(values), InputType::List(l)) => self
-                    .parse_list(&parent_path, &argument_path, values.clone(), &l)
+                    .parse_list(
+                        &parent_path,
+                        &selection_path,
+                        &argument_path,
+                        values.clone(),
+                        &l,
+                        input_type_description.clone(),
+                    )
                     .map(ParsedInputValue::List),
 
                 // Object handling
                 (ArgumentValue::Object(o) | ArgumentValue::FieldRef(o), InputType::Object(obj)) => self
-                    .parse_input_object(parent_path.clone(), argument_path.clone(), o.clone(), obj.into_arc())
+                    .parse_input_object(
+                        parent_path.clone(),
+                        selection_path.clone(),
+                        argument_path.clone(),
+                        o.clone(),
+                        obj.into_arc(),
+                    )
                     .map(ParsedInputValue::Map),
 
                 // Invalid combinations
@@ -470,13 +496,24 @@ impl QueryDocumentParser {
     fn parse_list(
         &self,
         path: &QueryPath,
+        selection_path: &SelectionPath,
         argument_path: &ArgumentPath,
         values: Vec<ArgumentValue>,
         value_type: &InputType,
+        input_type_description: validation::InputTypeDescription,
     ) -> QueryParserResult<Vec<ParsedInputValue>> {
         values
             .into_iter()
-            .map(|val| self.parse_input_value(path.clone(), argument_path.clone(), val, &[value_type.clone()]))
+            .map(|val| {
+                self.parse_input_value(
+                    path.clone(),
+                    selection_path.clone(),
+                    argument_path.clone(),
+                    val,
+                    &[value_type.clone()],
+                    input_type_description.clone(),
+                )
+            })
             .collect::<QueryParserResult<Vec<ParsedInputValue>>>()
     }
 
@@ -531,6 +568,7 @@ impl QueryDocumentParser {
     fn parse_input_object(
         &self,
         parent_path: QueryPath,
+        selection_path: SelectionPath,
         argument_path: ArgumentPath,
         object: ArgumentValueObject,
         schema_object: InputObjectTypeStrongRef,
@@ -567,14 +605,26 @@ impl QueryDocumentParser {
                             _ => default_value.get()?,
                         };
 
-                        match self.parse_input_value(path, argument_path, default_pv.into(), &field.field_types) {
+                        match self.parse_input_value(
+                            path,
+                            selection_path.clone(),
+                            argument_path,
+                            default_pv.into(),
+                            &field.field_types,
+                            conversions::schema_input_object_type_to_input_type_description(&schema_object),
+                        ) {
                             Ok(value) => Some(Ok((field.name.clone(), value))),
                             Err(err) => Some(Err(err)),
                         }
                     }
                     None => {
                         if field.is_required {
-                            Some(Err(ValidationError::required_argument_missing(path.segments()).into()))
+                            Some(Err(ValidationError::required_argument_missing(
+                                selection_path.segments(),
+                                argument_path.segments(),
+                                conversions::schema_input_object_type_to_input_type_description(&schema_object),
+                            )
+                            .into()))
                         } else {
                             None
                         }
@@ -597,7 +647,14 @@ impl QueryDocumentParser {
 
                 let path = path.add(field.name.clone());
                 let argument_path = argument_path.add(field.name.clone());
-                let parsed = self.parse_input_value(path, argument_path, value, &field.field_types)?;
+                let parsed = self.parse_input_value(
+                    path,
+                    selection_path.clone(),
+                    argument_path,
+                    value,
+                    &field.field_types,
+                    conversions::schema_input_object_type_to_input_type_description(&schema_object),
+                )?;
 
                 Ok((field_name, parsed))
             })
