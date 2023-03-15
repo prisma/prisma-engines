@@ -1,7 +1,3 @@
-use crate::{
-    schema::{InputType, OutputType},
-    ArgumentValue,
-};
 use fmt::Display;
 use itertools::Itertools;
 use std::fmt;
@@ -9,6 +5,7 @@ use user_facing_errors::query_engine::validation::{self, ValidationError};
 
 pub(crate) mod conversions {
     use super::*;
+    use crate::schema::{InputType, OutputType, ScalarType};
 
     /// converts an schema object to the narrower validation::OutputTypeDescription
     /// representation of an output field that is part of a validation error information.
@@ -88,6 +85,20 @@ pub(crate) mod conversions {
                 )
             })
             .collect::<Vec<_>>()
+    }
+
+    pub(crate) fn scalar_type_to_argument_description(
+        arg_name: String,
+        scalar_type: &ScalarType,
+    ) -> validation::ArgumentDescription {
+        validation::ArgumentDescription::new(arg_name, vec![scalar_type.to_string()])
+    }
+
+    pub(crate) fn input_type_to_argument_description(
+        arg_name: String,
+        input_type: &InputType,
+    ) -> validation::ArgumentDescription {
+        validation::ArgumentDescription::new(arg_name, vec![to_simplified_input_type_name(input_type)])
     }
 
     pub fn to_simplified_input_type_name(typ: &InputType) -> String {
@@ -192,7 +203,6 @@ pub enum QueryParserErrorKind {
     AssertionError(String),
     FieldCountError(FieldCountError),
     ValueParseError(String),
-    ValueTypeMismatchError { have: ArgumentValue, want: InputType },
     InputUnionParseError { parsing_errors: Vec<QueryParserError> },
     ValueFitError(String),
 }
@@ -212,9 +222,6 @@ impl Display for QueryParserErrorKind {
                     .collect::<Vec<_>>()
                     .join(", ")
             ),
-            Self::ValueTypeMismatchError { have, want } => {
-                write!(f, "Value types mismatch. Have: {have:?}, want: {want:?}")
-            }
             Self::ValueFitError(s) => write!(f, "{s}"),
         }
     }

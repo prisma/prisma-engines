@@ -41,6 +41,8 @@ impl fmt::Display for ValidationError {
 pub enum ValidationErrorKind {
     /// See [`ValidationError::empty_selection`]
     EmptySelection,
+    ///See [`ValidationError::invalid_argument_type`]
+    InvalidArgumentType,
     /// See [`ValidationError::selection_set_on_scalar`]
     SelectionSetOnScalar,
     /// See [`ValidationError::required_value_not_set`]
@@ -93,13 +95,31 @@ impl ValidationError {
     ///         "selection": {}
     ///     }
     /// }
-    pub fn empty_selection(path: Vec<String>, output_type_description: OutputTypeDescription) -> Self {
+    pub fn empty_selection(selection_path: Vec<String>, output_type_description: OutputTypeDescription) -> Self {
         let message = String::from("Expected a minimum of 1 field to be present, got 0");
         ValidationError {
             kind: ValidationErrorKind::EmptySelection,
             meta: Some(json!({ "outputType": output_type_description })),
             message,
-            selection_path: path,
+            selection_path,
+        }
+    }
+
+    pub fn invalid_argument_type(
+        selection_path: Vec<String>,
+        argument_path: Vec<String>,
+        argument: ArgumentDescription,
+    ) -> Self {
+        let message = format!(
+            "`{}` should be of any of the following types: `{}`",
+            argument.name,
+            argument.type_names.join(", ")
+        );
+        ValidationError {
+            kind: ValidationErrorKind::InvalidArgumentType,
+            message,
+            selection_path,
+            meta: Some(json!({"argumentPath": argument_path, "argument": argument})),
         }
     }
 
@@ -329,5 +349,16 @@ pub struct ArgumentDescription {
 impl ArgumentDescription {
     pub fn new(name: String, type_names: Vec<String>) -> Self {
         Self { name, type_names }
+    }
+}
+
+impl fmt::Display for ArgumentDescription {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{} should be of any of the following types: {}",
+            self.name,
+            self.type_names.join(", ")
+        )
     }
 }

@@ -251,7 +251,7 @@ impl QueryDocumentParser {
                     .into()),
                     // Scalar handling
                     (value, InputType::Scalar(scalar)) => self
-                        .parse_scalar(&parent_path, value, &scalar)
+                        .parse_scalar(&parent_path, &selection_path, &argument_path, value, &scalar)
                         .map(ParsedInputValue::Single),
 
                     // Enum handling
@@ -265,13 +265,15 @@ impl QueryDocumentParser {
                         self.parse_enum(&parent_path, value, &et.into_arc())
                     }
                     // Invalid combinations
-                    _ => Err(QueryParserError::Legacy {
-                        path: parent_path.clone(),
-                        error_kind: QueryParserErrorKind::ValueTypeMismatchError {
-                            have: value.clone(),
-                            want: input_type.clone(),
-                        },
-                    }),
+                    _ => Err(ValidationError::invalid_argument_type(
+                        selection_path.segments(),
+                        argument_path.segments(),
+                        conversions::input_type_to_argument_description(
+                            argument_path.last().unwrap_or_default().to_string(),
+                            input_type,
+                        ),
+                    )
+                    .into()),
                 },
 
                 // List handling.
@@ -298,13 +300,15 @@ impl QueryDocumentParser {
                     .map(ParsedInputValue::Map),
 
                 // Invalid combinations
-                _ => Err(QueryParserError::Legacy {
-                    path: parent_path.clone(),
-                    error_kind: QueryParserErrorKind::ValueTypeMismatchError {
-                        have: value.clone(),
-                        want: input_type.clone(),
-                    },
-                }),
+                _ => Err(ValidationError::invalid_argument_type(
+                    selection_path.segments(),
+                    argument_path.segments(),
+                    conversions::input_type_to_argument_description(
+                        argument_path.last().unwrap_or_default().to_string(),
+                        input_type,
+                    ),
+                )
+                .into()),
             };
 
             parse_results.push(result);
@@ -337,7 +341,9 @@ impl QueryDocumentParser {
     /// Attempts to parse given query value into a concrete PrismaValue based on given scalar type.
     fn parse_scalar(
         &self,
-        parent_path: &ArgumentPath,
+        parent_path: &QueryPath,
+        selection_path: &SelectionPath,
+        argument_path: &ArgumentPath,
         value: PrismaValue,
         scalar_type: &ScalarType,
     ) -> QueryParserResult<PrismaValue> {
@@ -393,13 +399,15 @@ impl QueryDocumentParser {
             (PrismaValue::Uuid(uuid), ScalarType::String) => Ok(PrismaValue::String(uuid.to_string())),
 
             // All other combinations are value type mismatches.
-            (qv, _) => Err(QueryParserError::Legacy {
-                path: parent_path.clone(),
-                error_kind: QueryParserErrorKind::ValueTypeMismatchError {
-                    have: qv.into(),
-                    want: InputType::Scalar(scalar_type.clone()),
-                },
-            }),
+            (_, _) => Err(ValidationError::invalid_argument_type(
+                selection_path.segments(),
+                argument_path.segments(),
+                conversions::scalar_type_to_argument_description(
+                    argument_path.last().unwrap_or_default().to_string(),
+                    scalar_type,
+                ),
+            )
+            .into()),
         }
     }
 
