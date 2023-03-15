@@ -8,6 +8,7 @@ anyhow = "1.0.26"
 colored = "2"
 structopt = "0.3.8"
 enumflags2 = "0.7"
+dmmf = { path = "../../query-engine/dmmf" }
 migration-core = { path = "../../migration-engine/core" }
 migration-connector = { path = "../../migration-engine/connectors/migration-connector" }
 introspection-core = { path = "../../introspection-engine/core" }
