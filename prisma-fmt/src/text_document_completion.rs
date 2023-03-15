@@ -169,7 +169,7 @@ fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut Comple
             datasource::url_quotes_completion(completion_list);
         }
 
-        position => ctx.connector().push_completions(ctx.db, position, completion_list),
+        position => ctx.connector().datamodel_completions(ctx.db, position, completion_list),
     }
 }
 

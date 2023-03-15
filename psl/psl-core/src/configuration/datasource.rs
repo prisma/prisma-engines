@@ -250,18 +250,23 @@ impl Datasource {
     pub fn provider_defined(&self) -> bool {
         !self.provider.is_empty()
     }
+
     pub fn url_defined(&self) -> bool {
         self.url_span.end > self.url_span.start
     }
+
     pub fn direct_url_defined(&self) -> bool {
         self.direct_url.is_some()
     }
+
     pub fn shadow_url_defined(&self) -> bool {
         self.shadow_database_url.is_some()
     }
+
     pub fn relation_mode_defined(&self) -> bool {
         self.relation_mode.is_some()
     }
+
     pub fn schemas_defined(&self) -> bool {
         self.schemas_span.is_some()
     }

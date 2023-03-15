@@ -96,6 +96,7 @@ impl PostgresDatasourceProperties {
             span: ast::Span::empty(),
         });
     }
+
     // Validation for property existence
     pub fn extensions_defined(&self) -> bool {
         self.extensions.is_some()
@@ -449,7 +450,7 @@ impl Connector for PostgresDatamodelConnector {
         Ok(())
     }
 
-    fn push_completions(
+    fn datamodel_completions(
         &self,
         db: &ParserDatabase,
         position: ast::SchemaPosition<'_>,

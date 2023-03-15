@@ -279,7 +279,7 @@ impl Connector for MsSqlDatamodelConnector {
         Ok(())
     }
 
-    fn push_completions(
+    fn datamodel_completions(
         &self,
         _db: &ParserDatabase,
         position: ast::SchemaPosition<'_>,

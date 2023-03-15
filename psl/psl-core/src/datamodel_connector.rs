@@ -335,7 +335,12 @@ pub trait Connector: Send + Sync {
 
     fn validate_url(&self, url: &str) -> Result<(), String>;
 
-    fn push_completions(&self, _db: &ParserDatabase, _position: SchemaPosition<'_>, _completions: &mut CompletionList) {
+    fn datamodel_completions(
+        &self,
+        _db: &ParserDatabase,
+        _position: SchemaPosition<'_>,
+        _completions: &mut CompletionList,
+    ) {
     }
 
     fn datasource_completions(&self, _config: &Configuration, _completion_list: &mut CompletionList) {}
