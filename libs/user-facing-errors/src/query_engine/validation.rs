@@ -105,6 +105,27 @@ impl ValidationError {
         }
     }
 
+    /// Creates an [`ValidationErrorKind::InvalidArgumentType`] kind of error, which happens when the
+    /// argument is of a type that is incompatible with its definition.
+    ///
+    /// Say the schema type for user.id is `Int`
+    ///
+    /// The example json query will fail, as it's trying to pass a string instead.
+    ///
+    /// {
+    ///     "action": "findMany",
+    ///     "modelName": "User",
+    ///     "query": {
+    ///         "arguments": {
+    ///             "where": {
+    ///                 "id": "a22b8732-be32-4a30-9b38-78843aaa48f8"
+    ///             }
+    ///         },
+    ///         "selection": {
+    ///             "$scalars": true
+    ///         }
+    ///     }
+    /// }
     pub fn invalid_argument_type(
         selection_path: Vec<String>,
         argument_path: Vec<String>,
@@ -135,6 +156,8 @@ impl ValidationError {
     ///         "selection": {}
     ///     }
     /// }
+    ///
+    /// Todo: add the `given` type to the meta
     pub fn required_argument_missing(
         selection_path: Vec<String>,
         argument_path: Vec<String>,
@@ -166,6 +189,7 @@ impl ValidationError {
     ///         }
     ///     }
     /// }
+    /// Todo: add the `given` type to the meta
     pub fn unknown_argument(
         path: Vec<String>,
         argument_path: Vec<String>,
