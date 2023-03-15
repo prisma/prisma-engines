@@ -114,7 +114,7 @@ mod rel_defaults {
             &runner,
             r#"mutation { createOneList(data: { id: 2, name: "listWithTodoOne" }) { id todo { id } } }"#,
             2009,
-            "`Mutation.createOneList.data.ListCreateInput.todo`: A value is required but not set"
+            "A value is required but not set"
         );
 
         Ok(())

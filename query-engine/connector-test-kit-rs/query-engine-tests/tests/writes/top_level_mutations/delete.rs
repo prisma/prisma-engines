@@ -100,7 +100,7 @@ mod delete {
             &runner,
             r#"mutation { deleteOneScalarModel(where: {unicorn: null}) { unicorn }}"#,
             2012,
-            "`Mutation.deleteOneScalarModel.where.ScalarModelWhereUniqueInput.unicorn`: A value is required but not set"
+            "A value is required but not set"
         );
 
         insta::assert_snapshot!(

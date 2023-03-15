@@ -221,16 +221,16 @@ mod basic_types {
     #[connector_test]
     async fn create_mut_empty_scalar_should_fail(runner: Runner) -> TestResult<()> {
         assert_error!(
-          runner,
-          r#"mutation {
+            runner,
+            r#"mutation {
             createOneScalarModel(data: {
               id: 1
               strings: {},
             }){ strings, ints, floats, booleans, enums, dateTimes }
           }"#,
-          2009,
-          "`Mutation.createOneScalarModel.data.ScalarModelCreateInput.strings.ScalarModelCreatestringsInput.set`: A value is required but not set"
-      );
+            2009,
+            "A value is required but not set"
+        );
 
         Ok(())
     }

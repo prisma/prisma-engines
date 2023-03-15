@@ -761,7 +761,7 @@ mod update_inside_update {
               }
             }"#,
             2009, // 3040
-            "`Mutation.updateOneNote.data.NoteUpdateInput.todos.TodoUpdateManyWithoutNotesNestedInput.update.TodoUpdateWithWhereUniqueWithoutNotesInput.where.TodoWhereUniqueInput.unique`: A value is required but not set"
+            "A value is required but not set"
         );
 
         Ok(())

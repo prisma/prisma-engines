@@ -179,7 +179,7 @@ mod unchecked_create {
                 }
             }"#,
             2009,
-            "`Mutation.createOneModelA.data.ModelAUncheckedCreateInput.b_id`: A value is required but not set"
+            "A value is required but not set"
         );
 
         run_query!(&runner, r#"mutation { createOneModelB(data: { id: 11 }) { id } }"#);

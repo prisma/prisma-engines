@@ -895,7 +895,7 @@ mod update {
                 }
               }"#,
             2009,
-            "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BCreateInput.c`: A value is required but not set"
+            "A value is required but not set"
         );
 
         Ok(())

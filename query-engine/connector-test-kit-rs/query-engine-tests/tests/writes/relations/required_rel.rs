@@ -55,7 +55,7 @@ mod required_rel {
                }
              }"#,
             2009,
-            "`Mutation.updateOneList.data.ListUpdateInput.todo`: A value is required but not set"
+            "A value is required but not set"
         );
 
         Ok(())

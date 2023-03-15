@@ -125,8 +125,8 @@ mod upsert {
     #[connector_test]
     async fn no_create_required_val_null(runner: Runner) -> TestResult<()> {
         assert_error!(
-          runner,
-          r#"mutation {
+            runner,
+            r#"mutation {
             upsertOneWithDefaultValue(
               where: {id: 1337}
               create: {

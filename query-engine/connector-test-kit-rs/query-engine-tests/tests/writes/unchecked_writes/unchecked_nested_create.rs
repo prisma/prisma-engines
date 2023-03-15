@@ -191,7 +191,7 @@ mod unchecked_nested_create {
               }
             }"#,
             2009,
-            "`Mutation.createOneModelB.data.ModelBUncheckedCreateInput.a.ModelAUncheckedCreateNestedManyWithoutBInput.create.ModelAUncheckedCreateWithoutBInput.c_id_2`: A value is required but not set"
+            "A value is required but not set"
         );
 
         Ok(())

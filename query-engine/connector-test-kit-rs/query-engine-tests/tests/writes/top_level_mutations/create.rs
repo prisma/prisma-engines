@@ -252,7 +252,7 @@ mod create {
             &runner,
             r#"mutation { createOneScalarModel(data: { id: "1", optRel: null }){ relId }}"#,
             2009,
-            "`Mutation.createOneScalarModel.data.ScalarModelCreateInput.optRel`: A value is required but not set"
+            "A value is required but not set"
         );
 
         Ok(())
