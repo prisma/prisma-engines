@@ -63,7 +63,7 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
 
     fn map_scalar_list(&self, ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputField {
         let list_input_type = map_scalar_input_type(ctx, &sf.type_identifier(), sf.is_list());
-        let ident = Identifier::new_prisma(format!("{}Update{}Input", sf.container().name(), sf.name()));
+        let ident = Identifier::new_prisma(IdentifierType::ScalarListUpdateInput(sf.clone()));
 
         let input_object = match ctx.get_input_type(&ident) {
             Some(t) => t,
@@ -100,25 +100,7 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
     }
 
     fn map_relation(&self, ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputField {
-        let related_model = rf.related_model();
-        let related_field = rf.related_field();
-
-        // Compute input object name
-        let arity_part = match (rf.is_list(), rf.is_required()) {
-            (true, _) => "Many",
-            (false, true) => "OneRequired",
-            (false, false) => "One",
-        };
-
-        let without_part = format!("Without{}", capitalize(related_field.name()));
-        let unchecked_part = if self.unchecked { "Unchecked" } else { "" };
-        let ident = Identifier::new_prisma(format!(
-            "{}{}Update{}{}NestedInput",
-            related_model.name(),
-            unchecked_part,
-            arity_part,
-            without_part
-        ));
+        let ident = Identifier::new_prisma(IdentifierType::RelationUpdateInput(rf.clone(), self.unchecked));
 
         let input_object = match ctx.get_input_type(&ident) {
             Some(t) => t,
@@ -167,8 +149,11 @@ fn update_operations_object_type(
 ) -> InputObjectTypeWeakRef {
     // Different names are required to construct and cache different objects.
     // - "Nullable" affects the `set` operation (`set` is nullable)
-    let nullable = if !sf.is_required() { "Nullable" } else { "" };
-    let ident = Identifier::new_prisma(format!("{nullable}{prefix}FieldUpdateOperationsInput"));
+    // let nullable = if !sf.is_required() { "Nullable" } else { "" };
+    let ident = Identifier::new_prisma(IdentifierType::FieldUpdateOperationsInput(
+        !sf.is_required(),
+        prefix.to_owned(),
+    ));
     return_cached_input!(ctx, &ident);
 
     let mut obj = init_input_object_type(ident.clone());
@@ -208,16 +193,7 @@ fn update_operations_object_type(
 /// }
 /// ```
 fn composite_update_envelope_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let arity = if cf.is_optional() {
-        "Nullable"
-    } else if cf.is_list() {
-        "List"
-    } else {
-        ""
-    };
-
-    let name = format!("{}{}UpdateEnvelopeInput", cf.typ().name(), arity);
-    let ident = Identifier::new_prisma(name);
+    let ident = Identifier::new_prisma(IdentifierType::CompositeUpdateEnvelopeInput(cf.clone()));
 
     return_cached_input!(ctx, &ident);
 
@@ -244,9 +220,8 @@ fn composite_update_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
 
 /// Builds the `update` input object type. Should be used in the envelope type.
 fn composite_update_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let name = format!("{}UpdateInput", cf.typ().name());
+    let ident = Identifier::new_prisma(IdentifierType::CompositeUpdateInput(cf.clone()));
 
-    let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
@@ -313,9 +288,8 @@ fn composite_push_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFie
 
 /// Builds the `upsert` input object type. Should only be used in the envelope type.
 fn composite_upsert_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let name = format!("{}UpsertInput", cf.typ().name());
+    let ident = Identifier::new_prisma(IdentifierType::CompositeUpsertObjectInput(cf.clone()));
 
-    let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
@@ -348,9 +322,8 @@ fn composite_upsert_update_input_field(ctx: &mut BuilderContext, cf: &CompositeF
 }
 
 fn composite_update_many_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let name = format!("{}UpdateManyInput", cf.typ().name());
+    let ident = Identifier::new_prisma(IdentifierType::CompositeUpdateManyInput(cf.clone()));
 
-    let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
@@ -374,9 +347,8 @@ fn composite_update_many_object_type(ctx: &mut BuilderContext, cf: &CompositeFie
 }
 
 fn composite_delete_many_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let name = format!("{}DeleteManyInput", cf.typ().name());
+    let ident = Identifier::new_prisma(IdentifierType::CompositeDeleteManyInput(cf.clone()));
 
-    let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());

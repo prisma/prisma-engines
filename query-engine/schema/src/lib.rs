@@ -2,16 +2,20 @@
 #![allow(clippy::derive_partial_eq_without_eq)]
 
 mod enum_type;
+mod identifier_type;
 mod input_types;
 mod output_types;
 mod query_schema;
 mod renderer;
+mod utils;
 
 pub use enum_type::*;
+pub use identifier_type::*;
 pub use input_types::*;
 pub use output_types::*;
 pub use query_schema::*;
 pub use renderer::*;
+pub use utils::*;
 
 use std::sync::{Arc, Weak};
 

@@ -65,8 +65,7 @@ fn to_one_relation_filter_shorthand_types(ctx: &mut BuilderContext, rf: &Relatio
 }
 
 fn to_many_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
-    let related_model = rf.related_model();
-    let ident = Identifier::new_prisma(format!("{}ListRelationFilter", capitalize(related_model.name())));
+    let ident = Identifier::new_prisma(IdentifierType::ToManyRelationFilterInput(rf.clone()));
 
     return_cached_input!(ctx, &ident);
 
@@ -76,7 +75,7 @@ fn to_many_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRe
     let object = Arc::new(object);
     ctx.cache_input_type(ident, object.clone());
 
-    let related_input_type = filter_objects::where_object_type(ctx, &related_model);
+    let related_input_type = filter_objects::where_object_type(ctx, &rf.related_model());
 
     let fields = vec![
         input_field(filters::EVERY, InputType::object(related_input_type.clone()), None).optional(),
@@ -89,16 +88,17 @@ fn to_many_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRe
 }
 
 fn to_one_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
-    let related_model = rf.related_model();
-    let related_input_type = filter_objects::where_object_type(ctx, &related_model);
-    let ident = Identifier::new_prisma(format!("{}RelationFilter", capitalize(related_model.name())));
+    let ident = Identifier::new_prisma(IdentifierType::ToOneRelationFilterInput(rf.clone()));
 
     return_cached_input!(ctx, &ident);
+
     let mut object = init_input_object_type(ident.clone());
     object.set_tag(ObjectTag::RelationEnvelope);
 
     let object = Arc::new(object);
     ctx.cache_input_type(ident, object.clone());
+
+    let related_input_type = filter_objects::where_object_type(ctx, &rf.related_model());
 
     let fields = vec![
         input_field(filters::IS, InputType::object(related_input_type.clone()), None)
@@ -121,8 +121,8 @@ fn to_one_composite_filter_shorthand_types(ctx: &mut BuilderContext, cf: &Compos
 }
 
 fn to_one_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let nullable = if cf.is_optional() { "Nullable" } else { "" };
-    let ident = Identifier::new_prisma(format!("{}{}CompositeFilter", capitalize(cf.typ().name()), nullable));
+    let ident = Identifier::new_prisma(IdentifierType::ToOneCompositeFilterInput(cf.clone()));
+
     return_cached_input!(ctx, &ident);
 
     let mut object = init_input_object_type(ident.clone());
@@ -157,7 +157,8 @@ fn to_one_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeFieldR
 }
 
 fn to_many_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new_prisma(format!("{}CompositeListFilter", capitalize(cf.typ().name())));
+    let ident = Identifier::new_prisma(IdentifierType::ToManyCompositeFilterInput(cf.clone()));
+
     return_cached_input!(ctx, &ident);
 
     let mut object = init_input_object_type(ident.clone());
@@ -195,13 +196,7 @@ fn to_many_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeField
 }
 
 fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new_prisma(scalar_filter_name(
-        &sf.type_identifier().type_name(&ctx.internal_data_model.schema),
-        true,
-        !sf.is_required(),
-        false,
-        false,
-    ));
+    let ident = Identifier::new_prisma(IdentifierType::ScalarListFilterInput(sf.clone()));
     return_cached_input!(ctx, &ident);
 
     let mut object = init_input_object_type(ident.clone());
@@ -551,7 +546,7 @@ fn query_mode_field(ctx: &mut BuilderContext, nested: bool) -> impl Iterator<Ite
     fields.into_iter()
 }
 
-fn scalar_filter_name(typ: &str, list: bool, nullable: bool, nested: bool, include_aggregates: bool) -> String {
+pub fn scalar_filter_name(typ: &str, list: bool, nullable: bool, nested: bool, include_aggregates: bool) -> String {
     let list = if list { "List" } else { "" };
     let nullable = if nullable { "Nullable" } else { "" };
     let nested = if nested { "Nested" } else { "" };

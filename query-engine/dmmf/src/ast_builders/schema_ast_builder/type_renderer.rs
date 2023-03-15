@@ -8,7 +8,7 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
 
             let obj = obj.into_arc();
             let type_reference = DmmfTypeReference {
-                typ: obj.identifier.name().to_string(),
+                typ: obj.identifier.name(),
                 namespace: Some(obj.identifier.namespace().to_string()),
                 location: TypeLocation::OutputObjectTypes,
                 is_list: false,
@@ -23,7 +23,7 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
 
             let ident = et.identifier();
             let type_reference = DmmfTypeReference {
-                typ: ident.name().to_owned(),
+                typ: ident.name(),
                 namespace: Some(ident.namespace().to_owned()),
                 location: TypeLocation::EnumTypes,
                 is_list: false,
@@ -85,7 +85,7 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
             };
 
             let type_reference = DmmfTypeReference {
-                typ: obj.identifier.name().to_owned(),
+                typ: obj.identifier.name(),
                 namespace: Some(obj.identifier.namespace().to_owned()),
                 location,
                 is_list: false,
@@ -100,7 +100,7 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
 
             let ident = et.identifier();
             let type_reference = DmmfTypeReference {
-                typ: ident.name().to_owned(),
+                typ: ident.name(),
                 namespace: Some(ident.namespace().to_owned()),
                 location: TypeLocation::EnumTypes,
                 is_list: false,
