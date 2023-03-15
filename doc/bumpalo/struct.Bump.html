@@ -178,7 +178,7 @@ bump.set_allocation_limit(<span class="prelude-val">None</span>);
 <p>Because of backwards compatibility, allocations that fail
 due to allocation limits will not present differently than
 errors due to resource exhaustion.</p>
-</div></details><h2 id="implementations" class="small-section-header">Implementations<a href="#implementations" class="anchor">§</a></h2><div id="implementations-list"><details class="toggle implementors-toggle" open><summary><section id="impl-Bump" class="impl has-srclink"><a class="srclink rightside" href="../src/bumpalo/lib.rs.html#485-1783">source</a><a href="#impl-Bump" class="anchor">§</a><h3 class="code-header">impl <a class="struct" href="struct.Bump.html" title="struct bumpalo::Bump">Bump</a></h3></section></summary><div class="impl-items"><details class="toggle method-toggle" open><summary><section id="method.new" class="method has-srclink"><a class="srclink rightside" href="../src/bumpalo/lib.rs.html#494-496">source</a><h4 class="code-header">pub fn <a href="#method.new" class="fn">new</a>() -&gt; <a class="struct" href="struct.Bump.html" title="struct bumpalo::Bump">Bump</a></h4></section></summary><div class="docblock"><p>Construct a new arena to bump allocate into.</p>
+</div></details><h2 id="implementations" class="small-section-header">Implementations<a href="#implementations" class="anchor">§</a></h2><div id="implementations-list"><details class="toggle implementors-toggle" open><summary><section id="impl-Bump" class="impl has-srclink"><a class="srclink rightside" href="../src/bumpalo/lib.rs.html#485-1787">source</a><a href="#impl-Bump" class="anchor">§</a><h3 class="code-header">impl <a class="struct" href="struct.Bump.html" title="struct bumpalo::Bump">Bump</a></h3></section></summary><div class="impl-items"><details class="toggle method-toggle" open><summary><section id="method.new" class="method has-srclink"><a class="srclink rightside" href="../src/bumpalo/lib.rs.html#494-496">source</a><h4 class="code-header">pub fn <a href="#method.new" class="fn">new</a>() -&gt; <a class="struct" href="struct.Bump.html" title="struct bumpalo::Bump">Bump</a></h4></section></summary><div class="docblock"><p>Construct a new arena to bump allocate into.</p>
 <h6 id="example-2"><a href="#example-2">Example</a></h6>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>bump = bumpalo::Bump::new();</code></pre></div>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.try_new" class="method has-srclink"><a class="srclink rightside" href="../src/bumpalo/lib.rs.html#506-508">source</a><h4 class="code-header">pub fn <a href="#method.try_new" class="fn">try_new</a>() -&gt; <a class="enum" href="https://doc.rust-lang.org/1.68.0/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="struct.Bump.html" title="struct bumpalo::Bump">Bump</a>, <a class="struct" href="struct.AllocErr.html" title="struct bumpalo::AllocErr">AllocErr</a>&gt;</h4></section></summary><div class="docblock"><p>Attempt to construct a new arena to bump allocate into.</p>
@@ -509,7 +509,7 @@ the caller must ensure that there exist no mutable references to
 previously allocated data.</p>
 <p>In addition, all of the caveats when reading the chunk data from
 <a href="struct.Bump.html#method.iter_allocated_chunks"><code>iter_allocated_chunks()</code></a> still apply.</p>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.allocated_bytes" class="method has-srclink"><a class="srclink rightside" href="../src/bumpalo/lib.rs.html#1689-1693">source</a><h4 class="code-header">pub fn <a href="#method.allocated_bytes" class="fn">allocated_bytes</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/1.68.0/core/primitive.usize.html">usize</a></h4></section></summary><div class="docblock"><p>Calculates the number of bytes currently allocated across all chunks in
+</div></details><details class="toggle method-toggle" open><summary><section id="method.allocated_bytes" class="method has-srclink"><a class="srclink rightside" href="../src/bumpalo/lib.rs.html#1693-1697">source</a><h4 class="code-header">pub fn <a href="#method.allocated_bytes" class="fn">allocated_bytes</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/1.68.0/core/primitive.usize.html">usize</a></h4></section></summary><div class="docblock"><p>Calculates the number of bytes currently allocated across all chunks in
 this bump arena.</p>
 <p>If you allocate types of different alignments or types with
 larger-than-typical alignment in the same arena, some padding
@@ -517,6 +517,9 @@ bytes might get allocated in the bump arena. Note that those padding
 bytes will add to this method’s resulting sum, so you cannot rely
 on it only counting the sum of the sizes of the things
 you’ve allocated in the arena.</p>
+<p>The allocated bytes do not include the size of bumpalo’s metadata,
+so the amount of memory requested from the Rust allocator is higher
+than the returned value.</p>
 <h6 id="example-25"><a href="#example-25">Example</a></h6>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>bump = bumpalo::Bump::new();
 <span class="kw">let </span>_x = bump.alloc_slice_fill_default::&lt;u32&gt;(<span class="number">5</span>);
