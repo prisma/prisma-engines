@@ -763,7 +763,7 @@ mod json_update {
                 }
               }"#,
             2009,
-            "Enum value 'AnyNull' is invalid for enum type NullableJsonNullValueInput"
+            "`AnyNull` is not a valid `NullableJsonNullValueInput`"
         );
 
         Ok(())

@@ -202,7 +202,6 @@ impl fmt::Display for ArgumentPath {
 pub enum QueryParserErrorKind {
     AssertionError(String),
     FieldCountError(FieldCountError),
-    ValueParseError(String),
     InputUnionParseError { parsing_errors: Vec<QueryParserError> },
     ValueFitError(String),
 }
@@ -212,7 +211,6 @@ impl Display for QueryParserErrorKind {
         match self {
             Self::AssertionError(reason) => write!(f, "Assertion error: {reason}."),
             Self::FieldCountError(err) => write!(f, "{err}"),
-            Self::ValueParseError(reason) => write!(f, "Error parsing value: {reason}."),
             Self::InputUnionParseError { parsing_errors } => write!(
                 f,
                 "Unable to match input value to any allowed input type for the field. Parse errors: [{}]",

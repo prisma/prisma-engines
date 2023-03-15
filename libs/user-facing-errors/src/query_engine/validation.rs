@@ -2,7 +2,7 @@ use crate::KnownError;
 use core::fmt;
 use serde::Serialize;
 use serde_json::json;
-use std::borrow::Cow;
+use std::{borrow::Cow, error};
 use user_facing_error_macros::*;
 
 #[derive(Debug, UserFacingError, Serialize)]
@@ -43,6 +43,8 @@ pub enum ValidationErrorKind {
     EmptySelection,
     ///See [`ValidationError::invalid_argument_type`]
     InvalidArgumentType,
+    ///See [`ValidationError::invalid_argument_value`]
+    InvalidArgumentValue,
     /// See [`ValidationError::selection_set_on_scalar`]
     SelectionSetOnScalar,
     /// See [`ValidationError::required_value_not_set`]
@@ -144,6 +146,65 @@ impl ValidationError {
         }
     }
 
+    /// Creates an [`ValidationErrorKind::InvalidArgumentValue`] kind of error, which happens when the
+    /// argument is of the correct type, but its value is invalid, said a negative number on a type
+    /// that is integer but which values should be non-negative. Or a uuid which type is correctly
+    /// a string, but its format is not the appropriate.
+    ///
+    /// Say the schema type for user.id is `Int`
+    ///
+    /// The example json query will fail, as it's trying to pass a string instead.
+    ///
+    /// {
+    ///     "action": "findMany",
+    ///     "modelName": "User",
+    ///     "query": {
+    ///         "arguments": {
+    ///             "where": {
+    ///                 "dob": "invalid date"
+    ///             }
+    ///         },
+    ///         "selection": {
+    ///             "$scalars": true
+    ///         }
+    ///     }
+    /// }
+    pub fn invalid_argument_value(
+        selection_path: Vec<String>,
+        argument_path: Vec<String>,
+        value: String,
+        expected_argument_type: String,
+        underlying_err: Option<Box<dyn error::Error>>,
+    ) -> Self {
+        let argument_name = argument_path.last().expect("Argument path cannot not be empty");
+
+        let (message, meta) = if let Some(err) = underlying_err {
+            let err_msg = err.to_string();
+            let message = format!(
+                "Invalid argument agument value. `{}` is not a valid `{}`. Underlying error: {}",
+                value, expected_argument_type, &err_msg
+            );
+            let argument = ArgumentDescription::new(argument_name.to_owned(), vec![expected_argument_type]);
+            let meta = json!({"argumentPath": argument_path, "argument": argument, "underlying_error": &err_msg});
+            (message, Some(meta))
+        } else {
+            let message = format!(
+                "Invalid argument agument value. `{}` is not a valid `{}`",
+                value, &expected_argument_type
+            );
+            let argument = ArgumentDescription::new(argument_name.to_owned(), vec![expected_argument_type]);
+            let meta = json!({"argumentPath": argument_path, "argument": argument, "underlying_error": serde_json::Value::Null});
+            (message, Some(meta))
+        };
+
+        ValidationError {
+            kind: ValidationErrorKind::InvalidArgumentValue,
+            message,
+            selection_path,
+            meta,
+        }
+    }
+
     /// Creates an [`ValidationErrorKind::RequiredArgumentMissing`] kind of error, which happens
     /// when there is a missing argument for a field missing, like the `where` field below.
     ///
@@ -231,6 +292,7 @@ impl ValidationError {
     ///         }
     ///     }
     /// }
+    /// TODO: chage path in favor of selection path and adjust the many test failing
     pub fn unknown_input_field(path: Vec<String>, input_type_description: InputTypeDescription) -> Self {
         let message = format!("`{}`: Field does not exist in enclosing type.", path.join("."));
 

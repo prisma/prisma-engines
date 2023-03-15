@@ -133,10 +133,7 @@ mod json {
             runner
                 .query("mutation { createOneTestModel(data: { id: 1, json: DbNull}) { id }}")
                 .await?
-                .assert_failure(
-                    2009,
-                    Some("Enum value 'DbNull' is invalid for enum type JsonNullValueInput".to_owned()),
-                );
+                .assert_failure(2009, Some("`DbNull` is not a valid `JsonNullValueInput`".to_owned()));
 
             insta::assert_snapshot!(
               run_query!(&runner, r#"query { findManyTestModel(where: { NOT: [{ json: { equals: DbNull } }]}) { id }}"#),

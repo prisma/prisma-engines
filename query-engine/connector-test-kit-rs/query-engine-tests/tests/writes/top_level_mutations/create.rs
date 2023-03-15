@@ -172,7 +172,7 @@ mod create {
             }
           }"#,
           2009,
-          "`Mutation.createOneScalarModel.data.ScalarModelCreateInput.optDateTime`: Error parsing value: Invalid DateTime: '2016-0B-31T23:59:01.000Z' (must be ISO 8601 compatible). Underlying error: input contains invalid characters."
+          "2016-0B-31T23:59:01.000Z` is not a valid `ISO-8601 DateTime`. Underlying error: input contains invalid characters"
         );
 
         Ok(())
@@ -236,10 +236,10 @@ mod create {
     #[connector_test]
     async fn fail_if_string_dont_match_enum_val(runner: Runner) -> TestResult<()> {
         assert_error!(
-          runner,
-          r#"mutation {createOneScalarModel(data: {id: "1", optEnum: "NOPE"}){ optEnum }}"#,
-          2009,
-          "Query parsing/validation error at `Mutation.createOneScalarModel.data.ScalarModelCreateInput.optEnum`: Error parsing value: Enum value 'NOPE' is invalid for enum type MyEnum."
+            runner,
+            r#"mutation {createOneScalarModel(data: {id: "1", optEnum: "NOPE"}){ optEnum }}"#,
+            2009,
+            "`NOPE` is not a valid `MyEnum`"
         );
 
         Ok(())
@@ -376,7 +376,7 @@ mod json_create {
                 }
               }"#,
             2009,
-            "Enum value 'AnyNull' is invalid for enum type NullableJsonNullValueInput"
+            "`AnyNull` is not a valid `NullableJsonNullValueInput`"
         );
 
         Ok(())

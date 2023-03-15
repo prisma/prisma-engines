@@ -220,7 +220,11 @@ impl QueryDocumentParser {
                 (value, InputType::Scalar(ScalarType::Json))
                     if value.can_be_parsed_as_json() && get_engine_protocol().is_json() =>
                 {
-                    Ok(ParsedInputValue::Single(self.to_json(&parent_path, &value)?))
+                    Ok(ParsedInputValue::Single(self.to_json(
+                        &selection_path,
+                        &argument_path,
+                        &value,
+                    )?))
                 }
                 // With the JSON protocol, JSON values are sent as deserialized values.
                 // This means that a JsonList([1, 2]) will be coerced as an `ArgumentValue::List([1, 2])`.
@@ -228,13 +232,16 @@ impl QueryDocumentParser {
                 (list @ ArgumentValue::List(_), InputType::Scalar(ScalarType::JsonList))
                     if get_engine_protocol().is_json() =>
                 {
-                    let json_val = serde_json::to_value(list).map_err(|err| QueryParserError::Legacy {
-                        path: parent_path.clone(),
-                        error_kind: QueryParserErrorKind::ValueParseError(format!(
-                            "Cannot deserialize argument value: {err}"
-                        )),
+                    let json_val = serde_json::to_value(list.clone()).map_err(|err| {
+                        ValidationError::invalid_argument_value(
+                            selection_path.segments(),
+                            argument_path.segments(),
+                            format!("{list:?}"),
+                            String::from("JSON array"),
+                            Some(Box::new(err)),
+                        )
                     })?;
-                    let json_list = self.parse_json_list_from_value(&parent_path, json_val)?;
+                    let json_list = self.parse_json_list_from_value(&selection_path, &argument_path, json_val)?;
 
                     Ok(ParsedInputValue::Single(json_list))
                 }
@@ -256,13 +263,13 @@ impl QueryDocumentParser {
 
                     // Enum handling
                     (value @ PrismaValue::Enum(_), InputType::Enum(et)) => {
-                        self.parse_enum(&parent_path, value, &et.into_arc())
+                        self.parse_enum(&selection_path, &argument_path, value, &et.into_arc())
                     }
                     (value @ PrismaValue::String(_), InputType::Enum(et)) => {
-                        self.parse_enum(&parent_path, value, &et.into_arc())
+                        self.parse_enum(&selection_path, &argument_path, value, &et.into_arc())
                     }
                     (value @ PrismaValue::Boolean(_), InputType::Enum(et)) => {
-                        self.parse_enum(&parent_path, value, &et.into_arc())
+                        self.parse_enum(&selection_path, &argument_path, value, &et.into_arc())
                     }
                     // Invalid combinations
                     _ => Err(ValidationError::invalid_argument_type(
@@ -361,19 +368,21 @@ impl QueryDocumentParser {
 
             // String coercion matchers
             (PrismaValue::String(s), ScalarType::Xml) => Ok(PrismaValue::Xml(s)),
-            (PrismaValue::String(s), ScalarType::JsonList) => self.parse_json_list_from_str(parent_path, &s),
-            (PrismaValue::String(s), ScalarType::Bytes) => self.parse_bytes(parent_path, s),
-            (PrismaValue::String(s), ScalarType::Decimal) => self.parse_decimal(parent_path, s),
-            (PrismaValue::String(s), ScalarType::BigInt) => self.parse_bigint(parent_path, s),
-            (PrismaValue::String(s), ScalarType::UUID) => {
-                self.parse_uuid(parent_path, s.as_str()).map(PrismaValue::Uuid)
+            (PrismaValue::String(s), ScalarType::JsonList) => {
+                self.parse_json_list_from_str(selection_path, argument_path, &s)
             }
-            (PrismaValue::String(s), ScalarType::Json) => {
-                Ok(PrismaValue::Json(self.parse_json(parent_path, &s).map(|_| s)?))
-            }
-            (PrismaValue::String(s), ScalarType::DateTime) => {
-                self.parse_datetime(parent_path, s.as_str()).map(PrismaValue::DateTime)
-            }
+            (PrismaValue::String(s), ScalarType::Bytes) => self.parse_bytes(selection_path, argument_path, s),
+            (PrismaValue::String(s), ScalarType::Decimal) => self.parse_decimal(selection_path, argument_path, s),
+            (PrismaValue::String(s), ScalarType::BigInt) => self.parse_bigint(selection_path, argument_path, s),
+            (PrismaValue::String(s), ScalarType::UUID) => self
+                .parse_uuid(selection_path, argument_path, s.as_str())
+                .map(PrismaValue::Uuid),
+            (PrismaValue::String(s), ScalarType::Json) => Ok(PrismaValue::Json(
+                self.parse_json(selection_path, argument_path, &s).map(|_| s)?,
+            )),
+            (PrismaValue::String(s), ScalarType::DateTime) => self
+                .parse_datetime(selection_path, argument_path, s.as_str())
+                .map(PrismaValue::DateTime),
 
             // Int coercion matchers
             (PrismaValue::Int(i), ScalarType::Int) => Ok(PrismaValue::Int(i)),
@@ -411,65 +420,115 @@ impl QueryDocumentParser {
         }
     }
 
-    fn parse_datetime(&self, path: &ArgumentPath, s: &str) -> QueryParserResult<DateTime<FixedOffset>> {
-        prisma_value::parse_datetime(s).map_err(|err| QueryParserError::Legacy {
-            path: path.clone(),
-            error_kind: QueryParserErrorKind::ValueParseError(format!(
-                "Invalid DateTime: '{s}' (must be ISO 8601 compatible). Underlying error: {err}"
-            )),
+    fn parse_datetime(
+        &self,
+        selection_path: &SelectionPath,
+        argument_path: &ArgumentPath,
+        s: &str,
+    ) -> QueryParserResult<DateTime<FixedOffset>> {
+        prisma_value::parse_datetime(s).map_err(|err| {
+            ValidationError::invalid_argument_value(
+                selection_path.segments(),
+                argument_path.segments(),
+                s.to_string(),
+                String::from("ISO-8601 DateTime"),
+                Some(Box::new(err)),
+            )
+            .into()
         })
     }
 
-    fn parse_bytes(&self, path: &ArgumentPath, s: String) -> QueryParserResult<PrismaValue> {
-        prisma_value::decode_bytes(&s)
-            .map(PrismaValue::Bytes)
-            .map_err(|_| QueryParserError::Legacy {
-                path: path.clone(),
-                error_kind: QueryParserErrorKind::ValueParseError(format!(
-                    "'{s}' is not a valid base64 encoded string."
-                )),
-            })
+    fn parse_bytes(
+        &self,
+        selection_path: &SelectionPath,
+        argument_path: &ArgumentPath,
+        s: String,
+    ) -> QueryParserResult<PrismaValue> {
+        prisma_value::decode_bytes(&s).map(PrismaValue::Bytes).map_err(|err| {
+            ValidationError::invalid_argument_value(
+                selection_path.segments(),
+                argument_path.segments(),
+                s.to_string(),
+                String::from("base64 String"),
+                Some(Box::new(err)),
+            )
+            .into()
+        })
     }
 
-    fn parse_decimal(&self, path: &ArgumentPath, s: String) -> QueryParserResult<PrismaValue> {
-        BigDecimal::from_str(&s)
-            .map(PrismaValue::Float)
-            .map_err(|_| QueryParserError::Legacy {
-                path: path.clone(),
-                error_kind: QueryParserErrorKind::ValueParseError(format!("'{s}' is not a valid decimal string")),
-            })
+    fn parse_decimal(
+        &self,
+        selection_path: &SelectionPath,
+        argument_path: &ArgumentPath,
+        s: String,
+    ) -> QueryParserResult<PrismaValue> {
+        BigDecimal::from_str(&s).map(PrismaValue::Float).map_err(|err| {
+            ValidationError::invalid_argument_value(
+                selection_path.segments(),
+                argument_path.segments(),
+                s.to_string(),
+                String::from("decimal String"),
+                Some(Box::new(err)),
+            )
+            .into()
+        })
     }
 
-    fn parse_bigint(&self, path: &ArgumentPath, s: String) -> QueryParserResult<PrismaValue> {
-        s.parse::<i64>()
-            .map(PrismaValue::BigInt)
-            .map_err(|_| QueryParserError::Legacy {
-                path: path.clone(),
-                error_kind: QueryParserErrorKind::ValueParseError(format!("'{s}' is not a valid big integer string")),
-            })
+    fn parse_bigint(
+        &self,
+        selection_path: &SelectionPath,
+        argument_path: &ArgumentPath,
+        s: String,
+    ) -> QueryParserResult<PrismaValue> {
+        s.parse::<i64>().map(PrismaValue::BigInt).map_err(|err| {
+            ValidationError::invalid_argument_value(
+                selection_path.segments(),
+                argument_path.segments(),
+                s.to_string(),
+                String::from("big integer String"),
+                Some(Box::new(err)),
+            )
+            .into()
+        })
     }
 
-    fn parse_json_list_from_str(&self, path: &ArgumentPath, s: &str) -> QueryParserResult<PrismaValue> {
-        let json = self.parse_json(path, s)?;
-        self.parse_json_list_from_value(path, json)
+    fn parse_json_list_from_str(
+        &self,
+        selection_path: &SelectionPath,
+        argument_path: &ArgumentPath,
+        s: &str,
+    ) -> QueryParserResult<PrismaValue> {
+        let json = self.parse_json(selection_path, argument_path, s)?;
+        self.parse_json_list_from_value(selection_path, argument_path, json)
     }
 
     fn parse_json_list_from_value(
         &self,
-        path: &ArgumentPath,
+        selection_path: &SelectionPath,
+        argument_path: &ArgumentPath,
         json: serde_json::Value,
     ) -> QueryParserResult<PrismaValue> {
-        let values = json.as_array().ok_or_else(|| QueryParserError::Legacy {
-            path: path.clone(),
-            error_kind: QueryParserErrorKind::AssertionError("JSON parameter needs to be an array".into()),
+        let values = json.as_array().ok_or_else(|| {
+            ValidationError::invalid_argument_value(
+                selection_path.segments(),
+                argument_path.segments(),
+                json.to_string(),
+                String::from("JSON array"),
+                None,
+            )
         })?;
 
         let mut prisma_values = Vec::with_capacity(values.len());
 
         for v in values.iter() {
-            let pv = PrismaValue::try_from(v.clone()).map_err(|_| QueryParserError::Legacy {
-                path: path.clone(),
-                error_kind: QueryParserErrorKind::AssertionError("Nested JSON arguments are not supported".into()),
+            let pv = PrismaValue::try_from(v.clone()).map_err(|err| {
+                ValidationError::invalid_argument_value(
+                    selection_path.segments(),
+                    argument_path.segments(),
+                    json.to_string(),
+                    String::from("Flat JSON array (no nesting)"),
+                    Some(Box::new(err)),
+                )
             })?;
 
             prisma_values.push(pv);
@@ -478,26 +537,59 @@ impl QueryDocumentParser {
         Ok(PrismaValue::List(prisma_values))
     }
 
-    fn parse_json(&self, path: &ArgumentPath, s: &str) -> QueryParserResult<serde_json::Value> {
-        serde_json::from_str(s).map_err(|err| QueryParserError::Legacy {
-            path: path.clone(),
-            error_kind: QueryParserErrorKind::ValueParseError(format!("Invalid json: {err}")),
+    fn parse_json(
+        &self,
+        selection_path: &SelectionPath,
+        argument_path: &ArgumentPath,
+        s: &str,
+    ) -> QueryParserResult<serde_json::Value> {
+        serde_json::from_str(s).map_err(|err| {
+            ValidationError::invalid_argument_value(
+                selection_path.segments(),
+                argument_path.segments(),
+                s.to_string(),
+                String::from("JSON String"),
+                Some(Box::new(err)),
+            )
+            .into()
         })
     }
 
-    fn to_json(&self, path: &ArgumentPath, value: &ArgumentValue) -> QueryParserResult<PrismaValue> {
+    fn to_json(
+        &self,
+        selection_path: &SelectionPath,
+        argument_path: &ArgumentPath,
+        value: &ArgumentValue,
+    ) -> QueryParserResult<PrismaValue> {
         serde_json::to_string(&value)
-            .map_err(|err| QueryParserError::Legacy {
-                path: path.clone(),
-                error_kind: QueryParserErrorKind::ValueParseError(format!("Invalid json: {err}")),
+            .map_err(|err| {
+                ValidationError::invalid_argument_value(
+                    selection_path.segments(),
+                    argument_path.segments(),
+                    format!("{value:?}"),
+                    String::from("JSON String"),
+                    Some(Box::new(err)),
+                )
+                .into()
             })
             .map(PrismaValue::Json)
     }
 
-    fn parse_uuid(&self, path: &ArgumentPath, s: &str) -> QueryParserResult<Uuid> {
-        Uuid::parse_str(s).map_err(|err| QueryParserError::Legacy {
-            path: path.clone(),
-            error_kind: QueryParserErrorKind::ValueParseError(format!("Invalid UUID: {err}")),
+    fn parse_uuid(
+        &self,
+        selection_path: &SelectionPath,
+        argument_path: &ArgumentPath,
+        s: &str,
+    ) -> QueryParserResult<Uuid> {
+        Uuid::parse_str(s).map_err(|err| {
+            ValidationError::invalid_argument_value(
+                selection_path.segments(),
+                argument_path.segments(),
+                s.to_string(),
+                String::from("UUID String"),
+                Some(Box::new(err)),
+            )
+            .into()
         })
     }
 
@@ -527,7 +619,8 @@ impl QueryDocumentParser {
 
     fn parse_enum(
         &self,
-        path: &ArgumentPath,
+        selection_path: &SelectionPath,
+        argument_path: &ArgumentPath,
         val: PrismaValue,
         typ: &EnumTypeRef,
     ) -> QueryParserResult<ParsedInputValue> {
@@ -536,24 +629,26 @@ impl QueryDocumentParser {
             PrismaValue::String(s) => s,
             PrismaValue::Boolean(b) => if b { "true" } else { "false" }.to_owned(), // Case where a bool was misinterpreted as constant literal
             _ => {
-                return Err(QueryParserError::Legacy {
-                    path: path.clone(),
-                    error_kind: QueryParserErrorKind::ValueParseError(format!(
-                        "Unexpected Enum value type {:?} for enum {}",
-                        val,
-                        typ.name()
-                    )),
-                });
+                return Err(ValidationError::invalid_argument_value(
+                    selection_path.segments(),
+                    argument_path.segments(),
+                    format!("{val:?}"),
+                    typ.name().to_string(),
+                    None,
+                )
+                .into());
             }
         };
 
         let err = |name: &str| {
-            Err(QueryParserError::Legacy {
-                path: path.clone(),
-                error_kind: QueryParserErrorKind::ValueParseError(format!(
-                    "Enum value '{raw}' is invalid for enum type {name}"
-                )),
-            })
+            Err(ValidationError::invalid_argument_value(
+                selection_path.segments(),
+                argument_path.segments(),
+                raw.clone(),
+                name.to_string(),
+                None,
+            )
+            .into())
         };
 
         match typ.borrow() {

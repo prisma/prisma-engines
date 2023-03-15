@@ -1,0 +1,16 @@
+{
+    "action": "createOne",
+    "modelName": "User",
+    "query": {
+        "arguments": {
+            "data": {
+                "id": 1,
+                "email": "fernandez@prisma.io",
+                "dob": "1983-10-31R10:20:00.000Z"
+            }
+        },
+        "selection": {
+            "$scalars": true
+        }
+    }
+}
