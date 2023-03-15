@@ -158,9 +158,9 @@ mod self_relation_filters {
                 }
               }
             "#,
-         },
-         2009,
-         "`Query.findManySong.where.SongWhereInput.creator.HumanRelationFilter.is.HumanWhereInput.daughters.HumanListRelationFilter.none`: A value is required but not set"
+            },
+            2009,
+            "`where.creator.is.daughters.none`: A value is required but not set"
         );
 
         Ok(())

@@ -574,7 +574,6 @@ impl QueryDocumentParser {
         schema_object: InputObjectTypeStrongRef,
     ) -> QueryParserResult<ParsedInputMap> {
         let path = parent_path.add(schema_object.identifier.name().to_owned());
-        let argument_path = argument_path.add(schema_object.identifier.name().to_owned());
 
         let valid_field_names: IndexSet<&str> = schema_object
             .get_fields()
