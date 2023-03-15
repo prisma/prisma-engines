@@ -4383,6 +4383,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "colored",
+ "dmmf",
  "enumflags2",
  "introspection-connector",
  "introspection-core",
