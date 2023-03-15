@@ -12,11 +12,14 @@ use psl_core::{
     },
     diagnostics::{Diagnostics, Span},
     parser_database::{self, ast, ParserDatabase, ReferentialAction, ScalarType},
+    PreviewFeature,
 };
 use std::borrow::Cow;
 
 use MsSqlType::*;
 use MsSqlTypeParameter::*;
+
+use crate::completions;
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[
     ConstraintScope::GlobalPrimaryKeyForeignKeyDefault,
@@ -292,6 +295,17 @@ impl Connector for MsSqlDatamodelConnector {
                 kind: Some(CompletionItemKind::PROPERTY),
                 ..Default::default()
             });
+        }
+    }
+
+    fn datasource_completions(&self, config: &psl_core::Configuration, completion_list: &mut CompletionList) {
+        let ds = match config.datasources.first() {
+            Some(ds) => ds,
+            None => return,
+        };
+
+        if config.preview_features().contains(PreviewFeature::MultiSchema) && !ds.schemas_defined() {
+            completions::schemas_completion(completion_list);
         }
     }
 }

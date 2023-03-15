@@ -1,4 +1,3 @@
-mod completions;
 mod datasource;
 mod native_types;
 mod validations;
@@ -18,6 +17,8 @@ use psl_core::{
 };
 use std::{borrow::Cow, collections::HashMap};
 use PostgresType::*;
+
+use crate::completions;
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[
     ConstraintScope::GlobalPrimaryKeyKeyIndex,

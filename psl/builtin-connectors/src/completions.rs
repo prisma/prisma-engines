@@ -3,7 +3,7 @@ use lsp_types::{
 };
 use psl_core::datamodel_connector::format_completion_docs;
 
-pub(super) fn extensions_completion(completion_list: &mut CompletionList) {
+pub(crate) fn extensions_completion(completion_list: &mut CompletionList) {
     completion_list.items.push(CompletionItem {
         label: "extensions".to_owned(),
         insert_text: Some("extensions = [$0]".to_owned()),
@@ -21,7 +21,7 @@ pub(super) fn extensions_completion(completion_list: &mut CompletionList) {
     })
 }
 
-pub(super) fn schemas_completion(completion_list: &mut CompletionList) {
+pub(crate) fn schemas_completion(completion_list: &mut CompletionList) {
     completion_list.items.push(CompletionItem {
         label: "schemas".to_owned(),
         insert_text: Some(r#"schemas = [$0]"#.to_owned()),

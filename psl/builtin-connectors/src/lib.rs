@@ -2,6 +2,7 @@
 #![allow(clippy::derive_partial_eq_without_eq)]
 
 pub mod cockroach_datamodel_connector;
+pub mod completions;
 
 pub use cockroach_datamodel_connector::CockroachType;
 pub use mongodb::MongoDbType;

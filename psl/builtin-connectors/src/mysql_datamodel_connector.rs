@@ -1,6 +1,7 @@
 mod native_types;
 mod validations;
 
+use lsp_types::CompletionList;
 pub use native_types::MySqlType;
 
 use enumflags2::BitFlags;
@@ -10,8 +11,11 @@ use psl_core::{
     },
     diagnostics::{DatamodelError, Diagnostics, Span},
     parser_database::{walkers, ReferentialAction, ScalarType},
+    PreviewFeature,
 };
 use MySqlType::*;
+
+use crate::completions;
 
 const TINY_BLOB_TYPE_NAME: &str = "TinyBlob";
 const BLOB_TYPE_NAME: &str = "Blob";
@@ -258,5 +262,16 @@ impl Connector for MySqlDatamodelConnector {
         }
 
         Ok(())
+    }
+
+    fn datasource_completions(&self, config: &psl_core::Configuration, completion_list: &mut CompletionList) {
+        let ds = match config.datasources.first() {
+            Some(ds) => ds,
+            None => return,
+        };
+
+        if config.preview_features().contains(PreviewFeature::MultiSchema) && !ds.schemas_defined() {
+            completions::schemas_completion(completion_list);
+        }
     }
 }

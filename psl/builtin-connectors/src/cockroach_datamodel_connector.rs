@@ -18,8 +18,11 @@ use psl_core::{
         walkers::ModelWalker,
         IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType,
     },
+    PreviewFeature,
 };
 use std::borrow::Cow;
+
+use crate::completions;
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey];
 
@@ -263,20 +266,36 @@ impl Connector for CockroachDatamodelConnector {
         Ok(())
     }
 
-    fn push_completions(&self, _db: &ParserDatabase, position: SchemaPosition<'_>, completions: &mut CompletionList) {
+    fn push_completions(
+        &self,
+        _db: &ParserDatabase,
+        position: SchemaPosition<'_>,
+        completion_list: &mut CompletionList,
+    ) {
         if let ast::SchemaPosition::Model(
             _,
             ast::ModelPosition::ModelAttribute("index", _, ast::AttributePosition::Argument("type")),
         ) = position
         {
             for index_type in self.supported_index_types() {
-                completions.items.push(CompletionItem {
+                completion_list.items.push(CompletionItem {
                     label: index_type.to_string(),
                     kind: Some(CompletionItemKind::ENUM),
                     detail: Some(index_type.documentation().to_owned()),
                     ..Default::default()
                 });
             }
+        }
+    }
+
+    fn datasource_completions(&self, config: &psl_core::Configuration, completion_list: &mut CompletionList) {
+        let ds = match config.datasources.first() {
+            Some(ds) => ds,
+            None => return,
+        };
+
+        if config.preview_features().contains(PreviewFeature::MultiSchema) && !ds.schemas_defined() {
+            completions::schemas_completion(completion_list);
         }
     }
 }

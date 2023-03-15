@@ -338,7 +338,7 @@ pub trait Connector: Send + Sync {
     fn push_completions(&self, _db: &ParserDatabase, _position: SchemaPosition<'_>, _completions: &mut CompletionList) {
     }
 
-    fn datasource_completions(&self, _config: &Configuration, _completions: &mut CompletionList) {}
+    fn datasource_completions(&self, _config: &Configuration, _completion_list: &mut CompletionList) {}
 
     fn parse_datasource_properties(
         &self,
