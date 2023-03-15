@@ -1,3 +1,4 @@
+mod completions;
 mod datasource;
 mod native_types;
 mod validations;
@@ -13,7 +14,7 @@ use psl_core::{
     },
     diagnostics::Diagnostics,
     parser_database::{ast, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction, ScalarType},
-    Datasource, DatasourceConnectorData, PreviewFeature,
+    Configuration, Datasource, DatasourceConnectorData, PreviewFeature,
 };
 use std::{borrow::Cow, collections::HashMap};
 use PostgresType::*;
@@ -519,6 +520,28 @@ impl Connector for PostgresDatamodelConnector {
                 }
             }
             _ => (),
+        }
+    }
+
+    fn datasource_completions(&self, config: &Configuration, completion_list: &mut CompletionList) {
+        let ds = match config.datasources.first() {
+            Some(ds) => ds,
+            None => return,
+        };
+
+        let connector_data = ds
+            .connector_data
+            .downcast_ref::<PostgresDatasourceProperties>()
+            .unwrap();
+
+        if config.preview_features().contains(PreviewFeature::PostgresqlExtensions)
+            && !connector_data.extensions_defined()
+        {
+            completions::extensions_completion(completion_list);
+        }
+
+        if config.preview_features().contains(PreviewFeature::MultiSchema) && !ds.schemas_defined() {
+            completions::schemas_completion(completion_list);
         }
     }
 

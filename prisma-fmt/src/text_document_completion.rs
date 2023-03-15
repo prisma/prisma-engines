@@ -2,14 +2,13 @@ use enumflags2::BitFlags;
 use log::*;
 use lsp_types::*;
 use psl::{
-    builtin_connectors::PostgresDatasourceProperties,
     datamodel_connector::Connector,
     diagnostics::Span,
     parse_configuration,
     parser_database::{ast, ParserDatabase, SourceFile},
     Configuration, Datasource, Diagnostics, Generator, PreviewFeature,
 };
-use std::{collections::HashMap, sync::Arc};
+use std::sync::Arc;
 
 use crate::position_to_offset;
 
@@ -143,21 +142,8 @@ fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut Comple
                 datasource::relation_mode_completion(completion_list);
             }
 
-            if ctx
-                .connector()
-                .has_capability(psl::datamodel_connector::ConnectorCapability::MultiSchema)
-                && ctx.namespaces().is_empty()
-                && ctx.preview_features().contains(PreviewFeature::MultiSchema)
-                && !ds_has_prop(ctx, "schemas")
-            {
-                datasource::schemas_completion(completion_list);
-            }
-
-            if ctx.connector().provider_name() == "postgresql"
-                && ctx.preview_features().contains(PreviewFeature::PostgresqlExtensions)
-                && !ds_has_prop(ctx, "extensions")
-            {
-                datasource::extensions_completion(completion_list);
+            if let Some(config) = ctx.config {
+                ctx.connector().datasource_completions(config, completion_list);
             }
         }
 
@@ -190,19 +176,11 @@ fn push_ast_completions(ctx: CompletionContext<'_>, completion_list: &mut Comple
 fn ds_has_prop(ctx: CompletionContext<'_>, prop: &str) -> bool {
     if let Some(ds) = ctx.datasource() {
         match prop {
-            "schemas" => ds.schemas_defined(),
             "relationMode" => ds.relation_mode_defined(),
             "directurl" => ds.direct_url_defined(),
             "shadowDatabaseUrl" => ds.shadow_url_defined(),
             "url" => ds.url_defined(),
-            "provider" => !ds.provider_defined(),
-            "extensions" => {
-                if let Some(connector_data) = ds.connector_data.downcast_ref::<PostgresDatasourceProperties>() {
-                    return connector_data.extensions_defined();
-                }
-
-                false
-            }
+            "provider" => ds.provider_defined(),
             _ => false,
         }
     } else {
@@ -251,17 +229,4 @@ fn is_inside_quote(position: &lsp_types::Position, schema: &str) -> bool {
         }
         None => false,
     }
-}
-
-fn generate_pretty_doc(example: &str, description: &str, params: Option<HashMap<&str, &str>>) -> String {
-    let param_docs: String = match params {
-        Some(params) => params
-            .into_iter()
-            .map(|(param_label, param_doc)| format!("_@param_ {param_label} {param_doc}"))
-            .collect::<Vec<String>>()
-            .join("\n"),
-        None => Default::default(),
-    };
-
-    format!("```prisma\n{example}\n```\n___\n{description}\n\n{param_docs}")
 }
