@@ -182,8 +182,8 @@ mod create {
     #[connector_test]
     async fn fail_when_int_invalid(runner: Runner) -> TestResult<()> {
         assert_error!(
-          runner,
-          r#"mutation {
+            runner,
+            r#"mutation {
             createOneScalarModel(data: {
               id: "1",
               optString: "test",
@@ -194,8 +194,8 @@ mod create {
               optDateTime: "2016-07-31T23:59:01.000Z"
             }
           ){ optString, optInt, optFloat, optBoolean, optEnum, optDateTime }}"#,
-          2009,
-          "Query parsing/validation error at `Mutation.createOneScalarModel.data.ScalarModelCreateInput.optInt`: Value types mismatch"
+            2009,
+            "Invalid argument type. `optInt` should be of any of the following types: `Int`"
         );
 
         Ok(())

@@ -125,14 +125,14 @@ mod failure {
             runner,
             r#"{ findManyTestModel(where: { str: { in: { _ref: "smth" } } }) { id } }"#,
             2009,
-            "Query.findManyTestModel.where.TestModelWhereInput.str.StringFilter.in`: Value types mismatch"
+            "Invalid argument type"
         );
 
         assert_error!(
             runner,
             r#"{ findManyTestModel(where: { str: { notIn: { _ref: "smth" } } }) { id } }"#,
             2009,
-            "Query.findManyTestModel.where.TestModelWhereInput.str.StringFilter.notIn`: Value types mismatch"
+            "Invalid argument type"
         );
 
         Ok(())
@@ -233,7 +233,7 @@ mod failure {
             runner,
             r#"query { findManyTestModel(where: { json: { gt: { _ref: "json" } } }) { id }}"#,
             2009,
-            "Failed to validate the query: `Value types mismatch."
+            "Invalid argument type"
         );
 
         Ok(())

@@ -197,7 +197,7 @@ mod json {
             &runner,
             r#"query { findManyTestModel(where: { json: "{}" }) { id }}"#,
             2009,
-            "`Value types mismatch. Have: Scalar(String(\"{}\")), want: Object(JsonNullableFilter)` at `Query.findManyTestModel.where.TestModelWhereInput.json`"
+            "Invalid argument type"
         );
 
         assert_error!(
@@ -219,14 +219,14 @@ mod json {
                 &runner,
                 r#"query { findManyTestModel(where: { json: { not: { equals: "{}" }}}) { id }}"#,
                 2009,
-                "`Query.findManyTestModel.where.TestModelWhereInput.json.JsonNullableFilter.not`: Value types mismatch. Have: Object({\"equals\": Scalar(String(\"{}\"))}), want: Json"
+                "Invalid argument type"
             );
 
             assert_error!(
                 &runner,
                 r#"query { findManyTestModel(where: { json: { not: { equals: null }}}) { id }}"#,
                 2009,
-                "`Query.findManyTestModel.where.TestModelWhereInput.json.JsonNullableFilter.not`: Value types mismatch. Have: Object({\"equals\": Scalar(Null)}), want: Json"
+                "Invalid argument type"
             );
         }
 

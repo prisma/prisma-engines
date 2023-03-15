@@ -111,7 +111,7 @@ impl ValidationError {
         argument: ArgumentDescription,
     ) -> Self {
         let message = format!(
-            "`{}` should be of any of the following types: `{}`",
+            "Invalid argument type. `{}` should be of any of the following types: `{}`",
             argument.name,
             argument.type_names.join(", ")
         );
@@ -349,16 +349,5 @@ pub struct ArgumentDescription {
 impl ArgumentDescription {
     pub fn new(name: String, type_names: Vec<String>) -> Self {
         Self { name, type_names }
-    }
-}
-
-impl fmt::Display for ArgumentDescription {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "{} should be of any of the following types: {}",
-            self.name,
-            self.type_names.join(", ")
-        )
     }
 }

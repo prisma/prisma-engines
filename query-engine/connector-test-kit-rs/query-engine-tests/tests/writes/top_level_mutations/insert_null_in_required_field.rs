@@ -72,7 +72,7 @@ mod insert_null {
             }
           }"#,
             2009,
-            "Mutation.createOneA.data.ACreateInput.key`: A value is required but not set"
+            "`data.key`: A value is required but not set"
         );
 
         Ok(())

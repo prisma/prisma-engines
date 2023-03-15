@@ -246,7 +246,7 @@ mod to_many {
     //             }
     //         }"#,
     //         2009,
-    //         "`Query.findManyTestModel.where.TestModelWhereInput.to_many_as.CompositeACompositeListFilter.equals`: Value types mismatch. Have: Object({\"a_1\": Scalar(String(\"Test\")), \"a_2\": Scalar(Int(0))}), want: Object(CompositeAObjectEqualityInput)"
+    //         "Invalid argument type"
     //     );
 
     //     Ok(())
