@@ -65,25 +65,12 @@ impl Types {
         &self,
         model_id: ast::ModelId,
     ) -> impl Iterator<Item = (RelationFieldId, &RelationField)> + Clone {
-        self.relation_fields
-            .binary_search_by_key(&model_id, |rf| rf.model_id)
-            .into_iter()
-            .flat_map(move |anchor| {
-                let back = self.relation_fields[..anchor]
-                    .iter()
-                    .rev()
-                    .take_while(move |rf| rf.model_id == model_id)
-                    .enumerate()
-                    .map(move |(idx, rf)| (RelationFieldId((anchor.saturating_sub(1) - idx) as u32), rf));
-
-                let forward = self.relation_fields[anchor..]
-                    .iter()
-                    .take_while(move |rf| rf.model_id == model_id)
-                    .enumerate()
-                    .map(move |(idx, rf)| (RelationFieldId((anchor + idx) as u32), rf));
-
-                back.chain(forward)
-            })
+        let first_relation_field_idx = self.relation_fields.partition_point(|rf| rf.model_id < model_id);
+        self.relation_fields[first_relation_field_idx..]
+            .iter()
+            .take_while(move |rf| rf.model_id == model_id)
+            .enumerate()
+            .map(move |(idx, rf)| (RelationFieldId((first_relation_field_idx + idx) as u32), rf))
     }
 
     pub(super) fn refine_field(
