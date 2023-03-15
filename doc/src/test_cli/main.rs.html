@@ -451,20 +451,6 @@
 <a href="#451" id="451">451</a>
 <a href="#452" id="452">452</a>
 <a href="#453" id="453">453</a>
-<a href="#454" id="454">454</a>
-<a href="#455" id="455">455</a>
-<a href="#456" id="456">456</a>
-<a href="#457" id="457">457</a>
-<a href="#458" id="458">458</a>
-<a href="#459" id="459">459</a>
-<a href="#460" id="460">460</a>
-<a href="#461" id="461">461</a>
-<a href="#462" id="462">462</a>
-<a href="#463" id="463">463</a>
-<a href="#464" id="464">464</a>
-<a href="#465" id="465">465</a>
-<a href="#466" id="466">466</a>
-<a href="#467" id="467">467</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(clippy::print_literal)] </span><span class="comment">// it is just wrong in this case
 
 </span><span class="kw">mod </span>diagnose_migration_history;
@@ -514,10 +500,6 @@
 
 <span class="attr">#[derive(Debug, StructOpt)]
 </span><span class="kw">struct </span>DmmfCommand {
-    <span class="doccomment">/// The path to the `query-engine` binary. Defaults to the value of the `PRISMA_BINARY_PATH`
-    /// env var, or just `query-engine`.
-    </span><span class="attr">#[structopt(env = <span class="string">&quot;PRISMA_BINARY_PATH&quot;</span>, default_value = <span class="string">&quot;query-engine&quot;</span>)]
-    </span>query_engine_binary_path: String,
     <span class="doccomment">/// A database URL to introspect and generate DMMF for.
     </span><span class="attr">#[structopt(long = <span class="string">&quot;url&quot;</span>)]
     </span>url: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -807,19 +789,9 @@
         }
     };
 
-    <span class="macro">eprintln!</span>(
-        <span class="string">&quot;{} {}&quot;</span>,
-        <span class="string">&quot;Using the query engine binary at&quot;</span>.yellow(),
-        cmd.query_engine_binary_path.bold()
-    );
-
-    <span class="kw">let </span>cmd = std::process::Command::new(<span class="kw-2">&amp;</span>cmd.query_engine_binary_path)
-        .arg(<span class="string">&quot;cli&quot;</span>)
-        .arg(<span class="string">&quot;dmmf&quot;</span>)
-        .env(<span class="string">&quot;PRISMA_DML_PATH&quot;</span>, schema_path)
-        .spawn()<span class="question-mark">?</span>;
-
-    cmd.wait_with_output()<span class="question-mark">?</span>;
+    <span class="kw">let </span>prisma_schema = std::fs::read_to_string(schema_path).unwrap();
+    <span class="kw">let </span>result = dmmf::dmmf_json_from_schema(<span class="kw-2">&amp;</span>prisma_schema);
+    <span class="macro">println!</span>(<span class="string">&quot;{result}&quot;</span>);
 
     <span class="prelude-val">Ok</span>(())
 }
