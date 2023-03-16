@@ -115,6 +115,7 @@ impl RelationField {
     fn linking_fields_impl(&self) -> Vec<ScalarFieldRef> {
         let walker = self.walker();
         let relation = walker.relation();
+
         match relation.refine() {
             walkers::RefinedRelationWalker::Inline(rel) => {
                 let forward = rel.forward_relation_field().unwrap();

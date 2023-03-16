@@ -1,5 +1,6 @@
 use super::*;
 use crate::constants::{filters, itx, json_null, ordering};
+use prisma_models::prelude::ParentContainer;
 use schema::EnumType;
 
 pub(crate) fn sort_order_enum(ctx: &mut BuilderContext) -> EnumTypeWeakRef {
@@ -29,7 +30,7 @@ pub(crate) fn nulls_order_enum(ctx: &mut BuilderContext) -> EnumTypeWeakRef {
 }
 
 pub(crate) fn map_schema_enum_type(ctx: &mut BuilderContext, enum_id: ast::EnumId) -> EnumTypeWeakRef {
-    let ident = Identifier::new_model(ctx.internal_data_model.walk(enum_id).name());
+    let ident = Identifier::new_model(IdentifierType::Enum(ctx.internal_data_model.clone().zip(enum_id)));
     return_cached_enum!(ctx, &ident);
 
     let schema_enum = ctx.internal_data_model.clone().zip(enum_id);
@@ -40,8 +41,8 @@ pub(crate) fn map_schema_enum_type(ctx: &mut BuilderContext, enum_id: ast::EnumI
 }
 
 pub(crate) fn model_field_enum(ctx: &mut BuilderContext, model: &ModelRef) -> EnumTypeWeakRef {
-    let name = format!("{}ScalarFieldEnum", capitalize(model.name()));
-    let ident = Identifier::new_prisma(name);
+    let ident = Identifier::new_prisma(IdentifierType::ScalarFieldEnum(model.clone()));
+
     return_cached_enum!(ctx, &ident);
 
     let values = model
@@ -98,11 +99,11 @@ pub(crate) fn json_null_input_enum(ctx: &mut BuilderContext, nullable: bool) -> 
 
 pub(crate) fn order_by_relevance_enum(
     ctx: &mut BuilderContext,
-    container: &str,
+    container: &ParentContainer,
     values: Vec<String>,
 ) -> EnumTypeWeakRef {
-    let name = format!("{container}OrderByRelevanceFieldEnum");
-    let ident = Identifier::new_prisma(name);
+    let ident = Identifier::new_prisma(IdentifierType::OrderByRelevanceFieldEnum(container.clone()));
+
     return_cached_enum!(ctx, &ident);
 
     let typ = Arc::new(EnumType::string(ident.clone(), values));
@@ -125,7 +126,7 @@ pub(crate) fn query_mode_enum(ctx: &mut BuilderContext) -> EnumTypeWeakRef {
 }
 
 pub(crate) fn itx_isolation_levels(ctx: &mut BuilderContext) -> Option<EnumTypeWeakRef> {
-    let ident = Identifier::new_prisma("TransactionIsolationLevel");
+    let ident = Identifier::new_prisma(IdentifierType::TransactionIsolationLevel);
     if let e @ Some(_) = ctx.get_enum_type(&ident) {
         return e;
     }

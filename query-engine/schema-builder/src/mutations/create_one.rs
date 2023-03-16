@@ -1,7 +1,6 @@
 use std::sync::Arc;
 
 use crate::{
-    capitalize,
     constants::args,
     field, init_input_object_type, input_field,
     input_types::fields::data_input_mapper::{CreateDataInputFieldMapper, DataInputFieldMapper},
@@ -9,7 +8,10 @@ use crate::{
     BuilderContext, ModelField,
 };
 use prisma_models::{ModelRef, RelationFieldRef};
-use schema::{Identifier, InputField, InputObjectTypeWeakRef, InputType, OutputField, OutputType, QueryInfo, QueryTag};
+use schema::{
+    Identifier, IdentifierType, InputField, InputObjectTypeWeakRef, InputType, OutputField, OutputType, QueryInfo,
+    QueryTag,
+};
 
 /// Builds a create mutation field (e.g. createUser) for given model.
 pub(crate) fn create_one(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
@@ -69,12 +71,8 @@ fn checked_create_input_type(
     // We allow creation from both sides of the relation - which would lead to an endless loop of input types
     // if we would allow to create the parent from a child create that is already a nested create.
     // To solve it, we remove the parent relation from the input ("Without<Parent>").
-    let name = match parent_field.map(|pf| pf.related_field()) {
-        Some(ref f) => format!("{}CreateWithout{}Input", model.name(), capitalize(f.name())),
-        _ => format!("{}CreateInput", model.name()),
-    };
+    let ident = Identifier::new_prisma(IdentifierType::CheckedCreateInput(model.clone(), parent_field.cloned()));
 
-    let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));
@@ -100,12 +98,11 @@ fn unchecked_create_input_type(
     // We allow creation from both sides of the relation - which would lead to an endless loop of input types
     // if we would allow to create the parent from a child create that is already a nested create.
     // To solve it, we remove the parent relation from the input ("Without<Parent>").
-    let name = match parent_field.map(|pf| pf.related_field()) {
-        Some(ref f) => format!("{}UncheckedCreateWithout{}Input", model.name(), capitalize(f.name())),
-        _ => format!("{}UncheckedCreateInput", model.name()),
-    };
+    let ident = Identifier::new_prisma(IdentifierType::UncheckedCreateInput(
+        model.clone(),
+        parent_field.cloned(),
+    ));
 
-    let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));

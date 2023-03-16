@@ -15,7 +15,7 @@ pub enum EnumType {
 }
 
 impl EnumType {
-    pub fn name(&self) -> &str {
+    pub fn name(&self) -> String {
         self.identifier().name()
     }
 
