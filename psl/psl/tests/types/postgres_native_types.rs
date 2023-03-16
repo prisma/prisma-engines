@@ -225,10 +225,10 @@ fn xml_should_work_with_string_scalar_type() {
         }
     "#};
 
-    let datamodel = parse(dml);
+    let datamodel = psl::parse_schema(dml).unwrap();
     let user_model = datamodel.assert_has_model("Blog");
-    let sft = user_model.assert_has_scalar_field("dec").assert_native_type();
 
-    let postgres_tpe: &PostgresType = sft.deserialize_native_type();
-    assert_eq!(postgres_tpe, &PostgresType::Xml);
+    user_model
+        .assert_has_scalar_field("dec")
+        .assert_native_type(datamodel.connector, &PostgresType::Xml);
 }

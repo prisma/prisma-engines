@@ -1,4 +1,5 @@
 use crate::{common::*, with_header, Provider};
+use psl::parser_database::ScalarType;
 
 #[test]
 fn parse_scalar_types() {
@@ -12,20 +13,24 @@ fn parse_scalar_types() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = psl::parse_schema(dml).unwrap();
     let user_model = schema.assert_has_model("User");
+
     user_model
         .assert_has_scalar_field("firstName")
-        .assert_base_type(&ScalarType::String);
+        .assert_scalar_type(ScalarType::String);
+
     user_model
         .assert_has_scalar_field("age")
-        .assert_base_type(&ScalarType::Int);
+        .assert_scalar_type(ScalarType::Int);
+
     user_model
         .assert_has_scalar_field("isPro")
-        .assert_base_type(&ScalarType::Boolean);
+        .assert_scalar_type(ScalarType::Boolean);
+
     user_model
         .assert_has_scalar_field("averageGrade")
-        .assert_base_type(&ScalarType::Float);
+        .assert_scalar_type(ScalarType::Float);
 }
 
 #[test]
@@ -51,20 +56,23 @@ fn parse_field_arity() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = psl::parse_schema(dml).unwrap();
     let post_model = schema.assert_has_model("Post");
+
     post_model
         .assert_has_scalar_field("text")
-        .assert_base_type(&ScalarType::String)
-        .assert_arity(&dml::FieldArity::Required);
+        .assert_scalar_type(ScalarType::String)
+        .assert_required();
+
     post_model
         .assert_has_scalar_field("photo")
-        .assert_base_type(&ScalarType::String)
-        .assert_arity(&dml::FieldArity::Optional);
+        .assert_scalar_type(ScalarType::String)
+        .assert_optional();
+
     post_model
         .assert_has_scalar_field("comments")
-        .assert_base_type(&ScalarType::String)
-        .assert_arity(&dml::FieldArity::List);
+        .assert_scalar_type(ScalarType::String)
+        .assert_list();
 }
 
 #[test]
@@ -170,10 +178,11 @@ fn json_type_must_work_for_some_connectors() {
     "#};
 
     // empty connector does support it
-    parse(dml)
+    psl::parse_schema(dml)
+        .unwrap()
         .assert_has_model("User")
         .assert_has_scalar_field("json")
-        .assert_base_type(&ScalarType::Json);
+        .assert_scalar_type(ScalarType::Json);
 
     let error = parse_unwrap_err(&format!("{SQLITE_SOURCE}\n{dml}"));
 
@@ -190,16 +199,18 @@ fn json_type_must_work_for_some_connectors() {
     expectation.assert_eq(&error);
 
     // Postgres does support it
-    parse(&format!("{POSTGRES_SOURCE}\n{dml}"))
+    psl::parse_schema(format!("{POSTGRES_SOURCE}\n{dml}"))
+        .unwrap()
         .assert_has_model("User")
         .assert_has_scalar_field("json")
-        .assert_base_type(&ScalarType::Json);
+        .assert_scalar_type(ScalarType::Json);
 
     // MySQL does support it
-    parse(&format!("{MYSQL_SOURCE}\n{dml}"))
+    psl::parse_schema(format!("{MYSQL_SOURCE}\n{dml}"))
+        .unwrap()
         .assert_has_model("User")
         .assert_has_scalar_field("json")
-        .assert_base_type(&ScalarType::Json);
+        .assert_scalar_type(ScalarType::Json);
 }
 
 #[test]
@@ -253,9 +264,11 @@ fn json_list_type_must_work_for_some_connectors() {
     expectation.assert_eq(&error);
 
     let schema = with_header(dml, Provider::Postgres, &[]);
+
     // Postgres does support it
-    parse(&schema)
+    psl::parse_schema(schema)
+        .unwrap()
         .assert_has_model("User")
         .assert_has_scalar_field("json_list")
-        .assert_base_type(&ScalarType::Json);
+        .assert_scalar_type(ScalarType::Json);
 }

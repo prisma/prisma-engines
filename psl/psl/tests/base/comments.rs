@@ -1,23 +1,26 @@
 use crate::common::*;
+use psl::parser_database::ScalarType;
 use psl::schema_ast::ast::WithDocumentation;
 
 #[test]
 fn comments_must_work_in_models() {
-    let dml = r#"
-    /// comment 1
-    model User { /// comment 2
-        id Int @id
-        firstName String /// comment 3
-        /// comment 4
-        lastName String /// comment 5
-    }
-    "#;
+    let dml = indoc! {r#"
+        /// comment 1
+        model User { /// comment 2
+          id Int @id
+          firstName String /// comment 3
+          /// comment 4
+          lastName String /// comment 5
+        }
+    "#};
 
-    let schema = parse(dml);
+    let schema = psl::parse_schema(dml).unwrap();
     let user_model = schema.assert_has_model("User").assert_with_documentation("comment 1");
+
     user_model
         .assert_has_scalar_field("firstName")
         .assert_with_documentation("comment 3");
+
     user_model
         .assert_has_scalar_field("lastName")
         .assert_with_documentation("comment 4\ncomment 5");
@@ -25,36 +28,38 @@ fn comments_must_work_in_models() {
 
 #[test]
 fn free_floating_doc_comments_must_work_in_models() {
-    let dml = r#"
-    model User {
-        id Int @id
-        firstName String
-        /// documentation comment
-    }
-    "#;
+    let dml = indoc! {r#"
+        model User {
+          id Int @id
+          firstName String
+          /// documentation comment
+        }
+    "#};
 
     assert_valid(dml);
 }
 
 #[test]
 fn free_floating_doc_comments_must_work_in_enums() {
-    let dml = r#"
-    enum Role {
-      USER
-      /// documentation comment
-    }"#;
+    let dml = indoc! {r#"
+        enum Role {
+          USER
+          /// documentation comment
+        }
+    "#};
 
     assert_valid(dml);
 }
 
 #[test]
 fn doc_comments_must_work_on_block_attributes() {
-    let dml = r#"
-    model Blog {
-      id1 Int
-      id2 Int
-      @@id([id1, id2]) /// Documentation comment block attribute
-    }"#;
+    let dml = indoc! {r#"
+        model Blog {
+          id1 Int
+          id2 Int
+          @@id([id1, id2]) /// Documentation comment block attribute
+        }
+    "#};
 
     assert_valid(dml);
 }
@@ -106,11 +111,12 @@ fn accept_a_comment_at_the_end() {
     }
     // This is a comment"#;
 
-    let schema = parse(dml);
+    let schema = psl::parse_schema(dml).unwrap();
     let user_model = schema.assert_has_model("User");
+
     user_model
         .assert_has_scalar_field("id")
-        .assert_base_type(&ScalarType::Int);
+        .assert_scalar_type(ScalarType::Int);
 }
 
 #[test]
@@ -121,11 +127,12 @@ fn accept_a_doc_comment_at_the_end() {
     }
     /// This is a doc comment"#;
 
-    let schema = parse(dml);
+    let schema = psl::parse_schema(dml).unwrap();
     let user_model = schema.assert_has_model("User");
+
     user_model
         .assert_has_scalar_field("id")
-        .assert_base_type(&ScalarType::Int);
+        .assert_scalar_type(ScalarType::Int);
 }
 
 #[test]
@@ -162,7 +169,8 @@ fn two_slash_comments_should_not_lead_to_empty_comments() {
         id        String    @id @default(uuid())
     }"#;
 
-    let schema = parse(dml);
+    let schema = psl::parse_schema(dml).unwrap();
     let user_model = schema.assert_has_model("User2");
-    assert_eq!(user_model.documentation, None);
+
+    assert_eq!(user_model.ast_model().documentation(), None);
 }

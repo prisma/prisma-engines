@@ -1,41 +1,46 @@
 use crate::common::*;
+use psl::parser_database::ScalarType;
 
 #[test]
 fn parse_basic_model() {
-    let dml = r#"
-    model User {
-        id Int @id
-        firstName String
-        lastName String
-    }
-    "#;
+    let dml = indoc! {r#"
+        model User {
+          id Int @id
+          firstName String
+          lastName String
+        }
+    "#};
 
-    let schema = parse(dml);
+    let schema = psl::parse_schema(dml).unwrap();
     let user_model = schema.assert_has_model("User");
+
     user_model
         .assert_has_scalar_field("firstName")
-        .assert_base_type(&ScalarType::String);
+        .assert_scalar_type(ScalarType::String);
+
     user_model
         .assert_has_scalar_field("lastName")
-        .assert_base_type(&ScalarType::String);
+        .assert_scalar_type(ScalarType::String);
 }
 
 #[test]
 fn parse_basic_enum() {
-    let dml = r#"
-    enum Roles {
-        Admin
-        User
-        USER
-        ADMIN
-        ADMIN_USER
-        Admin_User
-        HHorse99
-    }
-    "#;
+    let dml = indoc! {r#"
+        enum Roles {
+          Admin
+          User
+          USER
+          ADMIN
+          ADMIN_USER
+          Admin_User
+          HHorse99
+        }
+    "#};
+
     let schema = psl::parse_schema(dml).unwrap();
     let role_enum = schema.db.find_enum("Roles").unwrap();
     let values: Vec<_> = role_enum.values().map(|v| v.name()).collect();
+
     assert_eq!(
         values,
         &["Admin", "User", "USER", "ADMIN", "ADMIN_USER", "Admin_User", "HHorse99"]
@@ -44,20 +49,22 @@ fn parse_basic_enum() {
 
 #[test]
 fn parse_comments() {
-    let dml = r#"
-    /// The user model.
-    model User {
-        id Int @id
-        /// The first name.
-        /// Can be multi-line.
-        firstName String
-        lastName String
-    }
-    "#;
+    let dml = indoc! {r#"
+        /// The user model.
+        model User {
+          id Int @id
+          /// The first name.
+          /// Can be multi-line.
+          firstName String
+          lastName String
+        }
+    "#};
 
-    let schema = parse(dml);
+    let schema = psl::parse_schema(dml).unwrap();
+
     let user_model = schema.assert_has_model("User");
     user_model.assert_with_documentation("The user model.");
+
     user_model
         .assert_has_scalar_field("firstName")
         .assert_with_documentation("The first name.\nCan be multi-line.");
