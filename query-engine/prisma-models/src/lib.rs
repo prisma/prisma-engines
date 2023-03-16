@@ -29,7 +29,6 @@ pub use fields::*;
 pub use internal_data_model::*;
 pub use model::*;
 pub use order_by::*;
-pub use prisma_value_ext::*;
 pub use projections::*;
 pub use record::*;
 pub use relation::*;

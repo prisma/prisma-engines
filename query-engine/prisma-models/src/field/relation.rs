@@ -7,7 +7,6 @@ use std::fmt::Display;
 
 pub type RelationField = crate::Zipper<RelationFieldId>;
 pub type RelationFieldRef = RelationField;
-pub type RelationFieldWeak = RelationField;
 
 impl RelationField {
     pub fn name(&self) -> &str {

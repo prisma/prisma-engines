@@ -3057,13 +3057,10 @@ name = "prisma-models"
 version = "0.0.0"
 dependencies = [
  "bigdecimal",
- "chrono",
  "dml",
  "itertools",
  "prisma-value",
  "psl",
- "serde",
- "serde_json",
  "thiserror",
 ]
 

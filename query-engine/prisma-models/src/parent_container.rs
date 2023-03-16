@@ -24,13 +24,6 @@ impl ParentContainer {
         }
     }
 
-    pub fn as_model_weak(&self) -> Option<Model> {
-        match self {
-            ParentContainer::Model(m) => Some(m.clone()),
-            ParentContainer::CompositeType(_) => None,
-        }
-    }
-
     pub fn as_composite(&self) -> Option<CompositeType> {
         match self {
             ParentContainer::Model(_) => None,
@@ -53,11 +46,10 @@ impl ParentContainer {
     }
 
     pub fn find_field(&self, prisma_name: &str) -> Option<Field> {
-        // Unwraps are safe: This can never fail, the models and composites are always available in memory.
         match self {
-            ParentContainer::Model(weak) => weak.fields().find_from_all(prisma_name).ok(),
+            ParentContainer::Model(model) => model.fields().find_from_all(prisma_name).ok(),
 
-            ParentContainer::CompositeType(weak) => weak.fields().find(|field| field.name() == prisma_name),
+            ParentContainer::CompositeType(ct) => ct.fields().find(|field| field.name() == prisma_name),
         }
     }
 

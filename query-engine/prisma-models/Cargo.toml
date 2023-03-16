@@ -4,14 +4,11 @@ name = "prisma-models"
 version = "0.0.0"
 
 [dependencies]
-chrono = { version = "0.4", features = ["serde"] }
 psl.workspace = true
 dml = { path = "../dml" }
 itertools = "0.10"
 prisma-value = { path = "../../libs/prisma-value" }
 bigdecimal = "0.3"
-serde.workspace = true
-serde_json = { version = "1.0", features = ["float_roundtrip"] }
 thiserror = "1.0"
 
 [features]
