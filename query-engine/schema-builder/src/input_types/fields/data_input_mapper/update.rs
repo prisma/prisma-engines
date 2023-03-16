@@ -85,7 +85,7 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
                     )
                 }
 
-                let mut input_object = input_object_type(ident.clone(), object_fields);
+                let mut input_object = input_object_type(ident.clone(), object_fields.into_iter());
                 input_object.require_exactly_one_field();
 
                 let input_object = Arc::new(input_object);
@@ -110,14 +110,13 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
             (false, false) => "One",
         };
 
-        let without_part = format!("Without{}", capitalize(related_field.name()));
         let unchecked_part = if self.unchecked { "Unchecked" } else { "" };
         let ident = Identifier::new_prisma(format!(
-            "{}{}Update{}{}NestedInput",
+            "{}{}Update{}Without{}NestedInput",
             related_model.name(),
             unchecked_part,
             arity_part,
-            without_part
+            capitalize(related_field.name())
         ));
 
         let input_object = match ctx.get_input_type(&ident) {
@@ -193,7 +192,7 @@ fn update_operations_object_type(
         fields.push(input_field(operations::UNSET, InputType::boolean(), None).optional());
     }
 
-    obj.set_fields(fields);
+    obj.set_fields(fields.into_iter());
 
     Arc::downgrade(&obj)
 }
@@ -237,7 +236,7 @@ fn composite_update_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
     append_opt(&mut fields, composite_delete_many_update_input_field(ctx, cf));
     append_opt(&mut fields, composite_unset_update_input_field(cf));
 
-    input_object.set_fields(fields);
+    input_object.set_fields(fields.into_iter());
 
     Arc::downgrade(&input_object)
 }
@@ -256,8 +255,8 @@ fn composite_update_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef
     ctx.cache_input_type(ident, input_object.clone());
 
     let mapper = UpdateDataInputFieldMapper::new_checked();
-    let fields = cf.typ().fields().collect::<Vec<_>>();
-    let fields = mapper.map_all(ctx, &fields);
+    let ct = cf.typ();
+    let fields = mapper.map_all(ctx, ct.fields());
 
     input_object.set_fields(fields);
 
@@ -329,9 +328,9 @@ fn composite_upsert_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef
     let update_field = input_field(operations::UPDATE, InputType::Object(update_object_type), None);
     let set_field = composite_set_update_input_field(ctx, cf).required();
 
-    let fields = vec![set_field, update_field];
+    let fields = [set_field, update_field];
 
-    input_object.set_fields(fields);
+    input_object.set_fields(fields.into_iter());
 
     Arc::downgrade(&input_object)
 }
@@ -366,9 +365,9 @@ fn composite_update_many_object_type(ctx: &mut BuilderContext, cf: &CompositeFie
     let update_object_type = composite_update_object_type(ctx, cf);
     let data_field = input_field(args::DATA, InputType::Object(update_object_type), None);
 
-    let fields = vec![where_field, data_field];
+    let fields = [where_field, data_field];
 
-    input_object.set_fields(fields);
+    input_object.set_fields(fields.into_iter());
 
     Arc::downgrade(&input_object)
 }
@@ -389,9 +388,9 @@ fn composite_delete_many_object_type(ctx: &mut BuilderContext, cf: &CompositeFie
     let where_object_type = objects::filter_objects::where_object_type(ctx, cf.typ());
     let where_field = input_field(args::WHERE, InputType::object(where_object_type), None);
 
-    let fields = vec![where_field];
+    let fields = [where_field];
 
-    input_object.set_fields(fields);
+    input_object.set_fields(fields.into_iter());
 
     Arc::downgrade(&input_object)
 }

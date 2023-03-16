@@ -280,7 +280,7 @@ fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilde
     let mut pairs = vec![];
 
     for (field_name, map_value) in input_map {
-        let additional_pairs = match model.fields().find_from_scalar(&field_name) {
+        let additional_pairs = match model.find_from_scalar(&field_name) {
             Ok(field) => extract_cursor_field(field, map_value)?,
             Err(_) => match utils::resolve_compound_field(&field_name, &model) {
                 Some(fields) => extract_compound_cursor_field(fields, map_value)?,

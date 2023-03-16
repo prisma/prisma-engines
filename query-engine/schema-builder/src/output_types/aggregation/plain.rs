@@ -21,7 +21,7 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
             ctx,
             UNDERSCORE_COUNT,
             model,
-            model.fields().scalar(),
+            model.scalar_fields(),
             |_, _| OutputType::int(),
             |mut obj| {
                 obj.add_field(field("_all", vec![], OutputType::int(), None));

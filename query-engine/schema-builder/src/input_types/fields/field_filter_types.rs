@@ -78,13 +78,14 @@ fn to_many_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRe
 
     let related_input_type = filter_objects::where_object_type(ctx, &related_model);
 
-    let fields = vec![
+    let fields = [
         input_field(filters::EVERY, InputType::object(related_input_type.clone()), None).optional(),
         input_field(filters::SOME, InputType::object(related_input_type.clone()), None).optional(),
         input_field(filters::NONE, InputType::object(related_input_type), None).optional(),
     ];
 
-    object.set_fields(fields);
+    object.set_fields(fields.into_iter());
+
     Arc::downgrade(&object)
 }
 
@@ -100,7 +101,7 @@ fn to_one_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRef
     let object = Arc::new(object);
     ctx.cache_input_type(ident, object.clone());
 
-    let fields = vec![
+    let fields = [
         input_field(filters::IS, InputType::object(related_input_type.clone()), None)
             .optional()
             .nullable_if(!rf.is_required()),
@@ -109,7 +110,8 @@ fn to_one_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRef
             .nullable_if(!rf.is_required()),
     ];
 
-    object.set_fields(fields);
+    object.set_fields(fields.into_iter());
+
     Arc::downgrade(&object)
 }
 
@@ -152,7 +154,8 @@ fn to_one_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeFieldR
         fields.push(is_set_input_field());
     }
 
-    object.set_fields(fields);
+    object.set_fields(fields.into_iter());
+
     Arc::downgrade(&object)
 }
 
@@ -190,7 +193,8 @@ fn to_many_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeField
         fields.push(is_set_input_field());
     }
 
-    object.set_fields(fields);
+    object.set_fields(fields.into_iter());
+
     Arc::downgrade(&object)
 }
 
@@ -231,7 +235,8 @@ fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> Inp
     fields.push(input_field(filters::HAS_SOME, mapped_list_type.with_field_ref_input(ctx), None).optional());
     fields.push(input_field(filters::IS_EMPTY, InputType::boolean(), None).optional());
 
-    object.set_fields(fields);
+    object.set_fields(fields.into_iter());
+
     Arc::downgrade(&object)
 }
 
@@ -369,7 +374,8 @@ fn full_scalar_filter_type(
         fields.push(is_set_input_field());
     }
 
-    object.set_fields(fields);
+    object.set_fields(fields.into_iter());
+
     Arc::downgrade(&object)
 }
 

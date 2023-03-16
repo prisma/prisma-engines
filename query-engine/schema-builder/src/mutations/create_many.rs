@@ -71,18 +71,18 @@ pub(crate) fn create_many_object_type(
 
     let filtered_fields = filter_create_many_fields(ctx, model, parent_field);
     let field_mapper = CreateDataInputFieldMapper::new_checked();
-    let input_fields = field_mapper.map_all(ctx, &filtered_fields);
+    let input_fields = field_mapper.map_all(ctx, filtered_fields);
 
     input_object.set_fields(input_fields);
     Arc::downgrade(&input_object)
 }
 
 /// Filters the given model's fields down to the allowed ones for checked create.
-fn filter_create_many_fields(
+fn filter_create_many_fields<'a>(
     ctx: &BuilderContext,
-    model: &ModelRef,
-    parent_field: Option<&RelationFieldRef>,
-) -> Vec<ModelField> {
+    model: &'a ModelRef,
+    parent_field: Option<&'a RelationFieldRef>,
+) -> impl Iterator<Item = ModelField> + 'a {
     let linking_fields = if let Some(parent_field) = parent_field {
         let child_field = parent_field.related_field();
         if child_field.is_inlined_on_enclosing_model() {
@@ -97,14 +97,16 @@ fn filter_create_many_fields(
         vec![]
     };
 
+    let has_create_many = ctx.has_capability(ConnectorCapability::CreateManyWriteableAutoIncId);
+
     // 1) Filter out parent links.
     // 2) Only allow writing autoincrement fields if the connector supports it.
-    model.fields().filter_all(|field| match field {
+    model.fields().filter(move |field| match field {
         ModelField::Scalar(sf) => {
             if linking_fields.contains(sf) {
                 false
             } else if sf.is_autoincrement() {
-                ctx.has_capability(ConnectorCapability::CreateManyWriteableAutoIncId)
+                has_create_many
             } else {
                 true
             }

@@ -26,6 +26,7 @@ impl CompositeField {
             CompositeFieldId::InModel(sfid) => self.dm.walk(sfid).scalar_field_type().as_composite_type().unwrap(),
             CompositeFieldId::InCompositeType(ctid) => self.dm.walk(ctid).r#type().as_composite_type().unwrap(),
         };
+
         self.dm.find_composite_type_by_id(id)
     }
 
@@ -62,6 +63,20 @@ impl CompositeField {
                 self.dm.find_model_by_id(id).into()
             }
             CompositeFieldId::InCompositeType((ct_id, _)) => self.dm.find_composite_type_by_id(ct_id).into(),
+        }
+    }
+
+    pub fn is_ignored(&self) -> bool {
+        match self.id {
+            CompositeFieldId::InModel(id) => self.dm.walk(id).is_ignored(),
+            CompositeFieldId::InCompositeType(_) => false,
+        }
+    }
+
+    pub fn is_unsupported(&self) -> bool {
+        match self.id {
+            CompositeFieldId::InModel(id) => self.dm.walk(id).is_unsupported(),
+            CompositeFieldId::InCompositeType(_) => false,
         }
     }
 }

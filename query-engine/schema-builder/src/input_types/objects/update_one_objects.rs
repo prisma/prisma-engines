@@ -37,9 +37,10 @@ fn checked_update_one_input_type(
 
     let filtered_fields = filter_checked_update_fields(ctx, model, parent_field);
     let field_mapper = UpdateDataInputFieldMapper::new_checked();
-    let input_fields = field_mapper.map_all(ctx, &filtered_fields);
+    let input_fields = field_mapper.map_all(ctx, filtered_fields);
 
     input_object.set_fields(input_fields);
+
     Arc::downgrade(&input_object)
 }
 
@@ -62,19 +63,22 @@ fn unchecked_update_one_input_type(
 
     let filtered_fields = filter_unchecked_update_fields(ctx, model, parent_field);
     let field_mapper = UpdateDataInputFieldMapper::new_unchecked();
-    let input_fields = field_mapper.map_all(ctx, &filtered_fields);
+    let input_fields = field_mapper.map_all(ctx, filtered_fields);
 
     input_object.set_fields(input_fields);
+
     Arc::downgrade(&input_object)
 }
 
 /// Filters the given model's fields down to the allowed ones for checked update.
-pub(super) fn filter_checked_update_fields(
+pub(super) fn filter_checked_update_fields<'a>(
     ctx: &BuilderContext,
-    model: &ModelRef,
-    parent_field: Option<&RelationFieldRef>,
-) -> Vec<ModelField> {
-    model.fields().filter_all(|field| {
+    model: &'a ModelRef,
+    parent_field: Option<&'a RelationFieldRef>,
+) -> impl Iterator<Item = ModelField> + 'a {
+    let has_updateable_id = ctx.has_capability(ConnectorCapability::UpdateableId);
+
+    model.fields().filter(move |field| {
         match field {
             ModelField::Scalar(sf) => {
                 // We forbid updating auto-increment integer unique fields as this can create problems with the
@@ -88,7 +92,7 @@ pub(super) fn filter_checked_update_fields(
                 let model_id = sf.container().as_model().unwrap().primary_identifier();
                 let is_not_disallowed_id = if model_id.contains(sf.name()) {
                     // Is part of the id, connector must allow updating ID fields.
-                    ctx.has_capability(ConnectorCapability::UpdateableId)
+                    has_updateable_id
                 } else {
                     true
                 };
@@ -112,11 +116,11 @@ pub(super) fn filter_checked_update_fields(
 }
 
 /// Filters the given model's fields down to the allowed ones for unchecked update.
-pub(super) fn filter_unchecked_update_fields(
+pub(super) fn filter_unchecked_update_fields<'a>(
     ctx: &mut BuilderContext,
-    model: &ModelRef,
-    parent_field: Option<&RelationFieldRef>,
-) -> Vec<ModelField> {
+    model: &'a ModelRef,
+    parent_field: Option<&'a RelationFieldRef>,
+) -> impl Iterator<Item = ModelField> + 'a {
     let linking_fields = if let Some(parent_field) = parent_field {
         let child_field = parent_field.related_field();
         if child_field.is_inlined_on_enclosing_model() {
@@ -131,8 +135,11 @@ pub(super) fn filter_unchecked_update_fields(
         vec![]
     };
 
-    let id_fields = model.fields().id().map(|pk| pk.fields());
-    model.fields().filter_all(|field| match field {
+    let id_fields = model.id().map(|pk| pk.fields());
+
+    let has_updateable_id = ctx.has_capability(ConnectorCapability::UpdateableId);
+
+    model.fields().filter(move |field| match field {
         // 1) In principle, all scalars are writable for unchecked inputs. However, it still doesn't make any sense to be able to write the scalars that
         // link the model to the parent record in case of a nested unchecked create, as this would introduce complexities we don't want to deal with right now.
         // 2) Exclude @@id or @id fields if not updatable
@@ -141,7 +148,7 @@ pub(super) fn filter_unchecked_update_fields(
                 && if let Some(ref id_fields) = &id_fields {
                     // Exclude @@id or @id fields if not updatable
                     if id_fields.contains(sf) {
-                        ctx.has_capability(ConnectorCapability::UpdateableId)
+                        has_updateable_id
                     } else {
                         true
                     }
@@ -189,12 +196,13 @@ pub(crate) fn update_one_where_combination_object(
     let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
 
-    let fields = vec![
+    let fields = [
         input_field(args::WHERE, InputType::object(where_input_object), None),
         input_field(args::DATA, update_types, None),
     ];
 
-    input_object.set_fields(fields);
+    input_object.set_fields(fields.into_iter());
+
     Arc::downgrade(&input_object)
 }
 
@@ -219,11 +227,12 @@ pub(crate) fn update_to_one_rel_where_combination_object(
     let input_object = Arc::new(input_object);
     ctx.cache_input_type(ident, input_object.clone());
 
-    let fields = vec![
+    let fields = [
         arguments::where_argument(ctx, &related_model),
         input_field(args::DATA, update_types, None),
     ];
 
-    input_object.set_fields(fields);
+    input_object.set_fields(fields.into_iter());
+
     Arc::downgrade(&input_object)
 }

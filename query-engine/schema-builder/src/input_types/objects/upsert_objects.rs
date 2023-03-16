@@ -40,13 +40,14 @@ fn nested_upsert_list_input_object(
             let input_object = Arc::new(init_input_object_type(ident.clone()));
             ctx.cache_input_type(ident, input_object.clone());
 
-            let fields = vec![
+            let fields = [
                 input_field(args::WHERE, InputType::object(where_object), None),
                 input_field(args::UPDATE, update_types, None),
                 input_field(args::CREATE, create_types, None),
             ];
 
-            input_object.set_fields(fields);
+            input_object.set_fields(fields.into_iter());
+
             Some(Arc::downgrade(&input_object))
         }
         x => x,
@@ -86,7 +87,8 @@ fn nested_upsert_nonlist_input_object(
                 fields.push(where_argument(ctx, &related_model));
             }
 
-            input_object.set_fields(fields);
+            input_object.set_fields(fields.into_iter());
+
             Some(Arc::downgrade(&input_object))
         }
         x => x,

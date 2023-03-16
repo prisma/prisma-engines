@@ -125,6 +125,22 @@ impl Field {
             None
         }
     }
+
+    pub fn is_unsupported(&self) -> bool {
+        match self {
+            Field::Scalar(sf) => sf.is_unsupported(),
+            Field::Composite(cf) => cf.is_unsupported(),
+            Field::Relation(_) => false,
+        }
+    }
+
+    pub fn is_ignored(&self) -> bool {
+        match self {
+            Field::Scalar(sf) => sf.is_ignored(),
+            Field::Composite(cf) => cf.is_ignored(),
+            Field::Relation(rf) => rf.is_ignored(),
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
@@ -205,6 +221,15 @@ impl From<(crate::InternalDataModelRef, walkers::ScalarFieldWalker<'_>)> for Fie
 impl From<(crate::InternalDataModelRef, walkers::RelationFieldWalker<'_>)> for Field {
     fn from((dm, rf): (crate::InternalDataModelRef, walkers::RelationFieldWalker<'_>)) -> Self {
         Field::Relation(dm.zip(rf.id))
+    }
+}
+
+impl From<(crate::InternalDataModelRef, walkers::FieldWalker<'_>)> for Field {
+    fn from((dm, rf): (crate::InternalDataModelRef, walkers::FieldWalker<'_>)) -> Self {
+        match rf.refine() {
+            walkers::RefinedFieldWalker::Scalar(sf) => Field::from((dm, sf)),
+            walkers::RefinedFieldWalker::Relation(rf) => Field::from((dm, rf)),
+        }
     }
 }
 

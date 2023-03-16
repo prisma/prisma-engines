@@ -83,7 +83,7 @@ impl BatchDocument {
             // If it's a compound, then it's still considered as scalar
             ArgumentValue::Object(_) if resolve_compound_field(key, model).is_some() => false,
             // Otherwise, we just look for a scalar field inside the model. If it's not one, then we break.
-            val => match model.fields().find_from_scalar(&key) {
+            val => match model.find_from_scalar(&key) {
                 Ok(_) => match val {
                     // Consider scalar _only_ if the filter object contains "equals". eg: `{ scalar_field: { equals: 1 } }`
                     ArgumentValue::Object(obj) => !obj.contains_key(filters::EQUALS),

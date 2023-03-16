@@ -42,8 +42,8 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
         let input_object = match ctx.get_input_type(&ident) {
             Some(cached) => cached,
             None => {
-                let object_fields = vec![input_field(operations::SET, typ.clone(), None)];
-                let mut input_object = input_object_type(ident.clone(), object_fields);
+                let object_fields = [input_field(operations::SET, typ.clone(), None)];
+                let mut input_object = input_object_type(ident.clone(), object_fields.into_iter());
                 input_object.require_exactly_one_field();
 
                 let input_object = Arc::new(input_object);
@@ -175,7 +175,7 @@ fn composite_create_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
         .nullable_if(!cf.is_required() && !cf.is_list())
         .optional();
 
-    input_object.set_fields(vec![set_field]);
+    input_object.set_fields(std::iter::once(set_field));
 
     Arc::downgrade(&input_object)
 }
@@ -191,8 +191,8 @@ pub(crate) fn composite_create_object_type(ctx: &mut BuilderContext, cf: &Compos
     ctx.cache_input_type(ident, input_object.clone());
 
     let mapper = CreateDataInputFieldMapper::new_checked();
-    let fields = cf.typ().fields().collect::<Vec<_>>();
-    let fields = mapper.map_all(ctx, &fields);
+    let ct = cf.typ();
+    let fields = mapper.map_all(ctx, ct.fields());
 
     input_object.set_fields(fields);
 

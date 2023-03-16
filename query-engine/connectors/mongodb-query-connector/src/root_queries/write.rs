@@ -42,8 +42,7 @@ pub async fn create_record<'conn>(
     // Todo: Do we need to write null for everything? There's something with nulls and exists that might impact
     //       query capability (e.g. query for field: null may need to check for exist as well?)
     let fields: Vec<_> = model
-        .fields()
-        .non_relational()
+        .non_relational_fields()
         .iter()
         .filter(|field| args.has_arg_for(field.db_name()))
         .map(Clone::clone)
@@ -91,7 +90,7 @@ pub async fn create_records<'conn>(
     );
 
     let num_records = args.len();
-    let fields: Vec<_> = model.fields().non_relational();
+    let fields: Vec<_> = model.non_relational_fields();
 
     let docs = args
         .into_iter()
@@ -186,8 +185,6 @@ pub async fn update_records<'conn>(
     let filter = doc! { id_field.db_name(): { "$in": ids.clone() } };
     let fields: Vec<_> = model
         .fields()
-        .filter_all(|_| true)
-        .into_iter()
         .filter_map(|field| {
             args.take_field_value(field.db_name())
                 .map(|write_op| (field.clone(), write_op))

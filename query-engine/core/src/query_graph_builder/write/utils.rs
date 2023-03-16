@@ -1152,8 +1152,7 @@ fn collect_overlapping_relation_fields(model: ModelRef, relation_field: &Relatio
     let child_fks = relation_field.left_scalars();
 
     let dependent_relation_fields: Vec<_> = model
-        .fields()
-        .relation()
+        .relation_fields()
         .into_iter()
         .filter(|rf| rf != relation_field)
         .filter(|rf| {

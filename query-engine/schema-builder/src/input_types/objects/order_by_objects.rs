@@ -52,11 +52,10 @@ pub(crate) fn order_by_object_type(
     // Basic orderBy fields.
     let mut fields: Vec<_> = container
         .fields()
-        .iter()
         .filter_map(|field| match field {
             // We exclude composites if we're in aggregations land (groupBy).
             ModelField::Composite(_) if options.include_scalar_aggregations => None,
-            _ => orderby_field_mapper(field, ctx, options),
+            _ => orderby_field_mapper(&field, ctx, options),
         })
         .collect();
 
@@ -70,7 +69,8 @@ pub(crate) fn order_by_object_type(
         append_opt(&mut fields, order_by_field_text_search(ctx, container))
     }
 
-    input_object.set_fields(fields);
+    input_object.set_fields(fields.into_iter());
+
     Arc::downgrade(&input_object)
 }
 
@@ -168,12 +168,12 @@ fn sort_nulls_object_type(ctx: &mut BuilderContext) -> InputObjectTypeWeakRef {
     let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
 
-    let fields = vec![
+    let fields = [
         input_field(ordering::SORT, InputType::Enum(sort_order_enum(ctx)), None),
         input_field(ordering::NULLS, InputType::Enum(nulls_order_enum(ctx)), None).optional(),
     ];
 
-    input_object.set_fields(fields);
+    input_object.set_fields(fields.into_iter());
 
     Arc::downgrade(&input_object)
 }
@@ -217,10 +217,10 @@ fn order_by_object_type_aggregate(
 
     let fields = scalar_fields
         .iter()
-        .map(|sf| input_field(sf.name(), InputType::Enum(sort_order_enum(ctx)), None).optional())
-        .collect();
+        .map(|sf| input_field(sf.name(), InputType::Enum(sort_order_enum(ctx)), None).optional());
 
     input_object.set_fields(fields);
+
     Arc::downgrade(&input_object)
 }
 
@@ -242,14 +242,14 @@ fn order_by_to_many_aggregate_object_type(
     let input_object = Arc::new(input_object);
     ctx.cache_input_type(ident, input_object.clone());
 
-    let fields = vec![input_field(
+    let fields = [input_field(
         aggregations::UNDERSCORE_COUNT,
         InputType::Enum(sort_order_enum(ctx)),
         None,
     )
     .optional()];
 
-    input_object.set_fields(fields);
+    input_object.set_fields(fields.into_iter());
 
     Arc::downgrade(&input_object)
 }
@@ -296,7 +296,7 @@ fn order_by_object_type_text_search(
         scalar_fields.iter().map(|sf| sf.name().to_owned()).collect(),
     ));
 
-    let fields = vec![
+    let fields = [
         input_field(
             ordering::FIELDS,
             vec![fields_enum_type.clone(), InputType::list(fields_enum_type)],
@@ -306,7 +306,7 @@ fn order_by_object_type_text_search(
         input_field(ordering::SEARCH, InputType::string(), None),
     ];
 
-    input_object.set_fields(fields);
+    input_object.set_fields(fields.into_iter());
 
     Arc::downgrade(&input_object)
 }

@@ -23,7 +23,7 @@ impl WriteArgsParser {
                 nested: Default::default(),
             },
             |mut args, (k, v): (String, ParsedInputValue)| {
-                let field = model.fields().find_from_all(&k).unwrap();
+                let field = model.find_from_all(&k).unwrap();
 
                 match field {
                     Field::Scalar(sf) if sf.is_list() => {

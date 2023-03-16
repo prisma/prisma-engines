@@ -74,7 +74,8 @@ fn nested_create_many_envelope(ctx: &mut BuilderContext, parent_field: &Relation
         vec![data_arg]
     };
 
-    input_object.set_fields(fields);
+    input_object.set_fields(fields.into_iter());
+
     Arc::downgrade(&input_object)
 }
 

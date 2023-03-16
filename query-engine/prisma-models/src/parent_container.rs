@@ -45,17 +45,17 @@ impl ParentContainer {
         }
     }
 
-    pub fn fields(&self) -> Vec<Field> {
+    pub fn fields(&self) -> Box<dyn Iterator<Item = Field> + '_> {
         match self {
-            ParentContainer::Model(model) => model.fields().filter_all(|_| true),
-            ParentContainer::CompositeType(composite) => composite.fields().collect(),
+            ParentContainer::Model(model) => Box::new(model.fields()),
+            ParentContainer::CompositeType(composite) => Box::new(composite.fields()),
         }
     }
 
     pub fn find_field(&self, prisma_name: &str) -> Option<Field> {
         // Unwraps are safe: This can never fail, the models and composites are always available in memory.
         match self {
-            ParentContainer::Model(weak) => weak.fields().find_from_all(prisma_name).ok(),
+            ParentContainer::Model(weak) => weak.find_from_all(prisma_name).ok(),
 
             ParentContainer::CompositeType(weak) => weak.fields().find(|field| field.name() == prisma_name),
         }

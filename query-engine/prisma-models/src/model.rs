@@ -36,10 +36,6 @@ impl Model {
         FieldSelection::from(fields)
     }
 
-    pub fn fields(&self) -> Fields {
-        Fields::new(self.clone())
-    }
-
     pub fn supports_create_operation(&self) -> bool {
         let dm = self.internal_data_model();
         let walker = dm.walk(self.id);

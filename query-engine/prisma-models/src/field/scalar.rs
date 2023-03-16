@@ -166,6 +166,20 @@ impl ScalarField {
             ScalarFieldId::InCompositeType(_) => false,
         }
     }
+
+    pub fn is_unsupported(&self) -> bool {
+        match self.id {
+            ScalarFieldId::InModel(id) => self.dm.walk(id).is_unsupported(),
+            ScalarFieldId::InCompositeType(_) => false,
+        }
+    }
+
+    pub fn is_ignored(&self) -> bool {
+        match self.id {
+            ScalarFieldId::InModel(id) => self.dm.walk(id).is_ignored(),
+            ScalarFieldId::InCompositeType(_) => false,
+        }
+    }
 }
 
 impl Display for ScalarField {

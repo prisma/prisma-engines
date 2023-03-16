@@ -9,8 +9,7 @@ use tracing::Span;
 /// optional `RecordProjection` if available from the arguments or model.
 pub(crate) fn create_record(model: &ModelRef, mut args: WriteArgs, ctx: &Context<'_>) -> Insert<'static> {
     let fields: Vec<_> = model
-        .fields()
-        .scalar()
+        .scalar_fields()
         .into_iter()
         .filter(|field| args.has_arg_for(&field.db_name()))
         .collect();
@@ -101,7 +100,7 @@ pub(crate) fn create_records_empty(model: &ModelRef, skip_duplicates: bool, ctx:
 }
 
 pub(crate) fn build_update_and_set_query(model: &ModelRef, args: WriteArgs, ctx: &Context<'_>) -> Update<'static> {
-    let scalar_fields = model.fields().scalar();
+    let scalar_fields = model.scalar_fields();
     let table = model.as_table(ctx);
     let query = args
         .args
