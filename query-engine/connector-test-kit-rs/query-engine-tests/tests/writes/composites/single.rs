@@ -224,8 +224,8 @@ mod create {
     async fn fails_when_missing_required_fields(runner: Runner) -> TestResult<()> {
         // Envelope type failure
         assert_error!(
-          runner,
-          r#"mutation {
+            runner,
+            r#"mutation {
             createOneTestModel(
               data: {
                 id: 1
@@ -236,8 +236,8 @@ mod create {
               id
             }
           }"#,
-          2009,
-          "Mutation.createOneTestModel.data.TestModelUncheckedCreateInput.b.BNullableCreateEnvelopeInput`: Expected exactly one field to be present, got 0."
+            2009,
+            "Expected exactly one field to be present, got 0."
         );
 
         // Missing required field without default failure on field `B.c`
@@ -255,7 +255,7 @@ mod create {
             }
           }"#,
             2009,
-            "Mutation.createOneTestModel.data.TestModelCreateInput.b.BCreateInput.c`: A value is required but not set"
+            "A value is required but not set"
         );
 
         Ok(())

@@ -1,5 +1,3 @@
-use fmt::Display;
-use itertools::Itertools;
 use std::fmt;
 use user_facing_errors::query_engine::validation::{self, ValidationError};
 
@@ -201,15 +199,13 @@ impl fmt::Display for ArgumentPath {
 #[derive(Debug)]
 pub enum QueryParserErrorKind {
     AssertionError(String),
-    FieldCountError(FieldCountError),
     InputUnionParseError { parsing_errors: Vec<QueryParserError> },
 }
 
-impl Display for QueryParserErrorKind {
+impl fmt::Display for QueryParserErrorKind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::AssertionError(reason) => write!(f, "Assertion error: {reason}."),
-            Self::FieldCountError(err) => write!(f, "{err}"),
             Self::InputUnionParseError { parsing_errors } => write!(
                 f,
                 "Unable to match input value to any allowed input type for the field. Parse errors: [{}]",
@@ -219,77 +215,6 @@ impl Display for QueryParserErrorKind {
                     .collect::<Vec<_>>()
                     .join(", ")
             ),
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct FieldCountError {
-    pub min: Option<usize>,
-    pub max: Option<usize>,
-    pub fields: Option<Vec<String>>,
-    pub got: usize,
-}
-
-impl FieldCountError {
-    pub fn new(min: Option<usize>, max: Option<usize>, fields: Option<Vec<String>>, got: usize) -> Self {
-        Self { min, max, fields, got }
-    }
-}
-
-impl Display for FieldCountError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match &self.fields {
-            None => match (self.min, self.max) {
-                (Some(1), Some(1)) => {
-                    write!(f, "Expected exactly one field to be present, got {}.", self.got)
-                }
-                (Some(min), Some(max)) => write!(
-                    f,
-                    "Expected a minimum of {} and at most {} fields to be present, got {}.",
-                    min, max, self.got
-                ),
-                (Some(min), None) => write!(
-                    f,
-                    "Expected a minimum of {} fields to be present, got {}.",
-                    min, self.got
-                ),
-                (None, Some(max)) => write!(f, "Expected at most {} fields to be present, got {}.", max, self.got),
-                (None, None) => write!(f, "Expected any selection of fields, got {}.", self.got),
-            },
-            Some(fields) => match (self.min, self.max) {
-                (Some(1), Some(1)) => {
-                    write!(
-                        f,
-                        "Expected exactly one field of ({}) to be present, got {}.",
-                        fields.iter().join(", "),
-                        self.got
-                    )
-                }
-                (Some(min), Some(max)) => write!(
-                    f,
-                    "Expected a minimum of {} and at most {} fields of ({}) to be present, got {}.",
-                    min,
-                    max,
-                    fields.iter().join(", "),
-                    self.got
-                ),
-                (Some(min), None) => write!(
-                    f,
-                    "Expected a minimum of {} fields of ({}) to be present, got {}.",
-                    min,
-                    fields.iter().join(", "),
-                    self.got
-                ),
-                (None, Some(max)) => write!(
-                    f,
-                    "Expected at most {} fields of ({}) to be present, got {}.",
-                    max,
-                    fields.iter().join(", "),
-                    self.got
-                ),
-                (None, None) => write!(f, "Expected any selection of fields, got {}.", self.got),
-            },
         }
     }
 }

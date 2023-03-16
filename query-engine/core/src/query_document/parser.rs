@@ -785,21 +785,33 @@ impl QueryDocumentParser {
             .max_num_fields
             .map(|max| num_fields > max)
             .unwrap_or(false);
-
-        let too_few = schema_object
-            .constraints
-            .min_num_fields
-            .map(|min| num_fields < min)
-            .unwrap_or(false);
-
-        if too_many || too_few {
-            let error_kind = QueryParserErrorKind::FieldCountError(FieldCountError::new(
+        if too_many {
+            return Err(ValidationError::too_many_fields_given(
+                selection_path.segments(),
+                argument_path.segments(),
                 schema_object.constraints.min_num_fields,
                 schema_object.constraints.max_num_fields,
                 schema_object.constraints.fields.as_ref().cloned(),
                 num_fields,
-            ));
-            return Err(QueryParserError::Legacy { path, error_kind });
+            )
+            .into());
+        }
+
+        let some_missing = schema_object
+            .constraints
+            .min_num_fields
+            .map(|min| num_fields < min)
+            .unwrap_or(false);
+        if some_missing {
+            return Err(ValidationError::some_fields_missing(
+                selection_path.segments(),
+                argument_path.segments(),
+                schema_object.constraints.min_num_fields,
+                schema_object.constraints.max_num_fields,
+                schema_object.constraints.fields.as_ref().cloned(),
+                num_fields,
+            )
+            .into());
         }
 
         map.set_tag(schema_object.tag.clone());

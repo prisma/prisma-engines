@@ -1,8 +1,8 @@
 use crate::KnownError;
-use core::fmt;
+use itertools::Itertools;
 use serde::Serialize;
 use serde_json::json;
-use std::{borrow::Cow, error};
+use std::{borrow::Cow, error, fmt};
 use user_facing_error_macros::*;
 
 #[derive(Debug, UserFacingError, Serialize)]
@@ -45,10 +45,16 @@ pub enum ValidationErrorKind {
     InvalidArgumentType,
     ///See [`ValidationError::invalid_argument_value`]
     InvalidArgumentValue,
+    /// See [`ValidationError::some_fields_missing`]    
+    SomeFieldsMissing,
+    /// See [`ValidationError::too_many_fields_given`]
+    TooManyFieldsGiven,
     /// See [`ValidationError::selection_set_on_scalar`]
     SelectionSetOnScalar,
     /// See [`ValidationError::required_value_not_set`]
     RequiredArgumentMissing,
+    /// See [`ValidationError::union`]
+    Union,
     /// See [`ValidationError::unkown_argument`]
     UnkownArgument,
     /// See [`ValidationError::unknown_input_field`]
@@ -103,9 +109,9 @@ impl ValidationError {
         let message = String::from("Expected a minimum of 1 field to be present, got 0");
         ValidationError {
             kind: ValidationErrorKind::EmptySelection,
-            meta: Some(json!({ "outputType": output_type_description })),
             message,
             selection_path,
+            meta: Some(json!({ "outputType": output_type_description })),
         }
     }
 
@@ -207,6 +213,46 @@ impl ValidationError {
         }
     }
 
+    pub fn some_fields_missing(
+        selection_path: Vec<String>,
+        argument_path: Vec<String>,
+        min_field_count: Option<usize>,
+        max_field_count: Option<usize>,
+        required_fields: Option<Vec<String>>,
+        provided_field_count: usize,
+    ) -> Self {
+        let constraints =
+            InputTypeConstraints::new(min_field_count, max_field_count, required_fields, provided_field_count);
+
+        let message = format!("Some fields are missing: {}", constraints);
+        ValidationError {
+            kind: ValidationErrorKind::SomeFieldsMissing,
+            message,
+            selection_path,
+            meta: Some(json!({ "argumentPath": argument_path })),
+        }
+    }
+
+    pub fn too_many_fields_given(
+        selection_path: Vec<String>,
+        argument_path: Vec<String>,
+        min_field_count: Option<usize>,
+        max_field_count: Option<usize>,
+        required_fields: Option<Vec<String>>,
+        provided_field_count: usize,
+    ) -> Self {
+        let constraints =
+            InputTypeConstraints::new(min_field_count, max_field_count, required_fields, provided_field_count);
+
+        let message = format!("Too many fields given: {}", constraints);
+        ValidationError {
+            kind: ValidationErrorKind::TooManyFieldsGiven,
+            message,
+            selection_path,
+            meta: Some(json!({ "argumentPath": argument_path })),
+        }
+    }
+
     /// Creates an [`ValidationErrorKind::RequiredArgumentMissing`] kind of error, which happens
     /// when there is a missing argument for a field missing, like the `where` field below.
     ///
@@ -229,9 +275,9 @@ impl ValidationError {
         let message = format!("`{}`: A value is required but not set", argument_path.join("."));
         ValidationError {
             kind: ValidationErrorKind::RequiredArgumentMissing,
-            meta: Some(json!({ "inputType": input_type_description, "argumentPath": argument_path })),
             message,
             selection_path,
+            meta: Some(json!({ "inputType": input_type_description, "argumentPath": argument_path })),
         }
     }
 
@@ -261,9 +307,9 @@ impl ValidationError {
         let message = String::from("Argument does not exist in enclosing type");
         ValidationError {
             kind: ValidationErrorKind::UnkownArgument,
-            meta: Some(json!({"argumentPath": argument_path, "arguments": arguments})),
             message,
             selection_path,
+            meta: Some(json!({"argumentPath": argument_path, "arguments": arguments})),
         }
     }
 
@@ -303,9 +349,9 @@ impl ValidationError {
 
         ValidationError {
             kind: ValidationErrorKind::UnknownInputField,
-            meta: Some(json!({ "inputType": input_type_description })),
             message,
             selection_path,
+            meta: Some(json!({ "inputType": input_type_description })),
         }
     }
 
@@ -335,9 +381,9 @@ impl ValidationError {
         );
         ValidationError {
             kind: ValidationErrorKind::UnknownSelectionField,
-            meta: Some(json!({ "outputType": output_type_description })),
             message,
             selection_path,
+            meta: Some(json!({ "outputType": output_type_description })),
         }
     }
 
@@ -363,9 +409,9 @@ impl ValidationError {
         let message = format!("Cannot select over scalar field '{}'", field_name);
         ValidationError {
             kind: ValidationErrorKind::SelectionSetOnScalar,
-            meta: None,
             message,
             selection_path,
+            meta: None,
         }
     }
 
@@ -441,6 +487,7 @@ impl OutputTypeDescriptionField {
     }
 }
 #[derive(Debug, Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct InputTypeDescription {
     name: String,
     fields: Vec<InputTypeDescriptionField>,
@@ -466,6 +513,83 @@ impl InputTypeDescriptionField {
             name,
             type_names,
             required,
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Clone)]
+pub struct InputTypeConstraints {
+    #[serde(rename = "minFieldCount")]
+    min: Option<usize>,
+    #[serde(rename = "maxFieldCount")]
+    max: Option<usize>,
+    #[serde(rename = "requiredFields")]
+    fields: Option<Vec<String>>,
+    #[serde(skip)]
+    got: usize,
+}
+
+impl InputTypeConstraints {
+    fn new(min: Option<usize>, max: Option<usize>, fields: Option<Vec<String>>, got: usize) -> Self {
+        Self { min, max, fields, got }
+    }
+}
+
+// Todo: we might not need this, having only the two kind of error types related to cardinality
+// TooManyFieldsGiven, SomeFieldsMissing
+impl fmt::Display for InputTypeConstraints {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match &self.fields {
+            None => match (self.min, self.max) {
+                (Some(1), Some(1)) => {
+                    write!(f, "Expected exactly one field to be present, got {}.", self.got)
+                }
+                (Some(min), Some(max)) => write!(
+                    f,
+                    "Expected a minimum of {} and at most {} fields to be present, got {}.",
+                    min, max, self.got
+                ),
+                (Some(min), None) => write!(
+                    f,
+                    "Expected a minimum of {} fields to be present, got {}.",
+                    min, self.got
+                ),
+                (None, Some(max)) => write!(f, "Expected at most {} fields to be present, got {}.", max, self.got),
+                (None, None) => write!(f, "Expected any selection of fields, got {}.", self.got),
+            },
+            Some(fields) => match (self.min, self.max) {
+                (Some(1), Some(1)) => {
+                    write!(
+                        f,
+                        "Expected exactly one field of ({}) to be present, got {}.",
+                        fields.iter().join(", "),
+                        self.got
+                    )
+                }
+                (Some(min), Some(max)) => write!(
+                    f,
+                    "Expected a minimum of {} and at most {} fields of ({}) to be present, got {}.",
+                    min,
+                    max,
+                    fields.iter().join(", "),
+                    self.got
+                ),
+                (Some(min), None) => write!(
+                    f,
+                    "Expected a minimum of {} fields of ({}) to be present, got {}.",
+                    min,
+                    fields.iter().join(", "),
+                    self.got
+                ),
+                (None, Some(max)) => write!(
+                    f,
+                    "Expected at most {} fields of ({}) to be present, got {}.",
+                    max,
+                    fields.iter().join(", "),
+                    self.got
+                ),
+                (None, None) => write!(f, "Expected any selection of fields, got {}.", self.got),
+            },
         }
     }
 }
