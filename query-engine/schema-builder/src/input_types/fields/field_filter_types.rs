@@ -546,14 +546,6 @@ fn query_mode_field(ctx: &mut BuilderContext, nested: bool) -> impl Iterator<Ite
     fields.into_iter()
 }
 
-pub fn scalar_filter_name(typ: &str, list: bool, nullable: bool, nested: bool, include_aggregates: bool) -> String {
-    let list = if list { "List" } else { "" };
-    let nullable = if nullable { "Nullable" } else { "" };
-    let nested = if nested { "Nested" } else { "" };
-    let aggregates = if include_aggregates { "WithAggregates" } else { "" };
-    format!("{nested}{typ}{nullable}{list}{aggregates}Filter")
-}
-
 fn aggregate_filter_field(
     ctx: &mut BuilderContext,
     aggregation: &str,

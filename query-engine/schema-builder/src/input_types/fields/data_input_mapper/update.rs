@@ -147,9 +147,6 @@ fn update_operations_object_type(
     sf: &ScalarFieldRef,
     with_number_operators: bool,
 ) -> InputObjectTypeWeakRef {
-    // Different names are required to construct and cache different objects.
-    // - "Nullable" affects the `set` operation (`set` is nullable)
-    // let nullable = if !sf.is_required() { "Nullable" } else { "" };
     let ident = Identifier::new_prisma(IdentifierType::FieldUpdateOperationsInput(
         !sf.is_required(),
         prefix.to_owned(),
