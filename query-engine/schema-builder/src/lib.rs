@@ -66,9 +66,12 @@ pub(crate) struct BuilderContext {
 }
 
 impl BuilderContext {
-    fn new(internal_data_model: InternalDataModelRef, enable_raw_queries: bool) -> Self {
+    fn new(
+        internal_data_model: InternalDataModelRef,
+        enable_raw_queries: bool,
+        preview_features: PreviewFeatures,
+    ) -> Self {
         let connector = internal_data_model.schema.connector;
-        let preview_features = internal_data_model.schema.configuration.preview_features();
         Self {
             internal_data_model,
             enable_raw_queries,
@@ -173,7 +176,16 @@ impl TypeCache {
 }
 
 pub fn build(internal_data_model: InternalDataModelRef, enable_raw_queries: bool) -> QuerySchema {
-    let mut ctx = BuilderContext::new(internal_data_model, enable_raw_queries);
+    let preview_features = internal_data_model.schema.configuration.preview_features();
+    build_with_features(internal_data_model, preview_features, enable_raw_queries)
+}
+
+pub fn build_with_features(
+    internal_data_model: InternalDataModelRef,
+    preview_features: PreviewFeatures,
+    enable_raw_queries: bool,
+) -> QuerySchema {
+    let mut ctx = BuilderContext::new(internal_data_model, enable_raw_queries, preview_features);
 
     output_types::objects::initialize_caches(&mut ctx);
 
