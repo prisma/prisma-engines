@@ -70,7 +70,7 @@ bigdecimal = ["bigdecimal_"]
 fmt-sql = ["sqlformat"]
 
 [dependencies]
-connection-string = "0.1.10"
+connection-string = "0.1.14"
 percent-encoding = "2"
 tracing-core = "0.1"
 async-trait = "0.1"
