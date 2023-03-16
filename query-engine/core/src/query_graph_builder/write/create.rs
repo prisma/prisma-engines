@@ -17,6 +17,7 @@ pub fn create_record(
     connector_ctx: &ConnectorContext,
     model: ModelRef,
     mut field: ParsedField,
+    only_create: Option<bool>
 ) -> QueryGraphBuilderResult<()> {
     graph.flag_transactional();
 
@@ -26,6 +27,12 @@ pub fn create_record(
     };
 
     let create_node = create::create_record_node(graph, connector_ctx, model.clone(), data_map)?;
+
+    // if only_create is defined and it is set to true, we don't need to follow up with a read query
+    if only_create.is_some() && only_create.unwrap() {
+        return Ok(());
+    }
+
 
     // Follow-up read query on the write
     let read_query = read::find_unique(field, model.clone())?;
