@@ -5,7 +5,6 @@ use std::fmt::{Debug, Display};
 
 pub type ScalarField = crate::Zipper<ScalarFieldId>;
 pub type ScalarFieldRef = ScalarField;
-pub type ScalarFieldWeak = ScalarField;
 
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 pub enum ScalarFieldId {

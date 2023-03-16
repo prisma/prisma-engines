@@ -11,7 +11,6 @@ pub enum CompositeFieldId {
 
 pub type CompositeField = crate::Zipper<CompositeFieldId>;
 pub type CompositeFieldRef = CompositeField;
-pub type CompositeFieldWeak = CompositeField;
 
 impl CompositeField {
     fn arity(&self) -> FieldArity {

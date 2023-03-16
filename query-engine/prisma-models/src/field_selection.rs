@@ -1,6 +1,6 @@
 use crate::{
-    parent_container::ParentContainer, CompositeFieldRef, DomainError, Field, PrismaValueExtensions, ScalarFieldRef,
-    SelectionResult,
+    parent_container::ParentContainer, prisma_value_ext::PrismaValueExtensions, CompositeFieldRef, DomainError, Field,
+    ScalarFieldRef, SelectionResult,
 };
 use itertools::Itertools;
 use prisma_value::PrismaValue;
@@ -77,7 +77,7 @@ impl FieldSelection {
                 SelectedField::Scalar(sf) => Some(sf.clone()),
                 SelectedField::Composite(_) => None,
             })
-            .collect_vec();
+            .collect::<Vec<_>>();
 
         if scalar_fields.len() == self.selections.len() {
             Some(scalar_fields)
@@ -179,7 +179,7 @@ impl SelectedField {
     }
 
     /// Coerces a value to fit the selection. If the conversion is not possible, an error will be thrown.
-    pub fn coerce_value(&self, value: PrismaValue) -> crate::Result<PrismaValue> {
+    pub(crate) fn coerce_value(&self, value: PrismaValue) -> crate::Result<PrismaValue> {
         match self {
             SelectedField::Scalar(sf) => value.coerce(&sf.type_identifier()),
             SelectedField::Composite(cs) => cs.coerce_value(value),

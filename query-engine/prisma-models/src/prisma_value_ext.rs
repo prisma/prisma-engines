@@ -2,7 +2,7 @@ use super::{PrismaValue, TypeIdentifier};
 use crate::DomainError;
 use bigdecimal::ToPrimitive;
 
-pub trait PrismaValueExtensions {
+pub(crate) trait PrismaValueExtensions {
     fn coerce(self, to_type: &TypeIdentifier) -> crate::Result<PrismaValue>;
 }
 
