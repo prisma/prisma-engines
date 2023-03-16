@@ -30,9 +30,9 @@ pub fn create_record(
 
     // if only_create is defined and it is set to true, we don't need to follow up with a read query
     if only_create.is_some() && only_create.unwrap() {
+        graph.add_result_node(&create_node);
         return Ok(());
     }
-
 
     // Follow-up read query on the write
     let read_query = read::find_unique(field, model.clone())?;
