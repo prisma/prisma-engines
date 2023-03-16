@@ -26,7 +26,6 @@ pub struct ValidationError {
     kind: ValidationErrorKind,
     #[serde(skip)]
     message: String,
-    selection_path: Vec<String>,
     #[serde(flatten)]
     meta: Option<serde_json::Value>,
 }
@@ -110,8 +109,7 @@ impl ValidationError {
         ValidationError {
             kind: ValidationErrorKind::EmptySelection,
             message,
-            selection_path,
-            meta: Some(json!({ "outputType": output_type_description })),
+            meta: Some(json!({ "outputType": output_type_description, "selectionPath": selection_path })),
         }
     }
 
@@ -149,8 +147,7 @@ impl ValidationError {
         ValidationError {
             kind: ValidationErrorKind::InvalidArgumentType,
             message,
-            selection_path,
-            meta: Some(json!({"argumentPath": argument_path, "argument": argument})),
+            meta: Some(json!({"argumentPath": argument_path, "argument": argument, "selectionPath": selection_path })),
         }
     }
 
@@ -201,18 +198,19 @@ impl ValidationError {
                 value, &expected_argument_type
             );
             let argument = ArgumentDescription::new(argument_name.to_owned(), vec![expected_argument_type]);
-            let meta = json!({"argumentPath": argument_path, "argument": argument, "underlying_error": serde_json::Value::Null});
+            let meta = json!({"argumentPath": argument_path, "argument": argument, "selectionPath": selection_path, "underlying_error": serde_json::Value::Null});
             (message, Some(meta))
         };
 
         ValidationError {
             kind: ValidationErrorKind::InvalidArgumentValue,
             message,
-            selection_path,
             meta,
         }
     }
 
+    /// Creates an [`ValidationErrorKind::SomeFieldsMissing`] kind of error, which happens when
+    /// there are some fields missing from a query
     pub fn some_fields_missing(
         selection_path: Vec<String>,
         argument_path: Vec<String>,
@@ -228,11 +226,12 @@ impl ValidationError {
         ValidationError {
             kind: ValidationErrorKind::SomeFieldsMissing,
             message,
-            selection_path,
-            meta: Some(json!({ "argumentPath": argument_path })),
+            meta: Some(json!({ "argumentPath": argument_path, "selectionPath": selection_path })),
         }
     }
 
+    /// Creates an [`ValidationErrorKind::SomeFieldsMissing`] kind of error, which happens when
+    /// there are more fields given than the ones a type accept
     pub fn too_many_fields_given(
         selection_path: Vec<String>,
         argument_path: Vec<String>,
@@ -248,8 +247,7 @@ impl ValidationError {
         ValidationError {
             kind: ValidationErrorKind::TooManyFieldsGiven,
             message,
-            selection_path,
-            meta: Some(json!({ "argumentPath": argument_path })),
+            meta: Some(json!({ "argumentPath": argument_path,  "selectionPath": selection_path })),
         }
     }
 
@@ -276,8 +274,9 @@ impl ValidationError {
         ValidationError {
             kind: ValidationErrorKind::RequiredArgumentMissing,
             message,
-            selection_path,
-            meta: Some(json!({ "inputType": input_type_description, "argumentPath": argument_path })),
+            meta: Some(
+                json!({ "inputType": input_type_description, "argumentPath": argument_path,  "selectionPath": selection_path }),
+            ),
         }
     }
 
@@ -308,8 +307,9 @@ impl ValidationError {
         ValidationError {
             kind: ValidationErrorKind::UnkownArgument,
             message,
-            selection_path,
-            meta: Some(json!({"argumentPath": argument_path, "arguments": arguments})),
+            meta: Some(
+                json!({"argumentPath": argument_path, "arguments": arguments, "selectionPath": selection_path }),
+            ),
         }
     }
 
@@ -350,8 +350,7 @@ impl ValidationError {
         ValidationError {
             kind: ValidationErrorKind::UnknownInputField,
             message,
-            selection_path,
-            meta: Some(json!({ "inputType": input_type_description })),
+            meta: Some(json!({ "inputType": input_type_description, "selectionPath": selection_path })),
         }
     }
 
@@ -382,8 +381,7 @@ impl ValidationError {
         ValidationError {
             kind: ValidationErrorKind::UnknownSelectionField,
             message,
-            selection_path,
-            meta: Some(json!({ "outputType": output_type_description })),
+            meta: Some(json!({ "outputType": output_type_description, "selectionPath": selection_path })),
         }
     }
 
@@ -406,12 +404,11 @@ impl ValidationError {
     ///     }
     /// }
     pub fn selection_set_on_scalar(field_name: String, selection_path: Vec<String>) -> Self {
-        let message = format!("Cannot select over scalar field '{}'", field_name);
+        let message = format!("Cannot select over scalar field '{}'", &field_name);
         ValidationError {
             kind: ValidationErrorKind::SelectionSetOnScalar,
             message,
-            selection_path,
-            meta: None,
+            meta: Some(json!({ "fieldName": field_name, "selectionPath": selection_path })),
         }
     }
 
@@ -450,8 +447,7 @@ impl ValidationError {
         ValidationError {
             kind: ValidationErrorKind::ValueTooLarge,
             message,
-            selection_path,
-            meta: Some(json!({"argumentPath": argument_path, "argument": argument})),
+            meta: Some(json!({"argumentPath": argument_path, "argument": argument, "selectionPath": selection_path})),
         }
     }
 }
