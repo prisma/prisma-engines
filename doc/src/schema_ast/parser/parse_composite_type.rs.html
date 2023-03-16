@@ -121,6 +121,18 @@
 <a href="#121" id="121">121</a>
 <a href="#122" id="122">122</a>
 <a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{
     helpers::{parsing_catch_all, Pair},
     parse_attribute::parse_attribute,
@@ -129,7 +141,7 @@
     Rule,
 };
 <span class="kw">use </span><span class="kw">crate</span>::ast;
-<span class="kw">use </span>diagnostics::{DatamodelError, Diagnostics};
+<span class="kw">use </span>diagnostics::{DatamodelError, Diagnostics, Span};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse_composite_type(
     pair: Pair&lt;<span class="lifetime">&#39;_</span>&gt;,
@@ -139,97 +151,108 @@
     <span class="kw">let </span>pair_span = pair.as_span();
     <span class="kw">let </span><span class="kw-2">mut </span>name: <span class="prelude-ty">Option</span>&lt;ast::Identifier&gt; = <span class="prelude-val">None</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>fields: Vec&lt;ast::Field&gt; = <span class="macro">vec!</span>[];
-    <span class="kw">let </span><span class="kw-2">mut </span>pending_field_comment: <span class="prelude-ty">Option</span>&lt;Pair&lt;<span class="lifetime">&#39;_</span>&gt;&gt; = <span class="prelude-val">None</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>pairs = pair.into_inner();
+    <span class="kw">let </span><span class="kw-2">mut </span>inner_span: <span class="prelude-ty">Option</span>&lt;Span&gt; = <span class="prelude-val">None</span>;
 
     <span class="kw">while let </span><span class="prelude-val">Some</span>(current) = pairs.next() {
-        <span class="kw">let </span>current_span = current.as_span();
         <span class="kw">match </span>current.as_rule() {
+            Rule::BLOCK_OPEN | Rule::BLOCK_CLOSE =&gt; {}
             Rule::TYPE_KEYWORD =&gt; (),
             Rule::identifier =&gt; name = <span class="prelude-val">Some</span>(current.into()),
-            Rule::block_attribute =&gt; {
-                <span class="kw">let </span>attr = parse_attribute(current, diagnostics);
+            Rule::model_contents =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>pending_field_comment: <span class="prelude-ty">Option</span>&lt;Pair&lt;<span class="lifetime">&#39;_</span>&gt;&gt; = <span class="prelude-val">None</span>;
+                inner_span = <span class="prelude-val">Some</span>(current.as_span().into());
 
-                <span class="kw">let </span>err = <span class="kw">match </span>attr.name.name.as_str() {
-                    <span class="string">&quot;map&quot; </span>=&gt; {
-                        DatamodelError::new_validation_error(
-                            <span class="string">&quot;The name of a composite type is not persisted in the database, therefore it does not need a mapped database name.&quot;</span>,
-                            current_span.into(),
-                        )
-                    }
-                    <span class="string">&quot;unique&quot; </span>=&gt; {
-                        DatamodelError::new_validation_error(
-                            <span class="string">&quot;A unique constraint should be defined in the model containing the embed.&quot;</span>,
-                            current_span.into(),
-                        )
-                    }
-                    <span class="string">&quot;index&quot; </span>=&gt; {
-                        DatamodelError::new_validation_error(
-                            <span class="string">&quot;An index should be defined in the model containing the embed.&quot;</span>,
-                            current_span.into(),
-                        )
-                    }
-                    <span class="string">&quot;fulltext&quot; </span>=&gt; {
-                        DatamodelError::new_validation_error(
-                            <span class="string">&quot;A fulltext index should be defined in the model containing the embed.&quot;</span>,
-                            current_span.into(),
-                        )
-                    }
-                    <span class="string">&quot;id&quot; </span>=&gt; {
-                        DatamodelError::new_validation_error(
-                            <span class="string">&quot;A composite type cannot define an id.&quot;</span>,
-                            current_span.into(),
-                        )
-                    }
-                    <span class="kw">_ </span>=&gt; {
-                        DatamodelError::new_validation_error(
-                            <span class="string">&quot;A composite type cannot have block-level attributes.&quot;</span>,
-                            current_span.into(),
-                        )
-                    }
-                };
+                <span class="kw">for </span>item <span class="kw">in </span>current.into_inner() {
+                    <span class="kw">let </span>current_span = item.as_span();
 
-                diagnostics.push_error(err);
-            }
-            Rule::field_declaration =&gt; <span class="kw">match </span>parse_field(
-                <span class="kw-2">&amp;</span>name.as_ref().unwrap().name,
-                <span class="string">&quot;type&quot;</span>,
-                current,
-                pending_field_comment.take(),
-                diagnostics,
-            ) {
-                <span class="prelude-val">Ok</span>(field) =&gt; {
-                    <span class="kw">for </span>attr <span class="kw">in </span>field.attributes.iter() {
-                        <span class="kw">let </span>error = <span class="kw">match </span>attr.name.name.as_str() {
-                            <span class="string">&quot;relation&quot; </span>| <span class="string">&quot;unique&quot; </span>| <span class="string">&quot;id&quot; </span>=&gt; {
-                                <span class="kw">let </span>name = attr.name.name.as_str();
+                    <span class="kw">match </span>item.as_rule() {
+                        Rule::block_attribute =&gt; {
+                            <span class="kw">let </span>attr = parse_attribute(item, diagnostics);
 
-                                <span class="kw">let </span>msg = <span class="macro">format!</span>(
-                                    <span class="string">&quot;Defining `@{name}` attribute for a field in a composite type is not allowed.&quot;
-                                </span>);
+                            <span class="kw">let </span>err = <span class="kw">match </span>attr.name.name.as_str() {
+                                <span class="string">&quot;map&quot; </span>=&gt; {
+                                    DatamodelError::new_validation_error(
+                                        <span class="string">&quot;The name of a composite type is not persisted in the database, therefore it does not need a mapped database name.&quot;</span>,
+                                        current_span.into(),
+                                    )
+                                }
+                                <span class="string">&quot;unique&quot; </span>=&gt; {
+                                    DatamodelError::new_validation_error(
+                                        <span class="string">&quot;A unique constraint should be defined in the model containing the embed.&quot;</span>,
+                                        current_span.into(),
+                                    )
+                                }
+                                <span class="string">&quot;index&quot; </span>=&gt; {
+                                    DatamodelError::new_validation_error(
+                                        <span class="string">&quot;An index should be defined in the model containing the embed.&quot;</span>,
+                                        current_span.into(),
+                                    )
+                                }
+                                <span class="string">&quot;fulltext&quot; </span>=&gt; {
+                                    DatamodelError::new_validation_error(
+                                        <span class="string">&quot;A fulltext index should be defined in the model containing the embed.&quot;</span>,
+                                        current_span.into(),
+                                    )
+                                }
+                                <span class="string">&quot;id&quot; </span>=&gt; {
+                                    DatamodelError::new_validation_error(
+                                        <span class="string">&quot;A composite type cannot define an id.&quot;</span>,
+                                        current_span.into(),
+                                    )
+                                }
+                                <span class="kw">_ </span>=&gt; {
+                                    DatamodelError::new_validation_error(
+                                        <span class="string">&quot;A composite type cannot have block-level attributes.&quot;</span>,
+                                        current_span.into(),
+                                    )
+                                }
+                            };
 
-                                DatamodelError::new_validation_error(<span class="kw-2">&amp;</span>msg, current_span.into())
+                            diagnostics.push_error(err);
+                        }
+                        Rule::field_declaration =&gt; <span class="kw">match </span>parse_field(
+                            <span class="kw-2">&amp;</span>name.as_ref().unwrap().name,
+                            <span class="string">&quot;type&quot;</span>,
+                            item,
+                            pending_field_comment.take(),
+                            diagnostics,
+                        ) {
+                            <span class="prelude-val">Ok</span>(field) =&gt; {
+                                <span class="kw">for </span>attr <span class="kw">in </span>field.attributes.iter() {
+                                    <span class="kw">let </span>error = <span class="kw">match </span>attr.name.name.as_str() {
+                                        <span class="string">&quot;relation&quot; </span>| <span class="string">&quot;unique&quot; </span>| <span class="string">&quot;id&quot; </span>=&gt; {
+                                            <span class="kw">let </span>name = attr.name.name.as_str();
+
+                                            <span class="kw">let </span>msg = <span class="macro">format!</span>(
+                                                <span class="string">&quot;Defining `@{name}` attribute for a field in a composite type is not allowed.&quot;
+                                            </span>);
+
+                                            DatamodelError::new_validation_error(<span class="kw-2">&amp;</span>msg, current_span.into())
+                                        }
+                                        <span class="kw">_ </span>=&gt; <span class="kw">continue</span>,
+                                    };
+
+                                    diagnostics.push_error(error);
+                                }
+
+                                fields.push(field)
                             }
-                            <span class="kw">_ </span>=&gt; <span class="kw">continue</span>,
-                        };
-
-                        diagnostics.push_error(error);
+                            <span class="prelude-val">Err</span>(err) =&gt; diagnostics.push_error(err),
+                        },
+                        Rule::comment_block =&gt; {
+                            <span class="kw">if let </span><span class="prelude-val">Some</span>(Rule::field_declaration) = pairs.peek().map(|p| p.as_rule()) {
+                                pending_field_comment = <span class="prelude-val">Some</span>(item);
+                            }
+                        }
+                        Rule::BLOCK_LEVEL_CATCH_ALL =&gt; diagnostics.push_error(DatamodelError::new_validation_error(
+                            <span class="string">&quot;This line is not a valid field or attribute definition.&quot;</span>,
+                            item.as_span().into(),
+                        )),
+                        <span class="kw">_ </span>=&gt; parsing_catch_all(<span class="kw-2">&amp;</span>item, <span class="string">&quot;composite type&quot;</span>),
                     }
-
-                    fields.push(field)
-                }
-                <span class="prelude-val">Err</span>(err) =&gt; diagnostics.push_error(err),
-            },
-            Rule::comment_block =&gt; {
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(Rule::field_declaration) = pairs.peek().map(|p| p.as_rule()) {
-                    pending_field_comment = <span class="prelude-val">Some</span>(current);
                 }
             }
-            Rule::BLOCK_OPEN | Rule::BLOCK_CLOSE =&gt; {}
-            Rule::BLOCK_LEVEL_CATCH_ALL =&gt; diagnostics.push_error(DatamodelError::new_validation_error(
-                <span class="string">&quot;This line is not a valid field or attribute definition.&quot;</span>,
-                current.as_span().into(),
-            )),
             <span class="kw">_ </span>=&gt; parsing_catch_all(<span class="kw-2">&amp;</span>current, <span class="string">&quot;composite type&quot;</span>),
         }
     }
@@ -240,6 +263,7 @@
             fields,
             documentation: doc_comment.and_then(parse_comment_block),
             span: ast::Span::from(pair_span),
+            inner_span: inner_span.unwrap(),
         },
         <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Encountered impossible model declaration during parsing&quot;</span>,),
     }

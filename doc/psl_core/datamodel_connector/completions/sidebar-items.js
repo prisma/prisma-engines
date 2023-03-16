@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":[["format_completion_docs","Formats the documentation for a completion. example: How the completion is expected to be used."]]};

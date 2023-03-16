@@ -91,6 +91,18 @@
 <a href="#91" id="91">91</a>
 <a href="#92" id="92">92</a>
 <a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{
     helpers::{parsing_catch_all, Pair},
     parse_attribute::parse_attribute,
@@ -106,29 +118,40 @@
     <span class="kw">let </span><span class="kw-2">mut </span>name: <span class="prelude-ty">Option</span>&lt;Identifier&gt; = <span class="prelude-val">None</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>attributes: Vec&lt;Attribute&gt; = <span class="macro">vec!</span>[];
     <span class="kw">let </span><span class="kw-2">mut </span>values: Vec&lt;EnumValue&gt; = <span class="macro">vec!</span>[];
-    <span class="kw">let </span><span class="kw-2">mut </span>pending_value_comment = <span class="prelude-val">None</span>;
-    <span class="kw">let </span><span class="kw-2">mut </span>pairs = pair.into_inner().peekable();
+    <span class="kw">let </span>pairs = pair.into_inner().peekable();
+    <span class="kw">let </span><span class="kw-2">mut </span>inner_span: <span class="prelude-ty">Option</span>&lt;Span&gt; = <span class="prelude-val">None</span>;
 
-    <span class="kw">while let </span><span class="prelude-val">Some</span>(current) = pairs.next() {
+    <span class="kw">for </span>current <span class="kw">in </span>pairs {
         <span class="kw">match </span>current.as_rule() {
             Rule::BLOCK_OPEN | Rule::BLOCK_CLOSE | Rule::ENUM_KEYWORD =&gt; {}
             Rule::identifier =&gt; name = <span class="prelude-val">Some</span>(current.into()),
-            Rule::block_attribute =&gt; attributes.push(parse_attribute(current, diagnostics)),
-            Rule::enum_value_declaration =&gt; {
-                <span class="kw">match </span>parse_enum_value(current, pending_value_comment.take(), diagnostics) {
-                    <span class="prelude-val">Ok</span>(enum_value) =&gt; values.push(enum_value),
-                    <span class="prelude-val">Err</span>(err) =&gt; diagnostics.push_error(err),
+            Rule::enum_contents =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>pending_value_comment = <span class="prelude-val">None</span>;
+                inner_span = <span class="prelude-val">Some</span>(current.as_span().into());
+
+                <span class="kw">let </span><span class="kw-2">mut </span>items = current.into_inner();
+                <span class="kw">while let </span><span class="prelude-val">Some</span>(item) = items.next() {
+                    <span class="kw">match </span>item.as_rule() {
+                        Rule::block_attribute =&gt; attributes.push(parse_attribute(item, diagnostics)),
+                        Rule::enum_value_declaration =&gt; {
+                            <span class="kw">match </span>parse_enum_value(item, pending_value_comment.take(), diagnostics) {
+                                <span class="prelude-val">Ok</span>(enum_value) =&gt; values.push(enum_value),
+                                <span class="prelude-val">Err</span>(err) =&gt; diagnostics.push_error(err),
+                            }
+                        }
+                        Rule::comment_block =&gt; {
+                            <span class="kw">if let </span><span class="prelude-val">Some</span>(Rule::enum_value_declaration) = items.peek().map(|t| t.as_rule()) {
+                                pending_value_comment = <span class="prelude-val">Some</span>(item);
+                            }
+                        }
+                        Rule::BLOCK_LEVEL_CATCH_ALL =&gt; diagnostics.push_error(DatamodelError::new_validation_error(
+                            <span class="string">&quot;This line is not an enum value definition.&quot;</span>,
+                            item.as_span().into(),
+                        )),
+                        <span class="kw">_ </span>=&gt; parsing_catch_all(<span class="kw-2">&amp;</span>item, <span class="string">&quot;enum&quot;</span>),
+                    }
                 }
             }
-            Rule::comment_block =&gt; {
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(Rule::enum_value_declaration) = pairs.peek().map(|t| t.as_rule()) {
-                    pending_value_comment = <span class="prelude-val">Some</span>(current);
-                }
-            }
-            Rule::BLOCK_LEVEL_CATCH_ALL =&gt; diagnostics.push_error(DatamodelError::new_validation_error(
-                <span class="string">&quot;This line is not an enum value definition.&quot;</span>,
-                current.as_span().into(),
-            )),
             <span class="kw">_ </span>=&gt; parsing_catch_all(<span class="kw-2">&amp;</span>current, <span class="string">&quot;enum&quot;</span>),
         }
     }
@@ -140,6 +163,7 @@
             attributes,
             documentation: comment,
             span: Span::from(pair_span),
+            inner_span: inner_span.unwrap(),
         },
         <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Encountered impossible enum declaration during parsing, name is missing.&quot;</span>,),
     }

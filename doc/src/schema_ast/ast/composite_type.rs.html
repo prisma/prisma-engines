@@ -84,6 +84,8 @@
 <a href="#84" id="84">84</a>
 <a href="#85" id="85">85</a>
 <a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::{Comment, Field, FieldId, Identifier, SchemaAst, Span};
 
 <span class="kw">use super</span>::{WithDocumentation, WithIdentifier};
@@ -123,6 +125,8 @@
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) documentation: <span class="prelude-ty">Option</span>&lt;Comment&gt;,
     <span class="doccomment">/// The location of this type in the text representation.
     </span><span class="kw">pub </span>span: Span,
+    <span class="doccomment">/// The span of the inner contents.
+    </span><span class="kw">pub </span>inner_span: Span,
 }
 
 <span class="kw">impl </span>CompositeType {

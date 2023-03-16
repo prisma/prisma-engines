@@ -30,6 +30,8 @@
 <a href="#30" id="30">30</a>
 <a href="#31" id="31">31</a>
 <a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{Comment, ConfigBlockProperty, Identifier, Span, WithDocumentation, WithIdentifier, WithSpan};
 
 <span class="doccomment">/// A source block declaration.
@@ -43,6 +45,8 @@
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) documentation: <span class="prelude-ty">Option</span>&lt;Comment&gt;,
     <span class="doccomment">/// The location of this source block in the text representation.
     </span><span class="kw">pub </span>span: Span,
+    <span class="doccomment">/// The span of the inner contents.
+    </span><span class="kw">pub </span>inner_span: Span,
 }
 
 <span class="kw">impl </span>WithIdentifier <span class="kw">for </span>SourceConfig {

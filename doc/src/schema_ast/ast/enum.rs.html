@@ -139,6 +139,8 @@
 <a href="#139" id="139">139</a>
 <a href="#140" id="140">140</a>
 <a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{Attribute, Comment, Identifier, Span, WithAttributes, WithDocumentation, WithIdentifier, WithSpan};
 
 <span class="doccomment">/// An opaque identifier for a value in an AST enum. Use the
@@ -211,6 +213,8 @@
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) documentation: <span class="prelude-ty">Option</span>&lt;Comment&gt;,
     <span class="doccomment">/// The location of this enum in the text representation.
     </span><span class="kw">pub </span>span: Span,
+    <span class="doccomment">/// The span of the inner contents.
+    </span><span class="kw">pub </span>inner_span: Span,
 }
 
 <span class="kw">impl </span>Enum {

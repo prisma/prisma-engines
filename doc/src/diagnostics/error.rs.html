@@ -412,6 +412,16 @@
 <a href="#412" id="412">412</a>
 <a href="#413" id="413">413</a>
 <a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
 </pre><pre class="rust"><code><span class="kw">use </span>colored::{ColoredString, Colorize};
 
 <span class="kw">use crate</span>::{
@@ -792,6 +802,16 @@
 
     <span class="kw">pub fn </span>new_referential_integrity_and_relation_mode_cooccur_error(span: Span) -&gt; DatamodelError {
         <span class="kw">let </span>msg = <span class="string">&quot;The `referentialIntegrity` and `relationMode` attributes cannot be used together. Please use only `relationMode` instead.&quot;</span>.to_string();
+        <span class="self">Self</span>::new(msg, span)
+    }
+
+    <span class="kw">pub fn </span>new_config_property_missing_value_error(
+        property_name: <span class="kw-2">&amp;</span>str,
+        config_name: <span class="kw-2">&amp;</span>str,
+        config_kind: <span class="kw-2">&amp;</span>str,
+        span: Span,
+    ) -&gt; DatamodelError {
+        <span class="kw">let </span>msg = <span class="macro">format!</span>(<span class="string">&quot;Property {property_name} in {config_kind} {config_name} needs to be assigned a value&quot;</span>);
         <span class="self">Self</span>::new(msg, span)
     }
 

@@ -152,6 +152,31 @@
 <a href="#152" id="152">152</a>
 <a href="#153" id="153">153</a>
 <a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::WithSpan,
     common::{FeatureMap, PreviewFeature, ALL_PREVIEW_FEATURES},
@@ -161,7 +186,7 @@
 <span class="kw">use </span>enumflags2::BitFlags;
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>parser_database::{
-    ast::{<span class="self">self</span>, WithDocumentation},
+    ast::{<span class="self">self</span>, Expression, WithDocumentation},
     coerce, coerce_array,
 };
 <span class="kw">use </span>std::collections::HashMap;
@@ -195,11 +220,24 @@
 }
 
 <span class="kw">fn </span>lift_generator(ast_generator: <span class="kw-2">&amp;</span>ast::GeneratorConfig, diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics) -&gt; <span class="prelude-ty">Option</span>&lt;Generator&gt; {
-    <span class="kw">let </span>args: HashMap&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt; = ast_generator
+    <span class="kw">let </span>generator_name = ast_generator.name.name.as_str();
+    <span class="kw">let </span>args: HashMap&lt;<span class="kw">_</span>, <span class="kw-2">&amp;</span>Expression&gt; = ast_generator
         .properties
         .iter()
-        .map(|arg| (arg.name.name.as_str(), <span class="kw-2">&amp;</span>arg.value))
-        .collect();
+        .map(|arg| <span class="kw">match </span><span class="kw-2">&amp;</span>arg.value {
+            <span class="prelude-val">Some</span>(expr) =&gt; <span class="prelude-val">Some</span>((arg.name.name.as_str(), expr)),
+            <span class="prelude-val">None </span>=&gt; {
+                diagnostics.push_error(DatamodelError::new_config_property_missing_value_error(
+                    arg.name.name.as_str(),
+                    generator_name,
+                    <span class="string">&quot;generator&quot;</span>,
+                    ast_generator.span,
+                ));
+
+                <span class="prelude-val">None
+            </span>}
+        })
+        .collect::&lt;<span class="prelude-ty">Option</span>&lt;HashMap&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(expr) = args.get(ENGINE_TYPE_KEY) {
         <span class="kw">if </span>!expr.is_string() {
@@ -249,11 +287,23 @@
         }
 
         <span class="kw">let </span>value = <span class="kw">match </span><span class="kw-2">&amp;</span>prop.value {
-            ast::Expression::NumericValue(val, <span class="kw">_</span>) =&gt; val.clone(),
-            ast::Expression::StringValue(val, <span class="kw">_</span>) =&gt; val.clone(),
-            ast::Expression::ConstantValue(val, <span class="kw">_</span>) =&gt; val.clone(),
-            ast::Expression::Function(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; String::from(<span class="string">&quot;(function)&quot;</span>),
-            ast::Expression::Array(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; String::from(<span class="string">&quot;(array)&quot;</span>),
+            <span class="prelude-val">Some</span>(val) =&gt; <span class="kw">match </span>val {
+                ast::Expression::NumericValue(val, <span class="kw">_</span>) =&gt; val.clone(),
+                ast::Expression::StringValue(val, <span class="kw">_</span>) =&gt; val.clone(),
+                ast::Expression::ConstantValue(val, <span class="kw">_</span>) =&gt; val.clone(),
+                ast::Expression::Function(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; String::from(<span class="string">&quot;(function)&quot;</span>),
+                ast::Expression::Array(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; String::from(<span class="string">&quot;(array)&quot;</span>),
+            },
+            <span class="prelude-val">None </span>=&gt; {
+                diagnostics.push_error(DatamodelError::new_config_property_missing_value_error(
+                    <span class="kw-2">&amp;</span>prop.name.name,
+                    generator_name,
+                    <span class="string">&quot;generator&quot;</span>,
+                    prop.span,
+                ));
+
+                <span class="kw">continue</span>;
+            }
         };
 
         properties.insert(prop.name.name.clone(), value);

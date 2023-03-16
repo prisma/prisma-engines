@@ -256,6 +256,31 @@
 <a href="#256" id="256">256</a>
 <a href="#257" id="257">257</a>
 <a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::{<span class="self">self</span>, SourceConfig, Span},
     configuration::StringFromEnvVar,
@@ -264,7 +289,10 @@
     Datasource,
 };
 <span class="kw">use </span>diagnostics::DatamodelWarning;
-<span class="kw">use </span>parser_database::{ast::WithDocumentation, coerce, coerce_array, coerce_opt};
+<span class="kw">use </span>parser_database::{
+    ast::{Expression, WithDocumentation},
+    coerce, coerce_array, coerce_opt,
+};
 <span class="kw">use </span>std::{borrow::Cow, collections::HashMap};
 
 <span class="kw">const </span>PREVIEW_FEATURES_KEY: <span class="kw-2">&amp;</span>str = <span class="string">&quot;previewFeatures&quot;</span>;
@@ -272,6 +300,7 @@
 <span class="kw">const </span>SHADOW_DATABASE_URL_KEY: <span class="kw-2">&amp;</span>str = <span class="string">&quot;shadowDatabaseUrl&quot;</span>;
 <span class="kw">const </span>URL_KEY: <span class="kw-2">&amp;</span>str = <span class="string">&quot;url&quot;</span>;
 <span class="kw">const </span>DIRECT_URL_KEY: <span class="kw-2">&amp;</span>str = <span class="string">&quot;directUrl&quot;</span>;
+<span class="kw">const </span>PROVIDER_KEY: <span class="kw-2">&amp;</span>str = <span class="string">&quot;provider&quot;</span>;
 
 <span class="doccomment">/// Loads all datasources from the provided schema AST.
 /// - `ignore_datasource_urls`: datasource URLs are not parsed. They are replaced with dummy values.
@@ -307,84 +336,64 @@
     diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics,
     connectors: <span class="kw">crate</span>::ConnectorRegistry,
 ) -&gt; <span class="prelude-ty">Option</span>&lt;Datasource&gt; {
-    <span class="kw">let </span>source_name = <span class="kw-2">&amp;</span>ast_source.name.name;
-    <span class="kw">let </span><span class="kw-2">mut </span>args: HashMap&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt; = ast_source
+    <span class="kw">let </span>source_name = ast_source.name.name.as_str();
+    <span class="kw">let </span><span class="kw-2">mut </span>args: HashMap&lt;<span class="kw">_</span>, (<span class="kw">_</span>, <span class="kw-2">&amp;</span>Expression)&gt; = ast_source
         .properties
         .iter()
-        .map(|arg| (arg.name.name.as_str(), (arg.span, <span class="kw-2">&amp;</span>arg.value)))
-        .collect();
+        .map(|arg| <span class="kw">match </span><span class="kw-2">&amp;</span>arg.value {
+            <span class="prelude-val">Some</span>(expr) =&gt; <span class="prelude-val">Some</span>((arg.name.name.as_str(), (arg.span, expr))),
+            <span class="prelude-val">None </span>=&gt; {
+                diagnostics.push_error(DatamodelError::new_config_property_missing_value_error(
+                    <span class="kw-2">&amp;</span>arg.name.name,
+                    source_name,
+                    <span class="string">&quot;datasource&quot;</span>,
+                    ast_source.span,
+                ));
+                <span class="prelude-val">None
+            </span>}
+        })
+        .collect::&lt;<span class="prelude-ty">Option</span>&lt;HashMap&lt;<span class="kw">_</span>, (<span class="kw">_</span>, <span class="kw">_</span>)&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-    <span class="kw">let </span>(<span class="kw">_</span>, provider_arg) = <span class="kw">match </span>args.remove(<span class="string">&quot;provider&quot;</span>) {
-        <span class="prelude-val">Some</span>(provider) =&gt; provider,
+    <span class="kw">let </span>(provider, provider_arg) = <span class="kw">match </span>args.remove(PROVIDER_KEY) {
+        <span class="prelude-val">Some</span>((_span, provider_arg)) =&gt; {
+            <span class="kw">if </span>provider_arg.is_env_expression() {
+                <span class="kw">let </span>msg = Cow::Borrowed(<span class="string">&quot;A datasource must not use the env() function in the provider argument.&quot;</span>);
+                diagnostics.push_error(DatamodelError::new_functional_evaluation_error(msg, ast_source.span));
+                <span class="kw">return </span><span class="prelude-val">None</span>;
+            }
+
+            <span class="kw">let </span>provider = <span class="kw">match </span>coerce_opt::string(provider_arg) {
+                <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) =&gt; {
+                    diagnostics.push_error(DatamodelError::new_source_validation_error(
+                        <span class="string">&quot;The provider argument in a datasource must not be empty&quot;</span>,
+                        source_name,
+                        provider_arg.span(),
+                    ));
+                    <span class="kw">return </span><span class="prelude-val">None</span>;
+                }
+                <span class="prelude-val">None </span>=&gt; {
+                    diagnostics.push_error(DatamodelError::new_source_validation_error(
+                        <span class="string">&quot;The provider argument in a datasource must be a string literal&quot;</span>,
+                        source_name,
+                        provider_arg.span(),
+                    ));
+                    <span class="kw">return </span><span class="prelude-val">None</span>;
+                }
+                <span class="prelude-val">Some</span>(provider) =&gt; provider,
+            };
+
+            (provider, provider_arg)
+        }
+
         <span class="prelude-val">None </span>=&gt; {
             diagnostics.push_error(DatamodelError::new_source_argument_not_found_error(
                 <span class="string">&quot;provider&quot;</span>,
-                <span class="kw-2">&amp;</span>ast_source.name.name,
+                source_name,
                 ast_source.span,
             ));
             <span class="kw">return </span><span class="prelude-val">None</span>;
         }
     };
-
-    <span class="kw">if </span>provider_arg.is_env_expression() {
-        <span class="kw">let </span>msg = Cow::Borrowed(<span class="string">&quot;A datasource must not use the env() function in the provider argument.&quot;</span>);
-        diagnostics.push_error(DatamodelError::new_functional_evaluation_error(msg, ast_source.span));
-        <span class="kw">return </span><span class="prelude-val">None</span>;
-    }
-
-    <span class="kw">let </span>provider = <span class="kw">match </span>coerce_opt::string(provider_arg) {
-        <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) =&gt; {
-            diagnostics.push_error(DatamodelError::new_source_validation_error(
-                <span class="string">&quot;The provider argument in a datasource must not be empty&quot;</span>,
-                source_name,
-                provider_arg.span(),
-            ));
-            <span class="kw">return </span><span class="prelude-val">None</span>;
-        }
-        <span class="prelude-val">None </span>=&gt; {
-            diagnostics.push_error(DatamodelError::new_source_validation_error(
-                <span class="string">&quot;The provider argument in a datasource must be a string literal&quot;</span>,
-                source_name,
-                provider_arg.span(),
-            ));
-            <span class="kw">return </span><span class="prelude-val">None</span>;
-        }
-        <span class="prelude-val">Some</span>(provider) =&gt; provider,
-    };
-
-    <span class="kw">let </span>(<span class="kw">_</span>, url_arg) = <span class="kw">match </span>args.remove(URL_KEY) {
-        <span class="prelude-val">Some</span>(url_arg) =&gt; url_arg,
-        <span class="prelude-val">None </span>=&gt; {
-            diagnostics.push_error(DatamodelError::new_source_argument_not_found_error(
-                URL_KEY,
-                <span class="kw-2">&amp;</span>ast_source.name.name,
-                ast_source.span,
-            ));
-            <span class="kw">return </span><span class="prelude-val">None</span>;
-        }
-    };
-
-    <span class="kw">let </span>url = StringFromEnvVar::coerce(url_arg, diagnostics)<span class="question-mark">?</span>;
-    <span class="kw">let </span>shadow_database_url_arg = args.remove(SHADOW_DATABASE_URL_KEY);
-
-    <span class="kw">let </span>direct_url_arg = args.remove(DIRECT_URL_KEY).map(|(<span class="kw">_</span>, url)| url);
-    <span class="kw">let </span>direct_url = direct_url_arg.and_then(|url_arg| StringFromEnvVar::coerce(url_arg, diagnostics));
-
-    <span class="kw">let </span>shadow_database_url: <span class="prelude-ty">Option</span>&lt;(StringFromEnvVar, Span)&gt; =
-        <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, shadow_database_url_arg)) = shadow_database_url_arg.as_ref() {
-            <span class="kw">match </span>StringFromEnvVar::coerce(shadow_database_url_arg, diagnostics) {
-                <span class="prelude-val">Some</span>(shadow_database_url) =&gt; <span class="prelude-val">Some</span>(shadow_database_url)
-                    .filter(|s| !s.as_literal().map(|lit| lit.is_empty()).unwrap_or(<span class="bool-val">false</span>))
-                    .map(|url| (url, shadow_database_url_arg.span())),
-                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
-            }
-        } <span class="kw">else </span>{
-            <span class="prelude-val">None
-        </span>};
-
-    preview_features_guardrail(<span class="kw-2">&amp;mut </span>args, diagnostics);
-
-    <span class="kw">let </span>documentation = ast_source.documentation().map(String::from);
 
     <span class="kw">let </span>active_connector: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span><span class="kw">crate</span>::datamodel_connector::Connector =
         <span class="kw">match </span>connectors.iter().find(|c| c.is_provider(provider)) {
@@ -401,32 +410,73 @@
 
     <span class="kw">let </span>relation_mode = get_relation_mode(<span class="kw-2">&amp;mut </span>args, ast_source, diagnostics, active_connector);
 
-    <span class="kw">let </span>(schemas, schemas_span) = args
-        .remove(SCHEMAS_KEY)
-        .and_then(|(<span class="kw">_</span>, expr)| coerce_array(expr, <span class="kw-2">&amp;</span>coerce::string_with_span, diagnostics).map(|b| (b, expr.span())))
-        .map(|(<span class="kw-2">mut </span>schemas, span)| {
-            <span class="kw">if </span>schemas.is_empty() {
-                <span class="kw">let </span>error = DatamodelError::new_schemas_array_empty_error(span);
-
-                diagnostics.push_error(error);
-            }
-
-            schemas.sort_by(|(a, <span class="kw">_</span>), (b, <span class="kw">_</span>)| a.cmp(b));
-
-            <span class="kw">for </span>pair <span class="kw">in </span>schemas.windows(<span class="number">2</span>) {
-                <span class="kw">if </span>pair[<span class="number">0</span>].<span class="number">0 </span>== pair[<span class="number">1</span>].<span class="number">0 </span>{
-                    diagnostics.push_error(DatamodelError::new_static(
-                        <span class="string">&quot;Duplicated schema names are not allowed&quot;</span>,
-                        pair[<span class="number">0</span>].<span class="number">1</span>,
-                    ))
-                }
-            }
-
-            (schemas, <span class="prelude-val">Some</span>(span))
-        })
-        .unwrap_or_default();
-
     <span class="kw">let </span>connector_data = active_connector.parse_datasource_properties(<span class="kw-2">&amp;mut </span>args, diagnostics);
+
+    <span class="kw">let </span>(url, url_span) = <span class="kw">match </span>args.remove(URL_KEY) {
+        <span class="prelude-val">Some</span>((_span, url_arg)) =&gt; (StringFromEnvVar::coerce(url_arg, diagnostics)<span class="question-mark">?</span>, url_arg.span()),
+
+        <span class="prelude-val">None </span>=&gt; {
+            diagnostics.push_error(DatamodelError::new_source_argument_not_found_error(
+                URL_KEY,
+                source_name,
+                ast_source.span,
+            ));
+
+            <span class="kw">return </span><span class="prelude-val">None</span>;
+        }
+    };
+
+    <span class="kw">let </span>shadow_database_url = <span class="kw">match </span>args.remove(SHADOW_DATABASE_URL_KEY) {
+        <span class="prelude-val">Some</span>((_span, shadow_db_url_arg)) =&gt; <span class="kw">match </span>StringFromEnvVar::coerce(shadow_db_url_arg, diagnostics) {
+            <span class="prelude-val">Some</span>(shadow_db_url) =&gt; <span class="prelude-val">Some</span>(shadow_db_url)
+                .filter(|s| !s.as_literal().map(|literal| literal.is_empty()).unwrap_or(<span class="bool-val">false</span>))
+                .map(|url| (url, shadow_db_url_arg.span())),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
+        },
+
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+    };
+
+    <span class="kw">let </span>(direct_url, direct_url_span) = <span class="kw">match </span>args.remove(DIRECT_URL_KEY) {
+        <span class="prelude-val">Some</span>((<span class="kw">_</span>, direct_url)) =&gt; (
+            StringFromEnvVar::coerce(direct_url, diagnostics),
+            <span class="prelude-val">Some</span>(direct_url.span()),
+        ),
+
+        <span class="prelude-val">None </span>=&gt; (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+    };
+
+    preview_features_guardrail(<span class="kw-2">&amp;mut </span>args, diagnostics);
+
+    <span class="kw">let </span>documentation = ast_source.documentation().map(String::from);
+
+    <span class="kw">let </span>(schemas, schemas_span) = <span class="kw">match </span>args.remove(SCHEMAS_KEY) {
+        <span class="prelude-val">Some</span>((_span, schemas)) =&gt; coerce_array(schemas, <span class="kw-2">&amp;</span>coerce::string_with_span, diagnostics)
+            .map(|b| (b, schemas.span()))
+            .and_then(|(<span class="kw-2">mut </span>schemas, span)| {
+                <span class="kw">if </span>schemas.is_empty() {
+                    diagnostics.push_error(DatamodelError::new_schemas_array_empty_error(span));
+
+                    <span class="kw">return </span><span class="prelude-val">None</span>;
+                }
+
+                schemas.sort_by(|(a, <span class="kw">_</span>), (b, <span class="kw">_</span>)| a.cmp(b));
+
+                <span class="kw">for </span>pair <span class="kw">in </span>schemas.windows(<span class="number">2</span>) {
+                    <span class="kw">if </span>pair[<span class="number">0</span>].<span class="number">0 </span>== pair[<span class="number">1</span>].<span class="number">0 </span>{
+                        diagnostics.push_error(DatamodelError::new_static(
+                            <span class="string">&quot;Duplicated schema names are not allowed&quot;</span>,
+                            pair[<span class="number">0</span>].<span class="number">1</span>,
+                        ))
+                    }
+                }
+
+                <span class="prelude-val">Some</span>((schemas, <span class="prelude-val">Some</span>(span)))
+            })
+            .unwrap_or_default(),
+
+        <span class="prelude-val">None </span>=&gt; Default::default(),
+    };
 
     <span class="kw">for </span>(name, (span, <span class="kw">_</span>)) <span class="kw">in </span>args.into_iter() {
         diagnostics.push_error(DatamodelError::new_property_not_known_error(name, span));
@@ -435,13 +485,13 @@
     <span class="prelude-val">Some</span>(Datasource {
         namespaces: schemas.into_iter().map(|(s, span)| (s.to_owned(), span)).collect(),
         schemas_span,
-        name: source_name.to_string(),
+        name: source_name.to_owned(),
         provider: provider.to_owned(),
         active_provider: active_connector.provider_name(),
         url,
-        url_span: url_arg.span(),
+        url_span,
         direct_url,
-        direct_url_span: direct_url_arg.map(|arg| arg.span()),
+        direct_url_span,
         documentation,
         active_connector,
         shadow_database_url,

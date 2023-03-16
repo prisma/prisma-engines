@@ -131,6 +131,7 @@
 <a href="#131" id="131">131</a>
 <a href="#132" id="132">132</a>
 <a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
 </pre><pre class="rust"><code><span class="kw">use </span>serde::Deserialize;
 <span class="kw">use </span>serde_json::json;
 <span class="kw">use </span>std::fmt::Write <span class="kw">as _</span>;
@@ -258,8 +259,9 @@
         });
 
         <span class="kw">let </span>expected = <span class="macro">expect!</span>[[
-            <span class="string">r#&quot;{&quot;error_code&quot;:&quot;P1012&quot;,&quot;message&quot;:&quot;\u001b[1;91merror\u001b[0m: \u001b[1mThe `referentialIntegrity` and `relationMode` attributes cannot be used together. Please use only `relationMode` instead.\u001b[0m\n  \u001b[1;94m--&gt;\u001b[0m  \u001b[4mschema.prisma:6\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m              relationMode = \&quot;prisma\&quot;\n\u001b[1;94m 6 | \u001b[0m              \u001b[1;91mreferentialIntegrity = \&quot;foreignKeys\&quot;\u001b[0m\n\u001b[1;94m 7 | \u001b[0m          }\n\u001b[1;94m   | \u001b[0m\n\nValidation Error Count: 1&quot;}&quot;#
+            <span class="string">r#&quot;{&quot;error_code&quot;:&quot;P1012&quot;,&quot;message&quot;:&quot;\u001b[1;91merror\u001b[0m: \u001b[1mThe `referentialIntegrity` and `relationMode` attributes cannot be used together. Please use only `relationMode` instead.\u001b[0m\n  \u001b[1;94m--&gt;\u001b[0m  \u001b[4mschema.prisma:6\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m              relationMode = \&quot;prisma\&quot;\n\u001b[1;94m 6 | \u001b[0m              \u001b[1;91mreferentialIntegrity = \&quot;foreignKeys\&quot;\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\nValidation Error Count: 1&quot;}&quot;#
         </span>]];
+
         <span class="kw">let </span>response = validate(<span class="kw-2">&amp;</span>request.to_string()).unwrap_err();
         expected.assert_eq(<span class="kw-2">&amp;</span>response);
     }

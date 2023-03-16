@@ -318,6 +318,25 @@
 <a href="#318" id="318">318</a>
 <a href="#319" id="319">319</a>
 <a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>native_types;
 <span class="kw">mod </span>validations;
 
@@ -338,8 +357,11 @@
         walkers::ModelWalker,
         IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType,
     },
+    PreviewFeature,
 };
 <span class="kw">use </span>std::borrow::Cow;
+
+<span class="kw">use </span><span class="kw">crate</span>::completions;
 
 <span class="kw">const </span>CONSTRAINT_SCOPES: <span class="kw-2">&amp;</span>[ConstraintScope] = <span class="kw-2">&amp;</span>[ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey];
 
@@ -583,20 +605,36 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn </span>push_completions(<span class="kw-2">&amp;</span><span class="self">self</span>, _db: <span class="kw-2">&amp;</span>ParserDatabase, position: SchemaPosition&lt;<span class="lifetime">&#39;_</span>&gt;, completions: <span class="kw-2">&amp;mut </span>CompletionList) {
+    <span class="kw">fn </span>datamodel_completions(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        _db: <span class="kw-2">&amp;</span>ParserDatabase,
+        position: SchemaPosition&lt;<span class="lifetime">&#39;_</span>&gt;,
+        completion_list: <span class="kw-2">&amp;mut </span>CompletionList,
+    ) {
         <span class="kw">if let </span>ast::SchemaPosition::Model(
             <span class="kw">_</span>,
             ast::ModelPosition::ModelAttribute(<span class="string">&quot;index&quot;</span>, <span class="kw">_</span>, ast::AttributePosition::Argument(<span class="string">&quot;type&quot;</span>)),
         ) = position
         {
             <span class="kw">for </span>index_type <span class="kw">in </span><span class="self">self</span>.supported_index_types() {
-                completions.items.push(CompletionItem {
+                completion_list.items.push(CompletionItem {
                     label: index_type.to_string(),
                     kind: <span class="prelude-val">Some</span>(CompletionItemKind::ENUM),
                     detail: <span class="prelude-val">Some</span>(index_type.documentation().to_owned()),
                     ..Default::default()
                 });
             }
+        }
+    }
+
+    <span class="kw">fn </span>datasource_completions(<span class="kw-2">&amp;</span><span class="self">self</span>, config: <span class="kw-2">&amp;</span>psl_core::Configuration, completion_list: <span class="kw-2">&amp;mut </span>CompletionList) {
+        <span class="kw">let </span>ds = <span class="kw">match </span>config.datasources.first() {
+            <span class="prelude-val">Some</span>(ds) =&gt; ds,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
+        };
+
+        <span class="kw">if </span>config.preview_features().contains(PreviewFeature::MultiSchema) &amp;&amp; !ds.schemas_defined() {
+            completions::schemas_completion(completion_list);
         }
     }
 }

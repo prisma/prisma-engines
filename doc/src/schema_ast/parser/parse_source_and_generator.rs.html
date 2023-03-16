@@ -80,6 +80,18 @@
 <a href="#80" id="80">80</a>
 <a href="#81" id="81">81</a>
 <a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{
     helpers::{parsing_catch_all, Pair},
     parse_comments::<span class="kw-2">*</span>,
@@ -89,29 +101,40 @@
 <span class="kw">use </span><span class="kw">crate</span>::ast::<span class="kw-2">*</span>;
 <span class="kw">use </span>diagnostics::{DatamodelError, Diagnostics};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse_config_block(pair: Pair&lt;<span class="lifetime">&#39;_</span>&gt;, diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics) -&gt; Top {
+<span class="attr">#[track_caller]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse_config_block(pair: Pair&lt;<span class="lifetime">&#39;_</span>&gt;, diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics) -&gt; Top {
     <span class="kw">let </span>pair_span = pair.as_span();
     <span class="kw">let </span><span class="kw-2">mut </span>name: <span class="prelude-ty">Option</span>&lt;Identifier&gt; = <span class="prelude-val">None</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>properties = Vec::new();
     <span class="kw">let </span><span class="kw-2">mut </span>comment: <span class="prelude-ty">Option</span>&lt;Comment&gt; = <span class="prelude-val">None</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>kw = <span class="prelude-val">None</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>inner_span: <span class="prelude-ty">Option</span>&lt;Span&gt; = <span class="prelude-val">None</span>;
 
     <span class="kw">for </span>current <span class="kw">in </span>pair.into_inner() {
         <span class="kw">match </span>current.as_rule() {
+            Rule::config_contents =&gt; {
+                inner_span = <span class="prelude-val">Some</span>(current.as_span().into());
+                <span class="kw">for </span>item <span class="kw">in </span>current.into_inner() {
+                    <span class="kw">match </span>item.as_rule() {
+                        Rule::key_value =&gt; properties.push(parse_key_value(item, diagnostics)),
+                        Rule::comment_block =&gt; comment = parse_comment_block(item),
+                        Rule::BLOCK_LEVEL_CATCH_ALL =&gt; {
+                            <span class="kw">let </span>msg = <span class="macro">format!</span>(
+                                <span class="string">&quot;This line is not a valid definition within a {}.&quot;</span>,
+                                kw.unwrap_or(<span class="string">&quot;configuration block&quot;</span>)
+                            );
+
+                            <span class="kw">let </span>err = DatamodelError::new_validation_error(<span class="kw-2">&amp;</span>msg, item.as_span().into());
+                            diagnostics.push_error(err);
+                        }
+                        <span class="kw">_ </span>=&gt; parsing_catch_all(<span class="kw-2">&amp;</span>item, <span class="string">&quot;source&quot;</span>),
+                    }
+                }
+            }
             Rule::identifier =&gt; name = <span class="prelude-val">Some</span>(current.into()),
-            Rule::key_value =&gt; properties.push(parse_key_value(current, diagnostics)),
-            Rule::comment_block =&gt; comment = parse_comment_block(current),
             Rule::DATASOURCE_KEYWORD | Rule::GENERATOR_KEYWORD =&gt; kw = <span class="prelude-val">Some</span>(current.as_str()),
             Rule::BLOCK_OPEN | Rule::BLOCK_CLOSE =&gt; {}
-            Rule::BLOCK_LEVEL_CATCH_ALL =&gt; {
-                <span class="kw">let </span>msg = <span class="macro">format!</span>(
-                    <span class="string">&quot;This line is not a valid definition within a {}.&quot;</span>,
-                    kw.unwrap_or(<span class="string">&quot;configuration block&quot;</span>)
-                );
 
-                <span class="kw">let </span>err = DatamodelError::new_validation_error(<span class="kw-2">&amp;</span>msg, current.as_span().into());
-                diagnostics.push_error(err);
-            }
             <span class="kw">_ </span>=&gt; parsing_catch_all(<span class="kw-2">&amp;</span>current, <span class="string">&quot;source&quot;</span>),
         }
     }
@@ -122,6 +145,7 @@
             properties,
             documentation: comment,
             span: Span::from(pair_span),
+            inner_span: inner_span.unwrap(),
         }),
         <span class="prelude-val">Some</span>(<span class="string">&quot;generator&quot;</span>) =&gt; Top::Generator(GeneratorConfig {
             name: name.unwrap(),
@@ -151,7 +175,7 @@
     }
 
     <span class="kw">match </span>(name, value) {
-        (<span class="prelude-val">Some</span>(name), <span class="prelude-val">Some</span>(value)) =&gt; ConfigBlockProperty {
+        (<span class="prelude-val">Some</span>(name), value) =&gt; ConfigBlockProperty {
             name,
             value,
             span: Span::from(pair_span),

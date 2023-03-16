@@ -51,6 +51,14 @@
 <a href="#51" id="51">51</a>
 <a href="#52" id="52">52</a>
 <a href="#53" id="53">53</a>
+<a href="#54" id="54">54</a>
+<a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{
     helpers::{parsing_catch_all, Pair},
     parse_attribute::parse_attribute,
@@ -65,29 +73,37 @@
     <span class="kw">let </span>pair_span = pair.as_span();
     <span class="kw">let </span><span class="kw-2">mut </span>name: <span class="prelude-ty">Option</span>&lt;ast::Identifier&gt; = <span class="prelude-val">None</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>fields: Vec&lt;ast::Field&gt; = <span class="macro">vec!</span>[];
-    <span class="kw">let </span><span class="kw-2">mut </span>pending_field_comment: <span class="prelude-ty">Option</span>&lt;Pair&lt;<span class="lifetime">&#39;_</span>&gt;&gt; = <span class="prelude-val">None</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>attributes: Vec&lt;Attribute&gt; = Vec::new();
 
     <span class="kw">for </span>current <span class="kw">in </span>pair.into_inner() {
         <span class="kw">match </span>current.as_rule() {
             Rule::VIEW_KEYWORD | Rule::BLOCK_OPEN | Rule::BLOCK_CLOSE =&gt; (),
             Rule::identifier =&gt; name = <span class="prelude-val">Some</span>(current.into()),
-            Rule::block_attribute =&gt; attributes.push(parse_attribute(current, diagnostics)),
-            Rule::field_declaration =&gt; <span class="kw">match </span>parse_field(
-                <span class="kw-2">&amp;</span>name.as_ref().unwrap().name,
-                <span class="string">&quot;view&quot;</span>,
-                current,
-                pending_field_comment.take(),
-                diagnostics,
-            ) {
-                <span class="prelude-val">Ok</span>(field) =&gt; fields.push(field),
-                <span class="prelude-val">Err</span>(err) =&gt; diagnostics.push_error(err),
-            },
-            Rule::comment_block =&gt; pending_field_comment = <span class="prelude-val">Some</span>(current),
-            Rule::BLOCK_LEVEL_CATCH_ALL =&gt; diagnostics.push_error(DatamodelError::new_validation_error(
-                <span class="string">&quot;This line is not a valid field or attribute definition.&quot;</span>,
-                current.as_span().into(),
-            )),
+            Rule::model_contents =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>pending_field_comment: <span class="prelude-ty">Option</span>&lt;Pair&lt;<span class="lifetime">&#39;_</span>&gt;&gt; = <span class="prelude-val">None</span>;
+
+                <span class="kw">for </span>item <span class="kw">in </span>current.into_inner() {
+                    <span class="kw">match </span>item.as_rule() {
+                        Rule::block_attribute =&gt; attributes.push(parse_attribute(item, diagnostics)),
+                        Rule::field_declaration =&gt; <span class="kw">match </span>parse_field(
+                            <span class="kw-2">&amp;</span>name.as_ref().unwrap().name,
+                            <span class="string">&quot;view&quot;</span>,
+                            item,
+                            pending_field_comment.take(),
+                            diagnostics,
+                        ) {
+                            <span class="prelude-val">Ok</span>(field) =&gt; fields.push(field),
+                            <span class="prelude-val">Err</span>(err) =&gt; diagnostics.push_error(err),
+                        },
+                        Rule::comment_block =&gt; pending_field_comment = <span class="prelude-val">Some</span>(item),
+                        Rule::BLOCK_LEVEL_CATCH_ALL =&gt; diagnostics.push_error(DatamodelError::new_validation_error(
+                            <span class="string">&quot;This line is not a valid field or attribute definition.&quot;</span>,
+                            item.as_span().into(),
+                        )),
+                        <span class="kw">_ </span>=&gt; parsing_catch_all(<span class="kw-2">&amp;</span>item, <span class="string">&quot;view&quot;</span>),
+                    }
+                }
+            }
             <span class="kw">_ </span>=&gt; parsing_catch_all(<span class="kw-2">&amp;</span>current, <span class="string">&quot;view&quot;</span>),
         }
     }
