@@ -14,5 +14,6 @@ fn trailing_comments_allowed_in_configuration_blocks() {
         previewFeatures = ["referentialIntegrity"] // []
       }     
     "#;
+
     assert_valid(schema);
 }

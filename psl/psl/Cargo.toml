@@ -8,6 +8,7 @@ builtin-psl-connectors = { path = "../builtin-connectors" }
 psl-core = { path = "../psl-core" }
 
 [dev-dependencies]
+base64 = "0.13.0"
 dissimilar = "1.0.4"
 dml = { path = "../../query-engine/dml" }
 expect-test = "1.1.0"
