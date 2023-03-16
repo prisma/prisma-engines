@@ -1,4 +1,4 @@
-use psl::{PreviewFeatures, ALL_PREVIEW_FEATURES};
+use psl::ALL_PREVIEW_FEATURES;
 use query_core::query_graph_builder::QueryGraphBuilder;
 use request_handlers::JsonSingleQuery;
 use serde_json::json;
