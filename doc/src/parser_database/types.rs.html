@@ -1407,6 +1407,47 @@
 <a href="#1407" id="1407">1407</a>
 <a href="#1408" id="1408">1408</a>
 <a href="#1409" id="1409">1409</a>
+<a href="#1410" id="1410">1410</a>
+<a href="#1411" id="1411">1411</a>
+<a href="#1412" id="1412">1412</a>
+<a href="#1413" id="1413">1413</a>
+<a href="#1414" id="1414">1414</a>
+<a href="#1415" id="1415">1415</a>
+<a href="#1416" id="1416">1416</a>
+<a href="#1417" id="1417">1417</a>
+<a href="#1418" id="1418">1418</a>
+<a href="#1419" id="1419">1419</a>
+<a href="#1420" id="1420">1420</a>
+<a href="#1421" id="1421">1421</a>
+<a href="#1422" id="1422">1422</a>
+<a href="#1423" id="1423">1423</a>
+<a href="#1424" id="1424">1424</a>
+<a href="#1425" id="1425">1425</a>
+<a href="#1426" id="1426">1426</a>
+<a href="#1427" id="1427">1427</a>
+<a href="#1428" id="1428">1428</a>
+<a href="#1429" id="1429">1429</a>
+<a href="#1430" id="1430">1430</a>
+<a href="#1431" id="1431">1431</a>
+<a href="#1432" id="1432">1432</a>
+<a href="#1433" id="1433">1433</a>
+<a href="#1434" id="1434">1434</a>
+<a href="#1435" id="1435">1435</a>
+<a href="#1436" id="1436">1436</a>
+<a href="#1437" id="1437">1437</a>
+<a href="#1438" id="1438">1438</a>
+<a href="#1439" id="1439">1439</a>
+<a href="#1440" id="1440">1440</a>
+<a href="#1441" id="1441">1441</a>
+<a href="#1442" id="1442">1442</a>
+<a href="#1443" id="1443">1443</a>
+<a href="#1444" id="1444">1444</a>
+<a href="#1445" id="1445">1445</a>
+<a href="#1446" id="1446">1446</a>
+<a href="#1447" id="1447">1447</a>
+<a href="#1448" id="1448">1448</a>
+<a href="#1449" id="1449">1449</a>
+<a href="#1450" id="1450">1450</a>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>index_fields;
 
 <span class="kw">use crate</span>::{context::Context, interner::StringId, walkers::IndexFieldWalker, DatamodelError};
@@ -1433,7 +1474,7 @@
 <span class="attr">#[derive(Debug, Default)]
 </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>Types {
     <span class="kw">pub</span>(<span class="kw">super</span>) composite_type_fields: BTreeMap&lt;(ast::CompositeTypeId, ast::FieldId), CompositeTypeField&gt;,
-    <span class="kw">pub</span>(<span class="kw">super</span>) scalar_fields: BTreeMap&lt;(ast::ModelId, ast::FieldId), ScalarField&gt;,
+    scalar_fields: Vec&lt;ScalarField&gt;,
     <span class="doccomment">/// This contains only the relation fields actually present in the schema
     /// source text.
     </span>relation_fields: Vec&lt;RelationField&gt;,
@@ -1442,21 +1483,31 @@
     <span class="doccomment">/// Sorted array of scalar fields that have an `@default()` attribute with a function that is
     /// not part of the base Prisma ones. This is meant for later validation in the datamodel
     /// connector.
-    </span><span class="kw">pub</span>(<span class="kw">super</span>) unknown_function_defaults: Vec&lt;(ast::ModelId, ast::FieldId)&gt;,
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) unknown_function_defaults: Vec&lt;ScalarFieldId&gt;,
 }
 
 <span class="kw">impl </span>Types {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>find_model_scalar_field(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        model_id: ast::ModelId,
+        field_id: ast::FieldId,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;ScalarFieldId&gt; {
+        <span class="self">self</span>.scalar_fields
+            .binary_search_by_key(<span class="kw-2">&amp;</span>(model_id, field_id), |sf| (sf.model_id, sf.field_id))
+            .ok()
+            .map(|idx| ScalarFieldId(idx <span class="kw">as </span>u32))
+    }
+
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>range_model_scalar_fields(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         model_id: ast::ModelId,
-    ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = (ast::FieldId, <span class="kw-2">&amp;</span>ScalarField)&gt; {
-        <span class="self">self</span>.scalar_fields
-            .range((model_id, ast::FieldId::MIN)..=(model_id, ast::FieldId::MAX))
-            .map(|((<span class="kw">_</span>, field_id), scalar_field)| (<span class="kw-2">*</span>field_id, scalar_field))
-    }
-
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>take_scalar_field(<span class="kw-2">&amp;mut </span><span class="self">self</span>, model_id: ast::ModelId, field_id: ast::FieldId) -&gt; <span class="prelude-ty">Option</span>&lt;ScalarField&gt; {
-        <span class="self">self</span>.scalar_fields.remove(<span class="kw-2">&amp;</span>(model_id, field_id))
+    ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = (ScalarFieldId, <span class="kw-2">&amp;</span>ScalarField)&gt; {
+        <span class="kw">let </span>start = <span class="self">self</span>.scalar_fields.partition_point(|sf| sf.model_id &lt; model_id);
+        <span class="self">self</span>.scalar_fields[start..]
+            .iter()
+            .take_while(<span class="kw">move </span>|sf| sf.model_id == model_id)
+            .enumerate()
+            .map(<span class="kw">move </span>|(idx, sf)| (ScalarFieldId((start + idx) <span class="kw">as </span>u32), sf))
     }
 
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>iter_relation_field_ids(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RelationFieldId&gt; + <span class="lifetime">&#39;static </span>{
@@ -1468,6 +1519,15 @@
             .iter()
             .enumerate()
             .map(|(idx, rf)| (RelationFieldId(idx <span class="kw">as </span>u32), rf))
+    }
+
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>range_model_scalar_field_ids(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        model_id: ast::ModelId,
+    ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ScalarFieldId&gt; + Clone {
+        <span class="kw">let </span>end = <span class="self">self</span>.scalar_fields.partition_point(|sf| sf.model_id &lt;= model_id);
+        <span class="kw">let </span>start = <span class="self">self</span>.scalar_fields[..end].partition_point(|sf| sf.model_id &lt; model_id);
+        (start..end).map(|idx| ScalarFieldId(idx <span class="kw">as </span>u32))
     }
 
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>range_model_relation_fields(
@@ -1482,21 +1542,27 @@
             .map(<span class="kw">move </span>|(idx, rf)| (RelationFieldId((first_relation_field_idx + idx) <span class="kw">as </span>u32), rf))
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>refine_field(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        id: (ast::ModelId, ast::FieldId),
-    ) -&gt; Either&lt;RelationFieldId, <span class="kw">crate</span>::walkers::ScalarFieldId&gt; {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>refine_field(<span class="kw-2">&amp;</span><span class="self">self</span>, id: (ast::ModelId, ast::FieldId)) -&gt; Either&lt;RelationFieldId, ScalarFieldId&gt; {
         <span class="self">self</span>.relation_fields
             .binary_search_by_key(<span class="kw-2">&amp;</span>id, |rf| (rf.model_id, rf.field_id))
             .map(|idx| Either::Left(RelationFieldId(idx <span class="kw">as </span>u32)))
-            <span class="comment">// INVARIANT: every field is either a relation field or a scalar field, so we don&#39;t
-            // need to check.
-            </span>.unwrap_or_else(|<span class="kw">_</span>| Either::Right(<span class="kw">crate</span>::walkers::ScalarFieldId(id.<span class="number">0</span>, id.<span class="number">1</span>)))
+            .or_else(|<span class="kw">_</span>| {
+                <span class="self">self</span>.scalar_fields
+                    .binary_search_by_key(<span class="kw-2">&amp;</span>id, |sf| (sf.model_id, sf.field_id))
+                    .map(|id| Either::Right(ScalarFieldId(id <span class="kw">as </span>u32)))
+            })
+            .expect(<span class="string">&quot;expected field to be either scalar or relation field&quot;</span>)
     }
 
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>push_relation_field(<span class="kw-2">&amp;mut </span><span class="self">self</span>, relation_field: RelationField) -&gt; RelationFieldId {
         <span class="kw">let </span>id = RelationFieldId(<span class="self">self</span>.relation_fields.len() <span class="kw">as </span>u32);
         <span class="self">self</span>.relation_fields.push(relation_field);
+        id
+    }
+
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>push_scalar_field(<span class="kw-2">&amp;mut </span><span class="self">self</span>, scalar_field: ScalarField) -&gt; ScalarFieldId {
+        <span class="kw">let </span>id = ScalarFieldId(<span class="self">self</span>.scalar_fields.len() <span class="kw">as </span>u32);
+        <span class="self">self</span>.scalar_fields.push(scalar_field);
         id
     }
 }
@@ -1512,6 +1578,20 @@
 <span class="kw">impl </span>std::ops::IndexMut&lt;RelationFieldId&gt; <span class="kw">for </span>Types {
     <span class="kw">fn </span>index_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: RelationFieldId) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Output {
         <span class="kw-2">&amp;mut </span><span class="self">self</span>.relation_fields[index.<span class="number">0 </span><span class="kw">as </span>usize]
+    }
+}
+
+<span class="kw">impl </span>std::ops::Index&lt;ScalarFieldId&gt; <span class="kw">for </span>Types {
+    <span class="kw">type </span>Output = ScalarField;
+
+    <span class="kw">fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: ScalarFieldId) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Output {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.scalar_fields[index.<span class="number">0 </span><span class="kw">as </span>usize]
+    }
+}
+
+<span class="kw">impl </span>std::ops::IndexMut&lt;ScalarFieldId&gt; <span class="kw">for </span>Types {
+    <span class="kw">fn </span>index_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: ScalarFieldId) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Output {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.scalar_fields[index.<span class="number">0 </span><span class="kw">as </span>usize]
     }
 }
 
@@ -1638,6 +1718,8 @@
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ScalarField {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) model_id: ast::ModelId,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) field_id: ast::FieldId,
     <span class="kw">pub</span>(<span class="kw">crate</span>) r#type: ScalarFieldType,
     <span class="kw">pub</span>(<span class="kw">crate</span>) is_ignored: bool,
     <span class="kw">pub</span>(<span class="kw">crate</span>) is_updated_at: bool,
@@ -1660,9 +1742,9 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) on_delete: <span class="prelude-ty">Option</span>&lt;(<span class="kw">crate</span>::ReferentialAction, ast::Span)&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) on_update: <span class="prelude-ty">Option</span>&lt;(<span class="kw">crate</span>::ReferentialAction, ast::Span)&gt;,
     <span class="doccomment">/// The fields _explicitly present_ in the AST.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) fields: <span class="prelude-ty">Option</span>&lt;Vec&lt;ast::FieldId&gt;&gt;,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) fields: <span class="prelude-ty">Option</span>&lt;Vec&lt;ScalarFieldId&gt;&gt;,
     <span class="doccomment">/// The `references` fields _explicitly present_ in the AST.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) references: <span class="prelude-ty">Option</span>&lt;Vec&lt;ast::FieldId&gt;&gt;,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) references: <span class="prelude-ty">Option</span>&lt;Vec&lt;ScalarFieldId&gt;&gt;,
     <span class="doccomment">/// The name _explicitly present_ in the AST.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) name: <span class="prelude-ty">Option</span>&lt;StringId&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) is_ignored: bool,
@@ -1836,7 +1918,7 @@
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>IndexAttribute {
     <span class="kw">pub</span>(<span class="kw">crate</span>) r#type: IndexType,
     <span class="kw">pub</span>(<span class="kw">crate</span>) fields: Vec&lt;FieldWithArgs&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) source_field: <span class="prelude-ty">Option</span>&lt;ast::FieldId&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) source_field: <span class="prelude-ty">Option</span>&lt;ScalarFieldId&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) name: <span class="prelude-ty">Option</span>&lt;StringId&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) mapped_name: <span class="prelude-ty">Option</span>&lt;StringId&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) algorithm: <span class="prelude-ty">Option</span>&lt;IndexAlgorithm&gt;,
@@ -1899,7 +1981,7 @@
     ///   @@index([a.field])
     /// }
     /// ```
-    </span>root: ast::FieldId,
+    </span>root: ScalarFieldId,
     <span class="doccomment">/// Path from the root, one composite type at a time. The final item is the
     /// field that gets included in the index.
     ///
@@ -1919,7 +2001,7 @@
 }
 
 <span class="kw">impl </span>IndexFieldPath {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(root: ast::FieldId) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(root: ScalarFieldId) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{ root, path: Vec::new() }
     }
 
@@ -1943,7 +2025,7 @@
     ///   @@index([a.field])
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>root(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ast::FieldId {
+    </span><span class="kw">pub fn </span>root(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ScalarFieldId {
         <span class="self">self</span>.root
     }
 
@@ -1971,15 +2053,11 @@
     /// or in a composite type embedded in the model. Returns the same value as
     /// the [`root`](Self::root()) method if the field is in a model rather than in a
     /// composite type.
-    </span><span class="kw">pub fn </span>field_in_index(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ast::FieldId {
-        <span class="self">self</span>.path.last().map(|(<span class="kw">_</span>, field_id)| <span class="kw-2">*</span>field_id).unwrap_or(<span class="self">self</span>.root)
-    }
-
-    <span class="doccomment">/// If the indexed field is in a composite type embedded to the model, gives
-    /// a pointer to the type. Use this method to determine the type of the
-    /// index field.
-    </span><span class="kw">pub fn </span>type_holding_the_indexed_field(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ast::CompositeTypeId&gt; {
-        <span class="self">self</span>.path.last().map(|(ctid, <span class="kw">_</span>)| <span class="kw-2">*</span>ctid)
+    </span><span class="kw">pub fn </span>field_in_index(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Either&lt;ScalarFieldId, (ast::CompositeTypeId, ast::FieldId)&gt; {
+        <span class="self">self</span>.path
+            .last()
+            .map(|id| Either::Right(<span class="kw-2">*</span>id))
+            .unwrap_or(Either::Left(<span class="self">self</span>.root))
     }
 }
 
@@ -2011,16 +2089,16 @@
                 ctx.types.push_relation_field(rf);
             }
             <span class="prelude-val">Ok</span>(FieldType::Scalar(scalar_field_type)) =&gt; {
-                <span class="kw">let </span>field_data = ScalarField {
+                ctx.types.push_scalar_field(ScalarField {
+                    model_id,
+                    field_id,
                     r#type: scalar_field_type,
                     is_ignored: <span class="bool-val">false</span>,
                     is_updated_at: <span class="bool-val">false</span>,
                     default: <span class="prelude-val">None</span>,
                     mapped_name: <span class="prelude-val">None</span>,
                     native_type: <span class="prelude-val">None</span>,
-                };
-
-                ctx.types.scalar_fields.insert((model_id, field_id), field_data);
+                });
             }
             <span class="prelude-val">Err</span>(supported) =&gt; ctx.push_error(DatamodelError::new_type_not_found_error(
                 supported,
@@ -2816,5 +2894,9 @@
 <span class="doccomment">/// An opaque identifier for a model relation field in a schema.
 </span><span class="attr">#[derive(Copy, Clone, PartialEq, Debug, Hash, Eq, PartialOrd, Ord)]
 </span><span class="kw">pub struct </span>RelationFieldId(u32);
+
+<span class="doccomment">/// An opaque identifier for a model scalar field in a schema.
+</span><span class="attr">#[derive(Copy, Clone, PartialEq, Debug, Eq, Hash)]
+</span><span class="kw">pub struct </span>ScalarFieldId(u32);
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="parser_database" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>

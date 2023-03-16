@@ -48,7 +48,7 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>render_enum_types(ctx: <span class="kw-2">&amp;mut </span>RenderContext, enum_types: <span class="kw-2">&amp;</span>[EnumTypeRef]) {
     <span class="kw">let </span><span class="kw-2">mut </span>borrows: Vec&lt;<span class="kw">_</span>&gt; = enum_types.iter().collect();
 
-    borrows.sort_by(|a, b| a.name().cmp(b.name()));
+    borrows.sort_by_key(|a| a.name());
     borrows.into_iter().for_each(|et| DmmfEnumRenderer::new(et).render(ctx));
 }
 
@@ -65,7 +65,7 @@
 
         <span class="kw">let </span>values = <span class="self">self</span>.format_enum_values();
         <span class="kw">let </span>rendered = DmmfEnum {
-            name: <span class="self">self</span>.enum_type.name().to_owned(),
+            name: <span class="self">self</span>.enum_type.name(),
             values,
         };
 

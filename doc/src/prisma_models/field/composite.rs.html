@@ -72,12 +72,12 @@
 <a href="#72" id="72">72</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{parent_container::ParentContainer, CompositeType};
 <span class="kw">use </span>dml::FieldArity;
-<span class="kw">use </span>psl::{parser_database::walkers, schema_ast::ast};
+<span class="kw">use </span>psl::{parser_database::ScalarFieldId, schema_ast::ast};
 <span class="kw">use </span>std::fmt::{Debug, Display};
 
 <span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 </span><span class="kw">pub enum </span>CompositeFieldId {
-    InModel(walkers::ScalarFieldId),
+    InModel(ScalarFieldId),
     InCompositeType((ast::CompositeTypeId, ast::FieldId)),
 }
 

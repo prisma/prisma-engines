@@ -625,7 +625,7 @@
         selections: <span class="kw-2">&amp;</span>[Selection],
         schema_object: <span class="kw-2">&amp;</span>ObjectTypeStrongRef,
     ) -&gt; QueryParserResult&lt;ParsedObject&gt; {
-        <span class="kw">let </span>path = parent_path.add(schema_object.identifier.name().to_owned());
+        <span class="kw">let </span>path = parent_path.add(schema_object.identifier.name());
 
         <span class="kw">if </span>selections.is_empty() {
             <span class="kw">return </span><span class="prelude-val">Err</span>(QueryParserError::Legacy {
@@ -1057,15 +1057,15 @@
         <span class="kw">match </span>typ.borrow() {
             EnumType::Database(db) =&gt; <span class="kw">match </span>db.map_input_value(<span class="kw-2">&amp;</span>raw) {
                 <span class="prelude-val">Some</span>(value) =&gt; <span class="prelude-val">Ok</span>(ParsedInputValue::Single(value)),
-                <span class="prelude-val">None </span>=&gt; err(db.identifier().name()),
+                <span class="prelude-val">None </span>=&gt; err(<span class="kw-2">&amp;</span>db.identifier().name()),
             },
             EnumType::String(s) =&gt; <span class="kw">match </span>s.value_for(raw.as_str()) {
                 <span class="prelude-val">Some</span>(val) =&gt; <span class="prelude-val">Ok</span>(ParsedInputValue::Single(PrismaValue::Enum(val.to_owned()))),
-                <span class="prelude-val">None </span>=&gt; err(s.identifier().name()),
+                <span class="prelude-val">None </span>=&gt; err(<span class="kw-2">&amp;</span>s.identifier().name()),
             },
             EnumType::FieldRef(f) =&gt; <span class="kw">match </span>f.value_for(raw.as_str()) {
                 <span class="prelude-val">Some</span>(value) =&gt; <span class="prelude-val">Ok</span>(ParsedInputValue::ScalarField(value.clone())),
-                <span class="prelude-val">None </span>=&gt; err(f.identifier().name()),
+                <span class="prelude-val">None </span>=&gt; err(<span class="kw-2">&amp;</span>f.identifier().name()),
             },
         }
     }
@@ -1077,7 +1077,7 @@
         object: ArgumentValueObject,
         schema_object: InputObjectTypeStrongRef,
     ) -&gt; QueryParserResult&lt;ParsedInputMap&gt; {
-        <span class="kw">let </span>path = parent_path.add(schema_object.identifier.name().to_owned());
+        <span class="kw">let </span>path = parent_path.add(schema_object.identifier.name());
         <span class="kw">let </span>valid_field_names: IndexSet&lt;<span class="kw-2">&amp;</span>str&gt; = schema_object
             .get_fields()
             .iter()

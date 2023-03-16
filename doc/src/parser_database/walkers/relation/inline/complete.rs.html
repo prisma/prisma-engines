@@ -73,14 +73,8 @@
 <a href="#73" id="73">73</a>
 <a href="#74" id="74">74</a>
 <a href="#75" id="75">75</a>
-<a href="#76" id="76">76</a>
-<a href="#77" id="77">77</a>
-<a href="#78" id="78">78</a>
-<a href="#79" id="79">79</a>
-<a href="#80" id="80">80</a>
-<a href="#81" id="81">81</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
-    walkers::{ModelWalker, RelationFieldId, RelationFieldWalker, ScalarFieldId, ScalarFieldWalker},
+    walkers::{ModelWalker, RelationFieldId, RelationFieldWalker, ScalarFieldWalker},
     ParserDatabase, ReferentialAction,
 };
 <span class="kw">use </span>schema_ast::ast;
@@ -116,28 +110,22 @@
 
     <span class="doccomment">/// The scalar fields defining the relation on the referenced model.
     </span><span class="kw">pub fn </span>referenced_fields(<span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; + <span class="lifetime">&#39;db </span>{
-        <span class="kw">let </span>f = <span class="kw">move </span>|field_id: <span class="kw-2">&amp;</span>ast::FieldId| {
-            <span class="kw">let </span>model_id = <span class="self">self</span>.referenced_model().id;
-            <span class="self">self</span>.db.walk(ScalarFieldId(model_id, <span class="kw-2">*</span>field_id))
-        };
-
-        <span class="kw">match </span><span class="self">self</span>.referencing_field().attributes().references.as_ref() {
-            <span class="prelude-val">Some</span>(references) =&gt; references.iter().map(f),
-            <span class="prelude-val">None </span>=&gt; [].iter().map(f),
-        }
+        (<span class="kw">match </span><span class="self">self</span>.referencing_field().attributes().references.as_ref() {
+            <span class="prelude-val">Some</span>(references) =&gt; references.as_slice(),
+            <span class="prelude-val">None </span>=&gt; <span class="kw-2">&amp;</span>[],
+        })
+        .iter()
+        .map(|id| <span class="self">self</span>.db.walk(<span class="kw-2">*</span>id))
     }
 
     <span class="doccomment">/// The scalar fields on the defining the relation on the referencing model.
     </span><span class="kw">pub fn </span>referencing_fields(<span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; + <span class="lifetime">&#39;db </span>{
-        <span class="kw">let </span>f = <span class="kw">move </span>|field_id: <span class="kw-2">&amp;</span>ast::FieldId| {
-            <span class="kw">let </span>model_id = <span class="self">self</span>.referencing_model().id;
-            <span class="self">self</span>.db.walk(ScalarFieldId(model_id, <span class="kw-2">*</span>field_id))
-        };
-
-        <span class="kw">match </span><span class="self">self</span>.referencing_field().attributes().fields.as_ref() {
-            <span class="prelude-val">Some</span>(references) =&gt; references.iter().map(f),
-            <span class="prelude-val">None </span>=&gt; [].iter().map(f),
-        }
+        (<span class="kw">match </span><span class="self">self</span>.referencing_field().attributes().fields.as_ref() {
+            <span class="prelude-val">Some</span>(references) =&gt; references.as_slice(),
+            <span class="prelude-val">None </span>=&gt; <span class="kw-2">&amp;</span>[],
+        })
+        .iter()
+        .map(|id| <span class="self">self</span>.db.walk(<span class="kw-2">*</span>id))
     }
 
     <span class="doccomment">/// Gives the onUpdate referential action of the relation. If not defined

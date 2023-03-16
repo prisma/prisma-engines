@@ -191,7 +191,7 @@
 
 <span class="attr">#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 </span><span class="kw">pub enum </span>ScalarFieldId {
-    InModel(walkers::ScalarFieldId),
+    InModel(psl::parser_database::ScalarFieldId),
     InCompositeType((ast::CompositeTypeId, ast::FieldId)),
 }
 

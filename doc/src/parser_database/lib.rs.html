@@ -167,6 +167,9 @@
 <a href="#167" id="167">167</a>
 <a href="#168" id="168">168</a>
 <a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
 </pre><pre class="rust"><code><span class="attr">#![deny(unsafe_code, rust_2018_idioms, missing_docs)]
 #![allow(clippy::derive_partial_eq_without_eq)]
 
@@ -209,7 +212,10 @@
 <span class="kw">pub use </span>names::is_reserved_type_name;
 <span class="kw">pub use </span>relations::{ManyToManyRelationId, ReferentialAction, RelationId};
 <span class="kw">pub use </span>schema_ast::{ast, SourceFile};
-<span class="kw">pub use </span>types::{IndexAlgorithm, IndexFieldPath, IndexType, OperatorClass, ScalarFieldType, ScalarType, SortOrder};
+<span class="kw">pub use </span>types::{
+    IndexAlgorithm, IndexFieldPath, IndexType, OperatorClass, RelationFieldId, ScalarFieldId, ScalarFieldType,
+    ScalarType, SortOrder,
+};
 
 <span class="kw">use </span><span class="self">self</span>::{context::Context, interner::StringId, relations::Relations, types::Types};
 <span class="kw">use </span>diagnostics::{DatamodelError, Diagnostics};

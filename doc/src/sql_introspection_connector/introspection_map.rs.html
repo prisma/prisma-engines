@@ -324,7 +324,7 @@
     datamodel_calculator::DatamodelCalculatorContext, introspection_helpers <span class="kw">as </span>helpers, pair::RelationFieldDirection,
 };
 <span class="kw">use </span>psl::{
-    parser_database::{<span class="self">self</span>, ast, walkers},
+    parser_database::{<span class="self">self</span>, ast, ScalarFieldId},
     PreviewFeature,
 };
 <span class="kw">use </span>relation_names::RelationNames;
@@ -346,8 +346,8 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) existing_views: HashMap&lt;sql::ViewId, ast::ModelId&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) missing_tables_for_previous_models: HashSet&lt;ast::ModelId&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) missing_views_for_previous_models: HashSet&lt;ast::ModelId&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) existing_model_scalar_fields: HashMap&lt;sql::TableColumnId, walkers::ScalarFieldId&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) existing_view_scalar_fields: HashMap&lt;sql::ViewColumnId, walkers::ScalarFieldId&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) existing_model_scalar_fields: HashMap&lt;sql::TableColumnId, ScalarFieldId&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) existing_view_scalar_fields: HashMap&lt;sql::ViewColumnId, ScalarFieldId&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) existing_inline_relations: HashMap&lt;sql::ForeignKeyId, parser_database::RelationId&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) existing_m2m_relations: HashMap&lt;sql::TableId, parser_database::ManyToManyRelationId&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) relation_names: RelationNames&lt;<span class="lifetime">&#39;a</span>&gt;,

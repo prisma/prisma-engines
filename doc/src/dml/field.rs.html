@@ -175,6 +175,7 @@
 <a href="#175" id="175">175</a>
 <a href="#176" id="176">176</a>
 <a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
 </pre><pre class="rust"><code><span class="doccomment">//! A field in a model.
 
 </span><span class="kw">use </span><span class="kw">crate</span>::default_value::{DefaultKind, DefaultValue, ValueGenerator};
@@ -183,7 +184,8 @@
 <span class="kw">use </span><span class="kw">crate</span>::scalars::ScalarType;
 <span class="kw">use </span><span class="kw">crate</span>::traits::{WithDatabaseName, WithName};
 <span class="kw">use </span><span class="kw">crate</span>::FieldArity;
-<span class="kw">use </span>psl_core::{parser_database::walkers::ScalarFieldId, schema_ast::ast};
+<span class="kw">use </span>psl_core::parser_database::ScalarFieldId;
+<span class="kw">use </span>psl_core::schema_ast::ast;
 
 <span class="doccomment">/// Datamodel field type.
 </span><span class="attr">#[derive(Debug, PartialEq, Clone)]

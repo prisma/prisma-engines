@@ -242,16 +242,14 @@
 <a href="#242" id="242">242</a>
 <a href="#243" id="243">243</a>
 <a href="#244" id="244">244</a>
-<a href="#245" id="245">245</a>
-<a href="#246" id="246">246</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{FieldResolutionError, FieldResolvingSetup};
 <span class="kw">use crate</span>::{
     ast::{<span class="self">self</span>, WithName, WithSpan},
     attributes::resolve_field_array_with_args,
     coerce,
     context::Context,
-    types::{FieldWithArgs, IdAttribute, IndexFieldPath, ModelAttributes, SortOrder},
-    DatamodelError, StringId,
+    types::{FieldWithArgs, IdAttribute, IndexFieldPath, ModelAttributes, ScalarField, SortOrder},
+    DatamodelError, ScalarFieldId, StringId,
 };
 <span class="kw">use </span>std::borrow::Cow;
 
@@ -320,27 +318,24 @@
     <span class="comment">// ID attribute fields must reference only required fields.
     </span><span class="kw">let </span>fields_that_are_not_required: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = resolved_fields
         .iter()
-        .filter_map(|field| {
-            <span class="kw">let </span>field_id = field.path.field_in_index();
+        .filter_map(|field| <span class="kw">match </span>field.path.field_in_index() {
+            either::Either::Left(id) =&gt; {
+                <span class="kw">let </span>ScalarField { model_id, field_id, .. } = ctx.types[id];
+                <span class="kw">let </span>field = <span class="kw-2">&amp;</span>ctx.ast[model_id][field_id];
 
-            <span class="kw">match </span>field.path.type_holding_the_indexed_field() {
-                <span class="prelude-val">None </span>=&gt; {
-                    <span class="kw">let </span>field = <span class="kw-2">&amp;</span>ctx.ast[model_id][field_id];
-
-                    <span class="kw">if </span>field.arity.is_required() {
-                        <span class="prelude-val">None
-                    </span>} <span class="kw">else </span>{
-                        <span class="prelude-val">Some</span>(field.name())
-                    }
+                <span class="kw">if </span>field.arity.is_required() {
+                    <span class="prelude-val">None
+                </span>} <span class="kw">else </span>{
+                    <span class="prelude-val">Some</span>(field.name())
                 }
-                <span class="prelude-val">Some</span>(ctid) =&gt; {
-                    <span class="kw">let </span>field = <span class="kw-2">&amp;</span>ctx.ast[ctid][field_id];
+            }
+            either::Either::Right((ctid, field_id)) =&gt; {
+                <span class="kw">let </span>field = <span class="kw-2">&amp;</span>ctx.ast[ctid][field_id];
 
-                    <span class="kw">if </span>field.arity.is_required() {
-                        <span class="prelude-val">None
-                    </span>} <span class="kw">else </span>{
-                        <span class="prelude-val">Some</span>(field.name())
-                    }
+                <span class="kw">if </span>field.arity.is_required() {
+                    <span class="prelude-val">None
+                </span>} <span class="kw">else </span>{
+                    <span class="prelude-val">Some</span>(field.name())
                 }
             }
         })
@@ -392,56 +387,57 @@
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>field&lt;<span class="lifetime">&#39;db</span>&gt;(
     ast_model: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Model,
+    scalar_field_id: ScalarFieldId,
     field_id: ast::FieldId,
     model_attributes: <span class="kw-2">&amp;mut </span>ModelAttributes,
     ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;db</span>&gt;,
 ) {
-    <span class="kw">match </span>model_attributes.primary_key {
-        <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; ctx.push_error(DatamodelError::new_model_validation_error(
+    <span class="kw">if </span>model_attributes.primary_key.is_some() {
+        ctx.push_error(DatamodelError::new_model_validation_error(
             <span class="string">&quot;At most one field must be marked as the id field with the `@id` attribute.&quot;</span>,
             <span class="string">&quot;model&quot;</span>,
             ast_model.name(),
             ast_model.span(),
-        )),
-        <span class="prelude-val">None </span>=&gt; {
-            <span class="kw">let </span>mapped_name = primary_key_mapped_name(ctx);
+        ))
+    } <span class="kw">else </span>{
+        <span class="kw">let </span>mapped_name = primary_key_mapped_name(ctx);
 
-            <span class="kw">let </span>length = ctx
-                .visit_optional_arg(<span class="string">&quot;length&quot;</span>)
-                .and_then(|length| coerce::integer(length, ctx.diagnostics))
-                .map(|len| len <span class="kw">as </span>u32);
+        <span class="kw">let </span>length = ctx
+            .visit_optional_arg(<span class="string">&quot;length&quot;</span>)
+            .and_then(|length| coerce::integer(length, ctx.diagnostics))
+            .map(|len| len <span class="kw">as </span>u32);
 
-            <span class="kw">let </span>sort_order = <span class="kw">match </span>ctx
-                .visit_optional_arg(<span class="string">&quot;sort&quot;</span>)
-                .and_then(|sort| coerce::constant(sort, ctx.diagnostics))
-            {
-                <span class="prelude-val">Some</span>(<span class="string">&quot;Desc&quot;</span>) =&gt; <span class="prelude-val">Some</span>(SortOrder::Desc),
-                <span class="prelude-val">Some</span>(<span class="string">&quot;Asc&quot;</span>) =&gt; <span class="prelude-val">Some</span>(SortOrder::Asc),
-                <span class="prelude-val">Some</span>(other) =&gt; {
-                    ctx.push_attribute_validation_error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
-                        <span class="string">&quot;The `sort` argument can only be `Asc` or `Desc` you provided: {other}.&quot;
-                    </span>));
-                    <span class="prelude-val">None
-                </span>}
-                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
-            };
+        <span class="kw">let </span>sort_order = <span class="kw">match </span>ctx
+            .visit_optional_arg(<span class="string">&quot;sort&quot;</span>)
+            .and_then(|sort| coerce::constant(sort, ctx.diagnostics))
+        {
+            <span class="prelude-val">Some</span>(<span class="string">&quot;Desc&quot;</span>) =&gt; <span class="prelude-val">Some</span>(SortOrder::Desc),
+            <span class="prelude-val">Some</span>(<span class="string">&quot;Asc&quot;</span>) =&gt; <span class="prelude-val">Some</span>(SortOrder::Asc),
+            <span class="prelude-val">Some</span>(other) =&gt; {
+                ctx.push_attribute_validation_error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
+                    <span class="string">&quot;The `sort` argument can only be `Asc` or `Desc` you provided: {other}.&quot;
+                </span>));
+                <span class="prelude-val">None
+            </span>}
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
+        };
 
-            <span class="kw">let </span>clustered = <span class="kw">super</span>::validate_clustering_setting(ctx);
+        <span class="kw">let </span>clustered = <span class="kw">super</span>::validate_clustering_setting(ctx);
 
-            model_attributes.primary_key = <span class="prelude-val">Some</span>(IdAttribute {
-                name: <span class="prelude-val">None</span>,
-                mapped_name,
-                source_attribute: ctx.current_attribute_id(),
-                fields: <span class="macro">vec!</span>[FieldWithArgs {
-                    path: IndexFieldPath::new(field_id),
-                    sort_order,
-                    length,
-                    operator_class: <span class="prelude-val">None</span>,
-                }],
-                source_field: <span class="prelude-val">Some</span>(field_id),
-                clustered,
-            })
-        }
+        <span class="kw">let </span>source_attribute = ctx.current_attribute_id();
+        model_attributes.primary_key = <span class="prelude-val">Some</span>(IdAttribute {
+            name: <span class="prelude-val">None</span>,
+            mapped_name,
+            source_attribute,
+            fields: <span class="macro">vec!</span>[FieldWithArgs {
+                path: IndexFieldPath::new(scalar_field_id),
+                sort_order,
+                length,
+                operator_class: <span class="prelude-val">None</span>,
+            }],
+            source_field: <span class="prelude-val">Some</span>(field_id),
+            clustered,
+        })
     }
 }
 

@@ -26,34 +26,32 @@
 <a href="#26" id="26">26</a>
 <a href="#27" id="27">27</a>
 <a href="#28" id="28">28</a>
-<a href="#29" id="29">29</a>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{
-    ast,
-    types::{CompositeTypeField, ScalarField},
-    StringId,
-};
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{ast, context::Context, ScalarFieldId, StringId};
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>visit_model_field_native_type_attribute(
+    id: ScalarFieldId,
     datasource_name: StringId,
     type_name: StringId,
     attr: <span class="kw-2">&amp;</span>ast::Attribute,
-    scalar_field: <span class="kw-2">&amp;mut </span>ScalarField,
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) {
     <span class="kw">let </span>args = <span class="kw-2">&amp;</span>attr.arguments;
     <span class="kw">let </span>args: Vec&lt;String&gt; = args.arguments.iter().map(|arg| arg.value.to_string()).collect();
 
-    scalar_field.native_type = <span class="prelude-val">Some</span>((datasource_name, type_name, args, attr.span))
+    ctx.types[id].native_type = <span class="prelude-val">Some</span>((datasource_name, type_name, args, attr.span))
 }
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>visit_composite_type_field_native_type_attribute(
+    id: (ast::CompositeTypeId, ast::FieldId),
     datasource_name: StringId,
     type_name: StringId,
     attr: <span class="kw-2">&amp;</span>ast::Attribute,
-    composite_type_field: <span class="kw-2">&amp;mut </span>CompositeTypeField,
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) {
     <span class="kw">let </span>args = <span class="kw-2">&amp;</span>attr.arguments;
     <span class="kw">let </span>args: Vec&lt;String&gt; = args.arguments.iter().map(|arg| arg.value.to_string()).collect();
 
+    <span class="kw">let </span><span class="kw-2">mut </span>composite_type_field = ctx.types.composite_type_fields.get_mut(<span class="kw-2">&amp;</span>id).unwrap();
     composite_type_field.native_type = <span class="prelude-val">Some</span>((datasource_name, type_name, args, attr.span))
 }
 </code></pre></div>

@@ -1087,13 +1087,6 @@
 <a href="#1087" id="1087">1087</a>
 <a href="#1088" id="1088">1088</a>
 <a href="#1089" id="1089">1089</a>
-<a href="#1090" id="1090">1090</a>
-<a href="#1091" id="1091">1091</a>
-<a href="#1092" id="1092">1092</a>
-<a href="#1093" id="1093">1093</a>
-<a href="#1094" id="1094">1094</a>
-<a href="#1095" id="1095">1095</a>
-<a href="#1096" id="1096">1096</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>default;
 <span class="kw">mod </span>id;
 <span class="kw">mod </span>map;
@@ -1105,11 +1098,11 @@
     coerce, coerce_array,
     context::Context,
     types::{
-        EnumAttributes, FieldWithArgs, IndexAlgorithm, IndexAttribute, IndexFieldPath, IndexType, ModelAttributes,
-        OperatorClassStore, RelationField, ScalarField, ScalarFieldType, SortOrder,
+        CompositeTypeField, EnumAttributes, FieldWithArgs, IndexAlgorithm, IndexAttribute, IndexFieldPath, IndexType,
+        ModelAttributes, OperatorClassStore, RelationField, ScalarField, ScalarFieldType, SortOrder,
     },
     walkers::RelationFieldId,
-    DatamodelError, StringId,
+    DatamodelError, ScalarFieldId, StringId,
 };
 <span class="kw">use </span>diagnostics::Span;
 <span class="kw">use </span>std::borrow::Cow;
@@ -1121,7 +1114,7 @@
 
     <span class="kw">for </span>top <span class="kw">in </span>ctx.ast.iter_tops() {
         <span class="kw">match </span>top {
-            (ast::TopId::Model(model_id), ast::Top::Model(model)) =&gt; resolve_model_attributes(model_id, model, ctx),
+            (ast::TopId::Model(model_id), ast::Top::Model(<span class="kw">_</span>)) =&gt; resolve_model_attributes(model_id, ctx),
             (ast::TopId::Enum(enum_id), ast::Top::Enum(ast_enum)) =&gt; resolve_enum_attributes(enum_id, ast_enum, ctx),
             (ast::TopId::CompositeType(ctid), ast::Top::CompositeType(ct)) =&gt; {
                 resolve_composite_type_attributes(ctid, ct, ctx)
@@ -1137,35 +1130,35 @@
     ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;db</span>&gt;,
 ) {
     <span class="kw">for </span>(field_id, field) <span class="kw">in </span>ct.iter_fields() {
-        <span class="kw">let </span><span class="kw-2">mut </span>ctfield = ctx.types.composite_type_fields[<span class="kw-2">&amp;</span>(ctid, field_id)].clone();
+        <span class="kw">let </span>CompositeTypeField { r#type, .. } = ctx.types.composite_type_fields[<span class="kw-2">&amp;</span>(ctid, field_id)];
 
         ctx.visit_attributes((ctid, field_id).into());
 
-        <span class="kw">if let </span>ScalarFieldType::BuiltInScalar(_scalar_type) = ctfield.r#type {
+        <span class="kw">if let </span>ScalarFieldType::BuiltInScalar(_scalar_type) = r#type {
             <span class="comment">// native type attributes
             </span><span class="kw">if let </span><span class="prelude-val">Some</span>((datasource_name, type_name, args)) = ctx.visit_datasource_scoped() {
                 native_types::visit_composite_type_field_native_type_attribute(
+                    (ctid, field_id),
                     datasource_name,
                     type_name,
                     <span class="kw-2">&amp;</span>ctx.ast[args],
-                    <span class="kw-2">&amp;mut </span>ctfield,
+                    ctx,
                 )
             }
         }
 
         <span class="comment">// @map
         </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;map&quot;</span>) {
-            map::composite_type_field(ct, field, ctid, field_id, <span class="kw-2">&amp;mut </span>ctfield, ctx);
+            map::composite_type_field(ct, field, ctid, field_id, ctx);
             ctx.validate_visited_arguments();
         }
 
         <span class="comment">// @default
         </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;default&quot;</span>) {
-            default::visit_composite_field_default(<span class="kw-2">&amp;mut </span>ctfield, ctid, field_id, ctx);
+            default::visit_composite_field_default(ctid, field_id, r#type, ctx);
             ctx.validate_visited_arguments();
         }
 
-        ctx.types.composite_type_fields.insert((ctid, field_id), ctfield);
         ctx.validate_visited_attributes();
     }
 }
@@ -1210,24 +1203,12 @@
     ctx.validate_visited_attributes();
 }
 
-<span class="kw">fn </span>resolve_model_attributes&lt;<span class="lifetime">&#39;db</span>&gt;(model_id: ast::ModelId, ast_model: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Model, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;db</span>&gt;) {
+<span class="kw">fn </span>resolve_model_attributes(model_id: ast::ModelId, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
     <span class="kw">let </span><span class="kw-2">mut </span>model_attributes = ModelAttributes::default();
 
     <span class="comment">// First resolve all the attributes defined on fields **in isolation**.
-    </span><span class="kw">for </span>(field_id, ast_field) <span class="kw">in </span>ast_model.iter_fields() {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>scalar_field) = ctx.types.take_scalar_field(model_id, field_id) {
-            visit_scalar_field_attributes(
-                model_id,
-                field_id,
-                ast_model,
-                ast_field,
-                <span class="kw-2">&amp;mut </span>model_attributes,
-                <span class="kw-2">&amp;mut </span>scalar_field,
-                ctx,
-            );
-
-            ctx.types.scalar_fields.insert((model_id, field_id), scalar_field);
-        }
+    </span><span class="kw">for </span>sfid <span class="kw">in </span>ctx.types.range_model_scalar_field_ids(model_id) {
+        visit_scalar_field_attributes(sfid, <span class="kw-2">&amp;mut </span>model_attributes, ctx);
     }
 
     <span class="comment">// Resolve all the attributes defined on the model itself **in isolation**.
@@ -1282,29 +1263,33 @@
     ctx.validate_visited_attributes();
 }
 
-<span class="kw">fn </span>visit_scalar_field_attributes&lt;<span class="lifetime">&#39;db</span>&gt;(
-    model_id: ast::ModelId,
-    field_id: ast::FieldId,
-    ast_model: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Model,
-    ast_field: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Field,
-    model_attributes: <span class="kw-2">&amp;mut </span>ModelAttributes,
-    scalar_field_data: <span class="kw-2">&amp;mut </span>ScalarField,
-    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;db</span>&gt;,
+<span class="kw">fn </span>visit_scalar_field_attributes(
+    scalar_field_id: ScalarFieldId,
+    model_data: <span class="kw-2">&amp;mut </span>ModelAttributes,
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) {
+    <span class="kw">let </span>ScalarField {
+        model_id,
+        field_id,
+        r#type,
+        ..
+    } = ctx.types[scalar_field_id];
+    <span class="kw">let </span>ast_model = <span class="kw-2">&amp;</span>ctx.ast[model_id];
+    <span class="kw">let </span>ast_field = <span class="kw-2">&amp;</span>ast_model[field_id];
     ctx.visit_scalar_field_attributes(model_id, field_id);
 
     <span class="comment">// @map
     </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;map&quot;</span>) {
-        map::scalar_field(ast_model, ast_field, model_id, field_id, scalar_field_data, ctx);
+        map::scalar_field(scalar_field_id, ast_model, ast_field, model_id, field_id, ctx);
         ctx.validate_visited_arguments();
     }
 
     <span class="comment">// @ignore
     </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;ignore&quot;</span>) {
-        <span class="kw">if </span><span class="macro">matches!</span>(scalar_field_data.r#type, ScalarFieldType::Unsupported(<span class="kw">_</span>)) {
+        <span class="kw">if </span><span class="macro">matches!</span>(r#type, ScalarFieldType::Unsupported(<span class="kw">_</span>)) {
             ctx.push_attribute_validation_error(<span class="string">&quot;Fields of type `Unsupported` cannot take an `@ignore` attribute. They are already treated as ignored by the client due to their type.&quot;</span>);
         } <span class="kw">else </span>{
-            scalar_field_data.is_ignored = <span class="bool-val">true</span>;
+            ctx.types[scalar_field_id].is_ignored = <span class="bool-val">true</span>;
         }
         ctx.validate_visited_arguments();
     }
@@ -1317,16 +1302,13 @@
 
     <span class="comment">// @id
     </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;id&quot;</span>) {
-        id::field(ast_model, field_id, model_attributes, ctx);
+        id::field(ast_model, scalar_field_id, field_id, model_data, ctx);
         ctx.validate_visited_arguments();
     }
 
     <span class="comment">// @updatedAt
     </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;updatedAt&quot;</span>) {
-        <span class="kw">if </span>!<span class="macro">matches!</span>(
-            scalar_field_data.r#type,
-            ScalarFieldType::BuiltInScalar(<span class="kw">crate</span>::ScalarType::DateTime)
-        ) {
+        <span class="kw">if </span>!<span class="macro">matches!</span>(r#type, ScalarFieldType::BuiltInScalar(<span class="kw">crate</span>::ScalarType::DateTime)) {
             ctx.push_attribute_validation_error(<span class="string">&quot;Fields that are marked with @updatedAt must be of type DateTime.&quot;</span>);
         }
 
@@ -1334,39 +1316,40 @@
             ctx.push_attribute_validation_error(<span class="string">&quot;Fields that are marked with @updatedAt cannot be lists.&quot;</span>);
         }
 
-        scalar_field_data.is_updated_at = <span class="bool-val">true</span>;
+        ctx.types[scalar_field_id].is_updated_at = <span class="bool-val">true</span>;
         ctx.validate_visited_arguments();
     }
 
     <span class="comment">// @default
     </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;default&quot;</span>) {
-        default::visit_model_field_default(scalar_field_data, model_id, field_id, ctx);
+        default::visit_model_field_default(scalar_field_id, model_id, field_id, r#type, ctx);
         ctx.validate_visited_arguments();
     }
 
-    <span class="kw">if let </span>ScalarFieldType::BuiltInScalar(_scalar_type) = scalar_field_data.r#type {
+    <span class="kw">if let </span>ScalarFieldType::BuiltInScalar(_scalar_type) = r#type {
         <span class="comment">// native type attributes
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>((datasource_name, type_name, attribute_id)) = ctx.visit_datasource_scoped() {
             <span class="kw">let </span>attribute = <span class="kw-2">&amp;</span>ctx.ast[attribute_id];
             native_types::visit_model_field_native_type_attribute(
+                scalar_field_id,
                 datasource_name,
                 type_name,
                 attribute,
-                scalar_field_data,
+                ctx,
             );
         }
     }
 
     <span class="comment">// @unique
     </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;unique&quot;</span>) {
-        visit_field_unique(field_id, model_attributes, ctx);
+        visit_field_unique(scalar_field_id, model_data, ctx);
         ctx.validate_visited_arguments();
     }
 
     ctx.validate_visited_attributes();
 }
 
-<span class="kw">fn </span>visit_field_unique(field_id: ast::FieldId, model_attributes: <span class="kw-2">&amp;mut </span>ModelAttributes, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+<span class="kw">fn </span>visit_field_unique(scalar_field_id: ScalarFieldId, model_data: <span class="kw-2">&amp;mut </span>ModelAttributes, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
     <span class="kw">let </span>mapped_name = <span class="kw">match </span>ctx
         .visit_optional_arg(<span class="string">&quot;map&quot;</span>)
         .and_then(|arg| coerce::string(arg, ctx.diagnostics))
@@ -1401,17 +1384,18 @@
 
     <span class="kw">let </span>clustered = validate_clustering_setting(ctx);
 
-    model_attributes.ast_indexes.push((
-        ctx.current_attribute_id(),
+    <span class="kw">let </span>attribute_id = ctx.current_attribute_id();
+    model_data.ast_indexes.push((
+        attribute_id,
         IndexAttribute {
             r#type: IndexType::Unique,
             fields: <span class="macro">vec!</span>[FieldWithArgs {
-                path: IndexFieldPath::new(field_id),
+                path: IndexFieldPath::new(scalar_field_id),
                 sort_order,
                 length,
                 operator_class: <span class="prelude-val">None</span>,
             }],
-            source_field: <span class="prelude-val">Some</span>(field_id),
+            source_field: <span class="prelude-val">Some</span>(scalar_field_id),
             mapped_name,
             clustered,
             ..Default::default()
@@ -1468,7 +1452,8 @@
         <span class="kw">let </span><span class="kw-2">mut </span>suggested_fields = Vec::new();
 
         <span class="kw">for </span>underlying_field <span class="kw">in </span>ctx.types[rfid].fields.iter().flatten() {
-            suggested_fields.push(ctx.ast[model_id][<span class="kw-2">*</span>underlying_field].name());
+            <span class="kw">let </span>ScalarField { model_id, field_id, .. } = ctx.types[<span class="kw-2">*</span>underlying_field];
+            suggested_fields.push(ctx.ast[model_id][field_id].name());
         }
 
         <span class="kw">let </span>suggestion = <span class="kw">match </span>suggested_fields.len() {
@@ -1500,11 +1485,11 @@
         .types
         .range_model_scalar_fields(model_id)
         .filter(|(<span class="kw">_</span>, sf)| sf.is_ignored)
-        .map(|(field_id, <span class="kw">_</span>)| {
+        .map(|(<span class="kw">_</span>, sf)| {
             DatamodelError::new_attribute_validation_error(
                 <span class="string">&quot;Fields on an already ignored Model do not need an `@ignore` annotation.&quot;</span>,
                 <span class="string">&quot;@ignore&quot;</span>,
-                ctx.ast[model_id][field_id].span(),
+                ctx.ast[sf.model_id][sf.field_id].span(),
             )
         })
         .collect();
@@ -1739,7 +1724,8 @@
                         .iter()
                         .flatten();
                     <span class="kw">for </span>underlying_field <span class="kw">in </span>fields {
-                        suggested_fields.push(ctx.ast[model_id][<span class="kw-2">*</span>underlying_field].name());
+                        <span class="kw">let </span>ScalarField { model_id, field_id, .. } = ctx.types[<span class="kw-2">*</span>underlying_field];
+                        suggested_fields.push(ctx.ast[model_id][field_id].name());
                     }
                 }
 
@@ -1923,7 +1909,7 @@
     attribute_span: ast::Span,
     model_id: ast::ModelId,
     ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;db</span>&gt;,
-) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;ast::FieldId&gt;, FieldResolutionError&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
+) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;ScalarFieldId&gt;, FieldResolutionError&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
     <span class="kw">let </span>constant_array = <span class="kw">match </span>coerce_array(values, <span class="kw-2">&amp;</span>coerce::constant, ctx.diagnostics) {
         <span class="prelude-val">Some</span>(values) =&gt; values,
         <span class="prelude-val">None </span>=&gt; {
@@ -1931,7 +1917,7 @@
         }
     };
 
-    <span class="kw">let </span><span class="kw-2">mut </span>field_ids = Vec::with_capacity(constant_array.len());
+    <span class="kw">let </span><span class="kw-2">mut </span>field_ids: Vec&lt;ScalarFieldId&gt; = Vec::with_capacity(constant_array.len());
     <span class="kw">let </span><span class="kw-2">mut </span>unknown_fields = Vec::new();
     <span class="kw">let </span><span class="kw-2">mut </span>relation_fields = Vec::new();
     <span class="kw">let </span>ast_model = <span class="kw-2">&amp;</span>ctx.ast[model_id];
@@ -1951,13 +1937,13 @@
         };
 
         <span class="comment">// Is the field a scalar field?
-        </span><span class="kw">if </span>!ctx.types.scalar_fields.contains_key(<span class="kw-2">&amp;</span>(model_id, field_id)) {
+        </span><span class="kw">let </span><span class="prelude-val">Some</span>(sfid) = ctx.types.find_model_scalar_field(model_id, field_id) <span class="kw">else</span>{
             relation_fields.push((<span class="kw-2">&amp;</span>ctx.ast[model_id][field_id], field_id));
             <span class="kw">continue</span>;
-        }
+        };
 
         <span class="comment">// Is the field used twice?
-        </span><span class="kw">if </span>field_ids.contains(<span class="kw-2">&amp;</span>field_id) {
+        </span><span class="kw">if </span>field_ids.contains(<span class="kw-2">&amp;</span>sfid) {
             ctx.push_error(DatamodelError::new_model_validation_error(
                 <span class="kw-2">&amp;</span><span class="macro">format!</span>(
                     <span class="string">&quot;The unique index definition refers to the field {} multiple times.&quot;</span>,
@@ -1970,7 +1956,7 @@
             <span class="kw">return </span><span class="prelude-val">Err</span>(FieldResolutionError::AlreadyDealtWith);
         }
 
-        field_ids.push(field_id);
+        field_ids.push(sfid);
     }
 
     <span class="kw">if </span>!unknown_fields.is_empty() || !relation_fields.is_empty() {
@@ -2036,13 +2022,13 @@
                         }
                     };
 
-                    <span class="kw">if </span>!ctx.types.scalar_fields.contains_key(<span class="kw-2">&amp;</span>(model_id, field_id)) {
+                    <span class="kw">let </span><span class="prelude-val">Some</span>(sfid) = ctx.types.find_model_scalar_field(model_id, field_id) <span class="kw">else </span>{
                         relation_fields.push((<span class="kw-2">&amp;</span>ctx.ast[model_id][field_id], field_id));
                         <span class="kw">continue </span><span class="lifetime">&#39;fields</span>;
-                    }
+                    };
 
-                    <span class="kw">match </span><span class="kw-2">&amp;</span>ctx.types.scalar_fields[<span class="kw-2">&amp;</span>(model_id, field_id)].r#type {
-                        ScalarFieldType::CompositeType(ctid) =&gt; (IndexFieldPath::new(field_id), <span class="kw-2">*</span>ctid),
+                    <span class="kw">match </span><span class="kw-2">&amp;</span>ctx.types[sfid].r#type {
+                        ScalarFieldType::CompositeType(ctid) =&gt; (IndexFieldPath::new(sfid), ctid),
                         <span class="kw">_ </span>=&gt; {
                             unknown_fields.push((ast::TopId::Model(model_id), attrs.field_name));
                             <span class="kw">continue </span><span class="lifetime">&#39;fields</span>;
@@ -2057,19 +2043,19 @@
             };
 
             <span class="kw">for </span>(i, field_shard) <span class="kw">in </span>path_in_schema {
-                <span class="kw">let </span>field_id = <span class="kw">match </span>ctx.find_composite_type_field(next_type, field_shard) {
+                <span class="kw">let </span>field_id = <span class="kw">match </span>ctx.find_composite_type_field(<span class="kw-2">*</span>next_type, field_shard) {
                     <span class="prelude-val">Some</span>(field_id) =&gt; field_id,
                     <span class="prelude-val">None </span>=&gt; {
-                        unknown_fields.push((ast::TopId::CompositeType(next_type), field_shard));
+                        unknown_fields.push((ast::TopId::CompositeType(<span class="kw-2">*</span>next_type), field_shard));
                         <span class="kw">continue </span><span class="lifetime">&#39;fields</span>;
                     }
                 };
 
-                path.push_field(next_type, field_id);
+                path.push_field(<span class="kw-2">*</span>next_type, field_id);
 
-                <span class="kw">match </span><span class="kw-2">&amp;</span>ctx.types.composite_type_fields[<span class="kw-2">&amp;</span>(next_type, field_id)].r#type {
+                <span class="kw">match </span><span class="kw-2">&amp;</span>ctx.types.composite_type_fields[<span class="kw-2">&amp;</span>(<span class="kw-2">*</span>next_type, field_id)].r#type {
                     ScalarFieldType::CompositeType(ctid) =&gt; {
-                        next_type = <span class="kw-2">*</span>ctid;
+                        next_type = ctid;
                     }
                     <span class="kw">_ if </span>i &lt; field_count - <span class="number">1 </span>=&gt; {
                         unknown_fields.push((ast::TopId::Model(model_id), attrs.field_name));
@@ -2082,11 +2068,12 @@
             path
         } <span class="kw">else if let </span><span class="prelude-val">Some</span>(field_id) = ctx.find_model_field(model_id, attrs.field_name) {
             <span class="comment">// Is the field a scalar field?
-            </span><span class="kw">if </span>!ctx.types.scalar_fields.contains_key(<span class="kw-2">&amp;</span>(model_id, field_id)) {
-                relation_fields.push((<span class="kw-2">&amp;</span>ctx.ast[model_id][field_id], field_id));
-                <span class="kw">continue</span>;
-            } <span class="kw">else </span>{
-                IndexFieldPath::new(field_id)
+            </span><span class="kw">match </span>ctx.types.find_model_scalar_field(model_id, field_id) {
+                <span class="prelude-val">Some</span>(sfid) =&gt; IndexFieldPath::new(sfid),
+                <span class="prelude-val">None </span>=&gt; {
+                    relation_fields.push((<span class="kw-2">&amp;</span>ctx.ast[model_id][field_id], field_id));
+                    <span class="kw">continue</span>;
+                }
             }
         } <span class="kw">else </span>{
             unknown_fields.push((ast::TopId::Model(model_id), attrs.field_name));
@@ -2095,10 +2082,9 @@
 
         <span class="comment">// Is the field used twice?
         </span><span class="kw">if </span>field_ids.contains(<span class="kw-2">&amp;</span>path) {
-            <span class="kw">let </span>path_str = <span class="kw">match </span>path.type_holding_the_indexed_field() {
-                <span class="prelude-val">None </span>=&gt; Cow::from(attrs.field_name),
-                <span class="prelude-val">Some</span>(ctid) =&gt; {
-                    <span class="kw">let </span>field_id = path.field_in_index();
+            <span class="kw">let </span>path_str = <span class="kw">match </span>path.field_in_index() {
+                either::Either::Left(<span class="kw">_</span>) =&gt; Cow::from(attrs.field_name),
+                either::Either::Right((ctid, field_id)) =&gt; {
                     <span class="kw">let </span>field_name = <span class="kw-2">&amp;</span>ctx.ast[ctid][field_id].name();
                     <span class="kw">let </span>composite_type = <span class="kw-2">&amp;</span>ctx.ast[ctid].name();
 

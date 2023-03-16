@@ -285,8 +285,7 @@
     model: <span class="kw-2">&amp;</span>ModelRef,
     include_aggregates: bool,
 ) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>aggregate = <span class="kw">if </span>include_aggregates { <span class="string">&quot;WithAggregates&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
-    <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}ScalarWhere{}Input&quot;</span>, model.name(), aggregate));
+    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::ScalarFilterInput(model.clone(), include_aggregates));
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span><span class="kw-2">mut </span>input_object = init_input_object_type(ident.clone());
@@ -328,8 +327,8 @@
 <span class="kw">where
     </span>T: Into&lt;ParentContainer&gt;,
 {
-    <span class="kw">let </span>container = container.into();
-    <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}WhereInput&quot;</span>, container.name()));
+    <span class="kw">let </span>container: ParentContainer = container.into();
+    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::WhereInput(container.clone()));
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span><span class="kw-2">mut </span>input_object = init_input_object_type(ident.clone());
@@ -369,7 +368,8 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>where_unique_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}WhereUniqueInput&quot;</span>, model.name()));
+    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::WhereUniqueInput(model.clone()));
+
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="comment">// Split unique &amp; ID fields vs all the other fields

@@ -174,30 +174,6 @@
 <a href="#174" id="174">174</a>
 <a href="#175" id="175">175</a>
 <a href="#176" id="176">176</a>
-<a href="#177" id="177">177</a>
-<a href="#178" id="178">178</a>
-<a href="#179" id="179">179</a>
-<a href="#180" id="180">180</a>
-<a href="#181" id="181">181</a>
-<a href="#182" id="182">182</a>
-<a href="#183" id="183">183</a>
-<a href="#184" id="184">184</a>
-<a href="#185" id="185">185</a>
-<a href="#186" id="186">186</a>
-<a href="#187" id="187">187</a>
-<a href="#188" id="188">188</a>
-<a href="#189" id="189">189</a>
-<a href="#190" id="190">190</a>
-<a href="#191" id="191">191</a>
-<a href="#192" id="192">192</a>
-<a href="#193" id="193">193</a>
-<a href="#194" id="194">194</a>
-<a href="#195" id="195">195</a>
-<a href="#196" id="196">196</a>
-<a href="#197" id="197">197</a>
-<a href="#198" id="198">198</a>
-<a href="#199" id="199">199</a>
-<a href="#200" id="200">200</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::constants::<span class="kw-2">*</span>;
 <span class="kw">use </span>prisma_models::CompositeFieldRef;
@@ -237,7 +213,7 @@
 
     <span class="kw">fn </span>map_scalar_list(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; InputField {
         <span class="kw">let </span>typ = map_scalar_input_type_for_field(ctx, sf);
-        <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}Create{}Input&quot;</span>, sf.container().name(), sf.name()));
+        <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::CreateOneScalarList(sf.clone()));
 
         <span class="kw">let </span>input_object = <span class="kw">match </span>ctx.get_input_type(<span class="kw-2">&amp;</span>ident) {
             <span class="prelude-val">Some</span>(cached) =&gt; cached,
@@ -260,20 +236,7 @@
     }
 
     <span class="kw">fn </span>map_relation(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputField {
-        <span class="kw">let </span>related_model = rf.related_model();
-        <span class="kw">let </span>related_field = rf.related_field();
-
-        <span class="comment">// Compute input object name
-        </span><span class="kw">let </span>arity_part = <span class="kw">if </span>rf.is_list() { <span class="string">&quot;NestedMany&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;NestedOne&quot; </span>};
-        <span class="kw">let </span>without_part = <span class="macro">format!</span>(<span class="string">&quot;Without{}&quot;</span>, capitalize(related_field.name()));
-        <span class="kw">let </span>unchecked_part = <span class="kw">if </span><span class="self">self</span>.unchecked { <span class="string">&quot;Unchecked&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
-        <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(
-            <span class="string">&quot;{}{}Create{}{}Input&quot;</span>,
-            related_model.name(),
-            unchecked_part,
-            arity_part,
-            without_part
-        ));
+        <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::RelationCreateInput(rf.clone(), <span class="self">self</span>.unchecked));
 
         <span class="kw">let </span>input_object = <span class="kw">match </span>ctx.get_input_type(<span class="kw-2">&amp;</span>ident) {
             <span class="prelude-val">Some</span>(t) =&gt; t,
@@ -343,17 +306,7 @@
 /// }
 /// ```
 </span><span class="kw">fn </span>composite_create_envelope_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>arity = <span class="kw">if </span>cf.is_optional() {
-        <span class="string">&quot;Nullable&quot;
-    </span>} <span class="kw">else if </span>cf.is_list() {
-        <span class="string">&quot;List&quot;
-    </span>} <span class="kw">else </span>{
-        <span class="string">&quot;&quot;
-    </span>};
-
-    <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}{}CreateEnvelopeInput&quot;</span>, cf.typ().name(), arity);
-
-    <span class="kw">let </span>ident = Identifier::new_prisma(name);
+    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::CompositeCreateEnvelopeInput(cf.clone()));
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span><span class="kw-2">mut </span>input_object = init_input_object_type(ident.clone());
@@ -382,9 +335,8 @@
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>composite_create_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
     <span class="comment">// It&#39;s called &quot;Create&quot; input because it&#39;s used across multiple create-type operations, not only &quot;set&quot;.
-    </span><span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}CreateInput&quot;</span>, cf.typ().name());
+    </span><span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::CompositeCreateInput(cf.clone()));
 
-    <span class="kw">let </span>ident = Identifier::new_prisma(name);
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));

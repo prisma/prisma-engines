@@ -122,12 +122,13 @@
 <a href="#122" id="122">122</a>
 <a href="#123" id="123">123</a>
 <a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::{<span class="self">self</span>, WithName, WithSpan},
     coerce,
     context::Context,
-    types::{CompositeTypeField, ModelAttributes, ScalarField},
-    DatamodelError, StringId,
+    types::ModelAttributes,
+    DatamodelError, ScalarFieldId, StringId,
 };
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>model(model_attributes: <span class="kw-2">&amp;mut </span>ModelAttributes, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
@@ -140,11 +141,11 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>scalar_field(
+    sfid: ScalarFieldId,
     ast_model: <span class="kw-2">&amp;</span>ast::Model,
     ast_field: <span class="kw-2">&amp;</span>ast::Field,
     model_id: ast::ModelId,
     field_id: ast::FieldId,
-    scalar_field_data: <span class="kw-2">&amp;mut </span>ScalarField,
     ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) {
     <span class="kw">let </span>mapped_name = <span class="kw">match </span>visit_map_attribute(ctx) {
@@ -152,7 +153,7 @@
         <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
     };
 
-    scalar_field_data.mapped_name = <span class="prelude-val">Some</span>(mapped_name);
+    ctx.types[sfid].mapped_name = <span class="prelude-val">Some</span>(mapped_name);
 
     <span class="kw">if </span>ctx
         .mapped_model_scalar_field_names
@@ -168,25 +169,24 @@
     }
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(field_id) = ctx.names.model_fields.get(<span class="kw-2">&amp;</span>(model_id, mapped_name)) {
-        <span class="comment">// @map only conflicts with _scalar_ fields
-        </span><span class="kw">if </span>!ctx.types.scalar_fields.contains_key(<span class="kw-2">&amp;</span>(model_id, <span class="kw-2">*</span>field_id)) {
-            <span class="kw">return</span>;
-        }
-
         <span class="kw">match </span>ctx
             .types
-            .scalar_fields
-            .get(<span class="kw-2">&amp;</span>(model_id, <span class="kw-2">*</span>field_id))
-            .and_then(|sf| sf.mapped_name)
+            .range_model_scalar_fields(model_id)
+            .find(|(<span class="kw">_</span>, sf)| sf.field_id == <span class="kw-2">*</span>field_id)
+            .map(|(<span class="kw">_</span>, sf)| sf.mapped_name)
         {
-            <span class="prelude-val">Some</span>(name) <span class="kw">if </span>name != mapped_name =&gt; {}
-            <span class="kw">_ </span>=&gt; ctx.push_error(DatamodelError::new_duplicate_field_error(
-                ast_model.name(),
-                ast_field.name(),
-                <span class="kw">if </span>ast_model.is_view() { <span class="string">&quot;view&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;model&quot; </span>},
-                ast_field.span(),
-            )),
+            <span class="comment">// @map only conflicts with _scalar_ fields
+            </span><span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
+            <span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>(sf_mapped_name)) <span class="kw">if </span>sf_mapped_name != mapped_name =&gt; <span class="kw">return</span>,
+            <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {}
         }
+
+        ctx.push_error(DatamodelError::new_duplicate_field_error(
+            ast_model.name(),
+            ast_field.name(),
+            <span class="kw">if </span>ast_model.is_view() { <span class="string">&quot;view&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;model&quot; </span>},
+            ast_field.span(),
+        ))
     }
 }
 
@@ -195,7 +195,6 @@
     ast_field: <span class="kw-2">&amp;</span>ast::Field,
     ctid: ast::CompositeTypeId,
     field_id: ast::FieldId,
-    field: <span class="kw-2">&amp;mut </span>CompositeTypeField,
     ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) {
     <span class="kw">let </span>mapped_name_id = <span class="kw">match </span>visit_map_attribute(ctx) {
@@ -203,7 +202,10 @@
         <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
     };
 
-    field.mapped_name = <span class="prelude-val">Some</span>(mapped_name_id);
+    {
+        <span class="kw">let </span><span class="kw-2">mut </span>field = ctx.types.composite_type_fields.get_mut(<span class="kw-2">&amp;</span>(ctid, field_id)).unwrap();
+        field.mapped_name = <span class="prelude-val">Some</span>(mapped_name_id);
+    }
 
     <span class="kw">if </span>ctx
         .mapped_composite_type_names

@@ -138,10 +138,6 @@
 <a href="#138" id="138">138</a>
 <a href="#139" id="139">139</a>
 <a href="#140" id="140">140</a>
-<a href="#141" id="141">141</a>
-<a href="#142" id="142">142</a>
-<a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Convenient access to a datamodel as understood by ParserDatabase.
 //!
 //! The walkers:
@@ -248,14 +244,10 @@
         <span class="self">self</span>.types
             .unknown_function_defaults
             .iter()
-            .map(|(model_id, field_id)| DefaultValueWalker {
-                model_id: <span class="kw-2">*</span>model_id,
-                field_id: <span class="kw-2">*</span>field_id,
+            .map(|id| DefaultValueWalker {
+                field_id: <span class="kw-2">*</span>id,
                 db: <span class="self">self</span>,
-                default: <span class="self">self</span>.types.scalar_fields[<span class="kw-2">&amp;</span>(<span class="kw-2">*</span>model_id, <span class="kw-2">*</span>field_id)]
-                    .default
-                    .as_ref()
-                    .unwrap(),
+                default: <span class="self">self</span>.types[<span class="kw-2">*</span>id].default.as_ref().unwrap(),
             })
     }
 

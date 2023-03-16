@@ -528,6 +528,10 @@
 <a href="#528" id="528">528</a>
 <a href="#529" id="529">529</a>
 <a href="#530" id="530">530</a>
+<a href="#531" id="531">531</a>
+<a href="#532" id="532">532</a>
+<a href="#533" id="533">533</a>
+<a href="#534" id="534">534</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::{<span class="self">self</span>, WithName},
     interner::StringId,
@@ -895,8 +899,12 @@
                             .ast_indexes
                             .iter()
                             .any(|(<span class="kw">_</span>, idx)| {
-                                idx.is_unique()
-                                    &amp;&amp; <span class="kw-2">&amp;</span>idx.fields.iter().map(|f| f.path.field_in_index()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;() == fields
+                                idx.is_unique() &amp;&amp; idx.fields.len() == fields.len() &amp;&amp; {
+                                    idx.fields
+                                        .iter()
+                                        .zip(fields.iter())
+                                        .all(|(idx_field, field)| <span class="macro">matches!</span>(idx_field.path.field_in_index(), either::Either::Left(id) <span class="kw">if </span>id == <span class="kw-2">*</span>field))
+                                }
                             });
                     <span class="kw">if </span>fields_are_unique {
                         RelationAttributes::OneToOne(OneToOneRelationFields::Forward(evidence.field_id))

@@ -81,6 +81,7 @@
 <a href="#81" id="81">81</a>
 <a href="#82" id="82">82</a>
 <a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
 <span class="attr">#[derive(Debug)]
@@ -101,11 +102,12 @@
 <span class="kw">impl </span>GqlObjectRenderer {
     <span class="kw">fn </span>render_input_object(<span class="kw-2">&amp;</span><span class="self">self</span>, input_object: <span class="kw-2">&amp;</span>InputObjectTypeWeakRef, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
         <span class="kw">let </span>input_object = input_object.into_arc();
-        <span class="kw">if </span>ctx.already_rendered(input_object.identifier.name()) {
+
+        <span class="kw">if </span>ctx.already_rendered(<span class="kw-2">&amp;</span>input_object.identifier.name()) {
             <span class="kw">return </span><span class="string">&quot;&quot;</span>.into();
         } <span class="kw">else </span>{
             <span class="comment">// This short circuits recursive processing for fields.
-            </span>ctx.mark_as_rendered(input_object.identifier.name().to_owned())
+            </span>ctx.mark_as_rendered(input_object.identifier.name())
         }
 
         <span class="kw">let </span>fields = input_object.get_fields();
@@ -126,7 +128,7 @@
             indented.join(<span class="string">&quot;\n&quot;</span>)
         );
 
-        ctx.add(input_object.identifier.name().to_owned(), rendered.clone());
+        ctx.add(input_object.identifier.name(), rendered.clone());
 
         rendered
     }
@@ -134,11 +136,11 @@
     <span class="kw">fn </span>render_output_object(<span class="kw-2">&amp;</span><span class="self">self</span>, output_object: <span class="kw-2">&amp;</span>ObjectTypeWeakRef, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
         <span class="kw">let </span>output_object = output_object.into_arc();
 
-        <span class="kw">if </span>ctx.already_rendered(output_object.identifier.name()) {
+        <span class="kw">if </span>ctx.already_rendered(<span class="kw-2">&amp;</span>output_object.identifier.name()) {
             <span class="kw">return </span><span class="string">&quot;&quot;</span>.into();
         } <span class="kw">else </span>{
             <span class="comment">// This short circuits recursive processing for fields.
-            </span>ctx.mark_as_rendered(output_object.identifier.name().to_string())
+            </span>ctx.mark_as_rendered(output_object.identifier.name())
         }
 
         <span class="kw">let </span>fields = output_object.get_fields();

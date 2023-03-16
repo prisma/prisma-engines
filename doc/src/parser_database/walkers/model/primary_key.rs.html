@@ -101,12 +101,11 @@
 <a href="#101" id="101">101</a>
 <a href="#102" id="102">102</a>
 <a href="#103" id="103">103</a>
-<a href="#104" id="104">104</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     ast,
     types::IdAttribute,
-    walkers::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldId, ScalarFieldWalker},
-    ParserDatabase,
+    walkers::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
+    ParserDatabase, ScalarFieldId,
 };
 
 <span class="doccomment">/// An `@(@)id` attribute in the schema.
@@ -170,10 +169,10 @@
 
     <span class="doccomment">/// The scalar fields constrained by the id.
     </span><span class="kw">pub fn </span>fields(<span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; + <span class="lifetime">&#39;db </span>{
-        <span class="self">self</span>.attribute.fields.iter().map(<span class="kw">move </span>|field| {
-            <span class="kw">let </span>field_id = field.path.field_in_index();
-            <span class="self">self</span>.db.walk(ScalarFieldId(<span class="self">self</span>.model_id, field_id))
-        })
+        <span class="self">self</span>.attribute
+            .fields
+            .iter()
+            .map(<span class="kw">move </span>|field| <span class="self">self</span>.db.walk(field.path.root()))
     }
 
     <span class="doccomment">/// The scalar fields covered by the id, and their arguments.
@@ -183,7 +182,6 @@
             .iter()
             .enumerate()
             .map(<span class="kw">move </span>|(field_arg_id, <span class="kw">_</span>)| ScalarFieldAttributeWalker {
-                model_id: <span class="self">self</span>.model_id,
                 fields: <span class="kw-2">&amp;</span><span class="self">self</span>.attribute.fields,
                 db: <span class="self">self</span>.db,
                 field_arg_id,
@@ -191,14 +189,14 @@
     }
 
     <span class="doccomment">/// Do the constrained fields match exactly these?
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>contains_exactly_fields_by_id(<span class="self">self</span>, fields: <span class="kw-2">&amp;</span>[ast::FieldId]) -&gt; bool {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>contains_exactly_fields_by_id(<span class="self">self</span>, fields: <span class="kw-2">&amp;</span>[ScalarFieldId]) -&gt; bool {
         <span class="self">self</span>.attribute.fields.len() == fields.len()
             &amp;&amp; <span class="self">self
                 </span>.attribute
                 .fields
                 .iter()
                 .zip(fields)
-                .all(|(a, b)| a.path.field_in_index() == <span class="kw-2">*</span>b)
+                .all(|(a, b)| <span class="macro">matches!</span>(a.path.field_in_index(), either::Either::Left(id)  <span class="kw">if </span>id == <span class="kw-2">*</span>b))
     }
 
     <span class="doccomment">/// Do the constrained fields match exactly these?
