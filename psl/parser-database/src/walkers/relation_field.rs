@@ -98,11 +98,10 @@ impl<'db> RelationFieldWalker<'db> {
 
     /// The fields in the `@relation(references: ...)` argument.
     pub fn referenced_fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'db>>> {
-        self.attributes().references.as_ref().map(|references| {
-            references
-                .iter()
-                .map(move |field_id| self.walk(ScalarFieldId(self.related_model().id, *field_id)))
-        })
+        self.attributes()
+            .references
+            .as_ref()
+            .map(|references| references.iter().map(move |field_id| self.walk(*field_id)))
     }
 
     /// The relation this field is part of.
@@ -157,11 +156,10 @@ impl<'db> RelationFieldWalker<'db> {
     /// The fields in the `fields: [...]` argument in the forward relation field.
     pub fn fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'db>> + Clone> {
         let attributes = &self.db.types[self.id];
-        attributes.fields.as_ref().map(move |fields| {
-            fields
-                .iter()
-                .map(move |field_id| self.db.walk(super::ScalarFieldId(attributes.model_id, *field_id)))
-        })
+        attributes
+            .fields
+            .as_ref()
+            .map(move |fields| fields.iter().map(move |field_id| self.db.walk(*field_id)))
     }
 }
 

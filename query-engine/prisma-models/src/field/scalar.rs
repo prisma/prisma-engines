@@ -8,7 +8,7 @@ pub type ScalarFieldRef = ScalarField;
 
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 pub enum ScalarFieldId {
-    InModel(walkers::ScalarFieldId),
+    InModel(psl::parser_database::ScalarFieldId),
     InCompositeType((ast::CompositeTypeId, ast::FieldId)),
 }
 

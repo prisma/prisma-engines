@@ -104,14 +104,10 @@ impl crate::ParserDatabase {
         self.types
             .unknown_function_defaults
             .iter()
-            .map(|(model_id, field_id)| DefaultValueWalker {
-                model_id: *model_id,
-                field_id: *field_id,
+            .map(|id| DefaultValueWalker {
+                field_id: *id,
                 db: self,
-                default: self.types.scalar_fields[&(*model_id, *field_id)]
-                    .default
-                    .as_ref()
-                    .unwrap(),
+                default: self.types[*id].default.as_ref().unwrap(),
             })
     }
 

@@ -6,7 +6,8 @@ use crate::relation_info::RelationInfo;
 use crate::scalars::ScalarType;
 use crate::traits::{WithDatabaseName, WithName};
 use crate::FieldArity;
-use psl_core::{parser_database::walkers::ScalarFieldId, schema_ast::ast};
+use psl_core::parser_database::ScalarFieldId;
+use psl_core::schema_ast::ast;
 
 /// Datamodel field type.
 #[derive(Debug, PartialEq, Clone)]

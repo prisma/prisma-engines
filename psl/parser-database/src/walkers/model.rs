@@ -89,22 +89,6 @@ impl<'db> ModelWalker<'db> {
             .unwrap_or_else(|| self.db.ast[self.id].name())
     }
 
-    /// Get the database name of the scalar field.
-    pub fn get_field_database_name(self, field_id: ast::FieldId) -> &'db str {
-        self.db.types.scalar_fields[&(self.id, field_id)]
-            .mapped_name
-            .map(|id| &self.db[id])
-            .unwrap_or_else(|| self.db.ast[self.id][field_id].name())
-    }
-
-    /// Get the database names of the constrained scalar fields.
-    #[allow(clippy::unnecessary_lazy_evaluations)] // respectfully disagree
-    pub fn get_field_database_names(self, fields: &'db [ast::FieldId]) -> impl Iterator<Item = &'db str> {
-        fields
-            .iter()
-            .map(move |&field_id| self.get_field_database_name(field_id))
-    }
-
     /// Used in validation. True only if the model has a single field id.
     pub fn has_single_id_field(self) -> bool {
         matches!(&self.attributes().primary_key, Some(pk) if pk.fields.len() == 1)
@@ -126,34 +110,27 @@ impl<'db> ModelWalker<'db> {
 
     /// Iterate all the scalar fields in a given model in the order they were defined.
     pub fn scalar_fields(self) -> impl Iterator<Item = ScalarFieldWalker<'db>> {
-        let db = self.db;
-        db.types
-            .scalar_fields
-            .range((self.id, ast::FieldId::MIN)..=(self.id, ast::FieldId::MAX))
-            .map(move |((model_id, field_id), _)| self.walk(super::ScalarFieldId(*model_id, *field_id)))
+        self.db
+            .types
+            .range_model_scalar_fields(self.id)
+            .map(move |(id, _)| self.walk(id))
     }
 
     /// All unique criterias of the model; consisting of the primary key and
     /// unique indexes, if set.
     pub fn unique_criterias(self) -> impl Iterator<Item = UniqueCriteriaWalker<'db>> {
-        let model_id = self.id;
         let db = self.db;
 
         let from_pk = self
             .attributes()
             .primary_key
             .iter()
-            .map(move |pk| UniqueCriteriaWalker {
-                model_id,
-                fields: &pk.fields,
-                db,
-            });
+            .map(move |pk| UniqueCriteriaWalker { fields: &pk.fields, db });
 
         let from_indices = self
             .indexes()
             .filter(|walker| walker.attribute().is_unique())
             .map(move |walker| UniqueCriteriaWalker {
-                model_id,
                 fields: &walker.attribute().fields,
                 db,
             });

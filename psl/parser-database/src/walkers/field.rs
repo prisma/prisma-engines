@@ -1,5 +1,8 @@
 use super::{CompositeTypeFieldWalker, ModelWalker, RelationFieldWalker, ScalarFieldWalker, Walker};
-use crate::{types::RelationField, ScalarType};
+use crate::{
+    types::{RelationField, ScalarField},
+    ScalarType,
+};
 use schema_ast::ast;
 
 /// A model field, scalar or relation.
@@ -41,9 +44,10 @@ pub enum RefinedFieldWalker<'db> {
 
 impl<'db> From<ScalarFieldWalker<'db>> for FieldWalker<'db> {
     fn from(w: ScalarFieldWalker<'db>) -> Self {
+        let ScalarField { model_id, field_id, .. } = w.db.types[w.id];
         Walker {
             db: w.db,
-            id: (w.id.0, w.id.1),
+            id: (model_id, field_id),
         }
     }
 }
