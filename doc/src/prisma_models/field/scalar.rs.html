@@ -181,7 +181,6 @@
 <a href="#181" id="181">181</a>
 <a href="#182" id="182">182</a>
 <a href="#183" id="183">183</a>
-<a href="#184" id="184">184</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{ast, parent_container::ParentContainer, prelude::<span class="kw-2">*</span>};
 <span class="kw">use </span>dml::{FieldArity, NativeTypeInstance};
 <span class="kw">use </span>psl::parser_database::{walkers, ScalarFieldType};
@@ -189,7 +188,6 @@
 
 <span class="kw">pub type </span>ScalarField = <span class="kw">crate</span>::Zipper&lt;ScalarFieldId&gt;;
 <span class="kw">pub type </span>ScalarFieldRef = ScalarField;
-<span class="kw">pub type </span>ScalarFieldWeak = ScalarField;
 
 <span class="attr">#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 </span><span class="kw">pub enum </span>ScalarFieldId {

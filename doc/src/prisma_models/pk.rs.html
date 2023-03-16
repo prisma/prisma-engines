@@ -9,18 +9,14 @@
 <a href="#9" id="9">9</a>
 <a href="#10" id="10">10</a>
 <a href="#11" id="11">11</a>
-<a href="#12" id="12">12</a>
-<a href="#13" id="13">13</a>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{ScalarFieldRef, ScalarFieldWeak};
-
-<span class="attr">#[derive(Debug, Clone)]
+</pre><pre class="rust"><code><span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>PrimaryKey {
     <span class="kw">pub </span>alias: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) fields: Vec&lt;ScalarFieldWeak&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) fields: Vec&lt;<span class="kw">crate</span>::ScalarField&gt;,
 }
 
 <span class="kw">impl </span>PrimaryKey {
-    <span class="kw">pub fn </span>fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ScalarFieldRef&gt; {
+    <span class="kw">pub fn </span>fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;<span class="kw">crate</span>::ScalarField&gt; {
         <span class="self">self</span>.fields.clone()
     }
 }

@@ -303,8 +303,8 @@
 <a href="#303" id="303">303</a>
 <a href="#304" id="304">304</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
-    parent_container::ParentContainer, CompositeFieldRef, DomainError, Field, PrismaValueExtensions, ScalarFieldRef,
-    SelectionResult,
+    parent_container::ParentContainer, prisma_value_ext::PrismaValueExtensions, CompositeFieldRef, DomainError, Field,
+    ScalarFieldRef, SelectionResult,
 };
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>prisma_value::PrismaValue;
@@ -381,7 +381,7 @@
                 SelectedField::Scalar(sf) =&gt; <span class="prelude-val">Some</span>(sf.clone()),
                 SelectedField::Composite(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
             })
-            .collect_vec();
+            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
         <span class="kw">if </span>scalar_fields.len() == <span class="self">self</span>.selections.len() {
             <span class="prelude-val">Some</span>(scalar_fields)
@@ -483,7 +483,7 @@
     }
 
     <span class="doccomment">/// Coerces a value to fit the selection. If the conversion is not possible, an error will be thrown.
-    </span><span class="kw">pub fn </span>coerce_value(<span class="kw-2">&amp;</span><span class="self">self</span>, value: PrismaValue) -&gt; <span class="kw">crate</span>::Result&lt;PrismaValue&gt; {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>coerce_value(<span class="kw-2">&amp;</span><span class="self">self</span>, value: PrismaValue) -&gt; <span class="kw">crate</span>::Result&lt;PrismaValue&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             SelectedField::Scalar(sf) =&gt; value.coerce(<span class="kw-2">&amp;</span>sf.type_identifier()),
             SelectedField::Composite(cs) =&gt; cs.coerce_value(value),

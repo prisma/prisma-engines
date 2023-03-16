@@ -62,7 +62,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::DomainError;
 <span class="kw">use </span>bigdecimal::ToPrimitive;
 
-<span class="kw">pub trait </span>PrismaValueExtensions {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>PrismaValueExtensions {
     <span class="kw">fn </span>coerce(<span class="self">self</span>, to_type: <span class="kw-2">&amp;</span>TypeIdentifier) -&gt; <span class="kw">crate</span>::Result&lt;PrismaValue&gt;;
 }
 

@@ -70,7 +70,6 @@
 <a href="#70" id="70">70</a>
 <a href="#71" id="71">71</a>
 <a href="#72" id="72">72</a>
-<a href="#73" id="73">73</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{parent_container::ParentContainer, CompositeType};
 <span class="kw">use </span>dml::FieldArity;
 <span class="kw">use </span>psl::{parser_database::walkers, schema_ast::ast};
@@ -84,7 +83,6 @@
 
 <span class="kw">pub type </span>CompositeField = <span class="kw">crate</span>::Zipper&lt;CompositeFieldId&gt;;
 <span class="kw">pub type </span>CompositeFieldRef = CompositeField;
-<span class="kw">pub type </span>CompositeFieldWeak = CompositeField;
 
 <span class="kw">impl </span>CompositeField {
     <span class="kw">fn </span>arity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FieldArity {
