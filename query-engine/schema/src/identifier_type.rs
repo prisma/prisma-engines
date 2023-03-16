@@ -1,4 +1,4 @@
-use crate::capitalize;
+use crate::{capitalize, scalar_filter_name};
 
 use prisma_models::{prelude::*, *};
 
@@ -308,12 +308,4 @@ impl From<&str> for IdentifierType {
     fn from(value: &str) -> Self {
         Self::Raw(value.to_owned())
     }
-}
-
-fn scalar_filter_name(typ: &str, list: bool, nullable: bool, nested: bool, include_aggregates: bool) -> String {
-    let list = if list { "List" } else { "" };
-    let nullable = if nullable { "Nullable" } else { "" };
-    let nested = if nested { "Nested" } else { "" };
-    let aggregates = if include_aggregates { "WithAggregates" } else { "" };
-    format!("{nested}{typ}{nullable}{list}{aggregates}Filter")
 }
