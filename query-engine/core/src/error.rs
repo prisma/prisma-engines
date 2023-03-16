@@ -1,11 +1,9 @@
-use crate::{
-    InterpreterError, QueryGraphBuilderError, QueryGraphError, QueryParserError, RelationViolation, TransactionError,
-};
+use crate::{InterpreterError, QueryGraphBuilderError, QueryGraphError, RelationViolation, TransactionError};
 use bigdecimal::BigDecimal;
 use connector::error::ConnectorError;
 use prisma_models::DomainError;
 use thiserror::Error;
-use user_facing_errors::UnknownError;
+use user_facing_errors::{query_engine::validation::ValidationError, UnknownError};
 
 #[derive(Debug, Error)]
 #[error(
@@ -44,7 +42,7 @@ pub enum CoreError {
     DomainError(DomainError),
 
     #[error("{0}")]
-    QueryParserError(QueryParserError),
+    QueryParserError(ValidationError),
 
     #[error("Unsupported feature: {}", _0)]
     UnsupportedFeatureError(String),
@@ -123,8 +121,8 @@ impl From<DomainError> for CoreError {
     }
 }
 
-impl From<QueryParserError> for CoreError {
-    fn from(e: QueryParserError) -> CoreError {
+impl From<ValidationError> for CoreError {
+    fn from(e: ValidationError) -> CoreError {
         CoreError::QueryParserError(e)
     }
 }
@@ -166,23 +164,9 @@ impl From<CoreError> for user_facing_errors::Error {
                 ..
             })) => user_facing_error.into(),
 
-            // legacy query validation errors. This block should go away
-            CoreError::QueryParserError(QueryParserError::Legacy { path, error_kind })
-            | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(QueryParserError::Legacy {
-                path,
-                error_kind,
-            })) => user_facing_errors::KnownError::new(
-                user_facing_errors::query_engine::validation::LegacyQueryValidationFailed {
-                    query_validation_error: format!("{}", error_kind),
-                    query_position: format!("{}", path),
-                },
-            )
-            .into(),
-
-            // TODO. Once legacy is removed, promote this
-            CoreError::QueryParserError(e)
-            | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(e)) => {
-                e.into_user_facing_error()
+            CoreError::QueryParserError(err)
+            | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(err)) => {
+                user_facing_errors::Error::from(err)
             }
 
             CoreError::QueryGraphBuilderError(QueryGraphBuilderError::MissingRequiredArgument {

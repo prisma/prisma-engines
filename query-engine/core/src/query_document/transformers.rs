@@ -12,7 +12,7 @@ use std::convert::TryInto;
 use user_facing_errors::query_engine::validation::ValidationError;
 
 impl TryFrom<ParsedInputValue> for PrismaValue {
-    type Error = QueryParserError;
+    type Error = ValidationError;
 
     fn try_from(value: ParsedInputValue) -> QueryParserResult<PrismaValue> {
         match value {
@@ -31,28 +31,26 @@ impl TryFrom<ParsedInputValue> for PrismaValue {
 
             v => Err(ValidationError::unexpected_runtime_error(format!(
                 "Attempted conversion of ParsedInputValue ({v:?}) into PrismaValue failed."
-            ))
-            .into()),
+            ))),
         }
     }
 }
 
 impl TryFrom<ParsedInputValue> for ParsedInputMap {
-    type Error = QueryParserError;
+    type Error = ValidationError;
 
     fn try_from(value: ParsedInputValue) -> QueryParserResult<ParsedInputMap> {
         match value {
             ParsedInputValue::Map(val) => Ok(val),
             v => Err(ValidationError::unexpected_runtime_error(format!(
                 "Attempted conversion of non-map ParsedInputValue ({v:?}) into map failed."
-            ))
-            .into()),
+            ))),
         }
     }
 }
 
 impl TryFrom<ParsedInputValue> for Option<ParsedInputMap> {
-    type Error = QueryParserError;
+    type Error = ValidationError;
 
     fn try_from(value: ParsedInputValue) -> QueryParserResult<Option<ParsedInputMap>> {
         match value {
@@ -60,28 +58,26 @@ impl TryFrom<ParsedInputValue> for Option<ParsedInputMap> {
             ParsedInputValue::Map(val) => Ok(Some(val)),
             v => Err(ValidationError::unexpected_runtime_error(format!(
                 "Attempted conversion of non-map ParsedInputValue ({v:?}) into Option map failed."
-            ))
-            .into()),
+            ))),
         }
     }
 }
 
 impl TryFrom<ParsedInputValue> for ParsedInputList {
-    type Error = QueryParserError;
+    type Error = ValidationError;
 
     fn try_from(value: ParsedInputValue) -> QueryParserResult<Vec<ParsedInputValue>> {
         match value {
             ParsedInputValue::List(vals) => Ok(vals),
             v => Err(ValidationError::unexpected_runtime_error(format!(
                 "Attempted conversion of non-list ParsedInputValue ({v:?}) into list failed."
-            ))
-            .into()),
+            ))),
         }
     }
 }
 
 impl TryFrom<ParsedInputValue> for Vec<PrismaValue> {
-    type Error = QueryParserError;
+    type Error = ValidationError;
 
     fn try_from(value: ParsedInputValue) -> QueryParserResult<Vec<PrismaValue>> {
         match value {
@@ -91,14 +87,13 @@ impl TryFrom<ParsedInputValue> for Vec<PrismaValue> {
                 .collect::<QueryParserResult<Vec<_>>>(),
             v => Err(ValidationError::unexpected_runtime_error(format!(
                 "Attempted conversion of non-list ParsedInputValue ({v:?}) into prisma value list failed."
-            ))
-            .into()),
+            ))),
         }
     }
 }
 
 impl TryFrom<ParsedInputValue> for Option<String> {
-    type Error = QueryParserError;
+    type Error = ValidationError;
 
     fn try_from(value: ParsedInputValue) -> QueryParserResult<Option<String>> {
         let prisma_value = PrismaValue::try_from(value)?;
@@ -109,42 +104,39 @@ impl TryFrom<ParsedInputValue> for Option<String> {
             PrismaValue::Null => Ok(None),
             v => Err(ValidationError::unexpected_runtime_error(format!(
                 "Attempted conversion of non-String Prisma value type ({v:?}) into String failed."
-            ))
-            .into()),
+            ))),
         }
     }
 }
 
 impl TryFrom<ParsedInputValue> for OrderBy {
-    type Error = QueryParserError;
+    type Error = ValidationError;
 
     fn try_from(value: ParsedInputValue) -> QueryParserResult<OrderBy> {
         match value {
             ParsedInputValue::OrderBy(ord) => Ok(ord),
             v => Err(ValidationError::unexpected_runtime_error(format!(
                 "Attempted conversion of non-order-by enum ({v:?}) into order by enum value failed."
-            ))
-            .into()),
+            ))),
         }
     }
 }
 
 impl TryFrom<ParsedInputValue> for ScalarFieldRef {
-    type Error = QueryParserError;
+    type Error = ValidationError;
 
     fn try_from(value: ParsedInputValue) -> QueryParserResult<ScalarFieldRef> {
         match value {
             ParsedInputValue::ScalarField(f) => Ok(f),
             v => Err(ValidationError::unexpected_runtime_error(format!(
                 "Attempted conversion of non-field-ref enum ({v:?}) into scalar field reference value failed."
-            ))
-            .into()),
+            ))),
         }
     }
 }
 
 impl TryFrom<ParsedInputValue> for Option<f64> {
-    type Error = QueryParserError;
+    type Error = ValidationError;
 
     fn try_from(value: ParsedInputValue) -> QueryParserResult<Option<f64>> {
         let prisma_value = PrismaValue::try_from(value)?;
@@ -154,14 +146,13 @@ impl TryFrom<ParsedInputValue> for Option<f64> {
             PrismaValue::Null => Ok(None),
             v => Err(ValidationError::unexpected_runtime_error(format!(
                 "Attempted conversion of non-float Prisma value type ({v:?}) into float failed."
-            ))
-            .into()),
+            ))),
         }
     }
 }
 
 impl TryFrom<ParsedInputValue> for Option<bool> {
-    type Error = QueryParserError;
+    type Error = ValidationError;
 
     fn try_from(value: ParsedInputValue) -> QueryParserResult<Option<bool>> {
         let prisma_value = PrismaValue::try_from(value)?;
@@ -171,14 +162,13 @@ impl TryFrom<ParsedInputValue> for Option<bool> {
             PrismaValue::Null => Ok(None),
             v => Err(ValidationError::unexpected_runtime_error(format!(
                 "Attempted conversion of non-bool Prisma value type ({v:?}) into bool failed."
-            ))
-            .into()),
+            ))),
         }
     }
 }
 
 impl TryFrom<ParsedInputValue> for Option<DateTime<FixedOffset>> {
-    type Error = QueryParserError;
+    type Error = ValidationError;
 
     fn try_from(value: ParsedInputValue) -> QueryParserResult<Option<DateTime<FixedOffset>>> {
         let prisma_value = PrismaValue::try_from(value)?;
@@ -188,14 +178,13 @@ impl TryFrom<ParsedInputValue> for Option<DateTime<FixedOffset>> {
             PrismaValue::Null => Ok(None),
             v => Err(ValidationError::unexpected_runtime_error(format!(
                 "Attempted conversion of non-DateTime Prisma value type ({v:?}) into DateTime failed."
-            ))
-            .into()),
+            ))),
         }
     }
 }
 
 impl TryFrom<ParsedInputValue> for Option<i64> {
-    type Error = QueryParserError;
+    type Error = ValidationError;
 
     fn try_from(value: ParsedInputValue) -> QueryParserResult<Option<i64>> {
         let prisma_value = PrismaValue::try_from(value)?;
@@ -205,14 +194,13 @@ impl TryFrom<ParsedInputValue> for Option<i64> {
             PrismaValue::Null => Ok(None),
             v => Err(ValidationError::unexpected_runtime_error(format!(
                 "Attempted conversion of non-int Prisma value type ({v:?}) into int failed."
-            ))
-            .into()),
+            ))),
         }
     }
 }
 
 impl TryFrom<ParsedInputValue> for bool {
-    type Error = QueryParserError;
+    type Error = ValidationError;
 
     fn try_from(value: ParsedInputValue) -> QueryParserResult<bool> {
         let prisma_value = PrismaValue::try_from(value)?;
@@ -221,8 +209,7 @@ impl TryFrom<ParsedInputValue> for bool {
             PrismaValue::Boolean(b) => Ok(b),
             v => Err(ValidationError::unexpected_runtime_error(format!(
                 "Attempted conversion of non-boolean Prisma value type ({v:?}) into bool failed."
-            ))
-            .into()),
+            ))),
         }
     }
 }

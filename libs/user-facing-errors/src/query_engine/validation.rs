@@ -5,19 +5,6 @@ use serde_json::json;
 use std::{borrow::Cow, error, fmt};
 use user_facing_error_macros::*;
 
-#[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(
-    code = "P2009",
-    message = "Failed to validate the query: `{query_validation_error}` at `{query_position}`"
-)]
-pub struct LegacyQueryValidationFailed {
-    /// Error(s) encountered when trying to validate a query in the query engine
-    pub query_validation_error: String,
-
-    /// Location of the incorrect parsing, validation in a query. Represented by tuple or object with (line, character)
-    pub query_position: String,
-}
-
 /// A validation error is a Serializable object that contains the path where the validation error
 /// of a certain `kind` ocurred, and an optional and arbitrary piece of `meta`-information.
 #[derive(Debug, Serialize)]
@@ -90,6 +77,12 @@ impl From<ValidationError> for crate::KnownError {
             meta: serde_json::to_value(&err).expect("Failed to render validation error to JSON"),
             error_code: Cow::from(err.kind.code()),
         }
+    }
+}
+
+impl From<ValidationError> for crate::Error {
+    fn from(err: ValidationError) -> Self {
+        KnownError::from(err).into()
     }
 }
 
@@ -421,6 +414,19 @@ impl ValidationError {
             kind: ValidationErrorKind::SelectionSetOnScalar,
             message,
             meta: Some(json!({ "fieldName": field_name, "selectionPath": selection_path })),
+        }
+    }
+
+    /// Creates an error that is the union of different validation errors
+    pub fn union(errors: Vec<ValidationError>) -> Self {
+        let message = format!(
+            "Unable to match input value to any allowed input type for the field. Parse errors: [{}]",
+            errors.iter().map(|err| format!("{err}")).collect::<Vec<_>>().join(", ")
+        );
+        ValidationError {
+            message: message,
+            kind: ValidationErrorKind::Union,
+            meta: Some(json!({ "errors": errors })),
         }
     }
 
