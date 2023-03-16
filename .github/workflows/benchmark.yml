@@ -32,6 +32,7 @@ jobs:
 
       - name: Build the benchmark target(s)
         run: cargo codspeed build
+        working-directory: ./query-engine/schema-builder
 
       - name: Run the benchmarks
         uses: CodSpeedHQ/action@v1
