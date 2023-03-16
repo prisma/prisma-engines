@@ -38,6 +38,8 @@ impl fmt::Display for ValidationError {
 
 #[derive(Debug, Serialize)]
 pub enum ValidationErrorKind {
+    /// See [`ValidationError::unexpected_runtime_error`].
+    UnexpectedRuntimeError,
     /// See [`ValidationError::empty_selection`]
     EmptySelection,
     ///See [`ValidationError::invalid_argument_type`]
@@ -92,6 +94,16 @@ impl From<ValidationError> for crate::KnownError {
 }
 
 impl ValidationError {
+    /// Creates an [`ValidationErrorKind::UnexpectedRuntimeError`] kind of error when something unexpected
+    /// happen at runtime after a query was properly validated by the parser against the schema.
+    pub fn unexpected_runtime_error(message: String) -> Self {
+        ValidationError {
+            kind: ValidationErrorKind::UnexpectedRuntimeError,
+            message,
+            meta: None,
+        }
+    }
+
     /// Creates an [`ValidationErrorKind::EmptySelection`] kind of error, which happens when the
     /// selection of fields is empty for a query.
     ///

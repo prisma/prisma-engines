@@ -198,14 +198,12 @@ impl fmt::Display for ArgumentPath {
 
 #[derive(Debug)]
 pub enum QueryParserErrorKind {
-    AssertionError(String),
     InputUnionParseError { parsing_errors: Vec<QueryParserError> },
 }
 
 impl fmt::Display for QueryParserErrorKind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::AssertionError(reason) => write!(f, "Assertion error: {reason}."),
             Self::InputUnionParseError { parsing_errors } => write!(
                 f,
                 "Unable to match input value to any allowed input type for the field. Parse errors: [{}]",
@@ -215,15 +213,6 @@ impl fmt::Display for QueryParserErrorKind {
                     .collect::<Vec<_>>()
                     .join(", ")
             ),
-        }
-    }
-}
-
-impl From<prisma_models::DomainError> for QueryParserError {
-    fn from(err: prisma_models::DomainError) -> Self {
-        QueryParserError::Legacy {
-            path: ArgumentPath::default(),
-            error_kind: QueryParserErrorKind::AssertionError(format!("Domain error occurred: {err}")),
         }
     }
 }
