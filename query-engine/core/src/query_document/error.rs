@@ -203,7 +203,6 @@ pub enum QueryParserErrorKind {
     AssertionError(String),
     FieldCountError(FieldCountError),
     InputUnionParseError { parsing_errors: Vec<QueryParserError> },
-    ValueFitError(String),
 }
 
 impl Display for QueryParserErrorKind {
@@ -220,7 +219,6 @@ impl Display for QueryParserErrorKind {
                     .collect::<Vec<_>>()
                     .join(", ")
             ),
-            Self::ValueFitError(s) => write!(f, "{s}"),
         }
     }
 }

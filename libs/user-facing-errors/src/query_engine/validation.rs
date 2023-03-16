@@ -55,6 +55,8 @@ pub enum ValidationErrorKind {
     UnknownInputField,
     /// See [`ValidationError::unkown_selection_field`]
     UnknownSelectionField,
+    /// See [`ValidationError::value_too_large`]
+    ValueTooLarge,
 }
 
 impl ValidationErrorKind {
@@ -252,7 +254,7 @@ impl ValidationError {
     /// }
     /// Todo: add the `given` type to the meta
     pub fn unknown_argument(
-        path: Vec<String>,
+        selection_path: Vec<String>,
         argument_path: Vec<String>,
         arguments: Vec<ArgumentDescription>,
     ) -> Self {
@@ -261,7 +263,7 @@ impl ValidationError {
             kind: ValidationErrorKind::UnkownArgument,
             meta: Some(json!({"argumentPath": argument_path, "arguments": arguments})),
             message,
-            selection_path: path,
+            selection_path,
         }
     }
 
@@ -293,14 +295,17 @@ impl ValidationError {
     ///     }
     /// }
     /// TODO: chage path in favor of selection path and adjust the many test failing
-    pub fn unknown_input_field(path: Vec<String>, input_type_description: InputTypeDescription) -> Self {
-        let message = format!("`{}`: Field does not exist in enclosing type.", path.join("."));
+    pub fn unknown_input_field(selection_path: Vec<String>, input_type_description: InputTypeDescription) -> Self {
+        let message = format!(
+            "`{}`: Field does not exist in enclosing type.",
+            selection_path.join(".")
+        );
 
         ValidationError {
             kind: ValidationErrorKind::UnknownInputField,
             meta: Some(json!({ "inputType": input_type_description })),
             message,
-            selection_path: path,
+            selection_path,
         }
     }
 
@@ -321,7 +326,7 @@ impl ValidationError {
     // }
     pub fn unkown_selection_field(
         field_name: String,
-        path: Vec<String>,
+        selection_path: Vec<String>,
         output_type_description: OutputTypeDescription,
     ) -> Self {
         let message = format!(
@@ -332,7 +337,7 @@ impl ValidationError {
             kind: ValidationErrorKind::UnknownSelectionField,
             meta: Some(json!({ "outputType": output_type_description })),
             message,
-            selection_path: path,
+            selection_path,
         }
     }
 
@@ -354,13 +359,53 @@ impl ValidationError {
     ///         }
     ///     }
     /// }
-    pub fn selection_set_on_scalar(field_name: String, path: Vec<String>) -> Self {
+    pub fn selection_set_on_scalar(field_name: String, selection_path: Vec<String>) -> Self {
         let message = format!("Cannot select over scalar field '{}'", field_name);
         ValidationError {
             kind: ValidationErrorKind::SelectionSetOnScalar,
             meta: None,
             message,
-            selection_path: path,
+            selection_path,
+        }
+    }
+
+    /// Creates an [`ValidationErrorKind::ValueTooBig`] kind of error, which happens when the value
+    /// for a float or integer coming from the JS client is larger than what can fit in an i64
+    /// (2^64 - 1 = 18446744073709550000)
+    ///
+    /// Example json query
+    ///
+    ///{
+    ///     "action": "findMany",
+    ///     "modelName": "User",
+    ///     "query": {
+    ///         "arguments": {
+    ///             "where": {
+    ///                 "id": 18446744073709550000 // too large
+    ///             }
+    ///         },
+    ///         "selection": {
+    ///             "$scalars": true
+    ///         }
+    ///     }
+    /// }
+    ///
+    /// TODO: should this be a https://www.prisma.io/docs/reference/api-reference/error-reference#p2033 instead?
+    /// See: libs/user-facing-errors/src/query_engine/mod.rs:312
+    pub fn value_too_large(selection_path: Vec<String>, argument_path: Vec<String>, value: String) -> Self {
+        let argument_name = argument_path.last().expect("Argument path cannot not be empty");
+        let message = format!(
+            "Unable to fit float value (or large JS integer serialized in exponent notation) '{}' into a 64 Bit signed integer for field '{}'. If you're trying to store large integers, consider using `BigInt`",
+            value,
+            argument_name
+        );
+        let argument = ArgumentDescription::new(argument_name.to_owned(), vec!["BigInt".to_owned()]);
+
+        ValidationError {
+            kind: ValidationErrorKind::ValueTooLarge,
+            message,
+            selection_path,
+            meta: Some(json!({"argumentPath": argument_path, "argument": argument})),
         }
     }
 }

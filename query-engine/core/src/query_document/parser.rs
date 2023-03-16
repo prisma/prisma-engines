@@ -258,7 +258,7 @@ impl QueryDocumentParser {
                     .into()),
                     // Scalar handling
                     (value, InputType::Scalar(scalar)) => self
-                        .parse_scalar(&parent_path, &selection_path, &argument_path, value, &scalar)
+                        .parse_scalar(&selection_path, &argument_path, value, &scalar)
                         .map(ParsedInputValue::Single),
 
                     // Enum handling
@@ -348,7 +348,6 @@ impl QueryDocumentParser {
     /// Attempts to parse given query value into a concrete PrismaValue based on given scalar type.
     fn parse_scalar(
         &self,
-        parent_path: &QueryPath,
         selection_path: &SelectionPath,
         argument_path: &ArgumentPath,
         value: PrismaValue,
@@ -395,13 +394,12 @@ impl QueryDocumentParser {
             (PrismaValue::Float(f), ScalarType::Decimal) => Ok(PrismaValue::Float(f)),
             (PrismaValue::Float(f), ScalarType::Int) => match f.to_i64() {
                 Some(converted) => Ok(PrismaValue::Int(converted)),
-                None => {
-                    let error_kind = QueryParserErrorKind::ValueFitError(format!("Unable to fit float value (or large JS integer serialized in exponent notation) '{}' into a 64 Bit signed integer for field '{}'. If you're trying to store large integers, consider using `BigInt`.", f, parent_path.last().unwrap()));
-                    Err(QueryParserError::Legacy {
-                        path: parent_path.clone(),
-                        error_kind,
-                    })
-                }
+                None => Err(ValidationError::value_too_large(
+                    selection_path.segments(),
+                    argument_path.segments(),
+                    f.to_string(),
+                )
+                .into()),
             },
 
             // UUID coercion matchers
