@@ -3948,7 +3948,6 @@ name = "schema-builder"
 version = "0.1.0"
 dependencies = [
  "codspeed-criterion-compat",
- "criterion",
  "once_cell",
  "prisma-models",
  "psl",
