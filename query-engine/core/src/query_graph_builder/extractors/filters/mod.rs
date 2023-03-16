@@ -29,9 +29,9 @@ pub fn extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -> Que
     let (unique_map, rest_map): (IndexMap<_, _>, IndexMap<_, _>) =
         value_map
             .into_iter()
-            .partition(|(field_name, _)| match model.fields().find_from_scalar(&field_name) {
+            .partition(|(field_name, _)| match model.fields().find_from_scalar(field_name) {
                 Ok(field) => field.unique(),
-                Err(_) => utils::resolve_compound_field(&field_name, &model).is_some(),
+                Err(_) => utils::resolve_compound_field(field_name, model).is_some(),
             });
     let mut unique_map = ParsedInputMap::from(unique_map);
     let mut rest_map = ParsedInputMap::from(rest_map);
@@ -56,7 +56,7 @@ fn internal_extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -
                     let value: PrismaValue = value.try_into()?;
                     Ok(field.equals(value))
                 }
-                Err(_) => utils::resolve_compound_field(&field_name, &model)
+                Err(_) => utils::resolve_compound_field(&field_name, model)
                     .ok_or_else(|| {
                         QueryGraphBuilderError::AssertionError(format!(
                             "Unable to resolve field {} to a field or set of scalar fields on model {}",
@@ -252,16 +252,16 @@ fn fold_search_filters(filters: &[Filter]) -> Vec<Filter> {
 
     // Merge the search filters that have the same condition
     for (pv, filter) in filters_by_val.into_iter() {
-        let mut projections = projections_by_val.get_mut(&pv).unwrap();
+        let projections = projections_by_val.get_mut(&pv).unwrap();
         let mut filter = filter.clone();
 
         match filter {
             Filter::Scalar(ref mut sf) => match sf.condition {
                 ScalarCondition::Search(_, ref mut search_proj) => {
-                    search_proj.append(&mut projections);
+                    search_proj.append(projections);
                 }
                 ScalarCondition::NotSearch(_, ref mut search_proj) => {
-                    search_proj.append(&mut projections);
+                    search_proj.append(projections);
                 }
                 _ => unreachable!(),
             },

@@ -77,7 +77,7 @@ pub fn disconnect_records_node(
 
     // Edge from child to disconnect.
     graph.create_edge(
-        &child_node,
+        child_node,
         &disconnect_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model_id,

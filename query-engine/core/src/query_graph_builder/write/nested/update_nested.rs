@@ -114,7 +114,7 @@ pub fn nested_update(
         utils::insert_emulated_on_update(
             graph,
             connector_ctx,
-            &child_model,
+            child_model,
             &find_child_records_node,
             &update_node,
         )?;

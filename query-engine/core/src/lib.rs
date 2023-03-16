@@ -1,10 +1,3 @@
-#![allow(
-    clippy::module_inception,
-    clippy::vec_init_then_push,
-    clippy::derive_partial_eq_without_eq,
-    clippy::needless_borrow
-)]
-
 #[macro_use]
 extern crate tracing;
 

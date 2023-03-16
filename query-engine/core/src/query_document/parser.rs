@@ -195,7 +195,7 @@ impl QueryDocumentParser {
 
                     // Scalar handling
                     (value, InputType::Scalar(scalar)) => self
-                        .parse_scalar(&parent_path, value, &scalar)
+                        .parse_scalar(&parent_path, value, scalar)
                         .map(ParsedInputValue::Single),
 
                     // Enum handling
@@ -220,7 +220,7 @@ impl QueryDocumentParser {
 
                 // List handling.
                 (ArgumentValue::List(values), InputType::List(l)) => self
-                    .parse_list(&parent_path, values.clone(), &l)
+                    .parse_list(&parent_path, values.clone(), l)
                     .map(ParsedInputValue::List),
 
                 // Object handling

@@ -52,12 +52,12 @@ impl ITXServer {
     async fn process_msg(&mut self, op: TxOpRequest) -> RunState {
         match op.msg {
             TxOpRequestMsg::Single(ref operation, traceparent) => {
-                let result = self.execute_single(&operation, traceparent).await;
+                let result = self.execute_single(operation, traceparent).await;
                 let _ = op.respond_to.send(TxOpResponse::Single(result));
                 RunState::Continue
             }
             TxOpRequestMsg::Batch(ref operations, traceparent) => {
-                let result = self.execute_batch(&operations, traceparent).await;
+                let result = self.execute_batch(operations, traceparent).await;
                 let _ = op.respond_to.send(TxOpResponse::Batch(result));
                 RunState::Continue
             }
@@ -270,7 +270,7 @@ pub fn spawn_itx_actor(
     let span = Span::current();
 
     let tx_id_str = tx_id.to_string();
-    span.record("itx_id", &tx_id_str.as_str());
+    span.record("itx_id", tx_id_str.as_str());
 
     tokio::task::spawn(
         crate::executor::with_request_context(engine_protocol, async move {

@@ -1,5 +1,3 @@
-#![allow(clippy::declare_interior_mutable_const)]
-
 //! What the executor module DOES:
 //! - Defining an overarching executor trait, to be used on consumers of the core crate.
 //! - Defining executor implementations that combine the different core modules into a coherent
@@ -7,6 +5,7 @@
 //!
 //! What the executor module DOES NOT DO:
 //! - Define low level execution of queries. This is considered an implementation detail of the modules used by the executors.
+
 mod execute_operation;
 mod interpreting_executor;
 mod loader;
@@ -14,9 +13,9 @@ mod pipeline;
 mod request_context;
 
 pub use execute_operation::*;
-pub use loader::*;
+pub use loader::load;
+
 pub(crate) use request_context::*;
-use serde::Deserialize;
 
 use crate::{
     protocol::EngineProtocol, query_document::Operation, response_ir::ResponseData, schema::QuerySchemaRef,
@@ -24,6 +23,7 @@ use crate::{
 };
 use async_trait::async_trait;
 use connector::Connector;
+use serde::Deserialize;
 use tracing::Dispatch;
 
 #[async_trait]

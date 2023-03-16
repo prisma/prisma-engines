@@ -437,9 +437,9 @@ pub fn nested_create_many(
         .into_iter()
         .map(|data_value| {
             let data_map = data_value.try_into()?;
-            let mut args = WriteArgsParser::from(&child_model, data_map)?.args;
+            let mut args = WriteArgsParser::from(child_model, data_map)?.args;
 
-            args.add_datetimes(&child_model);
+            args.add_datetimes(child_model);
             Ok(args)
         })
         .collect::<QueryGraphBuilderResult<Vec<_>>>()?;

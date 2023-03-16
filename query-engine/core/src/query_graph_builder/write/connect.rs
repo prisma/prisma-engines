@@ -80,7 +80,7 @@ pub fn connect_records_node(
 
     // Edge from child to connect.
     graph.create_edge(
-        &child_node,
+        child_node,
         &connect_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model_id,
