@@ -37,6 +37,8 @@ pub struct CompositeType {
     pub(crate) documentation: Option<Comment>,
     /// The location of this type in the text representation.
     pub span: Span,
+    /// The span of the inner contents.
+    pub inner_span: Span,
 }
 
 impl CompositeType {

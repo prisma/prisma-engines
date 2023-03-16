@@ -68,32 +68,10 @@ fn reformat_key_value(pair: Pair<'_>, table: &mut TableFormat) {
 }
 
 fn reformat_block_element(pair: Pair<'_>, renderer: &mut Renderer) {
-    let mut table = TableFormat::default();
-    let mut attributes: Vec<(Option<Pair<'_>>, Pair<'_>)> = Vec::new(); // (Option<doc_comment>, attribute)
-    let mut pending_block_comment = None; // comment before an attribute
     let mut pairs = pair.into_inner().peekable();
     let block_type = pairs.next().unwrap().as_str();
 
     loop {
-        let ate_empty_lines = eat_empty_lines(&mut pairs);
-
-        // Decide what to do with the empty lines.
-        if ate_empty_lines {
-            match pairs.peek().map(|pair| pair.as_rule()) {
-                Some(Rule::BLOCK_CLOSE) | Some(Rule::block_attribute) | Some(Rule::comment_block) => {
-                    // Reformat away the empty lines at the end of blocks and before attributes (we
-                    // re-add them later).
-                }
-                Some(_) => {
-                    // Reset the table layout on an empty line.
-                    table.render(renderer);
-                    table = TableFormat::default();
-                    table.start_new_line();
-                }
-                _ => (),
-            }
-        }
-
         let current = match pairs.next() {
             Some(current) => current,
             None => return,
@@ -104,7 +82,60 @@ fn reformat_block_element(pair: Pair<'_>, renderer: &mut Renderer) {
                 // Reformat away the empty lines at the beginning of the block.
                 eat_empty_lines(&mut pairs);
             }
-            Rule::BLOCK_CLOSE => {
+            Rule::BLOCK_CLOSE => {}
+
+            Rule::model_contents | Rule::config_contents | Rule::enum_contents => {
+                reformat_block_contents(&mut current.into_inner().peekable(), renderer)
+            }
+
+            Rule::identifier => {
+                let block_name = current.as_str();
+                renderer.write(block_type);
+                renderer.write(" ");
+                renderer.write(block_name);
+                renderer.write(" {");
+                renderer.end_line();
+                renderer.indent_up();
+            }
+
+            _ => unreachable(&current),
+        }
+    }
+}
+
+fn reformat_block_contents<'a>(
+    pairs: &mut Peekable<impl Iterator<Item = pest::iterators::Pair<'a, Rule>>>,
+    renderer: &mut Renderer,
+) {
+    let mut attributes: Vec<(Option<Pair<'_>>, Pair<'_>)> = Vec::new(); // (Option<doc_comment>, attribute)
+    let mut table = TableFormat::default();
+
+    let mut pending_block_comment = None; // comment before an attribute
+
+    // Reformat away the empty lines at the beginning of the block.
+    eat_empty_lines(pairs);
+
+    loop {
+        let ate_empty_lines = eat_empty_lines(pairs);
+
+        // Decide what to do with the empty lines.
+        if ate_empty_lines {
+            match pairs.peek().map(|pair| pair.as_rule()) {
+                None | Some(Rule::block_attribute) | Some(Rule::comment_block) => {
+                    // Reformat away the empty lines at the end of blocks and before attributes (we
+                    // re-add them later).
+                }
+                Some(_) => {
+                    // Reset the table layout on an empty line.
+                    table.render(renderer);
+                    table = TableFormat::default();
+                    table.start_new_line();
+                }
+            }
+        }
+        let current = match pairs.next() {
+            Some(current) => current,
+            None => {
                 // Flush current table.
                 table.render(renderer);
                 table = Default::default();
@@ -127,18 +158,11 @@ fn reformat_block_element(pair: Pair<'_>, renderer: &mut Renderer) {
                 renderer.indent_down();
                 renderer.write("}");
                 renderer.end_line();
+                return;
             }
+        };
 
-            Rule::identifier => {
-                let block_name = current.as_str();
-                renderer.write(block_type);
-                renderer.write(" ");
-                renderer.write(block_name);
-                renderer.write(" {");
-                renderer.end_line();
-                renderer.indent_up();
-            }
-
+        match current.as_rule() {
             Rule::comment_block => {
                 if pairs.peek().map(|pair| pair.as_rule()) == Some(Rule::block_attribute) {
                     pending_block_comment = Some(current.clone()); // move it with the attribute
