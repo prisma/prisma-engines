@@ -224,8 +224,8 @@ mod create {
     async fn fails_when_missing_required_fields(runner: Runner) -> TestResult<()> {
         // Envelope type failure
         assert_error!(
-          runner,
-          r#"mutation {
+            runner,
+            r#"mutation {
             createOneTestModel(
               data: {
                 id: 1
@@ -236,8 +236,8 @@ mod create {
               id
             }
           }"#,
-          2009,
-          "Mutation.createOneTestModel.data.TestModelUncheckedCreateInput.b.BNullableCreateEnvelopeInput`: Expected exactly one field to be present, got 0."
+            2009,
+            "Expected exactly one field to be present, got 0."
         );
 
         // Missing required field without default failure on field `B.c`
@@ -255,7 +255,7 @@ mod create {
             }
           }"#,
             2009,
-            "Mutation.createOneTestModel.data.TestModelCreateInput.b.BCreateInput.c`: A value is required but not set."
+            "A value is required but not set"
         );
 
         Ok(())
@@ -610,13 +610,13 @@ mod update {
         create_test_data(&runner).await?;
 
         assert_error!(
-          runner,
-          r#"mutation { updateOneTestModel(
+            runner,
+            r#"mutation { updateOneTestModel(
             where: { id: 1 },
             data: { a: { update: { a_1: { unset: true } } } }
           ) { id }}"#,
-          2009,
-          "`Mutation.updateOneTestModel.data.TestModelUncheckedUpdateInput.a.AUpdateEnvelopeInput.update.AUpdateInput.a_1.StringFieldUpdateOperationsInput.unset`: Field does not exist on enclosing type."
+            2009,
+            "Field does not exist in enclosing type."
         );
 
         Ok(())
@@ -800,7 +800,7 @@ mod update {
               data: { a: { unset: true } }
             ) { id }}"#,
             2009,
-            "`Mutation.updateOneTestModel.data.TestModelUpdateInput.a.AUpdateEnvelopeInput.unset`: Field does not exist on enclosing type."
+            "Field does not exist in enclosing type."
         );
 
         Ok(())
@@ -817,7 +817,7 @@ mod update {
               data: { a: { upsert: { set: {}, update: {} } } }
             ) { id }}"#,
             2009,
-            "`Mutation.updateOneTestModel.data.TestModelUpdateInput.a.AUpdateEnvelopeInput.upsert`: Field does not exist on enclosing type."
+            "Field does not exist in enclosing type."
         );
 
         Ok(())
@@ -828,8 +828,8 @@ mod update {
         create_test_data(&runner).await?;
 
         assert_error!(
-          runner,
-          r#"mutation {
+            runner,
+            r#"mutation {
             updateOneTestModel(
               where: { id: 1 }
               data: {
@@ -839,13 +839,13 @@ mod update {
               id
             }
           }"#,
-          2009,
-          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BNullableUpdateEnvelopeInput.set.BCreateInput.c.CCreateInput.update`: Field does not exist on enclosing type."
+            2009,
+            "Field does not exist in enclosing type."
         );
 
         assert_error!(
-          runner,
-          r#"mutation {
+            runner,
+            r#"mutation {
             updateOneTestModel(
               where: { id: 1 }
               data: {
@@ -855,8 +855,8 @@ mod update {
               id
             }
           }"#,
-          2009,
-          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BCreateInput.c.CCreateInput.update`: Field does not exist on enclosing type."
+            2009,
+            "Field does not exist in enclosing type."
         );
 
         Ok(())
@@ -866,8 +866,8 @@ mod update {
     async fn fails_set_when_missing_required_fields(runner: Runner) -> TestResult<()> {
         // Envelope type failure
         assert_error!(
-              runner,
-              r#"mutation {
+            runner,
+            r#"mutation {
                 updateOneTestModel(
                   where: { id: 1 }
                   data: {
@@ -877,14 +877,14 @@ mod update {
                   id
                 }
               }"#,
-              2009,
-              "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BNullableUpdateEnvelopeInput`: Expected exactly one field to be present, got 0."
-            );
+            2009,
+            "Expected exactly one field to be present, got 0."
+        );
 
         // Missing required field without default failure on field `B.c`
         assert_error!(
-                runner,
-                r#"mutation {
+            runner,
+            r#"mutation {
                 updateOneTestModel(
                   where: { id: 1 }
                   data: {
@@ -894,9 +894,9 @@ mod update {
                   id
                 }
               }"#,
-                2009,
-                "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BCreateInput.c`: A value is required but not set."
-            );
+            2009,
+            "A value is required but not set"
+        );
 
         Ok(())
     }
@@ -907,8 +907,8 @@ mod update {
 
         // Invalid `update` on optional composite field
         assert_error!(
-          runner,
-          r#"mutation {
+            runner,
+            r#"mutation {
           updateOneTestModel(
             where: { id: 1 }
             data: {
@@ -918,9 +918,9 @@ mod update {
             id
           }
         }"#,
-          2009,
-          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BNullableUpdateEnvelopeInput.update`: Field does not exist on enclosing type."
-      );
+            2009,
+            "Field does not exist in enclosing type."
+        );
 
         Ok(())
     }
@@ -940,21 +940,21 @@ mod update {
               }
             }"#,
             2009,
-            "`Mutation.updateOneTestModel.data.TestModelUpdateInput.a.AUpdateEnvelopeInput.updateMany`: Field does not exist on enclosing type."
+            "Field does not exist in enclosing type."
         );
 
         // Fails on optional to-one
         assert_error!(
-          runner,
-          r#"mutation {
+            runner,
+            r#"mutation {
             updateOneTestModel(where: { id: 1 }, data: {
               b: { updateMany: {} }
             }) {
               id
             }
           }"#,
-          2009,
-          "Mutation.updateOneTestModel.data.TestModelUncheckedUpdateInput.b.BNullableUpdateEnvelopeInput.updateMany`: Field does not exist on enclosing type."
+            2009,
+            "Field does not exist in enclosing type."
         );
 
         Ok(())
@@ -966,31 +966,31 @@ mod update {
 
         // Fails on required to-one
         assert_error!(
-          runner,
-          r#"mutation {
+            runner,
+            r#"mutation {
             updateOneTestModel(where: { id: 1 }, data: {
               a: { deleteMany: {} }
             }) {
               id
             }
           }"#,
-          2009,
-          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.a.AUpdateEnvelopeInput.deleteMany`: Field does not exist on enclosing type."
-      );
+            2009,
+            "Field does not exist in enclosing type."
+        );
 
         // Fails on optional to-one
         assert_error!(
-        runner,
-        r#"mutation {
+            runner,
+            r#"mutation {
           updateOneTestModel(where: { id: 1 }, data: {
             b: { deleteMany: {} }
           }) {
             id
           }
         }"#,
-        2009,
-        "Mutation.updateOneTestModel.data.TestModelUncheckedUpdateInput.b.BNullableUpdateEnvelopeInput.deleteMany`: Field does not exist on enclosing type."
-      );
+            2009,
+            "Field does not exist in enclosing type."
+        );
 
         Ok(())
     }

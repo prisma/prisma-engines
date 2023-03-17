@@ -25,7 +25,8 @@ mod delete_many_inside_update {
 
         assert_error!(
             runner,
-            format!(r#"mutation {{
+            format!(
+                r#"mutation {{
               updateOneParent(
               where: {parent}
               data:{{
@@ -36,9 +37,10 @@ mod delete_many_inside_update {
                   c
                 }}
               }}
-            }}"#),
+            }}"#
+            ),
             2009,
-            "`Mutation.updateOneParent.data.ParentUpdateInput.childOpt.ChildUpdateOneWithoutParentOptNestedInput.deleteMany`: Field does not exist on enclosing type."
+            "Field does not exist in enclosing type."
         );
 
         Ok(())

@@ -373,7 +373,7 @@ mod json_create_many {
                     }
                   }"#,
                 2009,
-                "A value is required but not set."
+                "A value is required but not set"
             );
         }
 
@@ -387,7 +387,7 @@ mod json_create_many {
                 }
               }"#,
             2009,
-            "Enum value 'AnyNull' is invalid for enum type NullableJsonNullValueInput"
+            "`AnyNull` is not a valid `NullableJsonNullValueInput`"
         );
 
         Ok(())

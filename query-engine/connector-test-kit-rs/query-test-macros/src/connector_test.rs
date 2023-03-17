@@ -44,7 +44,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
     }
 
     // The shell function retains the name of the original test definition.
-    let test_fn_ident = test_function.sig.ident.clone();
+    let test_fn_ident = test_function.sig.ident;
 
     // Rename original test function to run_<orig_name>.
     let runner_fn_ident = Ident::new(&format!("run_{test_fn_ident}"), Span::call_site());

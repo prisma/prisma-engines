@@ -410,20 +410,10 @@ mod update {
         }"#;
 
         // Ensure `update` cannot be used in the Checked type
-        assert_error!(
-          runner,
-          query,
-          2009,
-          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.to_many_as.CompositeAListUpdateEnvelopeInput.set.CompositeACreateInput.a_2`: Value types mismatch. Have: Object({\"update\": Object({\"increment\": Scalar(Int(3))})}), want: Int"
-        );
+        assert_error!(runner, query, 2009, "Invalid argument type");
 
         // Ensure `update` cannot be used in the Unchecked type
-        assert_error!(
-          runner,
-          query,
-          2009,
-          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.to_many_as.CompositeAListUpdateEnvelopeInput.set.CompositeACreateInput.a_2`: Value types mismatch. Have: Object({\"update\": Object({\"increment\": Scalar(Int(3))})}), want: Int"
-        );
+        assert_error!(runner, query, 2009, "Invalid argument type");
 
         Ok(())
     }
@@ -671,20 +661,20 @@ mod update {
               ) { id }
             }"#,
             2009,
-            "`Mutation.updateOneTestModel.data.TestModelUpdateInput.a.ACreateInput.push`: Field does not exist on enclosing type."
+            "Field does not exist in enclosing type."
         );
 
         // No push on scalar
         assert_error!(
-          runner,
-          r#"mutation {
+            runner,
+            r#"mutation {
             updateOneTestModel(
               where: { id: 1 }
               data: { a: { update: { a_1: { push: {} } } } }
             ) { id }
           }"#,
-          2009,
-          "Mutation.updateOneTestModel.data.TestModelUpdateInput.a.AUpdateEnvelopeInput.update.AUpdateInput.a_1.StringFieldUpdateOperationsInput.push`: Field does not exist on enclosing type."
+            2009,
+            "Field does not exist in enclosing type."
         );
 
         Ok(())
@@ -704,7 +694,7 @@ mod update {
               ) { id }
             }"#,
             2009,
-            "`Mutation.updateOneTestModel.data.TestModelUncheckedUpdateInput.to_many_as.CompositeACreateInput.unset`: Field does not exist on enclosing type."
+            "Field does not exist in enclosing type."
         );
 
         Ok(())
@@ -722,7 +712,7 @@ mod update {
               ) { id }
             }"#,
             2009,
-            "`Mutation.updateOneTestModel.data.TestModelUncheckedUpdateInput.to_many_as.CompositeACreateInput.upsert`: Field does not exist on enclosing type."
+            "Field does not exist in enclosing type."
         );
 
         Ok(())

@@ -38,7 +38,7 @@ mod uuid_filter_spec {
             runner,
             r#"query { findManyCat(where: { id: { contains: "fb37a902-f54b-4520-8c90-8c0e4c7fd31d" } }) { id } }"#,
             2009,
-            r#"Query.findManyCat.where.CatWhereInput.id.UuidFilter.contains`: Field does not exist on enclosing type."#
+            r#"Field does not exist in enclosing type."#
         );
 
         Ok(())
