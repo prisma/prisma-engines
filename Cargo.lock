@@ -441,6 +441,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "codspeed"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2042d58652a59f53ee0d7f61435b6760b63a9c09a598c7044a8c8b1a0a352afe"
+dependencies = [
+ "colored",
+ "libc",
+]
+
+[[package]]
+name = "codspeed-criterion-compat"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "93201017af114a2ef3df75212aa456aa1a981673d84aa18555014bb89c2a7262"
+dependencies = [
+ "codspeed",
+ "colored",
+ "criterion",
+]
+
+[[package]]
 name = "colored"
 version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -566,6 +587,8 @@ dependencies = [
  "lazy_static",
  "num-traits",
  "oorandom",
+ "plotters",
+ "rayon",
  "regex",
  "serde",
  "serde_derive",
@@ -2948,6 +2971,34 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1df8c4ec4b0627e53bdf214615ad287367e482558cf84b109250b37464dc03ae"
 
 [[package]]
+name = "plotters"
+version = "0.3.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2538b639e642295546c50fcd545198c9d64ee2a38620a628724a3b266d5fbf97"
+dependencies = [
+ "num-traits",
+ "plotters-backend",
+ "plotters-svg",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
+name = "plotters-backend"
+version = "0.3.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "193228616381fecdc1224c62e96946dfbc73ff4384fba576e052ff8c1bea8142"
+
+[[package]]
+name = "plotters-svg"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f9a81d2759aae1dae668f783c308bc5c8ebd191ff4184aaa1b37f65a6ae5a56f"
+dependencies = [
+ "plotters-backend",
+]
+
+[[package]]
 name = "postgres-native-tls"
 version = "0.5.0"
 source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#74f0847e9a8ac350c48dd65c4c33e9be5fcf6010"
@@ -3622,6 +3673,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "rayon"
+version = "1.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1d2df5196e37bcc87abebc0053e20787d73847bb33134a69841207dd0a47f03b"
+dependencies = [
+ "either",
+ "rayon-core",
+]
+
+[[package]]
+name = "rayon-core"
+version = "1.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4b8f95bd6966f5c87776639160a66bd8ab9895d9d4ab01ddba9fc60661aebe8d"
+dependencies = [
+ "crossbeam-channel",
+ "crossbeam-deque",
+ "crossbeam-utils",
+ "num_cpus",
+]
+
+[[package]]
 name = "redox_syscall"
 version = "0.2.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3875,7 +3948,7 @@ dependencies = [
 name = "schema-builder"
 version = "0.1.0"
 dependencies = [
- "criterion",
+ "codspeed-criterion-compat",
  "once_cell",
  "prisma-models",
  "psl",
