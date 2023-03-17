@@ -10,6 +10,7 @@ serde.workspace = true
 backtrace = "0.3.40"
 tracing = "0.1"
 indoc = "1"
+itertools = "0.10"
 quaint = { workspace = true, optional = true }
 
 [features]

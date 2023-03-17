@@ -1,12 +1,9 @@
-use crate::{
-    InterpreterError, QueryGraphBuilderError, QueryGraphError, QueryParserError, QueryParserErrorKind,
-    RelationViolation, TransactionError,
-};
+use crate::{InterpreterError, QueryGraphBuilderError, QueryGraphError, RelationViolation, TransactionError};
 use bigdecimal::BigDecimal;
 use connector::error::ConnectorError;
 use prisma_models::DomainError;
 use thiserror::Error;
-use user_facing_errors::UnknownError;
+use user_facing_errors::{query_engine::validation::ValidationError, UnknownError};
 
 #[derive(Debug, Error)]
 #[error(
@@ -45,7 +42,7 @@ pub enum CoreError {
     DomainError(DomainError),
 
     #[error("{0}")]
-    QueryParserError(QueryParserError),
+    QueryParserError(ValidationError),
 
     #[error("Unsupported feature: {}", _0)]
     UnsupportedFeatureError(String),
@@ -124,8 +121,8 @@ impl From<DomainError> for CoreError {
     }
 }
 
-impl From<QueryParserError> for CoreError {
-    fn from(e: QueryParserError) -> CoreError {
+impl From<ValidationError> for CoreError {
+    fn from(e: ValidationError) -> CoreError {
         CoreError::QueryParserError(e)
     }
 }
@@ -167,32 +164,10 @@ impl From<CoreError> for user_facing_errors::Error {
                 ..
             })) => user_facing_error.into(),
 
-            // legacy query validation errors. This block should go away
-            CoreError::QueryParserError(QueryParserError::Legacy { path, error_kind })
-            | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(QueryParserError::Legacy {
-                path,
-                error_kind,
-            })) => {
-                let known_error =
-                    match error_kind {
-                        QueryParserErrorKind::RequiredValueNotSetError => user_facing_errors::KnownError::new(
-                            user_facing_errors::query_engine::MissingRequiredValue { path: path.to_string() },
-                        ),
-                        _ => user_facing_errors::KnownError::new(
-                            user_facing_errors::query_engine::LegacyQueryValidationFailed {
-                                query_validation_error: error_kind.to_string(),
-                                query_position: path.to_string(),
-                            },
-                        ),
-                    };
-
-                known_error.into()
+            CoreError::QueryParserError(err)
+            | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(err)) => {
+                user_facing_errors::Error::from(err)
             }
-
-            CoreError::QueryParserError(QueryParserError::Structured(se))
-            | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(
-                QueryParserError::Structured(se),
-            )) => user_facing_errors::KnownError::new(se).into(),
 
             CoreError::QueryGraphBuilderError(QueryGraphBuilderError::MissingRequiredArgument {
                 argument_name,

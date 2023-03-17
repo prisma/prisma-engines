@@ -40,7 +40,8 @@ impl QueryGraphBuilder {
     ) -> QueryGraphBuilderResult<(QueryGraph, IrSerializer)> {
         let mut selections = vec![selection];
         let mut parsed_object = QueryDocumentParser::new(crate::executor::get_request_now()).parse_object(
-            QueryPath::default(),
+            Path::default(),
+            Path::default(),
             &selections,
             root_object,
         )?;
