@@ -114,7 +114,7 @@ fn handle_many_to_many(
     let find_child_records_node =
         utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, filter)?;
 
-    disconnect::disconnect_records_node(graph, parent_node, &find_child_records_node, &parent_relation_field)?;
+    disconnect::disconnect_records_node(graph, parent_node, &find_child_records_node, parent_relation_field)?;
     Ok(())
 }
 

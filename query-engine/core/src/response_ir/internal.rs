@@ -475,7 +475,7 @@ fn serialize_composite(cf: &CompositeFieldRef, out_field: &OutputFieldRef, value
                     Field::Composite(cf) => {
                         map.insert(
                             inner_field.name().to_owned(),
-                            serialize_composite(&cf, &inner_out_field, value)?,
+                            serialize_composite(cf, &inner_out_field, value)?,
                         );
                     }
 

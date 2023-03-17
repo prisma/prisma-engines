@@ -27,7 +27,7 @@ pub fn nested_connect(
         .into_iter()
         .map(|value: ParsedInputValue| {
             let value: ParsedInputMap = value.try_into()?;
-            extract_unique_filter(value, &child_model)
+            extract_unique_filter(value, child_model)
         })
         .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
         .into_iter()
@@ -88,7 +88,7 @@ fn handle_many_to_many(
         graph,
         &parent_node,
         &child_node,
-        &parent_relation_field,
+        parent_relation_field,
         expected_connects,
     )?;
 

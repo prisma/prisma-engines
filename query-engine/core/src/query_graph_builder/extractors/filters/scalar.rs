@@ -26,7 +26,7 @@ impl<'a> ScalarFilterParser<'a> {
     }
 
     fn field(&self) -> &ScalarFieldRef {
-        &self.field
+        self.field
     }
 
     fn reverse(&self) -> bool {

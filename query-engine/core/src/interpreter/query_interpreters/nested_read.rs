@@ -175,9 +175,7 @@ pub async fn one2m(
         match link_mapping.get_mut(&link_values) {
             Some(records) => records.push(id),
             None => {
-                let mut ids = Vec::new();
-
-                ids.push(id);
+                let ids = vec![id];
                 uniq_selections.push(link_values.clone());
                 link_mapping.insert(link_values, ids);
             }

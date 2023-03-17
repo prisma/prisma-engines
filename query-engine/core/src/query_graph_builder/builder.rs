@@ -100,7 +100,7 @@ impl QueryGraphBuilder {
             let mut f = File::create("graph.dot").unwrap();
             let output = graph.to_graphviz();
 
-            f.write_all(&output.as_bytes()).unwrap();
+            f.write_all(output.as_bytes()).unwrap();
         }
 
         Ok(graph)

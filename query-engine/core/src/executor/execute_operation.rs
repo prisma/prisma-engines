@@ -1,5 +1,3 @@
-use std::time::{Duration, Instant};
-
 use super::pipeline::QueryPipeline;
 use crate::{
     executor::request_context, protocol::EngineProtocol, CoreError, IrSerializer, Operation, QueryGraph,
@@ -11,6 +9,7 @@ use query_engine_metrics::{
     histogram, increment_counter, metrics, PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, PRISMA_CLIENT_QUERIES_TOTAL,
 };
 use schema::QuerySchemaRef;
+use std::time::{Duration, Instant};
 use tracing::Instrument;
 use tracing_futures::WithSubscriber;
 

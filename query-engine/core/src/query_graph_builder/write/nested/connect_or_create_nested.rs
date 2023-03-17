@@ -105,7 +105,7 @@ fn handle_many_to_many(
         let create_arg = value.remove(args::CREATE).unwrap();
         let create_map: ParsedInputMap = create_arg.try_into()?;
 
-        let filter = extract_unique_filter(where_map, &child_model)?;
+        let filter = extract_unique_filter(where_map, child_model)?;
         let read_node = graph.create_node(utils::read_ids_infallible(
             child_model.clone(),
             child_model.primary_identifier(),
@@ -116,10 +116,10 @@ fn handle_many_to_many(
         let if_node = graph.create_node(Flow::default_if());
 
         let connect_exists_node =
-            connect::connect_records_node(graph, &parent_node, &read_node, &parent_relation_field, 1)?;
+            connect::connect_records_node(graph, &parent_node, &read_node, parent_relation_field, 1)?;
 
         let _connect_create_node =
-            connect::connect_records_node(graph, &parent_node, &create_node, &parent_relation_field, 1)?;
+            connect::connect_records_node(graph, &parent_node, &create_node, parent_relation_field, 1)?;
 
         graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
         graph.create_edge(
@@ -192,7 +192,7 @@ fn handle_one_to_one(
     let create_arg = value.remove(args::CREATE).unwrap();
     let create_data: ParsedInputMap = create_arg.try_into()?;
 
-    let filter = extract_unique_filter(where_map, &child_model)?;
+    let filter = extract_unique_filter(where_map, child_model)?;
 
     if parent_relation_field.is_inlined_on_enclosing_model() {
         one_to_one_inlined_parent(
@@ -266,7 +266,7 @@ fn one_to_many_inlined_child(
         let create_arg = value.remove(args::CREATE).unwrap();
         let create_map: ParsedInputMap = create_arg.try_into()?;
 
-        let filter = extract_unique_filter(where_map, &child_model)?;
+        let filter = extract_unique_filter(where_map, child_model)?;
         let read_node = graph.create_node(utils::read_ids_infallible(
             child_model.clone(),
             child_link.clone(),
@@ -405,7 +405,7 @@ fn one_to_many_inlined_parent(
     let create_arg = value.remove(args::CREATE).unwrap();
     let create_map: ParsedInputMap = create_arg.try_into()?;
 
-    let filter = extract_unique_filter(where_map, &child_model)?;
+    let filter = extract_unique_filter(where_map, child_model)?;
     let read_node = graph.create_node(utils::read_ids_infallible(
         child_model.clone(),
         child_link.clone(),
@@ -660,7 +660,7 @@ fn one_to_one_inlined_parent(
     } else {
         // Perform checks that no existing child in a required relation is violated.
         graph.create_edge(&if_node, &parent_node, QueryGraphDependency::ExecutionOrder)?;
-        utils::insert_existing_1to1_related_model_checks(graph, &parent_node, &parent_relation_field)?;
+        utils::insert_existing_1to1_related_model_checks(graph, &parent_node, parent_relation_field)?;
 
         let parent_model = parent_relation_field.model();
         let update_parent_node = utils::update_records_node_placeholder(graph, Filter::empty(), parent_model.clone());

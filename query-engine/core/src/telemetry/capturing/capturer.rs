@@ -145,7 +145,7 @@ mod task {
         fn query_event(mut self) -> models::LogEvent {
             self.value
                 .attributes
-                .retain(|key, _| (&VALID_QUERY_ATTRS).contains(&key.as_str()));
+                .retain(|key, _| VALID_QUERY_ATTRS.contains(&key.as_str()));
 
             models::LogEvent {
                 level: "query".to_string(),

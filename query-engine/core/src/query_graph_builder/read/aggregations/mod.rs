@@ -1,20 +1,17 @@
-use crate::FieldPair;
-
-use super::*;
-
 mod aggregate;
 mod group_by;
 
 pub(crate) use aggregate::*;
 pub(crate) use group_by::*;
 
+use super::*;
+use crate::FieldPair;
 use connector::AggregationSelection;
 use itertools::Itertools;
 use prisma_models::{ModelRef, ScalarFieldRef};
 use schema_builder::constants::aggregations::*;
 
 /// Resolves the given field as a aggregation query.
-#[allow(clippy::unnecessary_wraps)]
 fn resolve_query(
     field: FieldPair,
     model: &ModelRef,
