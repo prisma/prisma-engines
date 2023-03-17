@@ -848,7 +848,9 @@ fn resolve_field_array_without_args<'db>(
         };
 
         // Is the field a scalar field?
-        let Some(sfid) = ctx.types.find_model_scalar_field(model_id, field_id) else{
+        let sfid = if let Some(sfid) = ctx.types.find_model_scalar_field(model_id, field_id) {
+            sfid
+        } else {
             relation_fields.push((&ctx.ast[model_id][field_id], field_id));
             continue;
         };
@@ -933,7 +935,9 @@ fn resolve_field_array_with_args<'db>(
                         }
                     };
 
-                    let Some(sfid) = ctx.types.find_model_scalar_field(model_id, field_id) else {
+                    let sfid = if let Some(sfid) = ctx.types.find_model_scalar_field(model_id, field_id) {
+                        sfid
+                    } else {
                         relation_fields.push((&ctx.ast[model_id][field_id], field_id));
                         continue 'fields;
                     };
