@@ -239,15 +239,15 @@ mod basic_types {
     #[connector_test]
     async fn update_mut_empty_scalar_should_fail(runner: Runner) -> TestResult<()> {
         assert_error!(
-          runner,
-          r#"mutation {
+            runner,
+            r#"mutation {
             updateOneScalarModel(data: {
               strings: {},
             }){ strings, ints, floats, booleans, enums, dateTimes }
           }"#,
-          2009,
-          "`Mutation.updateOneScalarModel.data.ScalarModelUpdateInput.strings.ScalarModelUpdatestringsInput`: Expected exactly one field to be present, got 0."
-      );
+            2009,
+            "Some fields are missing: Expected exactly one field to be present, got 0."
+        );
 
         Ok(())
     }

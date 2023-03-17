@@ -3,7 +3,6 @@ use itertools::Itertools;
 use serde::Serialize;
 use serde_json::json;
 use std::{borrow::Cow, error, fmt};
-use user_facing_error_macros::*;
 
 /// A validation error is a Serializable object that contains the path where the validation error
 /// of a certain `kind` ocurred, and an optional and arbitrary piece of `meta`-information.
