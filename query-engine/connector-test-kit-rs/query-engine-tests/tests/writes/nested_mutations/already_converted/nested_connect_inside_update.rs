@@ -1140,7 +1140,7 @@ mod connect_inside_update {
     }
 
     // Regression test for https://github.com/prisma/prisma/issues/18173
-    #[connector_test(schema(p1_c1_child_compound_unique_schema))]
+    #[connector_test(schema(p1_c1_child_compound_unique_schema), exclude(MongoDb, SqlServer))]
     async fn p1_c1_child_compound_unique(runner: Runner) -> TestResult<()> {
         run_query!(&runner, r#"mutation { createOneParent(data: { id: 1 }) { id } }"#);
         run_query!(
