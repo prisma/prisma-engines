@@ -92,7 +92,7 @@
     </span><span class="kw">pub fn </span>primary_identifier(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FieldSelection {
         <span class="kw">let </span>fields: Vec&lt;<span class="kw">_</span>&gt; = <span class="self">self
             </span>.walker()
-            .unique_criterias()
+            .required_unique_criterias()
             .next()
             .unwrap()
             .fields()

@@ -263,6 +263,13 @@
 <a href="#263" id="263">263</a>
 <a href="#264" id="264">264</a>
 <a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>primary_key;
 <span class="kw">mod </span>unique_criteria;
 
@@ -401,6 +408,13 @@
             });
 
         from_pk.chain(from_indices)
+    }
+
+    <span class="doccomment">/// All _required_ unique criterias of the model; consisting of the primary key and
+    /// unique indexes, if set.
+    </span><span class="kw">pub fn </span>required_unique_criterias(<span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = UniqueCriteriaWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
+        <span class="self">self</span>.unique_criterias()
+            .filter(|walker| !walker.fields().any(|field| field.is_optional()))
     }
 
     <span class="doccomment">/// Iterate all the indexes in the model in the order they were
