@@ -138,6 +138,13 @@ impl<'db> ModelWalker<'db> {
         from_pk.chain(from_indices)
     }
 
+    /// All _required_ unique criterias of the model; consisting of the primary key and
+    /// unique indexes, if set.
+    pub fn required_unique_criterias(self) -> impl Iterator<Item = UniqueCriteriaWalker<'db>> {
+        self.unique_criterias()
+            .filter(|walker| !walker.fields().any(|field| field.is_optional()))
+    }
+
     /// Iterate all the indexes in the model in the order they were
     /// defined.
     pub fn indexes(self) -> impl Iterator<Item = IndexWalker<'db>> {
