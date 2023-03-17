@@ -1,0 +1,14 @@
+{
+    "action": "findMany",
+    "modelName": "User",
+    "query": {
+        "arguments": {
+            "where": {
+                "foo": 2
+            }
+        },
+        "selection": {
+            "$scalars": true
+        }
+    }
+}

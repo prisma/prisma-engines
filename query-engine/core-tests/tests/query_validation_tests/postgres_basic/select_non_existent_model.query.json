@@ -1,5 +1,0 @@
-{
-    "action": "findMany",
-    "modelName": "Alpaca",
-    "query": { "selection": { "id": true } }
-}

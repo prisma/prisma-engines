@@ -1,0 +1,53 @@
+{
+  "is_panic": false,
+  "message": "Argument does not exist in enclosing type",
+  "meta": {
+    "kind": "UnkownArgument",
+    "argumentPath": [
+      "foo"
+    ],
+    "arguments": [
+      {
+        "name": "where",
+        "typeNames": [
+          "UserWhereInput"
+        ]
+      },
+      {
+        "name": "orderBy",
+        "typeNames": [
+          "UserOrderByWithRelationAndSearchRelevanceInput[]",
+          "UserOrderByWithRelationAndSearchRelevanceInput"
+        ]
+      },
+      {
+        "name": "cursor",
+        "typeNames": [
+          "UserWhereUniqueInput"
+        ]
+      },
+      {
+        "name": "take",
+        "typeNames": [
+          "Int"
+        ]
+      },
+      {
+        "name": "skip",
+        "typeNames": [
+          "Int"
+        ]
+      },
+      {
+        "name": "distinct",
+        "typeNames": [
+          "enum[]"
+        ]
+      }
+    ],
+    "selectionPath": [
+      "findManyUser"
+    ]
+  },
+  "error_code": "P2009"
+}

@@ -1,0 +1,14 @@
+{
+  "is_panic": false,
+  "message": "Some fields are missing: Expected a minimum of 1 fields of (id, unique1, unique2, unique3_unique4) to be present, got 0.",
+  "meta": {
+    "kind": "SomeFieldsMissing",
+    "argumentPath": [
+      "where"
+    ],
+    "selectionPath": [
+      "findUniqueTestModel"
+    ]
+  },
+  "error_code": "P2009"
+}
