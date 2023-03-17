@@ -55,7 +55,7 @@ impl LogCallback {
 
             _ => Err(napi::Error::new(
                 napi::Status::from(status),
-                "could not create threadsafe function".into(),
+                "could not create threadsafe function".to_string(),
             )),
         }
     }
@@ -108,7 +108,7 @@ fn check_status_and_close(status: i32, tsfn_state: &mut ThreadsafeFunctionState)
 }
 
 fn closing_error() -> napi::Error {
-    napi::Error::new(napi::Status::Closing, "callback is closing".into())
+    napi::Error::new(napi::Status::Closing, "callback is closing".to_string())
 }
 
 unsafe extern "C" fn finalize_callback(

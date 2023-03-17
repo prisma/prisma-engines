@@ -15,7 +15,9 @@ fn comments_must_work_in_models() {
     "#};
 
     let schema = psl::parse_schema(dml).unwrap();
-    let user_model = schema.assert_has_model("User").assert_with_documentation("comment 1");
+
+    let user_model = schema.assert_has_model("User");
+    user_model.assert_with_documentation("comment 1");
 
     user_model
         .assert_has_scalar_field("firstName")

@@ -12,49 +12,32 @@ fn basic_index_must_work() {
     }
     "#;
 
-    let schema = parse(dml);
-    let user_model = schema.assert_has_model("User");
-    user_model.assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("User_firstName_lastName_idx".to_string()),
-        fields: vec![
-            IndexField::new_in_model("firstName"),
-            IndexField::new_in_model("lastName"),
-        ],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: None,
-        clustered: None,
-    });
+    psl::parse_schema(dml)
+        .unwrap()
+        .assert_has_model("User")
+        .assert_index_on_fields(&["firstName", "lastName"]);
 }
 
 #[test]
 fn indexes_on_enum_fields_must_work() {
     let dml = r#"
-    model User {
-        id        Int    @id
-        role      Role
+        model User {
+          id        Int    @id
+          role      Role
 
-        @@index([role])
-    }
+          @@index([role])
+        }
 
-    enum Role {
-        Admin
-        Member
-    }
+        enum Role {
+          Admin
+          Member
+        }
     "#;
 
-    let schema = parse(dml);
-    let user_model = schema.assert_has_model("User");
-    user_model.assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("User_role_idx".to_string()),
-        fields: vec![IndexField::new_in_model("role")],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: None,
-        clustered: None,
-    });
+    psl::parse_schema(dml)
+        .unwrap()
+        .assert_has_model("User")
+        .assert_index_on_fields(&["role"]);
 }
 
 // Illustrates the @@index compatibility hack.
@@ -70,20 +53,11 @@ fn the_name_argument_must_work() {
     }
     "#;
 
-    let schema = parse(dml);
-    let user_model = schema.assert_has_model("User");
-    user_model.assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("MyIndexName".to_string()),
-        fields: vec![
-            IndexField::new_in_model("firstName"),
-            IndexField::new_in_model("lastName"),
-        ],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: None,
-        clustered: None,
-    });
+    psl::parse_schema(dml)
+        .unwrap()
+        .assert_has_model("User")
+        .assert_index_on_fields(&["firstName", "lastName"])
+        .assert_name("MyIndexName");
 }
 
 #[test]
@@ -103,20 +77,11 @@ fn the_map_argument_must_work() {
         }
     "#;
 
-    let schema = parse(dml);
-    let user_model = schema.assert_has_model("User");
-    user_model.assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("MyIndexName".to_string()),
-        fields: vec![
-            IndexField::new_in_model("firstName"),
-            IndexField::new_in_model("lastName"),
-        ],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: None,
-        clustered: None,
-    });
+    psl::parse_schema(dml)
+        .unwrap()
+        .assert_has_model("User")
+        .assert_index_on_fields(&["firstName", "lastName"])
+        .assert_mapped_name("MyIndexName");
 }
 
 #[test]
@@ -132,34 +97,7 @@ fn multiple_index_must_work() {
     }
     "#;
 
-    let schema = parse(dml);
-    let user_model = schema.assert_has_model("User");
-
-    user_model.assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("User_firstName_lastName_idx".to_string()),
-        fields: vec![
-            IndexField::new_in_model("firstName"),
-            IndexField::new_in_model("lastName"),
-        ],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: None,
-        clustered: None,
-    });
-
-    user_model.assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("MyIndexName".to_string()),
-        fields: vec![
-            IndexField::new_in_model("firstName"),
-            IndexField::new_in_model("lastName"),
-        ],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: None,
-        clustered: None,
-    });
+    psl::parse_schema(dml).unwrap();
 }
 
 #[test]
@@ -183,47 +121,7 @@ fn index_accepts_three_different_notations() {
         &[],
     );
 
-    let schema = parse(&dml);
-    let user_model = schema.assert_has_model("User");
-
-    user_model.assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("OtherIndexName".to_string()),
-        fields: vec![
-            IndexField::new_in_model("firstName"),
-            IndexField::new_in_model("lastName"),
-        ],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: None,
-        clustered: None,
-    });
-
-    user_model.assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("MyIndexName".to_string()),
-        fields: vec![
-            IndexField::new_in_model("firstName"),
-            IndexField::new_in_model("lastName"),
-        ],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: None,
-        clustered: None,
-    });
-
-    user_model.assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("User_firstName_lastName_idx".to_string()),
-        fields: vec![
-            IndexField::new_in_model("firstName"),
-            IndexField::new_in_model("lastName"),
-        ],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: None,
-        clustered: None,
-    });
+    psl::parse_schema(dml).unwrap();
 }
 
 #[test]
@@ -234,23 +132,12 @@ fn mysql_allows_unique_length_prefix() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &[]);
-    let schema = parse(&schema);
-    let user_model = schema.assert_has_model("A");
-    user_model.assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_id_key".to_string()),
-        fields: vec![IndexField {
-            path: vec![("id".to_string(), None)],
-            sort_order: None,
-            length: Some(30),
-            operator_class: None,
-        }],
-        tpe: IndexType::Unique,
-        defined_on_field: true,
-        algorithm: None,
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Mysql, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_unique_on_fields(&["id"])
+        .assert_field("id")
+        .assert_length(30);
 }
 
 #[test]
@@ -417,17 +304,10 @@ fn mysql_fulltext_index() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Mysql, &["fullTextIndex"]);
-
-    parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_b_idx".to_string()),
-        fields: vec![IndexField::new_in_model("a"), IndexField::new_in_model("b")],
-        tpe: IndexType::Fulltext,
-        algorithm: None,
-        defined_on_field: false,
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Mysql, &["fullTextIndex"]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_fulltext_on_fields(&["a", "b"]);
 }
 
 #[test]
@@ -442,17 +322,11 @@ fn mysql_fulltext_index_map() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Mysql, &["fullTextIndex"]);
-
-    parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("my_text_index".to_string()),
-        fields: vec![IndexField::new_in_model("a"), IndexField::new_in_model("b")],
-        tpe: IndexType::Fulltext,
-        algorithm: None,
-        defined_on_field: false,
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Mysql, &["fullTextIndex"]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_fulltext_on_fields(&["a", "b"])
+        .assert_mapped_name("my_text_index");
 }
 
 #[test]
@@ -467,17 +341,10 @@ fn fulltext_index_mongodb() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Mongo, &["fullTextIndex"]);
-
-    parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_b_idx".to_string()),
-        fields: vec![IndexField::new_in_model("a"), IndexField::new_in_model("b")],
-        tpe: IndexType::Fulltext,
-        algorithm: None,
-        defined_on_field: false,
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Mongo, &["fullTextIndex"]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_fulltext_on_fields(&["a", "b"]);
 }
 
 #[test]
@@ -487,42 +354,18 @@ fn duplicate_index_different_sort_order_mongodb() {
           id String @id @default(auto()) @map("_id") @test.ObjectId
           a  Int
 
-          @@index([a(sort: Asc)], map: "aaa")
           @@index([a(sort: Desc)], map: "bbb")
+          @@index([a(sort: Asc)], map: "aaa")
         }
     "#};
 
-    let dml = with_header(dml, Provider::Mongo, &[]);
-
-    parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("aaa".to_string()),
-        fields: vec![IndexField {
-            path: vec![("a".to_string(), None)],
-            sort_order: Some(SortOrder::Asc),
-            length: None,
-            operator_class: None,
-        }],
-        tpe: IndexType::Normal,
-        algorithm: None,
-        defined_on_field: false,
-        clustered: None,
-    });
-
-    parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("bbb".to_string()),
-        fields: vec![IndexField {
-            path: vec![("a".to_string(), None)],
-            sort_order: Some(SortOrder::Desc),
-            length: None,
-            operator_class: None,
-        }],
-        tpe: IndexType::Normal,
-        algorithm: None,
-        defined_on_field: false,
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Mongo, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_mapped_name("bbb")
+        .assert_field("a")
+        .assert_descending();
 }
 
 #[test]
@@ -537,25 +380,12 @@ fn fulltext_index_sort_mongodb() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Mongo, &["fullTextIndex"]);
-
-    parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_b_idx".to_string()),
-        fields: vec![
-            IndexField::new_in_model("a"),
-            IndexField {
-                path: vec![("b".to_string(), None)],
-                sort_order: Some(SortOrder::Desc),
-                length: None,
-                operator_class: None,
-            },
-        ],
-        tpe: IndexType::Fulltext,
-        algorithm: None,
-        defined_on_field: false,
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Mongo, &["fullTextIndex"]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_fulltext_on_fields(&["a", "b"])
+        .assert_field("b")
+        .assert_descending();
 }
 
 #[test]
@@ -573,31 +403,9 @@ fn multiple_fulltext_indexes_allowed_per_model_in_mysql() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mysql, &["fullTextIndex"]);
+    let schema = psl::parse_schema(with_header(dml, Provider::Mysql, &["fullTextIndex"])).unwrap();
+    let a = schema.assert_has_model("A");
 
-    parse(&schema)
-        .assert_has_model("A")
-        .assert_has_index(IndexDefinition {
-            name: None,
-            db_name: Some("A_a_b_idx".to_string()),
-            fields: vec![IndexField::new_in_model("a"), IndexField::new_in_model("b")],
-            tpe: IndexType::Fulltext,
-            algorithm: None,
-            defined_on_field: false,
-            clustered: None,
-        })
-        .assert_has_index(IndexDefinition {
-            name: None,
-            db_name: Some("A_a_b_c_d_idx".to_string()),
-            fields: vec![
-                IndexField::new_in_model("a"),
-                IndexField::new_in_model("b"),
-                IndexField::new_in_model("c"),
-                IndexField::new_in_model("d"),
-            ],
-            tpe: IndexType::Fulltext,
-            algorithm: None,
-            defined_on_field: false,
-            clustered: None,
-        });
+    a.assert_fulltext_on_fields(&["a", "b"]);
+    a.assert_fulltext_on_fields(&["a", "b", "c", "d"]);
 }

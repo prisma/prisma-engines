@@ -1,5 +1,3 @@
-use crate::common::parse;
-
 #[test]
 fn skipping_of_env_vars() {
     let dml = r#"
@@ -15,5 +13,5 @@ fn skipping_of_env_vars() {
     "#;
 
     // must not fail without env var
-    parse(dml);
+    psl::parse_schema(dml).unwrap();
 }

@@ -11,18 +11,11 @@ fn clustered_index_works_on_sql_server() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::SqlServer, &[]);
-    let schema = parse(&schema);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![IndexField::new_in_model("a")],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: None,
-        clustered: Some(true),
-    });
+    psl::parse_schema(with_header(dml, Provider::SqlServer, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_clustered(true);
 }
 
 #[test]
@@ -34,19 +27,11 @@ fn clustered_unique_index_works_on_sql_server() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::SqlServer, &[]);
-    let schema = parse(&schema);
-    let model = schema.assert_has_model("A");
-
-    model.assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_key".to_string()),
-        fields: vec![IndexField::new_in_model("a")],
-        tpe: IndexType::Unique,
-        clustered: Some(true),
-        defined_on_field: true,
-        algorithm: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::SqlServer, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_unique_on_fields(&["a"])
+        .assert_clustered(true);
 }
 
 #[test]
@@ -61,19 +46,11 @@ fn clustered_compound_unique_index_works_on_sql_server() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::SqlServer, &[]);
-    let schema = parse(&schema);
-    let model = schema.assert_has_model("A");
-
-    model.assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_b_key".to_string()),
-        fields: vec![IndexField::new_in_model("a"), IndexField::new_in_model("b")],
-        tpe: IndexType::Unique,
-        clustered: Some(true),
-        defined_on_field: false,
-        algorithm: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::SqlServer, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_unique_on_fields(&["a", "b"])
+        .assert_clustered(true);
 }
 
 #[test]
@@ -84,11 +61,11 @@ fn non_clustered_id_works_on_sql_server() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::SqlServer, &[]);
-    let schema = parse_schema(&schema);
-    let model = schema.assert_has_model("A");
-    let pk = model.primary_key().unwrap();
-    assert_eq!(Some(false), pk.clustered())
+    psl::parse_schema(with_header(dml, Provider::SqlServer, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_id_on_fields(&["id"])
+        .assert_clustered(false);
 }
 
 #[test]
@@ -102,9 +79,9 @@ fn non_clustered_compound_id_works_on_sql_server() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::SqlServer, &[]);
-    let schema = parse_schema(&schema);
-    let model = schema.assert_has_model("A");
-    let pk = model.primary_key().unwrap();
-    assert_eq!(Some(false), pk.clustered())
+    psl::parse_schema(with_header(dml, Provider::SqlServer, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_id_on_fields(&["left", "right"])
+        .assert_clustered(false);
 }
