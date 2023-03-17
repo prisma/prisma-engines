@@ -791,7 +791,7 @@
 
                     <span class="comment">// Scalar handling
                     </span>(value, InputType::Scalar(scalar)) =&gt; <span class="self">self
-                        </span>.parse_scalar(<span class="kw-2">&amp;</span>parent_path, value, <span class="kw-2">&amp;</span>scalar)
+                        </span>.parse_scalar(<span class="kw-2">&amp;</span>parent_path, value, scalar)
                         .map(ParsedInputValue::Single),
 
                     <span class="comment">// Enum handling
@@ -816,7 +816,7 @@
 
                 <span class="comment">// List handling.
                 </span>(ArgumentValue::List(values), InputType::List(l)) =&gt; <span class="self">self
-                    </span>.parse_list(<span class="kw-2">&amp;</span>parent_path, values.clone(), <span class="kw-2">&amp;</span>l)
+                    </span>.parse_list(<span class="kw-2">&amp;</span>parent_path, values.clone(), l)
                     .map(ParsedInputValue::List),
 
                 <span class="comment">// Object handling

@@ -925,9 +925,9 @@
         .into_iter()
         .map(|data_value| {
             <span class="kw">let </span>data_map = data_value.try_into()<span class="question-mark">?</span>;
-            <span class="kw">let </span><span class="kw-2">mut </span>args = WriteArgsParser::from(<span class="kw-2">&amp;</span>child_model, data_map)<span class="question-mark">?</span>.args;
+            <span class="kw">let </span><span class="kw-2">mut </span>args = WriteArgsParser::from(child_model, data_map)<span class="question-mark">?</span>.args;
 
-            args.add_datetimes(<span class="kw-2">&amp;</span>child_model);
+            args.add_datetimes(child_model);
             <span class="prelude-val">Ok</span>(args)
         })
         .collect::&lt;QueryGraphBuilderResult&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;

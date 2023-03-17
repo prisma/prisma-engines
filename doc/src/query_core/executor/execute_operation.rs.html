@@ -262,10 +262,7 @@
 <a href="#262" id="262">262</a>
 <a href="#263" id="263">263</a>
 <a href="#264" id="264">264</a>
-<a href="#265" id="265">265</a>
-</pre><pre class="rust"><code><span class="kw">use </span>std::time::{Duration, Instant};
-
-<span class="kw">use </span><span class="kw">super</span>::pipeline::QueryPipeline;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::pipeline::QueryPipeline;
 <span class="kw">use crate</span>::{
     executor::request_context, protocol::EngineProtocol, CoreError, IrSerializer, Operation, QueryGraph,
     QueryGraphBuilder, QueryInterpreter, ResponseData,
@@ -276,6 +273,7 @@
     histogram, increment_counter, metrics, PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, PRISMA_CLIENT_QUERIES_TOTAL,
 };
 <span class="kw">use </span>schema::QuerySchemaRef;
+<span class="kw">use </span>std::time::{Duration, Instant};
 <span class="kw">use </span>tracing::Instrument;
 <span class="kw">use </span>tracing_futures::WithSubscriber;
 

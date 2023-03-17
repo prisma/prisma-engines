@@ -674,7 +674,7 @@
         .into_iter()
         .map(|value: ParsedInputValue| {
             <span class="kw">let </span>value: ParsedInputMap = value.try_into()<span class="question-mark">?</span>;
-            extract_unique_filter(value, <span class="kw-2">&amp;</span>child_model)
+            extract_unique_filter(value, child_model)
         })
         .collect::&lt;QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt;&gt;()<span class="question-mark">?
         </span>.into_iter()
@@ -735,7 +735,7 @@
         graph,
         <span class="kw-2">&amp;</span>parent_node,
         <span class="kw-2">&amp;</span>child_node,
-        <span class="kw-2">&amp;</span>parent_relation_field,
+        parent_relation_field,
         expected_connects,
     )<span class="question-mark">?</span>;
 

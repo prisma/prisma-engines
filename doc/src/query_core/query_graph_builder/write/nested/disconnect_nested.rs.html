@@ -337,7 +337,7 @@
     <span class="kw">let </span>find_child_records_node =
         utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, filter)<span class="question-mark">?</span>;
 
-    disconnect::disconnect_records_node(graph, parent_node, <span class="kw-2">&amp;</span>find_child_records_node, <span class="kw-2">&amp;</span>parent_relation_field)<span class="question-mark">?</span>;
+    disconnect::disconnect_records_node(graph, parent_node, <span class="kw-2">&amp;</span>find_child_records_node, parent_relation_field)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(())
 }
 

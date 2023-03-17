@@ -222,7 +222,7 @@
 
     <span class="kw">for </span>selector <span class="kw">in </span>selectors {
         <span class="kw">if let </span>AggregationSelection::Field(field) = selector {
-            <span class="kw">if </span>!group_by.contains(<span class="kw-2">&amp;</span>field) {
+            <span class="kw">if </span>!group_by.contains(field) {
                 missing_fields.push(field.name().to_owned());
             }
         }

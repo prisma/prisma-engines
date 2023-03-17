@@ -218,7 +218,7 @@
             <span class="kw">let </span><span class="kw-2">mut </span>f = File::create(<span class="string">&quot;graph.dot&quot;</span>).unwrap();
             <span class="kw">let </span>output = graph.to_graphviz();
 
-            f.write_all(<span class="kw-2">&amp;</span>output.as_bytes()).unwrap();
+            f.write_all(output.as_bytes()).unwrap();
         }
 
         <span class="prelude-val">Ok</span>(graph)

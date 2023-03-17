@@ -381,9 +381,9 @@
     </span><span class="kw">let </span>(unique_map, rest_map): (IndexMap&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;, IndexMap&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;) =
         value_map
             .into_iter()
-            .partition(|(field_name, <span class="kw">_</span>)| <span class="kw">match </span>model.fields().find_from_scalar(<span class="kw-2">&amp;</span>field_name) {
+            .partition(|(field_name, <span class="kw">_</span>)| <span class="kw">match </span>model.fields().find_from_scalar(field_name) {
                 <span class="prelude-val">Ok</span>(field) =&gt; field.unique(),
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; utils::resolve_compound_field(<span class="kw-2">&amp;</span>field_name, <span class="kw-2">&amp;</span>model).is_some(),
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; utils::resolve_compound_field(field_name, model).is_some(),
             });
     <span class="kw">let </span><span class="kw-2">mut </span>unique_map = ParsedInputMap::from(unique_map);
     <span class="kw">let </span><span class="kw-2">mut </span>rest_map = ParsedInputMap::from(rest_map);
@@ -408,7 +408,7 @@
                     <span class="kw">let </span>value: PrismaValue = value.try_into()<span class="question-mark">?</span>;
                     <span class="prelude-val">Ok</span>(field.equals(value))
                 }
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; utils::resolve_compound_field(<span class="kw-2">&amp;</span>field_name, <span class="kw-2">&amp;</span>model)
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; utils::resolve_compound_field(<span class="kw-2">&amp;</span>field_name, model)
                     .ok_or_else(|| {
                         QueryGraphBuilderError::AssertionError(<span class="macro">format!</span>(
                             <span class="string">&quot;Unable to resolve field {} to a field or set of scalar fields on model {}&quot;</span>,
@@ -604,16 +604,16 @@
 
     <span class="comment">// Merge the search filters that have the same condition
     </span><span class="kw">for </span>(pv, filter) <span class="kw">in </span>filters_by_val.into_iter() {
-        <span class="kw">let </span><span class="kw-2">mut </span>projections = projections_by_val.get_mut(<span class="kw-2">&amp;</span>pv).unwrap();
+        <span class="kw">let </span>projections = projections_by_val.get_mut(<span class="kw-2">&amp;</span>pv).unwrap();
         <span class="kw">let </span><span class="kw-2">mut </span>filter = filter.clone();
 
         <span class="kw">match </span>filter {
             Filter::Scalar(<span class="kw-2">ref mut </span>sf) =&gt; <span class="kw">match </span>sf.condition {
                 ScalarCondition::Search(<span class="kw">_</span>, <span class="kw-2">ref mut </span>search_proj) =&gt; {
-                    search_proj.append(<span class="kw-2">&amp;mut </span>projections);
+                    search_proj.append(projections);
                 }
                 ScalarCondition::NotSearch(<span class="kw">_</span>, <span class="kw-2">ref mut </span>search_proj) =&gt; {
-                    search_proj.append(<span class="kw-2">&amp;mut </span>projections);
+                    search_proj.append(projections);
                 }
                 <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
             },

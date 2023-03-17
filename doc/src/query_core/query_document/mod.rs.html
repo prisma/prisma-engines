@@ -388,7 +388,7 @@
             <span class="comment">// If it&#39;s a compound, then it&#39;s still considered as scalar
             </span>ArgumentValue::Object(<span class="kw">_</span>) <span class="kw">if </span>resolve_compound_field(key, model).is_some() =&gt; <span class="bool-val">false</span>,
             <span class="comment">// Otherwise, we just look for a scalar field inside the model. If it&#39;s not one, then we break.
-            </span>val =&gt; <span class="kw">match </span>model.fields().find_from_scalar(<span class="kw-2">&amp;</span>key) {
+            </span>val =&gt; <span class="kw">match </span>model.fields().find_from_scalar(key) {
                 <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">match </span>val {
                     <span class="comment">// Consider scalar _only_ if the filter object contains &quot;equals&quot;. eg: `{ scalar_field: { equals: 1 } }`
                     </span>ArgumentValue::Object(obj) =&gt; !obj.contains_key(filters::EQUALS),

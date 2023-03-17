@@ -507,16 +507,16 @@
         node: <span class="kw-2">&amp;</span>NodeRef,
         parent_edges: Vec&lt;EdgeRef&gt;,
     ) -&gt; InterpretationResult&lt;Expression&gt; {
-        graph.mark_visited(<span class="kw-2">&amp;</span>node);
+        graph.mark_visited(node);
 
         <span class="comment">// Child edges are ordered, evaluation order is low to high in the graph, unless other rules override.
-        </span><span class="kw">let </span>direct_children = graph.direct_child_pairs(<span class="kw-2">&amp;</span>node);
+        </span><span class="kw">let </span>direct_children = graph.direct_child_pairs(node);
 
         <span class="kw">let </span><span class="kw-2">mut </span>child_expressions = <span class="self">Self</span>::process_children(graph, direct_children)<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>is_result = graph.is_result_node(<span class="kw-2">&amp;</span>node);
+        <span class="kw">let </span>is_result = graph.is_result_node(node);
         <span class="kw">let </span>node_id = node.id();
-        <span class="kw">let </span>node = graph.pluck_node(<span class="kw-2">&amp;</span>node);
+        <span class="kw">let </span>node = graph.pluck_node(node);
         <span class="kw">let </span>into_expr = Box::new(|node: Node| {
             <span class="kw">let </span>query: Box&lt;Query&gt; = Box::new(node.try_into()<span class="question-mark">?</span>);
             <span class="prelude-val">Ok</span>(Expression::Query { query })
@@ -556,7 +556,7 @@
             .iter()
             .enumerate()
             .filter_map(|(ix, (<span class="kw">_</span>, child_node))| {
-                <span class="kw">if </span>graph.subgraph_contains_result(<span class="kw-2">&amp;</span>child_node) {
+                <span class="kw">if </span>graph.subgraph_contains_result(child_node) {
                     <span class="prelude-val">Some</span>(ix)
                 } <span class="kw">else </span>{
                     <span class="prelude-val">None
@@ -746,7 +746,7 @@
         node: <span class="kw-2">&amp;</span>NodeRef,
         parent_edges: Vec&lt;EdgeRef&gt;,
     ) -&gt; InterpretationResult&lt;Expression&gt; {
-        <span class="kw">let </span>direct_children = graph.direct_child_pairs(<span class="kw-2">&amp;</span>node);
+        <span class="kw">let </span>direct_children = graph.direct_child_pairs(node);
         <span class="kw">let </span>child_expressions = <span class="self">Self</span>::process_children(graph, direct_children)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>into_expr = Box::new(<span class="kw">move </span>|node: Node| {
@@ -819,7 +819,7 @@
                                             .as_selection_results(<span class="kw-2">&amp;</span>selection)
                                             .and_then(|parent_selections| <span class="prelude-val">Ok</span>(f(node, parent_selections)<span class="question-mark">?</span>)),
 
-                                        QueryGraphDependency::DataDependency(f) =&gt; <span class="prelude-val">Ok</span>(f(node, <span class="kw-2">&amp;</span>binding)<span class="question-mark">?</span>),
+                                        QueryGraphDependency::DataDependency(f) =&gt; <span class="prelude-val">Ok</span>(f(node, binding)<span class="question-mark">?</span>),
 
                                         <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
                                     };

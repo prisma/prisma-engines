@@ -1113,7 +1113,7 @@
         <span class="kw">let </span>create_arg = value.remove(args::CREATE).unwrap();
         <span class="kw">let </span>create_map: ParsedInputMap = create_arg.try_into()<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>filter = extract_unique_filter(where_map, <span class="kw-2">&amp;</span>child_model)<span class="question-mark">?</span>;
+        <span class="kw">let </span>filter = extract_unique_filter(where_map, child_model)<span class="question-mark">?</span>;
         <span class="kw">let </span>read_node = graph.create_node(utils::read_ids_infallible(
             child_model.clone(),
             child_model.primary_identifier(),
@@ -1124,10 +1124,10 @@
         <span class="kw">let </span>if_node = graph.create_node(Flow::default_if());
 
         <span class="kw">let </span>connect_exists_node =
-            connect::connect_records_node(graph, <span class="kw-2">&amp;</span>parent_node, <span class="kw-2">&amp;</span>read_node, <span class="kw-2">&amp;</span>parent_relation_field, <span class="number">1</span>)<span class="question-mark">?</span>;
+            connect::connect_records_node(graph, <span class="kw-2">&amp;</span>parent_node, <span class="kw-2">&amp;</span>read_node, parent_relation_field, <span class="number">1</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>_connect_create_node =
-            connect::connect_records_node(graph, <span class="kw-2">&amp;</span>parent_node, <span class="kw-2">&amp;</span>create_node, <span class="kw-2">&amp;</span>parent_relation_field, <span class="number">1</span>)<span class="question-mark">?</span>;
+            connect::connect_records_node(graph, <span class="kw-2">&amp;</span>parent_node, <span class="kw-2">&amp;</span>create_node, parent_relation_field, <span class="number">1</span>)<span class="question-mark">?</span>;
 
         graph.create_edge(<span class="kw-2">&amp;</span>parent_node, <span class="kw-2">&amp;</span>read_node, QueryGraphDependency::ExecutionOrder)<span class="question-mark">?</span>;
         graph.create_edge(
@@ -1200,7 +1200,7 @@
     <span class="kw">let </span>create_arg = value.remove(args::CREATE).unwrap();
     <span class="kw">let </span>create_data: ParsedInputMap = create_arg.try_into()<span class="question-mark">?</span>;
 
-    <span class="kw">let </span>filter = extract_unique_filter(where_map, <span class="kw-2">&amp;</span>child_model)<span class="question-mark">?</span>;
+    <span class="kw">let </span>filter = extract_unique_filter(where_map, child_model)<span class="question-mark">?</span>;
 
     <span class="kw">if </span>parent_relation_field.is_inlined_on_enclosing_model() {
         one_to_one_inlined_parent(
@@ -1274,7 +1274,7 @@
         <span class="kw">let </span>create_arg = value.remove(args::CREATE).unwrap();
         <span class="kw">let </span>create_map: ParsedInputMap = create_arg.try_into()<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>filter = extract_unique_filter(where_map, <span class="kw-2">&amp;</span>child_model)<span class="question-mark">?</span>;
+        <span class="kw">let </span>filter = extract_unique_filter(where_map, child_model)<span class="question-mark">?</span>;
         <span class="kw">let </span>read_node = graph.create_node(utils::read_ids_infallible(
             child_model.clone(),
             child_link.clone(),
@@ -1413,7 +1413,7 @@
     <span class="kw">let </span>create_arg = value.remove(args::CREATE).unwrap();
     <span class="kw">let </span>create_map: ParsedInputMap = create_arg.try_into()<span class="question-mark">?</span>;
 
-    <span class="kw">let </span>filter = extract_unique_filter(where_map, <span class="kw-2">&amp;</span>child_model)<span class="question-mark">?</span>;
+    <span class="kw">let </span>filter = extract_unique_filter(where_map, child_model)<span class="question-mark">?</span>;
     <span class="kw">let </span>read_node = graph.create_node(utils::read_ids_infallible(
         child_model.clone(),
         child_link.clone(),
@@ -1668,7 +1668,7 @@
     } <span class="kw">else </span>{
         <span class="comment">// Perform checks that no existing child in a required relation is violated.
         </span>graph.create_edge(<span class="kw-2">&amp;</span>if_node, <span class="kw-2">&amp;</span>parent_node, QueryGraphDependency::ExecutionOrder)<span class="question-mark">?</span>;
-        utils::insert_existing_1to1_related_model_checks(graph, <span class="kw-2">&amp;</span>parent_node, <span class="kw-2">&amp;</span>parent_relation_field)<span class="question-mark">?</span>;
+        utils::insert_existing_1to1_related_model_checks(graph, <span class="kw-2">&amp;</span>parent_node, parent_relation_field)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>parent_model = parent_relation_field.model();
         <span class="kw">let </span>update_parent_node = utils::update_records_node_placeholder(graph, Filter::empty(), parent_model.clone());

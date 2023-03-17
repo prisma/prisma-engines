@@ -429,12 +429,12 @@
     </span><span class="kw">async fn </span>process_msg(<span class="kw-2">&amp;mut </span><span class="self">self</span>, op: TxOpRequest) -&gt; RunState {
         <span class="kw">match </span>op.msg {
             TxOpRequestMsg::Single(<span class="kw-2">ref </span>operation, traceparent) =&gt; {
-                <span class="kw">let </span>result = <span class="self">self</span>.execute_single(<span class="kw-2">&amp;</span>operation, traceparent).<span class="kw">await</span>;
+                <span class="kw">let </span>result = <span class="self">self</span>.execute_single(operation, traceparent).<span class="kw">await</span>;
                 <span class="kw">let _ </span>= op.respond_to.send(TxOpResponse::Single(result));
                 RunState::Continue
             }
             TxOpRequestMsg::Batch(<span class="kw-2">ref </span>operations, traceparent) =&gt; {
-                <span class="kw">let </span>result = <span class="self">self</span>.execute_batch(<span class="kw-2">&amp;</span>operations, traceparent).<span class="kw">await</span>;
+                <span class="kw">let </span>result = <span class="self">self</span>.execute_batch(operations, traceparent).<span class="kw">await</span>;
                 <span class="kw">let _ </span>= op.respond_to.send(TxOpResponse::Batch(result));
                 RunState::Continue
             }
@@ -647,7 +647,7 @@
     <span class="kw">let </span>span = Span::current();
 
     <span class="kw">let </span>tx_id_str = tx_id.to_string();
-    span.record(<span class="string">&quot;itx_id&quot;</span>, <span class="kw-2">&amp;</span>tx_id_str.as_str());
+    span.record(<span class="string">&quot;itx_id&quot;</span>, tx_id_str.as_str());
 
     tokio::task::spawn(
         <span class="kw">crate</span>::executor::with_request_context(engine_protocol, <span class="kw">async move </span>{

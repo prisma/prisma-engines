@@ -114,26 +114,20 @@
 <a href="#114" id="114">114</a>
 <a href="#115" id="115">115</a>
 <a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::FieldPair;
-
-<span class="kw">use super</span>::<span class="kw-2">*</span>;
-
-<span class="kw">mod </span>aggregate;
+</pre><pre class="rust"><code><span class="kw">mod </span>aggregate;
 <span class="kw">mod </span>group_by;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>aggregate::<span class="kw-2">*</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>group_by::<span class="kw-2">*</span>;
 
+<span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::FieldPair;
 <span class="kw">use </span>connector::AggregationSelection;
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>prisma_models::{ModelRef, ScalarFieldRef};
 <span class="kw">use </span>schema_builder::constants::aggregations::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Resolves the given field as a aggregation query.
-</span><span class="attr">#[allow(clippy::unnecessary_wraps)]
 </span><span class="kw">fn </span>resolve_query(
     field: FieldPair,
     model: <span class="kw-2">&amp;</span>ModelRef,

@@ -12,12 +12,12 @@
 </pre><pre class="rust"><code><span class="kw">mod </span>error;
 <span class="kw">mod </span>expression;
 <span class="kw">mod </span>expressionista;
-<span class="kw">mod </span>interpreter;
+<span class="kw">mod </span>interpreter_impl;
 <span class="kw">mod </span>query_interpreters;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>error::<span class="kw-2">*</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>expressionista::<span class="kw-2">*</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>interpreter::<span class="kw-2">*</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>interpreter_impl::<span class="kw-2">*</span>;
 
 <span class="kw">type </span>InterpretationResult&lt;T&gt; = std::result::Result&lt;T, InterpreterError&gt;;
 </code></pre></div>
