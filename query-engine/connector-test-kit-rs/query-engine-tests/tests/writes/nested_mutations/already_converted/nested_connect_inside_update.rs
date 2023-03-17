@@ -1140,6 +1140,8 @@ mod connect_inside_update {
     }
 
     // Regression test for https://github.com/prisma/prisma/issues/18173
+    // Excluded on MongoDB because all models require an @id attribute
+    // Excluded on SQLServer because models with unique nulls can't have multiple NULLs, unlike other dbs.
     #[connector_test(schema(p1_c1_child_compound_unique_schema), exclude(MongoDb, SqlServer))]
     async fn p1_c1_child_compound_unique(runner: Runner) -> TestResult<()> {
         run_query!(&runner, r#"mutation { createOneParent(data: { id: 1 }) { id } }"#);
