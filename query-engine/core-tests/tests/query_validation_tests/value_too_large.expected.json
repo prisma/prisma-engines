@@ -18,7 +18,8 @@
         },
         "selectionPath": [
           "findManyUser"
-        ]
+        ],
+        "inferredType": "Float"
       },
       {
         "kind": "ValueTooLarge",

@@ -18,7 +18,8 @@
         },
         "selectionPath": [
           "findManyUser"
-        ]
+        ],
+        "inferredType": "String"
       },
       {
         "kind": "InvalidArgumentType",
@@ -34,7 +35,8 @@
         },
         "selectionPath": [
           "findManyUser"
-        ]
+        ],
+        "inferredType": "String"
       }
     ]
   },

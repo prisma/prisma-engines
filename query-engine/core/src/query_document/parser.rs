@@ -47,7 +47,7 @@ impl QueryDocumentParser {
                     Some(ref field) => {
                         self.parse_field(selection_path.clone(), argument_path.clone(), selection, field)
                     }
-                    None => Err(ValidationError::unkown_selection_field(
+                    None => Err(ValidationError::unknown_selection_field(
                         field_name.to_string(),
                         selection_path.segments(),
                         conversions::schema_object_to_output_type_description(schema_object),
@@ -238,19 +238,19 @@ impl QueryDocumentParser {
                         input_type_description.clone(),
                     )),
                     // Scalar handling
-                    (value, InputType::Scalar(scalar)) => self
-                        .parse_scalar(&selection_path, &argument_path, value, scalar)
+                    (pv, InputType::Scalar(st)) => self
+                        .parse_scalar(&selection_path, &argument_path, pv, st, &value, input_type)
                         .map(ParsedInputValue::Single),
 
                     // Enum handling
-                    (value @ PrismaValue::Enum(_), InputType::Enum(et)) => {
-                        self.parse_enum(&selection_path, &argument_path, value, &et.into_arc())
+                    (pv @ PrismaValue::Enum(_), InputType::Enum(et)) => {
+                        self.parse_enum(&selection_path, &argument_path, pv, &et.into_arc())
                     }
-                    (value @ PrismaValue::String(_), InputType::Enum(et)) => {
-                        self.parse_enum(&selection_path, &argument_path, value, &et.into_arc())
+                    (pv @ PrismaValue::String(_), InputType::Enum(et)) => {
+                        self.parse_enum(&selection_path, &argument_path, pv, &et.into_arc())
                     }
-                    (value @ PrismaValue::Boolean(_), InputType::Enum(et)) => {
-                        self.parse_enum(&selection_path, &argument_path, value, &et.into_arc())
+                    (pv @ PrismaValue::Boolean(_), InputType::Enum(et)) => {
+                        self.parse_enum(&selection_path, &argument_path, pv, &et.into_arc())
                     }
                     // Invalid combinations
                     _ => Err(ValidationError::invalid_argument_type(
@@ -260,6 +260,7 @@ impl QueryDocumentParser {
                             argument_path.last().unwrap_or_default().to_string(),
                             input_type,
                         ),
+                        conversions::argument_value_to_type_name(&value),
                     )),
                 },
 
@@ -287,6 +288,7 @@ impl QueryDocumentParser {
                         argument_path.last().unwrap_or_default().to_string(),
                         input_type,
                     ),
+                    conversions::argument_value_to_type_name(&value),
                 )),
             };
 
@@ -321,6 +323,8 @@ impl QueryDocumentParser {
         argument_path: &Path,
         value: PrismaValue,
         scalar_type: &ScalarType,
+        argument_value: &ArgumentValue,
+        input_type: &InputType,
     ) -> QueryParserResult<PrismaValue> {
         match (value, scalar_type.clone()) {
             // Identity matchers
@@ -377,10 +381,11 @@ impl QueryDocumentParser {
             (_, _) => Err(ValidationError::invalid_argument_type(
                 selection_path.segments(),
                 argument_path.segments(),
-                conversions::scalar_type_to_argument_description(
+                conversions::input_type_to_argument_description(
                     argument_path.last().unwrap_or_default().to_string(),
-                    scalar_type,
+                    input_type,
                 ),
+                conversions::argument_value_to_type_name(argument_value),
             )),
         }
     }
@@ -752,7 +757,11 @@ impl QueryDocumentParser {
 }
 
 pub(crate) mod conversions {
-    use crate::schema::{InputType, OutputType, ScalarType};
+    use crate::{
+        schema::{InputType, OutputType},
+        ArgumentValue,
+    };
+    use prisma_models::PrismaValue;
     use user_facing_errors::query_engine::validation;
 
     /// converts an schema object to the narrower validation::OutputTypeDescription
@@ -827,13 +836,6 @@ pub(crate) mod conversions {
             .collect::<Vec<_>>()
     }
 
-    pub(crate) fn scalar_type_to_argument_description(
-        arg_name: String,
-        scalar_type: &ScalarType,
-    ) -> validation::ArgumentDescription {
-        validation::ArgumentDescription::new(arg_name, vec![scalar_type.to_string()])
-    }
-
     pub(crate) fn input_type_to_argument_description(
         arg_name: String,
         input_type: &InputType,
@@ -841,7 +843,39 @@ pub(crate) mod conversions {
         validation::ArgumentDescription::new(arg_name, vec![to_simplified_input_type_name(input_type)])
     }
 
-    pub fn to_simplified_input_type_name(typ: &InputType) -> String {
+    pub(crate) fn argument_value_to_type_name(value: &ArgumentValue) -> String {
+        match value {
+            ArgumentValue::Scalar(pv) => prisma_value_to_type_name(pv),
+            ArgumentValue::Object(_) => "Object".to_string(),
+            ArgumentValue::List(v) => {
+                format!("({})", itertools::join(v.iter().map(argument_value_to_type_name), ", "))
+            }
+            ArgumentValue::FieldRef(_) => "FieldRef".to_string(),
+        }
+    }
+
+    fn prisma_value_to_type_name(pv: &PrismaValue) -> String {
+        match pv {
+            PrismaValue::String(_) => "String".to_string(),
+            PrismaValue::Boolean(_) => "Boolean".to_string(),
+            PrismaValue::Enum(_) => "Enum".to_string(),
+            PrismaValue::Int(_) => "Int".to_string(),
+            PrismaValue::Uuid(_) => "UUID".to_string(),
+            PrismaValue::List(v) => {
+                format!("({})", itertools::join(v.iter().map(prisma_value_to_type_name), ", "))
+            }
+            PrismaValue::Json(_) => "JSON".to_string(),
+            PrismaValue::Xml(_) => "XML".to_string(),
+            PrismaValue::Object(_) => "Object".to_string(),
+            PrismaValue::Null => "Null".to_string(),
+            PrismaValue::DateTime(_) => "DateTime".to_string(),
+            PrismaValue::Float(_) => "Float".to_string(),
+            PrismaValue::BigInt(_) => "BigInt".to_string(),
+            PrismaValue::Bytes(_) => "Bytes".to_string(),
+        }
+    }
+
+    pub(crate) fn to_simplified_input_type_name(typ: &InputType) -> String {
         match typ {
             InputType::Enum(_) => String::from("enum"),
             InputType::List(o) => format!("{}[]", to_simplified_input_type_name(o.as_ref())),
@@ -853,7 +887,7 @@ pub(crate) mod conversions {
         }
     }
 
-    pub fn to_simplified_output_type_name(typ: &OutputType) -> String {
+    pub(crate) fn to_simplified_output_type_name(typ: &OutputType) -> String {
         match typ {
             OutputType::Enum(_) => String::from("enum"),
             OutputType::List(o) => format!("{}[]", to_simplified_output_type_name(o)),
@@ -887,7 +921,7 @@ impl Path {
 }
 
 impl fmt::Display for Path {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.segments.join("."))
     }
 }

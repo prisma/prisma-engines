@@ -35,7 +35,8 @@
             },
             "selectionPath": [
               "createOneUser"
-            ]
+            ],
+            "inferredType": "String"
           }
         ]
       },
@@ -70,7 +71,8 @@
             },
             "selectionPath": [
               "createOneUser"
-            ]
+            ],
+            "inferredType": "String"
           }
         ]
       }

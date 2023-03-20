@@ -141,17 +141,20 @@ impl ValidationError {
     pub fn invalid_argument_type(
         selection_path: Vec<String>,
         argument_path: Vec<String>,
-        argument: ArgumentDescription,
+        argument_description: ArgumentDescription,
+        inferred_argument_type: String,
     ) -> Self {
         let message = format!(
             "Invalid argument type. `{}` should be of any of the following types: `{}`",
-            argument.name,
-            argument.type_names.join(", ")
+            argument_description.name,
+            argument_description.type_names.join(", ")
         );
         ValidationError {
             kind: ValidationErrorKind::InvalidArgumentType,
             message,
-            meta: Some(json!({"argumentPath": argument_path, "argument": argument, "selectionPath": selection_path })),
+            meta: Some(
+                json!({"argumentPath": argument_path, "argument": argument_description, "selectionPath": selection_path, "inferredType": inferred_argument_type }),
+            ),
         }
     }
 
@@ -305,14 +308,14 @@ impl ValidationError {
     pub fn unknown_argument(
         selection_path: Vec<String>,
         argument_path: Vec<String>,
-        arguments: Vec<ArgumentDescription>,
+        valid_argument_descriptions: Vec<ArgumentDescription>,
     ) -> Self {
         let message = String::from("Argument does not exist in enclosing type");
         ValidationError {
             kind: ValidationErrorKind::UnkownArgument,
             message,
             meta: Some(
-                json!({"argumentPath": argument_path, "arguments": arguments, "selectionPath": selection_path }),
+                json!({"argumentPath": argument_path, "arguments": valid_argument_descriptions, "selectionPath": selection_path}),
             ),
         }
     }
@@ -373,7 +376,7 @@ impl ValidationError {
     ///         }
     ///     }
     // }
-    pub fn unkown_selection_field(
+    pub fn unknown_selection_field(
         field_name: String,
         selection_path: Vec<String>,
         output_type_description: OutputTypeDescription,
