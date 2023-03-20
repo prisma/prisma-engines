@@ -1,10 +1,15 @@
 { config, pkgs, self', ... }:
 
-let engines = self'.packages.prisma-engines; in {
+# Run it with nix develop .#cli-shell.
+let
+  engines = self'.packages.prisma-engines;
+  prisma = self'.packages.cli-prisma;
+in
+{
   devShells.cli-shell = pkgs.mkShell {
-    packages = [ pkgs.cowsay pkgs.nodejs engines ];
+    packages = [ pkgs.cowsay pkgs.nodejs engines prisma ];
     shellHook = ''
-      cowsay -f turtle "Run prisma using \`npx prisma\`. In this shell, engines binaries built from source in this repo will automatically be used."
+      cowsay -f turtle "Run prisma using TODO"
 
       export PRISMA_MIGRATION_ENGINE_BINARY=${engines}/bin/migration-engine
       export PRISMA_QUERY_ENGINE_BINARY=${engines}/bin/query-engine

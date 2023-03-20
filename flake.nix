@@ -1,4 +1,6 @@
 {
+  nixConfig.sandbox = "relaxed";
+
   inputs = {
     crane = {
       url = "github:ipetkov/crane";
@@ -33,6 +35,7 @@
           ./nix/args.nix
           ./nix/cargo-doc.nix
           ./nix/cli-shell.nix
+          ./nix/cli-prisma.nix
           ./nix/dev-vm.nix
           ./nix/prisma-fmt-wasm.nix
           ./nix/publish-engine-size.nix
