@@ -1,10 +1,9 @@
 use std::fmt::Debug;
 
-use dml::ReferentialAction;
 use either::Either::{Left, Right};
 use psl::datamodel_connector::Connector;
 use psl::diagnostics::DatamodelWarning;
-use psl::parser_database::{walkers, IndexAlgorithm, OperatorClass, ScalarType, SortOrder};
+use psl::parser_database::{walkers, IndexAlgorithm, OperatorClass, ReferentialAction, ScalarType, SortOrder};
 use psl::schema_ast::ast::WithDocumentation;
 use psl::schema_ast::ast::{self, FieldArity};
 use psl::{Diagnostics, StringFromEnvVar};
@@ -31,6 +30,7 @@ pub(crate) trait ModelAssert<'a> {
     fn assert_with_documentation(&self, t: &str) -> &Self;
     fn assert_index_on_fields(&self, fields: &[&str]) -> walkers::IndexWalker<'a>;
     fn assert_unique_on_fields(&self, fields: &[&str]) -> walkers::IndexWalker<'a>;
+    fn assert_unique_on_fields_and_name(&self, fields: &[&str], name: &str) -> walkers::IndexWalker<'a>;
     fn assert_fulltext_on_fields(&self, fields: &[&str]) -> walkers::IndexWalker<'a>;
     fn assert_id_on_fields(&self, fields: &[&str]) -> walkers::PrimaryKeyWalker<'a>;
     fn assert_mapped_name(&self, name: &str) -> &Self;
@@ -52,6 +52,7 @@ pub(crate) trait ScalarFieldAssert {
     fn assert_list(&self) -> &Self;
     fn assert_default_value(&self) -> walkers::DefaultValueWalker<'_>;
     fn assert_mapped_name(&self, name: &str) -> &Self;
+    fn assert_is_updated_at(&self) -> &Self;
 
     fn assert_native_type<T>(&self, connector: &dyn Connector, typ: &T) -> &Self
     where
@@ -224,6 +225,18 @@ impl<'a> ModelAssert<'a> for walkers::ModelWalker<'a> {
     }
 
     #[track_caller]
+    fn assert_unique_on_fields_and_name(&self, fields: &[&str], name: &str) -> walkers::IndexWalker<'a> {
+        self.indexes()
+            .filter(|i| i.is_unique())
+            .find(|i| {
+                i.name() == Some(name)
+                    && i.fields().len() == fields.len()
+                    && i.fields().zip(fields).all(|(a, b)| a.name() == *b)
+            })
+            .expect("Could not find index with the given fields.")
+    }
+
+    #[track_caller]
     fn assert_fulltext_on_fields(&self, fields: &[&str]) -> walkers::IndexWalker<'a> {
         self.indexes()
             .filter(|i| i.is_fulltext())
@@ -351,6 +364,12 @@ impl<'a> ScalarFieldAssert for walkers::ScalarFieldWalker<'a> {
     fn assert_default_value(&self) -> walkers::DefaultValueWalker<'_> {
         self.default_value().expect("Field does not have a default value")
     }
+
+    #[track_caller]
+    fn assert_is_updated_at(&self) -> &Self {
+        assert!(self.is_updated_at());
+        self
+    }
 }
 
 impl<'a> DefaultValueAssert for walkers::DefaultValueWalker<'a> {
@@ -443,7 +462,12 @@ impl<'a> IndexAssert for walkers::IndexWalker<'a> {
 
     #[track_caller]
     fn assert_name(&self, name: &str) -> &Self {
-        assert_eq!(Some(name), self.mapped_name());
+        if self.name().is_some() {
+            assert_eq!(Some(name), self.name());
+        } else {
+            assert_eq!(Some(name), self.mapped_name());
+        }
+
         self
     }
 
