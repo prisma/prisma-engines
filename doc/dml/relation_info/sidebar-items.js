@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":[["RelationInfo","Holds information about a relation field."]]};
