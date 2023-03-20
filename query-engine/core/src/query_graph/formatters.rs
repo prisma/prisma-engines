@@ -52,7 +52,7 @@ fn stringify_nodes(graph: &QueryGraph, nodes: Vec<NodeRef>, seen_nodes: &mut Vec
 }
 
 impl Display for Flow {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::If(_) => write!(f, "(If (condition func)"),
             Self::Return(_) => write!(f, "(return results)"),
@@ -61,7 +61,7 @@ impl Display for Flow {
 }
 
 impl Display for Computation {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Diff(_) => write!(f, "Diff"),
         }
@@ -69,7 +69,7 @@ impl Display for Computation {
 }
 
 impl Display for Node {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Query(q) => write!(f, "{q}"),
             Self::Flow(flow) => write!(f, "{flow}"),
@@ -91,19 +91,19 @@ impl ToGraphviz for Node {
 }
 
 impl Display for NodeRef {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Node {}", self.id())
     }
 }
 
 impl Display for QueryGraph {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", format(self))
     }
 }
 
 impl Display for QueryGraphDependency {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::ExecutionOrder => write!(f, "ExecutionOrder"),
             Self::DataDependency(_) => write!(f, "ParentResult"),

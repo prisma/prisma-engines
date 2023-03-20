@@ -26,7 +26,7 @@ pub enum InterpreterError {
 }
 
 impl fmt::Display for InterpreterError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::QueryGraphBuilderError(e) => write!(f, "{e:?}"),
             _ => write!(f, "Error occurred during query execution:\n{self:?}"),

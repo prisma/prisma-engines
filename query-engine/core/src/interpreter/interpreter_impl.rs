@@ -156,7 +156,7 @@ impl<'conn> QueryInterpreter<'conn> {
         tracing::level_filters::STATIC_MAX_LEVEL == tracing::level_filters::LevelFilter::TRACE
     }
 
-    pub fn new(conn: &'conn mut dyn ConnectionLike) -> QueryInterpreter {
+    pub fn new(conn: &'conn mut dyn ConnectionLike) -> QueryInterpreter<'_> {
         let log = SegQueue::new();
 
         if Self::log_enabled() {

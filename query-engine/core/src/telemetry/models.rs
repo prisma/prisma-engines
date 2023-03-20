@@ -67,7 +67,7 @@ impl From<SpanData> for TraceSpan {
 
         let is_quaint_query = matches!(span.name, Cow::Borrowed("quaint:query"));
 
-        let name: Cow<str> = if is_quaint_query {
+        let name: Cow<'_, str> = if is_quaint_query {
             "prisma:engine:db_query".into()
         } else {
             span.name.clone()

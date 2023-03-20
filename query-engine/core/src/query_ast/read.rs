@@ -55,7 +55,7 @@ impl FilteredQuery for ReadQuery {
 }
 
 impl Display for ReadQuery {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::RecordQuery(q) => write!(
                 f,

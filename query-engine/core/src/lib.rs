@@ -1,3 +1,5 @@
+#![deny(rust_2018_idioms)]
+
 #[macro_use]
 extern crate tracing;
 
@@ -39,5 +41,5 @@ use self::{
 pub type Result<T> = std::result::Result<T, CoreError>;
 
 // Re-exports
-pub extern crate schema;
-pub extern crate schema_builder;
+pub use schema;
+pub use schema_builder;
