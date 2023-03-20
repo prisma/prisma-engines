@@ -1797,7 +1797,7 @@
 /// ```
 </span><span class="attr">#[bitflags]
 #[repr(u8)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 </span><span class="kw">pub enum </span>IndexAlgorithm {
     <span class="doccomment">/// Binary tree index (the default in most databases)
     </span>BTree,
