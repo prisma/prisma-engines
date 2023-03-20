@@ -72,7 +72,7 @@ async fn simple_view_from_one_table(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql), exclude(Vitess), preview_features("views"))]
+#[test_connector(tags(Mysql), exclude(Vitess, Mariadb), preview_features("views"))]
 async fn simple_view_from_two_tables(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE User (

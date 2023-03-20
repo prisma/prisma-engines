@@ -484,7 +484,7 @@ fn execute_postgres(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb))]
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("views"))]
 fn introspect_postgres(api: TestApi) {
     /* Drop and create database via `drop-database` and `create-database` */
 
@@ -502,6 +502,11 @@ fn introspect_postgres(api: TestApi) {
           provider = "postgres"
           url = env("TEST_DATABASE_URL")
         }
+
+        generator js {
+          provider = "prisma-client-js"
+          previewFeatures = ["views"]
+        }
     "#};
 
     let schema_path = tmpdir.path().join("prisma.schema");
@@ -517,11 +522,14 @@ fn introspect_postgres(api: TestApi) {
 
         let script = indoc! {r#"
             DROP TABLE IF EXISTS "public"."A";
+            DROP VIEW IF EXISTS "public"."B";
 
             CREATE TABLE "public"."A" (
                 id SERIAL PRIMARY KEY,
                 data TEXT
             );
+
+            CREATE VIEW "public"."B" AS SELECT 1 AS col;
         "#};
 
         let msg = serde_json::to_string(&serde_json::json!({
@@ -569,7 +577,7 @@ fn introspect_postgres(api: TestApi) {
         stdout.read_line(&mut response).unwrap();
 
         let expected = expect![[r#"
-            {"jsonrpc":"2.0","result":{"datamodel":"datasource db {\n  provider = \"postgres\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n\nmodel A {\n  id   Int     @id @default(autoincrement())\n  data String?\n}\n","version":"Prisma11","warnings":[]},"id":1}
+            {"jsonrpc":"2.0","result":{"datamodel":"generator js {\n  provider        = \"prisma-client-js\"\n  previewFeatures = [\"views\"]\n}\n\ndatasource db {\n  provider = \"postgres\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n\nmodel A {\n  id   Int     @id @default(autoincrement())\n  data String?\n}\n\n/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.\nview B {\n  col Int?\n\n  @@ignore\n}\n","version":"NonPrisma","views":[{"definition":"SELECT\n  1 AS col;","name":"B","schema":"public"}],"warnings":[{"affected":[{"view":"B"}],"code":24,"message":"The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers"}]},"id":1}
         "#]];
 
         expected.assert_eq(&response);
