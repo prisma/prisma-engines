@@ -14,7 +14,7 @@
 
 <span class="doccomment">/// Filters-in spans and events that are statically determined to be relevant for capturing
 /// Dynamic filtering will be done by the [`crate::capturer::Processor`]
-</span><span class="kw">pub fn </span>span_and_event_filter(meta: <span class="kw-2">&amp;</span>Metadata) -&gt; bool {
+</span><span class="kw">pub fn </span>span_and_event_filter(meta: <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
     <span class="kw">if </span>meta.fields().iter().any(|f| f.name() == <span class="string">&quot;user_facing&quot;</span>) {
         <span class="kw">return </span><span class="bool-val">true</span>;
     }

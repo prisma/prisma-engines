@@ -466,7 +466,7 @@
         tracing::level_filters::STATIC_MAX_LEVEL == tracing::level_filters::LevelFilter::TRACE
     }
 
-    <span class="kw">pub fn </span>new(conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn </span><span class="kw-2">mut </span><span class="kw">dyn </span>ConnectionLike) -&gt; QueryInterpreter {
+    <span class="kw">pub fn </span>new(conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn </span><span class="kw-2">mut </span><span class="kw">dyn </span>ConnectionLike) -&gt; QueryInterpreter&lt;<span class="lifetime">&#39;_</span>&gt; {
         <span class="kw">let </span>log = SegQueue::new();
 
         <span class="kw">if </span><span class="self">Self</span>::log_enabled() {

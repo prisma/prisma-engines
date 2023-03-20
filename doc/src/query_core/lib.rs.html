@@ -41,7 +41,11 @@
 <a href="#41" id="41">41</a>
 <a href="#42" id="42">42</a>
 <a href="#43" id="43">43</a>
-</pre><pre class="rust"><code><span class="attr">#[macro_use]
+<a href="#44" id="44">44</a>
+<a href="#45" id="45">45</a>
+</pre><pre class="rust"><code><span class="attr">#![deny(rust_2018_idioms)]
+
+#[macro_use]
 </span><span class="kw">extern crate </span>tracing;
 
 <span class="kw">pub mod </span>constants;
@@ -82,7 +86,7 @@
 </span><span class="kw">pub type </span><span class="prelude-ty">Result</span>&lt;T&gt; = std::result::Result&lt;T, CoreError&gt;;
 
 <span class="comment">// Re-exports
-</span><span class="kw">pub extern crate </span>schema;
-<span class="kw">pub extern crate </span>schema_builder;
+</span><span class="kw">pub use </span>schema;
+<span class="kw">pub use </span>schema_builder;
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="query_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
