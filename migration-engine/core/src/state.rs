@@ -361,9 +361,20 @@ impl GenericApi for EngineState {
                     if result.is_empty {
                         Err(ConnectorError::into_introspection_result_empty_error())
                     } else {
+                        let views = result.views.map(|v| {
+                            v.into_iter()
+                                .map(|view| IntrospectionView {
+                                    schema: view.schema,
+                                    name: view.name,
+                                    definition: view.definition,
+                                })
+                                .collect()
+                        });
+
                         Ok(IntrospectResult {
                             datamodel: result.data_model,
                             version: format!("{:?}", result.version),
+                            views,
                             warnings: result
                                 .warnings
                                 .into_iter()

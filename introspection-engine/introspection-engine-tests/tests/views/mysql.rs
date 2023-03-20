@@ -45,6 +45,16 @@ async fn simple_view_from_one_table(api: &TestApi) -> TestResult {
     api.expect_datamodel(&expected).await;
 
     let expected = expect![[r#"
+        SELECT
+          `simple_view_from_one_table`.`A`.`id` AS `id`,
+          `simple_view_from_one_table`.`A`.`first_name` AS `first_name`,
+          `simple_view_from_one_table`.`A`.`last_name` AS `last_name`
+        FROM
+          `simple_view_from_one_table`.`A`"#]];
+
+    api.expect_view_definition(api.schema_name(), "B", &expected).await;
+
+    let expected = expect![[r#"
         [
           {
             "code": 24,
@@ -56,6 +66,7 @@ async fn simple_view_from_one_table(api: &TestApi) -> TestResult {
             ]
           }
         ]"#]];
+
     api.expect_warnings(&expected).await;
 
     Ok(())
@@ -122,6 +133,20 @@ async fn simple_view_from_two_tables(api: &TestApi) -> TestResult {
     "#]];
 
     api.expect_datamodel(&expected).await;
+
+    let expected = expect![[r#"
+        SELECT
+          `u`.`id` AS `id`,
+          concat(`u`.`first_name`, ' ', `u`.`last_name`) AS `name`,
+          `p`.`introduction` AS `introduction`
+        FROM
+          (
+            `simple_view_from_two_tables`.`User` `u`
+            JOIN `simple_view_from_two_tables`.`Profile` `p` ON((`u`.`id` = `p`.`user_id`))
+          )"#]];
+
+    api.expect_view_definition(api.schema_name(), "Schwuser", &expected)
+        .await;
 
     Ok(())
 }

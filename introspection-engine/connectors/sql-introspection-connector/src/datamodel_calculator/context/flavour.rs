@@ -17,4 +17,13 @@ pub(crate) trait IntrospectionFlavour {
     fn keep_previous_scalar_field_arity(&self, _: sql::ColumnWalker<'_>) -> bool {
         false
     }
+
+    fn format_view_definition(&self, definition: &str) -> String {
+        let opts = sqlformat::FormatOptions {
+            uppercase: true,
+            ..Default::default()
+        };
+
+        sqlformat::format(definition, &Default::default(), opts)
+    }
 }

@@ -188,7 +188,9 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
             .catch(self.describe(Some(ctx.datasource().active_provider), &namespaces))
             .await?;
 
-        datamodel_calculator::calculate(&sql_schema, ctx).map_err(|sql_introspection_error| {
+        let search_path = self.connection.connection_info().schema_name();
+
+        datamodel_calculator::calculate(&sql_schema, ctx, search_path).map_err(|sql_introspection_error| {
             sql_introspection_error.into_connector_error(self.connection.connection_info())
         })
     }

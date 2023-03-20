@@ -137,6 +137,7 @@ impl RpcImpl {
                 datamodel: introspection_result.data_model,
                 warnings: introspection_result.warnings,
                 version: introspection_result.version,
+                views: introspection_result.views,
             })
         }
     }

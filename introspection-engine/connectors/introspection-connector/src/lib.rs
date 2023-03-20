@@ -42,6 +42,16 @@ impl Version {
     }
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+pub struct ViewDefinition {
+    /// The database or schema where the view is located.
+    pub schema: String,
+    /// The name of the view.
+    pub name: String,
+    /// The database definition of the view.
+    pub definition: String,
+}
+
 #[derive(Debug)]
 pub struct IntrospectionResult {
     /// Datamodel
@@ -52,6 +62,7 @@ pub struct IntrospectionResult {
     pub warnings: Vec<Warning>,
     /// Inferred Prisma version
     pub version: Version,
+    pub views: Option<Vec<ViewDefinition>>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -69,6 +80,8 @@ pub struct IntrospectionResultOutput {
     pub warnings: Vec<Warning>,
     /// version
     pub version: Version,
+    /// views
+    pub views: Option<Vec<ViewDefinition>>,
 }
 
 pub struct IntrospectionContext {

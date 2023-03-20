@@ -415,6 +415,10 @@ impl SqlFlavour for MysqlFlavour {
             connection.version(&params.url).await
         })
     }
+
+    fn search_path(&self) -> &str {
+        self.database_name()
+    }
 }
 
 #[enumflags2::bitflags]

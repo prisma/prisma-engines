@@ -167,4 +167,11 @@ impl<'a> ViewPair<'a> {
             .filter(|pk| pk.fields().len() > 1)
             .map(|prev| Pair::new(self.context, Some(prev), None))
     }
+
+    /// The SQL definition statement of the view.
+    pub(crate) fn definition(self) -> Option<String> {
+        self.next
+            .definition()
+            .map(|s| self.context.flavour.format_view_definition(s))
+    }
 }

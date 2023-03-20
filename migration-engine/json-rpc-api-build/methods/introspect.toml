@@ -33,6 +33,11 @@ isList = true
 [recordShapes.introspectResult.fields.version]
 shape = "string"
 
+[recordShapes.introspectResult.fields.views]
+shape = "introspectionView"
+isNullable = true
+isList = true
+
 [recordShapes.introspectionWarning]
 
 [recordShapes.introspectionWarning.fields.code]
@@ -43,3 +48,14 @@ shape = "string"
 
 [recordShapes.introspectionWarning.fields.affected]
 shape = "serde_json::Value"
+
+[recordShapes.introspectionView]
+
+[recordShapes.introspectionView.fields.schema]
+shape = "string"
+
+[recordShapes.introspectionView.fields.name]
+shape = "string"
+
+[recordShapes.introspectionView.fields.definition]
+shape = "string"

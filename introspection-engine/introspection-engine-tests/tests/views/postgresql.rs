@@ -83,6 +83,17 @@ async fn simple_view_from_one_table(api: &TestApi) -> TestResult {
     api.expect_datamodel(&expected).await;
 
     let expected = expect![[r#"
+        SELECT
+          "User".id,
+          "User".first_name,
+          "User".last_name
+        FROM
+          "User";"#]];
+
+    api.expect_view_definition(api.schema_name(), "Schwuser", &expected)
+        .await;
+
+    let expected = expect![[r#"
         [
           {
             "code": 24,
@@ -160,6 +171,20 @@ async fn simple_view_from_two_tables(api: &TestApi) -> TestResult {
     "#]];
 
     api.expect_datamodel(&expected).await;
+
+    let expected = expect![[r#"
+        SELECT
+          u.id,
+          concat(u.first_name, ' ', u.last_name) AS name,
+          p.introduction
+        FROM
+          (
+            "User" u
+            JOIN "Profile" p ON ((u.id = p.user_id))
+          );"#]];
+
+    api.expect_view_definition(api.schema_name(), "Schwuser", &expected)
+        .await;
 
     Ok(())
 }
@@ -853,6 +878,12 @@ async fn schema_is_introspected(api: &TestApi) -> TestResult {
     "#]];
 
     api.expect_datamodel(&expected).await;
+
+    let expected = expect![[r#"
+        SELECT
+          1 AS id;"#]];
+
+    api.expect_view_definition("public", "A", &expected).await;
 
     Ok(())
 }
