@@ -1,10 +1,6 @@
-use prisma_value::PrismaValue;
-use psl_core::parser_database::{
-    ast::{self},
-    ScalarType,
-};
-
 use crate::{DefaultKind, ValueGenerator};
+use prisma_value::PrismaValue;
+use psl_core::parser_database::{ast, ScalarType};
 
 pub fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<ScalarType>) -> DefaultKind {
     // This has all been validated in parser-database, so unwrapping is always safe.
