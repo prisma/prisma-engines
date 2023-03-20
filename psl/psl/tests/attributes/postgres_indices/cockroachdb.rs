@@ -1,3 +1,5 @@
+use psl::parser_database::IndexAlgorithm;
+
 use crate::{common::*, with_header, Provider};
 
 #[test]
@@ -11,20 +13,11 @@ fn array_field_default_ops() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Cockroach, &["cockroachDb"]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Gin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Gin);
 }
 
 #[test]
@@ -38,20 +31,11 @@ fn no_ops_json_prisma_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Cockroach, &["cockroachDb"]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Gin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Gin);
 }
 
 #[test]
@@ -65,20 +49,11 @@ fn with_raw_unsupported() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Cockroach, &["cockroachDb"]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Gin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Gin);
 }
 
 #[test]
@@ -93,21 +68,11 @@ fn jsonb_column_as_the_last_in_index() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Cockroach, &["cockroachDb"]);
-    let schema = parse(&schema);
-
-    let b = IndexField::new_in_model("b");
-    let a = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_b_a_idx".to_string()),
-        fields: vec![b, a],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Gin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["b", "a"])
+        .assert_type(IndexAlgorithm::Gin);
 }
 
 #[test]

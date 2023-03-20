@@ -1,9 +1,10 @@
 use std::fmt::Debug;
 
 use dml::ReferentialAction;
+use either::Either::{Left, Right};
 use psl::datamodel_connector::Connector;
 use psl::diagnostics::DatamodelWarning;
-use psl::parser_database::{walkers, ScalarType, SortOrder};
+use psl::parser_database::{walkers, IndexAlgorithm, OperatorClass, ScalarType, SortOrder};
 use psl::schema_ast::ast::WithDocumentation;
 use psl::schema_ast::ast::{self, FieldArity};
 use psl::{Diagnostics, StringFromEnvVar};
@@ -91,11 +92,14 @@ pub(crate) trait IndexAssert {
     fn assert_name(&self, name: &str) -> &Self;
     fn assert_mapped_name(&self, name: &str) -> &Self;
     fn assert_clustered(&self, clustered: bool) -> &Self;
+    fn assert_type(&self, r#type: IndexAlgorithm) -> &Self;
 }
 
 pub(crate) trait IndexFieldAssert {
     fn assert_descending(&self) -> &Self;
     fn assert_length(&self, length: u32) -> &Self;
+    fn assert_ops(&self, ops: OperatorClass) -> &Self;
+    fn assert_raw_ops(&self, ops: &str) -> &Self;
 }
 
 impl DatasourceAsserts for psl::Datasource {
@@ -454,6 +458,12 @@ impl<'a> IndexAssert for walkers::IndexWalker<'a> {
         assert_eq!(Some(clustered), self.clustered());
         self
     }
+
+    #[track_caller]
+    fn assert_type(&self, r#type: IndexAlgorithm) -> &Self {
+        assert_eq!(Some(r#type), self.algorithm());
+        self
+    }
 }
 
 impl<'a> IndexFieldAssert for walkers::ScalarFieldAttributeWalker<'a> {
@@ -466,6 +476,18 @@ impl<'a> IndexFieldAssert for walkers::ScalarFieldAttributeWalker<'a> {
     #[track_caller]
     fn assert_length(&self, length: u32) -> &Self {
         assert_eq!(Some(length), self.length());
+        self
+    }
+
+    #[track_caller]
+    fn assert_ops(&self, ops: OperatorClass) -> &Self {
+        assert_eq!(Some(Left(ops)), self.operator_class().map(|ops| ops.get()));
+        self
+    }
+
+    #[track_caller]
+    fn assert_raw_ops(&self, ops: &str) -> &Self {
+        assert_eq!(Some(Right(ops)), self.operator_class().map(|ops| ops.get()));
         self
     }
 }
@@ -635,5 +657,10 @@ impl<'a> IndexAssert for walkers::PrimaryKeyWalker<'a> {
     fn assert_clustered(&self, clustered: bool) -> &Self {
         assert_eq!(Some(clustered), self.clustered());
         self
+    }
+
+    #[track_caller]
+    fn assert_type(&self, _type: IndexAlgorithm) -> &Self {
+        unreachable!("Primary key cannot define the index type.");
     }
 }

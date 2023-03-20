@@ -347,7 +347,7 @@ pub(crate) struct ModelAttributes {
 /// ```
 #[bitflags]
 #[repr(u8)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum IndexAlgorithm {
     /// Binary tree index (the default in most databases)
     BTree,

@@ -4,6 +4,8 @@ mod gin;
 mod gist;
 mod spgist;
 
+use psl::parser_database::IndexAlgorithm;
+
 use crate::{common::*, with_header, Provider};
 
 #[test]
@@ -17,18 +19,11 @@ fn hash_index() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![IndexField::new_in_model("a")],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Hash),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Hash);
 }
 
 #[test]
