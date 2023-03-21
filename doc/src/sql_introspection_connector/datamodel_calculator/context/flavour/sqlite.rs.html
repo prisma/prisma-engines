@@ -7,13 +7,71 @@
 <a href="#7" id="7">7</a>
 <a href="#8" id="8">8</a>
 <a href="#9" id="9">9</a>
-</pre><pre class="rust"><code><span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
+<a href="#10" id="10">10</a>
+<a href="#11" id="11">11</a>
+<a href="#12" id="12">12</a>
+<a href="#13" id="13">13</a>
+<a href="#14" id="14">14</a>
+<a href="#15" id="15">15</a>
+<a href="#16" id="16">16</a>
+<a href="#17" id="17">17</a>
+<a href="#18" id="18">18</a>
+<a href="#19" id="19">19</a>
+<a href="#20" id="20">20</a>
+<a href="#21" id="21">21</a>
+<a href="#22" id="22">22</a>
+<a href="#23" id="23">23</a>
+<a href="#24" id="24">24</a>
+<a href="#25" id="25">25</a>
+<a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
+<a href="#38" id="38">38</a>
+</pre><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+
+<span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
+<span class="kw">use </span>sqlparser::{ast::Statement, parser::Parser};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>SqliteIntrospectionFlavour;
 
 <span class="kw">impl </span><span class="kw">super</span>::IntrospectionFlavour <span class="kw">for </span>SqliteIntrospectionFlavour {
     <span class="kw">fn </span>keep_previous_scalar_field_arity(<span class="kw-2">&amp;</span><span class="self">self</span>, next: sql::ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
         next.is_in_view() &amp;&amp; next.column_type().arity.is_nullable()
+    }
+
+    <span class="kw">fn </span>format_view_definition(<span class="kw-2">&amp;</span><span class="self">self</span>, definition: <span class="kw-2">&amp;</span>str) -&gt; String {
+        <span class="kw">let </span>dialect = sqlparser::dialect::SQLiteDialect {};
+
+        <span class="kw">let </span>stmt = Parser::new(<span class="kw-2">&amp;</span>dialect)
+            .try_with_sql(definition)
+            .and_then(|<span class="kw-2">mut </span>p| p.parse_statement());
+
+        <span class="kw">let </span>definition = <span class="kw">match </span>stmt {
+            <span class="comment">// SQLite stores the definition as `CREATE VIEW`,
+            // but we only want the query part in the definition
+            // file as we do with the other databases.
+            </span><span class="prelude-val">Ok</span>(Statement::CreateView { query, .. }) =&gt; Cow::Owned(<span class="macro">format!</span>(<span class="string">&quot;{query};&quot;</span>)),
+            <span class="comment">// If we get anything else than `CREATE VIEW`,
+            // we just print it to a file and hope to get an issue
+            // filed if it&#39;s wrong.
+            </span><span class="kw">_ </span>=&gt; Cow::Borrowed(definition),
+        };
+
+        <span class="kw">let </span>opts = sqlformat::FormatOptions {
+            uppercase: <span class="bool-val">true</span>,
+            ..Default::default()
+        };
+
+        sqlformat::format(<span class="kw-2">&amp;</span>definition, <span class="kw-2">&amp;</span>Default::default(), opts)
     }
 }
 </code></pre></div>

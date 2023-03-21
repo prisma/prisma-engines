@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":[["Token","SQL Token enumeration"],["Whitespace",""]],"struct":[["Location","Location in input string"],["TokenWithLocation","A [Token] with [Location] attached to it"],["Tokenizer","SQL Tokenizer"],["TokenizerError","Tokenizer error"],["Word","A keyword (like SELECT) or an optionally quoted SQL identifier"]]};

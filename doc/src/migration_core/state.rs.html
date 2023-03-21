@@ -435,6 +435,17 @@
 <a href="#435" id="435">435</a>
 <a href="#436" id="436">436</a>
 <a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
 </pre><pre class="rust"><code><span class="doccomment">//! A container to manage 0 or more migration connectors, based on request contents.
 //!
 //! Why this rather than using connectors directly? We must be able to use the migration engine
@@ -798,9 +809,20 @@
                     <span class="kw">if </span>result.is_empty {
                         <span class="prelude-val">Err</span>(ConnectorError::into_introspection_result_empty_error())
                     } <span class="kw">else </span>{
+                        <span class="kw">let </span>views = result.views.map(|v| {
+                            v.into_iter()
+                                .map(|view| IntrospectionView {
+                                    schema: view.schema,
+                                    name: view.name,
+                                    definition: view.definition,
+                                })
+                                .collect()
+                        });
+
                         <span class="prelude-val">Ok</span>(IntrospectResult {
                             datamodel: result.data_model,
                             version: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, result.version),
+                            views,
                             warnings: result
                                 .warnings
                                 .into_iter()

@@ -324,6 +324,8 @@
 <a href="#324" id="324">324</a>
 <a href="#325" id="325">325</a>
 <a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
 </pre><pre class="rust"><code><span class="doccomment">//! SQL flavours implement behaviour specific to a given SQL implementation (PostgreSQL, SQLite...),
 //! in order to avoid cluttering the connector with conditionals. This is a private implementation
 //! detail of the SQL connector.
@@ -615,6 +617,8 @@
     }
 
     <span class="kw">fn </span>version(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt;&gt;;
+
+    <span class="kw">fn </span>search_path(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str;
 }
 
 <span class="comment">// Utility function shared by multiple flavours to compare shadow database and main connection.

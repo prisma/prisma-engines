@@ -190,6 +190,19 @@
 <a href="#190" id="190">190</a>
 <a href="#191" id="191">191</a>
 <a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>error;
 
 <span class="kw">pub use </span>error::{ConnectorError, ErrorKind};
@@ -234,6 +247,16 @@
     }
 }
 
+<span class="attr">#[derive(Debug, Deserialize, Serialize)]
+</span><span class="kw">pub struct </span>ViewDefinition {
+    <span class="doccomment">/// The database or schema where the view is located.
+    </span><span class="kw">pub </span>schema: String,
+    <span class="doccomment">/// The name of the view.
+    </span><span class="kw">pub </span>name: String,
+    <span class="doccomment">/// The database definition of the view.
+    </span><span class="kw">pub </span>definition: String,
+}
+
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>IntrospectionResult {
     <span class="doccomment">/// Datamodel
@@ -244,6 +267,7 @@
     </span><span class="kw">pub </span>warnings: Vec&lt;Warning&gt;,
     <span class="doccomment">/// Inferred Prisma version
     </span><span class="kw">pub </span>version: Version,
+    <span class="kw">pub </span>views: <span class="prelude-ty">Option</span>&lt;Vec&lt;ViewDefinition&gt;&gt;,
 }
 
 <span class="attr">#[derive(Serialize, Deserialize, Debug)]
@@ -261,6 +285,8 @@
     </span><span class="kw">pub </span>warnings: Vec&lt;Warning&gt;,
     <span class="doccomment">/// version
     </span><span class="kw">pub </span>version: Version,
+    <span class="doccomment">/// views
+    </span><span class="kw">pub </span>views: <span class="prelude-ty">Option</span>&lt;Vec&lt;ViewDefinition&gt;&gt;,
 }
 
 <span class="kw">pub struct </span>IntrospectionContext {

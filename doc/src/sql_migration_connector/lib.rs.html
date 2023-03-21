@@ -396,6 +396,9 @@
 <a href="#396" id="396">396</a>
 <a href="#397" id="397">397</a>
 <a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
 </pre><pre class="rust"><code><span class="doccomment">//! The SQL migration connector.
 
 </span><span class="attr">#![deny(rust_2018_idioms, unsafe_code, missing_docs)]
@@ -643,8 +646,11 @@
 
             <span class="kw">let </span>namespaces = Namespaces::from_vec(<span class="kw-2">&amp;mut </span>namespace_names);
             <span class="kw">let </span>sql_schema = <span class="self">self</span>.flavour.introspect(namespaces, ctx).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="kw">let </span>datamodel = datamodel_calculator::calculate(<span class="kw-2">&amp;</span>sql_schema, ctx)
+            <span class="kw">let </span>search_path = <span class="self">self</span>.flavour.search_path();
+
+            <span class="kw">let </span>datamodel = datamodel_calculator::calculate(<span class="kw-2">&amp;</span>sql_schema, ctx, search_path)
                 .map_err(|err| ConnectorError::from_source(err, <span class="string">&quot;Introspection error&quot;</span>))<span class="question-mark">?</span>;
+
             <span class="prelude-val">Ok</span>(datamodel)
         })
     }

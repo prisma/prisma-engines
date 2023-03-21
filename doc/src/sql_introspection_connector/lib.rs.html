@@ -216,6 +216,8 @@
 <a href="#216" id="216">216</a>
 <a href="#217" id="217">217</a>
 <a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Handles the introspection from SQL database schema definition to
 //! the Prisma Schema Language (PSL).
 //!
@@ -406,7 +408,9 @@
             </span>.catch(<span class="self">self</span>.describe(<span class="prelude-val">Some</span>(ctx.datasource().active_provider), <span class="kw-2">&amp;</span>namespaces))
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        datamodel_calculator::calculate(<span class="kw-2">&amp;</span>sql_schema, ctx).map_err(|sql_introspection_error| {
+        <span class="kw">let </span>search_path = <span class="self">self</span>.connection.connection_info().schema_name();
+
+        datamodel_calculator::calculate(<span class="kw-2">&amp;</span>sql_schema, ctx, search_path).map_err(|sql_introspection_error| {
             sql_introspection_error.into_connector_error(<span class="self">self</span>.connection.connection_info())
         })
     }

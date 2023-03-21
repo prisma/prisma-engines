@@ -644,6 +644,10 @@
 <a href="#644" id="644">644</a>
 <a href="#645" id="645">645</a>
 <a href="#646" id="646">646</a>
+<a href="#647" id="647">647</a>
+<a href="#648" id="648">648</a>
+<a href="#649" id="649">649</a>
+<a href="#650" id="650">650</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>connection;
 <span class="kw">mod </span>shadow_db;
 
@@ -1101,6 +1105,10 @@ SET enable_experimental_alter_column_type_general = true;
         with_connection(<span class="self">self</span>, |params, _circumstances, connection| <span class="kw">async move </span>{
             connection.version(<span class="kw-2">&amp;</span>params.url).<span class="kw">await
         </span>})
+    }
+
+    <span class="kw">fn </span>search_path(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.schema_name()
     }
 }
 

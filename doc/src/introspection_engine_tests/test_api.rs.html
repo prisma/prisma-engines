@@ -380,9 +380,29 @@
 <a href="#380" id="380">380</a>
 <a href="#381" id="381">381</a>
 <a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
 </pre><pre class="rust"><code><span class="kw">pub use </span><span class="kw">super</span>::TestResult;
 <span class="kw">pub use </span>expect_test::expect;
 <span class="kw">pub use </span>indoc::{formatdoc, indoc};
+<span class="kw">use </span>introspection_connector::ViewDefinition;
 <span class="kw">pub use </span>quaint::prelude::Queryable;
 <span class="kw">pub use </span>test_macros::test_connector;
 <span class="kw">pub use </span>test_setup::{BitFlags, Capabilities, Tags};
@@ -496,6 +516,13 @@
         <span class="kw">let </span>introspection_result = <span class="self">self</span>.test_introspect_internal(previous_schema, <span class="bool-val">true</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(introspection_result.data_model)
+    }
+
+    <span class="kw">pub async fn </span>introspect_views(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;ViewDefinition&gt;&gt;&gt; {
+        <span class="kw">let </span>previous_schema = psl::validate(<span class="self">self</span>.pure_config().into());
+        <span class="kw">let </span>introspection_result = <span class="self">self</span>.test_introspect_internal(previous_schema, <span class="bool-val">true</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(introspection_result.views)
     }
 
     <span class="kw">pub async fn </span>introspect_dml(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
@@ -681,6 +708,17 @@
     <span class="kw">pub async fn </span>expect_datamodel(<span class="kw-2">&amp;</span><span class="self">self</span>, expectation: <span class="kw-2">&amp;</span>expect_test::Expect) {
         <span class="kw">let </span>found = <span class="self">self</span>.introspect().<span class="kw">await</span>.unwrap();
         expectation.assert_eq(<span class="kw-2">&amp;</span>found);
+    }
+
+    <span class="kw">pub async fn </span>expect_view_definition(<span class="kw-2">&amp;</span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span>str, view: <span class="kw-2">&amp;</span>str, expectation: <span class="kw-2">&amp;</span>expect_test::Expect) {
+        <span class="kw">let </span>views = <span class="self">self</span>.introspect_views().<span class="kw">await</span>.unwrap().unwrap_or_default();
+
+        <span class="kw">let </span>view = views
+            .into_iter()
+            .find(|v| v.schema == schema &amp;&amp; v.name == view)
+            .expect(<span class="string">&quot;Could not find view with the given name.&quot;</span>);
+
+        expectation.assert_eq(<span class="kw-2">&amp;</span>view.definition);
     }
 
     <span class="kw">pub async fn </span>expect_warnings(<span class="kw-2">&amp;</span><span class="self">self</span>, expectation: <span class="kw-2">&amp;</span>expect_test::Expect) {

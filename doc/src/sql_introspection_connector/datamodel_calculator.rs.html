@@ -29,6 +29,13 @@
 <a href="#29" id="29">29</a>
 <a href="#30" id="30">30</a>
 <a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
+<a href="#38" id="38">38</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Calculate a PSL data model, together with warnings.
 
 </span><span class="kw">mod </span>context;
@@ -40,10 +47,14 @@
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
 
 <span class="doccomment">/// Calculate a data model from a database schema.
-</span><span class="kw">pub fn </span>calculate(schema: <span class="kw-2">&amp;</span>sql::SqlSchema, ctx: <span class="kw-2">&amp;</span>IntrospectionContext) -&gt; SqlIntrospectionResult&lt;IntrospectionResult&gt; {
-    <span class="kw">let </span>ctx = DatamodelCalculatorContext::new(ctx, schema);
+</span><span class="kw">pub fn </span>calculate(
+    schema: <span class="kw-2">&amp;</span>sql::SqlSchema,
+    ctx: <span class="kw-2">&amp;</span>IntrospectionContext,
+    search_path: <span class="kw-2">&amp;</span>str,
+) -&gt; SqlIntrospectionResult&lt;IntrospectionResult&gt; {
+    <span class="kw">let </span>ctx = DatamodelCalculatorContext::new(ctx, schema, search_path);
 
-    <span class="kw">let </span>(schema_string, is_empty) = rendering::to_psl_string(<span class="kw-2">&amp;</span>ctx)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(schema_string, is_empty, views) = rendering::to_psl_string(<span class="kw-2">&amp;</span>ctx)<span class="question-mark">?</span>;
     <span class="kw">let </span>warnings = warnings::generate(<span class="kw-2">&amp;</span>ctx);
 
     <span class="comment">// Warning codes 5 and 6 are for Prisma 1 default reintrospection.
@@ -53,11 +64,14 @@
         ctx.version
     };
 
+    <span class="kw">let </span>views = <span class="kw">if </span>views.is_empty() { <span class="prelude-val">None </span>} <span class="kw">else </span>{ <span class="prelude-val">Some</span>(views) };
+
     <span class="prelude-val">Ok</span>(IntrospectionResult {
         data_model: schema_string,
         is_empty,
         version,
         warnings,
+        views,
     })
 }
 </code></pre></div>

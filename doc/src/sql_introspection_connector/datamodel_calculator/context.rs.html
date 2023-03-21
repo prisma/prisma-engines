@@ -403,6 +403,8 @@
 <a href="#403" id="403">403</a>
 <a href="#404" id="404">404</a>
 <a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>flavour;
 
 <span class="kw">use crate</span>::{
@@ -434,10 +436,11 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) introspection_map: IntrospectionMap&lt;<span class="lifetime">&#39;a</span>&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) force_namespaces: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[String]&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) flavour: Box&lt;<span class="kw">dyn </span>IntrospectionFlavour&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) search_path: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DatamodelCalculatorContext&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>IntrospectionContext, sql_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>sql::SqlSchema) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>IntrospectionContext, sql_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>sql::SqlSchema, search_path: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>flavour: Box&lt;<span class="kw">dyn </span>IntrospectionFlavour&gt; = <span class="kw">match </span>ctx.sql_family() {
             SqlFamily::Postgres =&gt; Box::new(flavour::PostgresIntrospectionFlavour),
             SqlFamily::Mysql =&gt; Box::new(flavour::MysqlIntrospectionFlavour),
@@ -455,6 +458,7 @@
             introspection_map: Default::default(),
             force_namespaces: ctx.namespaces(),
             flavour,
+            search_path,
         };
 
         ctx.introspection_map = IntrospectionMap::new(<span class="kw-2">&amp;</span>ctx);

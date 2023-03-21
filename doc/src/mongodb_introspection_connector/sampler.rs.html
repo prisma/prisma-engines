@@ -66,6 +66,7 @@
 <a href="#66" id="66">66</a>
 <a href="#67" id="67">67</a>
 <a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>field_type;
 <span class="kw">mod </span>statistics;
 
@@ -131,6 +132,7 @@
         data_model: psl::reformat(<span class="kw-2">&amp;</span>psl_string, <span class="number">2</span>).unwrap(),
         is_empty: data_model.is_empty(),
         warnings,
+        views: <span class="prelude-val">None</span>,
         version: Version::NonPrisma,
     })
 }

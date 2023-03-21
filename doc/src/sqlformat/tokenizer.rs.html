@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/4x24sahd9wybx9p8qskh7pdi6v1881x6-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/sqlformat-0.2.0/src/tokenizer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tokenizer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-93196c7a1c3542a8.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../sqlformat/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/65ifjqbbfzyd75lysy2mq9xkb3zrbbn6-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/sqlformat-0.2.1/src/tokenizer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tokenizer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-93196c7a1c3542a8.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../sqlformat/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -942,6 +942,37 @@
 <a href="#942" id="942">942</a>
 <a href="#943" id="943">943</a>
 <a href="#944" id="944">944</a>
+<a href="#945" id="945">945</a>
+<a href="#946" id="946">946</a>
+<a href="#947" id="947">947</a>
+<a href="#948" id="948">948</a>
+<a href="#949" id="949">949</a>
+<a href="#950" id="950">950</a>
+<a href="#951" id="951">951</a>
+<a href="#952" id="952">952</a>
+<a href="#953" id="953">953</a>
+<a href="#954" id="954">954</a>
+<a href="#955" id="955">955</a>
+<a href="#956" id="956">956</a>
+<a href="#957" id="957">957</a>
+<a href="#958" id="958">958</a>
+<a href="#959" id="959">959</a>
+<a href="#960" id="960">960</a>
+<a href="#961" id="961">961</a>
+<a href="#962" id="962">962</a>
+<a href="#963" id="963">963</a>
+<a href="#964" id="964">964</a>
+<a href="#965" id="965">965</a>
+<a href="#966" id="966">966</a>
+<a href="#967" id="967">967</a>
+<a href="#968" id="968">968</a>
+<a href="#969" id="969">969</a>
+<a href="#970" id="970">970</a>
+<a href="#971" id="971">971</a>
+<a href="#972" id="972">972</a>
+<a href="#973" id="973">973</a>
+<a href="#974" id="974">974</a>
+<a href="#975" id="975">975</a>
 </pre><pre class="rust"><code><span class="kw">use </span>nom::branch::alt;
 <span class="kw">use </span>nom::bytes::complete::{tag, tag_no_case, take, take_until, take_while1};
 <span class="kw">use </span>nom::character::complete::{anychar, char, digit0, digit1, not_line_ending};
@@ -955,12 +986,17 @@
 <span class="kw">use </span>unicode_categories::UnicodeCategories;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>tokenize(<span class="kw-2">mut </span>input: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;Token&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>tokens = Vec::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>token = <span class="prelude-val">None</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>tokens: Vec&lt;Token&gt; = Vec::new();
 
     <span class="comment">// Keep processing the string until it is empty
-    </span><span class="kw">while let </span><span class="prelude-val">Ok</span>(result) = get_next_token(input, token.as_ref()) {
-        token = <span class="prelude-val">Some</span>(result.<span class="number">1</span>.clone());
+    </span><span class="kw">while let </span><span class="prelude-val">Ok</span>(result) = get_next_token(
+        input,
+        tokens.last().cloned(),
+        tokens
+            .iter()
+            .rfind(|token| token.kind == TokenKind::Reserved)
+            .cloned(),
+    ) {
         input = result.<span class="number">0</span>;
 
         tokens.push(result.<span class="number">1</span>);
@@ -1020,7 +1056,8 @@
 
 <span class="kw">fn </span>get_next_token&lt;<span class="lifetime">&#39;a</span>&gt;(
     input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
-    previous_token: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Token&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    previous_token: <span class="prelude-ty">Option</span>&lt;Token&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    last_reserved_token: <span class="prelude-ty">Option</span>&lt;Token&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 ) -&gt; IResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, Token&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
     get_whitespace_token(input)
         .or_else(|<span class="kw">_</span>| get_comment_token(input))
@@ -1029,7 +1066,7 @@
         .or_else(|<span class="kw">_</span>| get_close_paren_token(input))
         .or_else(|<span class="kw">_</span>| get_placeholder_token(input))
         .or_else(|<span class="kw">_</span>| get_number_token(input))
-        .or_else(|<span class="kw">_</span>| get_reserved_word_token(input, previous_token))
+        .or_else(|<span class="kw">_</span>| get_reserved_word_token(input, previous_token, last_reserved_token))
         .or_else(|<span class="kw">_</span>| get_word_token(input))
         .or_else(|<span class="kw">_</span>| get_operator_token(input))
 }
@@ -1307,7 +1344,11 @@
 }
 
 <span class="kw">fn </span>get_number_token(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, Token&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
-    recognize(tuple((opt(tag(<span class="string">&quot;-&quot;</span>)), alt((decimal_number, digit1)))))(input).map(|(input, token)| {
+    recognize(tuple((
+        opt(tag(<span class="string">&quot;-&quot;</span>)),
+        alt((scientific_notation, decimal_number, digit1)),
+    )))(input)
+    .map(|(input, token)| {
         (
             input,
             Token {
@@ -1323,9 +1364,19 @@
     recognize(tuple((digit1, tag(<span class="string">&quot;.&quot;</span>), digit0)))(input)
 }
 
+<span class="kw">fn </span>scientific_notation(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str&gt; {
+    recognize(tuple((
+        alt((decimal_number, digit1)),
+        tag(<span class="string">&quot;e&quot;</span>),
+        alt((tag(<span class="string">&quot;-&quot;</span>), tag(<span class="string">&quot;+&quot;</span>))),
+        digit1,
+    )))(input)
+}
+
 <span class="kw">fn </span>get_reserved_word_token&lt;<span class="lifetime">&#39;a</span>&gt;(
     input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
-    previous_token: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Token&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    previous_token: <span class="prelude-ty">Option</span>&lt;Token&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    last_reserved_token: <span class="prelude-ty">Option</span>&lt;Token&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 ) -&gt; IResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, Token&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
     <span class="comment">// A reserved word cannot be preceded by a &quot;.&quot;
     // this makes it so in &quot;my_table.from&quot;, &quot;from&quot; is not considered a reserved word
@@ -1337,7 +1388,7 @@
 
     alt((
         get_top_level_reserved_token,
-        get_newline_reserved_token,
+        get_newline_reserved_token(last_reserved_token),
         get_top_level_reserved_token_no_indent,
         get_plain_reserved_token,
     ))(input)
@@ -1384,8 +1435,7 @@
     ))(<span class="kw-2">&amp;</span>uc_input);
     <span class="kw">if let </span><span class="prelude-val">Ok</span>((<span class="kw">_</span>, token)) = result {
         <span class="kw">let </span>final_word = token.split(<span class="string">&#39; &#39;</span>).last().unwrap();
-        <span class="kw">let </span>input_end_pos =
-            input.to_ascii_uppercase().find(<span class="kw-2">&amp;</span>final_word).unwrap() + final_word.len();
+        <span class="kw">let </span>input_end_pos = input.to_ascii_uppercase().find(final_word).unwrap() + final_word.len();
         <span class="kw">let </span>(token, input) = input.split_at(input_end_pos);
         <span class="prelude-val">Ok</span>((
             input,
@@ -1400,40 +1450,53 @@
     }
 }
 
-<span class="kw">fn </span>get_newline_reserved_token(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, Token&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
-    <span class="kw">let </span>uc_input = get_uc_words(input, <span class="number">3</span>);
-    <span class="kw">let </span>result: IResult&lt;<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str&gt; = alt((
-        terminated(tag(<span class="string">&quot;AND&quot;</span>), end_of_word),
-        terminated(tag(<span class="string">&quot;CROSS APPLY&quot;</span>), end_of_word),
-        terminated(tag(<span class="string">&quot;CROSS JOIN&quot;</span>), end_of_word),
-        terminated(tag(<span class="string">&quot;ELSE&quot;</span>), end_of_word),
-        terminated(tag(<span class="string">&quot;INNER JOIN&quot;</span>), end_of_word),
-        terminated(tag(<span class="string">&quot;JOIN&quot;</span>), end_of_word),
-        terminated(tag(<span class="string">&quot;LEFT JOIN&quot;</span>), end_of_word),
-        terminated(tag(<span class="string">&quot;LEFT OUTER JOIN&quot;</span>), end_of_word),
-        terminated(tag(<span class="string">&quot;OR&quot;</span>), end_of_word),
-        terminated(tag(<span class="string">&quot;OUTER APPLY&quot;</span>), end_of_word),
-        terminated(tag(<span class="string">&quot;OUTER JOIN&quot;</span>), end_of_word),
-        terminated(tag(<span class="string">&quot;RIGHT JOIN&quot;</span>), end_of_word),
-        terminated(tag(<span class="string">&quot;RIGHT OUTER JOIN&quot;</span>), end_of_word),
-        terminated(tag(<span class="string">&quot;WHEN&quot;</span>), end_of_word),
-        terminated(tag(<span class="string">&quot;XOR&quot;</span>), end_of_word),
-    ))(<span class="kw-2">&amp;</span>uc_input);
-    <span class="kw">if let </span><span class="prelude-val">Ok</span>((<span class="kw">_</span>, token)) = result {
-        <span class="kw">let </span>final_word = token.split(<span class="string">&#39; &#39;</span>).last().unwrap();
-        <span class="kw">let </span>input_end_pos =
-            input.to_ascii_uppercase().find(<span class="kw-2">&amp;</span>final_word).unwrap() + final_word.len();
-        <span class="kw">let </span>(token, input) = input.split_at(input_end_pos);
-        <span class="prelude-val">Ok</span>((
-            input,
-            Token {
-                kind: TokenKind::ReservedNewline,
-                value: token,
-                key: <span class="prelude-val">None</span>,
-            },
-        ))
-    } <span class="kw">else </span>{
-        <span class="prelude-val">Err</span>(Err::Error(Error::new(input, ErrorKind::Alt)))
+<span class="kw">fn </span>get_newline_reserved_token&lt;<span class="lifetime">&#39;a</span>&gt;(
+    last_reserved_token: <span class="prelude-ty">Option</span>&lt;Token&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+) -&gt; <span class="kw">impl </span>FnMut(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, Token&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">move </span>|input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str| {
+        <span class="kw">let </span>uc_input = get_uc_words(input, <span class="number">3</span>);
+        <span class="kw">let </span>result: IResult&lt;<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str&gt; = alt((
+            terminated(tag(<span class="string">&quot;AND&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;CROSS APPLY&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;CROSS JOIN&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;ELSE&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;INNER JOIN&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;JOIN&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;LEFT JOIN&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;LEFT OUTER JOIN&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;OR&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;OUTER APPLY&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;OUTER JOIN&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;RIGHT JOIN&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;RIGHT OUTER JOIN&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;WHEN&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;XOR&quot;</span>), end_of_word),
+        ))(<span class="kw-2">&amp;</span>uc_input);
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>((<span class="kw">_</span>, token)) = result {
+            <span class="kw">let </span>final_word = token.split(<span class="string">&#39; &#39;</span>).last().unwrap();
+            <span class="kw">let </span>input_end_pos =
+                input.to_ascii_uppercase().find(final_word).unwrap() + final_word.len();
+            <span class="kw">let </span>(token, input) = input.split_at(input_end_pos);
+            <span class="kw">let </span>kind = <span class="kw">if </span>token == <span class="string">&quot;AND&quot;
+                </span>&amp;&amp; last_reserved_token.is_some()
+                &amp;&amp; last_reserved_token.as_ref().unwrap().value == <span class="string">&quot;BETWEEN&quot;
+            </span>{
+                <span class="comment">// If the &quot;AND&quot; is part of a &quot;BETWEEN&quot; clause, we want to handle it as one clause by not adding a new line.
+                </span>TokenKind::Reserved
+            } <span class="kw">else </span>{
+                TokenKind::ReservedNewline
+            };
+            <span class="prelude-val">Ok</span>((
+                input,
+                Token {
+                    kind,
+                    value: token,
+                    key: <span class="prelude-val">None</span>,
+                },
+            ))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(Err::Error(Error::new(input, ErrorKind::Alt)))
+        }
     }
 }
 
@@ -1448,8 +1511,7 @@
     ))(<span class="kw-2">&amp;</span>uc_input);
     <span class="kw">if let </span><span class="prelude-val">Ok</span>((<span class="kw">_</span>, token)) = result {
         <span class="kw">let </span>final_word = token.split(<span class="string">&#39; &#39;</span>).last().unwrap();
-        <span class="kw">let </span>input_end_pos =
-            input.to_ascii_uppercase().find(<span class="kw-2">&amp;</span>final_word).unwrap() + final_word.len();
+        <span class="kw">let </span>input_end_pos = input.to_ascii_uppercase().find(final_word).unwrap() + final_word.len();
         <span class="kw">let </span>(token, input) = input.split_at(input_end_pos);
         <span class="prelude-val">Ok</span>((
             input,

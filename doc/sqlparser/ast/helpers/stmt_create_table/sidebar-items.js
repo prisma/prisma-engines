@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["CreateTableBuilder","Builder for create table statement variant (1)."]]};

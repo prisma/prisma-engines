@@ -168,6 +168,13 @@
 <a href="#168" id="168">168</a>
 <a href="#169" id="169">169</a>
 <a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="kw">use </span>psl::{
@@ -336,6 +343,13 @@
             .and_then(|prev| prev.primary_key())
             .filter(|pk| pk.fields().len() &gt; <span class="number">1</span>)
             .map(|prev| Pair::new(<span class="self">self</span>.context, <span class="prelude-val">Some</span>(prev), <span class="prelude-val">None</span>))
+    }
+
+    <span class="doccomment">/// The SQL definition statement of the view.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>definition(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+        <span class="self">self</span>.next
+            .definition()
+            .map(|s| <span class="self">self</span>.context.flavour.format_view_definition(s))
     }
 }
 </code></pre></div>
