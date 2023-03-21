@@ -25,6 +25,6 @@ tokio.workspace = true
 tracing = "0.1"
 tracing-futures = "0.2"
 url = "2.1.1"
-uuid.workspace = true
+uuid = { workspace = true, features = ["v4"] }
 either = "1.6"
 quaint.workspace = true
