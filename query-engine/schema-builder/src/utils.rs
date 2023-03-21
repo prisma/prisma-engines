@@ -65,6 +65,21 @@ where
     }
 }
 
+/// Capitalizes first character.
+/// Assumes 1-byte characters.
+pub fn capitalize<T>(s: T) -> String
+where
+    T: Into<String>,
+{
+    let s = s.into();
+
+    // This is safe to unwrap, as the validation regex for model / field
+    // names used in the data model essentially guarantees ASCII.
+    let first_char = s.chars().next().unwrap();
+
+    format!("{}{}", first_char.to_uppercase(), s[1..].to_owned())
+}
+
 /// Appends an option of type T to a vector over T if the option is Some.
 pub fn append_opt<T>(vec: &mut Vec<T>, opt: Option<T>) {
     vec.extend(opt.into_iter())

@@ -46,7 +46,7 @@ impl DmmfObjectRenderer {
         });
 
         let input_type = DmmfInputType {
-            name: input_object.identifier.name(),
+            name: input_object.identifier.name().to_owned(),
             constraints: DmmfInputTypeConstraints {
                 max_num_fields: input_object.constraints.max_num_fields,
                 min_num_fields: input_object.constraints.min_num_fields,
@@ -80,7 +80,7 @@ impl DmmfObjectRenderer {
         };
 
         let field_ref_type = DmmfFieldRefType {
-            name: input_object.identifier.name(),
+            name: input_object.identifier.name().to_owned(),
             allow_types: vec![render_input_type(allow_type, ctx)],
             fields: rendered_fields,
         };
@@ -106,7 +106,7 @@ impl DmmfObjectRenderer {
         }
 
         let output_type = DmmfOutputType {
-            name: output_object.identifier.name(),
+            name: output_object.identifier.name().to_string(),
             fields: rendered_fields,
         };
 

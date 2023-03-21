@@ -18,12 +18,11 @@ impl Renderer for GqlObjectRenderer {
 impl GqlObjectRenderer {
     fn render_input_object(&self, input_object: &InputObjectTypeWeakRef, ctx: &mut RenderContext) -> String {
         let input_object = input_object.into_arc();
-
-        if ctx.already_rendered(&input_object.identifier.name()) {
+        if ctx.already_rendered(input_object.identifier.name()) {
             return "".into();
         } else {
             // This short circuits recursive processing for fields.
-            ctx.mark_as_rendered(input_object.identifier.name())
+            ctx.mark_as_rendered(input_object.identifier.name().to_owned())
         }
 
         let fields = input_object.get_fields();
@@ -44,7 +43,7 @@ impl GqlObjectRenderer {
             indented.join("\n")
         );
 
-        ctx.add(input_object.identifier.name(), rendered.clone());
+        ctx.add(input_object.identifier.name().to_owned(), rendered.clone());
 
         rendered
     }
@@ -52,11 +51,11 @@ impl GqlObjectRenderer {
     fn render_output_object(&self, output_object: &ObjectTypeWeakRef, ctx: &mut RenderContext) -> String {
         let output_object = output_object.into_arc();
 
-        if ctx.already_rendered(&output_object.identifier.name()) {
+        if ctx.already_rendered(output_object.identifier.name()) {
             return "".into();
         } else {
             // This short circuits recursive processing for fields.
-            ctx.mark_as_rendered(output_object.identifier.name())
+            ctx.mark_as_rendered(output_object.identifier.name().to_string())
         }
 
         let fields = output_object.get_fields();
