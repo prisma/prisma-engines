@@ -497,6 +497,10 @@ impl SqlFlavour for MssqlFlavour {
             connection.version(params).await
         })
     }
+
+    fn search_path(&self) -> &str {
+        self.schema_name()
+    }
 }
 
 fn with_connection<'a, O, F, C>(state: &'a mut State, f: C) -> BoxFuture<'a, ConnectorResult<O>>

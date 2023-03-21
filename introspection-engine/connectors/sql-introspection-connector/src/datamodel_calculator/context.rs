@@ -29,10 +29,11 @@ pub(crate) struct DatamodelCalculatorContext<'a> {
     pub(crate) introspection_map: IntrospectionMap<'a>,
     pub(crate) force_namespaces: Option<&'a [String]>,
     pub(crate) flavour: Box<dyn IntrospectionFlavour>,
+    pub(crate) search_path: &'a str,
 }
 
 impl<'a> DatamodelCalculatorContext<'a> {
-    pub(crate) fn new(ctx: &'a IntrospectionContext, sql_schema: &'a sql::SqlSchema) -> Self {
+    pub(crate) fn new(ctx: &'a IntrospectionContext, sql_schema: &'a sql::SqlSchema, search_path: &'a str) -> Self {
         let flavour: Box<dyn IntrospectionFlavour> = match ctx.sql_family() {
             SqlFamily::Postgres => Box::new(flavour::PostgresIntrospectionFlavour),
             SqlFamily::Mysql => Box::new(flavour::MysqlIntrospectionFlavour),
@@ -50,6 +51,7 @@ impl<'a> DatamodelCalculatorContext<'a> {
             introspection_map: Default::default(),
             force_namespaces: ctx.namespaces(),
             flavour,
+            search_path,
         };
 
         ctx.introspection_map = IntrospectionMap::new(&ctx);

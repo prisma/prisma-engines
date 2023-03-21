@@ -50,6 +50,16 @@ async fn simple_view_from_one_table(api: &TestApi) -> TestResult {
     api.expect_datamodel(&expected).await;
 
     let expected = expect![[r#"
+        SELECT
+          id,
+          first_name,
+          last_name
+        FROM
+          A;"#]];
+
+    api.expect_view_definition(api.schema_name(), "B", &expected).await;
+
+    let expected = expect![[r#"
         [
           {
             "code": 24,
@@ -63,6 +73,50 @@ async fn simple_view_from_one_table(api: &TestApi) -> TestResult {
         ]"#]];
 
     api.expect_warnings(&expected).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(Mssql), preview_features("views"))]
+async fn simple_view_with_cte(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE VIEW A AS WITH foo AS (SELECT 1 AS bar) SELECT bar FROM foo;
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expected = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["views"]
+        }
+
+        datasource db {
+          provider = "sqlserver"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        view A {
+          bar Int
+
+          @@ignore
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
+
+    let expected = expect![[r#"
+        WITH foo AS (
+          SELECT
+            1 AS bar
+        )
+        SELECT
+          bar
+        FROM
+          foo;"#]];
+
+    api.expect_view_definition(api.schema_name(), "A", &expected).await;
 
     Ok(())
 }
@@ -134,6 +188,17 @@ async fn simple_view_from_two_tables(api: &TestApi) -> TestResult {
     "#]];
 
     api.expect_datamodel(&expected).await;
+
+    let expected = expect![[r#"
+        SELECT
+          a.id,
+          CONCAT(a.first_name, ' ', a.last_name) AS name,
+          b.introduction
+        FROM
+          A AS a
+          JOIN B AS b ON a.id = b.user_id;"#]];
+
+    api.expect_view_definition(api.schema_name(), "AB", &expected).await;
 
     Ok(())
 }

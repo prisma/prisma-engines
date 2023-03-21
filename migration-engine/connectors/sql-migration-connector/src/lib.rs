@@ -245,8 +245,11 @@ impl MigrationConnector for SqlMigrationConnector {
 
             let namespaces = Namespaces::from_vec(&mut namespace_names);
             let sql_schema = self.flavour.introspect(namespaces, ctx).await?;
-            let datamodel = datamodel_calculator::calculate(&sql_schema, ctx)
+            let search_path = self.flavour.search_path();
+
+            let datamodel = datamodel_calculator::calculate(&sql_schema, ctx, search_path)
                 .map_err(|err| ConnectorError::from_source(err, "Introspection error"))?;
+
             Ok(datamodel)
         })
     }

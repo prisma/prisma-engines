@@ -456,6 +456,10 @@ impl SqlFlavour for PostgresFlavour {
             connection.version(&params.url).await
         })
     }
+
+    fn search_path(&self) -> &str {
+        self.schema_name()
+    }
 }
 
 fn strip_schema_param_from_url(url: &mut Url) {

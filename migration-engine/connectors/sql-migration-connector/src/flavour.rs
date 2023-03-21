@@ -289,6 +289,8 @@ pub(crate) trait SqlFlavour:
     }
 
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<Option<String>>>;
+
+    fn search_path(&self) -> &str;
 }
 
 // Utility function shared by multiple flavours to compare shadow database and main connection.

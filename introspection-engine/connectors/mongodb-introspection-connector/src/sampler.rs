@@ -63,6 +63,7 @@ pub(super) async fn sample(
         data_model: psl::reformat(&psl_string, 2).unwrap(),
         is_empty: data_model.is_empty(),
         warnings,
+        views: None,
         version: Version::NonPrisma,
     })
 }

@@ -1,6 +1,7 @@
 pub use super::TestResult;
 pub use expect_test::expect;
 pub use indoc::{formatdoc, indoc};
+use introspection_connector::ViewDefinition;
 pub use quaint::prelude::Queryable;
 pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
@@ -114,6 +115,13 @@ impl TestApi {
         let introspection_result = self.test_introspect_internal(previous_schema, true).await?;
 
         Ok(introspection_result.data_model)
+    }
+
+    pub async fn introspect_views(&self) -> Result<Option<Vec<ViewDefinition>>> {
+        let previous_schema = psl::validate(self.pure_config().into());
+        let introspection_result = self.test_introspect_internal(previous_schema, true).await?;
+
+        Ok(introspection_result.views)
     }
 
     pub async fn introspect_dml(&self) -> Result<String> {
@@ -299,6 +307,17 @@ impl TestApi {
     pub async fn expect_datamodel(&self, expectation: &expect_test::Expect) {
         let found = self.introspect().await.unwrap();
         expectation.assert_eq(&found);
+    }
+
+    pub async fn expect_view_definition(&self, schema: &str, view: &str, expectation: &expect_test::Expect) {
+        let views = self.introspect_views().await.unwrap().unwrap_or_default();
+
+        let view = views
+            .into_iter()
+            .find(|v| v.schema == schema && v.name == view)
+            .expect("Could not find view with the given name.");
+
+        expectation.assert_eq(&view.definition);
     }
 
     pub async fn expect_warnings(&self, expectation: &expect_test::Expect) {

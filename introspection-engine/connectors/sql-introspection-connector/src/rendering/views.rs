@@ -1,13 +1,31 @@
 use crate::{datamodel_calculator::DatamodelCalculatorContext, introspection_helpers as helpers, pair::ViewPair};
 use datamodel_renderer::datamodel as renderer;
+use introspection_connector::ViewDefinition;
 
 use super::{id, indexes, relation_field, scalar_field};
 
 /// Render all view blocks to the PSL.
-pub(super) fn render<'a>(ctx: &'a DatamodelCalculatorContext<'a>, rendered: &mut renderer::Datamodel<'a>) {
+pub(super) fn render<'a>(
+    ctx: &'a DatamodelCalculatorContext<'a>,
+    rendered: &mut renderer::Datamodel<'a>,
+) -> Vec<ViewDefinition> {
+    let mut definitions = Vec::new();
     let mut views_with_idx: Vec<(Option<_>, renderer::View<'a>)> = Vec::with_capacity(ctx.sql_schema.views_count());
 
     for view in ctx.view_pairs() {
+        if let Some(definition) = view.definition() {
+            let schema = view
+                .namespace()
+                .map(ToString::to_string)
+                .unwrap_or_else(|| ctx.search_path.to_string());
+
+            definitions.push(ViewDefinition {
+                schema,
+                name: view.name().to_string(),
+                definition: definition.to_string(),
+            });
+        }
+
         views_with_idx.push((view.previous_position(), render_view(view)));
     }
 
@@ -16,6 +34,8 @@ pub(super) fn render<'a>(ctx: &'a DatamodelCalculatorContext<'a>, rendered: &mut
     for (_, render) in views_with_idx.into_iter() {
         rendered.push_view(render);
     }
+
+    definitions
 }
 
 /// Render a single view.

@@ -361,6 +361,10 @@ impl SqlFlavour for SqliteFlavour {
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<Option<String>>> {
         ready(Ok(Some(quaint::connector::sqlite_version().to_owned())))
     }
+
+    fn search_path(&self) -> &str {
+        self.state.params().map(|p| p.file_path.as_str()).unwrap_or("dev.db")
+    }
 }
 
 fn acquire_lock(connection: &mut Connection) -> ConnectorResult<()> {
