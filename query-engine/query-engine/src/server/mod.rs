@@ -7,11 +7,9 @@ use opentelemetry::trace::TraceContextExt;
 use opentelemetry::{global, propagation::Extractor};
 use query_core::helpers::*;
 use query_core::telemetry::capturing::TxTraceExt;
-use query_core::{
-    schema::QuerySchemaRenderer, telemetry, ExtendedTransactionUserFacingError, TransactionOptions, TxId,
-};
+use query_core::{telemetry, ExtendedTransactionUserFacingError, TransactionOptions, TxId};
 use query_engine_metrics::MetricFormat;
-use request_handlers::{dmmf, GraphQLSchemaRenderer, RequestBody, RequestHandler};
+use request_handlers::{dmmf, render_graphql_schema, RequestBody, RequestHandler};
 use serde_json::json;
 use std::collections::HashMap;
 use std::net::SocketAddr;
@@ -65,7 +63,7 @@ pub async fn routes(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Respon
             .unwrap(),
 
         (&Method::GET, "/sdl") => {
-            let schema = GraphQLSchemaRenderer::render(cx.query_schema().clone());
+            let schema = render_graphql_schema(cx.query_schema().clone());
 
             Response::builder()
                 .status(StatusCode::OK)

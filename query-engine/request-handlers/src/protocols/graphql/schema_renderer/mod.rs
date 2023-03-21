@@ -13,11 +13,8 @@ use std::{
 };
 use type_renderer::*;
 
-#[allow(dead_code)]
-pub struct GraphQLSchemaRenderer;
-
 /// Top level GraphQL schema renderer.
-pub struct GqlSchemaRenderer {
+struct GqlSchemaRenderer {
     query_schema: QuerySchemaRef,
 }
 
@@ -29,29 +26,27 @@ impl Renderer for GqlSchemaRenderer {
 }
 
 impl GqlSchemaRenderer {
-    pub fn new(query_schema: QuerySchemaRef) -> GqlSchemaRenderer {
+    fn new(query_schema: QuerySchemaRef) -> GqlSchemaRenderer {
         GqlSchemaRenderer { query_schema }
     }
 }
 
-impl QuerySchemaRenderer<String> for GraphQLSchemaRenderer {
-    fn render(query_schema: QuerySchemaRef) -> String {
-        let mut context = RenderContext::new();
-        query_schema.into_renderer().render(&mut context);
+pub fn render_graphql_schema(query_schema: QuerySchemaRef) -> String {
+    let mut context = RenderContext::new();
+    query_schema.into_renderer().render(&mut context);
 
-        // Add custom scalar types (required for graphql.js implementations)
-        format!(
-            "{}\n\nscalar DateTime\nscalar Json\nscalar UUID\nscalar BigInt\nscalar Decimal\nscalar Bytes",
-            context.format()
-        )
-    }
+    // Add custom scalar types (required for graphql.js implementations)
+    format!(
+        "{}\n\nscalar DateTime\nscalar Json\nscalar UUID\nscalar BigInt\nscalar Decimal\nscalar Bytes",
+        context.format()
+    )
 }
 
-pub trait Renderer {
+trait Renderer {
     fn render(&self, ctx: &mut RenderContext) -> String;
 }
 
-pub struct RenderContext {
+struct RenderContext {
     /// Output queue for all (top level) elements that need to be rendered,
     output_queue: Vec<String>,
 
@@ -77,32 +72,32 @@ impl Default for RenderContext {
 }
 
 impl RenderContext {
-    pub fn new() -> RenderContext {
+    fn new() -> RenderContext {
         Self::default()
     }
 
-    pub fn format(self) -> String {
+    fn format(self) -> String {
         self.output_queue.join("\n\n")
     }
 
-    pub fn already_rendered(&self, cache_key: &str) -> bool {
+    fn already_rendered(&self, cache_key: &str) -> bool {
         self.rendered.contains_key(cache_key)
     }
 
-    pub fn mark_as_rendered(&mut self, cache_key: String) {
+    fn mark_as_rendered(&mut self, cache_key: String) {
         self.rendered.insert(cache_key, ());
     }
 
-    pub fn add_output(&mut self, output: String) {
+    fn add_output(&mut self, output: String) {
         self.output_queue.push(output);
     }
 
-    pub fn add(&mut self, cache_key: String, output: String) {
+    fn add(&mut self, cache_key: String, output: String) {
         self.add_output(output);
         self.mark_as_rendered(cache_key);
     }
 
-    pub fn indent(&self) -> String {
+    fn indent(&self) -> String {
         self.indent_str.repeat(self.indent)
     }
 }

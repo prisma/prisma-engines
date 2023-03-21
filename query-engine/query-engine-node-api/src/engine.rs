@@ -2,13 +2,10 @@ use crate::{engine::executor::TransactionOptions, error::ApiError, log_callback:
 use futures::FutureExt;
 use psl::PreviewFeature;
 use query_core::{
-    executor,
-    protocol::EngineProtocol,
-    schema::{QuerySchema, QuerySchemaRenderer},
-    schema_builder, telemetry, QueryExecutor, TxId,
+    executor, protocol::EngineProtocol, schema::QuerySchema, schema_builder, telemetry, QueryExecutor, TxId,
 };
 use query_engine_metrics::{MetricFormat, MetricRegistry};
-use request_handlers::{dmmf, GraphQLSchemaRenderer, RequestBody, RequestHandler};
+use request_handlers::{dmmf, render_graphql_schema, RequestBody, RequestHandler};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::{
@@ -434,7 +431,7 @@ impl QueryEngine {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
 
-            Ok(GraphQLSchemaRenderer::render(engine.query_schema().clone()))
+            Ok(render_graphql_schema(engine.query_schema().clone()))
         })
         .await
     }
