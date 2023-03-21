@@ -2,7 +2,7 @@
   "is_panic": false,
   "message": "Argument does not exist in enclosing type",
   "meta": {
-    "kind": "UnkownArgument",
+    "kind": "UnknownArgument",
     "argumentPath": [
       "foo"
     ],

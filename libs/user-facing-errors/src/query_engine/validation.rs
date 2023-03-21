@@ -42,11 +42,11 @@ pub enum ValidationErrorKind {
     RequiredArgumentMissing,
     /// See [`ValidationError::union`]
     Union,
-    /// See [`ValidationError::unkown_argument`]
-    UnkownArgument,
+    /// See [`ValidationError::unknown_argument`]
+    UnknownArgument,
     /// See [`ValidationError::unknown_input_field`]
     UnknownInputField,
-    /// See [`ValidationError::unkown_selection_field`]
+    /// See [`ValidationError::unknown_selection_field`]
     UnknownSelectionField,
     /// See [`ValidationError::value_too_large`]
     ValueTooLarge,
@@ -287,7 +287,7 @@ impl ValidationError {
         }
     }
 
-    /// Creates an [`ValidationErrorKind::UnkownArgument`] kind of error, which happens when the
+    /// Creates an [`ValidationErrorKind::UnknownArgument`] kind of error, which happens when the
     /// arguments for a query are not congruent with those expressed in the schema
     ///
     /// Example json query:
@@ -312,7 +312,7 @@ impl ValidationError {
     ) -> Self {
         let message = String::from("Argument does not exist in enclosing type");
         ValidationError {
-            kind: ValidationErrorKind::UnkownArgument,
+            kind: ValidationErrorKind::UnknownArgument,
             message,
             meta: Some(
                 json!({"argumentPath": argument_path, "arguments": valid_argument_descriptions, "selectionPath": selection_path}),
