@@ -39,12 +39,8 @@ impl QueryGraphBuilder {
         root_object: &ObjectTypeStrongRef, // Either the query or mutation object.
     ) -> QueryGraphBuilderResult<(QueryGraph, IrSerializer)> {
         let mut selections = vec![selection];
-        let mut parsed_object = QueryDocumentParser::new(crate::executor::get_request_now()).parse_object(
-            Path::default(),
-            Path::default(),
-            &selections,
-            root_object,
-        )?;
+        let mut parsed_object =
+            QueryDocumentParser::new(crate::executor::get_request_now()).parse(&selections, root_object)?;
 
         // Because we're processing root objects, there can only be one query / mutation.
         let field_pair = parsed_object.fields.pop().unwrap();

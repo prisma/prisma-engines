@@ -20,12 +20,21 @@ impl QueryDocumentParser {
         QueryDocumentParser { default_now }
     }
 
+    // Public entry point to parsing the query document (as denoted by `selections`) against the `schema_object`.
+    pub fn parse(
+        &self,
+        selections: &[Selection],
+        schema_object: &ObjectTypeStrongRef,
+    ) -> QueryParserResult<ParsedObject> {
+        self.parse_object(Path::default(), Path::default(), selections, schema_object)
+    }
+
     /// Parses and validates a set of selections against a schema (output) object.
     /// On an output object, optional types designate whether or not an output field can be nulled.
     /// In contrast, nullable and optional types on an input object are separate concepts.
     /// The above is the reason we don't need to check nullability here, as it is done by the output
     /// validation in the serialization step.
-    pub fn parse_object(
+    fn parse_object(
         &self,
         selection_path: Path,
         argument_path: Path,
@@ -900,22 +909,22 @@ pub(crate) mod conversions {
     }
 }
 #[derive(Debug, Clone, Default)]
-pub struct Path {
+pub(crate) struct Path {
     segments: Vec<String>,
 }
 
 impl Path {
-    pub fn add(&self, segment: String) -> Self {
+    pub(crate) fn add(&self, segment: String) -> Self {
         let mut path = self.clone();
         path.segments.push(segment);
         path
     }
 
-    pub fn last(&self) -> Option<&str> {
+    pub(crate) fn last(&self) -> Option<&str> {
         self.segments.last().map(|s| s.as_str())
     }
 
-    pub fn segments(&self) -> Vec<String> {
+    pub(crate) fn segments(&self) -> Vec<String> {
         self.segments.clone()
     }
 }
