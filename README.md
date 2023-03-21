@@ -20,9 +20,7 @@ and test them.
 This repository contains four engines:
 
 - *Query engine*, used by the client to run database queries from Prisma Client
-- *Migration engine*, used to create and run migrations
-- *Introspection engine*, used to get the state of the database, compare it
-    to the schema file, and figure out what the differences are
+- *Migration engine*, used to create and run migrations and introspection
 - *Prisma Format*, used to format prisma files
 
 Additionally, the *psl* (Prisma Schema Language) is the library that defines how

@@ -1,4 +1,5 @@
 use expect_test::expect;
+use migration_core::json_rpc::types::IntrospectParams;
 use quaint::connector::rusqlite;
 use test_setup::runtime::run_with_thread_local_runtime as tok;
 
@@ -26,15 +27,19 @@ fn introspect_force_with_invalid_schema() {
     "#
     );
 
-    let result = &tok(introspection_core::RpcImpl::introspect_internal(
+    let api = migration_core::migration_api(Some(schema.clone()), None).unwrap();
+
+    let params = IntrospectParams {
         schema,
-        true,
-        Default::default(),
-        None,
-    ))
-    .unwrap()
-    .datamodel
-    .replace(db_path.as_str(), "<db_path>");
+        force: true,
+        composite_type_depth: 0,
+        schemas: None,
+    };
+
+    let result = &tok(api.introspect(params))
+        .unwrap()
+        .datamodel
+        .replace(db_path.as_str(), "<db_path>");
 
     let expected = expect![[r#"
         datasource sqlitedb {
@@ -64,39 +69,38 @@ fn introspect_no_force_with_invalid_schema() {
         conn.execute_batch("CREATE TABLE corgis (bites BOOLEAN)").unwrap();
     }
 
-    let schema = format!(
+    let schema = indoc::formatdoc!(
         r#"
         datasource sqlitedb {{
-            provider = "sqlite"
-            url = "{db_path}"
+          provider = "sqlite"
+          url = "{db_path}"
         }}
 
         model This_Is_Blatantly_Not_Valid_and_An_Outrage {{
-            pk Bytes @unknownAttributeThisIsNotValid
+          pk Bytes @unknownAttributeThisIsNotValid
         }}
     "#
     );
 
-    let result = &tok(introspection_core::RpcImpl::introspect_internal(
+    let api = migration_core::migration_api(Some(schema.clone()), None).unwrap();
+
+    let params = IntrospectParams {
         schema,
-        false,
-        Default::default(),
-        None,
-    ))
-    .unwrap_err()
-    .data
-    .unwrap();
+        force: false,
+        composite_type_depth: 0,
+        schemas: None,
+    };
+
+    let ufe = tok(api.introspect(params)).unwrap_err().to_user_facing();
 
     let expected = expect![[r#"
-        Object {
-            "is_panic": Bool(false),
-            "message": String("\u{1b}[1;91merror\u{1b}[0m: \u{1b}[1mAttribute not known: \"@unknownAttributeThisIsNotValid\".\u{1b}[0m\n  \u{1b}[1;94m-->\u{1b}[0m  \u{1b}[4mschema.prisma:8\u{1b}[0m\n\u{1b}[1;94m   | \u{1b}[0m\n\u{1b}[1;94m 7 | \u{1b}[0m        model This_Is_Blatantly_Not_Valid_and_An_Outrage {\n\u{1b}[1;94m 8 | \u{1b}[0m            pk Bytes \u{1b}[1;91m@unknownAttributeThisIsNotValid\u{1b}[0m\n\u{1b}[1;94m   | \u{1b}[0m\n"),
-            "meta": Object {
-                "full_error": String("\u{1b}[1;91merror\u{1b}[0m: \u{1b}[1mAttribute not known: \"@unknownAttributeThisIsNotValid\".\u{1b}[0m\n  \u{1b}[1;94m-->\u{1b}[0m  \u{1b}[4mschema.prisma:8\u{1b}[0m\n\u{1b}[1;94m   | \u{1b}[0m\n\u{1b}[1;94m 7 | \u{1b}[0m        model This_Is_Blatantly_Not_Valid_and_An_Outrage {\n\u{1b}[1;94m 8 | \u{1b}[0m            pk Bytes \u{1b}[1;91m@unknownAttributeThisIsNotValid\u{1b}[0m\n\u{1b}[1;94m   | \u{1b}[0m\n"),
-            },
-            "error_code": String("P1012"),
-        }
+        [1;91merror[0m: [1mAttribute not known: "@unknownAttributeThisIsNotValid".[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
+        [1;94m   | [0m
+        [1;94m 6 | [0mmodel This_Is_Blatantly_Not_Valid_and_An_Outrage {
+        [1;94m 7 | [0m  pk Bytes [1;91m@unknownAttributeThisIsNotValid[0m
+        [1;94m   | [0m
     "#]];
 
-    expected.assert_debug_eq(result);
+    expected.assert_eq(ufe.message());
 }

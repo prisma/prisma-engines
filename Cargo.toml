@@ -2,7 +2,6 @@
 resolver = "2"
 members = [
   "introspection-engine/connectors/*",
-  "introspection-engine/core",
   "introspection-engine/datamodel-renderer",
   "introspection-engine/introspection-engine-tests",
   "migration-engine/cli",

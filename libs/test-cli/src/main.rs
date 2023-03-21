@@ -4,7 +4,6 @@ mod diagnose_migration_history;
 
 use anyhow::Context;
 use colored::Colorize;
-use introspection_connector::CompositeTypeDepth;
 use migration_connector::BoxFuture;
 use migration_core::json_rpc::types::*;
 use std::{fmt, fs::File, io::Read, str::FromStr, sync::Arc};
@@ -205,15 +204,16 @@ async fn main() -> anyhow::Result<()> {
                 unreachable!()
             };
 
-            //todo configurable
-            let introspected = introspection_core::RpcImpl::introspect_internal(
+            let api = migration_core::migration_api(Some(schema.clone()), None)?;
+
+            let params = IntrospectParams {
                 schema,
-                false,
-                CompositeTypeDepth::from(composite_type_depth.unwrap_or(0)),
-                None,
-            )
-            .await
-            .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
+                force: false,
+                composite_type_depth: composite_type_depth.unwrap_or(0),
+                schemas: None,
+            };
+
+            let introspected = api.introspect(params).await.map_err(|err| anyhow::anyhow!("{err:?}"))?;
 
             println!("{}", &introspected.datamodel);
         }
@@ -311,11 +311,17 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
     let schema_path: String = {
         if let Some(url) = cmd.url.as_ref() {
             let skeleton = minimal_schema_from_url(url)?;
-            //todo make this configurable
-            let introspected =
-                introspection_core::RpcImpl::introspect_internal(skeleton, false, CompositeTypeDepth::Infinite, None)
-                    .await
-                    .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
+
+            let api = migration_core::migration_api(Some(skeleton.clone()), None)?;
+
+            let params = IntrospectParams {
+                schema: skeleton,
+                force: false,
+                composite_type_depth: -1,
+                schemas: None,
+            };
+
+            let introspected = api.introspect(params).await.map_err(|err| anyhow::anyhow!("{err:?}"))?;
 
             eprintln!("{}", "Schema was successfully introspected from database URL".green());
 

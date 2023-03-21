@@ -8,7 +8,6 @@ sql-introspection-connector = { path = "../connectors/sql-introspection-connecto
 migration-connector = { path = "../../migration-engine/connectors/migration-connector" }
 sql-migration-connector = { path = "../../migration-engine/connectors/sql-migration-connector" }
 introspection-connector = { path = "../connectors/introspection-connector" }
-introspection-core = { path = "../core" }
 sql-schema-describer = { path = "../../libs/sql-schema-describer" }
 psl.workspace = true
 test-macros = { path = "../../libs/test-macros" }
