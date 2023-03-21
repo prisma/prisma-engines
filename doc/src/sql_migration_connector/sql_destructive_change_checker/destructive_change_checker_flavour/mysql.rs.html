@@ -181,6 +181,31 @@
 <a href="#181" id="181">181</a>
 <a href="#182" id="182">182</a>
 <a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::DestructiveChangeCheckerFlavour;
 <span class="kw">use crate</span>::{
     flavour::{MysqlFlavour, SqlFlavour},
@@ -312,25 +337,50 @@
     }
 
     <span class="kw">fn </span>count_rows_in_table&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, table: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Table) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;i64&gt;&gt; {
+        <span class="comment">// TODO(MultiSchema): replace this when implementing MySQL.
+        </span><span class="kw">let </span>query = <span class="macro">format!</span>(<span class="string">&quot;SELECT COUNT(*) FROM `{}`&quot;</span>, table.table);
+
         Box::pin(<span class="kw">async move </span>{
-            <span class="comment">// TODO(MultiSchema): replace this when implementing MySQL.
-            </span><span class="kw">let </span>query = <span class="macro">format!</span>(<span class="string">&quot;SELECT COUNT(*) FROM `{}`&quot;</span>, table.table);
-            <span class="kw">let </span>result_set = <span class="self">self</span>.query_raw(<span class="kw-2">&amp;</span>query, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="kw">super</span>::extract_table_rows_count(table, result_set)
+            query_with_backoff(<span class="self">self</span>, <span class="kw-2">&amp;</span>query)
+                .<span class="kw">await
+                </span>.and_then(|result_set| <span class="kw">super</span>::extract_table_rows_count(table, result_set))
         })
     }
 
     <span class="kw">fn </span>count_values_in_column&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, column: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Column) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;i64&gt;&gt; {
+        <span class="comment">// TODO(MultiSchema): replace this when implementing MySQL.
+        </span><span class="kw">let </span>query = <span class="macro">format!</span>(
+            <span class="string">&quot;SELECT COUNT(*) FROM `{}` WHERE `{}` IS NOT NULL&quot;</span>,
+            column.table, column.column
+        );
+
         Box::pin(<span class="kw">async move </span>{
-            <span class="comment">// TODO(MultiSchema): replace this when implementing MySQL.
-            </span><span class="kw">let </span>query = <span class="macro">format!</span>(
-                <span class="string">&quot;SELECT COUNT(*) FROM `{}` WHERE `{}` IS NOT NULL&quot;</span>,
-                column.table, column.column
-            );
-            <span class="kw">let </span>result_set = <span class="self">self</span>.query_raw(<span class="kw-2">&amp;</span>query, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="kw">super</span>::extract_column_values_count(result_set)
+            query_with_backoff(<span class="self">self</span>, <span class="kw-2">&amp;</span>query)
+                .<span class="kw">await
+                </span>.and_then(<span class="kw">super</span>::extract_column_values_count)
         })
     }
+}
+
+<span class="doccomment">/// Run the query with exponential backoff on error, from 400ms up to (400 × 2⁵)ms.
+///
+/// This is necessary because destructive change checks can come after a migration, and _on
+/// Vitess_, schema changes are asynchronous, they can take time to take effect. That causes
+/// failures in destructive change checks. Trying again later, in this case, works.
+</span><span class="kw">async fn </span>query_with_backoff(flavour: <span class="kw-2">&amp;mut </span>MysqlFlavour, query: <span class="kw-2">&amp;</span>str) -&gt; ConnectorResult&lt;quaint::prelude::ResultSet&gt; {
+    <span class="kw">let </span>delay = std::time::Duration::from_millis(<span class="number">400</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>result = flavour.query_raw(query, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span>;
+
+    <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">6 </span>{
+        <span class="kw">match </span><span class="kw-2">&amp;</span>result {
+            <span class="prelude-val">Ok</span>(_result_set) =&gt; <span class="kw">break</span>,
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; tokio::time::sleep(delay.saturating_mul(<span class="number">2 </span>^ i)).<span class="kw">await</span>,
+        }
+
+        result = flavour.query_raw(query, <span class="kw-2">&amp;</span>[]).<span class="kw">await
+    </span>}
+
+    result
 }
 
 <span class="doccomment">/// If the type change is an enum change, diagnose it, and return whether it _was_ an enum change.

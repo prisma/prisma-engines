@@ -119,8 +119,6 @@ var sourcesIndex = JSON.parse('{\
 "indexmap":["",[["map",[["core",[],["raw.rs"]]],["core.rs"]]],["equivalent.rs","lib.rs","macros.rs","map.rs","mutable_keys.rs","serde.rs","serde_seq.rs","set.rs","util.rs"]],\
 "indoc":["",[],["error.rs","expr.rs","lib.rs","unindent.rs"]],\
 "introspection_connector":["",[],["error.rs","lib.rs"]],\
-"introspection_core":["",[],["error.rs","error_rendering.rs","lib.rs","rpc.rs"]],\
-"introspection_engine":["",[],["error.rs","error_rendering.rs","main.rs","rpc.rs"]],\
 "introspection_engine_tests":["",[],["lib.rs","test_api.rs"]],\
 "io_lifetimes":["",[],["example_ffi.rs","lib.rs","portability.rs","raw.rs","traits.rs","views.rs"]],\
 "ipnet":["",[],["ipext.rs","ipnet.rs","lib.rs","parser.rs"]],\
@@ -129,7 +127,6 @@ var sourcesIndex = JSON.parse('{\
 "json_rpc_api_build":["",[],["error.rs","lib.rs","rust_crate.rs"]],\
 "json_rpc_stdio":["",[],["lib.rs"]],\
 "jsonrpc_core":["",[["types",[],["error.rs","id.rs","mod.rs","params.rs","request.rs","response.rs","version.rs"]]],["calls.rs","delegates.rs","io.rs","lib.rs","middleware.rs"]],\
-"jsonrpc_derive":["",[],["lib.rs","options.rs","params_style.rs","rpc_attr.rs","rpc_trait.rs","to_client.rs","to_delegate.rs"]],\
 "lazy_static":["",[],["inline_lazy.rs","lib.rs"]],\
 "lexical":["",[],["lib.rs"]],\
 "lexical_core":["",[],["lib.rs"]],\
@@ -222,7 +219,6 @@ var sourcesIndex = JSON.parse('{\
 "prisma_models":["",[["field",[],["composite.rs","mod.rs","relation.rs","scalar.rs"]],["projections",[],["mod.rs","model_projection.rs"]]],["composite_type.rs","convert.rs","error.rs","field_selection.rs","fields.rs","internal_data_model.rs","internal_enum.rs","lib.rs","model.rs","order_by.rs","parent_container.rs","pk.rs","prelude.rs","prisma_value_ext.rs","record.rs","relation.rs","selection_result.rs","zipper.rs"]],\
 "prisma_value":["",[],["arithmetic.rs","error.rs","lib.rs"]],\
 "proc_macro2":["",[],["detection.rs","fallback.rs","lib.rs","marker.rs","parse.rs","rcvec.rs","wrapper.rs"]],\
-"proc_macro_crate":["",[],["lib.rs"]],\
 "proc_macro_error":["",[["imp",[],["fallback.rs"]]],["diagnostic.rs","dummy.rs","lib.rs","macros.rs","sealed.rs"]],\
 "proc_macro_error_attr":["",[],["lib.rs","parse.rs","settings.rs"]],\
 "proc_macro_hack":["",[],["error.rs","iter.rs","lib.rs","parse.rs","quote.rs"]],\

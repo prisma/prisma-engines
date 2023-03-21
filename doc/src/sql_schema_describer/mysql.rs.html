@@ -846,6 +846,8 @@
 <a href="#846" id="846">846</a>
 <a href="#847" id="847">847</a>
 <a href="#848" id="848">848</a>
+<a href="#849" id="849">849</a>
+<a href="#850" id="850">850</a>
 </pre><pre class="rust"><code><span class="doccomment">//! MySQL schema description.
 
 </span><span class="kw">use crate</span>::{getters::Getter, parsers::Parser, <span class="kw-2">*</span>};
@@ -1115,7 +1117,7 @@
         </span><span class="kw">let </span>sql = <span class="string">r#&quot;
             SELECT DISTINCT
               BINARY table_info.table_name AS table_name,
-              (CASE WHEN table_info.create_options=&#39;partitioned&#39; THEN TRUE ELSE FALSE END) as is_partition
+              table_info.create_options AS create_options
             FROM information_schema.tables AS table_info
             JOIN information_schema.columns AS column_info
                 ON BINARY column_info.table_name = BINARY table_info.table_name
@@ -1126,9 +1128,12 @@
                 AND table_info.table_type = &#39;BASE TABLE&#39;
             ORDER BY BINARY table_info.table_name&quot;#</span>;
         <span class="kw">let </span>rows = <span class="self">self</span>.conn.query_raw(sql, <span class="kw-2">&amp;</span>[schema.into(), schema.into()]).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let </span>names = rows
-            .into_iter()
-            .map(|row| (row.get_expect_string(<span class="string">&quot;table_name&quot;</span>), row.get_expect_bool(<span class="string">&quot;is_partition&quot;</span>)));
+        <span class="kw">let </span>names = rows.into_iter().map(|row| {
+            (
+                row.get_expect_string(<span class="string">&quot;table_name&quot;</span>),
+                row.get_expect_string(<span class="string">&quot;create_options&quot;</span>) == <span class="string">&quot;partitioned&quot;</span>,
+            )
+        });
 
         <span class="kw">let </span><span class="kw-2">mut </span>map = IndexMap::default();
 
@@ -1314,8 +1319,7 @@
                                     )))
                                 }
                             }
-                            <span class="comment">//todo check other now() definitions
-                            </span>ColumnTypeFamily::DateTime =&gt; <span class="kw">match </span><span class="self">Self</span>::default_is_current_timestamp(<span class="kw-2">&amp;</span>default_string) {
+                            ColumnTypeFamily::DateTime =&gt; <span class="kw">match </span><span class="self">Self</span>::default_is_current_timestamp(<span class="kw-2">&amp;</span>default_string) {
                                 <span class="bool-val">true </span>=&gt; DefaultValue::now(),
                                 <span class="kw">_ if </span>default_expression =&gt; <span class="self">Self</span>::dbgenerated_expression(<span class="kw-2">&amp;</span>default_string),
                                 <span class="kw">_ if </span>DEFAULT_QUOTES.is_match(<span class="kw-2">&amp;</span>default_string) =&gt; {
