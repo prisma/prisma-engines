@@ -12,23 +12,6 @@ pub enum OutputType {
     Scalar(ScalarType),
 }
 
-impl std::fmt::Display for OutputType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Enum(_) => write!(f, "enum"),
-            Self::List(o) => write!(f, "{o}"),
-            Self::Object(o) => write!(
-                f,
-                "{}",
-                o.upgrade()
-                    .map(|f| f.identifier().name())
-                    .unwrap_or_else(|| String::from("Object"))
-            ),
-            Self::Scalar(s) => write!(f, "{s}"),
-        }
-    }
-}
-
 impl OutputType {
     pub fn list(containing: OutputType) -> OutputType {
         OutputType::List(Arc::new(containing))
