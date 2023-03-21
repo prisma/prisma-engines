@@ -182,11 +182,6 @@
 <a href="#182" id="182">182</a>
 <a href="#183" id="183">183</a>
 <a href="#184" id="184">184</a>
-<a href="#185" id="185">185</a>
-<a href="#186" id="186">186</a>
-<a href="#187" id="187">187</a>
-<a href="#188" id="188">188</a>
-<a href="#189" id="189">189</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>enum_renderer;
 <span class="kw">mod </span>field_renderer;
 <span class="kw">mod </span>object_renderer;
@@ -202,11 +197,8 @@
 };
 <span class="kw">use </span>type_renderer::<span class="kw-2">*</span>;
 
-<span class="attr">#[allow(dead_code)]
-</span><span class="kw">pub struct </span>GraphQLSchemaRenderer;
-
 <span class="doccomment">/// Top level GraphQL schema renderer.
-</span><span class="kw">pub struct </span>GqlSchemaRenderer {
+</span><span class="kw">struct </span>GqlSchemaRenderer {
     query_schema: QuerySchemaRef,
 }
 
@@ -218,29 +210,27 @@
 }
 
 <span class="kw">impl </span>GqlSchemaRenderer {
-    <span class="kw">pub fn </span>new(query_schema: QuerySchemaRef) -&gt; GqlSchemaRenderer {
+    <span class="kw">fn </span>new(query_schema: QuerySchemaRef) -&gt; GqlSchemaRenderer {
         GqlSchemaRenderer { query_schema }
     }
 }
 
-<span class="kw">impl </span>QuerySchemaRenderer&lt;String&gt; <span class="kw">for </span>GraphQLSchemaRenderer {
-    <span class="kw">fn </span>render(query_schema: QuerySchemaRef) -&gt; String {
-        <span class="kw">let </span><span class="kw-2">mut </span>context = RenderContext::new();
-        query_schema.into_renderer().render(<span class="kw-2">&amp;mut </span>context);
+<span class="kw">pub fn </span>render_graphql_schema(query_schema: QuerySchemaRef) -&gt; String {
+    <span class="kw">let </span><span class="kw-2">mut </span>context = RenderContext::new();
+    query_schema.into_renderer().render(<span class="kw-2">&amp;mut </span>context);
 
-        <span class="comment">// Add custom scalar types (required for graphql.js implementations)
-        </span><span class="macro">format!</span>(
-            <span class="string">&quot;{}\n\nscalar DateTime\nscalar Json\nscalar UUID\nscalar BigInt\nscalar Decimal\nscalar Bytes&quot;</span>,
-            context.format()
-        )
-    }
+    <span class="comment">// Add custom scalar types (required for graphql.js implementations)
+    </span><span class="macro">format!</span>(
+        <span class="string">&quot;{}\n\nscalar DateTime\nscalar Json\nscalar UUID\nscalar BigInt\nscalar Decimal\nscalar Bytes&quot;</span>,
+        context.format()
+    )
 }
 
-<span class="kw">pub trait </span>Renderer {
+<span class="kw">trait </span>Renderer {
     <span class="kw">fn </span>render(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String;
 }
 
-<span class="kw">pub struct </span>RenderContext {
+<span class="kw">struct </span>RenderContext {
     <span class="doccomment">/// Output queue for all (top level) elements that need to be rendered,
     </span>output_queue: Vec&lt;String&gt;,
 
@@ -266,32 +256,32 @@
 }
 
 <span class="kw">impl </span>RenderContext {
-    <span class="kw">pub fn </span>new() -&gt; RenderContext {
+    <span class="kw">fn </span>new() -&gt; RenderContext {
         <span class="self">Self</span>::default()
     }
 
-    <span class="kw">pub fn </span>format(<span class="self">self</span>) -&gt; String {
+    <span class="kw">fn </span>format(<span class="self">self</span>) -&gt; String {
         <span class="self">self</span>.output_queue.join(<span class="string">&quot;\n\n&quot;</span>)
     }
 
-    <span class="kw">pub fn </span>already_rendered(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_key: <span class="kw-2">&amp;</span>str) -&gt; bool {
+    <span class="kw">fn </span>already_rendered(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_key: <span class="kw-2">&amp;</span>str) -&gt; bool {
         <span class="self">self</span>.rendered.contains_key(cache_key)
     }
 
-    <span class="kw">pub fn </span>mark_as_rendered(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache_key: String) {
+    <span class="kw">fn </span>mark_as_rendered(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache_key: String) {
         <span class="self">self</span>.rendered.insert(cache_key, ());
     }
 
-    <span class="kw">pub fn </span>add_output(<span class="kw-2">&amp;mut </span><span class="self">self</span>, output: String) {
+    <span class="kw">fn </span>add_output(<span class="kw-2">&amp;mut </span><span class="self">self</span>, output: String) {
         <span class="self">self</span>.output_queue.push(output);
     }
 
-    <span class="kw">pub fn </span>add(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache_key: String, output: String) {
+    <span class="kw">fn </span>add(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache_key: String, output: String) {
         <span class="self">self</span>.add_output(output);
         <span class="self">self</span>.mark_as_rendered(cache_key);
     }
 
-    <span class="kw">pub fn </span>indent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+    <span class="kw">fn </span>indent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="self">self</span>.indent_str.repeat(<span class="self">self</span>.indent)
     }
 }

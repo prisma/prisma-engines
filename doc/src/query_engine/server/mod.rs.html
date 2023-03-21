@@ -554,8 +554,6 @@
 <a href="#554" id="554">554</a>
 <a href="#555" id="555">555</a>
 <a href="#556" id="556">556</a>
-<a href="#557" id="557">557</a>
-<a href="#558" id="558">558</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::context::PrismaContext;
 <span class="kw">use </span><span class="kw">crate</span>::features::Feature;
 <span class="kw">use crate</span>::{opt::PrismaOpt, PrismaResult};
@@ -565,11 +563,9 @@
 <span class="kw">use </span>opentelemetry::{global, propagation::Extractor};
 <span class="kw">use </span>query_core::helpers::<span class="kw-2">*</span>;
 <span class="kw">use </span>query_core::telemetry::capturing::TxTraceExt;
-<span class="kw">use </span>query_core::{
-    schema::QuerySchemaRenderer, telemetry, ExtendedTransactionUserFacingError, TransactionOptions, TxId,
-};
+<span class="kw">use </span>query_core::{telemetry, ExtendedTransactionUserFacingError, TransactionOptions, TxId};
 <span class="kw">use </span>query_engine_metrics::MetricFormat;
-<span class="kw">use </span>request_handlers::{dmmf, GraphQLSchemaRenderer, RequestBody, RequestHandler};
+<span class="kw">use </span>request_handlers::{dmmf, render_graphql_schema, RequestBody, RequestHandler};
 <span class="kw">use </span>serde_json::json;
 <span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>std::net::SocketAddr;
@@ -623,7 +619,7 @@
             .unwrap(),
 
         (<span class="kw-2">&amp;</span>Method::GET, <span class="string">&quot;/sdl&quot;</span>) =&gt; {
-            <span class="kw">let </span>schema = GraphQLSchemaRenderer::render(cx.query_schema().clone());
+            <span class="kw">let </span>schema = render_graphql_schema(cx.query_schema().clone());
 
             Response::builder()
                 .status(StatusCode::OK)

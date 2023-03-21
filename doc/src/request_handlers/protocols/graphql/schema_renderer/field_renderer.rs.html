@@ -85,7 +85,7 @@
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
 <span class="attr">#[derive(Debug)]
-</span><span class="kw">pub enum </span>GqlFieldRenderer {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>GqlFieldRenderer {
     Input(InputFieldRef),
     Output(OutputFieldRef),
 }
