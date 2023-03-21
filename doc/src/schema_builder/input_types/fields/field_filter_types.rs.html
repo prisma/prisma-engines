@@ -612,6 +612,9 @@
 <a href="#612" id="612">612</a>
 <a href="#613" id="613">613</a>
 <a href="#614" id="614">614</a>
+<a href="#615" id="615">615</a>
+<a href="#616" id="616">616</a>
+<a href="#617" id="617">617</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{field_ref_type::WithFieldRefInputExt, objects::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
 <span class="kw">use </span>constants::{aggregations, filters};
 <span class="kw">use </span>prisma_models::{dml, CompositeFieldRef, PrismaValue};
@@ -679,7 +682,7 @@
 }
 
 <span class="kw">fn </span>to_many_relation_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::ToManyRelationFilterInput(rf.clone()));
+    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::ToManyRelationFilterInput(rf.related_model()));
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
@@ -702,7 +705,7 @@
 }
 
 <span class="kw">fn </span>to_one_relation_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::ToOneRelationFilterInput(rf.clone()));
+    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::ToOneRelationFilterInput(rf.related_model()));
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
@@ -810,7 +813,10 @@
 }
 
 <span class="kw">fn </span>scalar_list_filter_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::ScalarListFilterInput(sf.clone()));
+    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::ScalarListFilterInput(
+        ctx.internal_data_model.clone().zip(sf.type_identifier()),
+        sf.is_required(),
+    ));
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span><span class="kw-2">mut </span>object = init_input_object_type(ident.clone());

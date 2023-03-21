@@ -295,20 +295,6 @@
 <a href="#295" id="295">295</a>
 <a href="#296" id="296">296</a>
 <a href="#297" id="297">297</a>
-<a href="#298" id="298">298</a>
-<a href="#299" id="299">299</a>
-<a href="#300" id="300">300</a>
-<a href="#301" id="301">301</a>
-<a href="#302" id="302">302</a>
-<a href="#303" id="303">303</a>
-<a href="#304" id="304">304</a>
-<a href="#305" id="305">305</a>
-<a href="#306" id="306">306</a>
-<a href="#307" id="307">307</a>
-<a href="#308" id="308">308</a>
-<a href="#309" id="309">309</a>
-<a href="#310" id="310">310</a>
-<a href="#311" id="311">311</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{capitalize, scalar_filter_name};
 
 <span class="kw">use </span>prisma_models::{prelude::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
@@ -340,16 +326,16 @@
     OrderByRelevanceFieldEnum(ParentContainer),
     OrderByRelevanceInput(ParentContainer),
     OrderByToManyAggregateInput(ParentContainer),
-    RelationCreateInput(RelationField, bool),
-    RelationUpdateInput(RelationField, bool),
+    RelationCreateInput(RelationField, RelationField, bool),
+    RelationUpdateInput(RelationField, RelationField, bool),
     ScalarFieldEnum(Model),
     ScalarFilterInput(Model, bool),
-    ScalarListFilterInput(ScalarField),
+    ScalarListFilterInput(Zipper&lt;TypeIdentifier&gt;, bool),
     ScalarListUpdateInput(ScalarField),
     ToManyCompositeFilterInput(CompositeField),
-    ToManyRelationFilterInput(RelationField),
+    ToManyRelationFilterInput(Model),
     ToOneCompositeFilterInput(CompositeField),
-    ToOneRelationFilterInput(RelationField),
+    ToOneRelationFilterInput(Model),
     TransactionIsolationLevel,
     UncheckedCreateInput(Model, <span class="prelude-ty">Option</span>&lt;RelationField&gt;),
     UncheckedUpdateManyInput(Model, <span class="prelude-ty">Option</span>&lt;RelationField&gt;),
@@ -402,11 +388,14 @@
 
                 <span class="macro">format!</span>(<span class="string">&quot;{nullable}{prefix}FieldUpdateOperationsInput&quot;</span>)
             }
-            IdentifierType::RelationCreateInput(rf, unchecked) =&gt; {
-                <span class="kw">let </span>related_model = rf.related_model();
-                <span class="kw">let </span>related_field = rf.related_field();
+            IdentifierType::RelationCreateInput(parent_field, related_field, unchecked) =&gt; {
+                <span class="kw">let </span>related_model = related_field.model();
 
-                <span class="kw">let </span>arity_part = <span class="kw">if </span>rf.is_list() { <span class="string">&quot;NestedMany&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;NestedOne&quot; </span>};
+                <span class="kw">let </span>arity_part = <span class="kw">if </span>parent_field.is_list() {
+                    <span class="string">&quot;NestedMany&quot;
+                </span>} <span class="kw">else </span>{
+                    <span class="string">&quot;NestedOne&quot;
+                </span>};
                 <span class="kw">let </span>unchecked_part = <span class="kw">if </span><span class="kw-2">*</span>unchecked { <span class="string">&quot;Unchecked&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
 
                 <span class="macro">format!</span>(
@@ -434,12 +423,11 @@
             IdentifierType::ScalarListUpdateInput(sf) =&gt; {
                 <span class="macro">format!</span>(<span class="string">&quot;{}Update{}Input&quot;</span>, sf.container().name(), sf.name())
             }
-            IdentifierType::RelationUpdateInput(rf, unchecked) =&gt; {
-                <span class="kw">let </span>related_model = rf.related_model();
-                <span class="kw">let </span>related_field = rf.related_field();
+            IdentifierType::RelationUpdateInput(parent_field, related_field, unchecked) =&gt; {
+                <span class="kw">let </span>related_model = related_field.model();
 
                 <span class="comment">// Compute input object name
-                </span><span class="kw">let </span>arity_part = <span class="kw">match </span>(rf.is_list(), rf.is_required()) {
+                </span><span class="kw">let </span>arity_part = <span class="kw">match </span>(parent_field.is_list(), parent_field.is_required()) {
                     (<span class="bool-val">true</span>, <span class="kw">_</span>) =&gt; <span class="string">&quot;Many&quot;</span>,
                     (<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; <span class="string">&quot;OneRequired&quot;</span>,
                     (<span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; <span class="string">&quot;One&quot;</span>,
@@ -478,14 +466,10 @@
             IdentifierType::CompositeDeleteManyInput(cf) =&gt; {
                 <span class="macro">format!</span>(<span class="string">&quot;{}DeleteManyInput&quot;</span>, cf.typ().name())
             }
-            IdentifierType::ToManyRelationFilterInput(rf) =&gt; {
-                <span class="kw">let </span>related_model = rf.related_model();
-
+            IdentifierType::ToManyRelationFilterInput(related_model) =&gt; {
                 <span class="macro">format!</span>(<span class="string">&quot;{}ListRelationFilter&quot;</span>, capitalize(related_model.name()))
             }
-            IdentifierType::ToOneRelationFilterInput(rf) =&gt; {
-                <span class="kw">let </span>related_model = rf.related_model();
-
+            IdentifierType::ToOneRelationFilterInput(related_model) =&gt; {
                 <span class="macro">format!</span>(<span class="string">&quot;{}RelationFilter&quot;</span>, capitalize(related_model.name()))
             }
             IdentifierType::ToOneCompositeFilterInput(cf) =&gt; {
@@ -496,10 +480,10 @@
             IdentifierType::ToManyCompositeFilterInput(cf) =&gt; {
                 <span class="macro">format!</span>(<span class="string">&quot;{}CompositeListFilter&quot;</span>, capitalize(cf.typ().name()))
             }
-            IdentifierType::ScalarListFilterInput(sf) =&gt; scalar_filter_name(
-                <span class="kw-2">&amp;</span>sf.type_identifier().type_name(<span class="kw-2">&amp;</span>sf.dm.schema),
+            IdentifierType::ScalarListFilterInput(type_identifier, required) =&gt; scalar_filter_name(
+                <span class="kw-2">&amp;</span>type_identifier.id.type_name(<span class="kw-2">&amp;</span>type_identifier.dm.schema),
                 <span class="bool-val">true</span>,
-                !sf.is_required(),
+                !required,
                 <span class="bool-val">false</span>,
                 <span class="bool-val">false</span>,
             ),
@@ -514,94 +498,82 @@
             IdentifierType::WhereUniqueInput(model) =&gt; {
                 <span class="macro">format!</span>(<span class="string">&quot;{}WhereUniqueInput&quot;</span>, model.name())
             }
-            IdentifierType::CheckedUpdateOneInput(model, parent_field) =&gt; {
-                <span class="kw">match </span>parent_field.as_ref().map(|pf| pf.related_field()) {
-                    <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>f) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}UpdateWithout{}Input&quot;</span>, model.name(), capitalize(f.name())),
-                    <span class="kw">_ </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;{}UpdateInput&quot;</span>, model.name()),
-                }
-            }
-            IdentifierType::UncheckedUpdateOneInput(model, parent_field) =&gt; {
-                <span class="kw">match </span>parent_field.as_ref().map(|pf| pf.related_field()) {
-                    <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>f) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}UncheckedUpdateWithout{}Input&quot;</span>, model.name(), capitalize(f.name())),
-                    <span class="kw">_ </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;{}UncheckedUpdateInput&quot;</span>, model.name()),
-                }
-            }
-            IdentifierType::UpdateOneWhereCombinationInput(parent_field) =&gt; {
-                <span class="kw">let </span>related_model = parent_field.related_model();
+            IdentifierType::CheckedUpdateOneInput(model, related_field) =&gt; <span class="kw">match </span>related_field {
+                <span class="prelude-val">Some</span>(f) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}UpdateWithout{}Input&quot;</span>, model.name(), capitalize(f.name())),
+                <span class="kw">_ </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;{}UpdateInput&quot;</span>, model.name()),
+            },
+            IdentifierType::UncheckedUpdateOneInput(model, related_field) =&gt; <span class="kw">match </span>related_field {
+                <span class="prelude-val">Some</span>(f) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}UncheckedUpdateWithout{}Input&quot;</span>, model.name(), capitalize(f.name())),
+                <span class="kw">_ </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;{}UncheckedUpdateInput&quot;</span>, model.name()),
+            },
+            IdentifierType::UpdateOneWhereCombinationInput(related_field) =&gt; {
+                <span class="kw">let </span>related_model = related_field.model();
 
                 <span class="macro">format!</span>(
                     <span class="string">&quot;{}UpdateWithWhereUniqueWithout{}Input&quot;</span>,
                     related_model.name(),
-                    capitalize(parent_field.related_field().name())
+                    capitalize(related_field.name())
                 )
             }
-            IdentifierType::UpdateToOneRelWhereCombinationInput(parent_field) =&gt; {
-                <span class="kw">let </span>related_model = parent_field.related_model();
+            IdentifierType::UpdateToOneRelWhereCombinationInput(related_field) =&gt; {
+                <span class="kw">let </span>related_model = related_field.model();
 
                 <span class="macro">format!</span>(
                     <span class="string">&quot;{}UpdateToOneWithWhereWithout{}Input&quot;</span>,
                     related_model.name(),
-                    capitalize(parent_field.related_field().name())
+                    capitalize(related_field.name())
                 )
             }
             IdentifierType::CheckedUpdateManyInput(model) =&gt; {
                 <span class="macro">format!</span>(<span class="string">&quot;{}UpdateManyMutationInput&quot;</span>, model.name())
             }
-            IdentifierType::UncheckedUpdateManyInput(model, parent_field) =&gt; {
-                <span class="kw">match </span>parent_field.as_ref().map(|pf| pf.related_field()) {
-                    <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>f) =&gt; <span class="macro">format!</span>(
-                        <span class="string">&quot;{}UncheckedUpdateManyWithout{}Input&quot;</span>,
-                        model.name(),
-                        capitalize(f.related_field().name())
-                    ),
-                    <span class="kw">_ </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;{}UncheckedUpdateManyInput&quot;</span>, model.name()),
-                }
-            }
-            IdentifierType::UpdateManyWhereCombinationInput(parent_field) =&gt; {
-                <span class="kw">let </span>related_model = parent_field.related_model();
+            IdentifierType::UncheckedUpdateManyInput(model, parent_field) =&gt; <span class="kw">match </span>parent_field {
+                <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>f) =&gt; <span class="macro">format!</span>(
+                    <span class="string">&quot;{}UncheckedUpdateManyWithout{}Input&quot;</span>,
+                    model.name(),
+                    capitalize(f.name())
+                ),
+                <span class="kw">_ </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;{}UncheckedUpdateManyInput&quot;</span>, model.name()),
+            },
+            IdentifierType::UpdateManyWhereCombinationInput(related_field) =&gt; {
+                <span class="kw">let </span>related_model = related_field.model();
 
                 <span class="macro">format!</span>(
                     <span class="string">&quot;{}UpdateManyWithWhereWithout{}Input&quot;</span>,
                     related_model.name(),
-                    capitalize(parent_field.related_field().name())
+                    capitalize(related_field.name())
                 )
             }
-            IdentifierType::NestedUpsertManyInput(parent_field) =&gt; {
-                <span class="kw">let </span>related_model = parent_field.related_model();
+            IdentifierType::NestedUpsertManyInput(related_field) =&gt; {
+                <span class="kw">let </span>related_model = related_field.model();
 
                 <span class="macro">format!</span>(
                     <span class="string">&quot;{}UpsertWithWhereUniqueWithout{}Input&quot;</span>,
                     related_model.name(),
-                    capitalize(parent_field.related_field().name())
+                    capitalize(related_field.name())
                 )
             }
-            IdentifierType::NestedUpsertOneInput(parent_field) =&gt; {
-                <span class="kw">let </span>related_model = parent_field.related_model();
+            IdentifierType::NestedUpsertOneInput(related_field) =&gt; {
+                <span class="kw">let </span>related_model = related_field.model();
 
                 <span class="macro">format!</span>(
                     <span class="string">&quot;{}UpsertWithout{}Input&quot;</span>,
                     related_model.name(),
-                    capitalize(parent_field.related_field().name())
+                    capitalize(related_field.name())
                 )
             }
-            IdentifierType::CheckedCreateInput(model, parent_field) =&gt; {
-                <span class="kw">match </span>parent_field.as_ref().map(|pf| pf.related_field()) {
-                    <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>f) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}CreateWithout{}Input&quot;</span>, model.name(), capitalize(f.name())),
-                    <span class="kw">_ </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;{}CreateInput&quot;</span>, model.name()),
-                }
-            }
-            IdentifierType::UncheckedCreateInput(model, parent_field) =&gt; {
-                <span class="kw">match </span>parent_field.as_ref().map(|pf| pf.related_field()) {
-                    <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>f) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}UncheckedCreateWithout{}Input&quot;</span>, model.name(), capitalize(f.name())),
-                    <span class="kw">_ </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;{}UncheckedCreateInput&quot;</span>, model.name()),
-                }
-            }
-            IdentifierType::CreateManyInput(model, parent_field) =&gt; {
-                <span class="kw">match </span>parent_field.as_ref().map(|pf| pf.related_field()) {
-                    <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>f) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}CreateMany{}Input&quot;</span>, model.name(), capitalize(f.name())),
-                    <span class="kw">_ </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;{}CreateManyInput&quot;</span>, model.name()),
-                }
-            }
+            IdentifierType::CheckedCreateInput(model, related_field) =&gt; <span class="kw">match </span>related_field {
+                <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>rf) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}CreateWithout{}Input&quot;</span>, model.name(), capitalize(rf.name())),
+                <span class="kw">_ </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;{}CreateInput&quot;</span>, model.name()),
+            },
+            IdentifierType::UncheckedCreateInput(model, related_field) =&gt; <span class="kw">match </span>related_field {
+                <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>rf) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}UncheckedCreateWithout{}Input&quot;</span>, model.name(), capitalize(rf.name())),
+                <span class="kw">_ </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;{}UncheckedCreateInput&quot;</span>, model.name()),
+            },
+            IdentifierType::CreateManyInput(model, related_field) =&gt; <span class="kw">match </span>related_field {
+                <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>rf) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}CreateMany{}Input&quot;</span>, model.name(), capitalize(rf.name())),
+                <span class="kw">_ </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;{}CreateManyInput&quot;</span>, model.name()),
+            },
             IdentifierType::Raw(name) =&gt; name.to_string(),
         };
 

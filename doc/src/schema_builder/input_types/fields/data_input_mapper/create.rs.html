@@ -174,6 +174,10 @@
 <a href="#174" id="174">174</a>
 <a href="#175" id="175">175</a>
 <a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::constants::<span class="kw-2">*</span>;
 <span class="kw">use </span>prisma_models::CompositeFieldRef;
@@ -236,7 +240,11 @@
     }
 
     <span class="kw">fn </span>map_relation(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputField {
-        <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::RelationCreateInput(rf.clone(), <span class="self">self</span>.unchecked));
+        <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::RelationCreateInput(
+            rf.clone(),
+            rf.related_field(),
+            <span class="self">self</span>.unchecked,
+        ));
 
         <span class="kw">let </span>input_object = <span class="kw">match </span>ctx.get_input_type(<span class="kw-2">&amp;</span>ident) {
             <span class="prelude-val">Some</span>(t) =&gt; t,

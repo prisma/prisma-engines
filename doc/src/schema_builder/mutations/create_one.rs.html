@@ -176,6 +176,9 @@
 <a href="#176" id="176">176</a>
 <a href="#177" id="177">177</a>
 <a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use crate</span>::{
@@ -249,7 +252,10 @@
     <span class="comment">// We allow creation from both sides of the relation - which would lead to an endless loop of input types
     // if we would allow to create the parent from a child create that is already a nested create.
     // To solve it, we remove the parent relation from the input (&quot;Without&lt;Parent&gt;&quot;).
-    </span><span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::CheckedCreateInput(model.clone(), parent_field.cloned()));
+    </span><span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::CheckedCreateInput(
+        model.clone(),
+        parent_field.map(|pf| pf.related_field()),
+    ));
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
@@ -278,7 +284,7 @@
     // To solve it, we remove the parent relation from the input (&quot;Without&lt;Parent&gt;&quot;).
     </span><span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::UncheckedCreateInput(
         model.clone(),
-        parent_field.cloned(),
+        parent_field.map(|pf| pf.related_field()),
     ));
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);

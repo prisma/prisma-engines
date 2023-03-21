@@ -91,6 +91,8 @@
 <a href="#91" id="91">91</a>
 <a href="#92" id="92">92</a>
 <a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::fields::data_input_mapper::<span class="kw-2">*</span>;
 <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>constants::args;
@@ -140,7 +142,7 @@
 ) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::UncheckedUpdateManyInput(
         model.clone(),
-        parent_field.cloned(),
+        parent_field.map(|pf| pf.related_field()),
     ));
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
@@ -166,14 +168,16 @@
     ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
     parent_field: <span class="kw-2">&amp;</span>RelationFieldRef,
 ) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>related_model = parent_field.related_model();
+    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::UpdateManyWhereCombinationInput(
+        parent_field.related_field(),
+    ));
 
-    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::UpdateManyWhereCombinationInput(parent_field.clone()));
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
 
+    <span class="kw">let </span>related_model = parent_field.related_model();
     <span class="kw">let </span>where_input_object = filter_objects::scalar_filter_object_type(ctx, <span class="kw-2">&amp;</span>related_model, <span class="bool-val">false</span>);
     <span class="kw">let </span>update_types = update_many_input_types(ctx, <span class="kw-2">&amp;</span>related_model, <span class="prelude-val">Some</span>(parent_field));
 

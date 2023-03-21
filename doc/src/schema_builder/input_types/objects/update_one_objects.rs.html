@@ -220,6 +220,8 @@
 <a href="#220" id="220">220</a>
 <a href="#221" id="221">221</a>
 <a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{arguments, fields::data_input_mapper::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
 <span class="kw">use </span>constants::args;
 <span class="kw">use </span>psl::datamodel_connector::ConnectorCapability;
@@ -248,7 +250,7 @@
 ) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::CheckedUpdateOneInput(
         model.clone(),
-        parent_field.cloned(),
+        parent_field.map(|pf| pf.related_field()),
     ));
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
@@ -272,7 +274,7 @@
 ) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::UncheckedUpdateOneInput(
         model.clone(),
-        parent_field.cloned(),
+        parent_field.map(|pf| pf.related_field()),
     ));
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
@@ -396,7 +398,9 @@
     update_types: Vec&lt;InputType&gt;,
     parent_field: <span class="kw-2">&amp;</span>RelationFieldRef,
 ) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::UpdateOneWhereCombinationInput(parent_field.clone()));
+    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::UpdateOneWhereCombinationInput(
+        parent_field.related_field(),
+    ));
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
@@ -422,9 +426,8 @@
     update_types: Vec&lt;InputType&gt;,
     parent_field: <span class="kw-2">&amp;</span>RelationFieldRef,
 ) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>related_model = parent_field.related_model();
     <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::UpdateToOneRelWhereCombinationInput(
-        parent_field.clone(),
+        parent_field.related_field(),
     ));
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
@@ -434,6 +437,7 @@
     <span class="kw">let </span>input_object = Arc::new(input_object);
     ctx.cache_input_type(ident, input_object.clone());
 
+    <span class="kw">let </span>related_model = parent_field.related_model();
     <span class="kw">let </span>fields = <span class="macro">vec!</span>[
         arguments::where_argument(ctx, <span class="kw-2">&amp;</span>related_model),
         input_field(args::DATA, update_types, <span class="prelude-val">None</span>),

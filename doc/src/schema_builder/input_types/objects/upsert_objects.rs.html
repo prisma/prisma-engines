@@ -115,7 +115,7 @@
         <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::NestedUpsertManyInput(parent_field.clone()));
+    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::NestedUpsertManyInput(parent_field.related_field()));
 
     <span class="kw">match </span>ctx.get_input_type(<span class="kw-2">&amp;</span>ident) {
         <span class="prelude-val">None </span>=&gt; {
@@ -148,7 +148,7 @@
         <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::NestedUpsertOneInput(parent_field.clone()));
+    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::NestedUpsertOneInput(parent_field.related_field()));
 
     <span class="kw">match </span>ctx.get_input_type(<span class="kw-2">&amp;</span>ident) {
         <span class="prelude-val">None </span>=&gt; {
