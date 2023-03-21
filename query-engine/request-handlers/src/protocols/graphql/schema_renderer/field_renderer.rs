@@ -1,7 +1,7 @@
 use super::*;
 
 #[derive(Debug)]
-pub enum GqlFieldRenderer {
+pub(crate) enum GqlFieldRenderer {
     Input(InputFieldRef),
     Output(OutputFieldRef),
 }

@@ -1,6 +1,6 @@
 use super::*;
 
-pub struct GqlEnumRenderer<'a> {
+pub(crate) struct GqlEnumRenderer<'a> {
     enum_type: &'a EnumType,
 }
 
@@ -19,7 +19,7 @@ impl<'a> Renderer for GqlEnumRenderer<'a> {
 }
 
 impl<'a> GqlEnumRenderer<'a> {
-    pub fn new(enum_type: &EnumType) -> GqlEnumRenderer {
+    pub(crate) fn new(enum_type: &EnumType) -> GqlEnumRenderer {
         GqlEnumRenderer { enum_type }
     }
 

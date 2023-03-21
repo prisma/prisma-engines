@@ -17,23 +17,19 @@ use std::{
 };
 use type_renderer::*;
 
-pub struct DmmfQuerySchemaRenderer;
+pub(crate) fn render(query_schema: QuerySchemaRef) -> (DmmfSchema, DmmfOperationMappings) {
+    let mut ctx = RenderContext::new();
+    ctx.mark_to_be_rendered(&query_schema);
 
-impl QuerySchemaRenderer<(DmmfSchema, DmmfOperationMappings)> for DmmfQuerySchemaRenderer {
-    fn render(query_schema: QuerySchemaRef) -> (DmmfSchema, DmmfOperationMappings) {
-        let mut ctx = RenderContext::new();
-        ctx.mark_to_be_rendered(&query_schema);
+    while !ctx.next_pass.is_empty() {
+        let renderers = std::mem::take(&mut ctx.next_pass);
 
-        while !ctx.next_pass.is_empty() {
-            let renderers = std::mem::take(&mut ctx.next_pass);
-
-            for renderer in renderers {
-                renderer.render(&mut ctx)
-            }
+        for renderer in renderers {
+            renderer.render(&mut ctx)
         }
-
-        ctx.finalize()
     }
+
+    ctx.finalize()
 }
 
 #[derive(Default)]
