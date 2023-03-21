@@ -29,16 +29,16 @@ pub enum IdentifierType {
     OrderByRelevanceFieldEnum(ParentContainer),
     OrderByRelevanceInput(ParentContainer),
     OrderByToManyAggregateInput(ParentContainer),
-    RelationCreateInput(RelationField, bool),
-    RelationUpdateInput(RelationField, bool),
+    RelationCreateInput(RelationField, RelationField, bool),
+    RelationUpdateInput(RelationField, RelationField, bool),
     ScalarFieldEnum(Model),
     ScalarFilterInput(Model, bool),
-    ScalarListFilterInput(ScalarField),
+    ScalarListFilterInput(Zipper<TypeIdentifier>, bool),
     ScalarListUpdateInput(ScalarField),
     ToManyCompositeFilterInput(CompositeField),
-    ToManyRelationFilterInput(RelationField),
+    ToManyRelationFilterInput(Model),
     ToOneCompositeFilterInput(CompositeField),
-    ToOneRelationFilterInput(RelationField),
+    ToOneRelationFilterInput(Model),
     TransactionIsolationLevel,
     UncheckedCreateInput(Model, Option<RelationField>),
     UncheckedUpdateManyInput(Model, Option<RelationField>),
@@ -91,11 +91,14 @@ impl std::fmt::Display for IdentifierType {
 
                 format!("{nullable}{prefix}FieldUpdateOperationsInput")
             }
-            IdentifierType::RelationCreateInput(rf, unchecked) => {
-                let related_model = rf.related_model();
-                let related_field = rf.related_field();
+            IdentifierType::RelationCreateInput(parent_field, related_field, unchecked) => {
+                let related_model = related_field.model();
 
-                let arity_part = if rf.is_list() { "NestedMany" } else { "NestedOne" };
+                let arity_part = if parent_field.is_list() {
+                    "NestedMany"
+                } else {
+                    "NestedOne"
+                };
                 let unchecked_part = if *unchecked { "Unchecked" } else { "" };
 
                 format!(
@@ -123,12 +126,11 @@ impl std::fmt::Display for IdentifierType {
             IdentifierType::ScalarListUpdateInput(sf) => {
                 format!("{}Update{}Input", sf.container().name(), sf.name())
             }
-            IdentifierType::RelationUpdateInput(rf, unchecked) => {
-                let related_model = rf.related_model();
-                let related_field = rf.related_field();
+            IdentifierType::RelationUpdateInput(parent_field, related_field, unchecked) => {
+                let related_model = related_field.model();
 
                 // Compute input object name
-                let arity_part = match (rf.is_list(), rf.is_required()) {
+                let arity_part = match (parent_field.is_list(), parent_field.is_required()) {
                     (true, _) => "Many",
                     (false, true) => "OneRequired",
                     (false, false) => "One",
@@ -167,14 +169,10 @@ impl std::fmt::Display for IdentifierType {
             IdentifierType::CompositeDeleteManyInput(cf) => {
                 format!("{}DeleteManyInput", cf.typ().name())
             }
-            IdentifierType::ToManyRelationFilterInput(rf) => {
-                let related_model = rf.related_model();
-
+            IdentifierType::ToManyRelationFilterInput(related_model) => {
                 format!("{}ListRelationFilter", capitalize(related_model.name()))
             }
-            IdentifierType::ToOneRelationFilterInput(rf) => {
-                let related_model = rf.related_model();
-
+            IdentifierType::ToOneRelationFilterInput(related_model) => {
                 format!("{}RelationFilter", capitalize(related_model.name()))
             }
             IdentifierType::ToOneCompositeFilterInput(cf) => {
@@ -185,10 +183,10 @@ impl std::fmt::Display for IdentifierType {
             IdentifierType::ToManyCompositeFilterInput(cf) => {
                 format!("{}CompositeListFilter", capitalize(cf.typ().name()))
             }
-            IdentifierType::ScalarListFilterInput(sf) => scalar_filter_name(
-                &sf.type_identifier().type_name(&sf.dm.schema),
+            IdentifierType::ScalarListFilterInput(type_identifier, required) => scalar_filter_name(
+                &type_identifier.id.type_name(&type_identifier.dm.schema),
                 true,
-                !sf.is_required(),
+                !required,
                 false,
                 false,
             ),
@@ -203,94 +201,82 @@ impl std::fmt::Display for IdentifierType {
             IdentifierType::WhereUniqueInput(model) => {
                 format!("{}WhereUniqueInput", model.name())
             }
-            IdentifierType::CheckedUpdateOneInput(model, parent_field) => {
-                match parent_field.as_ref().map(|pf| pf.related_field()) {
-                    Some(ref f) => format!("{}UpdateWithout{}Input", model.name(), capitalize(f.name())),
-                    _ => format!("{}UpdateInput", model.name()),
-                }
-            }
-            IdentifierType::UncheckedUpdateOneInput(model, parent_field) => {
-                match parent_field.as_ref().map(|pf| pf.related_field()) {
-                    Some(ref f) => format!("{}UncheckedUpdateWithout{}Input", model.name(), capitalize(f.name())),
-                    _ => format!("{}UncheckedUpdateInput", model.name()),
-                }
-            }
-            IdentifierType::UpdateOneWhereCombinationInput(parent_field) => {
-                let related_model = parent_field.related_model();
+            IdentifierType::CheckedUpdateOneInput(model, related_field) => match related_field {
+                Some(f) => format!("{}UpdateWithout{}Input", model.name(), capitalize(f.name())),
+                _ => format!("{}UpdateInput", model.name()),
+            },
+            IdentifierType::UncheckedUpdateOneInput(model, related_field) => match related_field {
+                Some(f) => format!("{}UncheckedUpdateWithout{}Input", model.name(), capitalize(f.name())),
+                _ => format!("{}UncheckedUpdateInput", model.name()),
+            },
+            IdentifierType::UpdateOneWhereCombinationInput(related_field) => {
+                let related_model = related_field.model();
 
                 format!(
                     "{}UpdateWithWhereUniqueWithout{}Input",
                     related_model.name(),
-                    capitalize(parent_field.related_field().name())
+                    capitalize(related_field.name())
                 )
             }
-            IdentifierType::UpdateToOneRelWhereCombinationInput(parent_field) => {
-                let related_model = parent_field.related_model();
+            IdentifierType::UpdateToOneRelWhereCombinationInput(related_field) => {
+                let related_model = related_field.model();
 
                 format!(
                     "{}UpdateToOneWithWhereWithout{}Input",
                     related_model.name(),
-                    capitalize(parent_field.related_field().name())
+                    capitalize(related_field.name())
                 )
             }
             IdentifierType::CheckedUpdateManyInput(model) => {
                 format!("{}UpdateManyMutationInput", model.name())
             }
-            IdentifierType::UncheckedUpdateManyInput(model, parent_field) => {
-                match parent_field.as_ref().map(|pf| pf.related_field()) {
-                    Some(ref f) => format!(
-                        "{}UncheckedUpdateManyWithout{}Input",
-                        model.name(),
-                        capitalize(f.related_field().name())
-                    ),
-                    _ => format!("{}UncheckedUpdateManyInput", model.name()),
-                }
-            }
-            IdentifierType::UpdateManyWhereCombinationInput(parent_field) => {
-                let related_model = parent_field.related_model();
+            IdentifierType::UncheckedUpdateManyInput(model, parent_field) => match parent_field {
+                Some(ref f) => format!(
+                    "{}UncheckedUpdateManyWithout{}Input",
+                    model.name(),
+                    capitalize(f.name())
+                ),
+                _ => format!("{}UncheckedUpdateManyInput", model.name()),
+            },
+            IdentifierType::UpdateManyWhereCombinationInput(related_field) => {
+                let related_model = related_field.model();
 
                 format!(
                     "{}UpdateManyWithWhereWithout{}Input",
                     related_model.name(),
-                    capitalize(parent_field.related_field().name())
+                    capitalize(related_field.name())
                 )
             }
-            IdentifierType::NestedUpsertManyInput(parent_field) => {
-                let related_model = parent_field.related_model();
+            IdentifierType::NestedUpsertManyInput(related_field) => {
+                let related_model = related_field.model();
 
                 format!(
                     "{}UpsertWithWhereUniqueWithout{}Input",
                     related_model.name(),
-                    capitalize(parent_field.related_field().name())
+                    capitalize(related_field.name())
                 )
             }
-            IdentifierType::NestedUpsertOneInput(parent_field) => {
-                let related_model = parent_field.related_model();
+            IdentifierType::NestedUpsertOneInput(related_field) => {
+                let related_model = related_field.model();
 
                 format!(
                     "{}UpsertWithout{}Input",
                     related_model.name(),
-                    capitalize(parent_field.related_field().name())
+                    capitalize(related_field.name())
                 )
             }
-            IdentifierType::CheckedCreateInput(model, parent_field) => {
-                match parent_field.as_ref().map(|pf| pf.related_field()) {
-                    Some(ref f) => format!("{}CreateWithout{}Input", model.name(), capitalize(f.name())),
-                    _ => format!("{}CreateInput", model.name()),
-                }
-            }
-            IdentifierType::UncheckedCreateInput(model, parent_field) => {
-                match parent_field.as_ref().map(|pf| pf.related_field()) {
-                    Some(ref f) => format!("{}UncheckedCreateWithout{}Input", model.name(), capitalize(f.name())),
-                    _ => format!("{}UncheckedCreateInput", model.name()),
-                }
-            }
-            IdentifierType::CreateManyInput(model, parent_field) => {
-                match parent_field.as_ref().map(|pf| pf.related_field()) {
-                    Some(ref f) => format!("{}CreateMany{}Input", model.name(), capitalize(f.name())),
-                    _ => format!("{}CreateManyInput", model.name()),
-                }
-            }
+            IdentifierType::CheckedCreateInput(model, related_field) => match related_field {
+                Some(ref rf) => format!("{}CreateWithout{}Input", model.name(), capitalize(rf.name())),
+                _ => format!("{}CreateInput", model.name()),
+            },
+            IdentifierType::UncheckedCreateInput(model, related_field) => match related_field {
+                Some(ref rf) => format!("{}UncheckedCreateWithout{}Input", model.name(), capitalize(rf.name())),
+                _ => format!("{}UncheckedCreateInput", model.name()),
+            },
+            IdentifierType::CreateManyInput(model, related_field) => match related_field {
+                Some(ref rf) => format!("{}CreateMany{}Input", model.name(), capitalize(rf.name())),
+                _ => format!("{}CreateManyInput", model.name()),
+            },
             IdentifierType::Raw(name) => name.to_string(),
         };
 
