@@ -22,9 +22,6 @@ jobs:
           toolchain: stable
           default: true
 
-      - run: "cargo clean && cargo build --release -p introspection-core"
-        name: "Compile Introspection Engine"
-
       - run: "cargo clean && cargo build --release -p migration-engine-cli"
         name: "Compile Migration Engine"
 
