@@ -57,8 +57,7 @@ impl QueryDocumentParser {
                         self.parse_field(selection_path.clone(), argument_path.clone(), selection, field)
                     }
                     None => Err(ValidationError::unknown_selection_field(
-                        field_name.to_string(),
-                        selection_path.segments(),
+                        selection_path.add(field_name.to_owned()).segments(),
                         conversions::schema_object_to_output_type_description(schema_object),
                     )),
                 }

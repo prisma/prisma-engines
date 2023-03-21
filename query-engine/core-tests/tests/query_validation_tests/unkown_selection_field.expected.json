@@ -24,7 +24,8 @@
       ]
     },
     "selectionPath": [
-      "findManyUser"
+      "findManyUser",
+      "notAField"
     ]
   },
   "error_code": "P2009"

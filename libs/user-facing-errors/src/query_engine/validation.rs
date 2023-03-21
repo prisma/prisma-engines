@@ -377,13 +377,13 @@ impl ValidationError {
     ///     }
     // }
     pub fn unknown_selection_field(
-        field_name: String,
         selection_path: Vec<String>,
         output_type_description: OutputTypeDescription,
     ) -> Self {
         let message = format!(
             "Field '{}' not found in enclosing type '{}'",
-            field_name, output_type_description.name
+            selection_path.last().expect("Selection path must not be empty"),
+            output_type_description.name
         );
         ValidationError {
             kind: ValidationErrorKind::UnknownSelectionField,
