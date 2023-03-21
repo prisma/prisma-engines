@@ -438,6 +438,8 @@ async fn connection_string_problems_give_a_nice_error() {
     }
 }
 
+// Failing due to no color output on Windows :(
+#[cfg(unix)]
 #[tokio::test]
 async fn bad_connection_string_in_datamodel_returns_nice_error() {
     let schema = indoc! {r#"
