@@ -60,7 +60,10 @@ pub(crate) fn create_many_object_type(
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
 ) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new_prisma(IdentifierType::CreateManyInput(model.clone(), parent_field.cloned()));
+    let ident = Identifier::new_prisma(IdentifierType::CreateManyInput(
+        model.clone(),
+        parent_field.map(|pf| pf.related_field()),
+    ));
 
     return_cached_input!(ctx, &ident);
 
