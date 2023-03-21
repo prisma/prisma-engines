@@ -129,25 +129,50 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
     }
 
     fn count_rows_in_table<'a>(&'a mut self, table: &'a Table) -> BoxFuture<'a, ConnectorResult<i64>> {
+        // TODO(MultiSchema): replace this when implementing MySQL.
+        let query = format!("SELECT COUNT(*) FROM `{}`", table.table);
+
         Box::pin(async move {
-            // TODO(MultiSchema): replace this when implementing MySQL.
-            let query = format!("SELECT COUNT(*) FROM `{}`", table.table);
-            let result_set = self.query_raw(&query, &[]).await?;
-            super::extract_table_rows_count(table, result_set)
+            query_with_backoff(self, &query)
+                .await
+                .and_then(|result_set| super::extract_table_rows_count(table, result_set))
         })
     }
 
     fn count_values_in_column<'a>(&'a mut self, column: &'a Column) -> BoxFuture<'a, ConnectorResult<i64>> {
+        // TODO(MultiSchema): replace this when implementing MySQL.
+        let query = format!(
+            "SELECT COUNT(*) FROM `{}` WHERE `{}` IS NOT NULL",
+            column.table, column.column
+        );
+
         Box::pin(async move {
-            // TODO(MultiSchema): replace this when implementing MySQL.
-            let query = format!(
-                "SELECT COUNT(*) FROM `{}` WHERE `{}` IS NOT NULL",
-                column.table, column.column
-            );
-            let result_set = self.query_raw(&query, &[]).await?;
-            super::extract_column_values_count(result_set)
+            query_with_backoff(self, &query)
+                .await
+                .and_then(super::extract_column_values_count)
         })
     }
+}
+
+/// Run the query with exponential backoff on error, from 400ms up to (400 × 2⁵)ms.
+///
+/// This is necessary because destructive change checks can come after a migration, and _on
+/// Vitess_, schema changes are asynchronous, they can take time to take effect. That causes
+/// failures in destructive change checks. Trying again later, in this case, works.
+async fn query_with_backoff(flavour: &mut MysqlFlavour, query: &str) -> ConnectorResult<quaint::prelude::ResultSet> {
+    let delay = std::time::Duration::from_millis(400);
+    let mut result = flavour.query_raw(query, &[]).await;
+
+    for i in 0..6 {
+        match &result {
+            Ok(_result_set) => break,
+            Err(_) => tokio::time::sleep(delay.saturating_mul(2 ^ i)).await,
+        }
+
+        result = flavour.query_raw(query, &[]).await
+    }
+
+    result
 }
 
 /// If the type change is an enum change, diagnose it, and return whether it _was_ an enum change.

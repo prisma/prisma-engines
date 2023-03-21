@@ -44,7 +44,9 @@ fn adding_a_unique_constraint_should_warn(api: TestApi) {
         });
 }
 
-#[test_connector(tags(Mysql, Postgres))]
+// Excluding Vitess because schema changes being asynchronous messes with our assertions
+// (dump_table).
+#[test_connector(tags(Mysql, Postgres), exclude(Vitess))]
 fn dropping_enum_values_should_warn(api: TestApi) {
     let dm1 = r#"
         model Test {
