@@ -189,6 +189,10 @@ fn int_to_string_conversions_work(api: TestApi) {
         .assert_green()
         .assert_has_executed_steps();
 
+    if api.is_vitess() {
+        return; // asynchronous migrations mess with the following assertion
+    }
+
     api.dump_table("Cat")
         .assert_single_row(|row| row.assert_text_value("tag", "20"));
 }

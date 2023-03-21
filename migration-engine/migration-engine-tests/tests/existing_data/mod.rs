@@ -529,7 +529,9 @@ fn making_a_column_required_in_an_empty_table_should_not_warn(api: TestApi) {
     });
 }
 
-#[test_connector(capabilities(Enums))]
+// Excluding Vitess because schema changes being asynchronous messes with our assertions
+// (dump_table).
+#[test_connector(tags(Mysql, Postgres), exclude(Vitess))]
 fn enum_variants_can_be_added_without_data_loss(api: TestApi) {
     let dm1 = r#"
         model Cat {
@@ -632,7 +634,9 @@ fn enum_variants_can_be_added_without_data_loss(api: TestApi) {
     }
 }
 
-#[test_connector(capabilities(Enums))]
+// Excluding Vitess because schema changes being asynchronous messes with our assertions
+// (dump_table).
+#[test_connector(tags(Mysql, Postgres), exclude(Vitess))]
 fn enum_variants_can_be_dropped_without_data_loss(api: TestApi) {
     let dm1 = r#"
         model Cat {
@@ -778,8 +782,10 @@ fn set_default_current_timestamp_on_existing_column_works(api: TestApi) {
     });
 }
 
+// Excluding Vitess because schema changes being asynchronous messes with our assertions
+// (dump_table).
 // exclude: there is a cockroach-specific test. It's unexecutable there.
-#[test_connector(exclude(CockroachDb))]
+#[test_connector(exclude(CockroachDb, Vitess))]
 fn primary_key_migrations_do_not_cause_data_loss(api: TestApi) {
     let dm1 = r#"
         model Dog {

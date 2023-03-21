@@ -267,7 +267,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         let sql = r#"
             SELECT DISTINCT
               BINARY table_info.table_name AS table_name,
-              (CASE WHEN table_info.create_options='partitioned' THEN TRUE ELSE FALSE END) as is_partition
+              table_info.create_options AS create_options
             FROM information_schema.tables AS table_info
             JOIN information_schema.columns AS column_info
                 ON BINARY column_info.table_name = BINARY table_info.table_name
@@ -278,9 +278,12 @@ impl<'a> SqlSchemaDescriber<'a> {
                 AND table_info.table_type = 'BASE TABLE'
             ORDER BY BINARY table_info.table_name"#;
         let rows = self.conn.query_raw(sql, &[schema.into(), schema.into()]).await?;
-        let names = rows
-            .into_iter()
-            .map(|row| (row.get_expect_string("table_name"), row.get_expect_bool("is_partition")));
+        let names = rows.into_iter().map(|row| {
+            (
+                row.get_expect_string("table_name"),
+                row.get_expect_string("create_options") == "partitioned",
+            )
+        });
 
         let mut map = IndexMap::default();
 
@@ -466,7 +469,6 @@ impl<'a> SqlSchemaDescriber<'a> {
                                     )))
                                 }
                             }
-                            //todo check other now() definitions
                             ColumnTypeFamily::DateTime => match Self::default_is_current_timestamp(&default_string) {
                                 true => DefaultValue::now(),
                                 _ if default_expression => Self::dbgenerated_expression(&default_string),
