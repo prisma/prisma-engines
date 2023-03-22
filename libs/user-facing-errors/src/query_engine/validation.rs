@@ -520,7 +520,9 @@ pub enum InputTypeDescription {
     List {
         element_type: Box<InputTypeDescription>,
     },
-    Enum,
+    Enum {
+        name: String,
+    },
 }
 
 impl InputTypeDescription {

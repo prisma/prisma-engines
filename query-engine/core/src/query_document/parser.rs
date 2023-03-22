@@ -787,7 +787,9 @@ pub(crate) mod conversions {
     fn input_type_to_input_type_description(input_type: &InputType) -> InputTypeDescription {
         match input_type {
             InputType::Scalar(s) => InputTypeDescription::Scalar { name: s.to_string() },
-            InputType::Enum(_) => InputTypeDescription::Enum,
+            InputType::Enum(e) => InputTypeDescription::Enum {
+                name: e.upgrade().map(|e| e.name().to_string()).unwrap_or_default(),
+            },
             InputType::List(l) => InputTypeDescription::List {
                 element_type: Box::new(input_type_to_input_type_description(l.as_ref())),
             },
