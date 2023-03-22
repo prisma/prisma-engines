@@ -410,6 +410,8 @@ and prod databases, data migrations triggering unique constraint
 violations/foreign key errors/nullability errors, failing type casts, etc. can
 cause the same migration to fail in one environment and succeed in another.
 
+Note: There is one exception for SQL Server where migrate is wrapping a generated migration with a transaction.
+
 ### Could Migrate detect when multiple incompatible changes are developed in different branches?
 
 Example: Alice deletes the `User.birthday` field in her branch, and Bob changes
