@@ -1,11 +1,11 @@
 use super::*;
-use prisma_models::*;
+use fmt::Debug;
+use prisma_models::{InternalDataModelRef, ModelRef};
 use psl::{
     datamodel_connector::{ConnectorCapability, RelationMode},
     PreviewFeatures,
 };
-use std::fmt::{Debug, Display};
-use std::{borrow::Borrow, collections::HashMap};
+use std::{borrow::Borrow, collections::HashMap, fmt};
 
 /// The query schema.
 /// Defines which operations (query/mutations) are possible on a database, based on the (internal) data model.
@@ -211,8 +211,8 @@ pub enum QueryTag {
     AggregateRaw,
 }
 
-impl Display for QueryTag {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl fmt::Display for QueryTag {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let s = match self {
             Self::FindUnique => "findUnique",
             Self::FindUniqueOrThrow => "findUniqueOrThrow",
@@ -268,7 +268,7 @@ impl From<String> for QueryTag {
 
 #[derive(PartialEq, Hash, Eq, Debug, Clone)]
 pub struct Identifier {
-    name: IdentifierType,
+    name: String,
     namespace: IdentifierNamespace,
 }
 
@@ -279,22 +279,28 @@ enum IdentifierNamespace {
 }
 
 impl Identifier {
-    pub fn new_prisma(name: impl Into<IdentifierType>) -> Self {
+    pub fn new_prisma<T>(name: T) -> Self
+    where
+        T: Into<String>,
+    {
         Self {
             name: name.into(),
             namespace: IdentifierNamespace::Prisma,
         }
     }
 
-    pub fn new_model(name: impl Into<IdentifierType>) -> Self {
+    pub fn new_model<T>(name: T) -> Self
+    where
+        T: Into<String>,
+    {
         Self {
             name: name.into(),
             namespace: IdentifierNamespace::Model,
         }
     }
 
-    pub fn name(&self) -> String {
-        self.name.to_string()
+    pub fn name(&self) -> &str {
+        &self.name
     }
 
     pub fn namespace(&self) -> &str {
@@ -302,6 +308,12 @@ impl Identifier {
             IdentifierNamespace::Prisma => "prisma",
             IdentifierNamespace::Model => "model",
         }
+    }
+}
+
+impl ToString for Identifier {
+    fn to_string(&self) -> String {
+        format!("{}.{}", self.namespace(), self.name())
     }
 }
 
@@ -322,8 +334,8 @@ pub enum ScalarType {
     Bytes,
 }
 
-impl Display for ScalarType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl std::fmt::Display for ScalarType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let typ = match self {
             ScalarType::Null => "Null",
             ScalarType::String => "String",

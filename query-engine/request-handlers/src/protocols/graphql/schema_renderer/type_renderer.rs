@@ -21,13 +21,13 @@ impl<'a> GqlTypeRenderer<'a> {
         match i {
             InputType::Object(ref obj) => {
                 let _ = obj.into_renderer().render(ctx);
-                obj.into_arc().identifier.name()
+                obj.into_arc().identifier.name().to_string()
             }
 
             InputType::Enum(et) => {
                 let et = et.into_arc();
                 et.into_renderer().render(ctx);
-                et.identifier().name()
+                et.identifier().name().to_string()
             }
 
             InputType::List(ref l) => {
@@ -61,13 +61,13 @@ impl<'a> GqlTypeRenderer<'a> {
         match o {
             OutputType::Object(obj) => {
                 let _ = obj.into_renderer().render(ctx);
-                obj.into_arc().identifier.name()
+                obj.into_arc().identifier.name().to_string()
             }
 
             OutputType::Enum(et) => {
                 let et = et.into_arc();
                 et.into_renderer().render(ctx);
-                et.identifier().name()
+                et.identifier().name().to_string()
             }
 
             OutputType::List(l) => {
