@@ -225,6 +225,7 @@ impl ValidationError {
         max_field_count: Option<usize>,
         required_fields: Option<Vec<String>>,
         provided_field_count: usize,
+        input_type_description: &InputTypeDescription,
     ) -> Self {
         let constraints =
             InputTypeConstraints::new(min_field_count, max_field_count, required_fields, provided_field_count);
@@ -233,7 +234,9 @@ impl ValidationError {
         ValidationError {
             kind: ValidationErrorKind::SomeFieldsMissing,
             message,
-            meta: Some(json!({ "argumentPath": argument_path, "selectionPath": selection_path })),
+            meta: Some(
+                json!({ "inputType": input_type_description, "argumentPath": argument_path, "selectionPath": selection_path, "constraints": constraints }),
+            ),
         }
     }
 
@@ -246,6 +249,7 @@ impl ValidationError {
         max_field_count: Option<usize>,
         required_fields: Option<Vec<String>>,
         provided_field_count: usize,
+        input_type_description: &InputTypeDescription,
     ) -> Self {
         let constraints =
             InputTypeConstraints::new(min_field_count, max_field_count, required_fields, provided_field_count);
@@ -254,7 +258,9 @@ impl ValidationError {
         ValidationError {
             kind: ValidationErrorKind::TooManyFieldsGiven,
             message,
-            meta: Some(json!({ "argumentPath": argument_path,  "selectionPath": selection_path })),
+            meta: Some(
+                json!({ "inputType": input_type_description, "argumentPath": argument_path,  "selectionPath": selection_path, "constraints": constraints }),
+            ),
         }
     }
 

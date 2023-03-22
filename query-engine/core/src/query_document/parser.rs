@@ -723,6 +723,7 @@ impl QueryDocumentParser {
                 schema_object.constraints.max_num_fields,
                 schema_object.constraints.fields.as_ref().cloned(),
                 num_fields,
+                &conversions::schema_input_object_type_to_input_type_description(&schema_object),
             ));
         }
 
@@ -739,6 +740,7 @@ impl QueryDocumentParser {
                 schema_object.constraints.max_num_fields,
                 schema_object.constraints.fields.as_ref().cloned(),
                 num_fields,
+                &conversions::schema_input_object_type_to_input_type_description(&schema_object),
             ));
         }
 
