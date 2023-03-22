@@ -3,18 +3,62 @@
   "message": "`where`: A value is required but not set",
   "meta": {
     "kind": "RequiredArgumentMissing",
-    "inputType": {
-      "name": "findUniqueUser",
-      "fields": [
-        {
-          "name": "where",
-          "typeNames": [
-            "UserWhereUniqueInput"
-          ],
-          "required": true
+    "inputTypes": [
+      {
+        "object": {
+          "name": "UserWhereUniqueInput",
+          "fields": [
+            {
+              "name": "id",
+              "typeNames": [
+                "Int"
+              ],
+              "required": false
+            },
+            {
+              "name": "AND",
+              "typeNames": [
+                "UserWhereInput",
+                "UserWhereInput[]"
+              ],
+              "required": false
+            },
+            {
+              "name": "OR",
+              "typeNames": [
+                "UserWhereInput[]"
+              ],
+              "required": false
+            },
+            {
+              "name": "NOT",
+              "typeNames": [
+                "UserWhereInput",
+                "UserWhereInput[]"
+              ],
+              "required": false
+            },
+            {
+              "name": "email",
+              "typeNames": [
+                "StringFilter",
+                "String"
+              ],
+              "required": false
+            },
+            {
+              "name": "dob",
+              "typeNames": [
+                "DateTimeNullableFilter",
+                "DateTime",
+                "Null"
+              ],
+              "required": false
+            }
+          ]
         }
-      ]
-    },
+      }
+    ],
     "argumentPath": [
       "where"
     ],

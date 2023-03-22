@@ -275,14 +275,14 @@ impl ValidationError {
     pub fn required_argument_missing(
         selection_path: Vec<String>,
         argument_path: Vec<String>,
-        input_type_description: InputTypeDescription,
+        input_type_descriptions: &[InputTypeDescription],
     ) -> Self {
         let message = format!("`{}`: A value is required but not set", argument_path.join("."));
         ValidationError {
             kind: ValidationErrorKind::RequiredArgumentMissing,
             message,
             meta: Some(
-                json!({ "inputType": input_type_description, "argumentPath": argument_path,  "selectionPath": selection_path }),
+                json!({ "inputTypes": input_type_descriptions, "argumentPath": argument_path,  "selectionPath": selection_path }),
             ),
         }
     }
@@ -504,14 +504,21 @@ impl OutputTypeDescriptionField {
 }
 #[derive(Debug, Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct InputTypeDescription {
-    name: String,
-    fields: Vec<InputTypeDescriptionField>,
+pub enum InputTypeDescription {
+    Object {
+        name: String,
+        fields: Vec<InputTypeDescriptionField>,
+    },
+    Scalar {
+        name: String,
+    },
+    Enum,
+    List(Box<InputTypeDescription>),
 }
 
 impl InputTypeDescription {
-    pub fn new(name: String, fields: Vec<InputTypeDescriptionField>) -> Self {
-        Self { name, fields }
+    pub fn new_object(name: String, fields: Vec<InputTypeDescriptionField>) -> Self {
+        Self::Object { name, fields }
     }
 }
 
