@@ -211,23 +211,6 @@ impl Debug for InputType {
     }
 }
 
-impl std::fmt::Display for InputType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Enum(_) => write!(f, "enum"),
-            Self::List(o) => write!(f, "{o}"),
-            Self::Object(o) => write!(
-                f,
-                "{}",
-                o.upgrade()
-                    .map(|g| g.identifier.name().to_string())
-                    .unwrap_or_else(|| String::from("Object"))
-            ),
-            Self::Scalar(s) => write!(f, "{s}"),
-        }
-    }
-}
-
 impl InputType {
     pub fn list(containing: InputType) -> InputType {
         InputType::List(Box::new(containing))

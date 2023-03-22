@@ -788,13 +788,16 @@ pub(crate) mod conversions {
         match input_type {
             InputType::Scalar(s) => InputTypeDescription::Scalar { name: s.to_string() },
             InputType::Enum(e) => InputTypeDescription::Enum {
-                name: e.upgrade().map(|e| e.name().to_string()).unwrap_or_default(),
+                name: e
+                    .upgrade()
+                    .map(|e| e.name().to_string())
+                    .expect("enum type should be upgradeable"),
             },
             InputType::List(l) => InputTypeDescription::List {
                 element_type: Box::new(input_type_to_input_type_description(l.as_ref())),
             },
             InputType::Object(o) => {
-                let o = o.upgrade().expect("input object type should still exist");
+                let o = o.upgrade().expect("input object type should be upgradeable");
                 schema_input_object_type_to_input_type_description(&o)
             }
         }
@@ -873,26 +876,36 @@ pub(crate) mod conversions {
         }
     }
 
-    pub(crate) fn to_simplified_input_type_name(typ: &InputType) -> String {
+    fn to_simplified_input_type_name(typ: &InputType) -> String {
         match typ {
-            InputType::Enum(_) => String::from("enum"),
+            InputType::Enum(e) => format!(
+                "{}",
+                e.upgrade()
+                    .map(|e| e.name().to_string())
+                    .expect("enum type should be upgradeable")
+            ),
             InputType::List(o) => format!("{}[]", to_simplified_input_type_name(o.as_ref())),
             InputType::Object(o) => o
                 .upgrade()
                 .map(|f| f.identifier.name().to_string())
-                .unwrap_or_else(|| String::from("Object")),
+                .expect("input object type should be upgradeable"),
             InputType::Scalar(s) => s.to_string(),
         }
     }
 
-    pub(crate) fn to_simplified_output_type_name(typ: &OutputType) -> String {
+    fn to_simplified_output_type_name(typ: &OutputType) -> String {
         match typ {
-            OutputType::Enum(_) => String::from("enum"),
+            OutputType::Enum(e) => format!(
+                "{}",
+                e.upgrade()
+                    .map(|e| e.name().to_string())
+                    .expect("enum type should be upgradeable")
+            ),
             OutputType::List(o) => format!("{}[]", to_simplified_output_type_name(o)),
             OutputType::Object(o) => o
                 .upgrade()
                 .map(|f| f.identifier.name().to_string())
-                .unwrap_or_else(|| String::from("Object")),
+                .expect("input object type should be upgradeable"),
             OutputType::Scalar(s) => s.to_string(),
         }
     }
