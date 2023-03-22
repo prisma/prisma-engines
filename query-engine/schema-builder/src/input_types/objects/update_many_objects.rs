@@ -20,8 +20,7 @@ pub(crate) fn update_many_input_types(
 
 /// Builds "<x>UpdateManyMutationInput" input object type.
 pub(crate) fn checked_update_many_input_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new_prisma(IdentifierType::CheckedUpdateManyInput(model.clone()));
-
+    let ident = Identifier::new_prisma(format!("{}UpdateManyMutationInput", model.name()));
     return_cached_input!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));
@@ -45,11 +44,16 @@ pub(crate) fn unchecked_update_many_input_type(
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
 ) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new_prisma(IdentifierType::UncheckedUpdateManyInput(
-        model.clone(),
-        parent_field.cloned(),
-    ));
+    let name = match parent_field.map(|pf| pf.related_field()) {
+        Some(ref f) => format!(
+            "{}UncheckedUpdateManyWithout{}Input",
+            model.name(),
+            capitalize(f.related_field().name())
+        ),
+        _ => format!("{}UncheckedUpdateManyInput", model.name()),
+    };
 
+    let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));
@@ -74,8 +78,13 @@ pub(crate) fn update_many_where_combination_object(
     parent_field: &RelationFieldRef,
 ) -> InputObjectTypeWeakRef {
     let related_model = parent_field.related_model();
+    let name = format!(
+        "{}UpdateManyWithWhereWithout{}Input",
+        related_model.name(),
+        capitalize(parent_field.related_field().name())
+    );
 
-    let ident = Identifier::new_prisma(IdentifierType::UpdateManyWhereCombinationInput(parent_field.clone()));
+    let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));
