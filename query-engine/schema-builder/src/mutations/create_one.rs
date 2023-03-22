@@ -71,10 +71,7 @@ fn checked_create_input_type(
     // We allow creation from both sides of the relation - which would lead to an endless loop of input types
     // if we would allow to create the parent from a child create that is already a nested create.
     // To solve it, we remove the parent relation from the input ("Without<Parent>").
-    let ident = Identifier::new_prisma(IdentifierType::CheckedCreateInput(
-        model.clone(),
-        parent_field.map(|pf| pf.related_field()),
-    ));
+    let ident = Identifier::new_prisma(IdentifierType::CheckedCreateInput(model.clone(), parent_field.cloned()));
 
     return_cached_input!(ctx, &ident);
 
@@ -103,7 +100,7 @@ fn unchecked_create_input_type(
     // To solve it, we remove the parent relation from the input ("Without<Parent>").
     let ident = Identifier::new_prisma(IdentifierType::UncheckedCreateInput(
         model.clone(),
-        parent_field.map(|pf| pf.related_field()),
+        parent_field.cloned(),
     ));
 
     return_cached_input!(ctx, &ident);

@@ -26,7 +26,7 @@ fn checked_update_one_input_type(
 ) -> InputObjectTypeWeakRef {
     let ident = Identifier::new_prisma(IdentifierType::CheckedUpdateOneInput(
         model.clone(),
-        parent_field.map(|pf| pf.related_field()),
+        parent_field.cloned(),
     ));
 
     return_cached_input!(ctx, &ident);
@@ -50,7 +50,7 @@ fn unchecked_update_one_input_type(
 ) -> InputObjectTypeWeakRef {
     let ident = Identifier::new_prisma(IdentifierType::UncheckedUpdateOneInput(
         model.clone(),
-        parent_field.map(|pf| pf.related_field()),
+        parent_field.cloned(),
     ));
 
     return_cached_input!(ctx, &ident);
@@ -174,9 +174,7 @@ pub(crate) fn update_one_where_combination_object(
     update_types: Vec<InputType>,
     parent_field: &RelationFieldRef,
 ) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new_prisma(IdentifierType::UpdateOneWhereCombinationInput(
-        parent_field.related_field(),
-    ));
+    let ident = Identifier::new_prisma(IdentifierType::UpdateOneWhereCombinationInput(parent_field.clone()));
 
     return_cached_input!(ctx, &ident);
 
@@ -202,8 +200,9 @@ pub(crate) fn update_to_one_rel_where_combination_object(
     update_types: Vec<InputType>,
     parent_field: &RelationFieldRef,
 ) -> InputObjectTypeWeakRef {
+    let related_model = parent_field.related_model();
     let ident = Identifier::new_prisma(IdentifierType::UpdateToOneRelWhereCombinationInput(
-        parent_field.related_field(),
+        parent_field.clone(),
     ));
 
     return_cached_input!(ctx, &ident);
@@ -213,7 +212,6 @@ pub(crate) fn update_to_one_rel_where_combination_object(
     let input_object = Arc::new(input_object);
     ctx.cache_input_type(ident, input_object.clone());
 
-    let related_model = parent_field.related_model();
     let fields = vec![
         arguments::where_argument(ctx, &related_model),
         input_field(args::DATA, update_types, None),

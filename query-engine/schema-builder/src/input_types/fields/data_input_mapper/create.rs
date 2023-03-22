@@ -60,11 +60,7 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
     }
 
     fn map_relation(&self, ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputField {
-        let ident = Identifier::new_prisma(IdentifierType::RelationCreateInput(
-            rf.clone(),
-            rf.related_field(),
-            self.unchecked,
-        ));
+        let ident = Identifier::new_prisma(IdentifierType::RelationCreateInput(rf.clone(), self.unchecked));
 
         let input_object = match ctx.get_input_type(&ident) {
             Some(t) => t,

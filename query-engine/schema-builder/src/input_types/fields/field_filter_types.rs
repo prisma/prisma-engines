@@ -65,7 +65,7 @@ fn to_one_relation_filter_shorthand_types(ctx: &mut BuilderContext, rf: &Relatio
 }
 
 fn to_many_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new_prisma(IdentifierType::ToManyRelationFilterInput(rf.related_model()));
+    let ident = Identifier::new_prisma(IdentifierType::ToManyRelationFilterInput(rf.clone()));
 
     return_cached_input!(ctx, &ident);
 
@@ -88,7 +88,7 @@ fn to_many_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRe
 }
 
 fn to_one_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new_prisma(IdentifierType::ToOneRelationFilterInput(rf.related_model()));
+    let ident = Identifier::new_prisma(IdentifierType::ToOneRelationFilterInput(rf.clone()));
 
     return_cached_input!(ctx, &ident);
 
@@ -196,10 +196,7 @@ fn to_many_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeField
 }
 
 fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new_prisma(IdentifierType::ScalarListFilterInput(
-        ctx.internal_data_model.clone().zip(sf.type_identifier()),
-        sf.is_required(),
-    ));
+    let ident = Identifier::new_prisma(IdentifierType::ScalarListFilterInput(sf.clone()));
     return_cached_input!(ctx, &ident);
 
     let mut object = init_input_object_type(ident.clone());

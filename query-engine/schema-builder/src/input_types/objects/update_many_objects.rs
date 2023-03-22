@@ -47,7 +47,7 @@ pub(crate) fn unchecked_update_many_input_type(
 ) -> InputObjectTypeWeakRef {
     let ident = Identifier::new_prisma(IdentifierType::UncheckedUpdateManyInput(
         model.clone(),
-        parent_field.map(|pf| pf.related_field()),
+        parent_field.cloned(),
     ));
 
     return_cached_input!(ctx, &ident);
@@ -73,16 +73,14 @@ pub(crate) fn update_many_where_combination_object(
     ctx: &mut BuilderContext,
     parent_field: &RelationFieldRef,
 ) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new_prisma(IdentifierType::UpdateManyWhereCombinationInput(
-        parent_field.related_field(),
-    ));
+    let related_model = parent_field.related_model();
 
+    let ident = Identifier::new_prisma(IdentifierType::UpdateManyWhereCombinationInput(parent_field.clone()));
     return_cached_input!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
 
-    let related_model = parent_field.related_model();
     let where_input_object = filter_objects::scalar_filter_object_type(ctx, &related_model, false);
     let update_types = update_many_input_types(ctx, &related_model, Some(parent_field));
 

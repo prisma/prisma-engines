@@ -29,7 +29,7 @@ fn nested_upsert_list_input_object(
         return None;
     }
 
-    let ident = Identifier::new_prisma(IdentifierType::NestedUpsertManyInput(parent_field.related_field()));
+    let ident = Identifier::new_prisma(IdentifierType::NestedUpsertManyInput(parent_field.clone()));
 
     match ctx.get_input_type(&ident) {
         None => {
@@ -62,7 +62,7 @@ fn nested_upsert_nonlist_input_object(
         return None;
     }
 
-    let ident = Identifier::new_prisma(IdentifierType::NestedUpsertOneInput(parent_field.related_field()));
+    let ident = Identifier::new_prisma(IdentifierType::NestedUpsertOneInput(parent_field.clone()));
 
     match ctx.get_input_type(&ident) {
         None => {
