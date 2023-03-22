@@ -220,7 +220,7 @@ impl std::fmt::Display for InputType {
                 f,
                 "{}",
                 o.upgrade()
-                    .map(|f| f.identifier.name())
+                    .map(|g| g.identifier.name().to_string())
                     .unwrap_or_else(|| String::from("Object"))
             ),
             Self::Scalar(s) => write!(f, "{s}"),

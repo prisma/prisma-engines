@@ -576,7 +576,7 @@ impl QueryDocumentParser {
                     selection_path.segments(),
                     argument_path.segments(),
                     format!("{val:?}"),
-                    typ.name(),
+                    typ.name().to_string(),
                     None,
                 ));
             }
@@ -763,7 +763,7 @@ pub(crate) mod conversions {
     pub(crate) fn schema_object_to_output_type_description(
         o: &schema::ObjectTypeStrongRef,
     ) -> validation::OutputTypeDescription {
-        let name = o.identifier.name();
+        let name = o.identifier.name().to_string();
         let fields: Vec<validation::OutputTypeDescriptionField> = o
             .get_fields()
             .iter()
@@ -804,7 +804,7 @@ pub(crate) mod conversions {
     pub(crate) fn schema_input_object_type_to_input_type_description(
         i: &schema::InputObjectTypeStrongRef,
     ) -> validation::InputTypeDescription {
-        let name = i.identifier.name();
+        let name = i.identifier.name().to_string();
         let fields: Vec<validation::InputTypeDescriptionField> = i
             .get_fields()
             .iter()
@@ -880,7 +880,7 @@ pub(crate) mod conversions {
             InputType::List(o) => format!("{}[]", to_simplified_input_type_name(o.as_ref())),
             InputType::Object(o) => o
                 .upgrade()
-                .map(|f| f.identifier.name())
+                .map(|f| f.identifier.name().to_string())
                 .unwrap_or_else(|| String::from("Object")),
             InputType::Scalar(s) => s.to_string(),
         }
@@ -892,7 +892,7 @@ pub(crate) mod conversions {
             OutputType::List(o) => format!("{}[]", to_simplified_output_type_name(o)),
             OutputType::Object(o) => o
                 .upgrade()
-                .map(|f| f.identifier.name())
+                .map(|f| f.identifier.name().to_string())
                 .unwrap_or_else(|| String::from("Object")),
             OutputType::Scalar(s) => s.to_string(),
         }
