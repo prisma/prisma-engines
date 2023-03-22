@@ -271,7 +271,6 @@ impl ValidationError {
     ///     }
     /// }
     ///
-    /// Todo: add the `given` type to the meta
     pub fn required_argument_missing(
         selection_path: Vec<String>,
         argument_path: Vec<String>,
@@ -347,8 +346,12 @@ impl ValidationError {
     ///         }
     ///     }
     /// }
-    /// TODO: chage path in favor of selection path and adjust the many test failing
-    pub fn unknown_input_field(selection_path: Vec<String>, input_type_description: InputTypeDescription) -> Self {
+    ///
+    pub fn unknown_input_field(
+        selection_path: Vec<String>,
+        argument_path: Vec<String>,
+        input_type_description: InputTypeDescription,
+    ) -> Self {
         let message = format!(
             "`{}`: Field does not exist in enclosing type.",
             selection_path.join(".")
@@ -357,7 +360,9 @@ impl ValidationError {
         ValidationError {
             kind: ValidationErrorKind::UnknownInputField,
             message,
-            meta: Some(json!({ "inputType": input_type_description, "selectionPath": selection_path })),
+            meta: Some(
+                json!({ "inputType": input_type_description, "argumentPath": argument_path, "selectionPath": selection_path }),
+            ),
         }
     }
 
