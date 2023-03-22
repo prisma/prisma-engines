@@ -4,86 +4,85 @@
   "meta": {
     "kind": "SomeFieldsMissing",
     "inputType": {
-      "object": {
-        "name": "TestModelWhereUniqueInput",
-        "fields": [
-          {
-            "name": "id",
-            "typeNames": [
-              "Int"
-            ],
-            "required": false
-          },
-          {
-            "name": "unique1",
-            "typeNames": [
-              "Int"
-            ],
-            "required": false
-          },
-          {
-            "name": "unique2",
-            "typeNames": [
-              "Int"
-            ],
-            "required": false
-          },
-          {
-            "name": "unique3_unique4",
-            "typeNames": [
-              "TestModelUnique3Unique4CompoundUniqueInput"
-            ],
-            "required": false
-          },
-          {
-            "name": "AND",
-            "typeNames": [
-              "TestModelWhereInput",
-              "TestModelWhereInput[]"
-            ],
-            "required": false
-          },
-          {
-            "name": "OR",
-            "typeNames": [
-              "TestModelWhereInput[]"
-            ],
-            "required": false
-          },
-          {
-            "name": "NOT",
-            "typeNames": [
-              "TestModelWhereInput",
-              "TestModelWhereInput[]"
-            ],
-            "required": false
-          },
-          {
-            "name": "unique3",
-            "typeNames": [
-              "IntFilter",
-              "Int"
-            ],
-            "required": false
-          },
-          {
-            "name": "unique4",
-            "typeNames": [
-              "IntFilter",
-              "Int"
-            ],
-            "required": false
-          },
-          {
-            "name": "non_unique",
-            "typeNames": [
-              "IntFilter",
-              "Int"
-            ],
-            "required": false
-          }
-        ]
-      }
+      "kind": "object",
+      "name": "TestModelWhereUniqueInput",
+      "fields": [
+        {
+          "name": "id",
+          "typeNames": [
+            "Int"
+          ],
+          "required": false
+        },
+        {
+          "name": "unique1",
+          "typeNames": [
+            "Int"
+          ],
+          "required": false
+        },
+        {
+          "name": "unique2",
+          "typeNames": [
+            "Int"
+          ],
+          "required": false
+        },
+        {
+          "name": "unique3_unique4",
+          "typeNames": [
+            "TestModelUnique3Unique4CompoundUniqueInput"
+          ],
+          "required": false
+        },
+        {
+          "name": "AND",
+          "typeNames": [
+            "TestModelWhereInput",
+            "TestModelWhereInput[]"
+          ],
+          "required": false
+        },
+        {
+          "name": "OR",
+          "typeNames": [
+            "TestModelWhereInput[]"
+          ],
+          "required": false
+        },
+        {
+          "name": "NOT",
+          "typeNames": [
+            "TestModelWhereInput",
+            "TestModelWhereInput[]"
+          ],
+          "required": false
+        },
+        {
+          "name": "unique3",
+          "typeNames": [
+            "IntFilter",
+            "Int"
+          ],
+          "required": false
+        },
+        {
+          "name": "unique4",
+          "typeNames": [
+            "IntFilter",
+            "Int"
+          ],
+          "required": false
+        },
+        {
+          "name": "non_unique",
+          "typeNames": [
+            "IntFilter",
+            "Int"
+          ],
+          "required": false
+        }
+      ]
     },
     "argumentPath": [
       "where"

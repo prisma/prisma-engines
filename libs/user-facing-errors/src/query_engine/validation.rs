@@ -514,7 +514,7 @@ impl OutputTypeDescriptionField {
     }
 }
 #[derive(Debug, Serialize, Clone)]
-#[serde(rename_all = "camelCase")]
+#[serde(tag = "kind", rename_all = "camelCase")]
 pub enum InputTypeDescription {
     Object {
         name: String,
@@ -523,8 +523,10 @@ pub enum InputTypeDescription {
     Scalar {
         name: String,
     },
+    List {
+        element_type: Box<InputTypeDescription>,
+    },
     Enum,
-    List(Box<InputTypeDescription>),
 }
 
 impl InputTypeDescription {

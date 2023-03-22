@@ -788,9 +788,9 @@ pub(crate) mod conversions {
         match input_type {
             InputType::Scalar(s) => InputTypeDescription::Scalar { name: s.to_string() },
             InputType::Enum(_) => InputTypeDescription::Enum,
-            InputType::List(l) => {
-                InputTypeDescription::List(Box::new(input_type_to_input_type_description(l.as_ref())))
-            }
+            InputType::List(l) => InputTypeDescription::List {
+                element_type: Box::new(input_type_to_input_type_description(l.as_ref())),
+            },
             InputType::Object(o) => {
                 let o = o.upgrade().expect("input object type should still exist");
                 schema_input_object_type_to_input_type_description(&o)

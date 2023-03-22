@@ -5,58 +5,57 @@
     "kind": "RequiredArgumentMissing",
     "inputTypes": [
       {
-        "object": {
-          "name": "UserWhereUniqueInput",
-          "fields": [
-            {
-              "name": "id",
-              "typeNames": [
-                "Int"
-              ],
-              "required": false
-            },
-            {
-              "name": "AND",
-              "typeNames": [
-                "UserWhereInput",
-                "UserWhereInput[]"
-              ],
-              "required": false
-            },
-            {
-              "name": "OR",
-              "typeNames": [
-                "UserWhereInput[]"
-              ],
-              "required": false
-            },
-            {
-              "name": "NOT",
-              "typeNames": [
-                "UserWhereInput",
-                "UserWhereInput[]"
-              ],
-              "required": false
-            },
-            {
-              "name": "email",
-              "typeNames": [
-                "StringFilter",
-                "String"
-              ],
-              "required": false
-            },
-            {
-              "name": "dob",
-              "typeNames": [
-                "DateTimeNullableFilter",
-                "DateTime",
-                "Null"
-              ],
-              "required": false
-            }
-          ]
-        }
+        "kind": "object",
+        "name": "UserWhereUniqueInput",
+        "fields": [
+          {
+            "name": "id",
+            "typeNames": [
+              "Int"
+            ],
+            "required": false
+          },
+          {
+            "name": "AND",
+            "typeNames": [
+              "UserWhereInput",
+              "UserWhereInput[]"
+            ],
+            "required": false
+          },
+          {
+            "name": "OR",
+            "typeNames": [
+              "UserWhereInput[]"
+            ],
+            "required": false
+          },
+          {
+            "name": "NOT",
+            "typeNames": [
+              "UserWhereInput",
+              "UserWhereInput[]"
+            ],
+            "required": false
+          },
+          {
+            "name": "email",
+            "typeNames": [
+              "StringFilter",
+              "String"
+            ],
+            "required": false
+          },
+          {
+            "name": "dob",
+            "typeNames": [
+              "DateTimeNullableFilter",
+              "DateTime",
+              "Null"
+            ],
+            "required": false
+          }
+        ]
       }
     ],
     "argumentPath": [
