@@ -19,6 +19,9 @@
                 "ISO-8601 DateTime"
               ]
             },
+            "selectionPath": [
+              "createOneUser"
+            ],
             "underlyingError": "input contains invalid characters"
           },
           {
@@ -55,6 +58,9 @@
                 "ISO-8601 DateTime"
               ]
             },
+            "selectionPath": [
+              "createOneUser"
+            ],
             "underlyingError": "input contains invalid characters"
           },
           {
