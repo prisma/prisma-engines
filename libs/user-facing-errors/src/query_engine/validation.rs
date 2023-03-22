@@ -189,7 +189,6 @@ impl ValidationError {
         underlying_err: Option<Box<dyn error::Error>>,
     ) -> Self {
         let argument_name = argument_path.last().expect("Argument path cannot not be empty");
-
         let (message, meta) = if let Some(err) = underlying_err {
             let err_msg = err.to_string();
             let message = format!(
@@ -208,7 +207,6 @@ impl ValidationError {
             let meta = json!({"argumentPath": argument_path, "argument": argument, "selectionPath": selection_path, "underlyingError": serde_json::Value::Null});
             (message, Some(meta))
         };
-
         ValidationError {
             kind: ValidationErrorKind::InvalidArgumentValue,
             message,
@@ -229,7 +227,6 @@ impl ValidationError {
     ) -> Self {
         let constraints =
             InputTypeConstraints::new(min_field_count, max_field_count, required_fields, provided_field_count);
-
         let message = format!("Some fields are missing: {}", constraints);
         ValidationError {
             kind: ValidationErrorKind::SomeFieldsMissing,
@@ -253,7 +250,6 @@ impl ValidationError {
     ) -> Self {
         let constraints =
             InputTypeConstraints::new(min_field_count, max_field_count, required_fields, provided_field_count);
-
         let message = format!("Too many fields given: {}", constraints);
         ValidationError {
             kind: ValidationErrorKind::TooManyFieldsGiven,
@@ -362,7 +358,6 @@ impl ValidationError {
             "`{}`: Field does not exist in enclosing type.",
             selection_path.join(".")
         );
-
         ValidationError {
             kind: ValidationErrorKind::UnknownInputField,
             message,
@@ -474,7 +469,6 @@ impl ValidationError {
             argument_name
         );
         let argument = ArgumentDescription::new(argument_name.to_owned(), vec!["BigInt".to_owned()]);
-
         ValidationError {
             kind: ValidationErrorKind::ValueTooLarge,
             message,
