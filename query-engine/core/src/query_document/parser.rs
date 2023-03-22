@@ -177,7 +177,7 @@ impl QueryDocumentParser {
                     _ => Some(Err(ValidationError::required_argument_missing(
                         selection_path.segments(),
                         argument_path.segments(),
-                        &&conversions::input_types_to_input_type_descriptions(&input_field_ref.field_types),
+                        &conversions::input_types_to_input_type_descriptions(&input_field_ref.field_types),
                     ))),
                 }
             })
@@ -781,10 +781,7 @@ pub(crate) mod conversions {
     pub(crate) fn input_types_to_input_type_descriptions(
         input_types: &[schema::InputType],
     ) -> Vec<validation::InputTypeDescription> {
-        input_types
-            .into_iter()
-            .map(input_type_to_input_type_description)
-            .collect()
+        input_types.iter().map(input_type_to_input_type_description).collect()
     }
 
     fn input_type_to_input_type_description(input_type: &InputType) -> InputTypeDescription {
