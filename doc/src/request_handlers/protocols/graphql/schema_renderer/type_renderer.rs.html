@@ -120,13 +120,13 @@
         <span class="kw">match </span>i {
             InputType::Object(<span class="kw-2">ref </span>obj) =&gt; {
                 <span class="kw">let _ </span>= obj.into_renderer().render(ctx);
-                obj.into_arc().identifier.name()
+                obj.into_arc().identifier.name().to_string()
             }
 
             InputType::Enum(et) =&gt; {
                 <span class="kw">let </span>et = et.into_arc();
                 et.into_renderer().render(ctx);
-                et.identifier().name()
+                et.identifier().name().to_string()
             }
 
             InputType::List(<span class="kw-2">ref </span>l) =&gt; {
@@ -160,13 +160,13 @@
         <span class="kw">match </span>o {
             OutputType::Object(obj) =&gt; {
                 <span class="kw">let _ </span>= obj.into_renderer().render(ctx);
-                obj.into_arc().identifier.name()
+                obj.into_arc().identifier.name().to_string()
             }
 
             OutputType::Enum(et) =&gt; {
                 <span class="kw">let </span>et = et.into_arc();
                 et.into_renderer().render(ctx);
-                et.identifier().name()
+                et.identifier().name().to_string()
             }
 
             OutputType::List(l) =&gt; {

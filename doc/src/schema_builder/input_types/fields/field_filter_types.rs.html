@@ -615,6 +615,16 @@
 <a href="#615" id="615">615</a>
 <a href="#616" id="616">616</a>
 <a href="#617" id="617">617</a>
+<a href="#618" id="618">618</a>
+<a href="#619" id="619">619</a>
+<a href="#620" id="620">620</a>
+<a href="#621" id="621">621</a>
+<a href="#622" id="622">622</a>
+<a href="#623" id="623">623</a>
+<a href="#624" id="624">624</a>
+<a href="#625" id="625">625</a>
+<a href="#626" id="626">626</a>
+<a href="#627" id="627">627</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{field_ref_type::WithFieldRefInputExt, objects::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
 <span class="kw">use </span>constants::{aggregations, filters};
 <span class="kw">use </span>prisma_models::{dml, CompositeFieldRef, PrismaValue};
@@ -682,7 +692,8 @@
 }
 
 <span class="kw">fn </span>to_many_relation_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::ToManyRelationFilterInput(rf.related_model()));
+    <span class="kw">let </span>related_model = rf.related_model();
+    <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}ListRelationFilter&quot;</span>, capitalize(related_model.name())));
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
@@ -692,7 +703,7 @@
     <span class="kw">let </span>object = Arc::new(object);
     ctx.cache_input_type(ident, object.clone());
 
-    <span class="kw">let </span>related_input_type = filter_objects::where_object_type(ctx, <span class="kw-2">&amp;</span>rf.related_model());
+    <span class="kw">let </span>related_input_type = filter_objects::where_object_type(ctx, <span class="kw-2">&amp;</span>related_model);
 
     <span class="kw">let </span>fields = <span class="macro">vec!</span>[
         input_field(filters::EVERY, InputType::object(related_input_type.clone()), <span class="prelude-val">None</span>).optional(),
@@ -705,17 +716,16 @@
 }
 
 <span class="kw">fn </span>to_one_relation_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::ToOneRelationFilterInput(rf.related_model()));
+    <span class="kw">let </span>related_model = rf.related_model();
+    <span class="kw">let </span>related_input_type = filter_objects::where_object_type(ctx, <span class="kw-2">&amp;</span>related_model);
+    <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}RelationFilter&quot;</span>, capitalize(related_model.name())));
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
-
     <span class="kw">let </span><span class="kw-2">mut </span>object = init_input_object_type(ident.clone());
     object.set_tag(ObjectTag::RelationEnvelope);
 
     <span class="kw">let </span>object = Arc::new(object);
     ctx.cache_input_type(ident, object.clone());
-
-    <span class="kw">let </span>related_input_type = filter_objects::where_object_type(ctx, <span class="kw-2">&amp;</span>rf.related_model());
 
     <span class="kw">let </span>fields = <span class="macro">vec!</span>[
         input_field(filters::IS, InputType::object(related_input_type.clone()), <span class="prelude-val">None</span>)
@@ -738,8 +748,8 @@
 }
 
 <span class="kw">fn </span>to_one_composite_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::ToOneCompositeFilterInput(cf.clone()));
-
+    <span class="kw">let </span>nullable = <span class="kw">if </span>cf.is_optional() { <span class="string">&quot;Nullable&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
+    <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}{}CompositeFilter&quot;</span>, capitalize(cf.typ().name()), nullable));
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span><span class="kw-2">mut </span>object = init_input_object_type(ident.clone());
@@ -774,8 +784,7 @@
 }
 
 <span class="kw">fn </span>to_many_composite_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::ToManyCompositeFilterInput(cf.clone()));
-
+    <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}CompositeListFilter&quot;</span>, capitalize(cf.typ().name())));
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span><span class="kw-2">mut </span>object = init_input_object_type(ident.clone());
@@ -813,9 +822,12 @@
 }
 
 <span class="kw">fn </span>scalar_list_filter_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::ScalarListFilterInput(
-        ctx.internal_data_model.clone().zip(sf.type_identifier()),
-        sf.is_required(),
+    <span class="kw">let </span>ident = Identifier::new_prisma(scalar_filter_name(
+        <span class="kw-2">&amp;</span>sf.type_identifier().type_name(<span class="kw-2">&amp;</span>ctx.internal_data_model.schema),
+        <span class="bool-val">true</span>,
+        !sf.is_required(),
+        <span class="bool-val">false</span>,
+        <span class="bool-val">false</span>,
     ));
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
@@ -1164,6 +1176,14 @@
     };
 
     fields.into_iter()
+}
+
+<span class="kw">fn </span>scalar_filter_name(typ: <span class="kw-2">&amp;</span>str, list: bool, nullable: bool, nested: bool, include_aggregates: bool) -&gt; String {
+    <span class="kw">let </span>list = <span class="kw">if </span>list { <span class="string">&quot;List&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
+    <span class="kw">let </span>nullable = <span class="kw">if </span>nullable { <span class="string">&quot;Nullable&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
+    <span class="kw">let </span>nested = <span class="kw">if </span>nested { <span class="string">&quot;Nested&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
+    <span class="kw">let </span>aggregates = <span class="kw">if </span>include_aggregates { <span class="string">&quot;WithAggregates&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
+    <span class="macro">format!</span>(<span class="string">&quot;{nested}{typ}{nullable}{list}{aggregates}Filter&quot;</span>)
 }
 
 <span class="kw">fn </span>aggregate_filter_field(

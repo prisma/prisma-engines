@@ -310,7 +310,6 @@
 <a href="#310" id="310">310</a>
 <a href="#311" id="311">311</a>
 <a href="#312" id="312">312</a>
-<a href="#313" id="313">313</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>constants::{aggregations, ordering};
 <span class="kw">use </span>output_types::aggregation;
@@ -353,10 +352,7 @@
     container: <span class="kw-2">&amp;</span>ParentContainer,
     options: <span class="kw-2">&amp;</span>OrderByOptions,
 ) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::OrderByInput(
-        container.clone(),
-        options.type_suffix().to_owned(),
-    ));
+    <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}OrderBy{}Input&quot;</span>, container.name(), options.type_suffix()));
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span><span class="kw-2">mut </span>input_object = init_input_object_type(ident.clone());
@@ -521,10 +517,7 @@
     container: <span class="kw-2">&amp;</span>ParentContainer,
     scalar_fields: Vec&lt;ScalarFieldRef&gt;,
 ) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::OrderByAggregateInput(
-        container.clone(),
-        suffix.to_string(),
-    ));
+    <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}{}OrderByAggregateInput&quot;</span>, container.name(), suffix));
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
@@ -547,7 +540,12 @@
     ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
     container: <span class="kw-2">&amp;</span>ParentContainer,
 ) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::OrderByToManyAggregateInput(container.clone()));
+    <span class="kw">let </span>container_type = <span class="kw">match </span>container {
+        ParentContainer::Model(<span class="kw">_</span>) =&gt; <span class="string">&quot;Relation&quot;</span>,
+        ParentContainer::CompositeType(<span class="kw">_</span>) =&gt; <span class="string">&quot;Composite&quot;</span>,
+    };
+
+    <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}OrderBy{}AggregateInput&quot;</span>, container.name(), container_type));
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span><span class="kw-2">mut </span>input_object = init_input_object_type(ident.clone());
@@ -597,7 +595,7 @@
     container: <span class="kw-2">&amp;</span>ParentContainer,
     scalar_fields: Vec&lt;ScalarFieldRef&gt;,
 ) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::OrderByRelevanceInput(container.clone()));
+    <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}OrderByRelevanceInput&quot;</span>, container.name()));
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
@@ -606,7 +604,7 @@
 
     <span class="kw">let </span>fields_enum_type = InputType::enum_type(order_by_relevance_enum(
         ctx,
-        container,
+        <span class="kw-2">&amp;</span>container.name(),
         scalar_fields.iter().map(|sf| sf.name().to_owned()).collect(),
     ));
 
