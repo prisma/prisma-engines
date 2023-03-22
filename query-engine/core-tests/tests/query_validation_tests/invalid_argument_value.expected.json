@@ -19,7 +19,7 @@
                 "ISO-8601 DateTime"
               ]
             },
-            "underlying_error": "input contains invalid characters"
+            "underlyingError": "input contains invalid characters"
           },
           {
             "kind": "InvalidArgumentType",
@@ -55,7 +55,7 @@
                 "ISO-8601 DateTime"
               ]
             },
-            "underlying_error": "input contains invalid characters"
+            "underlyingError": "input contains invalid characters"
           },
           {
             "kind": "InvalidArgumentType",

@@ -197,7 +197,7 @@ impl ValidationError {
                 value, expected_argument_type, &err_msg
             );
             let argument = ArgumentDescription::new(argument_name.to_owned(), vec![expected_argument_type]);
-            let meta = json!({"argumentPath": argument_path, "argument": argument, "underlying_error": &err_msg});
+            let meta = json!({"argumentPath": argument_path, "argument": argument, "underlyingError": &err_msg});
             (message, Some(meta))
         } else {
             let message = format!(
