@@ -6,7 +6,7 @@ use url::Url;
 /// The maximum length of identifiers on mysql is 64 bytes.
 ///
 /// Source: https://dev.mysql.com/doc/mysql-reslimits-excerpt/5.5/en/identifier-length.html
-fn mysql_safe_identifier(identifier: &str) -> &str {
+pub fn mysql_safe_identifier(identifier: &str) -> &str {
     if identifier.len() <= 64 {
         identifier
     } else {

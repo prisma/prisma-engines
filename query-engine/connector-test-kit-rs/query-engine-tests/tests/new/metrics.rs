@@ -31,6 +31,7 @@ mod metrics {
             SqlServer(_) => assert_eq!(total_queries, 15),
             MongoDb(_) => assert_eq!(total_queries, 5),
             CockroachDb => assert_eq!(total_queries, 10),
+            MySql(_) => assert_eq!(total_queries, 9),
             _ => assert_eq!(total_queries, 11),
         }
 
