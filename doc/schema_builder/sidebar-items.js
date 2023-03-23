@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["build",""],["compound_id_field_name","Computes a compound field name based on a multi-field id."],["compound_index_field_name","Computes a compound field name based on an index."]],"mod":[["constants",""]]};
+window.SIDEBAR_ITEMS = {"fn":[["build",""],["build_with_features",""],["compound_id_field_name","Computes a compound field name based on a multi-field id."],["compound_index_field_name","Computes a compound field name based on an index."]],"mod":[["constants",""]]};

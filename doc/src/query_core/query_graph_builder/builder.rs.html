@@ -157,10 +157,10 @@
         root_object: <span class="kw-2">&amp;</span>ObjectTypeStrongRef, <span class="comment">// Either the query or mutation object.
     </span>) -&gt; QueryGraphBuilderResult&lt;(QueryGraph, IrSerializer)&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>selections = <span class="macro">vec!</span>[selection];
-        <span class="kw">let </span><span class="kw-2">mut </span>parsed_object = QueryDocumentParser::new(<span class="kw">crate</span>::executor::get_request_now()).parse_object(
-            QueryPath::default(),
+        <span class="kw">let </span><span class="kw-2">mut </span>parsed_object = QueryDocumentParser::new(<span class="kw">crate</span>::executor::get_request_now()).parse(
             <span class="kw-2">&amp;</span>selections,
             root_object,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.query_schema,
         )<span class="question-mark">?</span>;
 
         <span class="comment">// Because we&#39;re processing root objects, there can only be one query / mutation.

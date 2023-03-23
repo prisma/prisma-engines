@@ -413,10 +413,6 @@
 <a href="#413" id="413">413</a>
 <a href="#414" id="414">414</a>
 <a href="#415" id="415">415</a>
-<a href="#416" id="416">416</a>
-<a href="#417" id="417">417</a>
-<a href="#418" id="418">418</a>
-<a href="#419" id="419">419</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{constants::<span class="kw-2">*</span>, enum_types::<span class="kw-2">*</span>};
 <span class="kw">use </span>prisma_models::CompositeFieldRef;
@@ -466,7 +462,7 @@
         <span class="kw">match </span>sf.type_identifier() {
             TypeIdentifier::Json <span class="kw">if </span>has_adv_json =&gt; {
                 <span class="kw">let </span>enum_type = InputType::enum_type(json_null_input_enum(ctx, !sf.is_required()));
-                <span class="kw">let </span>input_field = input_field(sf.name(), <span class="macro">vec!</span>[enum_type, base_update_type], <span class="prelude-val">None</span>);
+                <span class="kw">let </span>input_field = input_field(ctx, sf.name(), <span class="macro">vec!</span>[enum_type, base_update_type], <span class="prelude-val">None</span>);
 
                 input_field.optional()
             }
@@ -474,8 +470,10 @@
             <span class="kw">_ </span>=&gt; {
                 <span class="kw">let </span>types = <span class="macro">vec!</span>[map_scalar_input_type_for_field(ctx, sf), base_update_type];
 
-                <span class="kw">let </span>input_field = input_field(sf.name(), types, <span class="prelude-val">None</span>);
-                input_field.optional().nullable_if(!sf.is_required())
+                <span class="kw">let </span>input_field = input_field(ctx, sf.name(), types, <span class="prelude-val">None</span>);
+                input_field
+                    .optional()
+                    .nullable_if(!sf.is_required(), <span class="kw-2">&amp;mut </span>ctx.input_field_types)
             }
         }
     }
@@ -487,20 +485,14 @@
         <span class="kw">let </span>input_object = <span class="kw">match </span>ctx.get_input_type(<span class="kw-2">&amp;</span>ident) {
             <span class="prelude-val">Some</span>(t) =&gt; t,
             <span class="prelude-val">None </span>=&gt; {
-                <span class="kw">let </span><span class="kw-2">mut </span>object_fields = <span class="macro">vec!</span>[input_field(operations::SET, list_input_type.clone(), <span class="prelude-val">None</span>).optional()];
+                <span class="kw">let </span><span class="kw-2">mut </span>object_fields =
+                    <span class="macro">vec!</span>[input_field(ctx, operations::SET, list_input_type.clone(), <span class="prelude-val">None</span>).optional()];
 
                 <span class="comment">// Todo this capability looks wrong to me.
                 </span><span class="kw">if </span>ctx.has_capability(ConnectorCapability::EnumArrayPush) {
+                    <span class="kw">let </span>map_scalar_type = map_scalar_input_type(ctx, <span class="kw-2">&amp;</span>sf.type_identifier(), <span class="bool-val">false</span>);
                     object_fields.push(
-                        input_field(
-                            operations::PUSH,
-                            <span class="macro">vec!</span>[
-                                map_scalar_input_type(ctx, <span class="kw-2">&amp;</span>sf.type_identifier(), <span class="bool-val">false</span>),
-                                list_input_type.clone(),
-                            ],
-                            <span class="prelude-val">None</span>,
-                        )
-                        .optional(),
+                        input_field(ctx, operations::PUSH, [map_scalar_type, list_input_type.clone()], <span class="prelude-val">None</span>).optional(),
                     )
                 }
 
@@ -515,7 +507,7 @@
         };
 
         <span class="kw">let </span>input_type = InputType::object(input_object);
-        input_field(sf.name(), <span class="macro">vec!</span>[input_type, list_input_type], <span class="prelude-val">None</span>).optional()
+        input_field(ctx, sf.name(), <span class="macro">vec!</span>[input_type, list_input_type], <span class="prelude-val">None</span>).optional()
     }
 
     <span class="kw">fn </span>map_relation(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputField {
@@ -556,7 +548,7 @@
             }
         };
 
-        input_field(rf.name(), InputType::object(input_object), <span class="prelude-val">None</span>).optional()
+        input_field(ctx, rf.name(), InputType::object(input_object), <span class="prelude-val">None</span>).optional()
     }
 
     <span class="kw">fn </span>map_composite(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputField {
@@ -572,8 +564,8 @@
             input_types.push(InputType::list(shorthand_type));
         }
 
-        input_field(cf.name(), input_types, <span class="prelude-val">None</span>)
-            .nullable_if(cf.is_optional() &amp;&amp; !cf.is_list())
+        input_field(ctx, cf.name(), input_types, <span class="prelude-val">None</span>)
+            .nullable_if(cf.is_optional() &amp;&amp; !cf.is_list(), <span class="kw-2">&amp;mut </span>ctx.input_field_types)
             .optional()
     }
 }
@@ -597,19 +589,19 @@
     ctx.cache_input_type(ident, obj.clone());
 
     <span class="kw">let </span>typ = map_scalar_input_type_for_field(ctx, sf);
-    <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="macro">vec!</span>[input_field(operations::SET, typ.clone(), <span class="prelude-val">None</span>)
+    <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="macro">vec!</span>[input_field(ctx, operations::SET, typ.clone(), <span class="prelude-val">None</span>)
         .optional()
-        .nullable_if(!sf.is_required())];
+        .nullable_if(!sf.is_required(), <span class="kw-2">&amp;mut </span>ctx.input_field_types)];
 
     <span class="kw">if </span>with_number_operators {
-        fields.push(input_field(operations::INCREMENT, typ.clone(), <span class="prelude-val">None</span>).optional());
-        fields.push(input_field(operations::DECREMENT, typ.clone(), <span class="prelude-val">None</span>).optional());
-        fields.push(input_field(operations::MULTIPLY, typ.clone(), <span class="prelude-val">None</span>).optional());
-        fields.push(input_field(operations::DIVIDE, typ, <span class="prelude-val">None</span>).optional());
+        fields.push(input_field(ctx, operations::INCREMENT, typ.clone(), <span class="prelude-val">None</span>).optional());
+        fields.push(input_field(ctx, operations::DECREMENT, typ.clone(), <span class="prelude-val">None</span>).optional());
+        fields.push(input_field(ctx, operations::MULTIPLY, typ.clone(), <span class="prelude-val">None</span>).optional());
+        fields.push(input_field(ctx, operations::DIVIDE, typ, <span class="prelude-val">None</span>).optional());
     }
 
     <span class="kw">if </span>ctx.has_capability(ConnectorCapability::UndefinedType) &amp;&amp; !sf.is_required() {
-        fields.push(input_field(operations::UNSET, InputType::boolean(), <span class="prelude-val">None</span>).optional());
+        fields.push(input_field(ctx, operations::UNSET, InputType::boolean(), <span class="prelude-val">None</span>).optional());
     }
 
     obj.set_fields(fields);
@@ -654,7 +646,7 @@
     append_opt(<span class="kw-2">&amp;mut </span>fields, composite_upsert_update_input_field(ctx, cf));
     append_opt(<span class="kw-2">&amp;mut </span>fields, composite_update_many_update_input_field(ctx, cf));
     append_opt(<span class="kw-2">&amp;mut </span>fields, composite_delete_many_update_input_field(ctx, cf));
-    append_opt(<span class="kw-2">&amp;mut </span>fields, composite_unset_update_input_field(cf));
+    append_opt(<span class="kw-2">&amp;mut </span>fields, composite_unset_update_input_field(ctx, cf));
 
     input_object.set_fields(fields);
 
@@ -688,16 +680,16 @@
     <span class="kw">if </span>cf.is_required() {
         <span class="kw">let </span>update_object_type = composite_update_object_type(ctx, cf);
 
-        <span class="prelude-val">Some</span>(input_field(operations::UPDATE, InputType::Object(update_object_type), <span class="prelude-val">None</span>).optional())
+        <span class="prelude-val">Some</span>(input_field(ctx, operations::UPDATE, InputType::Object(update_object_type), <span class="prelude-val">None</span>).optional())
     } <span class="kw">else </span>{
         <span class="prelude-val">None
     </span>}
 }
 
 <span class="comment">// Builds an `unset` input field. Should only be used in the envelope type.
-</span><span class="kw">fn </span>composite_unset_update_input_field(cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
+</span><span class="kw">fn </span>composite_unset_update_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
     <span class="kw">if </span>cf.is_optional() {
-        <span class="prelude-val">Some</span>(input_field(operations::UNSET, InputType::boolean(), <span class="prelude-val">None</span>).optional())
+        <span class="prelude-val">Some</span>(input_field(ctx, operations::UNSET, InputType::boolean(), <span class="prelude-val">None</span>).optional())
     } <span class="kw">else </span>{
         <span class="prelude-val">None
     </span>}
@@ -713,8 +705,8 @@
         input_types.push(InputType::list(set_object_type));
     }
 
-    input_field(operations::SET, input_types, <span class="prelude-val">None</span>)
-        .nullable_if(!cf.is_required() &amp;&amp; !cf.is_list())
+    input_field(ctx, operations::SET, input_types, <span class="prelude-val">None</span>)
+        .nullable_if(!cf.is_required() &amp;&amp; !cf.is_list(), <span class="kw-2">&amp;mut </span>ctx.input_field_types)
         .optional()
 }
 
@@ -724,7 +716,7 @@
         <span class="kw">let </span>set_object_type = InputType::Object(create::composite_create_object_type(ctx, cf));
         <span class="kw">let </span>input_types = <span class="macro">vec!</span>[set_object_type.clone(), InputType::list(set_object_type)];
 
-        <span class="prelude-val">Some</span>(input_field(operations::PUSH, input_types, <span class="prelude-val">None</span>).optional())
+        <span class="prelude-val">Some</span>(input_field(ctx, operations::PUSH, input_types, <span class="prelude-val">None</span>).optional())
     } <span class="kw">else </span>{
         <span class="prelude-val">None
     </span>}
@@ -745,7 +737,7 @@
     ctx.cache_input_type(ident, input_object.clone());
 
     <span class="kw">let </span>update_object_type = composite_update_object_type(ctx, cf);
-    <span class="kw">let </span>update_field = input_field(operations::UPDATE, InputType::Object(update_object_type), <span class="prelude-val">None</span>);
+    <span class="kw">let </span>update_field = input_field(ctx, operations::UPDATE, InputType::Object(update_object_type), <span class="prelude-val">None</span>);
     <span class="kw">let </span>set_field = composite_set_update_input_field(ctx, cf).required();
 
     <span class="kw">let </span>fields = <span class="macro">vec!</span>[set_field, update_field];
@@ -760,7 +752,7 @@
     <span class="kw">if </span>cf.is_optional() {
         <span class="kw">let </span>upsert_object_type = InputType::Object(composite_upsert_object_type(ctx, cf));
 
-        <span class="prelude-val">Some</span>(input_field(operations::UPSERT, upsert_object_type, <span class="prelude-val">None</span>).optional())
+        <span class="prelude-val">Some</span>(input_field(ctx, operations::UPSERT, upsert_object_type, <span class="prelude-val">None</span>).optional())
     } <span class="kw">else </span>{
         <span class="prelude-val">None
     </span>}
@@ -780,10 +772,10 @@
     ctx.cache_input_type(ident, input_object.clone());
 
     <span class="kw">let </span>where_object_type = objects::filter_objects::where_object_type(ctx, cf.typ());
-    <span class="kw">let </span>where_field = input_field(args::WHERE, InputType::object(where_object_type), <span class="prelude-val">None</span>);
+    <span class="kw">let </span>where_field = input_field(ctx, args::WHERE, InputType::object(where_object_type), <span class="prelude-val">None</span>);
 
     <span class="kw">let </span>update_object_type = composite_update_object_type(ctx, cf);
-    <span class="kw">let </span>data_field = input_field(args::DATA, InputType::Object(update_object_type), <span class="prelude-val">None</span>);
+    <span class="kw">let </span>data_field = input_field(ctx, args::DATA, InputType::Object(update_object_type), <span class="prelude-val">None</span>);
 
     <span class="kw">let </span>fields = <span class="macro">vec!</span>[where_field, data_field];
 
@@ -806,7 +798,7 @@
     ctx.cache_input_type(ident, input_object.clone());
 
     <span class="kw">let </span>where_object_type = objects::filter_objects::where_object_type(ctx, cf.typ());
-    <span class="kw">let </span>where_field = input_field(args::WHERE, InputType::object(where_object_type), <span class="prelude-val">None</span>);
+    <span class="kw">let </span>where_field = input_field(ctx, args::WHERE, InputType::object(where_object_type), <span class="prelude-val">None</span>);
 
     <span class="kw">let </span>fields = <span class="macro">vec!</span>[where_field];
 
@@ -820,7 +812,7 @@
     <span class="kw">if </span>cf.is_list() {
         <span class="kw">let </span>update_many = InputType::Object(composite_update_many_object_type(ctx, cf));
 
-        <span class="prelude-val">Some</span>(input_field(operations::UPDATE_MANY, update_many, <span class="prelude-val">None</span>).optional())
+        <span class="prelude-val">Some</span>(input_field(ctx, operations::UPDATE_MANY, update_many, <span class="prelude-val">None</span>).optional())
     } <span class="kw">else </span>{
         <span class="prelude-val">None
     </span>}
@@ -831,7 +823,7 @@
     <span class="kw">if </span>cf.is_list() {
         <span class="kw">let </span>delete_many = InputType::Object(composite_delete_many_object_type(ctx, cf));
 
-        <span class="prelude-val">Some</span>(input_field(operations::DELETE_MANY, delete_many, <span class="prelude-val">None</span>).optional())
+        <span class="prelude-val">Some</span>(input_field(ctx, operations::DELETE_MANY, delete_many, <span class="prelude-val">None</span>).optional())
     } <span class="kw">else </span>{
         <span class="prelude-val">None
     </span>}

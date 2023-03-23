@@ -206,6 +206,13 @@
 <a href="#206" id="206">206</a>
 <a href="#207" id="207">207</a>
 <a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>enum_renderer;
 <span class="kw">mod </span>field_renderer;
 <span class="kw">mod </span>object_renderer;
@@ -226,7 +233,7 @@
 <span class="kw">use </span>type_renderer::<span class="kw-2">*</span>;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>render(query_schema: QuerySchemaRef) -&gt; (DmmfSchema, DmmfOperationMappings) {
-    <span class="kw">let </span><span class="kw-2">mut </span>ctx = RenderContext::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>ctx = RenderContext::new(<span class="kw-2">&amp;</span>query_schema);
     ctx.mark_to_be_rendered(<span class="kw-2">&amp;</span>query_schema);
 
     <span class="kw">while </span>!ctx.next_pass.is_empty() {
@@ -240,8 +247,9 @@
     ctx.finalize()
 }
 
-<span class="attr">#[derive(Default)]
-</span><span class="kw">pub struct </span>RenderContext {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>RenderContext&lt;<span class="lifetime">&#39;a</span>&gt; {
+    query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema,
+
     <span class="doccomment">/// Aggregator for query schema
     </span>schema: DmmfSchema,
 
@@ -257,9 +265,15 @@
     </span>next_pass: Vec&lt;Box&lt;<span class="kw">dyn </span>Renderer&gt;&gt;,
 }
 
-<span class="kw">impl </span>RenderContext {
-    <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::default()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; RenderContext&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>new(query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema) -&gt; <span class="self">Self </span>{
+        RenderContext {
+            query_schema,
+            schema: Default::default(),
+            mappings: Default::default(),
+            rendered: Default::default(),
+            next_pass: Default::default(),
+        }
     }
 
     <span class="kw">pub fn </span>finalize(<span class="self">self</span>) -&gt; (DmmfSchema, DmmfOperationMappings) {
@@ -361,7 +375,7 @@
     }
 }
 
-<span class="kw">pub trait </span>Renderer {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>Renderer {
     <span class="kw">fn </span>render(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>RenderContext);
 }
 

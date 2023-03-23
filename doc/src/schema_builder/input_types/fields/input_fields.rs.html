@@ -247,6 +247,11 @@
 <a href="#247" id="247">247</a>
 <a href="#248" id="248">248</a>
 <a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::objects::<span class="kw-2">*</span>;
 <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::mutations::{create_many, create_one};
@@ -262,9 +267,9 @@
             <span class="kw">_ </span>=&gt; <span class="bool-val">true</span>,
         };
 
-    input_field(field.name().to_owned(), types, <span class="prelude-val">None</span>)
+    input_field(ctx, field.name().to_owned(), types, <span class="prelude-val">None</span>)
         .optional()
-        .nullable_if(nullable)
+        .nullable_if(nullable, <span class="kw-2">&amp;mut </span>ctx.input_field_types)
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nested_create_one_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, parent_field: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputField {
@@ -275,7 +280,7 @@
         .flat_map(|typ| list_union_type(typ, parent_field.is_list()))
         .collect();
 
-    input_field(operations::CREATE, types, <span class="prelude-val">None</span>).optional()
+    input_field(ctx, operations::CREATE, types, <span class="prelude-val">None</span>).optional()
 }
 
 <span class="doccomment">/// Nested create many calls can only ever be leaf operations because they can&#39;t return the ids of
@@ -294,7 +299,7 @@
     {
         <span class="kw">let </span>envelope = nested_create_many_envelope(ctx, parent_field);
 
-        <span class="prelude-val">Some</span>(input_field(operations::CREATE_MANY, InputType::object(envelope), <span class="prelude-val">None</span>).optional())
+        <span class="prelude-val">Some</span>(input_field(ctx, operations::CREATE_MANY, InputType::object(envelope), <span class="prelude-val">None</span>).optional())
     } <span class="kw">else </span>{
         <span class="prelude-val">None
     </span>}
@@ -313,10 +318,10 @@
     ctx.cache_input_type(ident, input_object.clone());
 
     <span class="kw">let </span>create_many_type = InputType::object(create_type);
-    <span class="kw">let </span>data_arg = input_field(args::DATA, list_union_type(create_many_type, <span class="bool-val">true</span>), <span class="prelude-val">None</span>);
+    <span class="kw">let </span>data_arg = input_field(ctx, args::DATA, list_union_type(create_many_type, <span class="bool-val">true</span>), <span class="prelude-val">None</span>);
 
     <span class="kw">let </span>fields = <span class="kw">if </span>ctx.has_capability(ConnectorCapability::CreateSkipDuplicates) {
-        <span class="kw">let </span>skip_arg = input_field(args::SKIP_DUPLICATES, InputType::boolean(), <span class="prelude-val">None</span>).optional();
+        <span class="kw">let </span>skip_arg = input_field(ctx, args::SKIP_DUPLICATES, InputType::boolean(), <span class="prelude-val">None</span>).optional();
 
         <span class="macro">vec!</span>[data_arg, skip_arg]
     } <span class="kw">else </span>{
@@ -333,6 +338,7 @@
 ) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
     connect_or_create_objects::nested_connect_or_create_input_object(ctx, parent_field).map(|input_object_type| {
         input_field(
+            ctx,
             operations::CONNECT_OR_CREATE,
             list_union_object_type(input_object_type, parent_field.is_list()),
             <span class="prelude-val">None</span>,
@@ -345,6 +351,7 @@
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nested_upsert_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, parent_field: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
     upsert_objects::nested_upsert_input_object(ctx, parent_field).map(|input_object_type| {
         input_field(
+            ctx,
             operations::UPSERT,
             list_union_object_type(input_object_type, parent_field.is_list()),
             <span class="prelude-val">None</span>,
@@ -364,6 +371,7 @@
 
         <span class="prelude-val">Some</span>(
             input_field(
+                ctx,
                 operations::DELETE_MANY,
                 <span class="macro">vec!</span>[input_type.clone(), InputType::list(input_type)],
                 <span class="prelude-val">None</span>,
@@ -385,6 +393,7 @@
 
         <span class="prelude-val">Some</span>(
             input_field(
+                ctx,
                 operations::UPDATE_MANY,
                 list_union_object_type(input_type, <span class="bool-val">true</span>), <span class="comment">//vec![input_type.clone(), InputType::list(input_type)],
                 </span><span class="prelude-val">None</span>,
@@ -422,7 +431,7 @@
                 )));
             }
 
-            <span class="prelude-val">Some</span>(input_field(operations::DISCONNECT, types, <span class="prelude-val">None</span>).optional())
+            <span class="prelude-val">Some</span>(input_field(ctx, operations::DISCONNECT, types, <span class="prelude-val">None</span>).optional())
         }
         (<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; <span class="prelude-val">None</span>,
     }
@@ -445,7 +454,7 @@
                 )));
             }
 
-            <span class="prelude-val">Some</span>(input_field(operations::DELETE, types, <span class="prelude-val">None</span>).optional())
+            <span class="prelude-val">Some</span>(input_field(ctx, operations::DELETE, types, <span class="prelude-val">None</span>).optional())
         }
         (<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; <span class="prelude-val">None</span>,
     }
@@ -480,7 +489,7 @@
         update_shorthand_types
     };
 
-    input_field(operations::UPDATE, update_types, <span class="prelude-val">None</span>).optional()
+    input_field(ctx, operations::UPDATE, update_types, <span class="prelude-val">None</span>).optional()
 }
 
 <span class="kw">fn </span>where_unique_input_field&lt;T&gt;(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, name: T, field: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputField
@@ -490,6 +499,7 @@
     <span class="kw">let </span>input_object_type = filter_objects::where_unique_object_type(ctx, <span class="kw-2">&amp;</span>field.related_model());
 
     input_field(
+        ctx,
         name.into(),
         list_union_object_type(input_object_type, field.is_list()),
         <span class="prelude-val">None</span>,

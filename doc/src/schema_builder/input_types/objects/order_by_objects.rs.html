@@ -308,8 +308,6 @@
 <a href="#308" id="308">308</a>
 <a href="#309" id="309">309</a>
 <a href="#310" id="310">310</a>
-<a href="#311" id="311">311</a>
-<a href="#312" id="312">312</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>constants::{aggregations, ordering};
 <span class="kw">use </span>output_types::aggregation;
@@ -431,7 +429,7 @@
             <span class="kw">let </span>related_model = rf.related_model();
             <span class="kw">let </span>to_many_aggregate_type = order_by_to_many_aggregate_object_type(ctx, <span class="kw-2">&amp;</span>related_model.into());
 
-            <span class="prelude-val">Some</span>(input_field(rf.name(), InputType::object(to_many_aggregate_type), <span class="prelude-val">None</span>).optional())
+            <span class="prelude-val">Some</span>(input_field(ctx, rf.name(), InputType::object(to_many_aggregate_type), <span class="prelude-val">None</span>).optional())
         }
 
         <span class="comment">// To-one relation field.
@@ -439,7 +437,7 @@
             <span class="kw">let </span>related_model = rf.related_model();
             <span class="kw">let </span>related_object_type = order_by_object_type(ctx, <span class="kw-2">&amp;</span>related_model.into(), options);
 
-            <span class="prelude-val">Some</span>(input_field(rf.name(), InputType::object(related_object_type), <span class="prelude-val">None</span>).optional())
+            <span class="prelude-val">Some</span>(input_field(ctx, rf.name(), InputType::object(related_object_type), <span class="prelude-val">None</span>).optional())
         }
 
         <span class="comment">// Scalar field.
@@ -454,19 +452,27 @@
                 types.push(InputType::object(sort_nulls_object_type(ctx)));
             }
 
-            <span class="prelude-val">Some</span>(input_field(sf.name(), types, <span class="prelude-val">None</span>).optional())
+            <span class="prelude-val">Some</span>(input_field(ctx, sf.name(), types, <span class="prelude-val">None</span>).optional())
         }
 
         <span class="comment">// Composite field.
         </span>ModelField::Composite(cf) <span class="kw">if </span>cf.is_list() =&gt; {
             <span class="kw">let </span>to_many_aggregate_type = order_by_to_many_aggregate_object_type(ctx, <span class="kw-2">&amp;</span>(cf.typ()).into());
-            <span class="prelude-val">Some</span>(input_field(cf.name().to_owned(), InputType::object(to_many_aggregate_type), <span class="prelude-val">None</span>).optional())
+            <span class="prelude-val">Some</span>(
+                input_field(
+                    ctx,
+                    cf.name().to_owned(),
+                    InputType::object(to_many_aggregate_type),
+                    <span class="prelude-val">None</span>,
+                )
+                .optional(),
+            )
         }
 
         ModelField::Composite(cf) =&gt; {
             <span class="kw">let </span>composite_order_object_type = order_by_object_type(ctx, <span class="kw-2">&amp;</span>(cf.typ()).into(), <span class="kw-2">&amp;</span>OrderByOptions::new());
 
-            <span class="prelude-val">Some</span>(input_field(cf.name(), InputType::object(composite_order_object_type), <span class="prelude-val">None</span>).optional())
+            <span class="prelude-val">Some</span>(input_field(ctx, cf.name(), InputType::object(composite_order_object_type), <span class="prelude-val">None</span>).optional())
         }
 
         <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
@@ -480,9 +486,12 @@
     <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
 
+    <span class="kw">let </span>sort_order_enum_type = sort_order_enum(ctx);
+    <span class="kw">let </span>nulls_order_enum_type = nulls_order_enum(ctx);
+
     <span class="kw">let </span>fields = <span class="macro">vec!</span>[
-        input_field(ordering::SORT, InputType::Enum(sort_order_enum(ctx)), <span class="prelude-val">None</span>),
-        input_field(ordering::NULLS, InputType::Enum(nulls_order_enum(ctx)), <span class="prelude-val">None</span>).optional(),
+        input_field(ctx, ordering::SORT, InputType::Enum(sort_order_enum_type), <span class="prelude-val">None</span>),
+        input_field(ctx, ordering::NULLS, InputType::Enum(nulls_order_enum_type), <span class="prelude-val">None</span>).optional(),
     ];
 
     input_object.set_fields(fields);
@@ -500,14 +509,8 @@
     <span class="kw">if </span>scalar_fields.is_empty() {
         <span class="prelude-val">None
     </span>} <span class="kw">else </span>{
-        <span class="prelude-val">Some</span>(
-            input_field(
-                name,
-                InputType::object(order_by_object_type_aggregate(suffix, ctx, container, scalar_fields)),
-                <span class="prelude-val">None</span>,
-            )
-            .optional(),
-        )
+        <span class="kw">let </span>ty = InputType::object(order_by_object_type_aggregate(suffix, ctx, container, scalar_fields));
+        <span class="prelude-val">Some</span>(input_field(ctx, name, ty, <span class="prelude-val">None</span>).optional())
     }
 }
 
@@ -527,9 +530,10 @@
     <span class="kw">let </span>input_object = Arc::new(input_object);
     ctx.cache_input_type(ident, input_object.clone());
 
+    <span class="kw">let </span>sort_order_enum = InputType::Enum(sort_order_enum(ctx));
     <span class="kw">let </span>fields = scalar_fields
         .iter()
-        .map(|sf| input_field(sf.name(), InputType::Enum(sort_order_enum(ctx)), <span class="prelude-val">None</span>).optional())
+        .map(|sf| input_field(ctx, sf.name(), sort_order_enum.clone(), <span class="prelude-val">None</span>).optional())
         .collect();
 
     input_object.set_fields(fields);
@@ -554,12 +558,8 @@
     <span class="kw">let </span>input_object = Arc::new(input_object);
     ctx.cache_input_type(ident, input_object.clone());
 
-    <span class="kw">let </span>fields = <span class="macro">vec!</span>[input_field(
-        aggregations::UNDERSCORE_COUNT,
-        InputType::Enum(sort_order_enum(ctx)),
-        <span class="prelude-val">None</span>,
-    )
-    .optional()];
+    <span class="kw">let </span>sort_order_enum = InputType::Enum(sort_order_enum(ctx));
+    <span class="kw">let </span>fields = <span class="macro">vec!</span>[input_field(ctx, aggregations::UNDERSCORE_COUNT, sort_order_enum, <span class="prelude-val">None</span>).optional()];
 
     input_object.set_fields(fields);
 
@@ -579,14 +579,8 @@
     <span class="kw">if </span>scalar_fields.is_empty() {
         <span class="prelude-val">None
     </span>} <span class="kw">else </span>{
-        <span class="prelude-val">Some</span>(
-            input_field(
-                ordering::UNDERSCORE_RELEVANCE,
-                InputType::object(order_by_object_type_text_search(ctx, container, scalar_fields)),
-                <span class="prelude-val">None</span>,
-            )
-            .optional(),
-        )
+        <span class="kw">let </span>ty = InputType::object(order_by_object_type_text_search(ctx, container, scalar_fields));
+        <span class="prelude-val">Some</span>(input_field(ctx, ordering::UNDERSCORE_RELEVANCE, ty, <span class="prelude-val">None</span>).optional())
     }
 }
 
@@ -607,15 +601,17 @@
         <span class="kw-2">&amp;</span>container.name(),
         scalar_fields.iter().map(|sf| sf.name().to_owned()).collect(),
     ));
+    <span class="kw">let </span>sort_order_enum = sort_order_enum(ctx);
 
     <span class="kw">let </span>fields = <span class="macro">vec!</span>[
         input_field(
+            ctx,
             ordering::FIELDS,
             <span class="macro">vec!</span>[fields_enum_type.clone(), InputType::list(fields_enum_type)],
             <span class="prelude-val">None</span>,
         ),
-        input_field(ordering::SORT, InputType::Enum(sort_order_enum(ctx)), <span class="prelude-val">None</span>),
-        input_field(ordering::SEARCH, InputType::string(), <span class="prelude-val">None</span>),
+        input_field(ctx, ordering::SORT, InputType::Enum(sort_order_enum), <span class="prelude-val">None</span>),
+        input_field(ctx, ordering::SEARCH, InputType::string(), <span class="prelude-val">None</span>),
     ];
 
     input_object.set_fields(fields);

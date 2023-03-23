@@ -233,6 +233,8 @@
 <a href="#233" id="233">233</a>
 <a href="#234" id="234">234</a>
 <a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::mutations::{create_many, create_one};
 <span class="kw">use </span>input_types::fields::{arguments, input_fields};
@@ -267,12 +269,12 @@
     create_nested_inputs(ctx);
 
     <span class="kw">if </span>ctx.enable_raw_queries &amp;&amp; ctx.has_capability(ConnectorCapability::SqlQueryRaw) {
-        fields.push(create_execute_raw_field());
-        fields.push(create_query_raw_field());
+        fields.push(create_execute_raw_field(ctx));
+        fields.push(create_query_raw_field(ctx));
     }
 
     <span class="kw">if </span>ctx.enable_raw_queries &amp;&amp; ctx.has_capability(ConnectorCapability::MongoDbQueryRaw) {
-        fields.push(create_mongodb_run_command_raw());
+        fields.push(create_mongodb_run_command_raw(ctx));
     }
 
     <span class="kw">let </span>ident = Identifier::new_prisma(<span class="string">&quot;Mutation&quot;</span>.to_owned());
@@ -332,12 +334,13 @@
     }
 }
 
-<span class="kw">fn </span>create_execute_raw_field() -&gt; OutputField {
+<span class="kw">fn </span>create_execute_raw_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; OutputField {
     field(
         <span class="string">&quot;executeRaw&quot;</span>,
         <span class="macro">vec!</span>[
-            input_field(<span class="string">&quot;query&quot;</span>, InputType::string(), <span class="prelude-val">None</span>),
+            input_field(ctx, <span class="string">&quot;query&quot;</span>, InputType::string(), <span class="prelude-val">None</span>),
             input_field(
+                ctx,
                 <span class="string">&quot;parameters&quot;</span>,
                 InputType::json_list(),
                 <span class="prelude-val">Some</span>(dml::DefaultKind::Single(PrismaValue::String(<span class="string">&quot;[]&quot;</span>.into()))),
@@ -352,12 +355,13 @@
     )
 }
 
-<span class="kw">fn </span>create_query_raw_field() -&gt; OutputField {
+<span class="kw">fn </span>create_query_raw_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; OutputField {
     field(
         <span class="string">&quot;queryRaw&quot;</span>,
         <span class="macro">vec!</span>[
-            input_field(<span class="string">&quot;query&quot;</span>, InputType::string(), <span class="prelude-val">None</span>),
+            input_field(ctx, <span class="string">&quot;query&quot;</span>, InputType::string(), <span class="prelude-val">None</span>),
             input_field(
+                ctx,
                 <span class="string">&quot;parameters&quot;</span>,
                 InputType::json_list(),
                 <span class="prelude-val">Some</span>(dml::DefaultKind::Single(PrismaValue::String(<span class="string">&quot;[]&quot;</span>.into()))),
@@ -372,10 +376,10 @@
     )
 }
 
-<span class="kw">fn </span>create_mongodb_run_command_raw() -&gt; OutputField {
+<span class="kw">fn </span>create_mongodb_run_command_raw(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; OutputField {
     field(
         <span class="string">&quot;runCommandRaw&quot;</span>,
-        <span class="macro">vec!</span>[input_field(<span class="string">&quot;command&quot;</span>, InputType::json(), <span class="prelude-val">None</span>)],
+        <span class="macro">vec!</span>[input_field(ctx, <span class="string">&quot;command&quot;</span>, InputType::json(), <span class="prelude-val">None</span>)],
         OutputType::json(),
         <span class="prelude-val">Some</span>(QueryInfo {
             tag: QueryTag::RunCommandRaw,

@@ -419,8 +419,8 @@
     ctx.cache_input_type(ident, input_object.clone());
 
     <span class="kw">let </span>fields = <span class="macro">vec!</span>[
-        input_field(args::WHERE, InputType::object(where_input_object), <span class="prelude-val">None</span>),
-        input_field(args::DATA, update_types, <span class="prelude-val">None</span>),
+        input_field(ctx, args::WHERE, InputType::object(where_input_object), <span class="prelude-val">None</span>),
+        input_field(ctx, args::DATA, update_types, <span class="prelude-val">None</span>),
     ];
 
     input_object.set_fields(fields);
@@ -450,7 +450,7 @@
 
     <span class="kw">let </span>fields = <span class="macro">vec!</span>[
         arguments::where_argument(ctx, <span class="kw-2">&amp;</span>related_model),
-        input_field(args::DATA, update_types, <span class="prelude-val">None</span>),
+        input_field(ctx, args::DATA, update_types, <span class="prelude-val">None</span>),
     ];
 
     input_object.set_fields(fields);

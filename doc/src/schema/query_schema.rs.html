@@ -355,6 +355,12 @@
 <a href="#355" id="355">355</a>
 <a href="#356" id="356">356</a>
 <a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
+<a href="#362" id="362">362</a>
+<a href="#363" id="363">363</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>fmt::Debug;
 <span class="kw">use </span>prisma_models::{InternalDataModelRef, ModelRef};
@@ -390,6 +396,10 @@
 
     <span class="doccomment">/// Information about the connector this schema was build for.
     </span><span class="kw">pub </span>context: ConnectorContext,
+
+    <span class="doccomment">/// Possible types for input fields. This is an internal implementation detail, it should stay
+    /// private.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) input_field_types: Vec&lt;InputType&gt;,
 
     <span class="comment">// Indexes query fields by their own query info for easier access.
     </span>query_map: HashMap&lt;QueryInfo, OutputFieldRef&gt;,
@@ -439,6 +449,7 @@
     </span><span class="kw">pub fn </span>new(
         query: OutputTypeRef,
         mutation: OutputTypeRef,
+        input_field_types: Vec&lt;InputType&gt;,
         _input_object_types: Vec&lt;InputObjectTypeStrongRef&gt;,
         _output_object_types: Vec&lt;ObjectTypeStrongRef&gt;,
         _enum_types: Vec&lt;EnumTypeRef&gt;,
@@ -467,6 +478,7 @@
             mutation,
             query_map,
             mutation_map,
+            input_field_types,
             _input_object_types,
             _output_object_types,
             _enum_types,

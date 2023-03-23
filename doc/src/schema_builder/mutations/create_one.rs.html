@@ -179,6 +179,8 @@
 <a href="#179" id="179">179</a>
 <a href="#180" id="180">180</a>
 <a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use crate</span>::{
@@ -218,7 +220,9 @@
     <span class="kw">if </span>all_empty {
         <span class="prelude-val">None
     </span>} <span class="kw">else </span>{
-        <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[input_field(args::DATA, create_types, <span class="prelude-val">None</span>).optional_if(any_empty)])
+        <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[
+            input_field(ctx, args::DATA, create_types, <span class="prelude-val">None</span>).optional_if(any_empty)
+        ])
     }
 }
 

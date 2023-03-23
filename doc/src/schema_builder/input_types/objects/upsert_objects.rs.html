@@ -135,9 +135,9 @@
             ctx.cache_input_type(ident, input_object.clone());
 
             <span class="kw">let </span>fields = <span class="macro">vec!</span>[
-                input_field(args::WHERE, InputType::object(where_object), <span class="prelude-val">None</span>),
-                input_field(args::UPDATE, update_types, <span class="prelude-val">None</span>),
-                input_field(args::CREATE, create_types, <span class="prelude-val">None</span>),
+                input_field(ctx, args::WHERE, InputType::object(where_object), <span class="prelude-val">None</span>),
+                input_field(ctx, args::UPDATE, update_types, <span class="prelude-val">None</span>),
+                input_field(ctx, args::CREATE, create_types, <span class="prelude-val">None</span>),
             ];
 
             input_object.set_fields(fields);
@@ -172,8 +172,8 @@
             ctx.cache_input_type(ident, input_object.clone());
 
             <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="macro">vec!</span>[
-                input_field(args::UPDATE, update_types, <span class="prelude-val">None</span>),
-                input_field(args::CREATE, create_types, <span class="prelude-val">None</span>),
+                input_field(ctx, args::UPDATE, update_types, <span class="prelude-val">None</span>),
+                input_field(ctx, args::CREATE, create_types, <span class="prelude-val">None</span>),
             ];
 
             <span class="kw">if </span>ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {

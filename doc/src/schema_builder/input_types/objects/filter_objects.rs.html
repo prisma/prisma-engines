@@ -275,6 +275,16 @@
 <a href="#275" id="275">275</a>
 <a href="#276" id="276">276</a>
 <a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>constants::filters;
 <span class="kw">use </span>prisma_models::{prelude::ParentContainer, CompositeFieldRef};
@@ -300,13 +310,15 @@
 
     <span class="kw">let </span><span class="kw-2">mut </span>input_fields = <span class="macro">vec!</span>[
         input_field(
+            ctx,
             filters::AND,
             <span class="macro">vec!</span>[object_type.clone(), InputType::list(object_type.clone())],
             <span class="prelude-val">None</span>,
         )
         .optional(),
-        input_field(filters::OR, <span class="macro">vec!</span>[InputType::list(object_type.clone())], <span class="prelude-val">None</span>).optional(),
+        input_field(ctx, filters::OR, <span class="macro">vec!</span>[InputType::list(object_type.clone())], <span class="prelude-val">None</span>).optional(),
         input_field(
+            ctx,
             filters::NOT,
             <span class="macro">vec!</span>[object_type.clone(), InputType::list(object_type)],
             <span class="prelude-val">None</span>,
@@ -343,13 +355,15 @@
 
     <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="macro">vec!</span>[
         input_field(
+            ctx,
             filters::AND,
             <span class="macro">vec!</span>[object_type.clone(), InputType::list(object_type.clone())],
             <span class="prelude-val">None</span>,
         )
         .optional(),
-        input_field(filters::OR, <span class="macro">vec!</span>[InputType::list(object_type.clone())], <span class="prelude-val">None</span>).optional(),
+        input_field(ctx, filters::OR, <span class="macro">vec!</span>[InputType::list(object_type.clone())], <span class="prelude-val">None</span>).optional(),
         input_field(
+            ctx,
             filters::NOT,
             <span class="macro">vec!</span>[object_type.clone(), InputType::list(object_type)],
             <span class="prelude-val">None</span>,
@@ -432,30 +446,33 @@
             <span class="kw">let </span>name = sf.name();
             <span class="kw">let </span>typ = map_scalar_input_type_for_field(ctx, sf);
 
-            input_field(name, typ, <span class="prelude-val">None</span>).optional()
+            input_field(ctx, name, typ, <span class="prelude-val">None</span>).optional()
         })
         .collect();
 
     <span class="comment">// @@unique compound fields.
     </span><span class="kw">let </span>compound_unique_fields: Vec&lt;InputField&gt; = compound_uniques
         .into_iter()
-        .map(|(name, typ)| input_field(name, InputType::object(typ), <span class="prelude-val">None</span>).optional())
+        .map(|(name, typ)| input_field(ctx, name, InputType::object(typ), <span class="prelude-val">None</span>).optional())
         .collect();
 
     <span class="comment">// @@id compound field (there can be only one per model).
-    </span><span class="kw">let </span>compound_id_field = compound_id.map(|(name, typ)| input_field(name, InputType::object(typ), <span class="prelude-val">None</span>).optional());
+    </span><span class="kw">let </span>compound_id_field =
+        compound_id.map(|(name, typ)| input_field(ctx, name, InputType::object(typ), <span class="prelude-val">None</span>).optional());
 
     <span class="comment">// Boolean operators AND/OR/NOT, which are _not_ where unique inputs
     </span><span class="kw">let </span>where_input_type = InputType::object(where_object_type(ctx, ParentContainer::Model(model.clone())));
     <span class="kw">let </span>boolean_operators = <span class="macro">vec!</span>[
         input_field(
+            ctx,
             filters::AND,
             <span class="macro">vec!</span>[where_input_type.clone(), InputType::list(where_input_type.clone())],
             <span class="prelude-val">None</span>,
         )
         .optional(),
-        input_field(filters::OR, <span class="macro">vec!</span>[InputType::list(where_input_type.clone())], <span class="prelude-val">None</span>).optional(),
+        input_field(ctx, filters::OR, <span class="macro">vec!</span>[InputType::list(where_input_type.clone())], <span class="prelude-val">None</span>).optional(),
         input_field(
+            ctx,
             filters::NOT,
             <span class="macro">vec!</span>[where_input_type.clone(), InputType::list(where_input_type)],
             <span class="prelude-val">None</span>,
@@ -505,7 +522,7 @@
             <span class="kw">let </span>name = field.name();
             <span class="kw">let </span>typ = map_scalar_input_type_for_field(ctx, <span class="kw-2">&amp;</span>field);
 
-            input_field(name, typ, <span class="prelude-val">None</span>)
+            input_field(ctx, name, typ, <span class="prelude-val">None</span>)
         })
         .collect();
 
@@ -526,9 +543,12 @@
 
     <span class="kw">let </span>composite_type = cf.typ();
     <span class="kw">let </span>input_fields = composite_type.fields().map(|f| <span class="kw">match </span>f {
-        ModelField::Scalar(sf) =&gt; input_field(sf.name(), map_scalar_input_type_for_field(ctx, <span class="kw-2">&amp;</span>sf), <span class="prelude-val">None</span>)
-            .optional_if(!sf.is_required())
-            .nullable_if(!sf.is_required() &amp;&amp; !sf.is_list()),
+        ModelField::Scalar(sf) =&gt; {
+            <span class="kw">let </span>map_scalar_input_type_for_field = map_scalar_input_type_for_field(ctx, <span class="kw-2">&amp;</span>sf);
+            input_field(ctx, sf.name(), map_scalar_input_type_for_field, <span class="prelude-val">None</span>)
+                .optional_if(!sf.is_required())
+                .nullable_if(!sf.is_required() &amp;&amp; !sf.is_list(), <span class="kw-2">&amp;mut </span>ctx.input_field_types)
+        }
 
         ModelField::Composite(cf) =&gt; {
             <span class="kw">let </span>types = <span class="kw">if </span>cf.is_list() {
@@ -539,9 +559,9 @@
                 <span class="macro">vec!</span>[InputType::object(composite_equality_object(ctx, <span class="kw-2">&amp;</span>cf))]
             };
 
-            input_field(cf.name(), types, <span class="prelude-val">None</span>)
+            input_field(ctx, cf.name(), types, <span class="prelude-val">None</span>)
                 .optional_if(!cf.is_required())
-                .nullable_if(!cf.is_required() &amp;&amp; !cf.is_list())
+                .nullable_if(!cf.is_required() &amp;&amp; !cf.is_list(), <span class="kw-2">&amp;mut </span>ctx.input_field_types)
         }
 
         ModelField::Relation(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),

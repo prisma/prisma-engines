@@ -211,6 +211,12 @@
 <a href="#211" id="211">211</a>
 <a href="#212" id="212">212</a>
 <a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
 </pre><pre class="rust"><code><span class="attr">#![deny(unsafe_code, warnings, rust_2018_idioms)]
 #![allow(clippy::derive_partial_eq_without_eq)]
 
@@ -403,6 +409,12 @@
 
 <span class="kw">pub fn </span>new_backtrace() -&gt; backtrace::Backtrace {
     backtrace::Backtrace::new()
+}
+
+<span class="kw">impl</span>&lt;T: UserFacingError&gt; From&lt;T&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(err: T) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from(KnownError::new(err))
+    }
 }
 
 <span class="kw">impl </span>From&lt;UnknownError&gt; <span class="kw">for </span>Error {

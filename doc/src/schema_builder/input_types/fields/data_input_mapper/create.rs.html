@@ -225,13 +225,13 @@
             TypeIdentifier::Json <span class="kw">if </span>supports_advanced_json =&gt; {
                 <span class="kw">let </span>enum_type = InputType::enum_type(json_null_input_enum(ctx, !sf.is_required()));
 
-                input_field(sf.name(), <span class="macro">vec!</span>[enum_type, typ], sf.default_value())
+                input_field(ctx, sf.name(), <span class="macro">vec!</span>[enum_type, typ], sf.default_value())
                     .optional_if(!sf.is_required() || sf.default_value().is_some() || sf.is_updated_at())
             }
 
-            <span class="kw">_ </span>=&gt; input_field(sf.name(), typ, sf.default_value())
+            <span class="kw">_ </span>=&gt; input_field(ctx, sf.name(), typ, sf.default_value())
                 .optional_if(!sf.is_required() || sf.default_value().is_some() || sf.is_updated_at())
-                .nullable_if(!sf.is_required()),
+                .nullable_if(!sf.is_required(), <span class="kw-2">&amp;mut </span>ctx.input_field_types),
         }
     }
 
@@ -242,7 +242,7 @@
         <span class="kw">let </span>input_object = <span class="kw">match </span>ctx.get_input_type(<span class="kw-2">&amp;</span>ident) {
             <span class="prelude-val">Some</span>(cached) =&gt; cached,
             <span class="prelude-val">None </span>=&gt; {
-                <span class="kw">let </span>object_fields = <span class="macro">vec!</span>[input_field(operations::SET, typ.clone(), <span class="prelude-val">None</span>)];
+                <span class="kw">let </span>object_fields = <span class="macro">vec!</span>[input_field(ctx, operations::SET, typ.clone(), <span class="prelude-val">None</span>)];
                 <span class="kw">let </span><span class="kw-2">mut </span>input_object = input_object_type(ident.clone(), object_fields);
                 input_object.require_exactly_one_field();
 
@@ -256,7 +256,7 @@
         <span class="kw">let </span>input_type = InputType::object(input_object);
 
         <span class="comment">// Shorthand type (`list_field: &lt;typ&gt;`) + full object (`list_field: { set: { &lt;typ&gt; }}`)
-        </span>input_field(sf.name(), <span class="macro">vec!</span>[input_type, typ], sf.default_value()).optional()
+        </span>input_field(ctx, sf.name(), <span class="macro">vec!</span>[input_type, typ], sf.default_value()).optional()
     }
 
     <span class="kw">fn </span>map_relation(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputField {
@@ -300,7 +300,7 @@
             .into_iter()
             .all(|scalar_field| scalar_field.default_value().is_some());
 
-        <span class="kw">let </span>input_field = input_field(rf.name(), InputType::object(input_object), <span class="prelude-val">None</span>);
+        <span class="kw">let </span>input_field = input_field(ctx, rf.name(), InputType::object(input_object), <span class="prelude-val">None</span>);
 
         <span class="kw">if </span>rf.is_required() &amp;&amp; !all_required_scalar_fields_have_defaults {
             input_field
@@ -328,8 +328,8 @@
             input_types.push(InputType::list(shorthand_type));
         }
 
-        input_field(cf.name().to_owned(), input_types, <span class="prelude-val">None</span>)
-            .nullable_if(!cf.is_required() &amp;&amp; !cf.is_list())
+        input_field(ctx, cf.name().to_owned(), input_types, <span class="prelude-val">None</span>)
+            .nullable_if(!cf.is_required() &amp;&amp; !cf.is_list(), <span class="kw-2">&amp;mut </span>ctx.input_field_types)
             .optional_if(!cf.is_required())
     }
 }
@@ -371,8 +371,8 @@
         input_types.push(InputType::list(create_input));
     }
 
-    <span class="kw">let </span>set_field = input_field(<span class="string">&quot;set&quot;</span>, input_types, <span class="prelude-val">None</span>)
-        .nullable_if(!cf.is_required() &amp;&amp; !cf.is_list())
+    <span class="kw">let </span>set_field = input_field(ctx, <span class="string">&quot;set&quot;</span>, input_types, <span class="prelude-val">None</span>)
+        .nullable_if(!cf.is_required() &amp;&amp; !cf.is_list(), <span class="kw-2">&amp;mut </span>ctx.input_field_types)
         .optional();
 
     input_object.set_fields(<span class="macro">vec!</span>[set_field]);

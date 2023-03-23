@@ -314,6 +314,38 @@
 <a href="#314" id="314">314</a>
 <a href="#315" id="315">315</a>
 <a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>fmt::Debug;
 <span class="kw">use </span>once_cell::sync::OnceCell;
@@ -430,7 +462,8 @@
     <span class="kw">pub </span>deprecation: <span class="prelude-ty">Option</span>&lt;Deprecation&gt;,
 
     <span class="doccomment">/// Possible field types, represented as a union of input types, but only one can be provided at any time.
-    </span><span class="kw">pub </span>field_types: Vec&lt;InputType&gt;,
+    /// Slice expressed as (start, len).
+    </span>field_types: <span class="prelude-ty">Option</span>&lt;(usize, usize)&gt;,
 
     <span class="doccomment">/// Indicates if the presence of the field on the higher input objects
     /// is required, but doesn&#39;t state whether or not the input can be null.
@@ -438,6 +471,21 @@
 }
 
 <span class="kw">impl </span>InputField {
+    <span class="kw">pub fn </span>new(name: String, default_value: <span class="prelude-ty">Option</span>&lt;dml::DefaultKind&gt;, is_required: bool) -&gt; InputField {
+        InputField {
+            name,
+            default_value,
+            deprecation: <span class="prelude-val">None</span>,
+            field_types: <span class="prelude-val">None</span>,
+            is_required,
+        }
+    }
+
+    <span class="kw">pub fn </span>field_types&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[InputType] {
+        <span class="kw">let </span>(start, len) = <span class="self">self</span>.field_types.unwrap_or_default();
+        <span class="kw-2">&amp;</span>query_schema.input_field_types[start..(start + len)]
+    }
+
     <span class="doccomment">/// Sets the field as optional (not required to be present on the input).
     </span><span class="kw">pub fn </span>optional(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.is_required = <span class="bool-val">false</span>;
@@ -460,22 +508,35 @@
     }
 
     <span class="doccomment">/// Sets the field as nullable (accepting null inputs).
-    </span><span class="kw">pub fn </span>nullable(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.add_type(InputType::null())
+    </span><span class="kw">pub fn </span>nullable(<span class="self">self</span>, input_types: <span class="kw-2">&amp;mut </span>Vec&lt;InputType&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.add_type(InputType::null(), input_types)
     }
 
     <span class="doccomment">/// Sets the field as nullable if the condition is true.
-    </span><span class="kw">pub fn </span>nullable_if(<span class="self">self</span>, condition: bool) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>nullable_if(<span class="self">self</span>, condition: bool, input_types: <span class="kw-2">&amp;mut </span>Vec&lt;InputType&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">if </span>condition {
-            <span class="self">self</span>.nullable()
+            <span class="self">self</span>.nullable(input_types)
         } <span class="kw">else </span>{
             <span class="self">self
         </span>}
     }
 
+    <span class="kw">pub fn </span>push_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, typ: InputType, input_types: <span class="kw-2">&amp;mut </span>Vec&lt;InputType&gt;) {
+        <span class="kw">match </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.field_types {
+            <span class="prelude-val">Some</span>((_start, len)) =&gt; {
+                <span class="kw-2">*</span>len += <span class="number">1</span>;
+                input_types.push(typ);
+            }
+            <span class="prelude-val">None </span>=&gt; {
+                <span class="self">self</span>.field_types = <span class="prelude-val">Some</span>((input_types.len(), <span class="number">1</span>));
+                input_types.push(typ);
+            }
+        }
+    }
+
     <span class="doccomment">/// Adds possible input type to this input field&#39;s type union.
-    </span><span class="kw">pub fn </span>add_type(<span class="kw-2">mut </span><span class="self">self</span>, typ: InputType) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.field_types.push(typ);
+    </span><span class="kw">pub fn </span>add_type(<span class="kw-2">mut </span><span class="self">self</span>, typ: InputType, input_types: <span class="kw-2">&amp;mut </span>Vec&lt;InputType&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.push_type(typ, input_types);
         <span class="self">self
     </span>}
 
@@ -519,10 +580,10 @@
 <span class="kw">impl </span>Debug <span class="kw">for </span>InputType {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
-            InputType::Object(obj) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Object({})&quot;</span>, obj.into_arc().identifier.name()),
-            InputType::Scalar(s) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{s:?}&quot;</span>),
-            InputType::Enum(e) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{e:?}&quot;</span>),
-            InputType::List(l) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{l:?}&quot;</span>),
+            <span class="self">Self</span>::Object(obj) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Object({})&quot;</span>, obj.into_arc().identifier.name()),
+            <span class="self">Self</span>::Scalar(s) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{s:?}&quot;</span>),
+            <span class="self">Self</span>::Enum(e) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{e:?}&quot;</span>),
+            <span class="self">Self</span>::List(l) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{l:?}&quot;</span>),
         }
     }
 }
@@ -625,9 +686,12 @@
     }
 }
 
-<span class="kw">impl </span>From&lt;InputType&gt; <span class="kw">for </span>Vec&lt;InputType&gt; {
-    <span class="kw">fn </span>from(r#type: InputType) -&gt; <span class="self">Self </span>{
-        <span class="macro">vec!</span>[r#type]
+<span class="kw">impl </span>IntoIterator <span class="kw">for </span>InputType {
+    <span class="kw">type </span>Item = InputType;
+    <span class="kw">type </span>IntoIter = std::iter::Once&lt;InputType&gt;;
+
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        std::iter::once(<span class="self">self</span>)
     }
 }
 </code></pre></div>

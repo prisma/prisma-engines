@@ -175,9 +175,6 @@
 <a href="#175" id="175">175</a>
 <a href="#176" id="176">176</a>
 <a href="#177" id="177">177</a>
-<a href="#178" id="178">178</a>
-<a href="#179" id="179">179</a>
-<a href="#180" id="180">180</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::input_types::objects::order_by_objects::OrderByOptions;
 <span class="kw">use </span><span class="kw">crate</span>::mutations::create_one;
@@ -189,7 +186,7 @@
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>where_argument(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; InputField {
     <span class="kw">let </span>where_object = filter_objects::where_object_type(ctx, model);
 
-    input_field(args::WHERE, InputType::object(where_object), <span class="prelude-val">None</span>).optional()
+    input_field(ctx, args::WHERE, InputType::object(where_object), <span class="prelude-val">None</span>).optional()
 }
 
 <span class="doccomment">/// Builds &quot;where&quot; argument which input type is the where unique type of the input builder.
@@ -199,7 +196,12 @@
     <span class="kw">if </span>input_object_type.into_arc().is_empty() {
         <span class="prelude-val">None
     </span>} <span class="kw">else </span>{
-        <span class="prelude-val">Some</span>(input_field(args::WHERE, InputType::object(input_object_type), <span class="prelude-val">None</span>))
+        <span class="prelude-val">Some</span>(input_field(
+            ctx,
+            args::WHERE,
+            InputType::object(input_object_type),
+            <span class="prelude-val">None</span>,
+        ))
     }
 }
 
@@ -213,7 +215,7 @@
     where_unique_argument(ctx, model).map(|unique_arg| {
         <span class="kw">let </span>update_types = update_one_objects::update_one_input_types(ctx, model, <span class="prelude-val">None</span>);
 
-        <span class="macro">vec!</span>[input_field(args::DATA, update_types, <span class="prelude-val">None</span>), unique_arg]
+        <span class="macro">vec!</span>[input_field(ctx, args::DATA, update_types, <span class="prelude-val">None</span>), unique_arg]
     })
 }
 
@@ -228,8 +230,8 @@
         </span>} <span class="kw">else </span>{
             <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[
                 where_unique_arg,
-                input_field(args::CREATE, create_types, <span class="prelude-val">None</span>),
-                input_field(args::UPDATE, update_types, <span class="prelude-val">None</span>),
+                input_field(ctx, args::CREATE, create_types, <span class="prelude-val">None</span>),
+                input_field(ctx, args::UPDATE, update_types, <span class="prelude-val">None</span>),
             ])
         }
     })
@@ -240,7 +242,7 @@
     <span class="kw">let </span>update_many_types = update_many_objects::update_many_input_types(ctx, model, <span class="prelude-val">None</span>);
     <span class="kw">let </span>where_arg = where_argument(ctx, model);
 
-    <span class="macro">vec!</span>[input_field(args::DATA, update_many_types, <span class="prelude-val">None</span>), where_arg]
+    <span class="macro">vec!</span>[input_field(ctx, args::DATA, update_many_types, <span class="prelude-val">None</span>), where_arg]
 }
 
 <span class="doccomment">/// Builds &quot;where&quot; argument intended for the delete many field.
@@ -292,20 +294,14 @@
     <span class="kw">let </span><span class="kw-2">mut </span>args = <span class="macro">vec!</span>[
         where_argument(ctx, model),
         order_by_argument(ctx, <span class="kw-2">&amp;</span>model.into(), <span class="kw-2">&amp;</span>order_by_options),
-        input_field(args::CURSOR, unique_input_type, <span class="prelude-val">None</span>).optional(),
-        input_field(args::TAKE, InputType::int(), <span class="prelude-val">None</span>).optional(),
-        input_field(args::SKIP, InputType::int(), <span class="prelude-val">None</span>).optional(),
+        input_field(ctx, args::CURSOR, unique_input_type, <span class="prelude-val">None</span>).optional(),
+        input_field(ctx, args::TAKE, InputType::int(), <span class="prelude-val">None</span>).optional(),
+        input_field(ctx, args::SKIP, InputType::int(), <span class="prelude-val">None</span>).optional(),
     ];
 
     <span class="kw">if </span>include_distinct {
-        args.push(
-            input_field(
-                args::DISTINCT,
-                InputType::list(InputType::Enum(model_field_enum(ctx, model))),
-                <span class="prelude-val">None</span>,
-            )
-            .optional(),
-        );
+        <span class="kw">let </span>input_type = InputType::list(InputType::Enum(model_field_enum(ctx, model)));
+        args.push(input_field(ctx, args::DISTINCT, input_type, <span class="prelude-val">None</span>).optional());
     }
 
     args
@@ -330,6 +326,7 @@
     <span class="kw">let </span>order_object_type = InputType::object(order_by_objects::order_by_object_type(ctx, container, options));
 
     input_field(
+        ctx,
         args::ORDER_BY,
         <span class="macro">vec!</span>[InputType::list(order_object_type.clone()), order_object_type],
         <span class="prelude-val">None</span>,
@@ -339,23 +336,20 @@
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>group_by_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; Vec&lt;InputField&gt; {
     <span class="kw">let </span>field_enum_type = InputType::Enum(model_field_enum(ctx, model));
+    <span class="kw">let </span>filter_object = InputType::object(filter_objects::scalar_filter_object_type(ctx, model, <span class="bool-val">true</span>));
 
     <span class="macro">vec!</span>[
         where_argument(ctx, model),
         order_by_argument(ctx, <span class="kw-2">&amp;</span>model.into(), <span class="kw-2">&amp;</span>OrderByOptions::new().with_aggregates()),
         input_field(
+            ctx,
             args::BY,
             <span class="macro">vec!</span>[InputType::list(field_enum_type.clone()), field_enum_type],
             <span class="prelude-val">None</span>,
         ),
-        input_field(
-            args::HAVING,
-            InputType::object(filter_objects::scalar_filter_object_type(ctx, model, <span class="bool-val">true</span>)),
-            <span class="prelude-val">None</span>,
-        )
-        .optional(),
-        input_field(args::TAKE, InputType::int(), <span class="prelude-val">None</span>).optional(),
-        input_field(args::SKIP, InputType::int(), <span class="prelude-val">None</span>).optional(),
+        input_field(ctx, args::HAVING, filter_object, <span class="prelude-val">None</span>).optional(),
+        input_field(ctx, args::TAKE, InputType::int(), <span class="prelude-val">None</span>).optional(),
+        input_field(ctx, args::SKIP, InputType::int(), <span class="prelude-val">None</span>).optional(),
     ]
 }
 </code></pre></div>

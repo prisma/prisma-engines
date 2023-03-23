@@ -196,8 +196,8 @@
     <span class="kw">let </span>update_types = update_many_input_types(ctx, <span class="kw-2">&amp;</span>related_model, <span class="prelude-val">Some</span>(parent_field));
 
     input_object.set_fields(<span class="macro">vec!</span>[
-        input_field(args::WHERE, InputType::object(where_input_object), <span class="prelude-val">None</span>),
-        input_field(args::DATA, update_types, <span class="prelude-val">None</span>),
+        input_field(ctx, args::WHERE, InputType::object(where_input_object), <span class="prelude-val">None</span>),
+        input_field(ctx, args::DATA, update_types, <span class="prelude-val">None</span>),
     ]);
 
     Arc::downgrade(<span class="kw-2">&amp;</span>input_object)

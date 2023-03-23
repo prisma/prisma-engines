@@ -205,8 +205,8 @@
             append_opt(<span class="kw-2">&amp;mut </span>vec, find_unique_or_throw_field(ctx, <span class="kw-2">&amp;</span>model));
 
             <span class="kw">if </span>ctx.enable_raw_queries &amp;&amp; ctx.has_capability(ConnectorCapability::MongoDbQueryRaw) {
-                vec.push(mongo_find_raw_field(<span class="kw-2">&amp;</span>model));
-                vec.push(mongo_aggregate_raw_field(<span class="kw-2">&amp;</span>model));
+                vec.push(mongo_find_raw_field(ctx, <span class="kw-2">&amp;</span>model));
+                vec.push(mongo_aggregate_raw_field(ctx, <span class="kw-2">&amp;</span>model));
             }
 
             vec
@@ -337,14 +337,14 @@
     )
 }
 
-<span class="kw">fn </span>mongo_aggregate_raw_field(model: <span class="kw-2">&amp;</span>ModelRef) -&gt; OutputField {
+<span class="kw">fn </span>mongo_aggregate_raw_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; OutputField {
     <span class="kw">let </span>field_name = <span class="macro">format!</span>(<span class="string">&quot;aggregate{}Raw&quot;</span>, model.name());
 
     field(
         field_name,
         <span class="macro">vec!</span>[
-            input_field(<span class="string">&quot;pipeline&quot;</span>, InputType::list(InputType::json()), <span class="prelude-val">None</span>).optional(),
-            input_field(<span class="string">&quot;options&quot;</span>, InputType::json(), <span class="prelude-val">None</span>).optional(),
+            input_field(ctx, <span class="string">&quot;pipeline&quot;</span>, InputType::list(InputType::json()), <span class="prelude-val">None</span>).optional(),
+            input_field(ctx, <span class="string">&quot;options&quot;</span>, InputType::json(), <span class="prelude-val">None</span>).optional(),
         ],
         OutputType::json(),
         <span class="prelude-val">Some</span>(QueryInfo {
@@ -354,14 +354,14 @@
     )
 }
 
-<span class="kw">fn </span>mongo_find_raw_field(model: <span class="kw-2">&amp;</span>ModelRef) -&gt; OutputField {
+<span class="kw">fn </span>mongo_find_raw_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; OutputField {
     <span class="kw">let </span>field_name = <span class="macro">format!</span>(<span class="string">&quot;find{}Raw&quot;</span>, model.name());
 
     field(
         field_name,
         <span class="macro">vec!</span>[
-            input_field(<span class="string">&quot;filter&quot;</span>, InputType::json(), <span class="prelude-val">None</span>).optional(),
-            input_field(<span class="string">&quot;options&quot;</span>, InputType::json(), <span class="prelude-val">None</span>).optional(),
+            input_field(ctx, <span class="string">&quot;filter&quot;</span>, InputType::json(), <span class="prelude-val">None</span>).optional(),
+            input_field(ctx, <span class="string">&quot;options&quot;</span>, InputType::json(), <span class="prelude-val">None</span>).optional(),
         ],
         OutputType::json(),
         <span class="prelude-val">Some</span>(QueryInfo {

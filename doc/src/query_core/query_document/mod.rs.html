@@ -302,7 +302,6 @@
 <a href="#302" id="302">302</a>
 <a href="#303" id="303">303</a>
 <a href="#304" id="304">304</a>
-<a href="#305" id="305">305</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Intermediate representation of the input document that is used by the query engine to build
 //! query ASTs and validate the incoming data.
 //!
@@ -320,7 +319,6 @@
 //!    - it can have a number of nested selections (selection set in GQL).
 //! - Arguments contain concrete values and complex subtypes that are parsed and validated by the query builders, and then used for querying data (input types in GQL).
 </span><span class="kw">mod </span>argument_value;
-<span class="kw">mod </span>error;
 <span class="kw">mod </span>operation;
 <span class="kw">mod </span>parse_ast;
 <span class="kw">mod </span>parser;
@@ -331,7 +329,6 @@
 <span class="kw">pub use </span>operation::Operation;
 <span class="kw">pub use </span>selection::{In, Selection, SelectionArgument, SelectionSet};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>error::<span class="kw-2">*</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>parse_ast::<span class="kw-2">*</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>parser::<span class="kw-2">*</span>;
 
@@ -340,8 +337,9 @@
 <span class="kw">use </span>schema::QuerySchemaRef;
 <span class="kw">use </span>schema_builder::constants::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::collections::HashMap;
+<span class="kw">use </span>user_facing_errors::query_engine::validation::ValidationError;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>QueryParserResult&lt;T&gt; = std::result::Result&lt;T, QueryParserError&gt;;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>QueryParserResult&lt;T&gt; = std::result::Result&lt;T, ValidationError&gt;;
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub enum </span>QueryDocument {

@@ -226,6 +226,13 @@
 <a href="#226" id="226">226</a>
 <a href="#227" id="227">227</a>
 <a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>fmt::Debug;
 <span class="kw">use </span>once_cell::sync::OnceCell;
@@ -452,6 +459,13 @@
 
     <span class="kw">pub fn </span>query_tag(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>QueryTag&gt; {
         <span class="self">self</span>.query_info().map(|info| <span class="kw-2">&amp;</span>info.tag)
+    }
+
+    <span class="comment">// Is relation determines whether the given output field maps to a a relation, i.e.
+    // is an object and that object is backed by a model, meaning that it is not an scalar list
+    </span><span class="kw">pub fn </span>maps_to_relation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>o = <span class="self">self</span>.field_type.as_object_type();
+        o.is_some() &amp;&amp; o.unwrap().model.is_some()
     }
 }
 </code></pre></div>

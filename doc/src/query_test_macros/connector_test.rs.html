@@ -134,7 +134,7 @@
     }
 
     <span class="comment">// The shell function retains the name of the original test definition.
-    </span><span class="kw">let </span>test_fn_ident = test_function.sig.ident.clone();
+    </span><span class="kw">let </span>test_fn_ident = test_function.sig.ident;
 
     <span class="comment">// Rename original test function to run_&lt;orig_name&gt;.
     </span><span class="kw">let </span>runner_fn_ident = Ident::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;run_{test_fn_ident}&quot;</span>), Span::call_site());

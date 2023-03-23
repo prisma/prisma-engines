@@ -86,8 +86,10 @@
 <a href="#86" id="86">86</a>
 <a href="#87" id="87">87</a>
 <a href="#88" id="88">88</a>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{QueryGraphError, QueryParserError};
+<a href="#89" id="89">89</a>
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::QueryGraphError;
 <span class="kw">use </span>prisma_models::{DomainError, RelationFieldRef};
+<span class="kw">use </span>user_facing_errors::query_engine::validation::ValidationError;
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub enum </span>QueryGraphBuilderError {
@@ -107,7 +109,7 @@
     },
 
     <span class="doccomment">/// Wraps the initial parsing stage errors.
-    </span>QueryParserError(QueryParserError),
+    </span>QueryParserError(ValidationError),
 
     <span class="doccomment">/// Wraps transformation errors from the prisma models.
     </span>DomainError(DomainError),
@@ -163,8 +165,8 @@
     }
 }
 
-<span class="kw">impl </span>From&lt;QueryParserError&gt; <span class="kw">for </span>QueryGraphBuilderError {
-    <span class="kw">fn </span>from(err: QueryParserError) -&gt; <span class="self">Self </span>{
+<span class="kw">impl </span>From&lt;ValidationError&gt; <span class="kw">for </span>QueryGraphBuilderError {
+    <span class="kw">fn </span>from(err: ValidationError) -&gt; <span class="self">Self </span>{
         QueryGraphBuilderError::QueryParserError(err)
     }
 }

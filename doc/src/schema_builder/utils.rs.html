@@ -103,6 +103,9 @@
 <a href="#103" id="103">103</a>
 <a href="#104" id="104">104</a>
 <a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>prisma_models::pk::PrimaryKey;
@@ -156,18 +159,21 @@
 }
 
 <span class="doccomment">/// Field convenience wrapper function.
-</span><span class="kw">pub fn </span>input_field&lt;T, S&gt;(name: T, field_types: S, default_value: <span class="prelude-ty">Option</span>&lt;dml::DefaultKind&gt;) -&gt; InputField
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>input_field&lt;T, S&gt;(
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    name: T,
+    field_types: S,
+    default_value: <span class="prelude-ty">Option</span>&lt;dml::DefaultKind&gt;,
+) -&gt; InputField
 <span class="kw">where
     </span>T: Into&lt;String&gt;,
-    S: Into&lt;Vec&lt;InputType&gt;&gt;,
+    S: IntoIterator&lt;Item = InputType&gt;,
 {
-    InputField {
-        name: name.into(),
-        field_types: field_types.into(),
-        default_value,
-        is_required: <span class="bool-val">true</span>,
-        deprecation: <span class="prelude-val">None</span>,
+    <span class="kw">let </span><span class="kw-2">mut </span>input_field = InputField::new(name.into(), default_value, <span class="bool-val">true</span>);
+    <span class="kw">for </span>field_type <span class="kw">in </span>field_types {
+        input_field.push_type(field_type, <span class="kw-2">&amp;mut </span>ctx.input_field_types);
     }
+    input_field
 }
 
 <span class="doccomment">/// Capitalizes first character.

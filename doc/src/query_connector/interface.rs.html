@@ -495,7 +495,7 @@
 }
 
 <span class="kw">impl </span>AggregationSelection {
-    <span class="doccomment">/// Returns (&lt;field db name&gt;, TypeIdentifier, FieldArity)
+    <span class="doccomment">/// Returns (field_db_name, TypeIdentifier, FieldArity)
     </span><span class="kw">pub fn </span>identifiers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;(String, TypeIdentifier, FieldArity)&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             AggregationSelection::Field(field) =&gt; {

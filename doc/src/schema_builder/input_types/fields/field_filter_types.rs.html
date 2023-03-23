@@ -625,6 +625,9 @@
 <a href="#625" id="625">625</a>
 <a href="#626" id="626">626</a>
 <a href="#627" id="627">627</a>
+<a href="#628" id="628">628</a>
+<a href="#629" id="629">629</a>
+<a href="#630" id="630">630</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{field_ref_type::WithFieldRefInputExt, objects::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
 <span class="kw">use </span>constants::{aggregations, filters};
 <span class="kw">use </span>prisma_models::{dml, CompositeFieldRef, PrismaValue};
@@ -706,9 +709,9 @@
     <span class="kw">let </span>related_input_type = filter_objects::where_object_type(ctx, <span class="kw-2">&amp;</span>related_model);
 
     <span class="kw">let </span>fields = <span class="macro">vec!</span>[
-        input_field(filters::EVERY, InputType::object(related_input_type.clone()), <span class="prelude-val">None</span>).optional(),
-        input_field(filters::SOME, InputType::object(related_input_type.clone()), <span class="prelude-val">None</span>).optional(),
-        input_field(filters::NONE, InputType::object(related_input_type), <span class="prelude-val">None</span>).optional(),
+        input_field(ctx, filters::EVERY, InputType::object(related_input_type.clone()), <span class="prelude-val">None</span>).optional(),
+        input_field(ctx, filters::SOME, InputType::object(related_input_type.clone()), <span class="prelude-val">None</span>).optional(),
+        input_field(ctx, filters::NONE, InputType::object(related_input_type), <span class="prelude-val">None</span>).optional(),
     ];
 
     object.set_fields(fields);
@@ -728,12 +731,12 @@
     ctx.cache_input_type(ident, object.clone());
 
     <span class="kw">let </span>fields = <span class="macro">vec!</span>[
-        input_field(filters::IS, InputType::object(related_input_type.clone()), <span class="prelude-val">None</span>)
+        input_field(ctx, filters::IS, InputType::object(related_input_type.clone()), <span class="prelude-val">None</span>)
             .optional()
-            .nullable_if(!rf.is_required()),
-        input_field(filters::IS_NOT, InputType::object(related_input_type), <span class="prelude-val">None</span>)
+            .nullable_if(!rf.is_required(), <span class="kw-2">&amp;mut </span>ctx.input_field_types),
+        input_field(ctx, filters::IS_NOT, InputType::object(related_input_type), <span class="prelude-val">None</span>)
             .optional()
-            .nullable_if(!rf.is_required()),
+            .nullable_if(!rf.is_required(), <span class="kw-2">&amp;mut </span>ctx.input_field_types),
     ];
 
     object.set_fields(fields);
@@ -764,19 +767,24 @@
     <span class="kw">let </span>composite_equals_object = filter_objects::composite_equality_object(ctx, cf);
 
     <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="macro">vec!</span>[
-        input_field(filters::EQUALS, InputType::object(composite_equals_object), <span class="prelude-val">None</span>)
+        input_field(ctx, filters::EQUALS, InputType::object(composite_equals_object), <span class="prelude-val">None</span>)
             .optional()
-            .nullable_if(!cf.is_required()),
-        input_field(filters::IS, InputType::object(composite_where_object.clone()), <span class="prelude-val">None</span>)
+            .nullable_if(!cf.is_required(), <span class="kw-2">&amp;mut </span>ctx.input_field_types),
+        input_field(
+            ctx,
+            filters::IS,
+            InputType::object(composite_where_object.clone()),
+            <span class="prelude-val">None</span>,
+        )
+        .optional()
+        .nullable_if(!cf.is_required(), <span class="kw-2">&amp;mut </span>ctx.input_field_types),
+        input_field(ctx, filters::IS_NOT, InputType::object(composite_where_object), <span class="prelude-val">None</span>)
             .optional()
-            .nullable_if(!cf.is_required()),
-        input_field(filters::IS_NOT, InputType::object(composite_where_object), <span class="prelude-val">None</span>)
-            .optional()
-            .nullable_if(!cf.is_required()),
+            .nullable_if(!cf.is_required(), <span class="kw-2">&amp;mut </span>ctx.input_field_types),
     ];
 
     <span class="kw">if </span>ctx.has_capability(ConnectorCapability::UndefinedType) &amp;&amp; cf.is_optional() {
-        fields.push(is_set_input_field());
+        fields.push(is_set_input_field(ctx));
     }
 
     object.set_fields(fields);
@@ -799,6 +807,7 @@
 
     <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="macro">vec!</span>[
         input_field(
+            ctx,
             filters::EQUALS,
             <span class="comment">// The object (aka shorthand) syntax is only supported because the client used to expose all
             // list input types as T | T[]. Consider removing it one day.
@@ -806,15 +815,27 @@
             <span class="prelude-val">None</span>,
         )
         .optional(),
-        input_field(filters::EVERY, InputType::object(composite_where_object.clone()), <span class="prelude-val">None</span>).optional(),
-        input_field(filters::SOME, InputType::object(composite_where_object.clone()), <span class="prelude-val">None</span>).optional(),
-        input_field(filters::NONE, InputType::object(composite_where_object), <span class="prelude-val">None</span>).optional(),
-        input_field(filters::IS_EMPTY, InputType::boolean(), <span class="prelude-val">None</span>).optional(),
+        input_field(
+            ctx,
+            filters::EVERY,
+            InputType::object(composite_where_object.clone()),
+            <span class="prelude-val">None</span>,
+        )
+        .optional(),
+        input_field(
+            ctx,
+            filters::SOME,
+            InputType::object(composite_where_object.clone()),
+            <span class="prelude-val">None</span>,
+        )
+        .optional(),
+        input_field(ctx, filters::NONE, InputType::object(composite_where_object), <span class="prelude-val">None</span>).optional(),
+        input_field(ctx, filters::IS_EMPTY, InputType::boolean(), <span class="prelude-val">None</span>).optional(),
     ];
 
     <span class="comment">// TODO: Remove from required lists once we have optional lists
     </span><span class="kw">if </span>ctx.has_capability(ConnectorCapability::UndefinedType) {
-        fields.push(is_set_input_field());
+        fields.push(is_set_input_field(ctx));
     }
 
     object.set_fields(fields);
@@ -841,22 +862,25 @@
     <span class="kw">let </span>mapped_list_type = InputType::list(mapped_nonlist_type.clone());
     <span class="kw">let </span><span class="kw-2">mut </span>fields: Vec&lt;<span class="kw">_</span>&gt; = equality_filters(ctx, mapped_list_type.clone(), !sf.is_required()).collect();
 
+    <span class="kw">let </span>mapped_nonlist_type_with_field_ref_input = mapped_nonlist_type.with_field_ref_input(ctx);
     fields.push(
-        input_field(filters::HAS, mapped_nonlist_type.with_field_ref_input(ctx), <span class="prelude-val">None</span>)
+        input_field(ctx, filters::HAS, mapped_nonlist_type_with_field_ref_input, <span class="prelude-val">None</span>)
             .optional()
-            .nullable_if(!sf.is_required()),
+            .nullable_if(!sf.is_required(), <span class="kw-2">&amp;mut </span>ctx.input_field_types),
     );
 
+    <span class="kw">let </span>mapped_list_type_with_field_ref_input = mapped_list_type.with_field_ref_input(ctx);
     fields.push(
         input_field(
+            ctx,
             filters::HAS_EVERY,
-            mapped_list_type.clone().with_field_ref_input(ctx),
+            mapped_list_type_with_field_ref_input.clone(),
             <span class="prelude-val">None</span>,
         )
         .optional(),
     );
-    fields.push(input_field(filters::HAS_SOME, mapped_list_type.with_field_ref_input(ctx), <span class="prelude-val">None</span>).optional());
-    fields.push(input_field(filters::IS_EMPTY, InputType::boolean(), <span class="prelude-val">None</span>).optional());
+    fields.push(input_field(ctx, filters::HAS_SOME, mapped_list_type_with_field_ref_input, <span class="prelude-val">None</span>).optional());
+    fields.push(input_field(ctx, filters::IS_EMPTY, InputType::boolean(), <span class="prelude-val">None</span>).optional());
 
     object.set_fields(fields);
     Arc::downgrade(<span class="kw-2">&amp;</span>object)
@@ -993,15 +1017,15 @@
     }
 
     <span class="kw">if </span>ctx.has_capability(ConnectorCapability::UndefinedType) &amp;&amp; (list || nullable) {
-        fields.push(is_set_input_field());
+        fields.push(is_set_input_field(ctx));
     }
 
     object.set_fields(fields);
     Arc::downgrade(<span class="kw-2">&amp;</span>object)
 }
 
-<span class="kw">fn </span>is_set_input_field() -&gt; InputField {
-    input_field(filters::IS_SET, InputType::boolean(), <span class="prelude-val">None</span>).optional()
+<span class="kw">fn </span>is_set_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; InputField {
+    input_field(ctx, filters::IS_SET, InputType::boolean(), <span class="prelude-val">None</span>).optional()
 }
 
 <span class="kw">fn </span>equality_filters(
@@ -1012,9 +1036,9 @@
     <span class="kw">let </span>types = mapped_type.with_field_ref_input(ctx);
 
     std::iter::once(
-        input_field(filters::EQUALS, types, <span class="prelude-val">None</span>)
+        input_field(ctx, filters::EQUALS, types, <span class="prelude-val">None</span>)
             .optional()
-            .nullable_if(nullable),
+            .nullable_if(nullable, <span class="kw-2">&amp;mut </span>ctx.input_field_types),
     )
 }
 
@@ -1028,11 +1052,12 @@
         <span class="kw">let </span><span class="kw-2">mut </span>field_types = mapped_type.with_field_ref_input(ctx);
         field_types.push(InputType::Enum(enum_type));
 
-        input_field(filters::EQUALS, field_types, <span class="prelude-val">None</span>).optional()
+        input_field(ctx, filters::EQUALS, field_types, <span class="prelude-val">None</span>).optional()
     } <span class="kw">else </span>{
-        input_field(filters::EQUALS, mapped_type.with_field_ref_input(ctx), <span class="prelude-val">None</span>)
+        <span class="kw">let </span>inner = mapped_type.with_field_ref_input(ctx);
+        input_field(ctx, filters::EQUALS, inner, <span class="prelude-val">None</span>)
             .optional()
-            .nullable_if(nullable)
+            .nullable_if(nullable, <span class="kw-2">&amp;mut </span>ctx.input_field_types)
     };
 
     std::iter::once(field)
@@ -1052,12 +1077,12 @@
     };
 
     <span class="macro">vec!</span>[
-        input_field(filters::IN, field_types.clone(), <span class="prelude-val">None</span>)
+        input_field(ctx, filters::IN, field_types.clone(), <span class="prelude-val">None</span>)
             .optional()
-            .nullable_if(nullable),
-        input_field(filters::NOT_IN, field_types, <span class="prelude-val">None</span>)
+            .nullable_if(nullable, <span class="kw-2">&amp;mut </span>ctx.input_field_types),
+        input_field(ctx, filters::NOT_IN, field_types, <span class="prelude-val">None</span>)
             .optional()
-            .nullable_if(nullable), <span class="comment">// Kept for legacy reasons!
+            .nullable_if(nullable, <span class="kw-2">&amp;mut </span>ctx.input_field_types), <span class="comment">// Kept for legacy reasons!
     </span>]
     .into_iter()
 }
@@ -1073,10 +1098,10 @@
         };
 
     <span class="macro">vec!</span>[
-        input_field(filters::LOWER_THAN, field_types.clone(), <span class="prelude-val">None</span>).optional(),
-        input_field(filters::LOWER_THAN_OR_EQUAL, field_types.clone(), <span class="prelude-val">None</span>).optional(),
-        input_field(filters::GREATER_THAN, field_types.clone(), <span class="prelude-val">None</span>).optional(),
-        input_field(filters::GREATER_THAN_OR_EQUAL, field_types, <span class="prelude-val">None</span>).optional(),
+        input_field(ctx, filters::LOWER_THAN, field_types.clone(), <span class="prelude-val">None</span>).optional(),
+        input_field(ctx, filters::LOWER_THAN_OR_EQUAL, field_types.clone(), <span class="prelude-val">None</span>).optional(),
+        input_field(ctx, filters::GREATER_THAN, field_types.clone(), <span class="prelude-val">None</span>).optional(),
+        input_field(ctx, filters::GREATER_THAN_OR_EQUAL, field_types, <span class="prelude-val">None</span>).optional(),
     ]
     .into_iter()
 }
@@ -1091,11 +1116,11 @@
     <span class="kw">let </span>string_filters = ctx.connector.string_filters(input_object_type_name);
     <span class="kw">let </span><span class="kw-2">mut </span>string_filters: Vec&lt;<span class="kw">_</span>&gt; = string_filters
         .iter()
-        .map(|filter| input_field(filter.name(), field_types.clone(), <span class="prelude-val">None</span>).optional())
+        .map(|filter| input_field(ctx, filter.name(), field_types.clone(), <span class="prelude-val">None</span>).optional())
         .collect();
 
     <span class="kw">if </span>ctx.can_full_text_search() {
-        string_filters.push(input_field(filters::SEARCH, mapped_type, <span class="prelude-val">None</span>).optional());
+        string_filters.push(input_field(ctx, filters::SEARCH, mapped_type, <span class="prelude-val">None</span>).optional());
     }
 
     string_filters.into_iter()
@@ -1111,48 +1136,29 @@
     } <span class="kw">else </span>{
         <span class="macro">unreachable!</span>()
     };
+    <span class="kw">let </span>string_with_field_ref_input = InputType::string().with_field_ref_input(ctx);
+    <span class="kw">let </span>json_with_field_ref_input = InputType::json().with_field_ref_input(ctx);
 
     <span class="macro">vec!</span>[
-        input_field(filters::PATH, path_type, <span class="prelude-val">None</span>).optional(),
+        input_field(ctx, filters::PATH, path_type, <span class="prelude-val">None</span>).optional(),
+        input_field(ctx, filters::STRING_CONTAINS, string_with_field_ref_input.clone(), <span class="prelude-val">None</span>).optional(),
         input_field(
-            filters::STRING_CONTAINS,
-            InputType::string().with_field_ref_input(ctx),
-            <span class="prelude-val">None</span>,
-        )
-        .optional(),
-        input_field(
+            ctx,
             filters::STRING_STARTS_WITH,
-            InputType::string().with_field_ref_input(ctx),
+            string_with_field_ref_input.clone(),
             <span class="prelude-val">None</span>,
         )
         .optional(),
-        input_field(
-            filters::STRING_ENDS_WITH,
-            InputType::string().with_field_ref_input(ctx),
-            <span class="prelude-val">None</span>,
-        )
-        .optional(),
-        input_field(
-            filters::ARRAY_CONTAINS,
-            InputType::json().with_field_ref_input(ctx),
-            <span class="prelude-val">None</span>,
-        )
-        .optional()
-        .nullable(),
-        input_field(
-            filters::ARRAY_STARTS_WITH,
-            InputType::json().with_field_ref_input(ctx),
-            <span class="prelude-val">None</span>,
-        )
-        .optional()
-        .nullable(),
-        input_field(
-            filters::ARRAY_ENDS_WITH,
-            InputType::json().with_field_ref_input(ctx),
-            <span class="prelude-val">None</span>,
-        )
-        .optional()
-        .nullable(),
+        input_field(ctx, filters::STRING_ENDS_WITH, string_with_field_ref_input, <span class="prelude-val">None</span>).optional(),
+        input_field(ctx, filters::ARRAY_CONTAINS, json_with_field_ref_input.clone(), <span class="prelude-val">None</span>)
+            .optional()
+            .nullable(<span class="kw-2">&amp;mut </span>ctx.input_field_types),
+        input_field(ctx, filters::ARRAY_STARTS_WITH, json_with_field_ref_input.clone(), <span class="prelude-val">None</span>)
+            .optional()
+            .nullable(<span class="kw-2">&amp;mut </span>ctx.input_field_types),
+        input_field(ctx, filters::ARRAY_ENDS_WITH, json_with_field_ref_input, <span class="prelude-val">None</span>)
+            .optional()
+            .nullable(<span class="kw-2">&amp;mut </span>ctx.input_field_types),
     ]
     .into_iter()
 }
@@ -1164,6 +1170,7 @@
         <span class="kw">let </span>enum_type = query_mode_enum(ctx);
 
         <span class="kw">let </span>field = input_field(
+            ctx,
             filters::MODE,
             InputType::enum_type(enum_type),
             <span class="prelude-val">Some</span>(dml::DefaultKind::Single(PrismaValue::Enum(filters::DEFAULT.to_owned()))),
@@ -1194,7 +1201,7 @@
     list: bool,
 ) -&gt; InputField {
     <span class="kw">let </span>filters = full_scalar_filter_type(ctx, typ, <span class="prelude-val">None</span>, list, nullable, <span class="bool-val">true</span>, <span class="bool-val">false</span>);
-    input_field(aggregation, InputType::object(filters), <span class="prelude-val">None</span>).optional()
+    input_field(ctx, aggregation, InputType::object(filters), <span class="prelude-val">None</span>).optional()
 }
 
 <span class="kw">fn </span>map_avg_type_ident(typ: TypeIdentifier) -&gt; TypeIdentifier {
@@ -1223,16 +1230,15 @@
             <span class="kw">let </span><span class="kw-2">mut </span>field_types = mapped_scalar_type.with_field_ref_input(ctx);
             field_types.push(InputType::Enum(enum_type));
 
-            input_field(filters::NOT_LOWERCASE, field_types, <span class="prelude-val">None</span>).optional()
+            input_field(ctx, filters::NOT_LOWERCASE, field_types, <span class="prelude-val">None</span>).optional()
         }
 
-        TypeIdentifier::Json =&gt; input_field(
-            filters::NOT_LOWERCASE,
-            mapped_scalar_type.with_field_ref_input(ctx),
-            <span class="prelude-val">None</span>,
-        )
-        .optional()
-        .nullable_if(is_nullable),
+        TypeIdentifier::Json =&gt; {
+            <span class="kw">let </span>ty = mapped_scalar_type.with_field_ref_input(ctx);
+            input_field(ctx, filters::NOT_LOWERCASE, ty, <span class="prelude-val">None</span>)
+                .optional()
+                .nullable_if(is_nullable, <span class="kw-2">&amp;mut </span>ctx.input_field_types)
+        }
 
         <span class="kw">_ </span>=&gt; {
             <span class="comment">// Full nested filter. Only available on non-JSON fields.
@@ -1246,9 +1252,9 @@
                 include_aggregates,
             ));
 
-            input_field(filters::NOT_LOWERCASE, <span class="macro">vec!</span>[mapped_scalar_type, shorthand], <span class="prelude-val">None</span>)
+            input_field(ctx, filters::NOT_LOWERCASE, <span class="macro">vec!</span>[mapped_scalar_type, shorthand], <span class="prelude-val">None</span>)
                 .optional()
-                .nullable_if(is_nullable)
+                .nullable_if(is_nullable, <span class="kw-2">&amp;mut </span>ctx.input_field_types)
         }
     }
 }
