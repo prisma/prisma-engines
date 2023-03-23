@@ -18,7 +18,7 @@ use std::{
 use type_renderer::*;
 
 pub(crate) fn render(query_schema: QuerySchemaRef) -> (DmmfSchema, DmmfOperationMappings) {
-    let mut ctx = RenderContext::new();
+    let mut ctx = RenderContext::new(&query_schema);
     ctx.mark_to_be_rendered(&query_schema);
 
     while !ctx.next_pass.is_empty() {
@@ -32,8 +32,9 @@ pub(crate) fn render(query_schema: QuerySchemaRef) -> (DmmfSchema, DmmfOperation
     ctx.finalize()
 }
 
-#[derive(Default)]
-pub struct RenderContext {
+pub(crate) struct RenderContext<'a> {
+    query_schema: &'a QuerySchema,
+
     /// Aggregator for query schema
     schema: DmmfSchema,
 
@@ -49,9 +50,15 @@ pub struct RenderContext {
     next_pass: Vec<Box<dyn Renderer>>,
 }
 
-impl RenderContext {
-    pub fn new() -> Self {
-        Self::default()
+impl<'a> RenderContext<'a> {
+    pub fn new(query_schema: &'a QuerySchema) -> Self {
+        RenderContext {
+            query_schema,
+            schema: Default::default(),
+            mappings: Default::default(),
+            rendered: Default::default(),
+            next_pass: Default::default(),
+        }
     }
 
     pub fn finalize(self) -> (DmmfSchema, DmmfOperationMappings) {
@@ -153,7 +160,7 @@ impl RenderContext {
     }
 }
 
-pub trait Renderer {
+pub(crate) trait Renderer {
     fn render(&self, ctx: &mut RenderContext);
 }
 

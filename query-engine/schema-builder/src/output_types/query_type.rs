@@ -19,8 +19,8 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
             append_opt(&mut vec, find_unique_or_throw_field(ctx, &model));
 
             if ctx.enable_raw_queries && ctx.has_capability(ConnectorCapability::MongoDbQueryRaw) {
-                vec.push(mongo_find_raw_field(&model));
-                vec.push(mongo_aggregate_raw_field(&model));
+                vec.push(mongo_find_raw_field(ctx, &model));
+                vec.push(mongo_aggregate_raw_field(ctx, &model));
             }
 
             vec
@@ -151,14 +151,14 @@ fn group_by_aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> Out
     )
 }
 
-fn mongo_aggregate_raw_field(model: &ModelRef) -> OutputField {
+fn mongo_aggregate_raw_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     let field_name = format!("aggregate{}Raw", model.name());
 
     field(
         field_name,
         vec![
-            input_field("pipeline", InputType::list(InputType::json()), None).optional(),
-            input_field("options", InputType::json(), None).optional(),
+            input_field(ctx, "pipeline", InputType::list(InputType::json()), None).optional(),
+            input_field(ctx, "options", InputType::json(), None).optional(),
         ],
         OutputType::json(),
         Some(QueryInfo {
@@ -168,14 +168,14 @@ fn mongo_aggregate_raw_field(model: &ModelRef) -> OutputField {
     )
 }
 
-fn mongo_find_raw_field(model: &ModelRef) -> OutputField {
+fn mongo_find_raw_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     let field_name = format!("find{}Raw", model.name());
 
     field(
         field_name,
         vec![
-            input_field("filter", InputType::json(), None).optional(),
-            input_field("options", InputType::json(), None).optional(),
+            input_field(ctx, "filter", InputType::json(), None).optional(),
+            input_field(ctx, "options", InputType::json(), None).optional(),
         ],
         OutputType::json(),
         Some(QueryInfo {

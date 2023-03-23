@@ -114,7 +114,8 @@ pub struct InputField {
     pub deprecation: Option<Deprecation>,
 
     /// Possible field types, represented as a union of input types, but only one can be provided at any time.
-    pub field_types: Vec<InputType>,
+    /// Slice expressed as (start, len).
+    field_types: Option<(usize, usize)>,
 
     /// Indicates if the presence of the field on the higher input objects
     /// is required, but doesn't state whether or not the input can be null.
@@ -122,6 +123,21 @@ pub struct InputField {
 }
 
 impl InputField {
+    pub fn new(name: String, default_value: Option<dml::DefaultKind>, is_required: bool) -> InputField {
+        InputField {
+            name,
+            default_value,
+            deprecation: None,
+            field_types: None,
+            is_required,
+        }
+    }
+
+    pub fn field_types<'a>(&self, query_schema: &'a QuerySchema) -> &'a [InputType] {
+        let (start, len) = self.field_types.unwrap_or_default();
+        &query_schema.input_field_types[start..(start + len)]
+    }
+
     /// Sets the field as optional (not required to be present on the input).
     pub fn optional(mut self) -> Self {
         self.is_required = false;
@@ -144,22 +160,35 @@ impl InputField {
     }
 
     /// Sets the field as nullable (accepting null inputs).
-    pub fn nullable(self) -> Self {
-        self.add_type(InputType::null())
+    pub fn nullable(self, input_types: &mut Vec<InputType>) -> Self {
+        self.add_type(InputType::null(), input_types)
     }
 
     /// Sets the field as nullable if the condition is true.
-    pub fn nullable_if(self, condition: bool) -> Self {
+    pub fn nullable_if(self, condition: bool, input_types: &mut Vec<InputType>) -> Self {
         if condition {
-            self.nullable()
+            self.nullable(input_types)
         } else {
             self
         }
     }
 
+    pub fn push_type(&mut self, typ: InputType, input_types: &mut Vec<InputType>) {
+        match &mut self.field_types {
+            Some((_start, len)) => {
+                *len += 1;
+                input_types.push(typ);
+            }
+            None => {
+                self.field_types = Some((input_types.len(), 1));
+                input_types.push(typ);
+            }
+        }
+    }
+
     /// Adds possible input type to this input field's type union.
-    pub fn add_type(mut self, typ: InputType) -> Self {
-        self.field_types.push(typ);
+    pub fn add_type(mut self, typ: InputType, input_types: &mut Vec<InputType>) -> Self {
+        self.push_type(typ, input_types);
         self
     }
 
@@ -309,8 +338,11 @@ impl InputType {
     }
 }
 
-impl From<InputType> for Vec<InputType> {
-    fn from(r#type: InputType) -> Self {
-        vec![r#type]
+impl IntoIterator for InputType {
+    type Item = InputType;
+    type IntoIter = std::iter::Once<InputType>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        std::iter::once(self)
     }
 }

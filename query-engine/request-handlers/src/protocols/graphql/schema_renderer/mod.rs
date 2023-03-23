@@ -32,7 +32,7 @@ impl GqlSchemaRenderer {
 }
 
 pub fn render_graphql_schema(query_schema: QuerySchemaRef) -> String {
-    let mut context = RenderContext::new();
+    let mut context = RenderContext::new(&query_schema);
     query_schema.into_renderer().render(&mut context);
 
     // Add custom scalar types (required for graphql.js implementations)
@@ -46,7 +46,9 @@ trait Renderer {
     fn render(&self, ctx: &mut RenderContext) -> String;
 }
 
-struct RenderContext {
+struct RenderContext<'a> {
+    query_schema: &'a QuerySchema,
+
     /// Output queue for all (top level) elements that need to be rendered,
     output_queue: Vec<String>,
 
@@ -60,20 +62,15 @@ struct RenderContext {
     indent_str: &'static str,
 }
 
-impl Default for RenderContext {
-    fn default() -> Self {
-        Self {
-            output_queue: vec![],
-            rendered: HashMap::new(),
+impl<'a> RenderContext<'a> {
+    fn new(query_schema: &'a QuerySchema) -> Self {
+        RenderContext {
+            query_schema,
+            output_queue: Default::default(),
+            rendered: Default::default(),
             indent: 2,
             indent_str: " ",
         }
-    }
-}
-
-impl RenderContext {
-    fn new() -> RenderContext {
-        Self::default()
     }
 
     fn format(self) -> String {

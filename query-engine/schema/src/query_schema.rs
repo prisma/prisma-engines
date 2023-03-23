@@ -34,6 +34,10 @@ pub struct QuerySchema {
     /// Information about the connector this schema was build for.
     pub context: ConnectorContext,
 
+    /// Possible types for input fields. This is an internal implementation detail, it should stay
+    /// private.
+    pub(crate) input_field_types: Vec<InputType>,
+
     // Indexes query fields by their own query info for easier access.
     query_map: HashMap<QueryInfo, OutputFieldRef>,
 
@@ -82,6 +86,7 @@ impl QuerySchema {
     pub fn new(
         query: OutputTypeRef,
         mutation: OutputTypeRef,
+        input_field_types: Vec<InputType>,
         _input_object_types: Vec<InputObjectTypeStrongRef>,
         _output_object_types: Vec<ObjectTypeStrongRef>,
         _enum_types: Vec<EnumTypeRef>,
@@ -110,6 +115,7 @@ impl QuerySchema {
             mutation,
             query_map,
             mutation_map,
+            input_field_types,
             _input_object_types,
             _output_object_types,
             _enum_types,

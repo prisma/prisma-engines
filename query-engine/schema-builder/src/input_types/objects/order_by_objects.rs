@@ -119,7 +119,7 @@ fn orderby_field_mapper(field: &ModelField, ctx: &mut BuilderContext, options: &
             let related_model = rf.related_model();
             let to_many_aggregate_type = order_by_to_many_aggregate_object_type(ctx, &related_model.into());
 
-            Some(input_field(rf.name(), InputType::object(to_many_aggregate_type), None).optional())
+            Some(input_field(ctx, rf.name(), InputType::object(to_many_aggregate_type), None).optional())
         }
 
         // To-one relation field.
@@ -127,7 +127,7 @@ fn orderby_field_mapper(field: &ModelField, ctx: &mut BuilderContext, options: &
             let related_model = rf.related_model();
             let related_object_type = order_by_object_type(ctx, &related_model.into(), options);
 
-            Some(input_field(rf.name(), InputType::object(related_object_type), None).optional())
+            Some(input_field(ctx, rf.name(), InputType::object(related_object_type), None).optional())
         }
 
         // Scalar field.
@@ -142,19 +142,27 @@ fn orderby_field_mapper(field: &ModelField, ctx: &mut BuilderContext, options: &
                 types.push(InputType::object(sort_nulls_object_type(ctx)));
             }
 
-            Some(input_field(sf.name(), types, None).optional())
+            Some(input_field(ctx, sf.name(), types, None).optional())
         }
 
         // Composite field.
         ModelField::Composite(cf) if cf.is_list() => {
             let to_many_aggregate_type = order_by_to_many_aggregate_object_type(ctx, &(cf.typ()).into());
-            Some(input_field(cf.name().to_owned(), InputType::object(to_many_aggregate_type), None).optional())
+            Some(
+                input_field(
+                    ctx,
+                    cf.name().to_owned(),
+                    InputType::object(to_many_aggregate_type),
+                    None,
+                )
+                .optional(),
+            )
         }
 
         ModelField::Composite(cf) => {
             let composite_order_object_type = order_by_object_type(ctx, &(cf.typ()).into(), &OrderByOptions::new());
 
-            Some(input_field(cf.name(), InputType::object(composite_order_object_type), None).optional())
+            Some(input_field(ctx, cf.name(), InputType::object(composite_order_object_type), None).optional())
         }
 
         _ => None,
@@ -168,9 +176,12 @@ fn sort_nulls_object_type(ctx: &mut BuilderContext) -> InputObjectTypeWeakRef {
     let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
 
+    let sort_order_enum_type = sort_order_enum(ctx);
+    let nulls_order_enum_type = nulls_order_enum(ctx);
+
     let fields = vec![
-        input_field(ordering::SORT, InputType::Enum(sort_order_enum(ctx)), None),
-        input_field(ordering::NULLS, InputType::Enum(nulls_order_enum(ctx)), None).optional(),
+        input_field(ctx, ordering::SORT, InputType::Enum(sort_order_enum_type), None),
+        input_field(ctx, ordering::NULLS, InputType::Enum(nulls_order_enum_type), None).optional(),
     ];
 
     input_object.set_fields(fields);
@@ -188,14 +199,8 @@ fn order_by_field_aggregate(
     if scalar_fields.is_empty() {
         None
     } else {
-        Some(
-            input_field(
-                name,
-                InputType::object(order_by_object_type_aggregate(suffix, ctx, container, scalar_fields)),
-                None,
-            )
-            .optional(),
-        )
+        let ty = InputType::object(order_by_object_type_aggregate(suffix, ctx, container, scalar_fields));
+        Some(input_field(ctx, name, ty, None).optional())
     }
 }
 
@@ -215,9 +220,10 @@ fn order_by_object_type_aggregate(
     let input_object = Arc::new(input_object);
     ctx.cache_input_type(ident, input_object.clone());
 
+    let sort_order_enum = InputType::Enum(sort_order_enum(ctx));
     let fields = scalar_fields
         .iter()
-        .map(|sf| input_field(sf.name(), InputType::Enum(sort_order_enum(ctx)), None).optional())
+        .map(|sf| input_field(ctx, sf.name(), sort_order_enum.clone(), None).optional())
         .collect();
 
     input_object.set_fields(fields);
@@ -242,12 +248,8 @@ fn order_by_to_many_aggregate_object_type(
     let input_object = Arc::new(input_object);
     ctx.cache_input_type(ident, input_object.clone());
 
-    let fields = vec![input_field(
-        aggregations::UNDERSCORE_COUNT,
-        InputType::Enum(sort_order_enum(ctx)),
-        None,
-    )
-    .optional()];
+    let sort_order_enum = InputType::Enum(sort_order_enum(ctx));
+    let fields = vec![input_field(ctx, aggregations::UNDERSCORE_COUNT, sort_order_enum, None).optional()];
 
     input_object.set_fields(fields);
 
@@ -267,14 +269,8 @@ fn order_by_field_text_search(ctx: &mut BuilderContext, container: &ParentContai
     if scalar_fields.is_empty() {
         None
     } else {
-        Some(
-            input_field(
-                ordering::UNDERSCORE_RELEVANCE,
-                InputType::object(order_by_object_type_text_search(ctx, container, scalar_fields)),
-                None,
-            )
-            .optional(),
-        )
+        let ty = InputType::object(order_by_object_type_text_search(ctx, container, scalar_fields));
+        Some(input_field(ctx, ordering::UNDERSCORE_RELEVANCE, ty, None).optional())
     }
 }
 
@@ -295,15 +291,17 @@ fn order_by_object_type_text_search(
         &container.name(),
         scalar_fields.iter().map(|sf| sf.name().to_owned()).collect(),
     ));
+    let sort_order_enum = sort_order_enum(ctx);
 
     let fields = vec![
         input_field(
+            ctx,
             ordering::FIELDS,
             vec![fields_enum_type.clone(), InputType::list(fields_enum_type)],
             None,
         ),
-        input_field(ordering::SORT, InputType::Enum(sort_order_enum(ctx)), None),
-        input_field(ordering::SEARCH, InputType::string(), None),
+        input_field(ctx, ordering::SORT, InputType::Enum(sort_order_enum), None),
+        input_field(ctx, ordering::SEARCH, InputType::string(), None),
     ];
 
     input_object.set_fields(fields);

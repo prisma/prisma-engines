@@ -32,12 +32,12 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
     create_nested_inputs(ctx);
 
     if ctx.enable_raw_queries && ctx.has_capability(ConnectorCapability::SqlQueryRaw) {
-        fields.push(create_execute_raw_field());
-        fields.push(create_query_raw_field());
+        fields.push(create_execute_raw_field(ctx));
+        fields.push(create_query_raw_field(ctx));
     }
 
     if ctx.enable_raw_queries && ctx.has_capability(ConnectorCapability::MongoDbQueryRaw) {
-        fields.push(create_mongodb_run_command_raw());
+        fields.push(create_mongodb_run_command_raw(ctx));
     }
 
     let ident = Identifier::new_prisma("Mutation".to_owned());
@@ -97,12 +97,13 @@ fn create_nested_inputs(ctx: &mut BuilderContext) {
     }
 }
 
-fn create_execute_raw_field() -> OutputField {
+fn create_execute_raw_field(ctx: &mut BuilderContext) -> OutputField {
     field(
         "executeRaw",
         vec![
-            input_field("query", InputType::string(), None),
+            input_field(ctx, "query", InputType::string(), None),
             input_field(
+                ctx,
                 "parameters",
                 InputType::json_list(),
                 Some(dml::DefaultKind::Single(PrismaValue::String("[]".into()))),
@@ -117,12 +118,13 @@ fn create_execute_raw_field() -> OutputField {
     )
 }
 
-fn create_query_raw_field() -> OutputField {
+fn create_query_raw_field(ctx: &mut BuilderContext) -> OutputField {
     field(
         "queryRaw",
         vec![
-            input_field("query", InputType::string(), None),
+            input_field(ctx, "query", InputType::string(), None),
             input_field(
+                ctx,
                 "parameters",
                 InputType::json_list(),
                 Some(dml::DefaultKind::Single(PrismaValue::String("[]".into()))),
@@ -137,10 +139,10 @@ fn create_query_raw_field() -> OutputField {
     )
 }
 
-fn create_mongodb_run_command_raw() -> OutputField {
+fn create_mongodb_run_command_raw(ctx: &mut BuilderContext) -> OutputField {
     field(
         "runCommandRaw",
-        vec![input_field("command", InputType::json(), None)],
+        vec![input_field(ctx, "command", InputType::json(), None)],
         OutputType::json(),
         Some(QueryInfo {
             tag: QueryTag::RunCommandRaw,

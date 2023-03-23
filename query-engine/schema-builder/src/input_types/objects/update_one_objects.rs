@@ -190,8 +190,8 @@ pub(crate) fn update_one_where_combination_object(
     ctx.cache_input_type(ident, input_object.clone());
 
     let fields = vec![
-        input_field(args::WHERE, InputType::object(where_input_object), None),
-        input_field(args::DATA, update_types, None),
+        input_field(ctx, args::WHERE, InputType::object(where_input_object), None),
+        input_field(ctx, args::DATA, update_types, None),
     ];
 
     input_object.set_fields(fields);
@@ -221,7 +221,7 @@ pub(crate) fn update_to_one_rel_where_combination_object(
 
     let fields = vec![
         arguments::where_argument(ctx, &related_model),
-        input_field(args::DATA, update_types, None),
+        input_field(ctx, args::DATA, update_types, None),
     ];
 
     input_object.set_fields(fields);

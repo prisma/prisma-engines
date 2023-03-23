@@ -38,10 +38,10 @@ pub(crate) fn create_many(ctx: &mut BuilderContext, model: &ModelRef) -> Option<
 /// Builds "skip_duplicates" and "data" arguments intended for the create many field.
 pub(crate) fn create_many_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<InputField> {
     let create_many_type = InputType::object(create_many_object_type(ctx, model, None));
-    let data_arg = input_field(args::DATA, list_union_type(create_many_type, true), None);
+    let data_arg = input_field(ctx, args::DATA, list_union_type(create_many_type, true), None);
 
     if ctx.has_capability(ConnectorCapability::CreateSkipDuplicates) {
-        let skip_arg = input_field(args::SKIP_DUPLICATES, InputType::boolean(), None).optional();
+        let skip_arg = input_field(ctx, args::SKIP_DUPLICATES, InputType::boolean(), None).optional();
 
         vec![data_arg, skip_arg]
     } else {

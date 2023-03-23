@@ -53,6 +53,7 @@ use std::sync::Arc;
 use utils::*;
 
 pub(crate) struct BuilderContext<'a> {
+    pub(crate) input_field_types: Vec<InputType>,
     internal_data_model: &'a InternalDataModel,
     enable_raw_queries: bool,
     cache: TypeCache,
@@ -70,6 +71,7 @@ impl<'a> BuilderContext<'a> {
     ) -> Self {
         let connector = internal_data_model.schema.connector;
         Self {
+            input_field_types: Vec::with_capacity(internal_data_model.schema.db.models_count() * 5),
             internal_data_model,
             enable_raw_queries,
             cache: TypeCache::new(),
@@ -194,10 +196,12 @@ pub fn build_with_features(
     let query_type = Arc::new(query_type);
     let mutation_type = Arc::new(mutation_type);
     let capabilities = ctx.connector.capabilities().to_owned();
+    let input_field_types = ctx.input_field_types;
 
     QuerySchema::new(
         query_type,
         mutation_type,
+        input_field_types,
         input_objects,
         output_objects,
         enum_types,

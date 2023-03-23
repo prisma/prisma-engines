@@ -51,18 +51,21 @@ where
 }
 
 /// Field convenience wrapper function.
-pub fn input_field<T, S>(name: T, field_types: S, default_value: Option<dml::DefaultKind>) -> InputField
+pub(crate) fn input_field<T, S>(
+    ctx: &mut BuilderContext,
+    name: T,
+    field_types: S,
+    default_value: Option<dml::DefaultKind>,
+) -> InputField
 where
     T: Into<String>,
-    S: Into<Vec<InputType>>,
+    S: IntoIterator<Item = InputType>,
 {
-    InputField {
-        name: name.into(),
-        field_types: field_types.into(),
-        default_value,
-        is_required: true,
-        deprecation: None,
+    let mut input_field = InputField::new(name.into(), default_value, true);
+    for field_type in field_types {
+        input_field.push_type(field_type, &mut ctx.input_field_types);
     }
+    input_field
 }
 
 /// Capitalizes first character.

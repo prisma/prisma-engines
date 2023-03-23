@@ -28,7 +28,12 @@ fn field_ref_input_object_type(ctx: &mut BuilderContext, allow_type: InputType) 
     let object = Arc::new(object);
     ctx.cache_input_type(ident, object.clone());
 
-    object.set_fields(vec![input_field(filters::UNDERSCORE_REF, InputType::string(), None)]);
+    object.set_fields(vec![input_field(
+        ctx,
+        filters::UNDERSCORE_REF,
+        InputType::string(),
+        None,
+    )]);
 
     Arc::downgrade(&object)
 }
