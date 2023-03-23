@@ -831,14 +831,9 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "cuid",
- "either",
- "enumflags2",
- "indoc",
  "nanoid",
  "prisma-value",
  "psl-core",
- "serde",
- "serde_json",
  "uuid 1.1.2",
 ]
 
