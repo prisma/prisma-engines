@@ -25,13 +25,13 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
             TypeIdentifier::Json if supports_advanced_json => {
                 let enum_type = InputType::enum_type(json_null_input_enum(ctx, !sf.is_required()));
 
-                input_field(sf.name(), vec![enum_type, typ], sf.default_value())
+                input_field(ctx, sf.name(), vec![enum_type, typ], sf.default_value())
                     .optional_if(!sf.is_required() || sf.default_value().is_some() || sf.is_updated_at())
             }
 
-            _ => input_field(sf.name(), typ, sf.default_value())
+            _ => input_field(ctx, sf.name(), typ, sf.default_value())
                 .optional_if(!sf.is_required() || sf.default_value().is_some() || sf.is_updated_at())
-                .nullable_if(!sf.is_required()),
+                .nullable_if(!sf.is_required(), &mut ctx.input_field_types),
         }
     }
 
@@ -42,7 +42,7 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
         let input_object = match ctx.get_input_type(&ident) {
             Some(cached) => cached,
             None => {
-                let object_fields = vec![input_field(operations::SET, typ.clone(), None)];
+                let object_fields = vec![input_field(ctx, operations::SET, typ.clone(), None)];
                 let mut input_object = input_object_type(ident.clone(), object_fields);
                 input_object.require_exactly_one_field();
 
@@ -56,7 +56,7 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
         let input_type = InputType::object(input_object);
 
         // Shorthand type (`list_field: <typ>`) + full object (`list_field: { set: { <typ> }}`)
-        input_field(sf.name(), vec![input_type, typ], sf.default_value()).optional()
+        input_field(ctx, sf.name(), vec![input_type, typ], sf.default_value()).optional()
     }
 
     fn map_relation(&self, ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputField {
@@ -100,7 +100,7 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
             .into_iter()
             .all(|scalar_field| scalar_field.default_value().is_some());
 
-        let input_field = input_field(rf.name(), InputType::object(input_object), None);
+        let input_field = input_field(ctx, rf.name(), InputType::object(input_object), None);
 
         if rf.is_required() && !all_required_scalar_fields_have_defaults {
             input_field
@@ -128,8 +128,8 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
             input_types.push(InputType::list(shorthand_type));
         }
 
-        input_field(cf.name().to_owned(), input_types, None)
-            .nullable_if(!cf.is_required() && !cf.is_list())
+        input_field(ctx, cf.name().to_owned(), input_types, None)
+            .nullable_if(!cf.is_required() && !cf.is_list(), &mut ctx.input_field_types)
             .optional_if(!cf.is_required())
     }
 }
@@ -171,8 +171,8 @@ fn composite_create_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
         input_types.push(InputType::list(create_input));
     }
 
-    let set_field = input_field("set", input_types, None)
-        .nullable_if(!cf.is_required() && !cf.is_list())
+    let set_field = input_field(ctx, "set", input_types, None)
+        .nullable_if(!cf.is_required() && !cf.is_list(), &mut ctx.input_field_types)
         .optional();
 
     input_object.set_fields(vec![set_field]);

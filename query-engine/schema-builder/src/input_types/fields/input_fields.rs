@@ -13,9 +13,9 @@ pub(crate) fn filter_input_field(ctx: &mut BuilderContext, field: &ModelField, i
             _ => true,
         };
 
-    input_field(field.name().to_owned(), types, None)
+    input_field(ctx, field.name().to_owned(), types, None)
         .optional()
-        .nullable_if(nullable)
+        .nullable_if(nullable, &mut ctx.input_field_types)
 }
 
 pub(crate) fn nested_create_one_input_field(ctx: &mut BuilderContext, parent_field: &RelationFieldRef) -> InputField {
@@ -26,7 +26,7 @@ pub(crate) fn nested_create_one_input_field(ctx: &mut BuilderContext, parent_fie
         .flat_map(|typ| list_union_type(typ, parent_field.is_list()))
         .collect();
 
-    input_field(operations::CREATE, types, None).optional()
+    input_field(ctx, operations::CREATE, types, None).optional()
 }
 
 /// Nested create many calls can only ever be leaf operations because they can't return the ids of
@@ -45,7 +45,7 @@ pub(crate) fn nested_create_many_input_field(
     {
         let envelope = nested_create_many_envelope(ctx, parent_field);
 
-        Some(input_field(operations::CREATE_MANY, InputType::object(envelope), None).optional())
+        Some(input_field(ctx, operations::CREATE_MANY, InputType::object(envelope), None).optional())
     } else {
         None
     }
@@ -64,10 +64,10 @@ fn nested_create_many_envelope(ctx: &mut BuilderContext, parent_field: &Relation
     ctx.cache_input_type(ident, input_object.clone());
 
     let create_many_type = InputType::object(create_type);
-    let data_arg = input_field(args::DATA, list_union_type(create_many_type, true), None);
+    let data_arg = input_field(ctx, args::DATA, list_union_type(create_many_type, true), None);
 
     let fields = if ctx.has_capability(ConnectorCapability::CreateSkipDuplicates) {
-        let skip_arg = input_field(args::SKIP_DUPLICATES, InputType::boolean(), None).optional();
+        let skip_arg = input_field(ctx, args::SKIP_DUPLICATES, InputType::boolean(), None).optional();
 
         vec![data_arg, skip_arg]
     } else {
@@ -84,6 +84,7 @@ pub(crate) fn nested_connect_or_create_field(
 ) -> Option<InputField> {
     connect_or_create_objects::nested_connect_or_create_input_object(ctx, parent_field).map(|input_object_type| {
         input_field(
+            ctx,
             operations::CONNECT_OR_CREATE,
             list_union_object_type(input_object_type, parent_field.is_list()),
             None,
@@ -96,6 +97,7 @@ pub(crate) fn nested_connect_or_create_field(
 pub(crate) fn nested_upsert_field(ctx: &mut BuilderContext, parent_field: &RelationFieldRef) -> Option<InputField> {
     upsert_objects::nested_upsert_input_object(ctx, parent_field).map(|input_object_type| {
         input_field(
+            ctx,
             operations::UPSERT,
             list_union_object_type(input_object_type, parent_field.is_list()),
             None,
@@ -115,6 +117,7 @@ pub(crate) fn nested_delete_many_field(
 
         Some(
             input_field(
+                ctx,
                 operations::DELETE_MANY,
                 vec![input_type.clone(), InputType::list(input_type)],
                 None,
@@ -136,6 +139,7 @@ pub(crate) fn nested_update_many_field(
 
         Some(
             input_field(
+                ctx,
                 operations::UPDATE_MANY,
                 list_union_object_type(input_type, true), //vec![input_type.clone(), InputType::list(input_type)],
                 None,
@@ -173,7 +177,7 @@ pub(crate) fn nested_disconnect_input_field(
                 )));
             }
 
-            Some(input_field(operations::DISCONNECT, types, None).optional())
+            Some(input_field(ctx, operations::DISCONNECT, types, None).optional())
         }
         (false, true) => None,
     }
@@ -196,7 +200,7 @@ pub(crate) fn nested_delete_input_field(
                 )));
             }
 
-            Some(input_field(operations::DELETE, types, None).optional())
+            Some(input_field(ctx, operations::DELETE, types, None).optional())
         }
         (false, true) => None,
     }
@@ -231,7 +235,7 @@ pub(crate) fn nested_update_input_field(ctx: &mut BuilderContext, parent_field: 
         update_shorthand_types
     };
 
-    input_field(operations::UPDATE, update_types, None).optional()
+    input_field(ctx, operations::UPDATE, update_types, None).optional()
 }
 
 fn where_unique_input_field<T>(ctx: &mut BuilderContext, name: T, field: &RelationFieldRef) -> InputField
@@ -241,6 +245,7 @@ where
     let input_object_type = filter_objects::where_unique_object_type(ctx, &field.related_model());
 
     input_field(
+        ctx,
         name.into(),
         list_union_object_type(input_object_type, field.is_list()),
         None,

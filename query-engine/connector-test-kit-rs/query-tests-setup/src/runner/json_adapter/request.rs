@@ -3,7 +3,7 @@ use itertools::Itertools;
 use prisma_models::PrismaValue;
 use query_core::{
     constants::custom_types,
-    schema::{InputFieldRef, InputObjectTypeStrongRef, InputType, OutputFieldRef, QuerySchemaRef},
+    schema::{InputFieldRef, InputObjectTypeStrongRef, InputType, OutputFieldRef, QuerySchema, QuerySchemaRef},
     schema_builder::constants::{self, json_null},
     ArgumentValue, ArgumentValueObject, Selection,
 };
@@ -29,23 +29,28 @@ impl JsonRequest {
         let output = JsonSingleQuery {
             model_name,
             action: Action::new(query_tag),
-            query: graphql_selection_to_json_field_query(selection, &schema_field),
+            query: graphql_selection_to_json_field_query(selection, &schema_field, query_schema.as_ref()),
         };
 
         Ok(output)
     }
 }
 
-fn graphql_selection_to_json_field_query(mut selection: Selection, schema_field: &OutputFieldRef) -> FieldQuery {
+fn graphql_selection_to_json_field_query(
+    mut selection: Selection,
+    schema_field: &OutputFieldRef,
+    query_schema: &QuerySchema,
+) -> FieldQuery {
     FieldQuery {
-        arguments: graphql_args_to_json_args(&mut selection, &schema_field.arguments),
-        selection: graphql_selection_to_json_selection(selection, schema_field),
+        arguments: graphql_args_to_json_args(&mut selection, &schema_field.arguments, query_schema),
+        selection: graphql_selection_to_json_selection(selection, schema_field, query_schema),
     }
 }
 
 fn graphql_args_to_json_args(
     selection: &mut Selection,
     args_fields: &[InputFieldRef],
+    query_schema: &QuerySchema,
 ) -> Option<IndexMap<String, JsonValue>> {
     if selection.arguments().is_empty() {
         return None;
@@ -56,9 +61,9 @@ fn graphql_args_to_json_args(
     for (arg_name, arg_value) in selection.arguments().iter().cloned() {
         let arg_field = args_fields.iter().find(|arg_field| arg_field.name == arg_name);
 
-        let inferrer = FieldTypeInferrer::from_field(arg_field).infer(&arg_value);
+        let inferrer = FieldTypeInferrer::from_field(arg_field, query_schema).infer(&arg_value);
 
-        let json = arg_value_to_json(arg_value, inferrer);
+        let json = arg_value_to_json(arg_value, inferrer, query_schema);
 
         args.insert(arg_name, json);
     }
@@ -66,28 +71,28 @@ fn graphql_args_to_json_args(
     Some(args)
 }
 
-fn arg_value_to_json(value: ArgumentValue, typ: InferredType) -> JsonValue {
+fn arg_value_to_json(value: ArgumentValue, typ: InferredType, query_schema: &QuerySchema) -> JsonValue {
     match (value, typ) {
         (ArgumentValue::Object(obj), InferredType::Object(typ)) => JsonValue::Object(
             obj.into_iter()
                 .map(|(k, v)| {
                     let field = typ.find_field(&k);
-                    let inferrer = FieldTypeInferrer::from_field(field.as_ref());
+                    let inferrer = FieldTypeInferrer::from_field(field.as_ref(), query_schema);
                     let inferred_type = inferrer.infer(&v);
 
-                    (k, arg_value_to_json(v, inferred_type))
+                    (k, arg_value_to_json(v, inferred_type, query_schema))
                 })
                 .collect(),
         ),
         (obj @ ArgumentValue::Object(_), InferredType::FieldRef) => {
-            let val = arg_value_to_json(obj, InferredType::Unknown);
+            let val = arg_value_to_json(obj, InferredType::Unknown, query_schema);
 
             make_json_custom_type(custom_types::FIELD_REF, val)
         }
         (ArgumentValue::Object(obj), InferredType::Unknown) => {
             let obj = obj
                 .into_iter()
-                .map(|(k, v)| (k, arg_value_to_json(v, InferredType::Unknown)))
+                .map(|(k, v)| (k, arg_value_to_json(v, InferredType::Unknown, query_schema)))
                 .collect();
 
             JsonValue::Object(obj)
@@ -104,9 +109,9 @@ fn arg_value_to_json(value: ArgumentValue, typ: InferredType) -> JsonValue {
             let values = list
                 .into_iter()
                 .map(|val| {
-                    let inferred_typ = FieldTypeInferrer::new(Some(&vec![typ.clone()])).infer(&val);
+                    let inferred_typ = FieldTypeInferrer::new(Some(&[typ.clone()])).infer(&val);
 
-                    arg_value_to_json(val, inferred_typ)
+                    arg_value_to_json(val, inferred_typ, query_schema)
                 })
                 .collect_vec();
 
@@ -114,14 +119,18 @@ fn arg_value_to_json(value: ArgumentValue, typ: InferredType) -> JsonValue {
         }
         (ArgumentValue::List(list), InferredType::Unknown) => JsonValue::Array(
             list.into_iter()
-                .map(|val| arg_value_to_json(val, InferredType::Unknown))
+                .map(|val| arg_value_to_json(val, InferredType::Unknown, query_schema))
                 .collect_vec(),
         ),
         _ => unreachable!(),
     }
 }
 
-fn graphql_selection_to_json_selection(selection: Selection, schema_field: &OutputFieldRef) -> SelectionSet {
+fn graphql_selection_to_json_selection(
+    selection: Selection,
+    schema_field: &OutputFieldRef,
+    query_schema: &QuerySchema,
+) -> SelectionSet {
     let mut res: IndexMap<String, SelectionSetValue> = IndexMap::new();
 
     for nested_selection in selection.nested_selections().iter().cloned() {
@@ -139,8 +148,11 @@ fn graphql_selection_to_json_selection(selection: Selection, schema_field: &Outp
                 .find_field(&selection_name)
                 .unwrap();
 
-            let nested =
-                SelectionSetValue::Nested(graphql_selection_to_json_field_query(nested_selection, &nested_field));
+            let nested = SelectionSetValue::Nested(graphql_selection_to_json_field_query(
+                nested_selection,
+                &nested_field,
+                query_schema,
+            ));
 
             res.insert(selection_name, nested);
         }
@@ -157,17 +169,17 @@ pub fn make_json_custom_type(typ: &str, val: JsonValue) -> JsonValue {
 /// when translated from GraphQL to JSON.
 struct FieldTypeInferrer<'a> {
     /// The list of input types of an input field.
-    types: Option<&'a Vec<InputType>>,
+    types: Option<&'a [InputType]>,
 }
 
 impl<'a> FieldTypeInferrer<'a> {
-    pub(crate) fn new(types: Option<&'a Vec<InputType>>) -> Self {
+    pub(crate) fn new(types: Option<&'a [InputType]>) -> Self {
         Self { types }
     }
 
-    pub(crate) fn from_field(field: Option<&'a InputFieldRef>) -> Self {
+    pub(crate) fn from_field(field: Option<&InputFieldRef>, query_schema: &'a QuerySchema) -> Self {
         Self {
-            types: field.map(|field| &field.field_types),
+            types: field.map(|field| field.field_types(query_schema)),
         }
     }
 

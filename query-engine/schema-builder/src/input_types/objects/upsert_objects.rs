@@ -41,9 +41,9 @@ fn nested_upsert_list_input_object(
             ctx.cache_input_type(ident, input_object.clone());
 
             let fields = vec![
-                input_field(args::WHERE, InputType::object(where_object), None),
-                input_field(args::UPDATE, update_types, None),
-                input_field(args::CREATE, create_types, None),
+                input_field(ctx, args::WHERE, InputType::object(where_object), None),
+                input_field(ctx, args::UPDATE, update_types, None),
+                input_field(ctx, args::CREATE, create_types, None),
             ];
 
             input_object.set_fields(fields);
@@ -78,8 +78,8 @@ fn nested_upsert_nonlist_input_object(
             ctx.cache_input_type(ident, input_object.clone());
 
             let mut fields = vec![
-                input_field(args::UPDATE, update_types, None),
-                input_field(args::CREATE, create_types, None),
+                input_field(ctx, args::UPDATE, update_types, None),
+                input_field(ctx, args::CREATE, create_types, None),
             ];
 
             if ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {

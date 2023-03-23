@@ -5,9 +5,9 @@ use super::{
 use schema::{InputFieldRef, InputType, OutputFieldRef, ScalarType};
 
 pub(super) fn render_input_field(input_field: &InputFieldRef, ctx: &mut RenderContext) -> DmmfInputField {
-    let type_references = render_input_types(&input_field.field_types, ctx);
+    let type_references = render_input_types(input_field.field_types(ctx.query_schema), ctx);
     let nullable = input_field
-        .field_types
+        .field_types(ctx.query_schema)
         .iter()
         .any(|typ| matches!(typ, InputType::Scalar(ScalarType::Null)));
 

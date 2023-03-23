@@ -9,7 +9,7 @@ use prisma_models::{prelude::ParentContainer, CompositeFieldRef};
 pub(crate) fn where_argument(ctx: &mut BuilderContext, model: &ModelRef) -> InputField {
     let where_object = filter_objects::where_object_type(ctx, model);
 
-    input_field(args::WHERE, InputType::object(where_object), None).optional()
+    input_field(ctx, args::WHERE, InputType::object(where_object), None).optional()
 }
 
 /// Builds "where" argument which input type is the where unique type of the input builder.
@@ -19,7 +19,12 @@ pub(crate) fn where_unique_argument(ctx: &mut BuilderContext, model: &ModelRef) 
     if input_object_type.into_arc().is_empty() {
         None
     } else {
-        Some(input_field(args::WHERE, InputType::object(input_object_type), None))
+        Some(input_field(
+            ctx,
+            args::WHERE,
+            InputType::object(input_object_type),
+            None,
+        ))
     }
 }
 
@@ -33,7 +38,7 @@ pub(crate) fn update_one_arguments(ctx: &mut BuilderContext, model: &ModelRef) -
     where_unique_argument(ctx, model).map(|unique_arg| {
         let update_types = update_one_objects::update_one_input_types(ctx, model, None);
 
-        vec![input_field(args::DATA, update_types, None), unique_arg]
+        vec![input_field(ctx, args::DATA, update_types, None), unique_arg]
     })
 }
 
@@ -48,8 +53,8 @@ pub(crate) fn upsert_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Op
         } else {
             Some(vec![
                 where_unique_arg,
-                input_field(args::CREATE, create_types, None),
-                input_field(args::UPDATE, update_types, None),
+                input_field(ctx, args::CREATE, create_types, None),
+                input_field(ctx, args::UPDATE, update_types, None),
             ])
         }
     })
@@ -60,7 +65,7 @@ pub(crate) fn update_many_arguments(ctx: &mut BuilderContext, model: &ModelRef) 
     let update_many_types = update_many_objects::update_many_input_types(ctx, model, None);
     let where_arg = where_argument(ctx, model);
 
-    vec![input_field(args::DATA, update_many_types, None), where_arg]
+    vec![input_field(ctx, args::DATA, update_many_types, None), where_arg]
 }
 
 /// Builds "where" argument intended for the delete many field.
@@ -112,20 +117,14 @@ pub(crate) fn relation_to_many_selection_arguments(
     let mut args = vec![
         where_argument(ctx, model),
         order_by_argument(ctx, &model.into(), &order_by_options),
-        input_field(args::CURSOR, unique_input_type, None).optional(),
-        input_field(args::TAKE, InputType::int(), None).optional(),
-        input_field(args::SKIP, InputType::int(), None).optional(),
+        input_field(ctx, args::CURSOR, unique_input_type, None).optional(),
+        input_field(ctx, args::TAKE, InputType::int(), None).optional(),
+        input_field(ctx, args::SKIP, InputType::int(), None).optional(),
     ];
 
     if include_distinct {
-        args.push(
-            input_field(
-                args::DISTINCT,
-                InputType::list(InputType::Enum(model_field_enum(ctx, model))),
-                None,
-            )
-            .optional(),
-        );
+        let input_type = InputType::list(InputType::Enum(model_field_enum(ctx, model)));
+        args.push(input_field(ctx, args::DISTINCT, input_type, None).optional());
     }
 
     args
@@ -150,6 +149,7 @@ pub(crate) fn order_by_argument(
     let order_object_type = InputType::object(order_by_objects::order_by_object_type(ctx, container, options));
 
     input_field(
+        ctx,
         args::ORDER_BY,
         vec![InputType::list(order_object_type.clone()), order_object_type],
         None,
@@ -159,22 +159,19 @@ pub(crate) fn order_by_argument(
 
 pub(crate) fn group_by_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<InputField> {
     let field_enum_type = InputType::Enum(model_field_enum(ctx, model));
+    let filter_object = InputType::object(filter_objects::scalar_filter_object_type(ctx, model, true));
 
     vec![
         where_argument(ctx, model),
         order_by_argument(ctx, &model.into(), &OrderByOptions::new().with_aggregates()),
         input_field(
+            ctx,
             args::BY,
             vec![InputType::list(field_enum_type.clone()), field_enum_type],
             None,
         ),
-        input_field(
-            args::HAVING,
-            InputType::object(filter_objects::scalar_filter_object_type(ctx, model, true)),
-            None,
-        )
-        .optional(),
-        input_field(args::TAKE, InputType::int(), None).optional(),
-        input_field(args::SKIP, InputType::int(), None).optional(),
+        input_field(ctx, args::HAVING, filter_object, None).optional(),
+        input_field(ctx, args::TAKE, InputType::int(), None).optional(),
+        input_field(ctx, args::SKIP, InputType::int(), None).optional(),
     ]
 }

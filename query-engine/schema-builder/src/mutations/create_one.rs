@@ -37,7 +37,9 @@ pub(crate) fn create_one_arguments(ctx: &mut BuilderContext, model: &ModelRef) -
     if all_empty {
         None
     } else {
-        Some(vec![input_field(args::DATA, create_types, None).optional_if(any_empty)])
+        Some(vec![
+            input_field(ctx, args::DATA, create_types, None).optional_if(any_empty)
+        ])
     }
 }
 

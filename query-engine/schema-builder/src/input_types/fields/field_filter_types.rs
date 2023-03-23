@@ -79,9 +79,9 @@ fn to_many_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRe
     let related_input_type = filter_objects::where_object_type(ctx, &related_model);
 
     let fields = vec![
-        input_field(filters::EVERY, InputType::object(related_input_type.clone()), None).optional(),
-        input_field(filters::SOME, InputType::object(related_input_type.clone()), None).optional(),
-        input_field(filters::NONE, InputType::object(related_input_type), None).optional(),
+        input_field(ctx, filters::EVERY, InputType::object(related_input_type.clone()), None).optional(),
+        input_field(ctx, filters::SOME, InputType::object(related_input_type.clone()), None).optional(),
+        input_field(ctx, filters::NONE, InputType::object(related_input_type), None).optional(),
     ];
 
     object.set_fields(fields);
@@ -101,12 +101,12 @@ fn to_one_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRef
     ctx.cache_input_type(ident, object.clone());
 
     let fields = vec![
-        input_field(filters::IS, InputType::object(related_input_type.clone()), None)
+        input_field(ctx, filters::IS, InputType::object(related_input_type.clone()), None)
             .optional()
-            .nullable_if(!rf.is_required()),
-        input_field(filters::IS_NOT, InputType::object(related_input_type), None)
+            .nullable_if(!rf.is_required(), &mut ctx.input_field_types),
+        input_field(ctx, filters::IS_NOT, InputType::object(related_input_type), None)
             .optional()
-            .nullable_if(!rf.is_required()),
+            .nullable_if(!rf.is_required(), &mut ctx.input_field_types),
     ];
 
     object.set_fields(fields);
@@ -137,19 +137,24 @@ fn to_one_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeFieldR
     let composite_equals_object = filter_objects::composite_equality_object(ctx, cf);
 
     let mut fields = vec![
-        input_field(filters::EQUALS, InputType::object(composite_equals_object), None)
+        input_field(ctx, filters::EQUALS, InputType::object(composite_equals_object), None)
             .optional()
-            .nullable_if(!cf.is_required()),
-        input_field(filters::IS, InputType::object(composite_where_object.clone()), None)
+            .nullable_if(!cf.is_required(), &mut ctx.input_field_types),
+        input_field(
+            ctx,
+            filters::IS,
+            InputType::object(composite_where_object.clone()),
+            None,
+        )
+        .optional()
+        .nullable_if(!cf.is_required(), &mut ctx.input_field_types),
+        input_field(ctx, filters::IS_NOT, InputType::object(composite_where_object), None)
             .optional()
-            .nullable_if(!cf.is_required()),
-        input_field(filters::IS_NOT, InputType::object(composite_where_object), None)
-            .optional()
-            .nullable_if(!cf.is_required()),
+            .nullable_if(!cf.is_required(), &mut ctx.input_field_types),
     ];
 
     if ctx.has_capability(ConnectorCapability::UndefinedType) && cf.is_optional() {
-        fields.push(is_set_input_field());
+        fields.push(is_set_input_field(ctx));
     }
 
     object.set_fields(fields);
@@ -172,6 +177,7 @@ fn to_many_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeField
 
     let mut fields = vec![
         input_field(
+            ctx,
             filters::EQUALS,
             // The object (aka shorthand) syntax is only supported because the client used to expose all
             // list input types as T | T[]. Consider removing it one day.
@@ -179,15 +185,27 @@ fn to_many_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeField
             None,
         )
         .optional(),
-        input_field(filters::EVERY, InputType::object(composite_where_object.clone()), None).optional(),
-        input_field(filters::SOME, InputType::object(composite_where_object.clone()), None).optional(),
-        input_field(filters::NONE, InputType::object(composite_where_object), None).optional(),
-        input_field(filters::IS_EMPTY, InputType::boolean(), None).optional(),
+        input_field(
+            ctx,
+            filters::EVERY,
+            InputType::object(composite_where_object.clone()),
+            None,
+        )
+        .optional(),
+        input_field(
+            ctx,
+            filters::SOME,
+            InputType::object(composite_where_object.clone()),
+            None,
+        )
+        .optional(),
+        input_field(ctx, filters::NONE, InputType::object(composite_where_object), None).optional(),
+        input_field(ctx, filters::IS_EMPTY, InputType::boolean(), None).optional(),
     ];
 
     // TODO: Remove from required lists once we have optional lists
     if ctx.has_capability(ConnectorCapability::UndefinedType) {
-        fields.push(is_set_input_field());
+        fields.push(is_set_input_field(ctx));
     }
 
     object.set_fields(fields);
@@ -214,22 +232,25 @@ fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> Inp
     let mapped_list_type = InputType::list(mapped_nonlist_type.clone());
     let mut fields: Vec<_> = equality_filters(ctx, mapped_list_type.clone(), !sf.is_required()).collect();
 
+    let mapped_nonlist_type_with_field_ref_input = mapped_nonlist_type.with_field_ref_input(ctx);
     fields.push(
-        input_field(filters::HAS, mapped_nonlist_type.with_field_ref_input(ctx), None)
+        input_field(ctx, filters::HAS, mapped_nonlist_type_with_field_ref_input, None)
             .optional()
-            .nullable_if(!sf.is_required()),
+            .nullable_if(!sf.is_required(), &mut ctx.input_field_types),
     );
 
+    let mapped_list_type_with_field_ref_input = mapped_list_type.with_field_ref_input(ctx);
     fields.push(
         input_field(
+            ctx,
             filters::HAS_EVERY,
-            mapped_list_type.clone().with_field_ref_input(ctx),
+            mapped_list_type_with_field_ref_input.clone(),
             None,
         )
         .optional(),
     );
-    fields.push(input_field(filters::HAS_SOME, mapped_list_type.with_field_ref_input(ctx), None).optional());
-    fields.push(input_field(filters::IS_EMPTY, InputType::boolean(), None).optional());
+    fields.push(input_field(ctx, filters::HAS_SOME, mapped_list_type_with_field_ref_input, None).optional());
+    fields.push(input_field(ctx, filters::IS_EMPTY, InputType::boolean(), None).optional());
 
     object.set_fields(fields);
     Arc::downgrade(&object)
@@ -366,15 +387,15 @@ fn full_scalar_filter_type(
     }
 
     if ctx.has_capability(ConnectorCapability::UndefinedType) && (list || nullable) {
-        fields.push(is_set_input_field());
+        fields.push(is_set_input_field(ctx));
     }
 
     object.set_fields(fields);
     Arc::downgrade(&object)
 }
 
-fn is_set_input_field() -> InputField {
-    input_field(filters::IS_SET, InputType::boolean(), None).optional()
+fn is_set_input_field(ctx: &mut BuilderContext) -> InputField {
+    input_field(ctx, filters::IS_SET, InputType::boolean(), None).optional()
 }
 
 fn equality_filters(
@@ -385,9 +406,9 @@ fn equality_filters(
     let types = mapped_type.with_field_ref_input(ctx);
 
     std::iter::once(
-        input_field(filters::EQUALS, types, None)
+        input_field(ctx, filters::EQUALS, types, None)
             .optional()
-            .nullable_if(nullable),
+            .nullable_if(nullable, &mut ctx.input_field_types),
     )
 }
 
@@ -401,11 +422,12 @@ fn json_equality_filters(
         let mut field_types = mapped_type.with_field_ref_input(ctx);
         field_types.push(InputType::Enum(enum_type));
 
-        input_field(filters::EQUALS, field_types, None).optional()
+        input_field(ctx, filters::EQUALS, field_types, None).optional()
     } else {
-        input_field(filters::EQUALS, mapped_type.with_field_ref_input(ctx), None)
+        let inner = mapped_type.with_field_ref_input(ctx);
+        input_field(ctx, filters::EQUALS, inner, None)
             .optional()
-            .nullable_if(nullable)
+            .nullable_if(nullable, &mut ctx.input_field_types)
     };
 
     std::iter::once(field)
@@ -425,12 +447,12 @@ fn inclusion_filters(
     };
 
     vec![
-        input_field(filters::IN, field_types.clone(), None)
+        input_field(ctx, filters::IN, field_types.clone(), None)
             .optional()
-            .nullable_if(nullable),
-        input_field(filters::NOT_IN, field_types, None)
+            .nullable_if(nullable, &mut ctx.input_field_types),
+        input_field(ctx, filters::NOT_IN, field_types, None)
             .optional()
-            .nullable_if(nullable), // Kept for legacy reasons!
+            .nullable_if(nullable, &mut ctx.input_field_types), // Kept for legacy reasons!
     ]
     .into_iter()
 }
@@ -446,10 +468,10 @@ fn alphanumeric_filters(ctx: &mut BuilderContext, mapped_type: InputType) -> imp
         };
 
     vec![
-        input_field(filters::LOWER_THAN, field_types.clone(), None).optional(),
-        input_field(filters::LOWER_THAN_OR_EQUAL, field_types.clone(), None).optional(),
-        input_field(filters::GREATER_THAN, field_types.clone(), None).optional(),
-        input_field(filters::GREATER_THAN_OR_EQUAL, field_types, None).optional(),
+        input_field(ctx, filters::LOWER_THAN, field_types.clone(), None).optional(),
+        input_field(ctx, filters::LOWER_THAN_OR_EQUAL, field_types.clone(), None).optional(),
+        input_field(ctx, filters::GREATER_THAN, field_types.clone(), None).optional(),
+        input_field(ctx, filters::GREATER_THAN_OR_EQUAL, field_types, None).optional(),
     ]
     .into_iter()
 }
@@ -464,11 +486,11 @@ fn string_filters(
     let string_filters = ctx.connector.string_filters(input_object_type_name);
     let mut string_filters: Vec<_> = string_filters
         .iter()
-        .map(|filter| input_field(filter.name(), field_types.clone(), None).optional())
+        .map(|filter| input_field(ctx, filter.name(), field_types.clone(), None).optional())
         .collect();
 
     if ctx.can_full_text_search() {
-        string_filters.push(input_field(filters::SEARCH, mapped_type, None).optional());
+        string_filters.push(input_field(ctx, filters::SEARCH, mapped_type, None).optional());
     }
 
     string_filters.into_iter()
@@ -484,48 +506,29 @@ fn json_filters(ctx: &mut BuilderContext) -> impl Iterator<Item = InputField> {
     } else {
         unreachable!()
     };
+    let string_with_field_ref_input = InputType::string().with_field_ref_input(ctx);
+    let json_with_field_ref_input = InputType::json().with_field_ref_input(ctx);
 
     vec![
-        input_field(filters::PATH, path_type, None).optional(),
+        input_field(ctx, filters::PATH, path_type, None).optional(),
+        input_field(ctx, filters::STRING_CONTAINS, string_with_field_ref_input.clone(), None).optional(),
         input_field(
-            filters::STRING_CONTAINS,
-            InputType::string().with_field_ref_input(ctx),
-            None,
-        )
-        .optional(),
-        input_field(
+            ctx,
             filters::STRING_STARTS_WITH,
-            InputType::string().with_field_ref_input(ctx),
+            string_with_field_ref_input.clone(),
             None,
         )
         .optional(),
-        input_field(
-            filters::STRING_ENDS_WITH,
-            InputType::string().with_field_ref_input(ctx),
-            None,
-        )
-        .optional(),
-        input_field(
-            filters::ARRAY_CONTAINS,
-            InputType::json().with_field_ref_input(ctx),
-            None,
-        )
-        .optional()
-        .nullable(),
-        input_field(
-            filters::ARRAY_STARTS_WITH,
-            InputType::json().with_field_ref_input(ctx),
-            None,
-        )
-        .optional()
-        .nullable(),
-        input_field(
-            filters::ARRAY_ENDS_WITH,
-            InputType::json().with_field_ref_input(ctx),
-            None,
-        )
-        .optional()
-        .nullable(),
+        input_field(ctx, filters::STRING_ENDS_WITH, string_with_field_ref_input, None).optional(),
+        input_field(ctx, filters::ARRAY_CONTAINS, json_with_field_ref_input.clone(), None)
+            .optional()
+            .nullable(&mut ctx.input_field_types),
+        input_field(ctx, filters::ARRAY_STARTS_WITH, json_with_field_ref_input.clone(), None)
+            .optional()
+            .nullable(&mut ctx.input_field_types),
+        input_field(ctx, filters::ARRAY_ENDS_WITH, json_with_field_ref_input, None)
+            .optional()
+            .nullable(&mut ctx.input_field_types),
     ]
     .into_iter()
 }
@@ -537,6 +540,7 @@ fn query_mode_field(ctx: &mut BuilderContext, nested: bool) -> impl Iterator<Ite
         let enum_type = query_mode_enum(ctx);
 
         let field = input_field(
+            ctx,
             filters::MODE,
             InputType::enum_type(enum_type),
             Some(dml::DefaultKind::Single(PrismaValue::Enum(filters::DEFAULT.to_owned()))),
@@ -567,7 +571,7 @@ fn aggregate_filter_field(
     list: bool,
 ) -> InputField {
     let filters = full_scalar_filter_type(ctx, typ, None, list, nullable, true, false);
-    input_field(aggregation, InputType::object(filters), None).optional()
+    input_field(ctx, aggregation, InputType::object(filters), None).optional()
 }
 
 fn map_avg_type_ident(typ: TypeIdentifier) -> TypeIdentifier {
@@ -596,16 +600,15 @@ fn not_filter_field(
             let mut field_types = mapped_scalar_type.with_field_ref_input(ctx);
             field_types.push(InputType::Enum(enum_type));
 
-            input_field(filters::NOT_LOWERCASE, field_types, None).optional()
+            input_field(ctx, filters::NOT_LOWERCASE, field_types, None).optional()
         }
 
-        TypeIdentifier::Json => input_field(
-            filters::NOT_LOWERCASE,
-            mapped_scalar_type.with_field_ref_input(ctx),
-            None,
-        )
-        .optional()
-        .nullable_if(is_nullable),
+        TypeIdentifier::Json => {
+            let ty = mapped_scalar_type.with_field_ref_input(ctx);
+            input_field(ctx, filters::NOT_LOWERCASE, ty, None)
+                .optional()
+                .nullable_if(is_nullable, &mut ctx.input_field_types)
+        }
 
         _ => {
             // Full nested filter. Only available on non-JSON fields.
@@ -619,9 +622,9 @@ fn not_filter_field(
                 include_aggregates,
             ));
 
-            input_field(filters::NOT_LOWERCASE, vec![mapped_scalar_type, shorthand], None)
+            input_field(ctx, filters::NOT_LOWERCASE, vec![mapped_scalar_type, shorthand], None)
                 .optional()
-                .nullable_if(is_nullable)
+                .nullable_if(is_nullable, &mut ctx.input_field_types)
         }
     }
 }
