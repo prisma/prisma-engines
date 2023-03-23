@@ -122,7 +122,7 @@
 <span class="doccomment">/// The maximum length of identifiers on mysql is 64 bytes.
 ///
 /// Source: https://dev.mysql.com/doc/mysql-reslimits-excerpt/5.5/en/identifier-length.html
-</span><span class="kw">fn </span>mysql_safe_identifier(identifier: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;</span>str {
+</span><span class="kw">pub fn </span>mysql_safe_identifier(identifier: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;</span>str {
     <span class="kw">if </span>identifier.len() &lt;= <span class="number">64 </span>{
         identifier
     } <span class="kw">else </span>{
