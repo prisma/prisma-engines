@@ -38,7 +38,7 @@ pub enum ValidationErrorKind {
     TooManyFieldsGiven,
     /// See [`ValidationError::selection_set_on_scalar`]
     SelectionSetOnScalar,
-    /// See [`ValidationError::required_value_not_set`]
+    /// See [`ValidationError::required_argument_missing`]
     RequiredArgumentMissing,
     /// See [`ValidationError::union`]
     Union,
@@ -438,7 +438,7 @@ impl ValidationError {
         }
     }
 
-    /// Creates an [`ValidationErrorKind::ValueTooBig`] kind of error, which happens when the value
+    /// Creates an [`ValidationErrorKind::ValueTooLarge`] kind of error, which happens when the value
     /// for a float or integer coming from the JS client is larger than what can fit in an i64
     /// (2^64 - 1 = 18446744073709550000)
     ///
@@ -459,8 +459,6 @@ impl ValidationError {
     ///     }
     /// }
     ///
-    /// TODO: should this be a https://www.prisma.io/docs/reference/api-reference/error-reference#p2033 instead?
-    /// See: libs/user-facing-errors/src/query_engine/mod.rs:312
     pub fn value_too_large(selection_path: Vec<String>, argument_path: Vec<String>, value: String) -> Self {
         let argument_name = argument_path.last().expect("Argument path cannot not be empty");
         let message = format!(

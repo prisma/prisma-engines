@@ -22,7 +22,7 @@ use std::{any::type_name, collections::BTreeMap, convert::TryInto};
 use tracing::trace;
 
 /// A PostgreSQL sequence.
-/// https://www.postgresql.org/docs/current/view-pg-sequences.html
+/// <https://www.postgresql.org/docs/current/view-pg-sequences.html>
 #[derive(Debug)]
 pub struct Sequence {
     /// Sequence name

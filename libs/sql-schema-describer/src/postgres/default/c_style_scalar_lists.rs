@@ -1,5 +1,5 @@
 //! Scalar list defaults of the form `'{}'`.
-//! Reference: https://www.postgresql.org/docs/current/arrays.html
+//! Reference: <https://www.postgresql.org/docs/current/arrays.html>
 
 use super::{tokenize, Parser, Token};
 use crate::{ColumnType, ColumnTypeFamily};
