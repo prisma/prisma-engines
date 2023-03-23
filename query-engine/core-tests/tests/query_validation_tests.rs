@@ -1,3 +1,4 @@
+use psl::ALL_PREVIEW_FEATURES;
 use query_core::query_graph_builder::QueryGraphBuilder;
 use request_handlers::JsonSingleQuery;
 use serde_json::json;
@@ -12,13 +13,25 @@ fn run_query_validation_test(query_file_path: &str) {
     let query = std::fs::read_to_string(&query_file_path).unwrap();
     let schema = std::fs::read_to_string(schema_path).unwrap();
 
+    let all_features = ALL_PREVIEW_FEATURES
+        .active_features()
+        .iter()
+        .chain(ALL_PREVIEW_FEATURES.hidden_features())
+        .collect();
     let parsed_schema = psl::parse_schema(schema).unwrap();
     let prisma_models_schema = prisma_models::convert(Arc::new(parsed_schema));
-    let schema = Arc::new(schema_builder::build(prisma_models_schema, true));
+    let schema = Arc::new(schema_builder::build_with_features(
+        prisma_models_schema,
+        all_features,
+        true,
+    ));
 
     let err_string = match validate(&query, schema) {
         Ok(()) => panic!("these tests are only for errors, the query should fail to validate, but it did not"),
-        Err(err) => json!(user_facing_errors::Error::from(err)).to_string(),
+        Err(err) => {
+            let value = json!(user_facing_errors::Error::from(err));
+            serde_json::to_string_pretty(&value).unwrap()
+        }
     };
 
     let snapshot_path = query_file_path.parent().unwrap().with_file_name(
@@ -83,10 +96,4 @@ fn validate(query: &str, schema: schema::QuerySchemaRef) -> Result<(), request_h
         .map_err(query_core::CoreError::from)?;
     Ok(())
 }
-
-// #[test]
-// fn postgres_basic_create_with_non_existent_field() {
-//     run_query_validation_test("postgres_basic/selection_is_empty.query.json");
-// }
-
 include!(concat!(env!("OUT_DIR"), "/query_validation_tests.rs"));

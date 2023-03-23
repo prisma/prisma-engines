@@ -5131,6 +5131,7 @@ version = "0.1.0"
 dependencies = [
  "backtrace",
  "indoc",
+ "itertools",
  "quaint",
  "serde",
  "serde_json",

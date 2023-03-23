@@ -1,0 +1,12 @@
+{
+    "action": "findMany",
+    "modelName": "User",
+    "query": {
+        "arguments": {
+            "foo": "123"
+        },
+        "selection": {
+            "$scalars": true
+        }
+    }
+}

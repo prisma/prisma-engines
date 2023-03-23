@@ -1,1 +1,0 @@
-{"is_panic":false,"message":"Failed to validate the query: `Expected a minimum of 1 fields to be present, got 0.` at `Query.findManyUser.User`","meta":{"query_validation_error":"Expected a minimum of 1 fields to be present, got 0.","query_position":"Query.findManyUser.User"},"error_code":"P2009"}

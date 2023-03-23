@@ -210,7 +210,7 @@ mod one_relation {
             runner,
             r#"query { findManyBlog { post(where: { title: "title 1" }) { title } } }"#,
             2009,
-            "Failed to validate the query: `Argument does not exist on enclosing type."
+            "Argument does not exist in enclosing type"
         );
 
         Ok(())

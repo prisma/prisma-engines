@@ -225,4 +225,11 @@ impl OutputField {
     pub fn query_tag(&self) -> Option<&QueryTag> {
         self.query_info().map(|info| &info.tag)
     }
+
+    // Is relation determines whether the given output field maps to a a relation, i.e.
+    // is an object and that object is backed by a model, meaning that it is not an scalar list
+    pub fn maps_to_relation(&self) -> bool {
+        let o = self.field_type.as_object_type();
+        o.is_some() && o.unwrap().model.is_some()
+    }
 }

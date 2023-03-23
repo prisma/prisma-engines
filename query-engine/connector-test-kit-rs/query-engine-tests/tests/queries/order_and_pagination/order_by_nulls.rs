@@ -406,7 +406,7 @@ mod order_by_nulls {
             runner,
             r#"{ findManyTestModel(orderBy: { id: { sort: asc, nulls: first } }) { id } }"#,
             2009,
-            "Value types mismatch"
+            "Invalid argument type"
         );
 
         Ok(())
@@ -418,7 +418,7 @@ mod order_by_nulls {
             runner,
             r#"{ findManyTestModel(orderBy: { string: { sort: asc, nulls: first } }) { id } }"#,
             2009,
-            "Value types mismatch"
+            "Invalid argument type"
         );
 
         Ok(())

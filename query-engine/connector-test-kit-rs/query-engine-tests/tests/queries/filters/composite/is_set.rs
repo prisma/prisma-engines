@@ -256,8 +256,7 @@ mod is_set_to_one {
         assert_error!(
             runner,
             r#"{ findManyTestModel(where: { a: { isSet: true } }) { id } }"#,
-            2009,
-            "Query.findManyTestModel.where.TestModelWhereInput.a.ACompositeFilter.isSet"
+            2009
         );
 
         Ok(())
@@ -520,7 +519,7 @@ mod is_set_scalar {
             runner,
             r#"{ findManyTestModel(where: { id: { isSet: true } }) { id } }"#,
             2009,
-            "Query.findManyTestModel.where.TestModelWhereInput.id.IntFilter.isSet`: Field does not exist on enclosing type"
+            "Field does not exist in enclosing type"
         );
 
         Ok(())

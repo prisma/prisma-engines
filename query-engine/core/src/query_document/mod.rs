@@ -15,7 +15,6 @@
 //!    - it can have a number of nested selections (selection set in GQL).
 //! - Arguments contain concrete values and complex subtypes that are parsed and validated by the query builders, and then used for querying data (input types in GQL).
 mod argument_value;
-mod error;
 mod operation;
 mod parse_ast;
 mod parser;
@@ -26,7 +25,6 @@ pub use argument_value::{ArgumentValue, ArgumentValueObject};
 pub use operation::Operation;
 pub use selection::{In, Selection, SelectionArgument, SelectionSet};
 
-pub(crate) use error::*;
 pub(crate) use parse_ast::*;
 pub(crate) use parser::*;
 
@@ -35,8 +33,9 @@ use prisma_models::ModelRef;
 use schema::QuerySchemaRef;
 use schema_builder::constants::*;
 use std::collections::HashMap;
+use user_facing_errors::query_engine::validation::ValidationError;
 
-pub(crate) type QueryParserResult<T> = std::result::Result<T, QueryParserError>;
+pub(crate) type QueryParserResult<T> = std::result::Result<T, ValidationError>;
 
 #[derive(Debug)]
 pub enum QueryDocument {

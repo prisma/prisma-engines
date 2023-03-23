@@ -1,0 +1,14 @@
+{
+    "action": "findMany",
+    "modelName": "User",
+    "query": {
+        "arguments": {
+            "where": {
+                "id": 18446744073709550000
+            }
+        },
+        "selection": {
+            "$scalars": true
+        }
+    }
+}

@@ -1,9 +1,8 @@
-mod validation;
+pub mod validation;
 
 use serde::Serialize;
 use std::fmt;
 use user_facing_error_macros::*;
-pub use validation::*;
 
 #[derive(Debug, PartialEq, Eq, Serialize, Clone)]
 #[serde(untagged)]
@@ -145,12 +144,6 @@ pub struct RawQueryFailed {
 #[user_facing(code = "P2011", message = "Null constraint violation on the {constraint}")]
 pub struct NullConstraintViolation {
     pub constraint: DatabaseConstraint,
-}
-
-#[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(code = "P2012", message = "Missing a required value at `{path}`")]
-pub struct MissingRequiredValue {
-    pub path: String,
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
