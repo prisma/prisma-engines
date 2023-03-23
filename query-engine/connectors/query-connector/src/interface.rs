@@ -121,7 +121,7 @@ pub enum AggregationSelection {
 }
 
 impl AggregationSelection {
-    /// Returns (<field db name>, TypeIdentifier, FieldArity)
+    /// Returns (field_db_name, TypeIdentifier, FieldArity)
     pub fn identifiers(&self) -> Vec<(String, TypeIdentifier, FieldArity)> {
         match self {
             AggregationSelection::Field(field) => {
