@@ -878,12 +878,10 @@ pub(crate) mod conversions {
 
     fn to_simplified_input_type_name(typ: &InputType) -> String {
         match typ {
-            InputType::Enum(e) => format!(
-                "{}",
-                e.upgrade()
-                    .map(|e| e.name().to_string())
-                    .expect("enum type should be upgradeable")
-            ),
+            InputType::Enum(e) => e
+                .upgrade()
+                .map(|e| e.name().to_string())
+                .expect("enum type should be upgradeable"),
             InputType::List(o) => format!("{}[]", to_simplified_input_type_name(o.as_ref())),
             InputType::Object(o) => o
                 .upgrade()
@@ -895,12 +893,10 @@ pub(crate) mod conversions {
 
     fn to_simplified_output_type_name(typ: &OutputType) -> String {
         match typ {
-            OutputType::Enum(e) => format!(
-                "{}",
-                e.upgrade()
-                    .map(|e| e.name().to_string())
-                    .expect("enum type should be upgradeable")
-            ),
+            OutputType::Enum(e) => e
+                .upgrade()
+                .map(|e| e.name().to_string())
+                .expect("enum type should be upgradeable"),
             OutputType::List(o) => format!("{}[]", to_simplified_output_type_name(o)),
             OutputType::Object(o) => o
                 .upgrade()
