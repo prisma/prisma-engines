@@ -1,4 +1,3 @@
-use crate::pk::PrimaryKey;
 use crate::*;
 use psl::parser_database::ScalarFieldType;
 use std::collections::BTreeSet;
@@ -13,18 +12,22 @@ impl Fields {
         Fields { model }
     }
 
-    pub fn id(&self) -> Option<PrimaryKey> {
-        self.model.walker().primary_key().map(|pk| PrimaryKey {
-            fields: pk
-                .fields()
-                .map(|f| self.model.dm.clone().zip(ScalarFieldId::InModel(f.id)))
-                .collect::<Vec<_>>(),
-            alias: pk.name().map(ToOwned::to_owned),
+    pub fn id_fields(&self) -> Option<impl Iterator<Item = ScalarFieldRef> + Clone + '_> {
+        self.model.walker().primary_key().map(|pk| {
+            pk.fields()
+                .map(move |field| self.model.dm.clone().zip(ScalarFieldId::InModel(field.id)))
         })
     }
 
-    pub fn compound_id(&self) -> Option<PrimaryKey> {
-        self.id().filter(|pk| pk.fields().len() > 1)
+    pub fn compound_id(&self) -> Option<impl Iterator<Item = ScalarFieldRef> + Clone + '_> {
+        self.model
+            .walker()
+            .primary_key()
+            .filter(|pk| pk.fields().len() > 1)
+            .map(|pk| {
+                pk.fields()
+                    .map(|field| self.model.dm.clone().zip(ScalarFieldId::InModel(field.id)))
+            })
     }
 
     pub fn updated_at(&self) -> impl Iterator<Item = ScalarFieldRef> {
@@ -32,10 +35,9 @@ impl Fields {
     }
 
     pub fn scalar(&self) -> Vec<ScalarFieldRef> {
-        let model = self.model();
-        let internal_data_model = model.internal_data_model();
-        internal_data_model
-            .walk(model.id)
+        self.model
+            .dm
+            .walk(self.model.id)
             .scalar_fields()
             .filter(|sf| {
                 !matches!(
@@ -43,29 +45,27 @@ impl Fields {
                     ScalarFieldType::CompositeType(_) | ScalarFieldType::Unsupported(_)
                 )
             })
-            .map(|rf| internal_data_model.clone().zip(ScalarFieldId::InModel(rf.id)))
+            .map(|rf| self.model.dm.clone().zip(ScalarFieldId::InModel(rf.id)))
             .collect()
     }
 
     pub fn relation(&self) -> Vec<RelationFieldRef> {
-        let model = self.model();
-        let internal_data_model = model.internal_data_model();
-        internal_data_model
-            .walk(model.id)
+        self.model
+            .dm
+            .walk(self.model.id)
             .relation_fields()
             .filter(|rf| !rf.relation().is_ignored())
-            .map(|rf| internal_data_model.clone().zip(rf.id))
+            .map(|rf| self.model.dm.clone().zip(rf.id))
             .collect()
     }
 
     pub fn composite(&self) -> Vec<CompositeFieldRef> {
-        let model = self.model();
-        let internal_data_model = model.internal_data_model();
-        internal_data_model
-            .walk(model.id)
+        self.model
+            .dm
+            .walk(self.model.id)
             .scalar_fields()
             .filter(|sf| sf.scalar_field_type().as_composite_type().is_some())
-            .map(|sf| internal_data_model.clone().zip(CompositeFieldId::InModel(sf.id)))
+            .map(|sf| self.model.dm.clone().zip(CompositeFieldId::InModel(sf.id)))
             .collect()
     }
 
@@ -85,18 +85,16 @@ impl Fields {
     }
 
     pub fn find_from_all(&self, prisma_name: &str) -> crate::Result<Field> {
-        let model = self.model();
-        let internal_data_model = model.internal_data_model();
-        let model_walker = internal_data_model.walk(model.id);
+        let model_walker = self.model.walker();
         let mut scalar_fields = model_walker.scalar_fields();
         let mut relation_fields = model_walker.relation_fields();
         scalar_fields
             .find(|f| f.name() == prisma_name)
-            .map(|w| Field::from((internal_data_model.clone(), w)))
+            .map(|w| Field::from((self.model.dm.clone(), w)))
             .or_else(|| {
                 relation_fields
                     .find(|f| f.name() == prisma_name)
-                    .map(|w| Field::from((internal_data_model.clone(), w)))
+                    .map(|w| Field::from((self.model.dm.clone(), w)))
             })
             .ok_or_else(|| DomainError::FieldNotFound {
                 name: prisma_name.to_string(),
@@ -147,18 +145,16 @@ impl Fields {
     where
         P: Fn(&&Field) -> bool,
     {
-        let model = self.model();
-        let internal_data_model = model.internal_data_model();
-        let model_walker = internal_data_model.walk(model.id);
+        let model_walker = self.model.walker();
         model_walker
             .scalar_fields()
             .filter(|f| !f.is_ignored() && !f.is_unsupported())
-            .map(|w| Field::from((internal_data_model.clone(), w)))
+            .map(|w| Field::from((self.model.dm.clone(), w)))
             .chain(
                 model_walker
                     .relation_fields()
                     .filter(|rf| !rf.relation().is_ignored())
-                    .map(|w| Field::from((internal_data_model.clone(), w))),
+                    .map(|w| Field::from((self.model.dm.clone(), w))),
             )
             .filter(|f| predicate(&f))
             .collect()

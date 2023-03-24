@@ -9,12 +9,6 @@ impl Model {
         self.walker().name()
     }
 
-    /// Returns the schema name for the model
-    /// which is the contents of the @@schema("...") attribute
-    pub fn schema_name(&self) -> Option<String> {
-        self.walker().schema_name().map(ToOwned::to_owned)
-    }
-
     /// Returns the set of fields to be used as the primary identifier for a record of that model.
     /// The identifier is nothing but an internal convention to have an anchor point for querying, or in other words,
     /// the identifier is not to be mistaken for a stable, external identifier, but has to be understood as
@@ -41,9 +35,8 @@ impl Model {
     }
 
     pub fn supports_create_operation(&self) -> bool {
-        let dm = self.internal_data_model();
-        let walker = dm.walk(self.id);
-        let has_unsupported_field = walker
+        let has_unsupported_field = self
+            .walker()
             .scalar_fields()
             .any(|sf| sf.ast_field().arity.is_required() && sf.is_unsupported() && sf.default_value().is_none());
 
@@ -58,10 +51,6 @@ impl Model {
 
     pub fn db_name_opt(&self) -> Option<&str> {
         self.walker().mapped_name()
-    }
-
-    pub fn internal_data_model(&self) -> InternalDataModelRef {
-        self.dm.clone()
     }
 
     pub fn unique_indexes(&self) -> impl Iterator<Item = walkers::IndexWalker<'_>> {

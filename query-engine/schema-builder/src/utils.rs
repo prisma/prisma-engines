@@ -1,7 +1,10 @@
 use super::*;
 use once_cell::sync::OnceCell;
-use prisma_models::pk::PrimaryKey;
-use prisma_models::{dml, walkers, ModelRef};
+use prisma_models::{
+    dml,
+    walkers::{self, PrimaryKeyWalker},
+    ModelRef,
+};
 use std::{fmt, sync::Arc};
 
 /// Object type convenience wrapper function.
@@ -106,11 +109,8 @@ pub fn compound_index_field_name(index: &walkers::IndexWalker<'_>) -> String {
 }
 
 /// Computes a compound field name based on a multi-field id.
-pub fn compound_id_field_name(pk: &PrimaryKey) -> String {
-    pk.alias.clone().unwrap_or_else(|| {
-        let pk_fields = pk.fields();
-        let field_names: Vec<&str> = pk_fields.iter().map(|sf| sf.name()).collect();
-
-        field_names.join("_")
-    })
+pub fn compound_id_field_name(pk: PrimaryKeyWalker<'_>) -> String {
+    pk.name()
+        .map(ToOwned::to_owned)
+        .unwrap_or_else(|| pk.fields().map(|sf| sf.name()).collect::<Vec<_>>().join("_"))
 }

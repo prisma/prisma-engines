@@ -186,7 +186,7 @@ fn format_attribute(
     attribute: &str,
     indentation: IndentationType,
     newline: NewlineType,
-    attributes: &Vec<Attribute>,
+    attributes: &[Attribute],
 ) -> String {
     let separator = if attributes.is_empty() { newline.as_ref() } else { "" };
 

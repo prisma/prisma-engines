@@ -68,7 +68,7 @@ impl From<&ModelRef> for ParentContainer {
     }
 }
 
-impl From<ModelRef> for ParentContainer {
+impl From<Model> for ParentContainer {
     fn from(model: ModelRef) -> Self {
         Self::Model(model)
     }

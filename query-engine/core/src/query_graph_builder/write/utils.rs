@@ -394,7 +394,7 @@ pub fn insert_emulated_on_delete(
     }
 
     // If the connector uses the `RelationMode::Prisma` mode, then the emulation will kick in.
-    let internal_model = model_to_delete.internal_data_model();
+    let internal_model = &model_to_delete.dm;
     let relation_fields = internal_model.fields_pointing_to_model(model_to_delete);
 
     for rf in relation_fields {
@@ -942,7 +942,7 @@ pub fn insert_emulated_on_update_with_intermediary_node(
     }
 
     // If the connector uses the `RelationMode::Prisma` mode, then the emulation will kick in.
-    let internal_model = model_to_update.internal_data_model();
+    let internal_model = &model_to_update.dm;
     let relation_fields = internal_model.fields_pointing_to_model(model_to_update);
 
     let join_node = graph.create_node(Flow::Return(None));
@@ -991,7 +991,7 @@ pub fn insert_emulated_on_update(
     }
 
     // If the connector uses the `RelationMode::Prisma` mode, then the emulation will kick in.
-    let internal_model = model_to_update.internal_data_model();
+    let internal_model = &model_to_update.dm;
     let relation_fields = internal_model.fields_pointing_to_model(model_to_update);
 
     for rf in relation_fields {

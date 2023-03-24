@@ -121,12 +121,17 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
         })
         .collect();
     // @@id compound field (there can be only one per model).
-    let compound_id = model.fields().compound_id().map(|pk| {
-        let name = compound_id_field_name(&pk);
-        let typ = compound_field_unique_object_type(ctx, model, pk.alias.as_deref(), pk.fields());
+    let compound_id = model
+        .walker()
+        .primary_key()
+        .filter(|pk| pk.fields().len() > 1)
+        .map(|pk| {
+            let name = compound_id_field_name(pk);
+            let fields = model.fields().id_fields().unwrap().collect();
+            let typ = compound_field_unique_object_type(ctx, model, pk.name(), fields);
 
-        (name, typ)
-    });
+            (name, typ)
+        });
 
     // Concatenated list of uniques/@@unique/@@id fields on which the input type constraints should be applied (that at least one of them is set).
     let constrained_fields: Vec<_> = {
