@@ -145,7 +145,6 @@
 <a href="#145" id="145">145</a>
 <a href="#146" id="146">146</a>
 <a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>psl::parser_database::{
     ast::FieldArity,
@@ -203,9 +202,8 @@
     }
 
     <span class="kw">pub fn </span>relation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Relation {
-        <span class="kw">let </span>internal_data_model = <span class="self">self</span>.model().internal_data_model();
-        <span class="kw">let </span>relation_id = internal_data_model.walk(<span class="self">self</span>.id).relation().id;
-        internal_data_model.zip(relation_id)
+        <span class="kw">let </span>relation_id = <span class="self">self</span>.dm.walk(<span class="self">self</span>.id).relation().id;
+        <span class="self">self</span>.dm.clone().zip(relation_id)
     }
 
     <span class="doccomment">/// Alias for more clarity (in most cases, doesn&#39;t add more clarity for self-relations);

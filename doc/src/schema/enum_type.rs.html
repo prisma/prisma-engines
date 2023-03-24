@@ -170,8 +170,8 @@
 
 <span class="attr">#[derive(Debug, Clone, PartialEq)]
 </span><span class="kw">pub struct </span>StringEnumType {
-    <span class="kw">pub </span>identifier: Identifier,
-    <span class="kw">pub </span>values: Vec&lt;String&gt;,
+    identifier: Identifier,
+    values: Vec&lt;String&gt;,
 }
 
 <span class="kw">impl </span>StringEnumType {
@@ -191,8 +191,8 @@
 
 <span class="attr">#[derive(Debug, Clone, PartialEq)]
 </span><span class="kw">pub struct </span>DatabaseEnumType {
-    <span class="kw">pub </span>identifier: Identifier,
-    <span class="kw">pub </span>internal_enum: InternalEnum,
+    identifier: Identifier,
+    internal_enum: InternalEnum,
 }
 
 <span class="kw">impl </span>DatabaseEnumType {
@@ -230,8 +230,8 @@
 
 <span class="attr">#[derive(Debug, Clone, PartialEq)]
 </span><span class="kw">pub struct </span>FieldRefEnumType {
-    <span class="kw">pub </span>identifier: Identifier,
-    <span class="kw">pub </span>values: Vec&lt;(String, ScalarFieldRef)&gt;,
+    identifier: Identifier,
+    values: Vec&lt;(String, ScalarFieldRef)&gt;,
 }
 
 <span class="kw">impl </span>FieldRefEnumType {

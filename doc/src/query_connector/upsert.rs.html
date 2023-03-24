@@ -158,8 +158,8 @@
         }
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(ids) = <span class="self">self</span>.model.fields().compound_id() {
-            <span class="kw">if </span>ids.fields().iter().all(|f| scalars.contains(f)) {
-                <span class="kw">return </span>ids.fields();
+            <span class="kw">if </span>ids.clone().all(|f| scalars.contains(<span class="kw-2">&amp;</span>f)) {
+                <span class="kw">return </span>ids.collect();
             }
         }
 

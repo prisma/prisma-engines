@@ -77,7 +77,6 @@
 <a href="#77" id="77">77</a>
 <a href="#78" id="78">78</a>
 <a href="#79" id="79">79</a>
-<a href="#80" id="80">80</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{prelude::<span class="kw-2">*</span>, CompositeType, InternalEnum};
 <span class="kw">use </span>psl::schema_ast::ast;
 <span class="kw">use </span>std::sync::Arc;
@@ -141,13 +140,12 @@
     }
 
     <span class="doccomment">/// Finds all inline relation fields pointing to the given model.
-    </span><span class="kw">pub fn </span>fields_pointing_to_model(<span class="kw-2">&amp;</span><span class="self">self</span>, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; Vec&lt;RelationFieldRef&gt; {
+    </span><span class="kw">pub fn </span>fields_pointing_to_model(<span class="kw-2">&amp;</span><span class="self">self</span>, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RelationFieldRef&gt; + <span class="lifetime">&#39;_ </span>{
         <span class="self">self</span>.walk(model.id)
             .relations_to()
             .filter_map(|rel| rel.refine().as_inline())
             .filter_map(|inline_rel| inline_rel.forward_relation_field())
             .map(<span class="kw">move </span>|rf| <span class="self">self</span>.clone().zip(rf.id))
-            .collect()
     }
 
     <span class="kw">pub fn </span>walk&lt;I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, id: I) -&gt; psl::parser_database::walkers::Walker&lt;I&gt; {

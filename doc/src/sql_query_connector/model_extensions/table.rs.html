@@ -35,13 +35,21 @@
 <a href="#35" id="35">35</a>
 <a href="#36" id="36">36</a>
 <a href="#37" id="37">37</a>
+<a href="#38" id="38">38</a>
+<a href="#39" id="39">39</a>
+<a href="#40" id="40">40</a>
+<a href="#41" id="41">41</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{model_extensions::AsColumns, Context};
 <span class="kw">use </span>prisma_models::Model;
 <span class="kw">use </span>quaint::ast::{Column, Table};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>db_name_with_schema(model: <span class="kw-2">&amp;</span>Model, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Table&lt;<span class="lifetime">&#39;static</span>&gt; {
-    <span class="kw">let </span>schema_prefix = model.schema_name().unwrap_or_else(|| ctx.schema_name().to_owned());
-    <span class="kw">let </span>model_db_name = model.db_name().to_string();
+    <span class="kw">let </span>schema_prefix = model
+        .walker()
+        .schema_name()
+        .map(ToOwned::to_owned)
+        .unwrap_or_else(|| ctx.schema_name().to_owned());
+    <span class="kw">let </span>model_db_name = model.db_name().to_owned();
     (schema_prefix, model_db_name).into()
 }
 

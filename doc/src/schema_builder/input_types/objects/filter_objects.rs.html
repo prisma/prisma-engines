@@ -285,6 +285,11 @@
 <a href="#285" id="285">285</a>
 <a href="#286" id="286">286</a>
 <a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>constants::filters;
 <span class="kw">use </span>prisma_models::{prelude::ParentContainer, CompositeFieldRef};
@@ -408,12 +413,17 @@
         })
         .collect();
     <span class="comment">// @@id compound field (there can be only one per model).
-    </span><span class="kw">let </span>compound_id = model.fields().compound_id().map(|pk| {
-        <span class="kw">let </span>name = compound_id_field_name(<span class="kw-2">&amp;</span>pk);
-        <span class="kw">let </span>typ = compound_field_unique_object_type(ctx, model, pk.alias.as_deref(), pk.fields());
+    </span><span class="kw">let </span>compound_id = model
+        .walker()
+        .primary_key()
+        .filter(|pk| pk.fields().len() &gt; <span class="number">1</span>)
+        .map(|pk| {
+            <span class="kw">let </span>name = compound_id_field_name(pk);
+            <span class="kw">let </span>fields = model.fields().id_fields().unwrap().collect();
+            <span class="kw">let </span>typ = compound_field_unique_object_type(ctx, model, pk.name(), fields);
 
-        (name, typ)
-    });
+            (name, typ)
+        });
 
     <span class="comment">// Concatenated list of uniques/@@unique/@@id fields on which the input type constraints should be applied (that at least one of them is set).
     </span><span class="kw">let </span>constrained_fields: Vec&lt;<span class="kw">_</span>&gt; = {

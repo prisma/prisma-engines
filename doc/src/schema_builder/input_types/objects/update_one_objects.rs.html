@@ -227,6 +227,7 @@
 <a href="#227" id="227">227</a>
 <a href="#228" id="228">228</a>
 <a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{arguments, fields::data_input_mapper::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
 <span class="kw">use </span>constants::args;
 <span class="kw">use </span>psl::datamodel_connector::ConnectorCapability;
@@ -360,7 +361,8 @@
         <span class="macro">vec!</span>[]
     };
 
-    <span class="kw">let </span>id_fields = model.fields().id().map(|pk| pk.fields());
+    <span class="kw">let </span>fields = model.fields();
+    <span class="kw">let </span>id_fields = fields.id_fields();
     model.fields().filter_all(|field| <span class="kw">match </span>field {
         <span class="comment">// 1) In principle, all scalars are writable for unchecked inputs. However, it still doesn&#39;t make any sense to be able to write the scalars that
         // link the model to the parent record in case of a nested unchecked create, as this would introduce complexities we don&#39;t want to deal with right now.
@@ -369,7 +371,7 @@
             !linking_fields.contains(sf)
                 &amp;&amp; <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>id_fields) = <span class="kw-2">&amp;</span>id_fields {
                     <span class="comment">// Exclude @@id or @id fields if not updatable
-                    </span><span class="kw">if </span>id_fields.contains(sf) {
+                    </span><span class="kw">if </span>id_fields.clone().any(|f| f.id == sf.id) {
                         ctx.has_capability(ConnectorCapability::UpdateableId)
                     } <span class="kw">else </span>{
                         <span class="bool-val">true

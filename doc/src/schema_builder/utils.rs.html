@@ -116,8 +116,11 @@
 <a href="#116" id="116">116</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>once_cell::sync::OnceCell;
-<span class="kw">use </span>prisma_models::pk::PrimaryKey;
-<span class="kw">use </span>prisma_models::{dml, walkers, ModelRef};
+<span class="kw">use </span>prisma_models::{
+    dml,
+    walkers::{<span class="self">self</span>, PrimaryKeyWalker},
+    ModelRef,
+};
 <span class="kw">use </span>std::{fmt, sync::Arc};
 
 <span class="doccomment">/// Object type convenience wrapper function.
@@ -222,13 +225,10 @@
 }
 
 <span class="doccomment">/// Computes a compound field name based on a multi-field id.
-</span><span class="kw">pub fn </span>compound_id_field_name(pk: <span class="kw-2">&amp;</span>PrimaryKey) -&gt; String {
-    pk.alias.clone().unwrap_or_else(|| {
-        <span class="kw">let </span>pk_fields = pk.fields();
-        <span class="kw">let </span>field_names: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = pk_fields.iter().map(|sf| sf.name()).collect();
-
-        field_names.join(<span class="string">&quot;_&quot;</span>)
-    })
+</span><span class="kw">pub fn </span>compound_id_field_name(pk: PrimaryKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
+    pk.name()
+        .map(ToOwned::to_owned)
+        .unwrap_or_else(|| pk.fields().map(|sf| sf.name()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;().join(<span class="string">&quot;_&quot;</span>))
 }
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="schema_builder" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>

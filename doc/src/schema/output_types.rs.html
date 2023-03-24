@@ -381,7 +381,7 @@
         <span class="self">self</span>.fields.get_mut().unwrap().push(Arc::new(field));
     }
 
-    <span class="kw">pub fn </span>get_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Vec&lt;OutputFieldRef&gt; {
+    <span class="kw">pub fn </span>get_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[OutputFieldRef] {
         <span class="self">self</span>.fields.get().unwrap()
     }
 

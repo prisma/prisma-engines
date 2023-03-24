@@ -327,7 +327,7 @@
         </span>D: serde::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
         <span class="kw">let </span>action = String::deserialize(deserializer)<span class="question-mark">?</span>;
-        <span class="kw">let </span>query_tag = QueryTag::from(action);
+        <span class="kw">let </span>query_tag = QueryTag::from(action.as_str());
 
         <span class="prelude-val">Ok</span>(Action(query_tag))
     }

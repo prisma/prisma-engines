@@ -45,8 +45,8 @@
 <a href="#45" id="45">45</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>render_enum_types(ctx: <span class="kw-2">&amp;mut </span>RenderContext, enum_types: <span class="kw-2">&amp;</span>[EnumTypeRef]) {
-    <span class="kw">let </span><span class="kw-2">mut </span>borrows: Vec&lt;<span class="kw">_</span>&gt; = enum_types.iter().collect();
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>render_enum_types&lt;<span class="lifetime">&#39;a</span>&gt;(ctx: <span class="kw-2">&amp;mut </span>RenderContext, enum_types: <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>EnumType&gt; + <span class="lifetime">&#39;a</span>) {
+    <span class="kw">let </span><span class="kw-2">mut </span>borrows: Vec&lt;<span class="kw">_</span>&gt; = enum_types.collect();
 
     borrows.sort_by(|a, b| a.name().cmp(b.name()));
     borrows.into_iter().for_each(|et| DmmfEnumRenderer::new(et).render(ctx));

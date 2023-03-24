@@ -408,7 +408,7 @@
     attribute: <span class="kw-2">&amp;</span>str,
     indentation: IndentationType,
     newline: NewlineType,
-    attributes: <span class="kw-2">&amp;</span>Vec&lt;Attribute&gt;,
+    attributes: <span class="kw-2">&amp;</span>[Attribute],
 ) -&gt; String {
     <span class="kw">let </span>separator = <span class="kw">if </span>attributes.is_empty() { newline.as_ref() } <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
 

@@ -57,17 +57,6 @@
 <a href="#57" id="57">57</a>
 <a href="#58" id="58">58</a>
 <a href="#59" id="59">59</a>
-<a href="#60" id="60">60</a>
-<a href="#61" id="61">61</a>
-<a href="#62" id="62">62</a>
-<a href="#63" id="63">63</a>
-<a href="#64" id="64">64</a>
-<a href="#65" id="65">65</a>
-<a href="#66" id="66">66</a>
-<a href="#67" id="67">67</a>
-<a href="#68" id="68">68</a>
-<a href="#69" id="69">69</a>
-<a href="#70" id="70">70</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>psl::{parser_database::walkers, schema_ast::ast};
 
@@ -77,12 +66,6 @@
 <span class="kw">impl </span>Model {
     <span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="self">self</span>.walker().name()
-    }
-
-    <span class="doccomment">/// Returns the schema name for the model
-    /// which is the contents of the @@schema(&quot;...&quot;) attribute
-    </span><span class="kw">pub fn </span>schema_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
-        <span class="self">self</span>.walker().schema_name().map(ToOwned::to_owned)
     }
 
     <span class="doccomment">/// Returns the set of fields to be used as the primary identifier for a record of that model.
@@ -111,9 +94,8 @@
     }
 
     <span class="kw">pub fn </span>supports_create_operation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="kw">let </span>dm = <span class="self">self</span>.internal_data_model();
-        <span class="kw">let </span>walker = dm.walk(<span class="self">self</span>.id);
-        <span class="kw">let </span>has_unsupported_field = walker
+        <span class="kw">let </span>has_unsupported_field = <span class="self">self
+            </span>.walker()
             .scalar_fields()
             .any(|sf| sf.ast_field().arity.is_required() &amp;&amp; sf.is_unsupported() &amp;&amp; sf.default_value().is_none());
 
@@ -128,10 +110,6 @@
 
     <span class="kw">pub fn </span>db_name_opt(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
         <span class="self">self</span>.walker().mapped_name()
-    }
-
-    <span class="kw">pub fn </span>internal_data_model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; InternalDataModelRef {
-        <span class="self">self</span>.dm.clone()
     }
 
     <span class="kw">pub fn </span>unique_indexes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = walkers::IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {

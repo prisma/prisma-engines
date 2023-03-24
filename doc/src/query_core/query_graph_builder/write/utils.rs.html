@@ -1565,7 +1565,7 @@
     }
 
     <span class="comment">// If the connector uses the `RelationMode::Prisma` mode, then the emulation will kick in.
-    </span><span class="kw">let </span>internal_model = model_to_delete.internal_data_model();
+    </span><span class="kw">let </span>internal_model = <span class="kw-2">&amp;</span>model_to_delete.dm;
     <span class="kw">let </span>relation_fields = internal_model.fields_pointing_to_model(model_to_delete);
 
     <span class="kw">for </span>rf <span class="kw">in </span>relation_fields {
@@ -2113,7 +2113,7 @@
     }
 
     <span class="comment">// If the connector uses the `RelationMode::Prisma` mode, then the emulation will kick in.
-    </span><span class="kw">let </span>internal_model = model_to_update.internal_data_model();
+    </span><span class="kw">let </span>internal_model = <span class="kw-2">&amp;</span>model_to_update.dm;
     <span class="kw">let </span>relation_fields = internal_model.fields_pointing_to_model(model_to_update);
 
     <span class="kw">let </span>join_node = graph.create_node(Flow::Return(<span class="prelude-val">None</span>));
@@ -2162,7 +2162,7 @@
     }
 
     <span class="comment">// If the connector uses the `RelationMode::Prisma` mode, then the emulation will kick in.
-    </span><span class="kw">let </span>internal_model = model_to_update.internal_data_model();
+    </span><span class="kw">let </span>internal_model = <span class="kw-2">&amp;</span>model_to_update.dm;
     <span class="kw">let </span>relation_fields = internal_model.fields_pointing_to_model(model_to_update);
 
     <span class="kw">for </span>rf <span class="kw">in </span>relation_fields {

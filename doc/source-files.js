@@ -216,7 +216,7 @@ var sourcesIndex = JSON.parse('{\
 "priority_queue":["",[["double_priority_queue",[],["iterators.rs","mod.rs"]],["priority_queue",[],["iterators.rs","mod.rs"]]],["core_iterators.rs","lib.rs","store.rs"]],\
 "prisma_fmt":["",[["code_actions",[],["multi_schema.rs","relation_mode.rs","relations.rs"]],["text_document_completion",[],["datasource.rs"]]],["actions.rs","code_actions.rs","get_config.rs","get_dmmf.rs","lib.rs","lint.rs","native.rs","preview.rs","text_document_completion.rs","validate.rs"]],\
 "prisma_fmt_build":["",[],["lib.rs"]],\
-"prisma_models":["",[["field",[],["composite.rs","mod.rs","relation.rs","scalar.rs"]],["projections",[],["mod.rs","model_projection.rs"]]],["composite_type.rs","convert.rs","error.rs","field_selection.rs","fields.rs","internal_data_model.rs","lib.rs","model.rs","order_by.rs","parent_container.rs","pk.rs","prelude.rs","prisma_value_ext.rs","record.rs","relation.rs","selection_result.rs","zipper.rs"]],\
+"prisma_models":["",[["field",[],["composite.rs","mod.rs","relation.rs","scalar.rs"]],["projections",[],["mod.rs","model_projection.rs"]]],["composite_type.rs","convert.rs","error.rs","field_selection.rs","fields.rs","internal_data_model.rs","lib.rs","model.rs","order_by.rs","parent_container.rs","prelude.rs","prisma_value_ext.rs","record.rs","relation.rs","selection_result.rs","zipper.rs"]],\
 "prisma_value":["",[],["arithmetic.rs","error.rs","lib.rs"]],\
 "proc_macro2":["",[],["detection.rs","fallback.rs","lib.rs","marker.rs","parse.rs","rcvec.rs","wrapper.rs"]],\
 "proc_macro_error":["",[["imp",[],["fallback.rs"]]],["diagnostic.rs","dummy.rs","lib.rs","macros.rs","sealed.rs"]],\

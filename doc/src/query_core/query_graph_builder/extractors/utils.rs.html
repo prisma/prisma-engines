@@ -24,7 +24,6 @@
 <a href="#24" id="24">24</a>
 <a href="#25" id="25">25</a>
 <a href="#26" id="26">26</a>
-<a href="#27" id="27">27</a>
 </pre><pre class="rust"><code><span class="kw">use </span>prisma_models::{ModelRef, ScalarFieldRef};
 
 <span class="doccomment">/// Attempts to resolve a field name to a compound field.
@@ -34,10 +33,9 @@
 
 <span class="doccomment">/// Attempts to match a given name to the (schema) name of a compound id field on the model.
 </span><span class="kw">pub fn </span>resolve_compound_id(name: <span class="kw-2">&amp;</span>str, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;ScalarFieldRef&gt;&gt; {
-    model
-        .fields()
-        .compound_id()
-        .and_then(|pk| (name == schema_builder::compound_id_field_name(<span class="kw-2">&amp;</span>pk)).then(|| pk.fields()))
+    model.fields().compound_id().and_then(|pk| {
+        (name == schema_builder::compound_id_field_name(model.walker().primary_key().unwrap())).then(|| pk.collect())
+    })
 }
 
 <span class="doccomment">/// Attempts to match a given name to the (schema) name of a compound indexes on the model and returns the first match.
