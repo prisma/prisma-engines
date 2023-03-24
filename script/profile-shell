@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# script/profile_shell: Run any command on the profile image, where rust and valgrind are installed
+#                        By default it will run the bash shell
+
+set -e
+cd "$(dirname "$0")/.."
+
+rust_version=$(rustc --version | cut -d ' ' -f 2)
+CMD="docker build -t prisma-engines-profile:latest --build-arg RUST_VERSION=$rust_version -f script/.profile/Dockerfile ."
+echo "==> Running command: $CMD"
+`$CMD`
+CMD="docker run -it -v $PWD:/rustrepo -v $HOME/.cargo:/.cargo -w /rustrepo prisma-engines-profile:latest $@"
+echo "==> Running command: $CMD"
+exec $CMD

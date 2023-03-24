@@ -40,6 +40,7 @@ datamodel_v2.prisma
 dev_datamodel.prisma
 .tmp/
 /target/
+/target-alternatives/
 /result
 
 dmmf.json

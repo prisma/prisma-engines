@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# script/profile: Profile any example in the repository using valgrind tools like DHAT and Massif.
+
+set -e
+cd "$(dirname "$0")"
+./profile-shell "bash -C build-and-run" $@
