@@ -106,11 +106,19 @@
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>prisma_models::pk::PrimaryKey;
 <span class="kw">use </span>prisma_models::{dml, walkers, ModelRef};
-<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::{fmt, sync::Arc};
 
 <span class="doccomment">/// Object type convenience wrapper function.
 </span><span class="kw">pub fn </span>object_type(ident: Identifier, fields: Vec&lt;OutputField&gt;, model: <span class="prelude-ty">Option</span>&lt;ModelRef&gt;) -&gt; ObjectType {
@@ -178,17 +186,25 @@
 
 <span class="doccomment">/// Capitalizes first character.
 /// Assumes 1-byte characters.
-</span><span class="kw">pub fn </span>capitalize&lt;T&gt;(s: T) -&gt; String
-<span class="kw">where
-    </span>T: Into&lt;String&gt;,
-{
-    <span class="kw">let </span>s = s.into();
+</span><span class="kw">pub fn </span>capitalize(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">impl </span>fmt::Display + <span class="lifetime">&#39;_ </span>{
+    <span class="kw">struct </span>Capitalized&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str);
 
-    <span class="comment">// This is safe to unwrap, as the validation regex for model / field
-    // names used in the data model essentially guarantees ASCII.
-    </span><span class="kw">let </span>first_char = s.chars().next().unwrap();
+    <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Capitalized&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+            <span class="kw">let </span>first_char = <span class="kw">if let </span><span class="prelude-val">Some</span>(first_char) = <span class="self">self</span>.<span class="number">0</span>.chars().next() {
+                first_char
+            } <span class="kw">else </span>{
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(());
+            };
+            <span class="macro">debug_assert!</span>(first_char.is_ascii());
+            <span class="kw">let </span>first_char = first_char.to_ascii_uppercase();
 
-    <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, first_char.to_uppercase(), s[<span class="number">1</span>..].to_owned())
+            fmt::Display::fmt(<span class="kw-2">&amp;</span>first_char, f)<span class="question-mark">?</span>;
+            f.write_str(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>[<span class="number">1</span>..])
+        }
+    }
+
+    Capitalized(s)
 }
 
 <span class="doccomment">/// Appends an option of type T to a vector over T if the option is Some.
