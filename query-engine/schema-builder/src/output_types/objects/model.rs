@@ -6,7 +6,7 @@ use std::convert::identity;
 
 /// Compute initial model cache. No fields are computed because we first
 /// need all models to be present, then we can compute fields in a second pass.
-pub(crate) fn initialize_cache(ctx: &mut BuilderContext) {
+pub(crate) fn initialize_cache(ctx: &mut BuilderContext<'_>) {
     for model in ctx.internal_data_model.models() {
         let ident = Identifier::new_model(model.name());
         ctx.cache_output_type(ident.clone(), Arc::new(ObjectType::new(ident, Some(model))));
@@ -14,7 +14,7 @@ pub(crate) fn initialize_cache(ctx: &mut BuilderContext) {
 }
 
 // Compute fields on all cached model object types.
-pub(crate) fn initialize_fields(ctx: &mut BuilderContext) {
+pub(crate) fn initialize_fields(ctx: &mut BuilderContext<'_>) {
     for model in ctx.internal_data_model.models() {
         let obj: ObjectTypeWeakRef = map_type(ctx, &model);
         let mut fields = compute_model_object_type_fields(ctx, &model);
@@ -40,7 +40,7 @@ pub(crate) fn initialize_fields(ctx: &mut BuilderContext) {
 
 /// Returns an output object type for the given model.
 /// Relies on the output type cache being initalized.
-pub(crate) fn map_type(ctx: &mut BuilderContext, model: &ModelRef) -> ObjectTypeWeakRef {
+pub(crate) fn map_type(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> ObjectTypeWeakRef {
     let ident = Identifier::new_model(model.name());
     ctx.get_output_type(&ident)
         .expect("Invariant violation: Initialized output object type for each model.")
@@ -48,7 +48,7 @@ pub(crate) fn map_type(ctx: &mut BuilderContext, model: &ModelRef) -> ObjectType
 
 /// Computes model output type fields.
 /// Requires an initialized cache.
-fn compute_model_object_type_fields(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<OutputField> {
+fn compute_model_object_type_fields(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> Vec<OutputField> {
     model
         .fields()
         .filter_all(|_| true)

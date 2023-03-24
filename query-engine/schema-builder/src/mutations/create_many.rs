@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use crate::{
     capitalize,
     constants::args,
@@ -14,9 +12,10 @@ use crate::{
 use prisma_models::{ModelRef, RelationFieldRef};
 use psl::datamodel_connector::ConnectorCapability;
 use schema::{Identifier, InputField, InputObjectTypeWeakRef, InputType, OutputField, OutputType, QueryInfo, QueryTag};
+use std::sync::Arc;
 
 /// Builds a create many mutation field (e.g. createManyUsers) for given model.
-pub(crate) fn create_many(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
+pub(crate) fn create_many(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> Option<OutputField> {
     let arguments = create_many_arguments(ctx, model);
     let field_name = format!("createMany{}", model.name());
 
@@ -36,7 +35,7 @@ pub(crate) fn create_many(ctx: &mut BuilderContext, model: &ModelRef) -> Option<
 }
 
 /// Builds "skip_duplicates" and "data" arguments intended for the create many field.
-pub(crate) fn create_many_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<InputField> {
+pub(crate) fn create_many_arguments(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> Vec<InputField> {
     let create_many_type = InputType::object(create_many_object_type(ctx, model, None));
     let data_arg = input_field(ctx, args::DATA, list_union_type(create_many_type, true), None);
 
@@ -54,7 +53,7 @@ pub(crate) fn create_many_arguments(ctx: &mut BuilderContext, model: &ModelRef) 
 /// where we don't allow the parent scalar to be written (ie. when the relation
 /// is inlined on the child).
 pub(crate) fn create_many_object_type(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
 ) -> InputObjectTypeWeakRef {
@@ -79,7 +78,7 @@ pub(crate) fn create_many_object_type(
 
 /// Filters the given model's fields down to the allowed ones for checked create.
 fn filter_create_many_fields(
-    ctx: &BuilderContext,
+    ctx: &BuilderContext<'_>,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
 ) -> Vec<ModelField> {

@@ -17,7 +17,7 @@ impl CreateDataInputFieldMapper {
 }
 
 impl DataInputFieldMapper for CreateDataInputFieldMapper {
-    fn map_scalar(&self, ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputField {
+    fn map_scalar(&self, ctx: &mut BuilderContext<'_>, sf: &ScalarFieldRef) -> InputField {
         let typ = map_scalar_input_type_for_field(ctx, sf);
         let supports_advanced_json = ctx.has_capability(ConnectorCapability::AdvancedJsonNullability);
 
@@ -35,7 +35,7 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
         }
     }
 
-    fn map_scalar_list(&self, ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputField {
+    fn map_scalar_list(&self, ctx: &mut BuilderContext<'_>, sf: &ScalarFieldRef) -> InputField {
         let typ = map_scalar_input_type_for_field(ctx, sf);
         let ident = Identifier::new_prisma(format!("{}Create{}Input", sf.container().name(), sf.name()));
 
@@ -59,7 +59,7 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
         input_field(ctx, sf.name(), vec![input_type, typ], sf.default_value()).optional()
     }
 
-    fn map_relation(&self, ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputField {
+    fn map_relation(&self, ctx: &mut BuilderContext<'_>, rf: &RelationFieldRef) -> InputField {
         let related_model = rf.related_model();
         let related_field = rf.related_field();
 
@@ -109,7 +109,7 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
         }
     }
 
-    fn map_composite(&self, ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputField {
+    fn map_composite(&self, ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputField {
         // Shorthand object (just the plain create object for the composite).
         let shorthand_type = InputType::Object(composite_create_object_type(ctx, cf));
 
@@ -142,7 +142,10 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
 ///   ... more ops ...
 /// }
 /// ```
-fn composite_create_envelope_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+fn composite_create_envelope_object_type(
+    ctx: &mut BuilderContext<'_>,
+    cf: &CompositeFieldRef,
+) -> InputObjectTypeWeakRef {
     let arity = if cf.is_optional() {
         "Nullable"
     } else if cf.is_list() {
@@ -180,7 +183,10 @@ fn composite_create_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
     Arc::downgrade(&input_object)
 }
 
-pub(crate) fn composite_create_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+pub(crate) fn composite_create_object_type(
+    ctx: &mut BuilderContext<'_>,
+    cf: &CompositeFieldRef,
+) -> InputObjectTypeWeakRef {
     // It's called "Create" input because it's used across multiple create-type operations, not only "set".
     let name = format!("{}CreateInput", cf.typ().name());
 

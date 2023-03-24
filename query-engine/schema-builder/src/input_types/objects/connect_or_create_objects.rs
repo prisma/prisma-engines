@@ -4,7 +4,7 @@ use mutations::create_one;
 
 /// Builds "<x>CreateOrConnectNestedInput" input object types.
 pub(crate) fn nested_connect_or_create_input_object(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     parent_field: &RelationFieldRef,
 ) -> Option<InputObjectTypeWeakRef> {
     let related_model = parent_field.related_model();

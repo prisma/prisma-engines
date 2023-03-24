@@ -1,3 +1,5 @@
+#![deny(rust_2018_idioms, unsafe_code)]
+
 //! Query schema builder. Root for query schema building.
 //!
 //! The schema builder creates all builders necessary for the process,

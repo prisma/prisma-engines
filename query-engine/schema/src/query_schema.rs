@@ -218,7 +218,7 @@ pub enum QueryTag {
 }
 
 impl fmt::Display for QueryTag {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let s = match self {
             Self::FindUnique => "findUnique",
             Self::FindUniqueOrThrow => "findUniqueOrThrow",

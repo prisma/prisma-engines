@@ -3,7 +3,7 @@ use constants::args;
 use psl::datamodel_connector::ConnectorCapability;
 
 pub(crate) fn update_one_input_types(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
 ) -> Vec<InputType> {
@@ -20,7 +20,7 @@ pub(crate) fn update_one_input_types(
 
 /// Builds "<x>UpdateInput" input object type.
 fn checked_update_one_input_type(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
 ) -> InputObjectTypeWeakRef {
@@ -45,7 +45,7 @@ fn checked_update_one_input_type(
 
 /// Builds "<x>UncheckedUpdateInput" input object type.
 fn unchecked_update_one_input_type(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
 ) -> InputObjectTypeWeakRef {
@@ -70,7 +70,7 @@ fn unchecked_update_one_input_type(
 
 /// Filters the given model's fields down to the allowed ones for checked update.
 pub(super) fn filter_checked_update_fields(
-    ctx: &BuilderContext,
+    ctx: &BuilderContext<'_>,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
 ) -> Vec<ModelField> {
@@ -113,7 +113,7 @@ pub(super) fn filter_checked_update_fields(
 
 /// Filters the given model's fields down to the allowed ones for unchecked update.
 pub(super) fn filter_unchecked_update_fields(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
 ) -> Vec<ModelField> {
@@ -173,7 +173,7 @@ pub(super) fn filter_unchecked_update_fields(
 /// Builds "<x>UpdateWithWhereUniqueNestedInput" / "<x>UpdateWithWhereUniqueWithout<y>Input" input object types.
 /// Simple combination object of "where" and "data".
 pub(crate) fn update_one_where_combination_object(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     update_types: Vec<InputType>,
     parent_field: &RelationFieldRef,
 ) -> InputObjectTypeWeakRef {
@@ -202,8 +202,8 @@ pub(crate) fn update_one_where_combination_object(
 /// Builds "<x>UpdateWithWhereUniqueWithout<y>Input" input object types.
 /// Simple combination object of "where" and "data" for to-one relations.
 pub(crate) fn update_to_one_rel_where_combination_object(
-    ctx: &mut BuilderContext,
-    update_types: Vec<InputType>,
+    ctx: &mut BuilderContext<'_>,
+    update_types: impl IntoIterator<Item = InputType>,
     parent_field: &RelationFieldRef,
 ) -> InputObjectTypeWeakRef {
     let related_model = parent_field.related_model();

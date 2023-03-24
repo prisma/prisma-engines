@@ -4,7 +4,7 @@ use prisma_models::{prelude::ParentContainer, CompositeFieldRef};
 use std::sync::Arc;
 
 pub(crate) fn scalar_filter_object_type(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     model: &ModelRef,
     include_aggregates: bool,
 ) -> InputObjectTypeWeakRef {
@@ -49,7 +49,7 @@ pub(crate) fn scalar_filter_object_type(
     weak_ref
 }
 
-pub(crate) fn where_object_type<T>(ctx: &mut BuilderContext, container: T) -> InputObjectTypeWeakRef
+pub(crate) fn where_object_type<T>(ctx: &mut BuilderContext<'_>, container: T) -> InputObjectTypeWeakRef
 where
     T: Into<ParentContainer>,
 {
@@ -95,7 +95,7 @@ where
     weak_ref
 }
 
-pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
+pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> InputObjectTypeWeakRef {
     let ident = Identifier::new_prisma(format!("{}WhereUniqueInput", model.name()));
     return_cached_input!(ctx, &ident);
 
@@ -218,7 +218,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
 
 /// Generates and caches an input object type for a compound field.
 fn compound_field_unique_object_type(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     model: &ModelRef,
     alias: Option<&str>,
     from_fields: Vec<ScalarFieldRef>,
@@ -250,7 +250,10 @@ fn compound_field_unique_object_type(
 
 /// Object used for full composite equality, e.g. `{ field: "value", field2: 123 } == { field: "value" }`.
 /// If the composite is a list, only lists are allowed for comparison, no shorthands are used.
-pub(crate) fn composite_equality_object(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+pub(crate) fn composite_equality_object(
+    ctx: &mut BuilderContext<'_>,
+    cf: &CompositeFieldRef,
+) -> InputObjectTypeWeakRef {
     let ident = Identifier::new_prisma(format!("{}ObjectEqualityInput", cf.typ().name()));
     return_cached_input!(ctx, &ident);
 

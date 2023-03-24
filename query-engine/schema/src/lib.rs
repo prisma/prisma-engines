@@ -1,4 +1,4 @@
-#![allow(clippy::derive_partial_eq_without_eq)]
+#![deny(rust_2018_idioms, unsafe_code)]
 
 mod enum_type;
 mod input_types;

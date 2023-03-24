@@ -12,7 +12,7 @@ use prisma_models::{ModelRef, RelationFieldRef};
 use schema::{Identifier, InputField, InputObjectTypeWeakRef, InputType, OutputField, OutputType, QueryInfo, QueryTag};
 
 /// Builds a create mutation field (e.g. createUser) for given model.
-pub(crate) fn create_one(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
+pub(crate) fn create_one(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> OutputField {
     let args = create_one_arguments(ctx, model).unwrap_or_default();
     let field_name = format!("createOne{}", model.name());
 
@@ -29,7 +29,7 @@ pub(crate) fn create_one(ctx: &mut BuilderContext, model: &ModelRef) -> OutputFi
 
 /// Builds "data" argument intended for the create field.
 /// The data argument is not present if no data can be created.
-pub(crate) fn create_one_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Vec<InputField>> {
+pub(crate) fn create_one_arguments(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> Option<Vec<InputField>> {
     let create_types = create_one_input_types(ctx, model, None);
     let any_empty = create_types.iter().any(|typ| typ.is_empty());
     let all_empty = create_types.iter().all(|typ| typ.is_empty());
@@ -44,7 +44,7 @@ pub(crate) fn create_one_arguments(ctx: &mut BuilderContext, model: &ModelRef) -
 }
 
 pub(crate) fn create_one_input_types(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
 ) -> Vec<InputType> {
@@ -64,7 +64,7 @@ pub(crate) fn create_one_input_types(
 /// "Checked" input refers to disallowing writing relation scalars directly, as it can lead to unintended
 /// data integrity violations if used incorrectly.
 fn checked_create_input_type(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
 ) -> InputObjectTypeWeakRef {
@@ -95,7 +95,7 @@ fn checked_create_input_type(
 /// "Unchecked" input refers to allowing to write _all_ scalars on a model directly, which can
 /// lead to unintended data integrity violations if used incorrectly.
 fn unchecked_create_input_type(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
 ) -> InputObjectTypeWeakRef {

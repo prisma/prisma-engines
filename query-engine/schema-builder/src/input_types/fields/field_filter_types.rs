@@ -5,7 +5,7 @@ use psl::datamodel_connector::ConnectorCapability;
 
 /// Builds filter types for the given model field.
 pub(crate) fn get_field_filter_types(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     field: &ModelField,
     include_aggregates: bool,
 ) -> Vec<InputType> {
@@ -57,14 +57,14 @@ pub(crate) fn get_field_filter_types(
 }
 
 /// Builds shorthand relation equality (`is`) filter for to-one: `where: { relation_field: { ... } }` (no `is` in between).
-fn to_one_relation_filter_shorthand_types(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputType {
+fn to_one_relation_filter_shorthand_types(ctx: &mut BuilderContext<'_>, rf: &RelationFieldRef) -> InputType {
     let related_model = rf.related_model();
     let related_input_type = filter_objects::where_object_type(ctx, &related_model);
 
     InputType::object(related_input_type)
 }
 
-fn to_many_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
+fn to_many_relation_filter_object(ctx: &mut BuilderContext<'_>, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
     let related_model = rf.related_model();
     let ident = Identifier::new_prisma(format!("{}ListRelationFilter", capitalize(related_model.name())));
 
@@ -88,7 +88,7 @@ fn to_many_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRe
     Arc::downgrade(&object)
 }
 
-fn to_one_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
+fn to_one_relation_filter_object(ctx: &mut BuilderContext<'_>, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
     let related_model = rf.related_model();
     let related_input_type = filter_objects::where_object_type(ctx, &related_model);
     let ident = Identifier::new_prisma(format!("{}RelationFilter", capitalize(related_model.name())));
@@ -114,13 +114,13 @@ fn to_one_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRef
 }
 
 /// Builds shorthand composite equality (`equals`) filter for to-one: `where: { composite_field: { ... } }` (no `equals` in between).
-fn to_one_composite_filter_shorthand_types(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputType {
+fn to_one_composite_filter_shorthand_types(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputType {
     let equality_object_type = filter_objects::composite_equality_object(ctx, cf);
 
     InputType::object(equality_object_type)
 }
 
-fn to_one_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+fn to_one_composite_filter_object(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
     let nullable = if cf.is_optional() { "Nullable" } else { "" };
     let ident = Identifier::new_prisma(format!("{}{}CompositeFilter", capitalize(cf.typ().name()), nullable));
     return_cached_input!(ctx, &ident);
@@ -161,7 +161,7 @@ fn to_one_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeFieldR
     Arc::downgrade(&object)
 }
 
-fn to_many_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+fn to_many_composite_filter_object(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
     let ident = Identifier::new_prisma(format!("{}CompositeListFilter", capitalize(cf.typ().name())));
     return_cached_input!(ctx, &ident);
 
@@ -212,7 +212,7 @@ fn to_many_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeField
     Arc::downgrade(&object)
 }
 
-fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputObjectTypeWeakRef {
+fn scalar_list_filter_type(ctx: &mut BuilderContext<'_>, sf: &ScalarFieldRef) -> InputObjectTypeWeakRef {
     let ident = Identifier::new_prisma(scalar_filter_name(
         &sf.type_identifier().type_name(&ctx.internal_data_model.schema),
         true,
@@ -257,7 +257,7 @@ fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> Inp
 }
 
 fn full_scalar_filter_type(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     typ: &TypeIdentifier,
     native_type: Option<&dml::NativeTypeInstance>,
     list: bool,
@@ -394,12 +394,12 @@ fn full_scalar_filter_type(
     Arc::downgrade(&object)
 }
 
-fn is_set_input_field(ctx: &mut BuilderContext) -> InputField {
+fn is_set_input_field(ctx: &mut BuilderContext<'_>) -> InputField {
     input_field(ctx, filters::IS_SET, InputType::boolean(), None).optional()
 }
 
 fn equality_filters(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     mapped_type: InputType,
     nullable: bool,
 ) -> impl Iterator<Item = InputField> {
@@ -413,7 +413,7 @@ fn equality_filters(
 }
 
 fn json_equality_filters(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     mapped_type: InputType,
     nullable: bool,
 ) -> impl Iterator<Item = InputField> {
@@ -434,7 +434,7 @@ fn json_equality_filters(
 }
 
 fn inclusion_filters(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     mapped_type: InputType,
     nullable: bool,
 ) -> impl Iterator<Item = InputField> {
@@ -457,7 +457,7 @@ fn inclusion_filters(
     .into_iter()
 }
 
-fn alphanumeric_filters(ctx: &mut BuilderContext, mapped_type: InputType) -> impl Iterator<Item = InputField> {
+fn alphanumeric_filters(ctx: &mut BuilderContext<'_>, mapped_type: InputType) -> impl Iterator<Item = InputField> {
     // We disable referencing fields on alphanumeric json filters for MySQL & MariaDB because we can't make it work
     // for both database without splitting them into their own connectors.
     let field_types =
@@ -477,7 +477,7 @@ fn alphanumeric_filters(ctx: &mut BuilderContext, mapped_type: InputType) -> imp
 }
 
 fn string_filters(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     input_object_type_name: &str,
     mapped_type: InputType,
 ) -> impl Iterator<Item = InputField> {
@@ -496,7 +496,7 @@ fn string_filters(
     string_filters.into_iter()
 }
 
-fn json_filters(ctx: &mut BuilderContext) -> impl Iterator<Item = InputField> {
+fn json_filters(ctx: &mut BuilderContext<'_>) -> impl Iterator<Item = InputField> {
     // TODO: also add json-specific "keys" filters
     // TODO: add json_type filter
     let path_type = if ctx.has_capability(ConnectorCapability::JsonFilteringJsonPath) {
@@ -533,7 +533,7 @@ fn json_filters(ctx: &mut BuilderContext) -> impl Iterator<Item = InputField> {
     .into_iter()
 }
 
-fn query_mode_field(ctx: &mut BuilderContext, nested: bool) -> impl Iterator<Item = InputField> {
+fn query_mode_field(ctx: &mut BuilderContext<'_>, nested: bool) -> impl Iterator<Item = InputField> {
     // Limit query mode field to the topmost filter level.
     // Only build mode field for connectors with insensitive filter support.
     let fields = if !nested && ctx.has_capability(ConnectorCapability::InsensitiveFilters) {
@@ -564,7 +564,7 @@ fn scalar_filter_name(typ: &str, list: bool, nullable: bool, nested: bool, inclu
 }
 
 fn aggregate_filter_field(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     aggregation: &str,
     typ: &TypeIdentifier,
     nullable: bool,
@@ -583,7 +583,7 @@ fn map_avg_type_ident(typ: TypeIdentifier) -> TypeIdentifier {
 
 // Shorthand `not equals` filter input field, skips the nested object filter.
 fn not_filter_field(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     typ: &TypeIdentifier,
     native_type: Option<&dml::NativeTypeInstance>,
     mapped_scalar_type: InputType,

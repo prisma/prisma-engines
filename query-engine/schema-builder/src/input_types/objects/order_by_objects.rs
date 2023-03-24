@@ -36,7 +36,7 @@ impl OrderByOptions {
 
 /// Builds "<Container>OrderBy<Suffixes>Input" object types.
 pub(crate) fn order_by_object_type(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     container: &ParentContainer,
     options: &OrderByOptions,
 ) -> InputObjectTypeWeakRef {
@@ -74,7 +74,7 @@ pub(crate) fn order_by_object_type(
     Arc::downgrade(&input_object)
 }
 
-fn compute_scalar_aggregation_fields(ctx: &mut BuilderContext, container: &ParentContainer) -> Vec<InputField> {
+fn compute_scalar_aggregation_fields(ctx: &mut BuilderContext<'_>, container: &ParentContainer) -> Vec<InputField> {
     let non_list_nor_json_fields = aggregation::collect_non_list_nor_json_fields(container);
     let numeric_fields = aggregation::collect_numeric_fields(container);
     let scalar_fields = container
@@ -112,7 +112,11 @@ fn compute_scalar_aggregation_fields(ctx: &mut BuilderContext, container: &Paren
     fields.into_iter().flatten().collect()
 }
 
-fn orderby_field_mapper(field: &ModelField, ctx: &mut BuilderContext, options: &OrderByOptions) -> Option<InputField> {
+fn orderby_field_mapper(
+    field: &ModelField,
+    ctx: &mut BuilderContext<'_>,
+    options: &OrderByOptions,
+) -> Option<InputField> {
     match field {
         // To-many relation field.
         ModelField::Relation(rf) if rf.is_list() && options.include_relations => {
@@ -169,7 +173,7 @@ fn orderby_field_mapper(field: &ModelField, ctx: &mut BuilderContext, options: &
     }
 }
 
-fn sort_nulls_object_type(ctx: &mut BuilderContext) -> InputObjectTypeWeakRef {
+fn sort_nulls_object_type(ctx: &mut BuilderContext<'_>) -> InputObjectTypeWeakRef {
     let ident = Identifier::new_prisma("SortOrderInput");
     return_cached_input!(ctx, &ident);
 
@@ -192,7 +196,7 @@ fn sort_nulls_object_type(ctx: &mut BuilderContext) -> InputObjectTypeWeakRef {
 fn order_by_field_aggregate(
     name: &str,
     suffix: &str,
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     container: &ParentContainer,
     scalar_fields: Vec<ScalarFieldRef>,
 ) -> Option<InputField> {
@@ -206,7 +210,7 @@ fn order_by_field_aggregate(
 
 fn order_by_object_type_aggregate(
     suffix: &str,
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     container: &ParentContainer,
     scalar_fields: Vec<ScalarFieldRef>,
 ) -> InputObjectTypeWeakRef {
@@ -231,7 +235,7 @@ fn order_by_object_type_aggregate(
 }
 
 fn order_by_to_many_aggregate_object_type(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     container: &ParentContainer,
 ) -> InputObjectTypeWeakRef {
     let container_type = match container {
@@ -256,7 +260,7 @@ fn order_by_to_many_aggregate_object_type(
     Arc::downgrade(&input_object)
 }
 
-fn order_by_field_text_search(ctx: &mut BuilderContext, container: &ParentContainer) -> Option<InputField> {
+fn order_by_field_text_search(ctx: &mut BuilderContext<'_>, container: &ParentContainer) -> Option<InputField> {
     let scalar_fields: Vec<_> = container
         .fields()
         .into_iter()
@@ -275,7 +279,7 @@ fn order_by_field_text_search(ctx: &mut BuilderContext, container: &ParentContai
 }
 
 fn order_by_object_type_text_search(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     container: &ParentContainer,
     scalar_fields: Vec<ScalarFieldRef>,
 ) -> InputObjectTypeWeakRef {
