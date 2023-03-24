@@ -6,6 +6,7 @@ use crate::{rendering, warnings, SqlIntrospectionResult};
 pub(crate) use context::DatamodelCalculatorContext;
 use introspection_connector::{IntrospectionContext, IntrospectionResult, Version};
 
+use psl::PreviewFeature;
 use sql_schema_describer as sql;
 
 /// Calculate a data model from a database schema.
@@ -26,7 +27,11 @@ pub fn calculate(
         ctx.version
     };
 
-    let views = if views.is_empty() { None } else { Some(views) };
+    let views = if ctx.config.preview_features().contains(PreviewFeature::Views) {
+        Some(views)
+    } else {
+        None
+    };
 
     Ok(IntrospectionResult {
         data_model: schema_string,
