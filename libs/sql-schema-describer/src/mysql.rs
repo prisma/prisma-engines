@@ -121,11 +121,13 @@ async fn push_indexes(
 
     for row in rows {
         let table_name = row.get_expect_string("table_name");
+
         let table_id = if let Some(id) = table_ids.get(table_name.as_str()) {
             *id
         } else {
             continue;
         };
+
         let index_name = row.get_expect_string("index_name");
         let length = row.get_u32("partial");
 
@@ -134,19 +136,26 @@ async fn push_indexes(
             "D" => SQLSortOrder::Desc,
             misc => panic!("Unexpected sort order `{misc}`, collation should be A, D or Null"),
         });
+
+        let seq_in_index = row.get_expect_i64("seq_in_index"); // starts at 1
+
         let column_name = if let Some(name) = row.get_string("column_name") {
             name
         } else {
-            index_should_be_filtered_out = true; // filter out indexes on expressions
+            // filter out indexes on expressions
+            // if the sequence is 1 and we have an expression,
+            // we never create an index to the collection and can
+            // just continue
+            index_should_be_filtered_out = seq_in_index > 1;
             continue;
         };
+
         let column_id = if let Some(col) = sql_schema.walk(table_id).column(&column_name) {
             col.id
         } else {
             continue;
         };
 
-        let seq_in_index = row.get_expect_i64("seq_in_index"); // starts at 1
         let is_unique = !row.get_expect_bool("non_unique");
         let is_pk = index_name.eq_ignore_ascii_case("primary");
         let is_fulltext = row.get_string("index_type").as_deref() == Some("FULLTEXT");
