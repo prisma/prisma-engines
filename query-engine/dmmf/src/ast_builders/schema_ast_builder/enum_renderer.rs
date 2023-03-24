@@ -3,7 +3,7 @@ use super::*;
 pub(crate) fn render_enum_types<'a>(ctx: &mut RenderContext, enum_types: impl Iterator<Item = &'a EnumType> + 'a) {
     let mut borrows: Vec<_> = enum_types.collect();
 
-    borrows.sort_by(|a, b| a.name().cmp(b.name()));
+    borrows.sort_by_key(|a| a.name());
     borrows.into_iter().for_each(|et| DmmfEnumRenderer::new(et).render(ctx));
 }
 
@@ -20,7 +20,7 @@ impl Renderer for DmmfEnumRenderer {
 
         let values = self.format_enum_values();
         let rendered = DmmfEnum {
-            name: self.enum_type.name().to_owned(),
+            name: self.enum_type.name(),
             values,
         };
 

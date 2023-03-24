@@ -59,7 +59,7 @@ fn format_diff(old: &str, new: &str) -> String {
     let diff = TextDiff::from_lines(old, new);
     let mut buf = String::new();
 
-    for (idx, group) in diff.grouped_ops(2).iter().enumerate() {
+    for (idx, group) in diff.grouped_ops(3).iter().enumerate() {
         if idx > 0 {
             buf.push_str(&format!("{:-^1$}\n", "-", 80));
         }

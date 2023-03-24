@@ -40,7 +40,10 @@ pub(crate) fn order_by_object_type(
     container: &ParentContainer,
     options: &OrderByOptions,
 ) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new_prisma(format!("{}OrderBy{}Input", container.name(), options.type_suffix()));
+    let ident = Identifier::new_prisma(IdentifierType::OrderByInput(
+        container.clone(),
+        options.type_suffix().to_owned(),
+    ));
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
@@ -214,7 +217,10 @@ fn order_by_object_type_aggregate(
     container: &ParentContainer,
     scalar_fields: Vec<ScalarFieldRef>,
 ) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new_prisma(format!("{}{}OrderByAggregateInput", container.name(), suffix));
+    let ident = Identifier::new_prisma(IdentifierType::OrderByAggregateInput(
+        container.clone(),
+        suffix.to_string(),
+    ));
 
     return_cached_input!(ctx, &ident);
 
@@ -238,12 +244,7 @@ fn order_by_to_many_aggregate_object_type(
     ctx: &mut BuilderContext<'_>,
     container: &ParentContainer,
 ) -> InputObjectTypeWeakRef {
-    let container_type = match container {
-        ParentContainer::Model(_) => "Relation",
-        ParentContainer::CompositeType(_) => "Composite",
-    };
-
-    let ident = Identifier::new_prisma(format!("{}OrderBy{}AggregateInput", container.name(), container_type));
+    let ident = Identifier::new_prisma(IdentifierType::OrderByToManyAggregateInput(container.clone()));
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
@@ -283,7 +284,7 @@ fn order_by_object_type_text_search(
     container: &ParentContainer,
     scalar_fields: Vec<ScalarFieldRef>,
 ) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new_prisma(format!("{}OrderByRelevanceInput", container.name()));
+    let ident = Identifier::new_prisma(IdentifierType::OrderByRelevanceInput(container.clone()));
 
     return_cached_input!(ctx, &ident);
 
@@ -292,7 +293,7 @@ fn order_by_object_type_text_search(
 
     let fields_enum_type = InputType::enum_type(order_by_relevance_enum(
         ctx,
-        &container.name(),
+        container,
         scalar_fields.iter().map(|sf| sf.name().to_owned()).collect(),
     ));
     let sort_order_enum = sort_order_enum(ctx);

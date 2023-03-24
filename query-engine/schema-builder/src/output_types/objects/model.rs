@@ -8,7 +8,8 @@ use std::convert::identity;
 /// need all models to be present, then we can compute fields in a second pass.
 pub(crate) fn initialize_cache(ctx: &mut BuilderContext<'_>) {
     for model in ctx.internal_data_model.models() {
-        let ident = Identifier::new_model(model.name());
+        let ident = Identifier::new_model(IdentifierType::Model(model.clone()));
+
         ctx.cache_output_type(ident.clone(), Arc::new(ObjectType::new(ident, Some(model.id))));
     }
 }
@@ -41,7 +42,8 @@ pub(crate) fn initialize_fields(ctx: &mut BuilderContext<'_>) {
 /// Returns an output object type for the given model.
 /// Relies on the output type cache being initalized.
 pub(crate) fn map_type(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> ObjectTypeWeakRef {
-    let ident = Identifier::new_model(model.name());
+    let ident = Identifier::new_model(IdentifierType::Model(model.clone()));
+
     ctx.get_output_type(&ident)
         .expect("Invariant violation: Initialized output object type for each model.")
 }

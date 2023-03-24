@@ -8,8 +8,7 @@ pub(crate) fn scalar_filter_object_type(
     model: &ModelRef,
     include_aggregates: bool,
 ) -> InputObjectTypeWeakRef {
-    let aggregate = if include_aggregates { "WithAggregates" } else { "" };
-    let ident = Identifier::new_prisma(format!("{}ScalarWhere{}Input", model.name(), aggregate));
+    let ident = Identifier::new_prisma(IdentifierType::ScalarFilterInput(model.clone(), include_aggregates));
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
@@ -53,8 +52,8 @@ pub(crate) fn where_object_type<T>(ctx: &mut BuilderContext<'_>, container: T) -
 where
     T: Into<ParentContainer>,
 {
-    let container = container.into();
-    let ident = Identifier::new_prisma(format!("{}WhereInput", container.name()));
+    let container: ParentContainer = container.into();
+    let ident = Identifier::new_prisma(IdentifierType::WhereInput(container.clone()));
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
@@ -96,7 +95,8 @@ where
 }
 
 pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new_prisma(format!("{}WhereUniqueInput", model.name()));
+    let ident = Identifier::new_prisma(IdentifierType::WhereUniqueInput(model.clone()));
+
     return_cached_input!(ctx, &ident);
 
     // Split unique & ID fields vs all the other fields

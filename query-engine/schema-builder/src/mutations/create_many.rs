@@ -1,5 +1,4 @@
 use crate::{
-    capitalize,
     constants::args,
     field, init_input_object_type, input_field,
     input_types::{
@@ -11,7 +10,10 @@ use crate::{
 };
 use prisma_models::{ModelRef, RelationFieldRef};
 use psl::datamodel_connector::ConnectorCapability;
-use schema::{Identifier, InputField, InputObjectTypeWeakRef, InputType, OutputField, OutputType, QueryInfo, QueryTag};
+use schema::{
+    Identifier, IdentifierType, InputField, InputObjectTypeWeakRef, InputType, OutputField, OutputType, QueryInfo,
+    QueryTag,
+};
 use std::sync::Arc;
 
 /// Builds a create many mutation field (e.g. createManyUsers) for given model.
@@ -57,12 +59,11 @@ pub(crate) fn create_many_object_type(
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
 ) -> InputObjectTypeWeakRef {
-    let name = match parent_field.map(|pf| pf.related_field()) {
-        Some(ref f) => format!("{}CreateMany{}Input", model.name(), capitalize(f.name())),
-        _ => format!("{}CreateManyInput", model.name()),
-    };
+    let ident = Identifier::new_prisma(IdentifierType::CreateManyInput(
+        model.clone(),
+        parent_field.map(|pf| pf.related_field()),
+    ));
 
-    let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));

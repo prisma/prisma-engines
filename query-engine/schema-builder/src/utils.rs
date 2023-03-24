@@ -4,7 +4,7 @@ use prisma_models::{
     ast, dml,
     walkers::{self, PrimaryKeyWalker},
 };
-use std::{fmt, sync::Arc};
+use std::sync::Arc;
 
 /// Object type convenience wrapper function.
 pub fn object_type(ident: Identifier, fields: Vec<OutputField>, model: Option<ast::ModelId>) -> ObjectType {
@@ -68,29 +68,6 @@ where
         input_field.push_type(field_type, &mut ctx.input_field_types);
     }
     input_field
-}
-
-/// Capitalizes first character.
-/// Assumes 1-byte characters.
-pub fn capitalize(s: &str) -> impl fmt::Display + '_ {
-    struct Capitalized<'a>(&'a str);
-
-    impl fmt::Display for Capitalized<'_> {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            let first_char = if let Some(first_char) = self.0.chars().next() {
-                first_char
-            } else {
-                return Ok(());
-            };
-            debug_assert!(first_char.is_ascii());
-            let first_char = first_char.to_ascii_uppercase();
-
-            fmt::Display::fmt(&first_char, f)?;
-            f.write_str(&self.0[1..])
-        }
-    }
-
-    Capitalized(s)
 }
 
 /// Appends an option of type T to a vector over T if the option is Some.
