@@ -2,7 +2,7 @@ use super::*;
 use once_cell::sync::OnceCell;
 use prisma_models::pk::PrimaryKey;
 use prisma_models::{dml, walkers, ModelRef};
-use std::sync::Arc;
+use std::{fmt, sync::Arc};
 
 /// Object type convenience wrapper function.
 pub fn object_type(ident: Identifier, fields: Vec<OutputField>, model: Option<ModelRef>) -> ObjectType {
@@ -70,17 +70,25 @@ where
 
 /// Capitalizes first character.
 /// Assumes 1-byte characters.
-pub fn capitalize<T>(s: T) -> String
-where
-    T: Into<String>,
-{
-    let s = s.into();
+pub fn capitalize(s: &str) -> impl fmt::Display + '_ {
+    struct Capitalized<'a>(&'a str);
 
-    // This is safe to unwrap, as the validation regex for model / field
-    // names used in the data model essentially guarantees ASCII.
-    let first_char = s.chars().next().unwrap();
+    impl fmt::Display for Capitalized<'_> {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            let first_char = if let Some(first_char) = self.0.chars().next() {
+                first_char
+            } else {
+                return Ok(());
+            };
+            debug_assert!(first_char.is_ascii());
+            let first_char = first_char.to_ascii_uppercase();
 
-    format!("{}{}", first_char.to_uppercase(), s[1..].to_owned())
+            fmt::Display::fmt(&first_char, f)?;
+            f.write_str(&self.0[1..])
+        }
+    }
+
+    Capitalized(s)
 }
 
 /// Appends an option of type T to a vector over T if the option is Some.
