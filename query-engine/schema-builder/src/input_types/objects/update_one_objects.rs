@@ -131,7 +131,8 @@ pub(super) fn filter_unchecked_update_fields(
         vec![]
     };
 
-    let id_fields = model.fields().id().map(|pk| pk.fields());
+    let fields = model.fields();
+    let id_fields = fields.id_fields();
     model.fields().filter_all(|field| match field {
         // 1) In principle, all scalars are writable for unchecked inputs. However, it still doesn't make any sense to be able to write the scalars that
         // link the model to the parent record in case of a nested unchecked create, as this would introduce complexities we don't want to deal with right now.
@@ -140,7 +141,7 @@ pub(super) fn filter_unchecked_update_fields(
             !linking_fields.contains(sf)
                 && if let Some(ref id_fields) = &id_fields {
                     // Exclude @@id or @id fields if not updatable
-                    if id_fields.contains(sf) {
+                    if id_fields.clone().any(|f| f.id == sf.id) {
                         ctx.has_capability(ConnectorCapability::UpdateableId)
                     } else {
                         true

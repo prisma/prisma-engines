@@ -15,9 +15,7 @@ mod relation;
 mod selection_result;
 mod zipper;
 
-pub mod pk;
 pub mod prelude;
-
 pub use self::zipper::*;
 pub use composite_type::*;
 pub use convert::convert;

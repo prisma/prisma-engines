@@ -51,7 +51,7 @@ pub struct QuerySchema {
     _output_object_types: Vec<ObjectTypeStrongRef>,
 
     /// Internal. Stores all enum refs.
-    _enum_types: Vec<EnumTypeRef>,
+    enum_types: Vec<EnumTypeRef>,
 }
 
 /// Connector meta information, to be used in query execution if necessary.
@@ -89,7 +89,7 @@ impl QuerySchema {
         input_field_types: Vec<InputType>,
         _input_object_types: Vec<InputObjectTypeStrongRef>,
         _output_object_types: Vec<ObjectTypeStrongRef>,
-        _enum_types: Vec<EnumTypeRef>,
+        enum_types: Vec<EnumTypeRef>,
         internal_data_model: InternalDataModelRef,
         capabilities: Vec<ConnectorCapability>,
     ) -> Self {
@@ -118,7 +118,7 @@ impl QuerySchema {
             input_field_types,
             _input_object_types,
             _output_object_types,
-            _enum_types,
+            enum_types,
             internal_data_model,
             context: ConnectorContext::new(capabilities, features, relation_mode),
         }
@@ -176,8 +176,8 @@ impl QuerySchema {
         }
     }
 
-    pub fn enum_types(&self) -> &[EnumTypeRef] {
-        &self._enum_types
+    pub fn enum_types(&self) -> impl Iterator<Item = &EnumType> {
+        self.enum_types.iter().map(|e| e.as_ref())
     }
 
     pub fn context(&self) -> &ConnectorContext {
@@ -241,13 +241,13 @@ impl fmt::Display for QueryTag {
             Self::AggregateRaw => "aggregateRaw",
         };
 
-        write!(f, "{s}")
+        f.write_str(s)
     }
 }
 
-impl From<String> for QueryTag {
-    fn from(value: String) -> Self {
-        match value.as_str() {
+impl From<&str> for QueryTag {
+    fn from(value: &str) -> Self {
+        match value {
             "findUnique" => Self::FindUnique,
             "findUniqueOrThrow" => Self::FindUniqueOrThrow,
             "findFirst" => Self::FindFirst,
@@ -317,12 +317,6 @@ impl Identifier {
     }
 }
 
-impl ToString for Identifier {
-    fn to_string(&self) -> String {
-        format!("{}.{}", self.namespace(), self.name())
-    }
-}
-
 #[derive(Debug, Clone, PartialEq)]
 pub enum ScalarType {
     Null,
@@ -358,6 +352,6 @@ impl std::fmt::Display for ScalarType {
             ScalarType::Bytes => "Bytes",
         };
 
-        write!(f, "{typ}")
+        f.write_str(typ)
     }
 }

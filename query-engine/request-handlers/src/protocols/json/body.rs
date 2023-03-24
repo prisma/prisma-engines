@@ -151,7 +151,7 @@ impl<'de> Deserialize<'de> for Action {
         D: serde::Deserializer<'de>,
     {
         let action = String::deserialize(deserializer)?;
-        let query_tag = QueryTag::from(action);
+        let query_tag = QueryTag::from(action.as_str());
 
         Ok(Action(query_tag))
     }

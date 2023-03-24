@@ -61,13 +61,12 @@ impl InternalDataModel {
     }
 
     /// Finds all inline relation fields pointing to the given model.
-    pub fn fields_pointing_to_model(&self, model: &ModelRef) -> Vec<RelationFieldRef> {
+    pub fn fields_pointing_to_model(&self, model: &ModelRef) -> impl Iterator<Item = RelationFieldRef> + '_ {
         self.walk(model.id)
             .relations_to()
             .filter_map(|rel| rel.refine().as_inline())
             .filter_map(|inline_rel| inline_rel.forward_relation_field())
             .map(move |rf| self.clone().zip(rf.id))
-            .collect()
     }
 
     pub fn walk<I>(&self, id: I) -> psl::parser_database::walkers::Walker<I> {
