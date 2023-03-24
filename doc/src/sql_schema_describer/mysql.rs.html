@@ -848,6 +848,15 @@
 <a href="#848" id="848">848</a>
 <a href="#849" id="849">849</a>
 <a href="#850" id="850">850</a>
+<a href="#851" id="851">851</a>
+<a href="#852" id="852">852</a>
+<a href="#853" id="853">853</a>
+<a href="#854" id="854">854</a>
+<a href="#855" id="855">855</a>
+<a href="#856" id="856">856</a>
+<a href="#857" id="857">857</a>
+<a href="#858" id="858">858</a>
+<a href="#859" id="859">859</a>
 </pre><pre class="rust"><code><span class="doccomment">//! MySQL schema description.
 
 </span><span class="kw">use crate</span>::{getters::Getter, parsers::Parser, <span class="kw-2">*</span>};
@@ -971,11 +980,13 @@
 
     <span class="kw">for </span>row <span class="kw">in </span>rows {
         <span class="kw">let </span>table_name = row.get_expect_string(<span class="string">&quot;table_name&quot;</span>);
+
         <span class="kw">let </span>table_id = <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = table_ids.get(table_name.as_str()) {
             <span class="kw-2">*</span>id
         } <span class="kw">else </span>{
             <span class="kw">continue</span>;
         };
+
         <span class="kw">let </span>index_name = row.get_expect_string(<span class="string">&quot;index_name&quot;</span>);
         <span class="kw">let </span>length = row.get_u32(<span class="string">&quot;partial&quot;</span>);
 
@@ -984,20 +995,27 @@
             <span class="string">&quot;D&quot; </span>=&gt; SQLSortOrder::Desc,
             misc =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected sort order `{misc}`, collation should be A, D or Null&quot;</span>),
         });
-        <span class="kw">let </span>column_name = <span class="kw">if let </span><span class="prelude-val">Some</span>(name) = row.get_string(<span class="string">&quot;column_name&quot;</span>) {
+
+        <span class="kw">let </span>seq_in_index = row.get_expect_i64(<span class="string">&quot;seq_in_index&quot;</span>); <span class="comment">// starts at 1
+
+        </span><span class="kw">let </span>column_name = <span class="kw">if let </span><span class="prelude-val">Some</span>(name) = row.get_string(<span class="string">&quot;column_name&quot;</span>) {
             name
         } <span class="kw">else </span>{
-            index_should_be_filtered_out = <span class="bool-val">true</span>; <span class="comment">// filter out indexes on expressions
-            </span><span class="kw">continue</span>;
+            <span class="comment">// filter out indexes on expressions
+            // if the sequence is 1 and we have an expression,
+            // we never create an index to the collection and can
+            // just continue
+            </span>index_should_be_filtered_out = seq_in_index &gt; <span class="number">1</span>;
+            <span class="kw">continue</span>;
         };
+
         <span class="kw">let </span>column_id = <span class="kw">if let </span><span class="prelude-val">Some</span>(col) = sql_schema.walk(table_id).column(<span class="kw-2">&amp;</span>column_name) {
             col.id
         } <span class="kw">else </span>{
             <span class="kw">continue</span>;
         };
 
-        <span class="kw">let </span>seq_in_index = row.get_expect_i64(<span class="string">&quot;seq_in_index&quot;</span>); <span class="comment">// starts at 1
-        </span><span class="kw">let </span>is_unique = !row.get_expect_bool(<span class="string">&quot;non_unique&quot;</span>);
+        <span class="kw">let </span>is_unique = !row.get_expect_bool(<span class="string">&quot;non_unique&quot;</span>);
         <span class="kw">let </span>is_pk = index_name.eq_ignore_ascii_case(<span class="string">&quot;primary&quot;</span>);
         <span class="kw">let </span>is_fulltext = row.get_string(<span class="string">&quot;index_type&quot;</span>).as_deref() == <span class="prelude-val">Some</span>(<span class="string">&quot;FULLTEXT&quot;</span>);
 
