@@ -146,7 +146,7 @@ impl ObjectType {
         self.fields.get_mut().unwrap().push(Arc::new(field));
     }
 
-    pub fn get_fields(&self) -> &Vec<OutputFieldRef> {
+    pub fn get_fields(&self) -> &[OutputFieldRef] {
         self.fields.get().unwrap()
     }
 

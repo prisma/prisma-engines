@@ -1,4 +1,4 @@
--- tags=mysql
+-- tags=mysql8
 -- exclude=vitess
 
 CREATE TABLE customers

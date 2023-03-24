@@ -55,9 +55,8 @@ impl RelationField {
     }
 
     pub fn relation(&self) -> Relation {
-        let internal_data_model = self.model().internal_data_model();
-        let relation_id = internal_data_model.walk(self.id).relation().id;
-        internal_data_model.zip(relation_id)
+        let relation_id = self.dm.walk(self.id).relation().id;
+        self.dm.clone().zip(relation_id)
     }
 
     /// Alias for more clarity (in most cases, doesn't add more clarity for self-relations);
