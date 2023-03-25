@@ -1575,6 +1575,7 @@ dependencies = [
  "sql-introspection-connector",
  "sql-migration-connector",
  "sql-schema-describer",
+ "tempfile",
  "test-macros",
  "test-setup",
  "tokio",
