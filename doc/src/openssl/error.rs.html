@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/ywl16b5iwmydra59ih94pszrw6n3wzhv-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/openssl-0.10.41/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-93196c7a1c3542a8.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/dlwrv4f2aawgs47vm6vjdflgm2j38lri-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/openssl-0.10.48/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-93196c7a1c3542a8.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -368,6 +368,54 @@
 <a href="#368" id="368">368</a>
 <a href="#369" id="369">369</a>
 <a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
+<a href="#408" id="408">408</a>
+<a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
+<a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Errors returned by OpenSSL library.
 //!
 //! OpenSSL errors are stored in an `ErrorStack`.  Most methods in the crate
@@ -386,14 +434,21 @@
 //! }
 //! ```
 </span><span class="kw">use </span>cfg_if::cfg_if;
-<span class="kw">use </span>libc::{c_char, c_int, c_ulong};
+<span class="kw">use </span>libc::{c_char, c_int};
 <span class="kw">use </span>std::borrow::Cow;
+<span class="attr">#[cfg(boringssl)]
+</span><span class="kw">use </span>std::convert::TryInto;
 <span class="kw">use </span>std::error;
 <span class="kw">use </span>std::ffi::CStr;
 <span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::io;
 <span class="kw">use </span>std::ptr;
 <span class="kw">use </span>std::str;
+
+<span class="attr">#[cfg(not(boringssl))]
+</span><span class="kw">type </span>ErrType = libc::c_ulong;
+<span class="attr">#[cfg(boringssl)]
+</span><span class="kw">type </span>ErrType = libc::c_uint;
 
 <span class="doccomment">/// Collection of [`Error`]s from OpenSSL.
 ///
@@ -461,7 +516,7 @@
 <span class="doccomment">/// An error reported from OpenSSL.
 </span><span class="attr">#[derive(Clone)]
 </span><span class="kw">pub struct </span>Error {
-    code: c_ulong,
+    code: ErrType,
     file: ShimStr,
     line: c_int,
     func: <span class="prelude-ty">Option</span>&lt;ShimStr&gt;,
@@ -490,11 +545,14 @@
                     </span><span class="kw">let </span>data = <span class="kw">if </span>flags &amp; ffi::ERR_TXT_STRING != <span class="number">0 </span>{
                         <span class="kw">let </span>bytes = CStr::from_ptr(data <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>).to_bytes();
                         <span class="kw">let </span>data = str::from_utf8(bytes).unwrap();
-                        <span class="kw">let </span>data = <span class="kw">if </span>flags &amp; ffi::ERR_TXT_MALLOCED != <span class="number">0 </span>{
+                        <span class="attr">#[cfg(not(boringssl))]
+                        </span><span class="kw">let </span>data = <span class="kw">if </span>flags &amp; ffi::ERR_TXT_MALLOCED != <span class="number">0 </span>{
                             Cow::Owned(data.to_string())
                         } <span class="kw">else </span>{
                             Cow::Borrowed(data)
                         };
+                        <span class="attr">#[cfg(boringssl)]
+                        </span><span class="kw">let </span>data = Cow::Borrowed(data);
                         <span class="prelude-val">Some</span>(data)
                     } <span class="kw">else </span>{
                         <span class="prelude-val">None
@@ -558,29 +616,29 @@
                 <span class="self">self</span>.line,
                 <span class="self">self</span>.func.as_ref().map_or(ptr::null(), |s| s.as_ptr()),
             );
-            ffi::ERR_set_error(
-                ffi::ERR_GET_LIB(<span class="self">self</span>.code),
-                ffi::ERR_GET_REASON(<span class="self">self</span>.code),
-                ptr::null(),
-            );
+            ffi::ERR_set_error(<span class="self">self</span>.library_code(), <span class="self">self</span>.reason_code(), ptr::null());
         }
     }
 
     <span class="attr">#[cfg(not(ossl300))]
     </span><span class="kw">fn </span>put_error(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="attr">#[cfg(not(boringssl))]
+        </span><span class="kw">let </span>line = <span class="self">self</span>.line;
+        <span class="attr">#[cfg(boringssl)]
+        </span><span class="kw">let </span>line = <span class="self">self</span>.line.try_into().unwrap();
         <span class="kw">unsafe </span>{
             ffi::ERR_put_error(
-                ffi::ERR_GET_LIB(<span class="self">self</span>.code),
+                <span class="self">self</span>.library_code(),
                 ffi::ERR_GET_FUNC(<span class="self">self</span>.code),
-                ffi::ERR_GET_REASON(<span class="self">self</span>.code),
+                <span class="self">self</span>.reason_code(),
                 <span class="self">self</span>.file.as_ptr(),
-                <span class="self">self</span>.line,
+                line,
             );
         }
     }
 
     <span class="doccomment">/// Returns the raw OpenSSL error code for this error.
-    </span><span class="kw">pub fn </span>code(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; c_ulong {
+    </span><span class="kw">pub fn </span>code(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ErrType {
         <span class="self">self</span>.code
     }
 
@@ -594,6 +652,15 @@
             <span class="kw">let </span>bytes = CStr::from_ptr(cstr <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>).to_bytes();
             <span class="prelude-val">Some</span>(str::from_utf8(bytes).unwrap())
         }
+    }
+
+    <span class="doccomment">/// Returns the raw OpenSSL error constant for the library reporting the
+    /// error.
+    </span><span class="comment">// On BoringSSL ERR_GET_{LIB,FUNC,REASON} are `unsafe`, but on
+    // OpenSSL/LibreSSL they&#39;re safe.
+    </span><span class="attr">#[allow(unused_unsafe)]
+    </span><span class="kw">pub fn </span>library_code(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; libc::c_int {
+        <span class="kw">unsafe </span>{ ffi::ERR_GET_LIB(<span class="self">self</span>.code) }
     }
 
     <span class="doccomment">/// Returns the name of the function reporting the error.
@@ -611,6 +678,14 @@
             <span class="kw">let </span>bytes = CStr::from_ptr(cstr <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>).to_bytes();
             <span class="prelude-val">Some</span>(str::from_utf8(bytes).unwrap())
         }
+    }
+
+    <span class="doccomment">/// Returns the raw OpenSSL error constant for the reason for the error.
+    </span><span class="comment">// On BoringSSL ERR_GET_{LIB,FUNC,REASON} are `unsafe`, but on
+    // OpenSSL/LibreSSL they&#39;re safe.
+    </span><span class="attr">#[allow(unused_unsafe)]
+    </span><span class="kw">pub fn </span>reason_code(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; libc::c_int {
+        <span class="kw">unsafe </span>{ ffi::ERR_GET_REASON(<span class="self">self</span>.code) }
     }
 
     <span class="doccomment">/// Returns the name of the source file which encountered the error.
@@ -653,19 +728,22 @@
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Error {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    <span class="comment">// On BoringSSL ERR_GET_{LIB,FUNC,REASON} are `unsafe`, but on
+    // OpenSSL/LibreSSL they&#39;re safe.
+    </span><span class="attr">#[allow(unused_unsafe)]
+    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         <span class="macro">write!</span>(fmt, <span class="string">&quot;error:{:08X}&quot;</span>, <span class="self">self</span>.code())<span class="question-mark">?</span>;
         <span class="kw">match </span><span class="self">self</span>.library() {
             <span class="prelude-val">Some</span>(l) =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;:{}&quot;</span>, l)<span class="question-mark">?</span>,
-            <span class="prelude-val">None </span>=&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;:lib({})&quot;</span>, ffi::ERR_GET_LIB(<span class="self">self</span>.code()))<span class="question-mark">?</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;:lib({})&quot;</span>, <span class="self">self</span>.library_code())<span class="question-mark">?</span>,
         }
         <span class="kw">match </span><span class="self">self</span>.function() {
             <span class="prelude-val">Some</span>(f) =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;:{}&quot;</span>, f)<span class="question-mark">?</span>,
-            <span class="prelude-val">None </span>=&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;:func({})&quot;</span>, ffi::ERR_GET_FUNC(<span class="self">self</span>.code()))<span class="question-mark">?</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;:func({})&quot;</span>, <span class="kw">unsafe </span>{ ffi::ERR_GET_FUNC(<span class="self">self</span>.code()) })<span class="question-mark">?</span>,
         }
         <span class="kw">match </span><span class="self">self</span>.reason() {
             <span class="prelude-val">Some</span>(r) =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;:{}&quot;</span>, r)<span class="question-mark">?</span>,
-            <span class="prelude-val">None </span>=&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;:reason({})&quot;</span>, ffi::ERR_GET_REASON(<span class="self">self</span>.code()))<span class="question-mark">?</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;:reason({})&quot;</span>, <span class="self">self</span>.reason_code())<span class="question-mark">?</span>,
         }
         <span class="macro">write!</span>(
             fmt,
@@ -710,7 +788,7 @@
             func: <span class="kw-2">*mut *const </span>c_char,
             data: <span class="kw-2">*mut *const </span>c_char,
             flags: <span class="kw-2">*mut </span>c_int,
-        ) -&gt; c_ulong {
+        ) -&gt; ErrType {
             <span class="kw">let </span>code = ffi::ERR_get_error_line_data(file, line, data, flags);
             <span class="kw-2">*</span>func = ffi::ERR_func_error_string(code);
             code
@@ -736,6 +814,24 @@
                 }
             }
         }
+    }
+}
+
+<span class="attr">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="attr">#[cfg(not(ossl310))]
+    </span><span class="kw">use </span><span class="kw">crate</span>::nid::Nid;
+
+    <span class="attr">#[test]
+    </span><span class="comment">// Due to a bug in OpenSSL 3.1.0, this test can hang there. Skip for now.
+    </span><span class="attr">#[cfg(not(ossl310))]
+    </span><span class="kw">fn </span>test_error_library_code() {
+        <span class="kw">let </span>stack = Nid::create(<span class="string">&quot;not-an-oid&quot;</span>, <span class="string">&quot;invalid&quot;</span>, <span class="string">&quot;invalid&quot;</span>).unwrap_err();
+        <span class="kw">let </span>errors = stack.errors();
+        <span class="attr">#[cfg(not(boringssl))]
+        </span><span class="macro">assert_eq!</span>(errors[<span class="number">0</span>].library_code(), ffi::ERR_LIB_ASN1);
+        <span class="attr">#[cfg(boringssl)]
+        </span><span class="macro">assert_eq!</span>(errors[<span class="number">0</span>].library_code(), ffi::ERR_LIB_OBJ <span class="kw">as </span>libc::c_int);
     }
 }
 </code></pre></div>

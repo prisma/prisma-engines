@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/ywl16b5iwmydra59ih94pszrw6n3wzhv-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/openssl-0.10.41/src/ec.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ec.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-93196c7a1c3542a8.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/dlwrv4f2aawgs47vm6vjdflgm2j38lri-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/openssl-0.10.48/src/ec.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ec.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-93196c7a1c3542a8.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1220,6 +1220,52 @@
 <a href="#1220" id="1220">1220</a>
 <a href="#1221" id="1221">1221</a>
 <a href="#1222" id="1222">1222</a>
+<a href="#1223" id="1223">1223</a>
+<a href="#1224" id="1224">1224</a>
+<a href="#1225" id="1225">1225</a>
+<a href="#1226" id="1226">1226</a>
+<a href="#1227" id="1227">1227</a>
+<a href="#1228" id="1228">1228</a>
+<a href="#1229" id="1229">1229</a>
+<a href="#1230" id="1230">1230</a>
+<a href="#1231" id="1231">1231</a>
+<a href="#1232" id="1232">1232</a>
+<a href="#1233" id="1233">1233</a>
+<a href="#1234" id="1234">1234</a>
+<a href="#1235" id="1235">1235</a>
+<a href="#1236" id="1236">1236</a>
+<a href="#1237" id="1237">1237</a>
+<a href="#1238" id="1238">1238</a>
+<a href="#1239" id="1239">1239</a>
+<a href="#1240" id="1240">1240</a>
+<a href="#1241" id="1241">1241</a>
+<a href="#1242" id="1242">1242</a>
+<a href="#1243" id="1243">1243</a>
+<a href="#1244" id="1244">1244</a>
+<a href="#1245" id="1245">1245</a>
+<a href="#1246" id="1246">1246</a>
+<a href="#1247" id="1247">1247</a>
+<a href="#1248" id="1248">1248</a>
+<a href="#1249" id="1249">1249</a>
+<a href="#1250" id="1250">1250</a>
+<a href="#1251" id="1251">1251</a>
+<a href="#1252" id="1252">1252</a>
+<a href="#1253" id="1253">1253</a>
+<a href="#1254" id="1254">1254</a>
+<a href="#1255" id="1255">1255</a>
+<a href="#1256" id="1256">1256</a>
+<a href="#1257" id="1257">1257</a>
+<a href="#1258" id="1258">1258</a>
+<a href="#1259" id="1259">1259</a>
+<a href="#1260" id="1260">1260</a>
+<a href="#1261" id="1261">1261</a>
+<a href="#1262" id="1262">1262</a>
+<a href="#1263" id="1263">1263</a>
+<a href="#1264" id="1264">1264</a>
+<a href="#1265" id="1265">1265</a>
+<a href="#1266" id="1266">1266</a>
+<a href="#1267" id="1267">1267</a>
+<a href="#1268" id="1268">1268</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Elliptic Curve
 //!
 //! Cryptography relies on the difficulty of solving mathematical problems, such as the factor
@@ -1236,7 +1282,7 @@
 //!
 //! [`EcGroup`]: struct.EcGroup.html
 //! [`Nid`]: ../nid/struct.Nid.html
-//! [Eliptic Curve Cryptography]: https://wiki.openssl.org/index.php/Elliptic_Curve_Cryptography
+//! [Elliptic Curve Cryptography]: https://wiki.openssl.org/index.php/Elliptic_Curve_Cryptography
 </span><span class="kw">use </span>foreign_types::{ForeignType, ForeignTypeRef};
 <span class="kw">use </span>libc::c_int;
 <span class="kw">use </span>std::fmt;
@@ -1295,7 +1341,7 @@
     ///
     /// OpenSSL documentation at [`EC_GROUP`]
     ///
-    /// [`EC_GROUP`]: https://www.openssl.org/docs/man1.1.0/crypto/EC_GROUP_get_seed_len.html
+    /// [`EC_GROUP`]: https://www.openssl.org/docs/manmaster/crypto/EC_GROUP_get_seed_len.html
     </span><span class="kw">pub const </span>EXPLICIT_CURVE: Asn1Flag = Asn1Flag(<span class="number">0</span>);
 
     <span class="doccomment">/// Standard Curves
@@ -1338,6 +1384,19 @@
 
 <span class="kw">impl </span>EcGroup {
     <span class="doccomment">/// Returns the group of a standard named curve.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// use openssl::nid::Nid;
+    /// use openssl::ec::{EcGroup, EcKey};
+    ///
+    /// let nid = Nid::X9_62_PRIME256V1; // NIST P-256 curve
+    /// let group = EcGroup::from_curve_name(nid)?;
+    /// let key = EcKey::generate(&amp;group)?;
+    /// # Ok(()) }
+    /// ```
     </span><span class="attr">#[corresponds(EC_GROUP_new_by_curve_name)]
     </span><span class="kw">pub fn </span>from_curve_name(nid: Nid) -&gt; <span class="prelude-ty">Result</span>&lt;EcGroup, ErrorStack&gt; {
         <span class="kw">unsafe </span>{
@@ -1396,7 +1455,7 @@
     /// a term in the polynomial.  It will be set to 3 `1`s or 5 `1`s depending on
     /// using a trinomial or pentanomial.
     </span><span class="attr">#[corresponds(EC_GROUP_get_curve_GF2m)]
-    #[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_EC2M&quot;</span>))]
+    #[cfg(not(any(boringssl, osslconf = <span class="string">&quot;OPENSSL_NO_EC2M&quot;</span>)))]
     </span><span class="kw">pub fn </span>components_gf2m(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         p: <span class="kw-2">&amp;mut </span>BigNumRef,
@@ -1761,7 +1820,7 @@
     <span class="doccomment">/// Places affine coordinates of a curve over a binary field in the provided
     /// `x` and `y` `BigNum`s
     </span><span class="attr">#[corresponds(EC_POINT_get_affine_coordinates_GF2m)]
-    #[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_EC2M&quot;</span>))]
+    #[cfg(not(any(boringssl, osslconf = <span class="string">&quot;OPENSSL_NO_EC2M&quot;</span>)))]
     </span><span class="kw">pub fn </span>affine_coordinates_gf2m(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         group: <span class="kw-2">&amp;</span>EcGroupRef,
@@ -1970,26 +2029,32 @@
 }
 
 <span class="kw">impl </span>EcKey&lt;Public&gt; {
-    <span class="doccomment">/// Constructs an `EcKey` from the specified group with the associated `EcPoint`, public_key.
+    <span class="doccomment">/// Constructs an `EcKey` from the specified group with the associated [`EcPoint`]: `public_key`.
     ///
-    /// This will only have the associated public_key.
+    /// This will only have the associated `public_key`.
     ///
     /// # Example
     ///
-    /// ```no_run
+    /// ```
+    /// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// use openssl::bn::BigNumContext;
     /// use openssl::ec::*;
     /// use openssl::nid::Nid;
     /// use openssl::pkey::PKey;
     ///
-    /// // get bytes from somewhere, i.e. this will not produce a valid key
-    /// let public_key: Vec&lt;u8&gt; = vec![];
+    /// let group = EcGroup::from_curve_name(Nid::SECP384R1)?;
+    /// let mut ctx = BigNumContext::new()?;
+    ///
+    /// // get bytes from somewhere
+    /// let public_key = // ...
+    /// # EcKey::generate(&amp;group)?.public_key().to_bytes(&amp;group,
+    /// # PointConversionForm::COMPRESSED, &amp;mut ctx)?;
     ///
     /// // create an EcKey from the binary form of a EcPoint
-    /// let group = EcGroup::from_curve_name(Nid::SECP256K1).unwrap();
-    /// let mut ctx = BigNumContext::new().unwrap();
-    /// let point = EcPoint::from_bytes(&amp;group, &amp;public_key, &amp;mut ctx).unwrap();
-    /// let key = EcKey::from_public_key(&amp;group, &amp;point);
+    /// let point = EcPoint::from_bytes(&amp;group, &amp;public_key, &amp;mut ctx)?;
+    /// let key = EcKey::from_public_key(&amp;group, &amp;point)?;
+    /// key.check_key()?;
+    /// # Ok(()) }
     /// ```
     </span><span class="attr">#[corresponds(EC_KEY_set_public_key)]
     </span><span class="kw">pub fn </span>from_public_key(
@@ -2057,6 +2122,33 @@
 
 <span class="kw">impl </span>EcKey&lt;Private&gt; {
     <span class="doccomment">/// Generates a new public/private key pair on the specified curve.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// use openssl::bn::BigNumContext;
+    /// use openssl::nid::Nid;
+    /// use openssl::ec::{EcGroup, EcKey, PointConversionForm};
+    ///
+    /// let nid = Nid::X9_62_PRIME256V1; // NIST P-256 curve
+    /// let group = EcGroup::from_curve_name(nid)?;
+    /// let key = EcKey::generate(&amp;group)?;
+    ///
+    /// let mut ctx = BigNumContext::new()?;
+    ///
+    /// let public_key = &amp;key.public_key().to_bytes(
+    ///     &amp;group,
+    ///     PointConversionForm::COMPRESSED,
+    ///     &amp;mut ctx,
+    /// )?;
+    /// assert_eq!(public_key.len(), 33);
+    /// assert_ne!(public_key[0], 0x04);
+    ///
+    /// let private_key = key.private_key().to_vec();
+    /// assert!(private_key.len() &gt;= 31);
+    /// # Ok(()) }
+    /// ```
     </span><span class="attr">#[corresponds(EC_KEY_generate_key)]
     </span><span class="kw">pub fn </span>generate(group: <span class="kw-2">&amp;</span>EcGroupRef) -&gt; <span class="prelude-ty">Result</span>&lt;EcKey&lt;Private&gt;, ErrorStack&gt; {
         <span class="kw">unsafe </span>{
@@ -2431,7 +2523,7 @@
     }
 
     <span class="attr">#[test]
-    #[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_EC2M&quot;</span>))]
+    #[cfg(not(any(boringssl, osslconf = <span class="string">&quot;OPENSSL_NO_EC2M&quot;</span>)))]
     </span><span class="kw">fn </span>is_on_curve() {
         <span class="kw">let </span>group = EcGroup::from_curve_name(Nid::X9_62_PRIME256V1).unwrap();
         <span class="kw">let </span><span class="kw-2">mut </span>ctx = BigNumContext::new().unwrap();

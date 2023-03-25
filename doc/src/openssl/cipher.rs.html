@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/ywl16b5iwmydra59ih94pszrw6n3wzhv-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/openssl-0.10.41/src/cipher.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cipher.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-93196c7a1c3542a8.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/dlwrv4f2aawgs47vm6vjdflgm2j38lri-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/openssl-0.10.48/src/cipher.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cipher.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-93196c7a1c3542a8.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -411,6 +411,77 @@
 <a href="#411" id="411">411</a>
 <a href="#412" id="412">412</a>
 <a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
+<a href="#450" id="450">450</a>
+<a href="#451" id="451">451</a>
+<a href="#452" id="452">452</a>
+<a href="#453" id="453">453</a>
+<a href="#454" id="454">454</a>
+<a href="#455" id="455">455</a>
+<a href="#456" id="456">456</a>
+<a href="#457" id="457">457</a>
+<a href="#458" id="458">458</a>
+<a href="#459" id="459">459</a>
+<a href="#460" id="460">460</a>
+<a href="#461" id="461">461</a>
+<a href="#462" id="462">462</a>
+<a href="#463" id="463">463</a>
+<a href="#464" id="464">464</a>
+<a href="#465" id="465">465</a>
+<a href="#466" id="466">466</a>
+<a href="#467" id="467">467</a>
+<a href="#468" id="468">468</a>
+<a href="#469" id="469">469</a>
+<a href="#470" id="470">470</a>
+<a href="#471" id="471">471</a>
+<a href="#472" id="472">472</a>
+<a href="#473" id="473">473</a>
+<a href="#474" id="474">474</a>
+<a href="#475" id="475">475</a>
+<a href="#476" id="476">476</a>
+<a href="#477" id="477">477</a>
+<a href="#478" id="478">478</a>
+<a href="#479" id="479">479</a>
+<a href="#480" id="480">480</a>
+<a href="#481" id="481">481</a>
+<a href="#482" id="482">482</a>
+<a href="#483" id="483">483</a>
+<a href="#484" id="484">484</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Symmetric ciphers.
 
 </span><span class="attr">#[cfg(ossl300)]
@@ -429,7 +500,7 @@
 </span><span class="kw">use </span>std::ptr;
 
 <span class="macro">cfg_if! </span>{
-    <span class="kw">if </span><span class="attr">#[cfg(any(ossl110, libressl273))] </span>{
+    <span class="kw">if </span><span class="attr">#[cfg(any(boringssl, ossl110, libressl273))] </span>{
         <span class="kw">use </span>ffi::{EVP_CIPHER_block_size, EVP_CIPHER_iv_length, EVP_CIPHER_key_length};
     } <span class="kw">else </span>{
         <span class="kw">use </span>libc::c_int;
@@ -558,35 +629,43 @@
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_aes_128_cbc() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
-    <span class="kw">pub fn </span>aes_128_xts() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
+    <span class="attr">#[cfg(not(boringssl))]
+    </span><span class="kw">pub fn </span>aes_128_xts() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_aes_128_xts() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
-    <span class="kw">pub fn </span>aes_128_ctr() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
+    <span class="attr">#[cfg(not(boringssl))]
+    </span><span class="kw">pub fn </span>aes_128_ctr() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_aes_128_ctr() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
-    <span class="kw">pub fn </span>aes_128_cfb1() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
+    <span class="attr">#[cfg(not(boringssl))]
+    </span><span class="kw">pub fn </span>aes_128_cfb1() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_aes_128_cfb1() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
-    <span class="kw">pub fn </span>aes_128_cfb128() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
+    <span class="attr">#[cfg(not(boringssl))]
+    </span><span class="kw">pub fn </span>aes_128_cfb128() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_aes_128_cfb128() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
-    <span class="kw">pub fn </span>aes_128_cfb8() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
+    <span class="attr">#[cfg(not(boringssl))]
+    </span><span class="kw">pub fn </span>aes_128_cfb8() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_aes_128_cfb8() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
-    <span class="kw">pub fn </span>aes_128_gcm() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
+    <span class="attr">#[cfg(not(boringssl))]
+    </span><span class="kw">pub fn </span>aes_128_gcm() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_aes_128_gcm() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
-    <span class="kw">pub fn </span>aes_128_ccm() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
+    <span class="attr">#[cfg(not(boringssl))]
+    </span><span class="kw">pub fn </span>aes_128_ccm() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_aes_128_ccm() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
-    <span class="kw">pub fn </span>aes_128_ofb() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
+    <span class="attr">#[cfg(not(boringssl))]
+    </span><span class="kw">pub fn </span>aes_128_ofb() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_aes_128_ofb() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
@@ -608,7 +687,8 @@
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_aes_192_ctr() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
-    <span class="kw">pub fn </span>aes_192_cfb1() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
+    <span class="attr">#[cfg(not(boringssl))]
+    </span><span class="kw">pub fn </span>aes_192_cfb1() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_aes_192_cfb1() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
@@ -616,7 +696,8 @@
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_aes_192_cfb128() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
-    <span class="kw">pub fn </span>aes_192_cfb8() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
+    <span class="attr">#[cfg(not(boringssl))]
+    </span><span class="kw">pub fn </span>aes_192_cfb8() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_aes_192_cfb8() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
@@ -624,7 +705,8 @@
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_aes_192_gcm() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
-    <span class="kw">pub fn </span>aes_192_ccm() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
+    <span class="attr">#[cfg(not(boringssl))]
+    </span><span class="kw">pub fn </span>aes_192_ccm() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_aes_192_ccm() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
@@ -650,7 +732,8 @@
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_aes_256_ctr() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
-    <span class="kw">pub fn </span>aes_256_cfb1() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
+    <span class="attr">#[cfg(not(boringssl))]
+    </span><span class="kw">pub fn </span>aes_256_cfb1() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_aes_256_cfb1() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
@@ -658,7 +741,8 @@
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_aes_256_cfb128() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
-    <span class="kw">pub fn </span>aes_256_cfb8() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
+    <span class="attr">#[cfg(not(boringssl))]
+    </span><span class="kw">pub fn </span>aes_256_cfb8() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_aes_256_cfb8() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
@@ -666,7 +750,8 @@
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_aes_256_gcm() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
-    <span class="kw">pub fn </span>aes_256_ccm() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
+    <span class="attr">#[cfg(not(boringssl))]
+    </span><span class="kw">pub fn </span>aes_256_ccm() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_aes_256_ccm() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
@@ -691,11 +776,13 @@
     }
 
     <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_BF&quot;</span>))]
+    #[cfg(not(boringssl))]
     </span><span class="kw">pub fn </span>bf_cfb64() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_bf_cfb64() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
     <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_BF&quot;</span>))]
+    #[cfg(not(boringssl))]
     </span><span class="kw">pub fn </span>bf_ofb() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_bf_ofb() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
@@ -716,12 +803,63 @@
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_des_ede3_cbc() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
-    <span class="kw">pub fn </span>des_ede3_cfb64() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
+    <span class="attr">#[cfg(not(boringssl))]
+    </span><span class="kw">pub fn </span>des_ede3_cfb64() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_des_ede3_cfb64() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
     <span class="kw">pub fn </span>rc4() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_rc4() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
+    }
+
+    <span class="attr">#[cfg(not(any(boringssl, osslconf = <span class="string">&quot;OPENSSL_NO_CAMELLIA&quot;</span>)))]
+    </span><span class="kw">pub fn </span>camellia128_cfb128() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
+        <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_camellia_128_cfb128() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
+    }
+
+    <span class="attr">#[cfg(not(any(boringssl, osslconf = <span class="string">&quot;OPENSSL_NO_CAMELLIA&quot;</span>)))]
+    </span><span class="kw">pub fn </span>camellia128_ecb() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
+        <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_camellia_128_ecb() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
+    }
+
+    <span class="attr">#[cfg(not(any(boringssl, osslconf = <span class="string">&quot;OPENSSL_NO_CAMELLIA&quot;</span>)))]
+    </span><span class="kw">pub fn </span>camellia192_cfb128() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
+        <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_camellia_192_cfb128() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
+    }
+
+    <span class="attr">#[cfg(not(any(boringssl, osslconf = <span class="string">&quot;OPENSSL_NO_CAMELLIA&quot;</span>)))]
+    </span><span class="kw">pub fn </span>camellia192_ecb() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
+        <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_camellia_192_ecb() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
+    }
+
+    <span class="attr">#[cfg(not(any(boringssl, osslconf = <span class="string">&quot;OPENSSL_NO_CAMELLIA&quot;</span>)))]
+    </span><span class="kw">pub fn </span>camellia256_cfb128() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
+        <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_camellia_256_cfb128() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
+    }
+
+    <span class="attr">#[cfg(not(any(boringssl, osslconf = <span class="string">&quot;OPENSSL_NO_CAMELLIA&quot;</span>)))]
+    </span><span class="kw">pub fn </span>camellia256_ecb() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
+        <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_camellia_256_ecb() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
+    }
+
+    <span class="attr">#[cfg(not(any(boringssl, osslconf = <span class="string">&quot;OPENSSL_NO_CAST&quot;</span>)))]
+    </span><span class="kw">pub fn </span>cast5_cfb64() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
+        <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_cast5_cfb64() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
+    }
+
+    <span class="attr">#[cfg(not(any(boringssl, osslconf = <span class="string">&quot;OPENSSL_NO_CAST&quot;</span>)))]
+    </span><span class="kw">pub fn </span>cast5_ecb() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
+        <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_cast5_ecb() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
+    }
+
+    <span class="attr">#[cfg(not(any(boringssl, osslconf = <span class="string">&quot;OPENSSL_NO_IDEA&quot;</span>)))]
+    </span><span class="kw">pub fn </span>idea_cfb64() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
+        <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_idea_cfb64() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
+    }
+
+    <span class="attr">#[cfg(not(any(boringssl, osslconf = <span class="string">&quot;OPENSSL_NO_IDEA&quot;</span>)))]
+    </span><span class="kw">pub fn </span>idea_ecb() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
+        <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_idea_ecb() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
     <span class="attr">#[cfg(all(ossl110, not(osslconf = <span class="string">&quot;OPENSSL_NO_CHACHA&quot;</span>)))]
@@ -735,21 +873,25 @@
     }
 
     <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_SEED&quot;</span>))]
+    #[cfg(not(boringssl))]
     </span><span class="kw">pub fn </span>seed_cbc() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_seed_cbc() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
     <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_SEED&quot;</span>))]
+    #[cfg(not(boringssl))]
     </span><span class="kw">pub fn </span>seed_cfb128() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_seed_cfb128() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
     <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_SEED&quot;</span>))]
+    #[cfg(not(boringssl))]
     </span><span class="kw">pub fn </span>seed_ecb() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_seed_ecb() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
     <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_SEED&quot;</span>))]
+    #[cfg(not(boringssl))]
     </span><span class="kw">pub fn </span>seed_ofb() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CipherRef {
         <span class="kw">unsafe </span>{ CipherRef::from_ptr(ffi::EVP_seed_ofb() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/ywl16b5iwmydra59ih94pszrw6n3wzhv-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/openssl-0.10.41/src/hash.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hash.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-93196c7a1c3542a8.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/dlwrv4f2aawgs47vm6vjdflgm2j38lri-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/openssl-0.10.48/src/hash.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hash.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-93196c7a1c3542a8.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -702,7 +702,135 @@
 <a href="#702" id="702">702</a>
 <a href="#703" id="703">703</a>
 <a href="#704" id="704">704</a>
-</pre><pre class="rust"><code><span class="kw">use </span>cfg_if::cfg_if;
+<a href="#705" id="705">705</a>
+<a href="#706" id="706">706</a>
+<a href="#707" id="707">707</a>
+<a href="#708" id="708">708</a>
+<a href="#709" id="709">709</a>
+<a href="#710" id="710">710</a>
+<a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
+<a href="#713" id="713">713</a>
+<a href="#714" id="714">714</a>
+<a href="#715" id="715">715</a>
+<a href="#716" id="716">716</a>
+<a href="#717" id="717">717</a>
+<a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
+<a href="#720" id="720">720</a>
+<a href="#721" id="721">721</a>
+<a href="#722" id="722">722</a>
+<a href="#723" id="723">723</a>
+<a href="#724" id="724">724</a>
+<a href="#725" id="725">725</a>
+<a href="#726" id="726">726</a>
+<a href="#727" id="727">727</a>
+<a href="#728" id="728">728</a>
+<a href="#729" id="729">729</a>
+<a href="#730" id="730">730</a>
+<a href="#731" id="731">731</a>
+<a href="#732" id="732">732</a>
+<a href="#733" id="733">733</a>
+<a href="#734" id="734">734</a>
+<a href="#735" id="735">735</a>
+<a href="#736" id="736">736</a>
+<a href="#737" id="737">737</a>
+<a href="#738" id="738">738</a>
+<a href="#739" id="739">739</a>
+<a href="#740" id="740">740</a>
+<a href="#741" id="741">741</a>
+<a href="#742" id="742">742</a>
+<a href="#743" id="743">743</a>
+<a href="#744" id="744">744</a>
+<a href="#745" id="745">745</a>
+<a href="#746" id="746">746</a>
+<a href="#747" id="747">747</a>
+<a href="#748" id="748">748</a>
+<a href="#749" id="749">749</a>
+<a href="#750" id="750">750</a>
+<a href="#751" id="751">751</a>
+<a href="#752" id="752">752</a>
+<a href="#753" id="753">753</a>
+<a href="#754" id="754">754</a>
+<a href="#755" id="755">755</a>
+<a href="#756" id="756">756</a>
+<a href="#757" id="757">757</a>
+<a href="#758" id="758">758</a>
+<a href="#759" id="759">759</a>
+<a href="#760" id="760">760</a>
+<a href="#761" id="761">761</a>
+<a href="#762" id="762">762</a>
+<a href="#763" id="763">763</a>
+<a href="#764" id="764">764</a>
+<a href="#765" id="765">765</a>
+<a href="#766" id="766">766</a>
+<a href="#767" id="767">767</a>
+<a href="#768" id="768">768</a>
+<a href="#769" id="769">769</a>
+<a href="#770" id="770">770</a>
+<a href="#771" id="771">771</a>
+<a href="#772" id="772">772</a>
+<a href="#773" id="773">773</a>
+<a href="#774" id="774">774</a>
+<a href="#775" id="775">775</a>
+<a href="#776" id="776">776</a>
+<a href="#777" id="777">777</a>
+<a href="#778" id="778">778</a>
+<a href="#779" id="779">779</a>
+<a href="#780" id="780">780</a>
+<a href="#781" id="781">781</a>
+<a href="#782" id="782">782</a>
+<a href="#783" id="783">783</a>
+<a href="#784" id="784">784</a>
+<a href="#785" id="785">785</a>
+<a href="#786" id="786">786</a>
+<a href="#787" id="787">787</a>
+<a href="#788" id="788">788</a>
+<a href="#789" id="789">789</a>
+<a href="#790" id="790">790</a>
+<a href="#791" id="791">791</a>
+<a href="#792" id="792">792</a>
+<a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
+<a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
+<a href="#797" id="797">797</a>
+<a href="#798" id="798">798</a>
+<a href="#799" id="799">799</a>
+<a href="#800" id="800">800</a>
+</pre><pre class="rust"><code><span class="doccomment">//! Message digest (hash) computation support.
+//!
+//! # Examples
+//!
+//! Calculate a hash in one go:
+//!
+//! ```
+//! # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+//! use openssl::hash::{hash, MessageDigest};
+//!
+//! let data = b&quot;\x42\xF4\x97\xE0&quot;;
+//! let spec = b&quot;\x7c\x43\x0f\x17\x8a\xef\xdf\x14\x87\xfe\xe7\x14\x4e\x96\x41\xe2&quot;;
+//! let res = hash(MessageDigest::md5(), data)?;
+//! assert_eq!(&amp;*res, spec);
+//! # Ok(()) }
+//! ```
+//!
+//! Supply the input in chunks:
+//!
+//! ```
+//! use openssl::hash::{Hasher, MessageDigest};
+//!
+//! # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+//! let mut hasher = Hasher::new(MessageDigest::sha256())?;
+//! hasher.update(b&quot;test&quot;)?;
+//! hasher.update(b&quot;this&quot;)?;
+//! let digest: &amp;[u8] = &amp;hasher.finish()?;
+//!
+//! let expected = hex::decode(&quot;9740e652ab5b4acd997a7cca13d6696702ccb2d441cca59fc6e285127f28cfe6&quot;)?;
+//! assert_eq!(digest, expected);
+//! # Ok(()) }
+//! ```
+</span><span class="kw">use </span>cfg_if::cfg_if;
 <span class="kw">use </span>std::ffi::CString;
 <span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::io;
@@ -722,7 +850,8 @@
     }
 }
 
-<span class="attr">#[derive(Copy, Clone, PartialEq, Eq)]
+<span class="doccomment">/// A message digest algorithm.
+</span><span class="attr">#[derive(Copy, Clone, PartialEq, Eq)]
 </span><span class="kw">pub struct </span>MessageDigest(<span class="kw-2">*const </span>ffi::EVP_MD);
 
 <span class="kw">impl </span>MessageDigest {
@@ -739,7 +868,7 @@
     ///
     /// This corresponds to [`EVP_get_digestbynid`].
     ///
-    /// [`EVP_get_digestbynid`]: https://www.openssl.org/docs/man1.1.0/crypto/EVP_DigestInit.html
+    /// [`EVP_get_digestbynid`]: https://www.openssl.org/docs/manmaster/crypto/EVP_DigestInit.html
     </span><span class="kw">pub fn </span>from_nid(type_: Nid) -&gt; <span class="prelude-ty">Option</span>&lt;MessageDigest&gt; {
         <span class="kw">unsafe </span>{
             <span class="kw">let </span>ptr = ffi::EVP_get_digestbynid(type_.as_raw());
@@ -755,7 +884,7 @@
     ///
     /// This corresponds to [`EVP_get_digestbyname`].
     ///
-    /// [`EVP_get_digestbyname`]: https://www.openssl.org/docs/man1.1.0/crypto/EVP_DigestInit.html
+    /// [`EVP_get_digestbyname`]: https://www.openssl.org/docs/manmaster/crypto/EVP_DigestInit.html
     </span><span class="kw">pub fn </span>from_name(name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;MessageDigest&gt; {
         ffi::init();
         <span class="kw">let </span>name = CString::new(name).ok()<span class="question-mark">?</span>;
@@ -769,7 +898,8 @@
         }
     }
 
-    <span class="kw">pub fn </span>null() -&gt; MessageDigest {
+    <span class="attr">#[cfg(not(boringssl))]
+    </span><span class="kw">pub fn </span>null() -&gt; MessageDigest {
         <span class="kw">unsafe </span>{ MessageDigest(ffi::EVP_md_null()) }
     }
 
@@ -827,7 +957,7 @@
         <span class="kw">unsafe </span>{ MessageDigest(ffi::EVP_shake256()) }
     }
 
-    <span class="attr">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_RMD160&quot;</span>))]
+    <span class="attr">#[cfg(not(any(boringssl, osslconf = <span class="string">&quot;OPENSSL_NO_RMD160&quot;</span>)))]
     </span><span class="kw">pub fn </span>ripemd160() -&gt; MessageDigest {
         <span class="kw">unsafe </span>{ MessageDigest(ffi::EVP_ripemd160()) }
     }
@@ -877,44 +1007,18 @@
 ///
 /// # Examples
 ///
-/// Calculate a hash in one go:
-///
-/// ```
-/// use openssl::hash::{hash, MessageDigest};
-///
-/// let data = b&quot;\x42\xF4\x97\xE0&quot;;
-/// let spec = b&quot;\x7c\x43\x0f\x17\x8a\xef\xdf\x14\x87\xfe\xe7\x14\x4e\x96\x41\xe2&quot;;
-/// let res = hash(MessageDigest::md5(), data).unwrap();
-/// assert_eq!(&amp;*res, spec);
-/// ```
-///
-/// Supply the input in chunks:
-///
 /// ```
 /// use openssl::hash::{Hasher, MessageDigest};
 ///
+/// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
 /// let data = [b&quot;\x42\xF4&quot;, b&quot;\x97\xE0&quot;];
 /// let spec = b&quot;\x7c\x43\x0f\x17\x8a\xef\xdf\x14\x87\xfe\xe7\x14\x4e\x96\x41\xe2&quot;;
-/// let mut h = Hasher::new(MessageDigest::md5()).unwrap();
-/// h.update(data[0]).unwrap();
-/// h.update(data[1]).unwrap();
-/// let res = h.finish().unwrap();
+/// let mut h = Hasher::new(MessageDigest::md5())?;
+/// h.update(data[0])?;
+/// h.update(data[1])?;
+/// let res = h.finish()?;
 /// assert_eq!(&amp;*res, spec);
-/// ```
-///
-/// Use an XOF hasher (OpenSSL 1.1.1+):
-///
-/// ```
-/// #[cfg(ossl111)]
-/// {
-///     use openssl::hash::{hash_xof, MessageDigest};
-///
-///     let data = b&quot;\x41\x6c\x6c\x20\x79\x6f\x75\x72\x20\x62\x61\x73\x65\x20\x61\x72\x65\x20\x62\x65\x6c\x6f\x6e\x67\x20\x74\x6f\x20\x75\x73&quot;;
-///     let spec = b&quot;\x49\xd0\x69\x7f\xf5\x08\x11\x1d\x8b\x84\xf1\x5e\x46\xda\xf1\x35&quot;;
-///     let mut buf = vec![0; 16];
-///     hash_xof(MessageDigest::shake_128(), data, buf.as_mut_slice()).unwrap();
-///     assert_eq!(buf, spec);
-/// }
+/// # Ok(()) }
 /// ```
 ///
 /// # Warning
@@ -923,8 +1027,10 @@
 ///
 /// Don&#39;t ever hash passwords, use the functions in the `pkcs5` module or bcrypt/scrypt instead.
 ///
-/// For extendable output functions (XOFs, i.e. SHAKE128/SHAKE256), you must use finish_xof instead
-/// of finish and provide a buf to store the hash. The hash will be as long as the buf.
+/// For extendable output functions (XOFs, i.e. SHAKE128/SHAKE256),
+/// you must use [`Hasher::finish_xof`] instead of [`Hasher::finish`]
+/// and provide a `buf` to store the hash. The hash will be as long as
+/// the `buf`.
 </span><span class="kw">pub struct </span>Hasher {
     ctx: <span class="kw-2">*mut </span>ffi::EVP_MD_CTX,
     md: <span class="kw-2">*const </span>ffi::EVP_MD,
@@ -989,7 +1095,10 @@
             <span class="self">self</span>.init()<span class="question-mark">?</span>;
         }
         <span class="kw">unsafe </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>len = ffi::EVP_MAX_MD_SIZE;
+            <span class="attr">#[cfg(not(boringssl))]
+            </span><span class="kw">let </span><span class="kw-2">mut </span>len = ffi::EVP_MAX_MD_SIZE;
+            <span class="attr">#[cfg(boringssl)]
+            </span><span class="kw">let </span><span class="kw-2">mut </span>len = ffi::EVP_MAX_MD_SIZE <span class="kw">as </span>u32;
             <span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0</span>; ffi::EVP_MAX_MD_SIZE <span class="kw">as </span>usize];
             cvt(ffi::EVP_DigestFinal_ex(
                 <span class="self">self</span>.ctx,
@@ -1111,6 +1220,19 @@
 }
 
 <span class="doccomment">/// Computes the hash of the `data` with the non-XOF hasher `t`.
+///
+/// # Examples
+///
+/// ```
+/// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+/// use openssl::hash::{hash, MessageDigest};
+///
+/// let data = b&quot;\x42\xF4\x97\xE0&quot;;
+/// let spec = b&quot;\x7c\x43\x0f\x17\x8a\xef\xdf\x14\x87\xfe\xe7\x14\x4e\x96\x41\xe2&quot;;
+/// let res = hash(MessageDigest::md5(), data)?;
+/// assert_eq!(&amp;*res, spec);
+/// # Ok(()) }
+/// ```
 </span><span class="kw">pub fn </span>hash(t: MessageDigest, data: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;DigestBytes, ErrorStack&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>h = Hasher::new(t)<span class="question-mark">?</span>;
     h.update(data)<span class="question-mark">?</span>;
@@ -1118,6 +1240,19 @@
 }
 
 <span class="doccomment">/// Computes the hash of the `data` with the XOF hasher `t` and stores it in `buf`.
+///
+/// # Examples
+///
+/// ```
+/// use openssl::hash::{hash_xof, MessageDigest};
+///
+/// let data = b&quot;\x41\x6c\x6c\x20\x79\x6f\x75\x72\x20\x62\x61\x73\x65\x20\x61\x72\x65\x20\x62\x65\x6c\x6f\x6e\x67\x20\x74\x6f\x20\x75\x73&quot;;
+/// let spec = b&quot;\x49\xd0\x69\x7f\xf5\x08\x11\x1d\x8b\x84\xf1\x5e\x46\xda\xf1\x35&quot;;
+/// let mut buf = vec![0; 16];
+/// hash_xof(MessageDigest::shake_128(), data, buf.as_mut_slice()).unwrap();
+/// assert_eq!(buf, spec);
+/// ```
+///
 </span><span class="attr">#[cfg(ossl111)]
 </span><span class="kw">pub fn </span>hash_xof(t: MessageDigest, data: <span class="kw-2">&amp;</span>[u8], buf: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), ErrorStack&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>h = Hasher::new(t)<span class="question-mark">?</span>;
@@ -1184,6 +1319,7 @@
 
         <span class="macro">assert_eq!</span>(MessageDigest::md5().block_size(), <span class="number">64</span>);
         <span class="macro">assert_eq!</span>(MessageDigest::md5().size(), <span class="number">16</span>);
+        <span class="macro">assert_eq!</span>(MessageDigest::md5().type_().as_raw(), Nid::MD5.as_raw());
     }
 
     <span class="attr">#[test]
@@ -1246,6 +1382,7 @@
 
         <span class="macro">assert_eq!</span>(MessageDigest::sha1().block_size(), <span class="number">64</span>);
         <span class="macro">assert_eq!</span>(MessageDigest::sha1().size(), <span class="number">20</span>);
+        <span class="macro">assert_eq!</span>(MessageDigest::sha1().type_().as_raw(), Nid::SHA1.as_raw());
     }
 
     <span class="attr">#[test]
@@ -1261,6 +1398,30 @@
 
         <span class="macro">assert_eq!</span>(MessageDigest::sha256().block_size(), <span class="number">64</span>);
         <span class="macro">assert_eq!</span>(MessageDigest::sha256().size(), <span class="number">32</span>);
+        <span class="macro">assert_eq!</span>(
+            MessageDigest::sha256().type_().as_raw(),
+            Nid::SHA256.as_raw()
+        );
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_sha512() {
+        <span class="kw">let </span>tests = [(
+            <span class="string">&quot;737465766566696e647365766572797468696e67&quot;</span>,
+            <span class="string">&quot;ba61d1f1af0f2dd80729f6cc900f19c0966bd38ba5c75e4471ef11b771dfe7551afab7fcbd300fdc4418f2\
+            b07a028fcd99e7b6446a566f2d9bcd7c604a1ea801&quot;</span>,
+        )];
+
+        <span class="kw">for </span>test <span class="kw">in </span>tests.iter() {
+            hash_test(MessageDigest::sha512(), test);
+        }
+
+        <span class="macro">assert_eq!</span>(MessageDigest::sha512().block_size(), <span class="number">128</span>);
+        <span class="macro">assert_eq!</span>(MessageDigest::sha512().size(), <span class="number">64</span>);
+        <span class="macro">assert_eq!</span>(
+            MessageDigest::sha512().type_().as_raw(),
+            Nid::SHA512.as_raw()
+        );
     }
 
     <span class="attr">#[cfg(ossl111)]
@@ -1277,6 +1438,10 @@
 
         <span class="macro">assert_eq!</span>(MessageDigest::sha3_224().block_size(), <span class="number">144</span>);
         <span class="macro">assert_eq!</span>(MessageDigest::sha3_224().size(), <span class="number">28</span>);
+        <span class="macro">assert_eq!</span>(
+            MessageDigest::sha3_224().type_().as_raw(),
+            Nid::SHA3_224.as_raw()
+        );
     }
 
     <span class="attr">#[cfg(ossl111)]
@@ -1293,6 +1458,10 @@
 
         <span class="macro">assert_eq!</span>(MessageDigest::sha3_256().block_size(), <span class="number">136</span>);
         <span class="macro">assert_eq!</span>(MessageDigest::sha3_256().size(), <span class="number">32</span>);
+        <span class="macro">assert_eq!</span>(
+            MessageDigest::sha3_256().type_().as_raw(),
+            Nid::SHA3_256.as_raw()
+        );
     }
 
     <span class="attr">#[cfg(ossl111)]
@@ -1309,6 +1478,10 @@
 
         <span class="macro">assert_eq!</span>(MessageDigest::sha3_384().block_size(), <span class="number">104</span>);
         <span class="macro">assert_eq!</span>(MessageDigest::sha3_384().size(), <span class="number">48</span>);
+        <span class="macro">assert_eq!</span>(
+            MessageDigest::sha3_384().type_().as_raw(),
+            Nid::SHA3_384.as_raw()
+        );
     }
 
     <span class="attr">#[cfg(ossl111)]
@@ -1325,6 +1498,10 @@
 
         <span class="macro">assert_eq!</span>(MessageDigest::sha3_512().block_size(), <span class="number">72</span>);
         <span class="macro">assert_eq!</span>(MessageDigest::sha3_512().size(), <span class="number">64</span>);
+        <span class="macro">assert_eq!</span>(
+            MessageDigest::sha3_512().type_().as_raw(),
+            Nid::SHA3_512.as_raw()
+        );
     }
 
     <span class="attr">#[cfg(ossl111)]
@@ -1341,6 +1518,10 @@
 
         <span class="macro">assert_eq!</span>(MessageDigest::shake_128().block_size(), <span class="number">168</span>);
         <span class="macro">assert_eq!</span>(MessageDigest::shake_128().size(), <span class="number">16</span>);
+        <span class="macro">assert_eq!</span>(
+            MessageDigest::shake_128().type_().as_raw(),
+            Nid::SHAKE128.as_raw()
+        );
     }
 
     <span class="attr">#[cfg(ossl111)]
@@ -1357,9 +1538,15 @@
 
         <span class="macro">assert_eq!</span>(MessageDigest::shake_256().block_size(), <span class="number">136</span>);
         <span class="macro">assert_eq!</span>(MessageDigest::shake_256().size(), <span class="number">32</span>);
+        <span class="macro">assert_eq!</span>(
+            MessageDigest::shake_256().type_().as_raw(),
+            Nid::SHAKE256.as_raw()
+        );
     }
 
     <span class="attr">#[test]
+    #[cfg(not(boringssl))]
+    #[cfg_attr(ossl300, ignore)]
     </span><span class="kw">fn </span>test_ripemd160() {
         <span class="attr">#[cfg(ossl300)]
         </span><span class="kw">let </span>_provider = <span class="kw">crate</span>::provider::Provider::try_load(<span class="prelude-val">None</span>, <span class="string">&quot;legacy&quot;</span>, <span class="bool-val">true</span>).unwrap();
@@ -1372,6 +1559,10 @@
 
         <span class="macro">assert_eq!</span>(MessageDigest::ripemd160().block_size(), <span class="number">64</span>);
         <span class="macro">assert_eq!</span>(MessageDigest::ripemd160().size(), <span class="number">20</span>);
+        <span class="macro">assert_eq!</span>(
+            MessageDigest::ripemd160().type_().as_raw(),
+            Nid::RIPEMD160.as_raw()
+        );
     }
 
     <span class="attr">#[cfg(all(any(ossl111, libressl291), not(osslconf = <span class="string">&quot;OPENSSL_NO_SM3&quot;</span>)))]
@@ -1388,6 +1579,7 @@
 
         <span class="macro">assert_eq!</span>(MessageDigest::sm3().block_size(), <span class="number">64</span>);
         <span class="macro">assert_eq!</span>(MessageDigest::sm3().size(), <span class="number">32</span>);
+        <span class="macro">assert_eq!</span>(MessageDigest::sm3().type_().as_raw(), Nid::SM3.as_raw());
     }
 
     <span class="attr">#[test]

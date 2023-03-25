@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/ywl16b5iwmydra59ih94pszrw6n3wzhv-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/openssl-0.10.41/src/pkey_ctx.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pkey_ctx.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-93196c7a1c3542a8.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/dlwrv4f2aawgs47vm6vjdflgm2j38lri-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/openssl-0.10.48/src/pkey_ctx.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pkey_ctx.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-93196c7a1c3542a8.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -758,6 +758,50 @@
 <a href="#758" id="758">758</a>
 <a href="#759" id="759">759</a>
 <a href="#760" id="760">760</a>
+<a href="#761" id="761">761</a>
+<a href="#762" id="762">762</a>
+<a href="#763" id="763">763</a>
+<a href="#764" id="764">764</a>
+<a href="#765" id="765">765</a>
+<a href="#766" id="766">766</a>
+<a href="#767" id="767">767</a>
+<a href="#768" id="768">768</a>
+<a href="#769" id="769">769</a>
+<a href="#770" id="770">770</a>
+<a href="#771" id="771">771</a>
+<a href="#772" id="772">772</a>
+<a href="#773" id="773">773</a>
+<a href="#774" id="774">774</a>
+<a href="#775" id="775">775</a>
+<a href="#776" id="776">776</a>
+<a href="#777" id="777">777</a>
+<a href="#778" id="778">778</a>
+<a href="#779" id="779">779</a>
+<a href="#780" id="780">780</a>
+<a href="#781" id="781">781</a>
+<a href="#782" id="782">782</a>
+<a href="#783" id="783">783</a>
+<a href="#784" id="784">784</a>
+<a href="#785" id="785">785</a>
+<a href="#786" id="786">786</a>
+<a href="#787" id="787">787</a>
+<a href="#788" id="788">788</a>
+<a href="#789" id="789">789</a>
+<a href="#790" id="790">790</a>
+<a href="#791" id="791">791</a>
+<a href="#792" id="792">792</a>
+<a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
+<a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
+<a href="#797" id="797">797</a>
+<a href="#798" id="798">798</a>
+<a href="#799" id="799">799</a>
+<a href="#800" id="800">800</a>
+<a href="#801" id="801">801</a>
+<a href="#802" id="802">802</a>
+<a href="#803" id="803">803</a>
+<a href="#804" id="804">804</a>
 </pre><pre class="rust"><code><span class="doccomment">//! The asymmetric encryption context.
 //!
 //! # Examples
@@ -779,21 +823,26 @@
 //! let mut ciphertext = vec![];
 //! ctx.encrypt_to_vec(data, &amp;mut ciphertext).unwrap();
 //! ```
-//!
-//! Generate a CMAC key
-//!
-//! ```
-//! use openssl::pkey_ctx::PkeyCtx;
-//! use openssl::pkey::Id;
-//! use openssl::cipher::Cipher;
-//!
-//! let mut ctx = PkeyCtx::new_id(Id::CMAC).unwrap();
-//! ctx.keygen_init().unwrap();
-//! ctx.set_keygen_cipher(Cipher::aes_128_cbc()).unwrap();
-//! ctx.set_keygen_mac_key(b&quot;0123456789abcdef&quot;).unwrap();
-//! let cmac_key = ctx.keygen().unwrap();
-//! ```
-//!
+
+</span><span class="attr">#![cfg_attr(
+    not(boringssl),
+    doc = <span class="string">r#&quot;\
+Generate a CMAC key
+
+```
+use openssl::pkey_ctx::PkeyCtx;
+use openssl::pkey::Id;
+use openssl::cipher::Cipher;
+
+let mut ctx = PkeyCtx::new_id(Id::CMAC).unwrap();
+ctx.keygen_init().unwrap();
+ctx.set_keygen_cipher(Cipher::aes_128_cbc()).unwrap();
+ctx.set_keygen_mac_key(b&quot;0123456789abcdef&quot;).unwrap();
+let cmac_key = ctx.keygen().unwrap();
+```&quot;#
+</span>)]
+
+</span><span class="doccomment">//!
 //! Sign and verify data with RSA
 //!
 //! ```
@@ -819,6 +868,7 @@
 //! let valid = ctx.verify(text, &amp;signature).unwrap();
 //! assert!(valid);
 //! ```
+</span><span class="attr">#[cfg(not(boringssl))]
 </span><span class="kw">use </span><span class="kw">crate</span>::cipher::CipherRef;
 <span class="kw">use </span><span class="kw">crate</span>::error::ErrorStack;
 <span class="kw">use </span><span class="kw">crate</span>::md::MdRef;
@@ -826,7 +876,8 @@
 <span class="kw">use </span><span class="kw">crate</span>::rsa::Padding;
 <span class="kw">use crate</span>::{cvt, cvt_n, cvt_p};
 <span class="kw">use </span>foreign_types::{ForeignType, ForeignTypeRef};
-<span class="kw">use </span>libc::c_int;
+<span class="attr">#[cfg(not(boringssl))]
+</span><span class="kw">use </span>libc::c_int;
 <span class="kw">use </span>openssl_macros::corresponds;
 <span class="kw">use </span>std::convert::TryFrom;
 <span class="kw">use </span>std::ptr;
@@ -837,9 +888,24 @@
 
 <span class="attr">#[cfg(ossl111)]
 </span><span class="kw">impl </span>HkdfMode {
-    <span class="kw">pub const </span>EXTRACT_THEN_EXPAND: <span class="self">Self </span>= HkdfMode(ffi::EVP_PKEY_HKDEF_MODE_EXTRACT_AND_EXPAND);
-    <span class="kw">pub const </span>EXTRACT_ONLY: <span class="self">Self </span>= HkdfMode(ffi::EVP_PKEY_HKDEF_MODE_EXTRACT_ONLY);
-    <span class="kw">pub const </span>EXPAND_ONLY: <span class="self">Self </span>= HkdfMode(ffi::EVP_PKEY_HKDEF_MODE_EXPAND_ONLY);
+    <span class="doccomment">/// This is the default mode. Calling [`derive`][PkeyCtxRef::derive] on a [`PkeyCtxRef`] set up
+    /// for HKDF will perform an extract followed by an expand operation in one go. The derived key
+    /// returned will be the result after the expand operation. The intermediate fixed-length
+    /// pseudorandom key K is not returned.
+    </span><span class="kw">pub const </span>EXTRACT_THEN_EXPAND: <span class="self">Self </span>= HkdfMode(ffi::EVP_PKEY_HKDEF_MODE_EXTRACT_AND_EXPAND);
+
+    <span class="doccomment">/// In this mode calling [`derive`][PkeyCtxRef::derive] will just perform the extract operation.
+    /// The value returned will be the intermediate fixed-length pseudorandom key K.
+    ///
+    /// The digest, key and salt values must be set before a key is derived or an error occurs.
+    </span><span class="kw">pub const </span>EXTRACT_ONLY: <span class="self">Self </span>= HkdfMode(ffi::EVP_PKEY_HKDEF_MODE_EXTRACT_ONLY);
+
+    <span class="doccomment">/// In this mode calling [`derive`][PkeyCtxRef::derive] will just perform the expand operation.
+    /// The input key should be set to the intermediate fixed-length pseudorandom key K returned
+    /// from a previous extract operation.
+    ///
+    /// The digest, key and info values must be set before a key is derived or an error occurs.
+    </span><span class="kw">pub const </span>EXPAND_ONLY: <span class="self">Self </span>= HkdfMode(ffi::EVP_PKEY_HKDEF_MODE_EXPAND_ONLY);
 }
 
 <span class="macro">generic_foreign_type_and_impl_send_sync! </span>{
@@ -1156,15 +1222,20 @@
     ///
     /// This is only useful for RSA keys.
     </span><span class="attr">#[corresponds(EVP_PKEY_CTX_set0_rsa_oaep_label)]
-    #[cfg(any(ossl102, libressl310))]
+    #[cfg(any(ossl102, libressl310, boringssl))]
     </span><span class="kw">pub fn </span>set_rsa_oaep_label(<span class="kw-2">&amp;mut </span><span class="self">self</span>, label: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), ErrorStack&gt; {
-        <span class="kw">let </span>len = c_int::try_from(label.len()).unwrap();
+        <span class="kw">use </span><span class="kw">crate</span>::LenType;
+        <span class="kw">let </span>len = LenType::try_from(label.len()).unwrap();
 
         <span class="kw">unsafe </span>{
             <span class="kw">let </span>p = ffi::OPENSSL_malloc(label.len() <span class="kw">as _</span>);
             ptr::copy_nonoverlapping(label.as_ptr(), p <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>, label.len());
 
-            <span class="kw">let </span>r = cvt(ffi::EVP_PKEY_CTX_set0_rsa_oaep_label(<span class="self">self</span>.as_ptr(), p, len));
+            <span class="kw">let </span>r = cvt(ffi::EVP_PKEY_CTX_set0_rsa_oaep_label(
+                <span class="self">self</span>.as_ptr(),
+                p <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>,
+                len,
+            ));
             <span class="kw">if </span>r.is_err() {
                 ffi::OPENSSL_free(p);
             }
@@ -1175,7 +1246,8 @@
     }
 
     <span class="doccomment">/// Sets the cipher used during key generation.
-    </span><span class="attr">#[corresponds(EVP_PKEY_CTX_ctrl)]
+    </span><span class="attr">#[cfg(not(boringssl))]
+    #[corresponds(EVP_PKEY_CTX_ctrl)]
     #[inline]
     </span><span class="kw">pub fn </span>set_keygen_cipher(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cipher: <span class="kw-2">&amp;</span>CipherRef) -&gt; <span class="prelude-ty">Result</span>&lt;(), ErrorStack&gt; {
         <span class="kw">unsafe </span>{
@@ -1193,7 +1265,8 @@
     }
 
     <span class="doccomment">/// Sets the key MAC key used during key generation.
-    </span><span class="attr">#[corresponds(EVP_PKEY_CTX_ctrl)]
+    </span><span class="attr">#[cfg(not(boringssl))]
+    #[corresponds(EVP_PKEY_CTX_ctrl)]
     #[inline]
     </span><span class="kw">pub fn </span>set_keygen_mac_key(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), ErrorStack&gt; {
         <span class="kw">let </span>len = c_int::try_from(key.len()).unwrap();
@@ -1233,6 +1306,10 @@
     ///
     /// Defaults to [`HkdfMode::EXTRACT_THEN_EXPAND`].
     ///
+    /// WARNING: Although this API calls it a &quot;mode&quot;, HKDF-Extract and HKDF-Expand are distinct
+    /// operations with distinct inputs and distinct kinds of keys. Callers should not pass input
+    /// secrets for one operation into the other.
+    ///
     /// Requires OpenSSL 1.1.1 or newer.
     </span><span class="attr">#[corresponds(EVP_PKEY_CTX_set_hkdf_mode)]
     #[cfg(ossl111)]
@@ -1245,7 +1322,12 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Sets the input keying material for HKDF generation.
+    <span class="doccomment">/// Sets the input material for HKDF generation as the &quot;key&quot;.
+    ///
+    /// Which input is the key depends on the &quot;mode&quot; (see [`set_hkdf_mode`][Self::set_hkdf_mode]).
+    /// If [`HkdfMode::EXTRACT_THEN_EXPAND`] or [`HkdfMode::EXTRACT_ONLY`], this function specifies
+    /// the input keying material (IKM) for HKDF-Extract. If [`HkdfMode::EXPAND_ONLY`], it instead
+    /// specifies the pseudorandom key (PRK) for HKDF-Expand.
     ///
     /// Requires OpenSSL 1.1.0 or newer.
     </span><span class="attr">#[corresponds(EVP_PKEY_CTX_set1_hkdf_key)]
@@ -1267,6 +1349,8 @@
 
     <span class="doccomment">/// Sets the salt value for HKDF generation.
     ///
+    /// If performing HKDF-Expand only, this parameter is ignored.
+    ///
     /// Requires OpenSSL 1.1.0 or newer.
     </span><span class="attr">#[corresponds(EVP_PKEY_CTX_set1_hkdf_salt)]
     #[cfg(ossl110)]
@@ -1286,6 +1370,8 @@
     }
 
     <span class="doccomment">/// Appends info bytes for HKDF generation.
+    ///
+    /// If performing HKDF-Extract only, this parameter is ignored.
     ///
     /// Requires OpenSSL 1.1.0 or newer.
     </span><span class="attr">#[corresponds(EVP_PKEY_CTX_add1_hkdf_info)]
@@ -1347,7 +1433,8 @@
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>test {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use </span><span class="kw">crate</span>::cipher::Cipher;
+    <span class="attr">#[cfg(not(boringssl))]
+    </span><span class="kw">use </span><span class="kw">crate</span>::cipher::Cipher;
     <span class="kw">use </span><span class="kw">crate</span>::ec::{EcGroup, EcKey};
     <span class="attr">#[cfg(any(ossl102, libressl310))]
     </span><span class="kw">use </span><span class="kw">crate</span>::md::Md;
@@ -1423,6 +1510,7 @@
     }
 
     <span class="attr">#[test]
+    #[cfg(not(boringssl))]
     </span><span class="kw">fn </span>cmac_keygen() {
         <span class="kw">let </span><span class="kw-2">mut </span>ctx = PkeyCtx::new_id(Id::CMAC).unwrap();
         ctx.keygen_init().unwrap();

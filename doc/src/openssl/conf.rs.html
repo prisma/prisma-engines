@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/ywl16b5iwmydra59ih94pszrw6n3wzhv-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/openssl-0.10.41/src/conf.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>conf.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-93196c7a1c3542a8.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/dlwrv4f2aawgs47vm6vjdflgm2j38lri-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/openssl-0.10.48/src/conf.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>conf.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-93196c7a1c3542a8.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -56,42 +56,16 @@
 <a href="#56" id="56">56</a>
 <a href="#57" id="57">57</a>
 <a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Interface for processing OpenSSL configuration files.
 
-</span><span class="kw">use </span><span class="kw">crate</span>::cvt_p;
-<span class="kw">use </span><span class="kw">crate</span>::error::ErrorStack;
-<span class="kw">use </span>openssl_macros::corresponds;
-
-<span class="kw">pub struct </span>ConfMethod(<span class="kw-2">*mut </span>ffi::CONF_METHOD);
-
-<span class="kw">impl </span>ConfMethod {
-    <span class="doccomment">/// Retrieve handle to the default OpenSSL configuration file processing function.
-    </span><span class="attr">#[corresponds(NCONF_default)]
-    </span><span class="kw">pub fn </span>default() -&gt; ConfMethod {
-        <span class="kw">unsafe </span>{
-            ffi::init();
-            <span class="comment">// `NCONF` stands for &quot;New Conf&quot;, as described in crypto/conf/conf_lib.c. This is
-            // a newer API than the &quot;CONF classic&quot; functions.
-            </span>ConfMethod(ffi::NCONF_default())
-        }
-    }
-
-    <span class="doccomment">/// Construct from raw pointer.
-    ///
-    /// # Safety
-    ///
-    /// The caller must ensure that the pointer is valid.
-    </span><span class="kw">pub unsafe fn </span>from_ptr(ptr: <span class="kw-2">*mut </span>ffi::CONF_METHOD) -&gt; ConfMethod {
-        ConfMethod(ptr)
-    }
-
-    <span class="doccomment">/// Convert to raw pointer.
-    </span><span class="kw">pub fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>ffi::CONF_METHOD {
-        <span class="self">self</span>.<span class="number">0
-    </span>}
-}
-
-<span class="macro">foreign_type_and_impl_send_sync! </span>{
+</span><span class="macro">foreign_type_and_impl_send_sync! </span>{
     <span class="kw">type </span>CType = ffi::CONF;
     <span class="kw">fn </span>drop = ffi::NCONF_free;
 
@@ -99,20 +73,60 @@
     <span class="kw">pub struct </span>ConfRef;
 }
 
-<span class="kw">impl </span>Conf {
-    <span class="doccomment">/// Create a configuration parser.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use openssl::conf::{Conf, ConfMethod};
-    ///
-    /// let conf = Conf::new(ConfMethod::default());
-    /// ```
-    </span><span class="attr">#[corresponds(NCONF_new)]
-    </span><span class="kw">pub fn </span>new(method: ConfMethod) -&gt; <span class="prelude-ty">Result</span>&lt;Conf, ErrorStack&gt; {
-        <span class="kw">unsafe </span>{ cvt_p(ffi::NCONF_new(method.as_ptr())).map(Conf) }
+<span class="attr">#[cfg(not(boringssl))]
+</span><span class="kw">mod </span>methods {
+    <span class="kw">use </span><span class="kw">super</span>::Conf;
+    <span class="kw">use </span><span class="kw">crate</span>::cvt_p;
+    <span class="kw">use </span><span class="kw">crate</span>::error::ErrorStack;
+    <span class="kw">use </span>openssl_macros::corresponds;
+
+    <span class="kw">pub struct </span>ConfMethod(<span class="kw-2">*mut </span>ffi::CONF_METHOD);
+
+    <span class="kw">impl </span>ConfMethod {
+        <span class="doccomment">/// Retrieve handle to the default OpenSSL configuration file processing function.
+        </span><span class="attr">#[corresponds(NCONF_default)]
+        #[allow(clippy::should_implement_trait)]
+        </span><span class="kw">pub fn </span>default() -&gt; ConfMethod {
+            <span class="kw">unsafe </span>{
+                ffi::init();
+                <span class="comment">// `NCONF` stands for &quot;New Conf&quot;, as described in crypto/conf/conf_lib.c. This is
+                // a newer API than the &quot;CONF classic&quot; functions.
+                </span>ConfMethod(ffi::NCONF_default())
+            }
+        }
+
+        <span class="doccomment">/// Construct from raw pointer.
+        ///
+        /// # Safety
+        ///
+        /// The caller must ensure that the pointer is valid.
+        </span><span class="kw">pub unsafe fn </span>from_ptr(ptr: <span class="kw-2">*mut </span>ffi::CONF_METHOD) -&gt; ConfMethod {
+            ConfMethod(ptr)
+        }
+
+        <span class="doccomment">/// Convert to raw pointer.
+        </span><span class="kw">pub fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>ffi::CONF_METHOD {
+            <span class="self">self</span>.<span class="number">0
+        </span>}
+    }
+
+    <span class="kw">impl </span>Conf {
+        <span class="doccomment">/// Create a configuration parser.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use openssl::conf::{Conf, ConfMethod};
+        ///
+        /// let conf = Conf::new(ConfMethod::default());
+        /// ```
+        </span><span class="attr">#[corresponds(NCONF_new)]
+        </span><span class="kw">pub fn </span>new(method: ConfMethod) -&gt; <span class="prelude-ty">Result</span>&lt;Conf, ErrorStack&gt; {
+            <span class="kw">unsafe </span>{ cvt_p(ffi::NCONF_new(method.as_ptr())).map(Conf) }
+        }
     }
 }
+<span class="attr">#[cfg(not(boringssl))]
+</span><span class="kw">pub use </span>methods::<span class="kw-2">*</span>;
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="openssl" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
