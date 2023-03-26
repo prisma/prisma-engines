@@ -10,7 +10,7 @@ use prisma_models::prelude::*;
 // Todo: This isn't final, this is only the first draft to get structure into the
 // wild cross-dependency waste that was the create/update inputs.
 pub(crate) trait DataInputFieldMapper {
-    fn map_all(&self, ctx: &mut BuilderContext, fields: &[Field]) -> Vec<InputField> {
+    fn map_all(&self, ctx: &mut BuilderContext<'_>, fields: &[Field]) -> Vec<InputField> {
         fields
             .iter()
             .map(|field| match field {
@@ -22,11 +22,11 @@ pub(crate) trait DataInputFieldMapper {
             .collect()
     }
 
-    fn map_scalar(&self, ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputField;
+    fn map_scalar(&self, ctx: &mut BuilderContext<'_>, sf: &ScalarFieldRef) -> InputField;
 
-    fn map_scalar_list(&self, ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputField;
+    fn map_scalar_list(&self, ctx: &mut BuilderContext<'_>, sf: &ScalarFieldRef) -> InputField;
 
-    fn map_relation(&self, ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputField;
+    fn map_relation(&self, ctx: &mut BuilderContext<'_>, rf: &RelationFieldRef) -> InputField;
 
-    fn map_composite(&self, ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputField;
+    fn map_composite(&self, ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputField;
 }

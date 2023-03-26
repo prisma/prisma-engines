@@ -3,7 +3,7 @@ use super::*;
 use constants::args;
 
 pub(crate) fn update_many_input_types(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
 ) -> Vec<InputType> {
@@ -19,7 +19,7 @@ pub(crate) fn update_many_input_types(
 }
 
 /// Builds "<x>UpdateManyMutationInput" input object type.
-pub(crate) fn checked_update_many_input_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
+pub(crate) fn checked_update_many_input_type(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> InputObjectTypeWeakRef {
     let ident = Identifier::new_prisma(format!("{}UpdateManyMutationInput", model.name()));
     return_cached_input!(ctx, &ident);
 
@@ -40,7 +40,7 @@ pub(crate) fn checked_update_many_input_type(ctx: &mut BuilderContext, model: &M
 
 /// Builds "<x>UncheckedUpdateManyWithout<y>MutationInput" input object type
 pub(crate) fn unchecked_update_many_input_type(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
 ) -> InputObjectTypeWeakRef {
@@ -74,7 +74,7 @@ pub(crate) fn unchecked_update_many_input_type(
 /// Builds "<x>UpdateManyWithWhereWithout<y>Input" input object type.
 /// Simple combination object of "where" and "data"
 pub(crate) fn update_many_where_combination_object(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     parent_field: &RelationFieldRef,
 ) -> InputObjectTypeWeakRef {
     let related_model = parent_field.related_model();

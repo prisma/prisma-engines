@@ -2,11 +2,11 @@ use super::*;
 use crate::constants::filters;
 
 pub(crate) trait WithFieldRefInputExt {
-    fn with_field_ref_input(self, ctx: &mut BuilderContext) -> Vec<InputType>;
+    fn with_field_ref_input(self, ctx: &mut BuilderContext<'_>) -> Vec<InputType>;
 }
 
 impl WithFieldRefInputExt for InputType {
-    fn with_field_ref_input(self, ctx: &mut BuilderContext) -> Vec<InputType> {
+    fn with_field_ref_input(self, ctx: &mut BuilderContext<'_>) -> Vec<InputType> {
         let mut field_types: Vec<InputType> = vec![self.clone()];
 
         if ctx.has_feature(PreviewFeature::FieldReference) {
@@ -17,7 +17,7 @@ impl WithFieldRefInputExt for InputType {
     }
 }
 
-fn field_ref_input_object_type(ctx: &mut BuilderContext, allow_type: InputType) -> InputObjectTypeWeakRef {
+fn field_ref_input_object_type(ctx: &mut BuilderContext<'_>, allow_type: InputType) -> InputObjectTypeWeakRef {
     let ident = Identifier::new_prisma(field_ref_input_type_name(&allow_type));
 
     return_cached_input!(ctx, &ident);

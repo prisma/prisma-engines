@@ -5,7 +5,7 @@ use crate::mutations::create_one;
 use super::*;
 
 pub(crate) fn nested_upsert_input_object(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     parent_field: &RelationFieldRef,
 ) -> Option<InputObjectTypeWeakRef> {
     if parent_field.is_list() {
@@ -17,7 +17,7 @@ pub(crate) fn nested_upsert_input_object(
 
 /// Builds "<x>UpsertWithWhereUniqueNestedInput" / "<x>UpsertWithWhereUniqueWithout<y>Input" input object types.
 fn nested_upsert_list_input_object(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     parent_field: &RelationFieldRef,
 ) -> Option<InputObjectTypeWeakRef> {
     let related_model = parent_field.related_model();
@@ -55,7 +55,7 @@ fn nested_upsert_list_input_object(
 
 /// Builds "<x>UpsertNestedInput" / "<x>UpsertWithout<y>Input" input object types.
 fn nested_upsert_nonlist_input_object(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     parent_field: &RelationFieldRef,
 ) -> Option<InputObjectTypeWeakRef> {
     let related_model = parent_field.related_model();

@@ -8,7 +8,7 @@ use crate::constants::output_fields::*;
 /// This is a critical first step to ensure that all model and composite output
 /// object types are present and that subsequent schema computation has a base to rely on.
 /// Called only once at the very beginning of schema building.
-pub(crate) fn initialize_caches(ctx: &mut BuilderContext) {
+pub(crate) fn initialize_caches(ctx: &mut BuilderContext<'_>) {
     model::initialize_cache(ctx);
     composite::initialize_cache(ctx);
 
@@ -16,7 +16,7 @@ pub(crate) fn initialize_caches(ctx: &mut BuilderContext) {
     composite::initialize_fields(ctx);
 }
 
-pub(crate) fn affected_records_object_type(ctx: &mut BuilderContext) -> ObjectTypeWeakRef {
+pub(crate) fn affected_records_object_type(ctx: &mut BuilderContext<'_>) -> ObjectTypeWeakRef {
     let ident = Identifier::new_prisma("AffectedRowsOutput".to_owned());
     return_cached_output!(ctx, &ident);
 

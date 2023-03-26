@@ -55,7 +55,7 @@ where
 
 /// Field convenience wrapper function.
 pub(crate) fn input_field<T, S>(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     name: T,
     field_types: S,
     default_value: Option<dml::DefaultKind>,

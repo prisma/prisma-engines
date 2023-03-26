@@ -4,7 +4,7 @@ use prisma_models::{prelude::ParentContainer, ScalarFieldRef};
 pub(crate) mod group_by;
 pub(crate) mod plain;
 
-fn field_avg_output_type(ctx: &mut BuilderContext, field: &ScalarFieldRef) -> OutputType {
+fn field_avg_output_type(ctx: &mut BuilderContext<'_>, field: &ScalarFieldRef) -> OutputType {
     match field.type_identifier() {
         TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float => OutputType::float(),
         TypeIdentifier::Decimal => OutputType::decimal(),
@@ -37,7 +37,7 @@ pub fn collect_numeric_fields(container: &ParentContainer) -> Vec<ScalarFieldRef
 /// Returns an aggregation field with given name if the passed fields contains any fields.
 /// Field types inside the object type of the field are determined by the passed mapper fn.
 fn aggregation_field<F, G>(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     name: &str,
     model: &ModelRef,
     fields: Vec<ScalarFieldRef>,
@@ -46,7 +46,7 @@ fn aggregation_field<F, G>(
     is_count: bool,
 ) -> Option<OutputField>
 where
-    F: Fn(&mut BuilderContext, &ScalarFieldRef) -> OutputType,
+    F: Fn(&mut BuilderContext<'_>, &ScalarFieldRef) -> OutputType,
     G: Fn(ObjectType) -> ObjectType,
 {
     if fields.is_empty() {
@@ -68,7 +68,7 @@ where
 
 /// Maps the object type for aggregations that operate on a field level.
 fn map_field_aggregation_object<F, G>(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     model: &ModelRef,
     suffix: &str,
     fields: &[ScalarFieldRef],
@@ -77,7 +77,7 @@ fn map_field_aggregation_object<F, G>(
     is_count: bool,
 ) -> ObjectTypeWeakRef
 where
-    F: Fn(&mut BuilderContext, &ScalarFieldRef) -> OutputType,
+    F: Fn(&mut BuilderContext<'_>, &ScalarFieldRef) -> OutputType,
     G: Fn(ObjectType) -> ObjectType,
 {
     let ident = Identifier::new_prisma(format!(

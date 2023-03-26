@@ -17,7 +17,7 @@ impl UpdateDataInputFieldMapper {
 }
 
 impl DataInputFieldMapper for UpdateDataInputFieldMapper {
-    fn map_scalar(&self, ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputField {
+    fn map_scalar(&self, ctx: &mut BuilderContext<'_>, sf: &ScalarFieldRef) -> InputField {
         let base_update_type = match sf.type_identifier() {
             TypeIdentifier::Float => InputType::object(update_operations_object_type(ctx, "Float", sf, true)),
             TypeIdentifier::Decimal => InputType::object(update_operations_object_type(ctx, "Decimal", sf, true)),
@@ -63,7 +63,7 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
         }
     }
 
-    fn map_scalar_list(&self, ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputField {
+    fn map_scalar_list(&self, ctx: &mut BuilderContext<'_>, sf: &ScalarFieldRef) -> InputField {
         let list_input_type = map_scalar_input_type(ctx, &sf.type_identifier(), sf.is_list());
         let ident = Identifier::new_prisma(format!("{}Update{}Input", sf.container().name(), sf.name()));
 
@@ -95,7 +95,7 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
         input_field(ctx, sf.name(), vec![input_type, list_input_type], None).optional()
     }
 
-    fn map_relation(&self, ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputField {
+    fn map_relation(&self, ctx: &mut BuilderContext<'_>, rf: &RelationFieldRef) -> InputField {
         let related_model = rf.related_model();
         let related_field = rf.related_field();
 
@@ -136,7 +136,7 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
         input_field(ctx, rf.name(), InputType::object(input_object), None).optional()
     }
 
-    fn map_composite(&self, ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputField {
+    fn map_composite(&self, ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputField {
         // Shorthand object (equivalent to the "set" operation).
         let shorthand_type = InputType::Object(create::composite_create_object_type(ctx, cf));
 
@@ -156,7 +156,7 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
 }
 
 fn update_operations_object_type(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     prefix: &str,
     sf: &ScalarFieldRef,
     with_number_operators: bool,
@@ -203,7 +203,10 @@ fn update_operations_object_type(
 ///   ... more ops ...
 /// }
 /// ```
-fn composite_update_envelope_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+fn composite_update_envelope_object_type(
+    ctx: &mut BuilderContext<'_>,
+    cf: &CompositeFieldRef,
+) -> InputObjectTypeWeakRef {
     let arity = if cf.is_optional() {
         "Nullable"
     } else if cf.is_list() {
@@ -239,7 +242,7 @@ fn composite_update_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
 }
 
 /// Builds the `update` input object type. Should be used in the envelope type.
-fn composite_update_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+fn composite_update_object_type(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
     let name = format!("{}UpdateInput", cf.typ().name());
 
     let ident = Identifier::new_prisma(name);
@@ -261,7 +264,7 @@ fn composite_update_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef
 }
 
 // Builds an `update` input field. Should only be used in the envelope type.
-fn composite_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> Option<InputField> {
+fn composite_update_input_field(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> Option<InputField> {
     if cf.is_required() {
         let update_object_type = composite_update_object_type(ctx, cf);
 
@@ -272,7 +275,7 @@ fn composite_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFieldRef
 }
 
 // Builds an `unset` input field. Should only be used in the envelope type.
-fn composite_unset_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> Option<InputField> {
+fn composite_unset_update_input_field(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> Option<InputField> {
     if cf.is_optional() {
         Some(input_field(ctx, operations::UNSET, InputType::boolean(), None).optional())
     } else {
@@ -281,7 +284,7 @@ fn composite_unset_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFi
 }
 
 // Builds an `set` input field. Should only be used in the envelope type.
-fn composite_set_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputField {
+fn composite_set_update_input_field(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputField {
     let set_object_type = InputType::Object(create::composite_create_object_type(ctx, cf));
 
     let mut input_types = vec![set_object_type.clone()];
@@ -296,7 +299,7 @@ fn composite_set_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFiel
 }
 
 // Builds an `push` input field. Should only be used in the envelope type.
-fn composite_push_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> Option<InputField> {
+fn composite_push_update_input_field(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> Option<InputField> {
     if cf.is_list() {
         let set_object_type = InputType::Object(create::composite_create_object_type(ctx, cf));
         let input_types = vec![set_object_type.clone(), InputType::list(set_object_type)];
@@ -308,7 +311,7 @@ fn composite_push_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFie
 }
 
 /// Builds the `upsert` input object type. Should only be used in the envelope type.
-fn composite_upsert_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+fn composite_upsert_object_type(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
     let name = format!("{}UpsertInput", cf.typ().name());
 
     let ident = Identifier::new_prisma(name);
@@ -333,7 +336,7 @@ fn composite_upsert_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef
 }
 
 // Builds an `upsert` input field. Should only be used in the envelope type.
-fn composite_upsert_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> Option<InputField> {
+fn composite_upsert_update_input_field(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> Option<InputField> {
     if cf.is_optional() {
         let upsert_object_type = InputType::Object(composite_upsert_object_type(ctx, cf));
 
@@ -343,7 +346,7 @@ fn composite_upsert_update_input_field(ctx: &mut BuilderContext, cf: &CompositeF
     }
 }
 
-fn composite_update_many_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+fn composite_update_many_object_type(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
     let name = format!("{}UpdateManyInput", cf.typ().name());
 
     let ident = Identifier::new_prisma(name);
@@ -369,7 +372,7 @@ fn composite_update_many_object_type(ctx: &mut BuilderContext, cf: &CompositeFie
     Arc::downgrade(&input_object)
 }
 
-fn composite_delete_many_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+fn composite_delete_many_object_type(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
     let name = format!("{}DeleteManyInput", cf.typ().name());
 
     let ident = Identifier::new_prisma(name);
@@ -393,7 +396,10 @@ fn composite_delete_many_object_type(ctx: &mut BuilderContext, cf: &CompositeFie
 }
 
 // Builds an `updateMany` input field. Should only be used in the envelope type.
-fn composite_update_many_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> Option<InputField> {
+fn composite_update_many_update_input_field(
+    ctx: &mut BuilderContext<'_>,
+    cf: &CompositeFieldRef,
+) -> Option<InputField> {
     if cf.is_list() {
         let update_many = InputType::Object(composite_update_many_object_type(ctx, cf));
 
@@ -404,7 +410,10 @@ fn composite_update_many_update_input_field(ctx: &mut BuilderContext, cf: &Compo
 }
 
 // Builds a `deleteMany` input field. Should only be used in the envelope type.
-fn composite_delete_many_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> Option<InputField> {
+fn composite_delete_many_update_input_field(
+    ctx: &mut BuilderContext<'_>,
+    cf: &CompositeFieldRef,
+) -> Option<InputField> {
     if cf.is_list() {
         let delete_many = InputType::Object(composite_delete_many_object_type(ctx, cf));
 

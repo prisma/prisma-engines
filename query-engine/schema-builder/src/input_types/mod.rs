@@ -7,11 +7,11 @@ use fields::*;
 use prisma_models::ScalarFieldRef;
 use schema::*;
 
-fn map_scalar_input_type_for_field(ctx: &mut BuilderContext, field: &ScalarFieldRef) -> InputType {
+fn map_scalar_input_type_for_field(ctx: &mut BuilderContext<'_>, field: &ScalarFieldRef) -> InputType {
     map_scalar_input_type(ctx, &field.type_identifier(), field.is_list())
 }
 
-fn map_scalar_input_type(ctx: &mut BuilderContext, typ: &TypeIdentifier, list: bool) -> InputType {
+fn map_scalar_input_type(ctx: &mut BuilderContext<'_>, typ: &TypeIdentifier, list: bool) -> InputType {
     let typ = match typ {
         TypeIdentifier::String => InputType::string(),
         TypeIdentifier::Int => InputType::int(),

@@ -3,7 +3,7 @@ use crate::constants::aggregations::*;
 use std::convert::identity;
 
 /// Builds group by aggregation object type for given model (e.g. GroupByUserOutputType).
-pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> ObjectTypeWeakRef {
+pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> ObjectTypeWeakRef {
     let ident = Identifier::new_prisma(format!("{}GroupByOutputType", capitalize(model.name())));
     return_cached_output!(ctx, &ident);
 
@@ -91,7 +91,7 @@ pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &Mode
     ObjectTypeStrongRef::downgrade(&object)
 }
 
-fn scalar_output_fields(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<OutputField> {
+fn scalar_output_fields(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> Vec<OutputField> {
     let fields = model.fields().scalar();
 
     fields

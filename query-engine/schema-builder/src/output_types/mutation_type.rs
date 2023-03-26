@@ -5,7 +5,7 @@ use prisma_models::{dml, PrismaValue};
 use psl::datamodel_connector::ConnectorCapability;
 
 /// Builds the root `Mutation` type.
-pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRef) {
+pub(crate) fn build(ctx: &mut BuilderContext<'_>) -> (OutputType, ObjectTypeStrongRef) {
     let mut fields: Vec<OutputField> = ctx
         .internal_data_model
         .models()
@@ -47,7 +47,7 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
 }
 
 // implementation note: these need to be in the same function, because these vecs interact: the create inputs will enqueue update inputs, and vice versa.
-fn create_nested_inputs(ctx: &mut BuilderContext) {
+fn create_nested_inputs(ctx: &mut BuilderContext<'_>) {
     let mut nested_create_inputs_queue = std::mem::take(&mut ctx.nested_create_inputs_queue);
     let mut nested_update_inputs_queue = std::mem::take(&mut ctx.nested_update_inputs_queue);
 
@@ -97,7 +97,7 @@ fn create_nested_inputs(ctx: &mut BuilderContext) {
     }
 }
 
-fn create_execute_raw_field(ctx: &mut BuilderContext) -> OutputField {
+fn create_execute_raw_field(ctx: &mut BuilderContext<'_>) -> OutputField {
     field(
         "executeRaw",
         vec![
@@ -118,7 +118,7 @@ fn create_execute_raw_field(ctx: &mut BuilderContext) -> OutputField {
     )
 }
 
-fn create_query_raw_field(ctx: &mut BuilderContext) -> OutputField {
+fn create_query_raw_field(ctx: &mut BuilderContext<'_>) -> OutputField {
     field(
         "queryRaw",
         vec![
@@ -139,7 +139,7 @@ fn create_query_raw_field(ctx: &mut BuilderContext) -> OutputField {
     )
 }
 
-fn create_mongodb_run_command_raw(ctx: &mut BuilderContext) -> OutputField {
+fn create_mongodb_run_command_raw(ctx: &mut BuilderContext<'_>) -> OutputField {
     field(
         "runCommandRaw",
         vec![input_field(ctx, "command", InputType::json(), None)],
@@ -152,7 +152,7 @@ fn create_mongodb_run_command_raw(ctx: &mut BuilderContext) -> OutputField {
 }
 
 /// Builds a delete mutation field (e.g. deleteUser) for given model.
-fn delete_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
+fn delete_item_field(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> Option<OutputField> {
     arguments::delete_one_arguments(ctx, model).map(|args| {
         let field_name = format!("deleteOne{}", model.name());
 
@@ -170,7 +170,7 @@ fn delete_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
 }
 
 /// Builds a delete many mutation field (e.g. deleteManyUsers) for given model.
-fn delete_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
+fn delete_many_field(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> OutputField {
     let arguments = arguments::delete_many_arguments(ctx, model);
     let field_name = format!("deleteMany{}", model.name());
 
@@ -186,7 +186,7 @@ fn delete_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField 
 }
 
 /// Builds an update mutation field (e.g. updateUser) for given model.
-fn update_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
+fn update_item_field(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> Option<OutputField> {
     arguments::update_one_arguments(ctx, model).map(|args| {
         let field_name = format!("updateOne{}", model.name());
 
@@ -204,7 +204,7 @@ fn update_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
 }
 
 /// Builds an update many mutation field (e.g. updateManyUsers) for given model.
-fn update_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
+fn update_many_field(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> OutputField {
     let arguments = arguments::update_many_arguments(ctx, model);
     let field_name = format!("updateMany{}", model.name());
 
@@ -220,7 +220,7 @@ fn update_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField 
 }
 
 /// Builds an upsert mutation field (e.g. upsertUser) for given model.
-fn upsert_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
+fn upsert_item_field(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> Option<OutputField> {
     arguments::upsert_arguments(ctx, model).map(|args| {
         let field_name = format!("upsertOne{}", model.name());
 

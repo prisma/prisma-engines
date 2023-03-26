@@ -4,7 +4,7 @@ use super::*;
 use std::convert::identity;
 
 /// Builds plain aggregation object type for given model (e.g. AggregateUser).
-pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> ObjectTypeWeakRef {
+pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> ObjectTypeWeakRef {
     let ident = Identifier::new_prisma(format!("Aggregate{}", capitalize(model.name())));
     return_cached_output!(ctx, &ident);
 
