@@ -252,13 +252,30 @@
 <a href="#252" id="252">252</a>
 <a href="#253" id="253">253</a>
 <a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::objects::<span class="kw-2">*</span>;
 <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::mutations::{create_many, create_one};
 <span class="kw">use </span>constants::{args, operations};
 <span class="kw">use </span>psl::datamodel_connector::ConnectorCapability;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>filter_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, field: <span class="kw-2">&amp;</span>ModelField, include_aggregates: bool) -&gt; InputField {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>filter_input_field(
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
+    field: <span class="kw-2">&amp;</span>ModelField,
+    include_aggregates: bool,
+) -&gt; InputField {
     <span class="kw">let </span>types = field_filter_types::get_field_filter_types(ctx, field, include_aggregates);
     <span class="kw">let </span>nullable = !field.is_required()
         &amp;&amp; !field.is_list()
@@ -272,7 +289,10 @@
         .nullable_if(nullable, <span class="kw-2">&amp;mut </span>ctx.input_field_types)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nested_create_one_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, parent_field: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputField {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nested_create_one_input_field(
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
+    parent_field: <span class="kw-2">&amp;</span>RelationFieldRef,
+) -&gt; InputField {
     <span class="kw">let </span>create_types = create_one::create_one_input_types(ctx, <span class="kw-2">&amp;</span>parent_field.related_model(), <span class="prelude-val">Some</span>(parent_field));
 
     <span class="kw">let </span>types: Vec&lt;InputType&gt; = create_types
@@ -289,7 +309,7 @@
 /// It also means that we can&#39;t serve implicit m:n relations, as this would require a write to the join
 /// table, but we don&#39;t have the IDs.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nested_create_many_input_field(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     parent_field: <span class="kw-2">&amp;</span>RelationFieldRef,
 ) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
     <span class="kw">if </span>ctx.has_capability(ConnectorCapability::CreateMany)
@@ -305,7 +325,10 @@
     </span>}
 }
 
-<span class="kw">fn </span>nested_create_many_envelope(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, parent_field: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputObjectTypeWeakRef {
+<span class="kw">fn </span>nested_create_many_envelope(
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
+    parent_field: <span class="kw-2">&amp;</span>RelationFieldRef,
+) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>create_type = create_many::create_many_object_type(ctx, <span class="kw-2">&amp;</span>parent_field.related_model(), <span class="prelude-val">Some</span>(parent_field));
 
     <span class="kw">let </span>nested_ident = <span class="kw-2">&amp;</span>create_type.into_arc().identifier;
@@ -333,7 +356,7 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nested_connect_or_create_field(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     parent_field: <span class="kw-2">&amp;</span>RelationFieldRef,
 ) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
     connect_or_create_objects::nested_connect_or_create_input_object(ctx, parent_field).map(|input_object_type| {
@@ -348,7 +371,7 @@
 }
 
 <span class="doccomment">/// Builds &quot;upsert&quot; field for nested updates (on relation fields).
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nested_upsert_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, parent_field: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nested_upsert_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, parent_field: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
     upsert_objects::nested_upsert_input_object(ctx, parent_field).map(|input_object_type| {
         input_field(
             ctx,
@@ -362,7 +385,7 @@
 
 <span class="doccomment">/// Builds &quot;deleteMany&quot; field for nested updates (on relation fields).
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nested_delete_many_field(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     parent_field: <span class="kw-2">&amp;</span>RelationFieldRef,
 ) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
     <span class="kw">if </span>parent_field.is_list() {
@@ -385,7 +408,7 @@
 
 <span class="doccomment">/// Builds &quot;updateMany&quot; field for nested updates (on relation fields).
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nested_update_many_field(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     parent_field: <span class="kw-2">&amp;</span>RelationFieldRef,
 ) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
     <span class="kw">if </span>parent_field.is_list() {
@@ -406,7 +429,10 @@
 }
 
 <span class="doccomment">/// Builds &quot;set&quot; field for nested updates (on relation fields).
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nested_set_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, parent_field: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nested_set_input_field(
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
+    parent_field: <span class="kw-2">&amp;</span>RelationFieldRef,
+) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
     <span class="kw">if </span>parent_field.is_list() {
         <span class="prelude-val">Some</span>(where_unique_input_field(ctx, operations::SET, parent_field))
     } <span class="kw">else </span>{
@@ -416,7 +442,7 @@
 
 <span class="doccomment">/// Builds &quot;disconnect&quot; field for nested updates (on relation fields).
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nested_disconnect_input_field(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     parent_field: <span class="kw-2">&amp;</span>RelationFieldRef,
 ) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
     <span class="kw">match </span>(parent_field.is_list(), parent_field.is_required()) {
@@ -439,7 +465,7 @@
 
 <span class="doccomment">/// Builds &quot;delete&quot; field for nested updates (on relation fields).
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nested_delete_input_field(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     parent_field: <span class="kw-2">&amp;</span>RelationFieldRef,
 ) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
     <span class="kw">match </span>(parent_field.is_list(), parent_field.is_required()) {
@@ -461,11 +487,11 @@
 }
 
 <span class="doccomment">/// Builds the &quot;connect&quot; input field for a relation.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nested_connect_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, parent_field: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputField {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nested_connect_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, parent_field: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputField {
     where_unique_input_field(ctx, operations::CONNECT, parent_field)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nested_update_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, parent_field: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputField {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nested_update_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, parent_field: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputField {
     <span class="kw">let </span><span class="kw-2">mut </span>update_shorthand_types =
         update_one_objects::update_one_input_types(ctx, <span class="kw-2">&amp;</span>parent_field.related_model(), <span class="prelude-val">Some</span>(parent_field));
 
@@ -492,7 +518,7 @@
     input_field(ctx, operations::UPDATE, update_types, <span class="prelude-val">None</span>).optional()
 }
 
-<span class="kw">fn </span>where_unique_input_field&lt;T&gt;(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, name: T, field: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputField
+<span class="kw">fn </span>where_unique_input_field&lt;T&gt;(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, name: T, field: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputField
 <span class="kw">where
     </span>T: Into&lt;String&gt;,
 {

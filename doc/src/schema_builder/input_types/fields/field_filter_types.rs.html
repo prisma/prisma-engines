@@ -635,7 +635,7 @@
 
 <span class="doccomment">/// Builds filter types for the given model field.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_field_filter_types(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     field: <span class="kw-2">&amp;</span>ModelField,
     include_aggregates: bool,
 ) -&gt; Vec&lt;InputType&gt; {
@@ -687,14 +687,14 @@
 }
 
 <span class="doccomment">/// Builds shorthand relation equality (`is`) filter for to-one: `where: { relation_field: { ... } }` (no `is` in between).
-</span><span class="kw">fn </span>to_one_relation_filter_shorthand_types(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputType {
+</span><span class="kw">fn </span>to_one_relation_filter_shorthand_types(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputType {
     <span class="kw">let </span>related_model = rf.related_model();
     <span class="kw">let </span>related_input_type = filter_objects::where_object_type(ctx, <span class="kw-2">&amp;</span>related_model);
 
     InputType::object(related_input_type)
 }
 
-<span class="kw">fn </span>to_many_relation_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputObjectTypeWeakRef {
+<span class="kw">fn </span>to_many_relation_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>related_model = rf.related_model();
     <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}ListRelationFilter&quot;</span>, capitalize(related_model.name())));
 
@@ -718,7 +718,7 @@
     Arc::downgrade(<span class="kw-2">&amp;</span>object)
 }
 
-<span class="kw">fn </span>to_one_relation_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputObjectTypeWeakRef {
+<span class="kw">fn </span>to_one_relation_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>related_model = rf.related_model();
     <span class="kw">let </span>related_input_type = filter_objects::where_object_type(ctx, <span class="kw-2">&amp;</span>related_model);
     <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}RelationFilter&quot;</span>, capitalize(related_model.name())));
@@ -744,13 +744,13 @@
 }
 
 <span class="doccomment">/// Builds shorthand composite equality (`equals`) filter for to-one: `where: { composite_field: { ... } }` (no `equals` in between).
-</span><span class="kw">fn </span>to_one_composite_filter_shorthand_types(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputType {
+</span><span class="kw">fn </span>to_one_composite_filter_shorthand_types(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputType {
     <span class="kw">let </span>equality_object_type = filter_objects::composite_equality_object(ctx, cf);
 
     InputType::object(equality_object_type)
 }
 
-<span class="kw">fn </span>to_one_composite_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
+<span class="kw">fn </span>to_one_composite_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>nullable = <span class="kw">if </span>cf.is_optional() { <span class="string">&quot;Nullable&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
     <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}{}CompositeFilter&quot;</span>, capitalize(cf.typ().name()), nullable));
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
@@ -791,7 +791,7 @@
     Arc::downgrade(<span class="kw-2">&amp;</span>object)
 }
 
-<span class="kw">fn </span>to_many_composite_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
+<span class="kw">fn </span>to_many_composite_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}CompositeListFilter&quot;</span>, capitalize(cf.typ().name())));
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
@@ -842,7 +842,7 @@
     Arc::downgrade(<span class="kw-2">&amp;</span>object)
 }
 
-<span class="kw">fn </span>scalar_list_filter_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; InputObjectTypeWeakRef {
+<span class="kw">fn </span>scalar_list_filter_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>ident = Identifier::new_prisma(scalar_filter_name(
         <span class="kw-2">&amp;</span>sf.type_identifier().type_name(<span class="kw-2">&amp;</span>ctx.internal_data_model.schema),
         <span class="bool-val">true</span>,
@@ -887,7 +887,7 @@
 }
 
 <span class="kw">fn </span>full_scalar_filter_type(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     typ: <span class="kw-2">&amp;</span>TypeIdentifier,
     native_type: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>dml::NativeTypeInstance&gt;,
     list: bool,
@@ -1024,12 +1024,12 @@
     Arc::downgrade(<span class="kw-2">&amp;</span>object)
 }
 
-<span class="kw">fn </span>is_set_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; InputField {
+<span class="kw">fn </span>is_set_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; InputField {
     input_field(ctx, filters::IS_SET, InputType::boolean(), <span class="prelude-val">None</span>).optional()
 }
 
 <span class="kw">fn </span>equality_filters(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     mapped_type: InputType,
     nullable: bool,
 ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = InputField&gt; {
@@ -1043,7 +1043,7 @@
 }
 
 <span class="kw">fn </span>json_equality_filters(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     mapped_type: InputType,
     nullable: bool,
 ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = InputField&gt; {
@@ -1064,7 +1064,7 @@
 }
 
 <span class="kw">fn </span>inclusion_filters(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     mapped_type: InputType,
     nullable: bool,
 ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = InputField&gt; {
@@ -1087,7 +1087,7 @@
     .into_iter()
 }
 
-<span class="kw">fn </span>alphanumeric_filters(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, mapped_type: InputType) -&gt; <span class="kw">impl </span>Iterator&lt;Item = InputField&gt; {
+<span class="kw">fn </span>alphanumeric_filters(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, mapped_type: InputType) -&gt; <span class="kw">impl </span>Iterator&lt;Item = InputField&gt; {
     <span class="comment">// We disable referencing fields on alphanumeric json filters for MySQL &amp; MariaDB because we can&#39;t make it work
     // for both database without splitting them into their own connectors.
     </span><span class="kw">let </span>field_types =
@@ -1107,7 +1107,7 @@
 }
 
 <span class="kw">fn </span>string_filters(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     input_object_type_name: <span class="kw-2">&amp;</span>str,
     mapped_type: InputType,
 ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = InputField&gt; {
@@ -1126,7 +1126,7 @@
     string_filters.into_iter()
 }
 
-<span class="kw">fn </span>json_filters(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; <span class="kw">impl </span>Iterator&lt;Item = InputField&gt; {
+<span class="kw">fn </span>json_filters(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="kw">impl </span>Iterator&lt;Item = InputField&gt; {
     <span class="comment">// TODO: also add json-specific &quot;keys&quot; filters
     // TODO: add json_type filter
     </span><span class="kw">let </span>path_type = <span class="kw">if </span>ctx.has_capability(ConnectorCapability::JsonFilteringJsonPath) {
@@ -1163,7 +1163,7 @@
     .into_iter()
 }
 
-<span class="kw">fn </span>query_mode_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, nested: bool) -&gt; <span class="kw">impl </span>Iterator&lt;Item = InputField&gt; {
+<span class="kw">fn </span>query_mode_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, nested: bool) -&gt; <span class="kw">impl </span>Iterator&lt;Item = InputField&gt; {
     <span class="comment">// Limit query mode field to the topmost filter level.
     // Only build mode field for connectors with insensitive filter support.
     </span><span class="kw">let </span>fields = <span class="kw">if </span>!nested &amp;&amp; ctx.has_capability(ConnectorCapability::InsensitiveFilters) {
@@ -1194,7 +1194,7 @@
 }
 
 <span class="kw">fn </span>aggregate_filter_field(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     aggregation: <span class="kw-2">&amp;</span>str,
     typ: <span class="kw-2">&amp;</span>TypeIdentifier,
     nullable: bool,
@@ -1213,7 +1213,7 @@
 
 <span class="comment">// Shorthand `not equals` filter input field, skips the nested object filter.
 </span><span class="kw">fn </span>not_filter_field(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     typ: <span class="kw-2">&amp;</span>TypeIdentifier,
     native_type: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>dml::NativeTypeInstance&gt;,
     mapped_scalar_type: InputType,

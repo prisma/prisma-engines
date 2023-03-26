@@ -42,7 +42,7 @@
 <span class="comment">// Todo: This isn&#39;t final, this is only the first draft to get structure into the
 // wild cross-dependency waste that was the create/update inputs.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>DataInputFieldMapper {
-    <span class="kw">fn </span>map_all(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, fields: <span class="kw-2">&amp;</span>[Field]) -&gt; Vec&lt;InputField&gt; {
+    <span class="kw">fn </span>map_all(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, fields: <span class="kw-2">&amp;</span>[Field]) -&gt; Vec&lt;InputField&gt; {
         fields
             .iter()
             .map(|field| <span class="kw">match </span>field {
@@ -54,13 +54,13 @@
             .collect()
     }
 
-    <span class="kw">fn </span>map_scalar(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; InputField;
+    <span class="kw">fn </span>map_scalar(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; InputField;
 
-    <span class="kw">fn </span>map_scalar_list(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; InputField;
+    <span class="kw">fn </span>map_scalar_list(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; InputField;
 
-    <span class="kw">fn </span>map_relation(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputField;
+    <span class="kw">fn </span>map_relation(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputField;
 
-    <span class="kw">fn </span>map_composite(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputField;
+    <span class="kw">fn </span>map_composite(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputField;
 }
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="schema_builder" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>

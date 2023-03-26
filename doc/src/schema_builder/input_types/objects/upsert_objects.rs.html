@@ -99,7 +99,7 @@
 <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nested_upsert_input_object(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     parent_field: <span class="kw-2">&amp;</span>RelationFieldRef,
 ) -&gt; <span class="prelude-ty">Option</span>&lt;InputObjectTypeWeakRef&gt; {
     <span class="kw">if </span>parent_field.is_list() {
@@ -111,7 +111,7 @@
 
 <span class="doccomment">/// Builds &quot;&lt;x&gt;UpsertWithWhereUniqueNestedInput&quot; / &quot;&lt;x&gt;UpsertWithWhereUniqueWithout&lt;y&gt;Input&quot; input object types.
 </span><span class="kw">fn </span>nested_upsert_list_input_object(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     parent_field: <span class="kw-2">&amp;</span>RelationFieldRef,
 ) -&gt; <span class="prelude-ty">Option</span>&lt;InputObjectTypeWeakRef&gt; {
     <span class="kw">let </span>related_model = parent_field.related_model();
@@ -149,7 +149,7 @@
 
 <span class="doccomment">/// Builds &quot;&lt;x&gt;UpsertNestedInput&quot; / &quot;&lt;x&gt;UpsertWithout&lt;y&gt;Input&quot; input object types.
 </span><span class="kw">fn </span>nested_upsert_nonlist_input_object(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     parent_field: <span class="kw-2">&amp;</span>RelationFieldRef,
 ) -&gt; <span class="prelude-ty">Option</span>&lt;InputObjectTypeWeakRef&gt; {
     <span class="kw">let </span>related_model = parent_field.related_model();

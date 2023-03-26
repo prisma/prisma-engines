@@ -308,6 +308,10 @@
 <a href="#308" id="308">308</a>
 <a href="#309" id="309">309</a>
 <a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>constants::{aggregations, ordering};
 <span class="kw">use </span>output_types::aggregation;
@@ -346,7 +350,7 @@
 
 <span class="doccomment">/// Builds &quot;&lt;Container&gt;OrderBy&lt;Suffixes&gt;Input&quot; object types.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>order_by_object_type(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     container: <span class="kw-2">&amp;</span>ParentContainer,
     options: <span class="kw-2">&amp;</span>OrderByOptions,
 ) -&gt; InputObjectTypeWeakRef {
@@ -384,7 +388,7 @@
     Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
 }
 
-<span class="kw">fn </span>compute_scalar_aggregation_fields(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, container: <span class="kw-2">&amp;</span>ParentContainer) -&gt; Vec&lt;InputField&gt; {
+<span class="kw">fn </span>compute_scalar_aggregation_fields(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, container: <span class="kw-2">&amp;</span>ParentContainer) -&gt; Vec&lt;InputField&gt; {
     <span class="kw">let </span>non_list_nor_json_fields = aggregation::collect_non_list_nor_json_fields(container);
     <span class="kw">let </span>numeric_fields = aggregation::collect_numeric_fields(container);
     <span class="kw">let </span>scalar_fields = container
@@ -422,7 +426,11 @@
     fields.into_iter().flatten().collect()
 }
 
-<span class="kw">fn </span>orderby_field_mapper(field: <span class="kw-2">&amp;</span>ModelField, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, options: <span class="kw-2">&amp;</span>OrderByOptions) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
+<span class="kw">fn </span>orderby_field_mapper(
+    field: <span class="kw-2">&amp;</span>ModelField,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
+    options: <span class="kw-2">&amp;</span>OrderByOptions,
+) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
     <span class="kw">match </span>field {
         <span class="comment">// To-many relation field.
         </span>ModelField::Relation(rf) <span class="kw">if </span>rf.is_list() &amp;&amp; options.include_relations =&gt; {
@@ -479,7 +487,7 @@
     }
 }
 
-<span class="kw">fn </span>sort_nulls_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; InputObjectTypeWeakRef {
+<span class="kw">fn </span>sort_nulls_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>ident = Identifier::new_prisma(<span class="string">&quot;SortOrderInput&quot;</span>);
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
@@ -502,7 +510,7 @@
 <span class="kw">fn </span>order_by_field_aggregate(
     name: <span class="kw-2">&amp;</span>str,
     suffix: <span class="kw-2">&amp;</span>str,
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     container: <span class="kw-2">&amp;</span>ParentContainer,
     scalar_fields: Vec&lt;ScalarFieldRef&gt;,
 ) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
@@ -516,7 +524,7 @@
 
 <span class="kw">fn </span>order_by_object_type_aggregate(
     suffix: <span class="kw-2">&amp;</span>str,
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     container: <span class="kw-2">&amp;</span>ParentContainer,
     scalar_fields: Vec&lt;ScalarFieldRef&gt;,
 ) -&gt; InputObjectTypeWeakRef {
@@ -541,7 +549,7 @@
 }
 
 <span class="kw">fn </span>order_by_to_many_aggregate_object_type(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     container: <span class="kw-2">&amp;</span>ParentContainer,
 ) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>container_type = <span class="kw">match </span>container {
@@ -566,7 +574,7 @@
     Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
 }
 
-<span class="kw">fn </span>order_by_field_text_search(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, container: <span class="kw-2">&amp;</span>ParentContainer) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
+<span class="kw">fn </span>order_by_field_text_search(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, container: <span class="kw-2">&amp;</span>ParentContainer) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
     <span class="kw">let </span>scalar_fields: Vec&lt;<span class="kw">_</span>&gt; = container
         .fields()
         .into_iter()
@@ -585,7 +593,7 @@
 }
 
 <span class="kw">fn </span>order_by_object_type_text_search(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     container: <span class="kw-2">&amp;</span>ParentContainer,
     scalar_fields: Vec&lt;ScalarFieldRef&gt;,
 ) -&gt; InputObjectTypeWeakRef {

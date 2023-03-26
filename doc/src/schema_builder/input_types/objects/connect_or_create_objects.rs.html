@@ -44,7 +44,7 @@
 
 <span class="doccomment">/// Builds &quot;&lt;x&gt;CreateOrConnectNestedInput&quot; input object types.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nested_connect_or_create_input_object(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     parent_field: <span class="kw-2">&amp;</span>RelationFieldRef,
 ) -&gt; <span class="prelude-ty">Option</span>&lt;InputObjectTypeWeakRef&gt; {
     <span class="kw">let </span>related_model = parent_field.related_model();

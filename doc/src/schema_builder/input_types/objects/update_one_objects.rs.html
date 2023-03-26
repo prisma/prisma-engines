@@ -233,7 +233,7 @@
 <span class="kw">use </span>psl::datamodel_connector::ConnectorCapability;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update_one_input_types(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     model: <span class="kw-2">&amp;</span>ModelRef,
     parent_field: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>RelationFieldRef&gt;,
 ) -&gt; Vec&lt;InputType&gt; {
@@ -250,7 +250,7 @@
 
 <span class="doccomment">/// Builds &quot;&lt;x&gt;UpdateInput&quot; input object type.
 </span><span class="kw">fn </span>checked_update_one_input_type(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     model: <span class="kw-2">&amp;</span>ModelRef,
     parent_field: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>RelationFieldRef&gt;,
 ) -&gt; InputObjectTypeWeakRef {
@@ -275,7 +275,7 @@
 
 <span class="doccomment">/// Builds &quot;&lt;x&gt;UncheckedUpdateInput&quot; input object type.
 </span><span class="kw">fn </span>unchecked_update_one_input_type(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     model: <span class="kw-2">&amp;</span>ModelRef,
     parent_field: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>RelationFieldRef&gt;,
 ) -&gt; InputObjectTypeWeakRef {
@@ -300,7 +300,7 @@
 
 <span class="doccomment">/// Filters the given model&#39;s fields down to the allowed ones for checked update.
 </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>filter_checked_update_fields(
-    ctx: <span class="kw-2">&amp;</span>BuilderContext,
+    ctx: <span class="kw-2">&amp;</span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     model: <span class="kw-2">&amp;</span>ModelRef,
     parent_field: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>RelationFieldRef&gt;,
 ) -&gt; Vec&lt;ModelField&gt; {
@@ -343,7 +343,7 @@
 
 <span class="doccomment">/// Filters the given model&#39;s fields down to the allowed ones for unchecked update.
 </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>filter_unchecked_update_fields(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     model: <span class="kw-2">&amp;</span>ModelRef,
     parent_field: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>RelationFieldRef&gt;,
 ) -&gt; Vec&lt;ModelField&gt; {
@@ -403,7 +403,7 @@
 <span class="doccomment">/// Builds &quot;&lt;x&gt;UpdateWithWhereUniqueNestedInput&quot; / &quot;&lt;x&gt;UpdateWithWhereUniqueWithout&lt;y&gt;Input&quot; input object types.
 /// Simple combination object of &quot;where&quot; and &quot;data&quot;.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update_one_where_combination_object(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     update_types: Vec&lt;InputType&gt;,
     parent_field: <span class="kw-2">&amp;</span>RelationFieldRef,
 ) -&gt; InputObjectTypeWeakRef {
@@ -432,8 +432,8 @@
 <span class="doccomment">/// Builds &quot;&lt;x&gt;UpdateWithWhereUniqueWithout&lt;y&gt;Input&quot; input object types.
 /// Simple combination object of &quot;where&quot; and &quot;data&quot; for to-one relations.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update_to_one_rel_where_combination_object(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
-    update_types: Vec&lt;InputType&gt;,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
+    update_types: <span class="kw">impl </span>IntoIterator&lt;Item = InputType&gt;,
     parent_field: <span class="kw-2">&amp;</span>RelationFieldRef,
 ) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>related_model = parent_field.related_model();

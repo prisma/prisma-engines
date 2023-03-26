@@ -139,7 +139,7 @@
 <span class="kw">use </span>input_types::fields::arguments;
 <span class="kw">use </span>prisma_models::{CompositeFieldRef, ScalarFieldRef};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_output_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model_field: <span class="kw-2">&amp;</span>ModelField) -&gt; OutputField {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_output_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model_field: <span class="kw-2">&amp;</span>ModelField) -&gt; OutputField {
     field(
         model_field.name(),
         arguments::many_records_output_field_arguments(ctx, model_field),
@@ -149,7 +149,7 @@
     .nullable_if(!model_field.is_required())
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_field_output_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model_field: <span class="kw-2">&amp;</span>ModelField) -&gt; OutputType {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_field_output_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model_field: <span class="kw-2">&amp;</span>ModelField) -&gt; OutputType {
     <span class="kw">match </span>model_field {
         ModelField::Scalar(sf) =&gt; map_scalar_output_type_for_field(ctx, sf),
         ModelField::Relation(rf) =&gt; map_relation_output_type(ctx, rf),
@@ -157,11 +157,11 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_scalar_output_type_for_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, field: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; OutputType {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_scalar_output_type_for_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, field: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; OutputType {
     map_scalar_output_type(ctx, <span class="kw-2">&amp;</span>field.type_identifier(), field.is_list())
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_scalar_output_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, typ: <span class="kw-2">&amp;</span>TypeIdentifier, list: bool) -&gt; OutputType {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_scalar_output_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, typ: <span class="kw-2">&amp;</span>TypeIdentifier, list: bool) -&gt; OutputType {
     <span class="kw">let </span>output_type = <span class="kw">match </span>typ {
         TypeIdentifier::String =&gt; OutputType::string(),
         TypeIdentifier::Float =&gt; OutputType::float(),
@@ -185,7 +185,7 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_relation_output_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; OutputType {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_relation_output_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; OutputType {
     <span class="kw">let </span>related_model_obj = OutputType::object(objects::model::map_type(ctx, <span class="kw-2">&amp;</span>rf.related_model()));
 
     <span class="kw">if </span>rf.is_list() {
@@ -195,7 +195,7 @@
     }
 }
 
-<span class="kw">fn </span>map_composite_field_output_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; OutputType {
+<span class="kw">fn </span>map_composite_field_output_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; OutputType {
     <span class="kw">let </span>obj = objects::composite::map_type(ctx, <span class="kw-2">&amp;</span>cf.typ());
     <span class="kw">let </span>typ = OutputType::Object(obj);
 
@@ -209,7 +209,7 @@
 <span class="doccomment">/// Returns an aggregation field with given name if the passed fields contains any fields.
 /// Field types inside the object type of the field are determined by the passed mapper fn.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>aggregation_relation_field&lt;F, G&gt;(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     name: <span class="kw-2">&amp;</span>str,
     model: <span class="kw-2">&amp;</span>ModelRef,
     fields: Vec&lt;RelationFieldRef&gt;,
@@ -217,7 +217,7 @@
     object_mapper: G,
 ) -&gt; <span class="prelude-ty">Option</span>&lt;OutputField&gt;
 <span class="kw">where
-    </span>F: Fn(<span class="kw-2">&amp;mut </span>BuilderContext, <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; OutputType,
+    </span>F: Fn(<span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; OutputType,
     G: Fn(ObjectType) -&gt; ObjectType,
 {
     <span class="kw">if </span>fields.is_empty() {
@@ -237,14 +237,14 @@
 
 <span class="doccomment">/// Maps the object type for aggregations that operate on a field level.
 </span><span class="kw">fn </span>map_field_aggration_relation&lt;F, G&gt;(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     model: <span class="kw-2">&amp;</span>ModelRef,
     fields: <span class="kw-2">&amp;</span>[RelationFieldRef],
     type_mapper: F,
     object_mapper: G,
 ) -&gt; ObjectTypeWeakRef
 <span class="kw">where
-    </span>F: Fn(<span class="kw-2">&amp;mut </span>BuilderContext, <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; OutputType,
+    </span>F: Fn(<span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; OutputType,
     G: Fn(ObjectType) -&gt; ObjectType,
 {
     <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}CountOutputType&quot;</span>, capitalize(model.name())));

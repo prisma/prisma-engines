@@ -198,6 +198,12 @@
 <a href="#198" id="198">198</a>
 <a href="#199" id="199">199</a>
 <a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::constants::<span class="kw-2">*</span>;
 <span class="kw">use </span>prisma_models::CompositeFieldRef;
@@ -217,7 +223,7 @@
 }
 
 <span class="kw">impl </span>DataInputFieldMapper <span class="kw">for </span>CreateDataInputFieldMapper {
-    <span class="kw">fn </span>map_scalar(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; InputField {
+    <span class="kw">fn </span>map_scalar(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; InputField {
         <span class="kw">let </span>typ = map_scalar_input_type_for_field(ctx, sf);
         <span class="kw">let </span>supports_advanced_json = ctx.has_capability(ConnectorCapability::AdvancedJsonNullability);
 
@@ -235,7 +241,7 @@
         }
     }
 
-    <span class="kw">fn </span>map_scalar_list(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; InputField {
+    <span class="kw">fn </span>map_scalar_list(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; InputField {
         <span class="kw">let </span>typ = map_scalar_input_type_for_field(ctx, sf);
         <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}Create{}Input&quot;</span>, sf.container().name(), sf.name()));
 
@@ -259,7 +265,7 @@
         </span>input_field(ctx, sf.name(), <span class="macro">vec!</span>[input_type, typ], sf.default_value()).optional()
     }
 
-    <span class="kw">fn </span>map_relation(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputField {
+    <span class="kw">fn </span>map_relation(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputField {
         <span class="kw">let </span>related_model = rf.related_model();
         <span class="kw">let </span>related_field = rf.related_field();
 
@@ -309,7 +315,7 @@
         }
     }
 
-    <span class="kw">fn </span>map_composite(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputField {
+    <span class="kw">fn </span>map_composite(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputField {
         <span class="comment">// Shorthand object (just the plain create object for the composite).
         </span><span class="kw">let </span>shorthand_type = InputType::Object(composite_create_object_type(ctx, cf));
 
@@ -342,7 +348,10 @@
 ///   ... more ops ...
 /// }
 /// ```
-</span><span class="kw">fn </span>composite_create_envelope_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
+</span><span class="kw">fn </span>composite_create_envelope_object_type(
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
+    cf: <span class="kw-2">&amp;</span>CompositeFieldRef,
+) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>arity = <span class="kw">if </span>cf.is_optional() {
         <span class="string">&quot;Nullable&quot;
     </span>} <span class="kw">else if </span>cf.is_list() {
@@ -380,7 +389,10 @@
     Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>composite_create_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>composite_create_object_type(
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
+    cf: <span class="kw-2">&amp;</span>CompositeFieldRef,
+) -&gt; InputObjectTypeWeakRef {
     <span class="comment">// It&#39;s called &quot;Create&quot; input because it&#39;s used across multiple create-type operations, not only &quot;set&quot;.
     </span><span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}CreateInput&quot;</span>, cf.typ().name());
 

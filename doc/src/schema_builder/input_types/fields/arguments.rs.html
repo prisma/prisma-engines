@@ -183,14 +183,14 @@
 <span class="kw">use </span>prisma_models::{prelude::ParentContainer, CompositeFieldRef};
 
 <span class="doccomment">/// Builds &quot;where&quot; argument.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>where_argument(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; InputField {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>where_argument(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; InputField {
     <span class="kw">let </span>where_object = filter_objects::where_object_type(ctx, model);
 
     input_field(ctx, args::WHERE, InputType::object(where_object), <span class="prelude-val">None</span>).optional()
 }
 
 <span class="doccomment">/// Builds &quot;where&quot; argument which input type is the where unique type of the input builder.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>where_unique_argument(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>where_unique_argument(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
     <span class="kw">let </span>input_object_type = filter_objects::where_unique_object_type(ctx, model);
 
     <span class="kw">if </span>input_object_type.into_arc().is_empty() {
@@ -206,12 +206,12 @@
 }
 
 <span class="doccomment">/// Builds &quot;where&quot; (unique) argument intended for the delete field.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>delete_one_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;InputField&gt;&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>delete_one_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;InputField&gt;&gt; {
     where_unique_argument(ctx, model).map(|arg| <span class="macro">vec!</span>[arg])
 }
 
 <span class="doccomment">/// Builds &quot;where&quot; (unique) and &quot;data&quot; arguments intended for the update field.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update_one_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;InputField&gt;&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update_one_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;InputField&gt;&gt; {
     where_unique_argument(ctx, model).map(|unique_arg| {
         <span class="kw">let </span>update_types = update_one_objects::update_one_input_types(ctx, model, <span class="prelude-val">None</span>);
 
@@ -220,7 +220,7 @@
 }
 
 <span class="doccomment">/// Builds &quot;where&quot; (unique), &quot;create&quot;, and &quot;update&quot; arguments intended for the upsert field.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>upsert_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;InputField&gt;&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>upsert_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;InputField&gt;&gt; {
     where_unique_argument(ctx, model).and_then(|where_unique_arg| {
         <span class="kw">let </span>update_types = update_one_objects::update_one_input_types(ctx, model, <span class="prelude-val">None</span>);
         <span class="kw">let </span>create_types = create_one::create_one_input_types(ctx, model, <span class="prelude-val">None</span>);
@@ -238,7 +238,7 @@
 }
 
 <span class="doccomment">/// Builds &quot;where&quot; and &quot;data&quot; arguments intended for the update many field.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update_many_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; Vec&lt;InputField&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update_many_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; Vec&lt;InputField&gt; {
     <span class="kw">let </span>update_many_types = update_many_objects::update_many_input_types(ctx, model, <span class="prelude-val">None</span>);
     <span class="kw">let </span>where_arg = where_argument(ctx, model);
 
@@ -246,14 +246,14 @@
 }
 
 <span class="doccomment">/// Builds &quot;where&quot; argument intended for the delete many field.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>delete_many_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; Vec&lt;InputField&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>delete_many_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; Vec&lt;InputField&gt; {
     <span class="kw">let </span>where_arg = where_argument(ctx, model);
 
     <span class="macro">vec!</span>[where_arg]
 }
 
 <span class="doccomment">/// Builds &quot;many records where&quot; arguments based on the given model and field.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>many_records_output_field_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, field: <span class="kw-2">&amp;</span>ModelField) -&gt; Vec&lt;InputField&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>many_records_output_field_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, field: <span class="kw-2">&amp;</span>ModelField) -&gt; Vec&lt;InputField&gt; {
     <span class="kw">match </span>field {
         ModelField::Scalar(<span class="kw">_</span>) =&gt; <span class="macro">vec!</span>[],
 
@@ -280,7 +280,7 @@
 
 <span class="doccomment">/// Builds &quot;many records where&quot; arguments for to-many relation selection sets.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>relation_to_many_selection_arguments(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     model: <span class="kw-2">&amp;</span>ModelRef,
     include_distinct: bool,
 ) -&gt; Vec&lt;InputField&gt; {
@@ -308,18 +308,18 @@
 }
 
 <span class="doccomment">/// Builds &quot;many records where&quot; arguments for to-many relation selection sets.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>relation_to_one_selection_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; Vec&lt;InputField&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>relation_to_one_selection_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; Vec&lt;InputField&gt; {
     <span class="macro">vec!</span>[where_argument(ctx, model)]
 }
 
 <span class="doccomment">/// Builds &quot;many composite where&quot; arguments for to-many composite selection sets.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>composite_selection_arguments(_ctx: <span class="kw-2">&amp;mut </span>BuilderContext, _cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; Vec&lt;InputField&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>composite_selection_arguments(_ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, _cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; Vec&lt;InputField&gt; {
     <span class="macro">vec!</span>[]
 }
 
 <span class="comment">// Builds &quot;orderBy&quot; argument.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>order_by_argument(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     container: <span class="kw-2">&amp;</span>ParentContainer,
     options: <span class="kw-2">&amp;</span>OrderByOptions,
 ) -&gt; InputField {
@@ -334,7 +334,7 @@
     .optional()
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>group_by_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; Vec&lt;InputField&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>group_by_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; Vec&lt;InputField&gt; {
     <span class="kw">let </span>field_enum_type = InputType::Enum(model_field_enum(ctx, model));
     <span class="kw">let </span>filter_object = InputType::object(filter_objects::scalar_filter_object_type(ctx, model, <span class="bool-val">true</span>));
 

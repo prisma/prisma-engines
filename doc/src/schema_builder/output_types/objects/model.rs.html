@@ -64,7 +64,7 @@
 
 <span class="doccomment">/// Compute initial model cache. No fields are computed because we first
 /// need all models to be present, then we can compute fields in a second pass.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>initialize_cache(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>initialize_cache(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) {
     <span class="kw">for </span>model <span class="kw">in </span>ctx.internal_data_model.models() {
         <span class="kw">let </span>ident = Identifier::new_model(model.name());
         ctx.cache_output_type(ident.clone(), Arc::new(ObjectType::new(ident, <span class="prelude-val">Some</span>(model))));
@@ -72,7 +72,7 @@
 }
 
 <span class="comment">// Compute fields on all cached model object types.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>initialize_fields(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>initialize_fields(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) {
     <span class="kw">for </span>model <span class="kw">in </span>ctx.internal_data_model.models() {
         <span class="kw">let </span>obj: ObjectTypeWeakRef = map_type(ctx, <span class="kw-2">&amp;</span>model);
         <span class="kw">let </span><span class="kw-2">mut </span>fields = compute_model_object_type_fields(ctx, <span class="kw-2">&amp;</span>model);
@@ -98,7 +98,7 @@
 
 <span class="doccomment">/// Returns an output object type for the given model.
 /// Relies on the output type cache being initalized.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; ObjectTypeWeakRef {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; ObjectTypeWeakRef {
     <span class="kw">let </span>ident = Identifier::new_model(model.name());
     ctx.get_output_type(<span class="kw-2">&amp;</span>ident)
         .expect(<span class="string">&quot;Invariant violation: Initialized output object type for each model.&quot;</span>)
@@ -106,7 +106,7 @@
 
 <span class="doccomment">/// Computes model output type fields.
 /// Requires an initialized cache.
-</span><span class="kw">fn </span>compute_model_object_type_fields(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; Vec&lt;OutputField&gt; {
+</span><span class="kw">fn </span>compute_model_object_type_fields(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; Vec&lt;OutputField&gt; {
     model
         .fields()
         .filter_all(|<span class="kw">_</span>| <span class="bool-val">true</span>)

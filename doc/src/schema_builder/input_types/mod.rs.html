@@ -70,11 +70,11 @@
 <span class="kw">use </span>prisma_models::ScalarFieldRef;
 <span class="kw">use </span>schema::<span class="kw-2">*</span>;
 
-<span class="kw">fn </span>map_scalar_input_type_for_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, field: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; InputType {
+<span class="kw">fn </span>map_scalar_input_type_for_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, field: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; InputType {
     map_scalar_input_type(ctx, <span class="kw-2">&amp;</span>field.type_identifier(), field.is_list())
 }
 
-<span class="kw">fn </span>map_scalar_input_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, typ: <span class="kw-2">&amp;</span>TypeIdentifier, list: bool) -&gt; InputType {
+<span class="kw">fn </span>map_scalar_input_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, typ: <span class="kw-2">&amp;</span>TypeIdentifier, list: bool) -&gt; InputType {
     <span class="kw">let </span>typ = <span class="kw">match </span>typ {
         TypeIdentifier::String =&gt; InputType::string(),
         TypeIdentifier::Int =&gt; InputType::int(),

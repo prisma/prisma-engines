@@ -55,11 +55,11 @@
 <span class="kw">use </span><span class="kw">crate</span>::constants::filters;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>WithFieldRefInputExt {
-    <span class="kw">fn </span>with_field_ref_input(<span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; Vec&lt;InputType&gt;;
+    <span class="kw">fn </span>with_field_ref_input(<span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Vec&lt;InputType&gt;;
 }
 
 <span class="kw">impl </span>WithFieldRefInputExt <span class="kw">for </span>InputType {
-    <span class="kw">fn </span>with_field_ref_input(<span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; Vec&lt;InputType&gt; {
+    <span class="kw">fn </span>with_field_ref_input(<span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Vec&lt;InputType&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>field_types: Vec&lt;InputType&gt; = <span class="macro">vec!</span>[<span class="self">self</span>.clone()];
 
         <span class="kw">if </span>ctx.has_feature(PreviewFeature::FieldReference) {
@@ -70,7 +70,7 @@
     }
 }
 
-<span class="kw">fn </span>field_ref_input_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, allow_type: InputType) -&gt; InputObjectTypeWeakRef {
+<span class="kw">fn </span>field_ref_input_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, allow_type: InputType) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>ident = Identifier::new_prisma(field_ref_input_type_name(<span class="kw-2">&amp;</span>allow_type));
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);

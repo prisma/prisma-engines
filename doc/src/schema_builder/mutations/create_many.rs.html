@@ -112,10 +112,7 @@
 <a href="#112" id="112">112</a>
 <a href="#113" id="113">113</a>
 <a href="#114" id="114">114</a>
-<a href="#115" id="115">115</a>
-</pre><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
-
-<span class="kw">use crate</span>::{
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
     capitalize,
     constants::args,
     field, init_input_object_type, input_field,
@@ -129,9 +126,10 @@
 <span class="kw">use </span>prisma_models::{ModelRef, RelationFieldRef};
 <span class="kw">use </span>psl::datamodel_connector::ConnectorCapability;
 <span class="kw">use </span>schema::{Identifier, InputField, InputObjectTypeWeakRef, InputType, OutputField, OutputType, QueryInfo, QueryTag};
+<span class="kw">use </span>std::sync::Arc;
 
 <span class="doccomment">/// Builds a create many mutation field (e.g. createManyUsers) for given model.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_many(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;OutputField&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_many(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;OutputField&gt; {
     <span class="kw">let </span>arguments = create_many_arguments(ctx, model);
     <span class="kw">let </span>field_name = <span class="macro">format!</span>(<span class="string">&quot;createMany{}&quot;</span>, model.name());
 
@@ -151,7 +149,7 @@
 }
 
 <span class="doccomment">/// Builds &quot;skip_duplicates&quot; and &quot;data&quot; arguments intended for the create many field.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_many_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; Vec&lt;InputField&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_many_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; Vec&lt;InputField&gt; {
     <span class="kw">let </span>create_many_type = InputType::object(create_many_object_type(ctx, model, <span class="prelude-val">None</span>));
     <span class="kw">let </span>data_arg = input_field(ctx, args::DATA, list_union_type(create_many_type, <span class="bool-val">true</span>), <span class="prelude-val">None</span>);
 
@@ -169,7 +167,7 @@
 /// where we don&#39;t allow the parent scalar to be written (ie. when the relation
 /// is inlined on the child).
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_many_object_type(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     model: <span class="kw-2">&amp;</span>ModelRef,
     parent_field: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>RelationFieldRef&gt;,
 ) -&gt; InputObjectTypeWeakRef {
@@ -194,7 +192,7 @@
 
 <span class="doccomment">/// Filters the given model&#39;s fields down to the allowed ones for checked create.
 </span><span class="kw">fn </span>filter_create_many_fields(
-    ctx: <span class="kw-2">&amp;</span>BuilderContext,
+    ctx: <span class="kw-2">&amp;</span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     model: <span class="kw-2">&amp;</span>ModelRef,
     parent_field: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>RelationFieldRef&gt;,
 ) -&gt; Vec&lt;ModelField&gt; {

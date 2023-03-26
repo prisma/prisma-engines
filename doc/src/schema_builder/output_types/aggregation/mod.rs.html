@@ -107,7 +107,7 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>group_by;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>plain;
 
-<span class="kw">fn </span>field_avg_output_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, field: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; OutputType {
+<span class="kw">fn </span>field_avg_output_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, field: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; OutputType {
     <span class="kw">match </span>field.type_identifier() {
         TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float =&gt; OutputType::float(),
         TypeIdentifier::Decimal =&gt; OutputType::decimal(),
@@ -140,7 +140,7 @@
 <span class="doccomment">/// Returns an aggregation field with given name if the passed fields contains any fields.
 /// Field types inside the object type of the field are determined by the passed mapper fn.
 </span><span class="kw">fn </span>aggregation_field&lt;F, G&gt;(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     name: <span class="kw-2">&amp;</span>str,
     model: <span class="kw-2">&amp;</span>ModelRef,
     fields: Vec&lt;ScalarFieldRef&gt;,
@@ -149,7 +149,7 @@
     is_count: bool,
 ) -&gt; <span class="prelude-ty">Option</span>&lt;OutputField&gt;
 <span class="kw">where
-    </span>F: Fn(<span class="kw-2">&amp;mut </span>BuilderContext, <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; OutputType,
+    </span>F: Fn(<span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; OutputType,
     G: Fn(ObjectType) -&gt; ObjectType,
 {
     <span class="kw">if </span>fields.is_empty() {
@@ -171,7 +171,7 @@
 
 <span class="doccomment">/// Maps the object type for aggregations that operate on a field level.
 </span><span class="kw">fn </span>map_field_aggregation_object&lt;F, G&gt;(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     model: <span class="kw-2">&amp;</span>ModelRef,
     suffix: <span class="kw-2">&amp;</span>str,
     fields: <span class="kw-2">&amp;</span>[ScalarFieldRef],
@@ -180,7 +180,7 @@
     is_count: bool,
 ) -&gt; ObjectTypeWeakRef
 <span class="kw">where
-    </span>F: Fn(<span class="kw-2">&amp;mut </span>BuilderContext, <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; OutputType,
+    </span>F: Fn(<span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; OutputType,
     G: Fn(ObjectType) -&gt; ObjectType,
 {
     <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(

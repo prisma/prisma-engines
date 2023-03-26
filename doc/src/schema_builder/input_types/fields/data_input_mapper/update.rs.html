@@ -413,6 +413,15 @@
 <a href="#413" id="413">413</a>
 <a href="#414" id="414">414</a>
 <a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{constants::<span class="kw-2">*</span>, enum_types::<span class="kw-2">*</span>};
 <span class="kw">use </span>prisma_models::CompositeFieldRef;
@@ -432,7 +441,7 @@
 }
 
 <span class="kw">impl </span>DataInputFieldMapper <span class="kw">for </span>UpdateDataInputFieldMapper {
-    <span class="kw">fn </span>map_scalar(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; InputField {
+    <span class="kw">fn </span>map_scalar(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; InputField {
         <span class="kw">let </span>base_update_type = <span class="kw">match </span>sf.type_identifier() {
             TypeIdentifier::Float =&gt; InputType::object(update_operations_object_type(ctx, <span class="string">&quot;Float&quot;</span>, sf, <span class="bool-val">true</span>)),
             TypeIdentifier::Decimal =&gt; InputType::object(update_operations_object_type(ctx, <span class="string">&quot;Decimal&quot;</span>, sf, <span class="bool-val">true</span>)),
@@ -478,7 +487,7 @@
         }
     }
 
-    <span class="kw">fn </span>map_scalar_list(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; InputField {
+    <span class="kw">fn </span>map_scalar_list(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; InputField {
         <span class="kw">let </span>list_input_type = map_scalar_input_type(ctx, <span class="kw-2">&amp;</span>sf.type_identifier(), sf.is_list());
         <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}Update{}Input&quot;</span>, sf.container().name(), sf.name()));
 
@@ -510,7 +519,7 @@
         input_field(ctx, sf.name(), <span class="macro">vec!</span>[input_type, list_input_type], <span class="prelude-val">None</span>).optional()
     }
 
-    <span class="kw">fn </span>map_relation(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputField {
+    <span class="kw">fn </span>map_relation(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputField {
         <span class="kw">let </span>related_model = rf.related_model();
         <span class="kw">let </span>related_field = rf.related_field();
 
@@ -551,7 +560,7 @@
         input_field(ctx, rf.name(), InputType::object(input_object), <span class="prelude-val">None</span>).optional()
     }
 
-    <span class="kw">fn </span>map_composite(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputField {
+    <span class="kw">fn </span>map_composite(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputField {
         <span class="comment">// Shorthand object (equivalent to the &quot;set&quot; operation).
         </span><span class="kw">let </span>shorthand_type = InputType::Object(create::composite_create_object_type(ctx, cf));
 
@@ -571,7 +580,7 @@
 }
 
 <span class="kw">fn </span>update_operations_object_type(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     prefix: <span class="kw-2">&amp;</span>str,
     sf: <span class="kw-2">&amp;</span>ScalarFieldRef,
     with_number_operators: bool,
@@ -618,7 +627,10 @@
 ///   ... more ops ...
 /// }
 /// ```
-</span><span class="kw">fn </span>composite_update_envelope_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
+</span><span class="kw">fn </span>composite_update_envelope_object_type(
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
+    cf: <span class="kw-2">&amp;</span>CompositeFieldRef,
+) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>arity = <span class="kw">if </span>cf.is_optional() {
         <span class="string">&quot;Nullable&quot;
     </span>} <span class="kw">else if </span>cf.is_list() {
@@ -654,7 +666,7 @@
 }
 
 <span class="doccomment">/// Builds the `update` input object type. Should be used in the envelope type.
-</span><span class="kw">fn </span>composite_update_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
+</span><span class="kw">fn </span>composite_update_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}UpdateInput&quot;</span>, cf.typ().name());
 
     <span class="kw">let </span>ident = Identifier::new_prisma(name);
@@ -676,7 +688,7 @@
 }
 
 <span class="comment">// Builds an `update` input field. Should only be used in the envelope type.
-</span><span class="kw">fn </span>composite_update_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
+</span><span class="kw">fn </span>composite_update_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
     <span class="kw">if </span>cf.is_required() {
         <span class="kw">let </span>update_object_type = composite_update_object_type(ctx, cf);
 
@@ -687,7 +699,7 @@
 }
 
 <span class="comment">// Builds an `unset` input field. Should only be used in the envelope type.
-</span><span class="kw">fn </span>composite_unset_update_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
+</span><span class="kw">fn </span>composite_unset_update_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
     <span class="kw">if </span>cf.is_optional() {
         <span class="prelude-val">Some</span>(input_field(ctx, operations::UNSET, InputType::boolean(), <span class="prelude-val">None</span>).optional())
     } <span class="kw">else </span>{
@@ -696,7 +708,7 @@
 }
 
 <span class="comment">// Builds an `set` input field. Should only be used in the envelope type.
-</span><span class="kw">fn </span>composite_set_update_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputField {
+</span><span class="kw">fn </span>composite_set_update_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputField {
     <span class="kw">let </span>set_object_type = InputType::Object(create::composite_create_object_type(ctx, cf));
 
     <span class="kw">let </span><span class="kw-2">mut </span>input_types = <span class="macro">vec!</span>[set_object_type.clone()];
@@ -711,7 +723,7 @@
 }
 
 <span class="comment">// Builds an `push` input field. Should only be used in the envelope type.
-</span><span class="kw">fn </span>composite_push_update_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
+</span><span class="kw">fn </span>composite_push_update_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
     <span class="kw">if </span>cf.is_list() {
         <span class="kw">let </span>set_object_type = InputType::Object(create::composite_create_object_type(ctx, cf));
         <span class="kw">let </span>input_types = <span class="macro">vec!</span>[set_object_type.clone(), InputType::list(set_object_type)];
@@ -723,7 +735,7 @@
 }
 
 <span class="doccomment">/// Builds the `upsert` input object type. Should only be used in the envelope type.
-</span><span class="kw">fn </span>composite_upsert_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
+</span><span class="kw">fn </span>composite_upsert_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}UpsertInput&quot;</span>, cf.typ().name());
 
     <span class="kw">let </span>ident = Identifier::new_prisma(name);
@@ -748,7 +760,7 @@
 }
 
 <span class="comment">// Builds an `upsert` input field. Should only be used in the envelope type.
-</span><span class="kw">fn </span>composite_upsert_update_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
+</span><span class="kw">fn </span>composite_upsert_update_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
     <span class="kw">if </span>cf.is_optional() {
         <span class="kw">let </span>upsert_object_type = InputType::Object(composite_upsert_object_type(ctx, cf));
 
@@ -758,7 +770,7 @@
     </span>}
 }
 
-<span class="kw">fn </span>composite_update_many_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
+<span class="kw">fn </span>composite_update_many_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}UpdateManyInput&quot;</span>, cf.typ().name());
 
     <span class="kw">let </span>ident = Identifier::new_prisma(name);
@@ -784,7 +796,7 @@
     Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
 }
 
-<span class="kw">fn </span>composite_delete_many_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
+<span class="kw">fn </span>composite_delete_many_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}DeleteManyInput&quot;</span>, cf.typ().name());
 
     <span class="kw">let </span>ident = Identifier::new_prisma(name);
@@ -808,7 +820,10 @@
 }
 
 <span class="comment">// Builds an `updateMany` input field. Should only be used in the envelope type.
-</span><span class="kw">fn </span>composite_update_many_update_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
+</span><span class="kw">fn </span>composite_update_many_update_input_field(
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
+    cf: <span class="kw-2">&amp;</span>CompositeFieldRef,
+) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
     <span class="kw">if </span>cf.is_list() {
         <span class="kw">let </span>update_many = InputType::Object(composite_update_many_object_type(ctx, cf));
 
@@ -819,7 +834,10 @@
 }
 
 <span class="comment">// Builds a `deleteMany` input field. Should only be used in the envelope type.
-</span><span class="kw">fn </span>composite_delete_many_update_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
+</span><span class="kw">fn </span>composite_delete_many_update_input_field(
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
+    cf: <span class="kw-2">&amp;</span>CompositeFieldRef,
+) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
     <span class="kw">if </span>cf.is_list() {
         <span class="kw">let </span>delete_many = InputType::Object(composite_delete_many_object_type(ctx, cf));
 

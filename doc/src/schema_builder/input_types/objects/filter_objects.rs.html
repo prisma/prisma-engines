@@ -290,13 +290,16 @@
 <a href="#290" id="290">290</a>
 <a href="#291" id="291">291</a>
 <a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>constants::filters;
 <span class="kw">use </span>prisma_models::{prelude::ParentContainer, CompositeFieldRef};
 <span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>scalar_filter_object_type(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     model: <span class="kw-2">&amp;</span>ModelRef,
     include_aggregates: bool,
 ) -&gt; InputObjectTypeWeakRef {
@@ -341,7 +344,7 @@
     weak_ref
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>where_object_type&lt;T&gt;(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, container: T) -&gt; InputObjectTypeWeakRef
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>where_object_type&lt;T&gt;(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, container: T) -&gt; InputObjectTypeWeakRef
 <span class="kw">where
     </span>T: Into&lt;ParentContainer&gt;,
 {
@@ -387,7 +390,7 @@
     weak_ref
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>where_unique_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; InputObjectTypeWeakRef {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>where_unique_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}WhereUniqueInput&quot;</span>, model.name()));
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
@@ -510,7 +513,7 @@
 
 <span class="doccomment">/// Generates and caches an input object type for a compound field.
 </span><span class="kw">fn </span>compound_field_unique_object_type(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     model: <span class="kw-2">&amp;</span>ModelRef,
     alias: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     from_fields: Vec&lt;ScalarFieldRef&gt;,
@@ -542,7 +545,10 @@
 
 <span class="doccomment">/// Object used for full composite equality, e.g. `{ field: &quot;value&quot;, field2: 123 } == { field: &quot;value&quot; }`.
 /// If the composite is a list, only lists are allowed for comparison, no shorthands are used.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>composite_equality_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>composite_equality_object(
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
+    cf: <span class="kw-2">&amp;</span>CompositeFieldRef,
+) -&gt; InputObjectTypeWeakRef {
     <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}ObjectEqualityInput&quot;</span>, cf.typ().name()));
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 

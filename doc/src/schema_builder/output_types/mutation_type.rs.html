@@ -242,7 +242,7 @@
 <span class="kw">use </span>psl::datamodel_connector::ConnectorCapability;
 
 <span class="doccomment">/// Builds the root `Mutation` type.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; (OutputType, ObjectTypeStrongRef) {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; (OutputType, ObjectTypeStrongRef) {
     <span class="kw">let </span><span class="kw-2">mut </span>fields: Vec&lt;OutputField&gt; = ctx
         .internal_data_model
         .models()
@@ -284,7 +284,7 @@
 }
 
 <span class="comment">// implementation note: these need to be in the same function, because these vecs interact: the create inputs will enqueue update inputs, and vice versa.
-</span><span class="kw">fn </span>create_nested_inputs(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) {
+</span><span class="kw">fn </span>create_nested_inputs(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) {
     <span class="kw">let </span><span class="kw-2">mut </span>nested_create_inputs_queue = std::mem::take(<span class="kw-2">&amp;mut </span>ctx.nested_create_inputs_queue);
     <span class="kw">let </span><span class="kw-2">mut </span>nested_update_inputs_queue = std::mem::take(<span class="kw-2">&amp;mut </span>ctx.nested_update_inputs_queue);
 
@@ -334,7 +334,7 @@
     }
 }
 
-<span class="kw">fn </span>create_execute_raw_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; OutputField {
+<span class="kw">fn </span>create_execute_raw_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; OutputField {
     field(
         <span class="string">&quot;executeRaw&quot;</span>,
         <span class="macro">vec!</span>[
@@ -355,7 +355,7 @@
     )
 }
 
-<span class="kw">fn </span>create_query_raw_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; OutputField {
+<span class="kw">fn </span>create_query_raw_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; OutputField {
     field(
         <span class="string">&quot;queryRaw&quot;</span>,
         <span class="macro">vec!</span>[
@@ -376,7 +376,7 @@
     )
 }
 
-<span class="kw">fn </span>create_mongodb_run_command_raw(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; OutputField {
+<span class="kw">fn </span>create_mongodb_run_command_raw(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; OutputField {
     field(
         <span class="string">&quot;runCommandRaw&quot;</span>,
         <span class="macro">vec!</span>[input_field(ctx, <span class="string">&quot;command&quot;</span>, InputType::json(), <span class="prelude-val">None</span>)],
@@ -389,7 +389,7 @@
 }
 
 <span class="doccomment">/// Builds a delete mutation field (e.g. deleteUser) for given model.
-</span><span class="kw">fn </span>delete_item_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;OutputField&gt; {
+</span><span class="kw">fn </span>delete_item_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;OutputField&gt; {
     arguments::delete_one_arguments(ctx, model).map(|args| {
         <span class="kw">let </span>field_name = <span class="macro">format!</span>(<span class="string">&quot;deleteOne{}&quot;</span>, model.name());
 
@@ -407,7 +407,7 @@
 }
 
 <span class="doccomment">/// Builds a delete many mutation field (e.g. deleteManyUsers) for given model.
-</span><span class="kw">fn </span>delete_many_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; OutputField {
+</span><span class="kw">fn </span>delete_many_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; OutputField {
     <span class="kw">let </span>arguments = arguments::delete_many_arguments(ctx, model);
     <span class="kw">let </span>field_name = <span class="macro">format!</span>(<span class="string">&quot;deleteMany{}&quot;</span>, model.name());
 
@@ -423,7 +423,7 @@
 }
 
 <span class="doccomment">/// Builds an update mutation field (e.g. updateUser) for given model.
-</span><span class="kw">fn </span>update_item_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;OutputField&gt; {
+</span><span class="kw">fn </span>update_item_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;OutputField&gt; {
     arguments::update_one_arguments(ctx, model).map(|args| {
         <span class="kw">let </span>field_name = <span class="macro">format!</span>(<span class="string">&quot;updateOne{}&quot;</span>, model.name());
 
@@ -441,7 +441,7 @@
 }
 
 <span class="doccomment">/// Builds an update many mutation field (e.g. updateManyUsers) for given model.
-</span><span class="kw">fn </span>update_many_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; OutputField {
+</span><span class="kw">fn </span>update_many_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; OutputField {
     <span class="kw">let </span>arguments = arguments::update_many_arguments(ctx, model);
     <span class="kw">let </span>field_name = <span class="macro">format!</span>(<span class="string">&quot;updateMany{}&quot;</span>, model.name());
 
@@ -457,7 +457,7 @@
 }
 
 <span class="doccomment">/// Builds an upsert mutation field (e.g. upsertUser) for given model.
-</span><span class="kw">fn </span>upsert_item_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;OutputField&gt; {
+</span><span class="kw">fn </span>upsert_item_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;OutputField&gt; {
     arguments::upsert_arguments(ctx, model).map(|args| {
         <span class="kw">let </span>field_name = <span class="macro">format!</span>(<span class="string">&quot;upsertOne{}&quot;</span>, model.name());
 

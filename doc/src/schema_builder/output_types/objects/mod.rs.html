@@ -39,7 +39,7 @@
 /// This is a critical first step to ensure that all model and composite output
 /// object types are present and that subsequent schema computation has a base to rely on.
 /// Called only once at the very beginning of schema building.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>initialize_caches(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>initialize_caches(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) {
     model::initialize_cache(ctx);
     composite::initialize_cache(ctx);
 
@@ -47,7 +47,7 @@
     composite::initialize_fields(ctx);
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>affected_records_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; ObjectTypeWeakRef {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>affected_records_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; ObjectTypeWeakRef {
     <span class="kw">let </span>ident = Identifier::new_prisma(<span class="string">&quot;AffectedRowsOutput&quot;</span>.to_owned());
     <span class="macro">return_cached_output!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
