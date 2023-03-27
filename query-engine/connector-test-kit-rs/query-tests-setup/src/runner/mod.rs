@@ -147,6 +147,26 @@ impl Runner {
         Ok(())
     }
 
+    pub async fn batch_json(
+        &self,
+        queries: Vec<String>,
+        transaction: bool,
+        isolation_level: Option<String>,
+    ) -> TestResult<crate::QueryResult> {
+        let handler = RequestHandler::new(&*self.executor, &self.query_schema, self.protocol);
+        let body = RequestBody::Json(JsonBody::Batch(JsonBatchQuery {
+            batch: queries
+                .into_iter()
+                .map(|q| serde_json::from_str::<JsonSingleQuery>(&q).unwrap())
+                .collect(),
+            transaction: transaction.then(|| BatchTransactionOption { isolation_level }),
+        }));
+
+        let res = handler.handle(body, self.current_tx_id.clone(), None).await;
+
+        Ok(res.into())
+    }
+
     pub async fn batch(
         &self,
         queries: Vec<String>,

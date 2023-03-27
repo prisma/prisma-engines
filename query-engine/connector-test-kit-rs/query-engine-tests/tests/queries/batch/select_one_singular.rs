@@ -257,6 +257,57 @@ mod singular_batch {
         Ok(())
     }
 
+    fn bigint_id() -> String {
+        let schema = indoc! {
+            r#" model TestModel {
+                #id(id, BigInt, @id)
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // Regression test for https://github.com/prisma/prisma/issues/18096
+    #[connector_test(schema(bigint_id))]
+    async fn batch_bigint_id(runner: Runner) -> TestResult<()> {
+        run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { id } }"#);
+        run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 2 }) { id } }"#);
+        run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 3 }) { id } }"#);
+
+        match runner.protocol() {
+            EngineProtocol::Graphql => {
+                let queries = vec![
+                    r#"query { findUniqueTestModel(where: { id: 1 }) { id }}"#.to_string(),
+                    r#"query { findUniqueTestModel(where: { id: 2 }) { id }}"#.to_string(),
+                    r#"query { findUniqueTestModel(where: { id: 3 }) { id }}"#.to_string(),
+                ];
+
+                let batch_results = runner.batch(queries, false, None).await?;
+
+                insta::assert_snapshot!(
+                    batch_results.to_string(),
+                    @r###"{"batchResult":[{"data":{"findUniqueTestModel":{"id":"1"}}},{"data":{"findUniqueTestModel":{"id":"2"}}},{"data":{"findUniqueTestModel":{"id":"3"}}}]}"###
+                );
+            }
+            EngineProtocol::Json => {
+                let queries = vec![
+                    r#"{ "modelName": "TestModel", "action": "findUnique", "query": { "arguments": { "where": { "id": { "$type": "BigInt", "value": "1" } } }, "selection": { "$scalars": true } } }"#.to_string(),
+                    r#"{ "modelName": "TestModel", "action": "findUnique", "query": { "arguments": { "where": { "id": { "$type": "BigInt", "value": "2" } } }, "selection": { "$scalars": true } } }"#.to_string(),
+                    r#"{ "modelName": "TestModel", "action": "findUnique", "query": { "arguments": { "where": { "id": { "$type": "BigInt", "value": "3" } } }, "selection": { "$scalars": true } } }"#.to_string(),
+                ];
+
+                let batch_results = runner.batch_json(queries, false, None).await?;
+
+                insta::assert_snapshot!(
+                    batch_results.to_string(),
+                    @r###"{"batchResult":[{"data":{"findUniqueTestModel":{"id":{"$type":"BigInt","value":"1"}}}},{"data":{"findUniqueTestModel":{"id":{"$type":"BigInt","value":"2"}}}},{"data":{"findUniqueTestModel":{"id":{"$type":"BigInt","value":"3"}}}}]}"###
+                );
+            }
+        }
+
+        Ok(())
+    }
+
     // Regression test for https://github.com/prisma/prisma/issues/16548
     #[connector_test(schema(schemas::generic))]
     async fn repro_16548(runner: Runner) -> TestResult<()> {
