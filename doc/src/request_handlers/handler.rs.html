@@ -257,6 +257,13 @@
 <a href="#257" id="257">257</a>
 <a href="#258" id="258">258</a>
 <a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::GQLResponse;
 <span class="kw">use crate</span>::{GQLError, PrismaResponse, RequestBody};
 <span class="kw">use </span>futures::FutureExt;
@@ -484,9 +491,12 @@
         })
     }
 
-    <span class="doccomment">/// Compares two PrismaValues but treats DateTime and String as equal when their parsed/stringified versions are equal.
+    <span class="doccomment">/// Compares two PrismaValues with special comparisons rules needed because user-inputted values are coerced differently than response values.
     /// We need this when comparing user-inputted values with query response values in the context of compacted queries.
-    /// User-inputted datetimes are coerced as `PrismaValue::DateTime` but response (and thus serialized) datetimes are `PrismaValue::String`.
+    /// Here are the cases covered:
+    /// - DateTime/String: User-input: DateTime / Response: String
+    /// - Int/BigInt: User-input: Int / Response: BigInt
+    /// - (JSON protocol only) Custom types (eg: { &quot;$type&quot;: &quot;BigInt&quot;, value: &quot;1&quot; }): User-input: Scalar / Response: Object
     /// This should likely _not_ be used outside of this specific context.
     </span><span class="kw">fn </span>compare_values(left: <span class="kw-2">&amp;</span>ArgumentValue, right: <span class="kw-2">&amp;</span>ArgumentValue) -&gt; bool {
         <span class="kw">match </span>(left, right) {
@@ -495,6 +505,10 @@
                 parse_datetime(t1)
                     .map(|t1| <span class="kw-2">&amp;</span>t1 == t2)
                     .unwrap_or_else(|<span class="kw">_</span>| t1 == stringify_datetime(t2).as_str())
+            }
+            (ArgumentValue::Scalar(PrismaValue::Int(i1)), ArgumentValue::Scalar(PrismaValue::BigInt(i2)))
+            | (ArgumentValue::Scalar(PrismaValue::BigInt(i2)), ArgumentValue::Scalar(PrismaValue::Int(i1))) =&gt; {
+                <span class="kw-2">*</span>i1 == <span class="kw-2">*</span>i2
             }
             (ArgumentValue::Object(t1), t2) | (t2, ArgumentValue::Object(t1)) =&gt; <span class="kw">match </span><span class="self">Self</span>::unwrap_value(t1) {
                 <span class="prelude-val">Some</span>(t1) =&gt; <span class="self">Self</span>::compare_values(t1, t2),

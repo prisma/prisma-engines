@@ -256,6 +256,26 @@
 <a href="#256" id="256">256</a>
 <a href="#257" id="257">257</a>
 <a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>json_adapter;
 
 <span class="kw">use </span>std::{env, sync::Arc};
@@ -403,6 +423,26 @@
         conn.raw_cmd(<span class="kw-2">&amp;</span>query).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">pub async fn </span>batch_json(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        queries: Vec&lt;String&gt;,
+        transaction: bool,
+        isolation_level: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; TestResult&lt;<span class="kw">crate</span>::QueryResult&gt; {
+        <span class="kw">let </span>handler = RequestHandler::new(<span class="kw-2">&amp;*</span><span class="self">self</span>.executor, <span class="kw-2">&amp;</span><span class="self">self</span>.query_schema, <span class="self">self</span>.protocol);
+        <span class="kw">let </span>body = RequestBody::Json(JsonBody::Batch(JsonBatchQuery {
+            batch: queries
+                .into_iter()
+                .map(|q| serde_json::from_str::&lt;JsonSingleQuery&gt;(<span class="kw-2">&amp;</span>q).unwrap())
+                .collect(),
+            transaction: transaction.then_some(BatchTransactionOption { isolation_level }),
+        }));
+
+        <span class="kw">let </span>res = handler.handle(body, <span class="self">self</span>.current_tx_id.clone(), <span class="prelude-val">None</span>).<span class="kw">await</span>;
+
+        <span class="prelude-val">Ok</span>(res.into())
     }
 
     <span class="kw">pub async fn </span>batch(
