@@ -12,6 +12,10 @@ on:
       - 'renovate.json'
       - 'introspection-engine/**'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   benchmark:
     name: "Run benchmarks on Linux"

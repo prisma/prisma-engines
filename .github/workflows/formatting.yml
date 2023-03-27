@@ -11,6 +11,10 @@ on:
       - 'CODEOWNERS'
       - 'renovate.json'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   clippy:
     runs-on: ubuntu-latest
