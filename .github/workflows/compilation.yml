@@ -8,6 +8,10 @@ on:
       - 'CODEOWNERS'
       - 'renovate.json'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test-crate-compilation:
     name: "Compile top level crates on Linux"
