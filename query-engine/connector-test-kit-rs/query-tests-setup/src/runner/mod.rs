@@ -159,7 +159,7 @@ impl Runner {
                 .into_iter()
                 .map(|q| serde_json::from_str::<JsonSingleQuery>(&q).unwrap())
                 .collect(),
-            transaction: transaction.then(|| BatchTransactionOption { isolation_level }),
+            transaction: transaction.then_some(BatchTransactionOption { isolation_level }),
         }));
 
         let res = handler.handle(body, self.current_tx_id.clone(), None).await;
