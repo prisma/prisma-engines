@@ -10,7 +10,6 @@ on:
       - 'LICENSE'
       - 'CODEOWNERS'
       - 'renovate.json'
-      - 'introspection-engine/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
