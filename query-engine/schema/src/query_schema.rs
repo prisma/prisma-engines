@@ -45,10 +45,10 @@ pub struct QuerySchema {
     mutation_map: HashMap<QueryInfo, OutputFieldRef>,
 
     /// Internal. Stores all strong Arc refs to the input object types.
-    _input_object_types: Vec<InputObjectTypeStrongRef>,
+    input_object_types: Vec<InputObjectTypeStrongRef>,
 
     /// Internal. Stores all strong Arc refs to the output object types.
-    _output_object_types: Vec<ObjectTypeStrongRef>,
+    output_object_types: Vec<ObjectTypeStrongRef>,
 
     /// Internal. Stores all enum refs.
     enum_types: Vec<EnumTypeRef>,
@@ -87,8 +87,8 @@ impl QuerySchema {
         query: OutputTypeRef,
         mutation: OutputTypeRef,
         input_field_types: Vec<InputType>,
-        _input_object_types: Vec<InputObjectTypeStrongRef>,
-        _output_object_types: Vec<ObjectTypeStrongRef>,
+        input_object_types: Vec<InputObjectTypeStrongRef>,
+        output_object_types: Vec<ObjectTypeStrongRef>,
         enum_types: Vec<EnumTypeRef>,
         internal_data_model: InternalDataModelRef,
         capabilities: Vec<ConnectorCapability>,
@@ -116,8 +116,8 @@ impl QuerySchema {
             query_map,
             mutation_map,
             input_field_types,
-            _input_object_types,
-            _output_object_types,
+            input_object_types,
+            output_object_types,
             enum_types,
             internal_data_model,
             context: ConnectorContext::new(capabilities, features, relation_mode),
@@ -182,6 +182,14 @@ impl QuerySchema {
 
     pub fn context(&self) -> &ConnectorContext {
         &self.context
+    }
+
+    pub fn input_object_types_len(&self) -> usize {
+        self.input_object_types.len()
+    }
+
+    pub fn output_object_types_len(&self) -> usize {
+        self.output_object_types.len()
     }
 }
 

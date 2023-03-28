@@ -213,3 +213,19 @@ pub fn build_with_features(
 }
 
 type NestedInputsQueue = Vec<(Arc<InputObjectType>, RelationFieldRef)>;
+
+#[cfg(test)]
+mod tests {
+    use std::sync::Arc;
+
+    #[test]
+    fn standupbot_schema_size() {
+        let schema = include_str!("../benches/standupbot.prisma");
+        let schema = psl::parse_schema(schema).unwrap();
+        let converted = prisma_models::convert(Arc::new(schema));
+        let query_schema = super::build(converted, true);
+
+        assert_eq!(query_schema.input_object_types_len(), 487);
+        assert_eq!(query_schema.output_object_types_len(), 85);
+    }
+}
