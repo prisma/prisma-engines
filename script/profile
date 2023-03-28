@@ -4,4 +4,4 @@
 
 set -e
 cd "$(dirname "$0")"
-./profile-shell "bash -C build-and-run" $@
+./profile-shell "bash -C build-and-run $*"

@@ -16,7 +16,6 @@ rustc --version
 rustup default stable > /dev/null
 
 echo "==> Building the prisma-engines workspace"
-cargo build --workspace --all-targets
-if [ $? -eq 0 ]; then
+if cargo build --workspace --all-targets; then
   echo "==> You are all set!"
 fi
