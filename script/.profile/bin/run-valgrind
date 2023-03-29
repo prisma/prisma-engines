@@ -1,0 +1,23 @@
+#!/bin/bash
+VALID_TOOLS=" memcheck cachegrind callgrind helgrind drd massif sgcheck dhat "
+EXAMPLES_DIR="/rustrepo/target-alternatives/profiling/examples"
+VALID_EXAMPLES=$(find $EXAMPLES_DIR -type f -perm -u=x -printf "%f\n")
+DEFAULT_EXAMPLE=$(echo "${VALID_EXAMPLES}" | head -n1)
+EXAMPLE=${2:-${DEFAULT_EXAMPLE}}
+TOOL=$1
+ARGS=${*:3}
+
+if [ -z "$2" ] || ! [[ " ${VALID_TOOLS} " == *" $TOOL "* ]] || [ ! -f "$EXAMPLES_DIR/$EXAMPLE" ]; then
+  echo ""
+  echo "❌  Failed to run command: $*"
+  echo ""
+  echo "  Usage: $0 tool example"
+  echo "  Valid tools: ${VALID_TOOLS}. See https://valgrind.org/docs/manual/manual.html"
+  echo "  Valid examples: ${VALID_EXAMPLES}"
+  echo "  Example: $0 massif ${DEFAULT_EXAMPLE}"
+  exit 1
+else
+  CMD="valgrind $ARGS --tool=$TOOL $EXAMPLES_DIR/$EXAMPLE"
+  echo "==> Running valgrind: $CMD"  
+  exec $CMD
+fi
