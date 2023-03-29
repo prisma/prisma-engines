@@ -275,7 +275,7 @@ impl ValueGeneratorFn {
 
     #[cfg(feature = "default_generators")]
     fn generate_cuid() -> PrismaValue {
-        PrismaValue::String(cuid::cuid().unwrap())
+        PrismaValue::String(cuid2::create_id())
     }
 
     #[cfg(feature = "default_generators")]

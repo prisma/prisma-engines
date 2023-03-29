@@ -46,8 +46,8 @@ workspace = true
 [dependencies.serde]
 workspace = true
 
-[dependencies.cuid]
-version = "1.2"
+[dependencies.cuid2]
+version = "0.1"
 
 [dependencies.user-facing-errors]
 features = ["sql"]

@@ -41,7 +41,7 @@ tracing-opentelemetry = "0.17.4"
 url = "2"
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 uuid = "1"
-cuid = "1.2"
+cuid2 = "0.1"
 pin-utils = "0.1"
 schema = { path = "../schema" }
 schema-builder = { path = "../schema-builder" }
