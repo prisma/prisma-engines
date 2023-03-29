@@ -12,6 +12,13 @@ LIBRARY_EXT := $(shell                            \
 
 default: build
 
+#####################
+# Boostrap commands #
+#####################
+
+bootstrap-darwin:
+	script/bootstrap-darwin
+
 ##################
 # Build commands #
 ##################

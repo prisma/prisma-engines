@@ -1,0 +1,3 @@
+#/bin/bash
+echo "==> Building examples to profile..."
+cd /rustrepo && cargo build --profile=profiling --examples
