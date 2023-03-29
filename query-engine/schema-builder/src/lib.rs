@@ -76,7 +76,7 @@ impl<'a> BuilderContext<'a> {
             input_field_types: Vec::with_capacity(internal_data_model.schema.db.models_count() * 5),
             internal_data_model,
             enable_raw_queries,
-            cache: TypeCache::new(),
+            cache: TypeCache::new(internal_data_model.schema.db.models_count()),
             connector,
             preview_features,
             nested_create_inputs_queue: Vec::new(),
@@ -141,30 +141,12 @@ struct TypeCache {
 }
 
 impl TypeCache {
-    pub fn new() -> Self {
+    fn new(models_count: usize) -> Self {
         Self {
-            input_types: TypeRefCache::new(),
-            output_types: TypeRefCache::new(),
-            enum_types: TypeRefCache::new(),
+            input_types: TypeRefCache::with_capacity(models_count * 3),
+            output_types: TypeRefCache::with_capacity(models_count),
+            enum_types: TypeRefCache::with_capacity(0),
         }
-    }
-
-    /// Consumes the cache and collects all types to merge them into the vectors required to
-    /// finalize the query schema building.
-    /// Unwraps are safe because the cache is required to be the only strong Arc ref holder,
-    /// which makes the Arc counter 1, all other refs contained in the schema are weak refs.
-    pub fn collect_types(
-        self,
-    ) -> (
-        Vec<InputObjectTypeStrongRef>,
-        Vec<ObjectTypeStrongRef>,
-        Vec<EnumTypeRef>,
-    ) {
-        let input_objects = self.input_types.into();
-        let output_objects = self.output_types.into();
-        let enum_types = self.enum_types.into();
-
-        (input_objects, output_objects, enum_types)
     }
 }
 
@@ -188,8 +170,9 @@ pub fn build_with_features(
     // Add iTX isolation levels to the schema.
     enum_types::itx_isolation_levels(&mut ctx);
 
-    // Finalize the schema.
-    let (input_objects, mut output_objects, enum_types) = ctx.cache.collect_types();
+    let input_objects = ctx.cache.input_types.into();
+    let mut output_objects: Vec<_> = ctx.cache.output_types.into();
+    let enum_types = ctx.cache.enum_types.into();
 
     // The mutation and query object types need to be part of the strong refs.
     output_objects.push(query_object_ref);

@@ -18,18 +18,22 @@ use std::{collections::HashMap, fmt::Debug, sync::Weak};
 /// Caches keys at most once, and errors on repeated insertion of the same key
 /// to uphold schema building consistency guarantees.
 #[derive(Debug, Default)]
-pub struct TypeRefCache<T> {
-    cache: HashMap<Identifier, Arc<T>>,
+pub(crate) struct TypeRefCache<T> {
+    cache: HashMap<Identifier, usize>,
+    storage: Vec<Arc<T>>,
 }
 
 impl<T: Debug> TypeRefCache<T> {
-    pub fn new() -> Self {
-        TypeRefCache { cache: HashMap::new() }
+    pub(crate) fn with_capacity(capacity: usize) -> Self {
+        TypeRefCache {
+            cache: HashMap::with_capacity(capacity),
+            storage: Vec::with_capacity(capacity),
+        }
     }
 
     // Retrieves a cached Arc if present, and hands out a weak reference to the contents.
-    pub fn get(&self, ident: &Identifier) -> Option<Weak<T>> {
-        self.cache.get(ident).map(|v| Arc::downgrade(v))
+    pub(crate) fn get(&self, ident: &Identifier) -> Option<Weak<T>> {
+        self.cache.get(ident).map(|idx| Arc::downgrade(&self.storage[*idx]))
     }
 
     /// Caches given value with given identifier. Panics if the cache key already exists.
@@ -38,10 +42,12 @@ impl<T: Debug> TypeRefCache<T> {
     /// as it invalidates all weak refs pointing to the replaced arc, assuming that the contents
     /// changed as well. While this restriction could be lifted by comparing the contents, it is
     /// not required in the context of the schema builders.
-    pub fn insert(&mut self, ident: Identifier, value: Arc<T>) {
-        if let Some(old) = self.cache.insert(ident.clone(), value) {
+    pub(crate) fn insert(&mut self, ident: Identifier, value: Arc<T>) {
+        let idx = self.storage.len();
+        self.storage.push(value);
+        if let Some(old) = self.cache.insert(ident, idx) {
             panic!(
-                "Invariant violation: Inserted identifier {ident:?} twice, this is a bug and invalidates weak arc references. {old:?}"
+                "Invariant violation: Inserted identifier twice, this is a bug and invalidates weak arc references. {old:?}"
             )
         }
     }
@@ -51,19 +57,7 @@ impl<T: Debug> TypeRefCache<T> {
 #[allow(clippy::from_over_into)]
 impl<T> Into<Vec<Arc<T>>> for TypeRefCache<T> {
     fn into(self) -> Vec<Arc<T>> {
-        let mut vec: Vec<Arc<T>> = vec![];
-
-        vec.extend(self.cache.into_values());
-        vec
-    }
-}
-
-/// Builds a cache over T from a vector of tuples of shape (String, Arc<T>).
-impl<T> From<Vec<(Identifier, Arc<T>)>> for TypeRefCache<T> {
-    fn from(tuples: Vec<(Identifier, Arc<T>)>) -> TypeRefCache<T> {
-        TypeRefCache {
-            cache: tuples.into_iter().collect(),
-        }
+        self.storage
     }
 }
 
