@@ -25,7 +25,7 @@ fn dmmf_rendering() {
     let snapshot_path = format!("{SNAPSHOTS_PATH}/odoo.snapshot.json.gz");
 
     if std::env::var("UPDATE_EXPECT").as_deref() == Ok("1") {
-        write_compresed_snapshot(&dmmf, &snapshot_path);
+        write_compressed_snapshot(&dmmf, &snapshot_path);
         return;
     }
 
