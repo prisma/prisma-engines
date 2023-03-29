@@ -1,7 +1,7 @@
 use super::*;
 use fmt::Debug;
 use once_cell::sync::OnceCell;
-use prisma_models::ModelRef;
+use prisma_models::{ast::ModelId, ModelRef};
 use std::{fmt, sync::Arc};
 
 #[derive(Debug, Clone)]
@@ -116,7 +116,7 @@ pub struct ObjectType {
     fields: OnceCell<Vec<OutputFieldRef>>,
 
     // Object types can directly map to models.
-    model: Option<ModelRef>,
+    model: Option<ModelId>,
 }
 
 impl Debug for ObjectType {
@@ -130,7 +130,7 @@ impl Debug for ObjectType {
 }
 
 impl ObjectType {
-    pub fn new(ident: Identifier, model: Option<ModelRef>) -> Self {
+    pub fn new(ident: Identifier, model: Option<ModelId>) -> Self {
         Self {
             identifier: ident,
             fields: OnceCell::new(),
