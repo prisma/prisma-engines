@@ -58,7 +58,9 @@ pub(crate) struct BuilderContext<'a> {
     pub(crate) input_field_types: Vec<InputType>,
     internal_data_model: &'a InternalDataModel,
     enable_raw_queries: bool,
-    cache: TypeCache,
+    input_types: TypeRefCache<InputObjectType>,
+    output_types: TypeRefCache<ObjectType>,
+    enum_types: TypeRefCache<EnumType>,
     connector: &'static dyn Connector,
     preview_features: PreviewFeatures,
     nested_create_inputs_queue: NestedInputsQueue,
@@ -72,11 +74,14 @@ impl<'a> BuilderContext<'a> {
         preview_features: PreviewFeatures,
     ) -> Self {
         let connector = internal_data_model.schema.connector;
+        let models_count = internal_data_model.schema.db.models_count();
         Self {
             input_field_types: Vec::with_capacity(internal_data_model.schema.db.models_count() * 5),
             internal_data_model,
             enable_raw_queries,
-            cache: TypeCache::new(),
+            input_types: TypeRefCache::with_capacity(models_count * 3),
+            output_types: TypeRefCache::with_capacity(models_count),
+            enum_types: TypeRefCache::with_capacity(0),
             connector,
             preview_features,
             nested_create_inputs_queue: Vec::new(),
@@ -94,32 +99,32 @@ impl<'a> BuilderContext<'a> {
 
     /// Get an input (object) type.
     fn get_input_type(&mut self, ident: &Identifier) -> Option<InputObjectTypeWeakRef> {
-        self.cache.input_types.get(ident)
+        self.input_types.get(ident)
     }
 
     /// Get an output (object) type.
-    pub fn get_output_type(&mut self, ident: &Identifier) -> Option<ObjectTypeWeakRef> {
-        self.cache.output_types.get(ident)
+    pub(crate) fn get_output_type(&mut self, ident: &Identifier) -> Option<ObjectTypeWeakRef> {
+        self.output_types.get(ident)
     }
 
     /// Get an enum type.
-    pub fn get_enum_type(&mut self, ident: &Identifier) -> Option<EnumTypeWeakRef> {
-        self.cache.enum_types.get(ident)
+    pub(crate) fn get_enum_type(&mut self, ident: &Identifier) -> Option<EnumTypeWeakRef> {
+        self.enum_types.get(ident)
     }
 
     /// Caches an input (object) type.
-    pub fn cache_input_type(&mut self, ident: Identifier, typ: InputObjectTypeStrongRef) {
-        self.cache.input_types.insert(ident, typ);
+    pub(crate) fn cache_input_type(&mut self, ident: Identifier, typ: InputObjectTypeStrongRef) {
+        self.input_types.insert(ident, typ);
     }
 
     /// Caches an output (object) type.
     pub fn cache_output_type(&mut self, ident: Identifier, typ: ObjectTypeStrongRef) {
-        self.cache.output_types.insert(ident, typ);
+        self.output_types.insert(ident, typ);
     }
 
     /// Caches an enum type.
     pub fn cache_enum_type(&mut self, ident: Identifier, e: EnumTypeRef) {
-        self.cache.enum_types.insert(ident, e);
+        self.enum_types.insert(ident, e);
     }
 
     pub fn can_full_text_search(&self) -> bool {
@@ -130,41 +135,6 @@ impl<'a> BuilderContext<'a> {
 
     pub fn supports_any(&self, capabilities: &[ConnectorCapability]) -> bool {
         capabilities.iter().any(|c| self.connector.has_capability(*c))
-    }
-}
-
-#[derive(Debug)]
-struct TypeCache {
-    input_types: TypeRefCache<InputObjectType>,
-    output_types: TypeRefCache<ObjectType>,
-    enum_types: TypeRefCache<EnumType>,
-}
-
-impl TypeCache {
-    pub fn new() -> Self {
-        Self {
-            input_types: TypeRefCache::new(),
-            output_types: TypeRefCache::new(),
-            enum_types: TypeRefCache::new(),
-        }
-    }
-
-    /// Consumes the cache and collects all types to merge them into the vectors required to
-    /// finalize the query schema building.
-    /// Unwraps are safe because the cache is required to be the only strong Arc ref holder,
-    /// which makes the Arc counter 1, all other refs contained in the schema are weak refs.
-    pub fn collect_types(
-        self,
-    ) -> (
-        Vec<InputObjectTypeStrongRef>,
-        Vec<ObjectTypeStrongRef>,
-        Vec<EnumTypeRef>,
-    ) {
-        let input_objects = self.input_types.into();
-        let output_objects = self.output_types.into();
-        let enum_types = self.enum_types.into();
-
-        (input_objects, output_objects, enum_types)
     }
 }
 
@@ -188,8 +158,9 @@ pub fn build_with_features(
     // Add iTX isolation levels to the schema.
     enum_types::itx_isolation_levels(&mut ctx);
 
-    // Finalize the schema.
-    let (input_objects, mut output_objects, enum_types) = ctx.cache.collect_types();
+    let input_objects = ctx.input_types.into();
+    let mut output_objects: Vec<_> = ctx.output_types.into();
+    let enum_types = ctx.enum_types.into();
 
     // The mutation and query object types need to be part of the strong refs.
     output_objects.push(query_object_ref);
