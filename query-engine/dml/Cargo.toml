@@ -16,4 +16,4 @@ chrono = { version = "0.4.6", features = ["serde"] }
 # Support for generating default UUID, CUID, nanoid and datetime values. This
 # implies random number generation works, so it won't compile on targets like
 # wasm32.
-default_generators = ["uuid/v4", "cuid", "nanoid"]
+default_generators = ["uuid/v4", "cuid2", "nanoid"]
