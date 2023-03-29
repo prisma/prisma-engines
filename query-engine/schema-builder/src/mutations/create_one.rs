@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use crate::{
     constants::args,
     field, init_input_object_type, input_field,
@@ -9,8 +7,7 @@ use crate::{
 };
 use prisma_models::{ModelRef, RelationFieldRef};
 use schema::{
-    Identifier, IdentifierType, InputField, InputObjectTypeWeakRef, InputType, OutputField, OutputType, QueryInfo,
-    QueryTag,
+    Identifier, IdentifierType, InputField, InputObjectTypeId, InputType, OutputField, OutputType, QueryInfo, QueryTag,
 };
 
 /// Builds a create mutation field (e.g. createUser) for given model.
@@ -33,8 +30,8 @@ pub(crate) fn create_one(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> Outp
 /// The data argument is not present if no data can be created.
 pub(crate) fn create_one_arguments(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> Option<Vec<InputField>> {
     let create_types = create_one_input_types(ctx, model, None);
-    let any_empty = create_types.iter().any(|typ| typ.is_empty());
-    let all_empty = create_types.iter().all(|typ| typ.is_empty());
+    let any_empty = create_types.iter().any(|typ| typ.is_empty(&ctx.db));
+    let all_empty = create_types.iter().all(|typ| typ.is_empty(&ctx.db));
 
     if all_empty {
         None
@@ -69,7 +66,7 @@ fn checked_create_input_type(
     ctx: &mut BuilderContext<'_>,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
-) -> InputObjectTypeWeakRef {
+) -> InputObjectTypeId {
     // We allow creation from both sides of the relation - which would lead to an endless loop of input types
     // if we would allow to create the parent from a child create that is already a nested create.
     // To solve it, we remove the parent relation from the input ("Without<Parent>").
@@ -80,15 +77,15 @@ fn checked_create_input_type(
 
     return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, input_object.clone());
+    let input_object = init_input_object_type(ident.clone());
+    let id = ctx.cache_input_type(ident, input_object);
 
     let filtered_fields = filter_checked_create_fields(model, parent_field);
     let field_mapper = CreateDataInputFieldMapper::new_checked();
     let input_fields = field_mapper.map_all(ctx, &filtered_fields);
 
-    input_object.set_fields(input_fields);
-    Arc::downgrade(&input_object)
+    ctx.db[id].set_fields(input_fields);
+    id
 }
 
 /// Builds the create input type (<x>UncheckedCreateInput / <x>UncheckedCreateWithout<y>Input)
@@ -99,7 +96,7 @@ fn unchecked_create_input_type(
     ctx: &mut BuilderContext<'_>,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
-) -> InputObjectTypeWeakRef {
+) -> InputObjectTypeId {
     // We allow creation from both sides of the relation - which would lead to an endless loop of input types
     // if we would allow to create the parent from a child create that is already a nested create.
     // To solve it, we remove the parent relation from the input ("Without<Parent>").
@@ -110,15 +107,15 @@ fn unchecked_create_input_type(
 
     return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, input_object.clone());
+    let input_object = init_input_object_type(ident.clone());
+    let id = ctx.cache_input_type(ident, input_object);
 
     let filtered_fields = filter_unchecked_create_fields(model, parent_field);
     let field_mapper = CreateDataInputFieldMapper::new_unchecked();
     let input_fields = field_mapper.map_all(ctx, &filtered_fields);
 
-    input_object.set_fields(input_fields);
-    Arc::downgrade(&input_object)
+    ctx.db[id].set_fields(input_fields);
+    id
 }
 
 /// Filters the given model's fields down to the allowed ones for checked create.

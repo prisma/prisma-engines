@@ -1,31 +1,23 @@
-use super::*;
-use prisma_models::*;
+use crate::{EnumType, IdentifierType, ObjectType, OutputFieldRef, OutputObjectTypeId, QuerySchemaDatabase};
+use prisma_models::{InternalDataModelRef, ModelRef};
 use psl::{
     datamodel_connector::{ConnectorCapability, RelationMode},
     PreviewFeatures,
 };
-use std::{borrow::Borrow, collections::HashMap, fmt};
+use std::{collections::HashMap, fmt};
 
-/// The query schema.
-/// Defines which operations (query/mutations) are possible on a database, based on the (internal) data model.
+/// The query schema defines which operations (query/mutations) are possible on a database, based
+/// on a Prisma schema.
 ///
-/// Conceptually, a query schema stores two trees (query / mutation) that consist of
-/// input and output types. Special consideration is required when dealing with object types.
-///
-/// Object types can be referenced multiple times throughout the schema, also recursively, which requires the use
-/// of weak references to prevent memory leaks. To simplify the overall management of Arcs and weaks, the
-/// query schema is subject to a number of invariants.
-/// The most important one is that the only strong references (Arc) to a single object types
-/// is only ever held by the top-level QuerySchema struct, never by the trees, which only ever hold weak refs.
-///
-/// Using a QuerySchema should never involve dealing with the strong references.
+/// Conceptually, a query schema stores two trees (query/mutation) that consist of input and output
+/// types.
 #[derive(Debug)]
 pub struct QuerySchema {
     /// Root query object (read queries).
-    pub query: OutputTypeRef,
+    pub query: OutputObjectTypeId,
 
     /// Root mutation object (write queries).
-    pub mutation: OutputTypeRef,
+    pub mutation: OutputObjectTypeId,
 
     /// Internal abstraction over the datamodel AST.
     pub internal_data_model: InternalDataModelRef,
@@ -33,24 +25,14 @@ pub struct QuerySchema {
     /// Information about the connector this schema was build for.
     pub context: ConnectorContext,
 
-    /// Possible types for input fields. This is an internal implementation detail, it should stay
-    /// private.
-    pub(crate) input_field_types: Vec<InputType>,
+    /// The primary source of truth for schema data.
+    pub db: QuerySchemaDatabase,
 
     // Indexes query fields by their own query info for easier access.
     query_map: HashMap<QueryInfo, OutputFieldRef>,
 
     // Indexes mutation fields by their own query info for easier access.
     mutation_map: HashMap<QueryInfo, OutputFieldRef>,
-
-    /// Internal. Stores all strong Arc refs to the input object types.
-    _input_object_types: Vec<InputObjectTypeStrongRef>,
-
-    /// Internal. Stores all strong Arc refs to the output object types.
-    _output_object_types: Vec<ObjectTypeStrongRef>,
-
-    /// Internal. Stores all enum refs.
-    enum_types: Vec<EnumTypeRef>,
 }
 
 /// Connector meta information, to be used in query execution if necessary.
@@ -83,12 +65,9 @@ impl ConnectorContext {
 impl QuerySchema {
     #[allow(clippy::too_many_arguments)]
     pub fn new(
-        query: OutputTypeRef,
-        mutation: OutputTypeRef,
-        input_field_types: Vec<InputType>,
-        _input_object_types: Vec<InputObjectTypeStrongRef>,
-        _output_object_types: Vec<ObjectTypeStrongRef>,
-        enum_types: Vec<EnumTypeRef>,
+        query: OutputObjectTypeId,
+        mutation: OutputObjectTypeId,
+        db: QuerySchemaDatabase,
         internal_data_model: InternalDataModelRef,
         capabilities: Vec<ConnectorCapability>,
     ) -> Self {
@@ -97,13 +76,13 @@ impl QuerySchema {
         let mut query_map: HashMap<QueryInfo, OutputFieldRef> = HashMap::new();
         let mut mutation_map: HashMap<QueryInfo, OutputFieldRef> = HashMap::new();
 
-        for field in query.as_object_type().unwrap().get_fields() {
+        for field in db[query].get_fields() {
             if let Some(query_info) = field.query_info() {
                 query_map.insert(query_info.to_owned(), field.clone());
             }
         }
 
-        for field in mutation.as_object_type().unwrap().get_fields() {
+        for field in db[mutation].get_fields() {
             if let Some(query_info) = field.query_info() {
                 mutation_map.insert(query_info.to_owned(), field.clone());
             }
@@ -114,10 +93,7 @@ impl QuerySchema {
             mutation,
             query_map,
             mutation_map,
-            input_field_types,
-            _input_object_types,
-            _output_object_types,
-            enum_types,
+            db,
             internal_data_model,
             context: ConnectorContext::new(capabilities, features, relation_mode),
         }
@@ -161,22 +137,16 @@ impl QuerySchema {
         self.mutation_map.get(&query_info)
     }
 
-    pub fn mutation(&self) -> ObjectTypeStrongRef {
-        match self.mutation.borrow() {
-            OutputType::Object(ref o) => o.into_arc(),
-            _ => unreachable!(),
-        }
+    pub fn mutation(&self) -> &ObjectType {
+        &self.db[self.mutation]
     }
 
-    pub fn query(&self) -> ObjectTypeStrongRef {
-        match self.query.borrow() {
-            OutputType::Object(ref o) => o.into_arc(),
-            _ => unreachable!(),
-        }
+    pub fn query(&self) -> &ObjectType {
+        &self.db[self.query]
     }
 
     pub fn enum_types(&self) -> impl Iterator<Item = &EnumType> {
-        self.enum_types.iter().map(|e| e.as_ref())
+        self.db.iter_enum_types()
     }
 
     pub fn context(&self) -> &ConnectorContext {

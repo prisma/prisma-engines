@@ -2,13 +2,13 @@ use super::*;
 use fmt::Debug;
 use once_cell::sync::OnceCell;
 use prisma_models::{dml, prelude::ParentContainer};
-use std::{boxed::Box, fmt, sync::Arc};
+use std::{boxed::Box, fmt};
 
 #[derive(PartialEq)]
 pub struct InputObjectType {
     pub identifier: Identifier,
     pub constraints: InputObjectTypeConstraints,
-    pub fields: OnceCell<Vec<InputFieldRef>>,
+    pub fields: OnceCell<Vec<InputField>>,
     pub tag: Option<ObjectTag>,
 }
 
@@ -48,13 +48,13 @@ impl Debug for InputObjectType {
 }
 
 impl InputObjectType {
-    pub fn get_fields(&self) -> &Vec<InputFieldRef> {
+    pub fn get_fields(&self) -> &Vec<InputField> {
         self.fields.get().unwrap()
     }
 
     pub fn set_fields(&self, fields: Vec<InputField>) {
         self.fields
-            .set(fields.into_iter().map(Arc::new).collect())
+            .set(fields)
             .unwrap_or_else(|_| panic!("Fields of {:?} are already set", self.identifier));
     }
 
@@ -63,12 +63,12 @@ impl InputObjectType {
         self.get_fields().is_empty()
     }
 
-    pub fn find_field<T>(&self, name: T) -> Option<InputFieldRef>
+    pub fn find_field<T>(&self, name: T) -> Option<&InputField>
     where
         T: Into<String>,
     {
         let name = name.into();
-        self.get_fields().iter().find(|f| f.name == name).cloned()
+        self.get_fields().iter().find(|f| f.name == name)
     }
 
     /// Require exactly one field of the possible ones to be in the input.
@@ -135,7 +135,7 @@ impl InputField {
 
     pub fn field_types<'a>(&self, query_schema: &'a QuerySchema) -> &'a [InputType] {
         let (start, len) = self.field_types.unwrap_or_default();
-        &query_schema.input_field_types[start..(start + len)]
+        &query_schema.db.input_field_types[start..(start + len)]
     }
 
     /// Sets the field as optional (not required to be present on the input).
@@ -160,35 +160,35 @@ impl InputField {
     }
 
     /// Sets the field as nullable (accepting null inputs).
-    pub fn nullable(self, input_types: &mut Vec<InputType>) -> Self {
-        self.add_type(InputType::null(), input_types)
+    pub fn nullable(self, db: &mut QuerySchemaDatabase) -> Self {
+        self.add_type(InputType::null(), db)
     }
 
     /// Sets the field as nullable if the condition is true.
-    pub fn nullable_if(self, condition: bool, input_types: &mut Vec<InputType>) -> Self {
+    pub fn nullable_if(self, condition: bool, db: &mut QuerySchemaDatabase) -> Self {
         if condition {
-            self.nullable(input_types)
+            self.nullable(db)
         } else {
             self
         }
     }
 
-    pub fn push_type(&mut self, typ: InputType, input_types: &mut Vec<InputType>) {
+    pub fn push_type(&mut self, typ: InputType, db: &mut QuerySchemaDatabase) {
         match &mut self.field_types {
             Some((_start, len)) => {
                 *len += 1;
-                input_types.push(typ);
+                db.input_field_types.push(typ);
             }
             None => {
-                self.field_types = Some((input_types.len(), 1));
-                input_types.push(typ);
+                self.field_types = Some((db.input_field_types.len(), 1));
+                db.input_field_types.push(typ);
             }
         }
     }
 
     /// Adds possible input type to this input field's type union.
-    pub fn add_type(mut self, typ: InputType, input_types: &mut Vec<InputType>) -> Self {
-        self.push_type(typ, input_types);
+    pub fn add_type(mut self, typ: InputType, db: &mut QuerySchemaDatabase) -> Self {
+        self.push_type(typ, db);
         self
     }
 
@@ -210,9 +210,9 @@ impl InputField {
 #[derive(Clone)]
 pub enum InputType {
     Scalar(ScalarType),
-    Enum(EnumTypeWeakRef),
+    Enum(EnumTypeId),
     List(Box<InputType>),
-    Object(InputObjectTypeWeakRef),
+    Object(InputObjectTypeId),
 }
 
 impl PartialEq for InputType {
@@ -221,9 +221,7 @@ impl PartialEq for InputType {
             (InputType::Scalar(st), InputType::Scalar(ost)) => st.eq(ost),
             (InputType::Enum(_), InputType::Enum(_)) => true,
             (InputType::List(lt), InputType::List(olt)) => lt.eq(olt),
-            (InputType::Object(obj), InputType::Object(oobj)) => {
-                obj.into_arc().identifier == oobj.into_arc().identifier
-            }
+            (InputType::Object(obj), InputType::Object(oobj)) => obj == oobj,
             _ => false,
         }
     }
@@ -232,7 +230,7 @@ impl PartialEq for InputType {
 impl Debug for InputType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Object(obj) => write!(f, "Object({})", obj.into_arc().identifier.name()),
+            Self::Object(obj) => write!(f, "Object({obj:?})"),
             Self::Scalar(s) => write!(f, "{s:?}"),
             Self::Enum(e) => write!(f, "{e:?}"),
             Self::List(l) => write!(f, "{l:?}"),
@@ -245,7 +243,7 @@ impl InputType {
         InputType::List(Box::new(containing))
     }
 
-    pub fn object(containing: InputObjectTypeWeakRef) -> InputType {
+    pub fn object(containing: InputObjectTypeId) -> InputType {
         InputType::Object(containing)
     }
 
@@ -301,16 +299,16 @@ impl InputType {
         InputType::Scalar(ScalarType::Null)
     }
 
-    pub fn enum_type(containing: EnumTypeWeakRef) -> InputType {
+    pub fn enum_type(containing: EnumTypeId) -> InputType {
         InputType::Enum(containing)
     }
 
-    pub fn is_empty(&self) -> bool {
+    pub fn is_empty(&self, query_schema: &QuerySchemaDatabase) -> bool {
         match self {
             Self::Scalar(_) => false,
             Self::Enum(_) => false,
-            Self::List(inner) => inner.is_empty(),
-            Self::Object(weak) => weak.into_arc().is_empty(),
+            Self::List(inner) => inner.is_empty(query_schema),
+            Self::Object(id) => query_schema[*id].is_empty(),
         }
     }
 
@@ -321,9 +319,9 @@ impl InputType {
         )
     }
 
-    pub fn as_object(&self) -> Option<InputObjectTypeStrongRef> {
+    pub fn as_object<'a>(&self, query_schema: &'a QuerySchemaDatabase) -> Option<&'a InputObjectType> {
         if let Self::Object(v) = self {
-            Some(v.into_arc())
+            Some(&query_schema[*v])
         } else {
             None
         }

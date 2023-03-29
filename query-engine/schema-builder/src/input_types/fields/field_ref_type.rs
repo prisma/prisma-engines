@@ -17,35 +17,28 @@ impl WithFieldRefInputExt for InputType {
     }
 }
 
-fn field_ref_input_object_type(ctx: &mut BuilderContext<'_>, allow_type: InputType) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new_prisma(field_ref_input_type_name(&allow_type));
+fn field_ref_input_object_type(ctx: &mut BuilderContext<'_>, allow_type: InputType) -> InputObjectTypeId {
+    let ident = Identifier::new_prisma(field_ref_input_type_name(&allow_type, ctx));
 
     return_cached_input!(ctx, &ident);
 
     let mut object = init_input_object_type(ident.clone());
     object.set_tag(ObjectTag::FieldRefType(allow_type));
+    let id = ctx.cache_input_type(ident, object);
 
-    let object = Arc::new(object);
-    ctx.cache_input_type(ident, object.clone());
-
-    object.set_fields(vec![input_field(
-        ctx,
-        filters::UNDERSCORE_REF,
-        InputType::string(),
-        None,
-    )]);
-
-    Arc::downgrade(&object)
+    let fields = vec![input_field(ctx, filters::UNDERSCORE_REF, InputType::string(), None)];
+    ctx.db[id].set_fields(fields);
+    id
 }
 
-fn field_ref_input_type_name(allow_type: &InputType) -> String {
+fn field_ref_input_type_name(allow_type: &InputType, ctx: &mut BuilderContext<'_>) -> String {
     let typ_str = match allow_type {
         InputType::Scalar(scalar) => match scalar {
             ScalarType::Null => unreachable!("ScalarType::Null should never reach that code path"),
             _ => scalar.to_string(),
         },
-        InputType::Enum(e) => format!("Enum{}", e.into_arc().name()),
-        InputType::List(inner) => return format!("List{}", field_ref_input_type_name(inner)),
+        InputType::Enum(e) => format!("Enum{}", ctx.db[*e].name()),
+        InputType::List(inner) => return format!("List{}", field_ref_input_type_name(inner, ctx)),
         _ => unreachable!("input ref type only support scalar or enums"),
     };
 

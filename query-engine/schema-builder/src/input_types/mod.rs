@@ -37,7 +37,7 @@ fn map_scalar_input_type(ctx: &mut BuilderContext<'_>, typ: &TypeIdentifier, lis
 
 /// Convenience function to return [object_type, list_object_type]
 /// (shorthand + full type) if the field is a list.
-pub(crate) fn list_union_object_type(input: InputObjectTypeWeakRef, as_list: bool) -> Vec<InputType> {
+pub(crate) fn list_union_object_type(input: InputObjectTypeId, as_list: bool) -> Vec<InputType> {
     let input_type = InputType::object(input);
     list_union_type(input_type, as_list)
 }

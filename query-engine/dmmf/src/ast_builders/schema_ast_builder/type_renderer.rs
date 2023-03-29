@@ -1,12 +1,12 @@
 use super::{DmmfTypeReference, RenderContext, TypeLocation};
-use schema::{InputType, IntoArc, ObjectTag, OutputType, ScalarType};
+use schema::{InputType, ObjectTag, OutputType, ScalarType};
 
 pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderContext) -> DmmfTypeReference {
     match output_type {
         OutputType::Object(ref obj) => {
             ctx.mark_to_be_rendered(obj);
+            let obj = &ctx.query_schema.db[*obj];
 
-            let obj = obj.into_arc();
             let type_reference = DmmfTypeReference {
                 typ: obj.identifier.name(),
                 namespace: Some(obj.identifier.namespace().to_string()),
@@ -18,8 +18,8 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
         }
 
         OutputType::Enum(et) => {
-            let et = et.into_arc();
-            ctx.mark_to_be_rendered(&et.as_ref());
+            let et = &ctx.query_schema.db[*et];
+            ctx.mark_to_be_rendered(&et);
 
             let ident = et.identifier();
             let type_reference = DmmfTypeReference {
@@ -76,8 +76,7 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
     match input_type {
         InputType::Object(ref obj) => {
             ctx.mark_to_be_rendered(obj);
-
-            let obj = obj.into_arc();
+            let obj = &ctx.query_schema.db[*obj];
 
             let location = match &obj.tag {
                 Some(ObjectTag::FieldRefType(_)) => TypeLocation::FieldRefTypes,
@@ -95,8 +94,8 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
         }
 
         InputType::Enum(et) => {
-            let et = et.into_arc();
-            ctx.mark_to_be_rendered(&et.as_ref());
+            let et = &ctx.query_schema.db[*et];
+            ctx.mark_to_be_rendered(&et);
 
             let ident = et.identifier();
             let type_reference = DmmfTypeReference {

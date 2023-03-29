@@ -6,11 +6,11 @@ use mutations::create_one;
 pub(crate) fn nested_connect_or_create_input_object(
     ctx: &mut BuilderContext<'_>,
     parent_field: &RelationFieldRef,
-) -> Option<InputObjectTypeWeakRef> {
+) -> Option<InputObjectTypeId> {
     let related_model = parent_field.related_model();
     let where_object = filter_objects::where_unique_object_type(ctx, &related_model);
 
-    if where_object.into_arc().is_empty() {
+    if ctx.db[where_object].is_empty() {
         return None;
     }
 
@@ -24,16 +24,16 @@ pub(crate) fn nested_connect_or_create_input_object(
 
     match ctx.get_input_type(&ident) {
         None => {
-            let input_object = Arc::new(init_input_object_type(ident.clone()));
-            ctx.cache_input_type(ident, input_object.clone());
+            let input_object = init_input_object_type(ident.clone());
+            let id = ctx.cache_input_type(ident, input_object);
 
             let fields = vec![
                 input_field(ctx, args::WHERE, InputType::object(where_object), None),
                 input_field(ctx, args::CREATE, create_types, None),
             ];
 
-            input_object.set_fields(fields);
-            Some(Arc::downgrade(&input_object))
+            ctx.db[id].set_fields(fields);
+            Some(id)
         }
         x => x,
     }

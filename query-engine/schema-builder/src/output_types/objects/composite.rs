@@ -8,7 +8,7 @@ use prisma_models::CompositeType;
 pub(crate) fn initialize_cache(ctx: &mut BuilderContext<'_>) {
     for composite in ctx.internal_data_model.composite_types() {
         let ident = Identifier::new_model(composite.name().to_owned());
-        ctx.cache_output_type(ident.clone(), Arc::new(ObjectType::new(ident, None)));
+        ctx.cache_output_type(ident.clone(), ObjectType::new(ident, None));
     }
 }
 
@@ -16,13 +16,12 @@ pub(crate) fn initialize_cache(ctx: &mut BuilderContext<'_>) {
 pub(crate) fn initialize_fields(ctx: &mut BuilderContext<'_>) {
     for composite in ctx.internal_data_model.composite_types() {
         let fields = compute_composite_object_type_fields(ctx, &composite);
-        let obj: ObjectTypeWeakRef = map_type(ctx, &composite);
-
-        obj.into_arc().set_fields(fields);
+        let obj = map_type(ctx, &composite);
+        ctx.db[obj].set_fields(fields);
     }
 }
 
-pub(crate) fn map_type(ctx: &mut BuilderContext<'_>, ct: &CompositeType) -> ObjectTypeWeakRef {
+pub(crate) fn map_type(ctx: &mut BuilderContext<'_>, ct: &CompositeType) -> OutputObjectTypeId {
     let ident = Identifier::new_model(ct.name().to_owned());
     ctx.get_output_type(&ident)
         .expect("Invariant violation: Initialized output object type for each composite.")
