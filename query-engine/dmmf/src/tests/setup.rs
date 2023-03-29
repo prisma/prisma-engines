@@ -68,13 +68,6 @@ fn format_diff(old: &str, new: &str) -> String {
                     ChangeTag::Equal => (" ", Style::new().dim()),
                 };
 
-                // let index = match (change.old_index(), change.new_index()) {
-                //     (None, None) => Line(None),
-                //     (None, new_idx @ Some(_)) => Line(new_idx),
-                //     (old_idx @ Some(_), None) => Line(old_idx),
-                //     (Some(_), new_idx @ Some(_)) => Line(new_idx),
-                // };
-
                 let index = change.new_index().or_else(|| change.old_index());
 
                 buf.push_str(&format!("{} |{}", style(Line(index)).dim(), s.apply_to(sign).bold()));
