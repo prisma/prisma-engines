@@ -513,7 +513,6 @@ dependencies = [
  "lazy_static",
  "libc",
  "terminal_size",
- "unicode-width",
  "winapi",
 ]
 
@@ -852,7 +851,7 @@ name = "dmmf"
 version = "0.1.0"
 dependencies = [
  "bigdecimal",
- "console",
+ "colored",
  "expect-test",
  "flate2",
  "indexmap",

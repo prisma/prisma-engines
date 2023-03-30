@@ -1,6 +1,6 @@
 use crate::DataModelMetaFormat;
 
-use console::*;
+use colored::*;
 use flate2::*;
 use similar::*;
 use std::{
@@ -8,7 +8,7 @@ use std::{
     io::{Read, Write},
 };
 
-pub fn write_compressed_snapshot(dmmf: &DataModelMetaFormat, path: &str) -> () {
+pub(crate) fn write_compressed_snapshot(dmmf: &DataModelMetaFormat, path: &str) -> () {
     let mut encoder = write::GzEncoder::new(File::create(path).unwrap(), Compression::best());
     let json = serde_json::to_vec(dmmf).unwrap();
 
@@ -16,7 +16,7 @@ pub fn write_compressed_snapshot(dmmf: &DataModelMetaFormat, path: &str) -> () {
     encoder.finish().unwrap();
 }
 
-pub fn read_compressed_snapshot(path: &str) -> serde_json::Value {
+pub(crate) fn read_compressed_snapshot(path: &str) -> serde_json::Value {
     let reader_json = std::fs::read(path).unwrap();
     let mut decoder = read::GzDecoder::new(reader_json.as_slice());
     let mut json: Vec<u8> = vec![];
@@ -26,16 +26,19 @@ pub fn read_compressed_snapshot(path: &str) -> serde_json::Value {
     serde_json::from_slice::<serde_json::Value>(&json).unwrap()
 }
 
-pub fn panic_with_diff(expected: &str, found: &str) {
+pub(crate) fn panic_with_diff(expected: &str, found: &str) {
     let formatted = format_diff(expected, found);
+    let snapshot_warn =
+        "Snapshot comparison failed. Run the test again with UPDATE_EXPECT=1 in the environment to update the snapshot."
+            .on_red();
 
     panic!(
         r#"
-Snapshot comparison failed. Run the test again with UPDATE_EXPECT=1 in the environment to update the snapshot.
+{snapshot_warn}
 ======== DIFF ========
 {formatted}
 ======================
-Snapshot comparison failed. Run the test again with UPDATE_EXPECT=1 in the environment to update the snapshot.
+{snapshot_warn}
 
 "#,
     );
@@ -62,21 +65,24 @@ fn format_diff(old: &str, new: &str) -> String {
         }
         for op in group {
             for change in diff.iter_inline_changes(op) {
-                let (sign, s) = match change.tag() {
-                    ChangeTag::Delete => ("-", Style::new().red()),
-                    ChangeTag::Insert => ("+", Style::new().green()),
-                    ChangeTag::Equal => (" ", Style::new().dim()),
+                let sign = match change.tag() {
+                    ChangeTag::Delete => "-",
+                    ChangeTag::Insert => "+",
+                    ChangeTag::Equal => " ",
                 };
-
                 let index = change.new_index().or_else(|| change.old_index());
 
-                buf.push_str(&format!("{} |{}", style(Line(index)).dim(), s.apply_to(sign).bold()));
+                buf.push_str(&format!(
+                    "{} |{}",
+                    Line(index).to_string().as_str().dimmed(),
+                    apply_styles(sign, change.tag())
+                ));
 
                 for (emphasized, value) in change.iter_strings_lossy() {
                     if emphasized {
-                        buf.push_str(&format!("{}", s.apply_to(value).underlined().bold()));
+                        buf.push_str(&format!("{}", apply_styles(&value, change.tag()).underline().bold()));
                     } else {
-                        buf.push_str(&format!("{}", s.apply_to(value)));
+                        buf.push_str(&format!("{}", apply_styles(&value, change.tag())));
                     }
                 }
 
@@ -88,4 +94,12 @@ fn format_diff(old: &str, new: &str) -> String {
     }
 
     buf
+}
+
+fn apply_styles(s: &str, change: ChangeTag) -> ColoredString {
+    match change {
+        ChangeTag::Delete => s.bright_red(),
+        ChangeTag::Insert => s.bright_green(),
+        ChangeTag::Equal => s.dimmed(),
+    }
 }
