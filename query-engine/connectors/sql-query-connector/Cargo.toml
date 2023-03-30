@@ -49,3 +49,12 @@ version = "1.2"
 [dependencies.user-facing-errors]
 features = ["sql"]
 path = "../../../libs/user-facing-errors"
+
+[dev-dependencies]
+codspeed-criterion-compat = "1.1.0"
+postgres = "0.19"
+tokio-postgres = "0.7"
+
+[[bench]]
+name = "trivial_postgres_query"
+harness = false
