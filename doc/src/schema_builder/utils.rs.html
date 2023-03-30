@@ -113,18 +113,16 @@
 <a href="#113" id="113">113</a>
 <a href="#114" id="114">114</a>
 <a href="#115" id="115">115</a>
-<a href="#116" id="116">116</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>prisma_models::{
-    dml,
+    ast, dml,
     walkers::{<span class="self">self</span>, PrimaryKeyWalker},
-    ModelRef,
 };
 <span class="kw">use </span>std::{fmt, sync::Arc};
 
 <span class="doccomment">/// Object type convenience wrapper function.
-</span><span class="kw">pub fn </span>object_type(ident: Identifier, fields: Vec&lt;OutputField&gt;, model: <span class="prelude-ty">Option</span>&lt;ModelRef&gt;) -&gt; ObjectType {
+</span><span class="kw">pub fn </span>object_type(ident: Identifier, fields: Vec&lt;OutputField&gt;, model: <span class="prelude-ty">Option</span>&lt;ast::ModelId&gt;) -&gt; ObjectType {
     <span class="kw">let </span>object_type = ObjectType::new(ident, model);
 
     object_type.set_fields(fields);

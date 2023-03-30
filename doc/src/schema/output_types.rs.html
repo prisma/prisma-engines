@@ -236,7 +236,7 @@
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>fmt::Debug;
 <span class="kw">use </span>once_cell::sync::OnceCell;
-<span class="kw">use </span>prisma_models::ModelRef;
+<span class="kw">use </span>prisma_models::{ast::ModelId, ModelRef};
 <span class="kw">use </span>std::{fmt, sync::Arc};
 
 <span class="attr">#[derive(Debug, Clone)]
@@ -351,7 +351,7 @@
     fields: OnceCell&lt;Vec&lt;OutputFieldRef&gt;&gt;,
 
     <span class="comment">// Object types can directly map to models.
-    </span>model: <span class="prelude-ty">Option</span>&lt;ModelRef&gt;,
+    </span>model: <span class="prelude-ty">Option</span>&lt;ModelId&gt;,
 }
 
 <span class="kw">impl </span>Debug <span class="kw">for </span>ObjectType {
@@ -365,7 +365,7 @@
 }
 
 <span class="kw">impl </span>ObjectType {
-    <span class="kw">pub fn </span>new(ident: Identifier, model: <span class="prelude-ty">Option</span>&lt;ModelRef&gt;) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub fn </span>new(ident: Identifier, model: <span class="prelude-ty">Option</span>&lt;ModelId&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             identifier: ident,
             fields: OnceCell::new(),
