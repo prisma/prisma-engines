@@ -9,7 +9,7 @@ use std::convert::identity;
 pub(crate) fn initialize_cache(ctx: &mut BuilderContext<'_>) {
     for model in ctx.internal_data_model.models() {
         let ident = Identifier::new_model(model.name());
-        ctx.cache_output_type(ident.clone(), Arc::new(ObjectType::new(ident, Some(model))));
+        ctx.cache_output_type(ident.clone(), Arc::new(ObjectType::new(ident, Some(model.id))));
     }
 }
 

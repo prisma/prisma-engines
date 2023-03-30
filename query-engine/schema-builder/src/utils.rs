@@ -1,14 +1,13 @@
 use super::*;
 use once_cell::sync::OnceCell;
 use prisma_models::{
-    dml,
+    ast, dml,
     walkers::{self, PrimaryKeyWalker},
-    ModelRef,
 };
 use std::{fmt, sync::Arc};
 
 /// Object type convenience wrapper function.
-pub fn object_type(ident: Identifier, fields: Vec<OutputField>, model: Option<ModelRef>) -> ObjectType {
+pub fn object_type(ident: Identifier, fields: Vec<OutputField>, model: Option<ast::ModelId>) -> ObjectType {
     let object_type = ObjectType::new(ident, model);
 
     object_type.set_fields(fields);
