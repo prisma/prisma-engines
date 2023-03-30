@@ -5,9 +5,8 @@ RUN apt update
 RUN apt-get install -y git valgrind
 
 # Symlink caches
-RUN mkdir -p /.cargo/registry \
- /.cargo/git \
- /.cargo/.package-cache
+RUN mkdir -p /.cargo/registry
+RUN mkdir .cargo/git
 RUN rm -rf /usr/local/cargo/git \
  /usr/local/cargo/registry \
  /usr/local/cargo/.package-cache \
@@ -20,7 +19,9 @@ RUN ln -s /.cargo/.crates.toml /usr/local/cargo
 RUN ln -s /.cargo/.crates2.json /usr/local/cargo
 
 # Set env
-ENV PATH="${PATH}:/rustrepo/script/.profile/bin"
+ENV PATH="${PATH}:/prisma-engines/script/.profile-shell/bin"
 ENV VALGRIND_LIB=/usr/lib/aarch64-linux-gnu/valgrind/
 ENV VALID_TOOLS="memcheck cachegrind callgrind helgrind drd massif sgcheck memcheck-dhat"
 ENV CARGO_TARGET_DIR=target-alternatives
+
+CMD ["/bin/bash"]
