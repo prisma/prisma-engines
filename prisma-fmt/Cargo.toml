@@ -14,6 +14,9 @@ log = "0.4.14"
 indoc = "1"
 enumflags2 = "0.7"
 
+wasm-bindgen = { version = "0.2.84" }
+tsify = { version = "0.4.3", features = ["json"] }
+
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 structopt = "0.3"
 

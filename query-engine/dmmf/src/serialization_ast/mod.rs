@@ -7,10 +7,13 @@ pub use mappings_ast::*;
 pub use schema_ast::*;
 
 use serde::Serialize;
+use tsify::Tsify;
 
 /// The main DMMF serialization struct.
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
+#[derive(Tsify)]
+#[tsify(into_wasm_abi)]
 pub struct DataModelMetaFormat {
     #[serde(rename = "datamodel")]
     /// The datamodel AST.
@@ -20,5 +23,6 @@ pub struct DataModelMetaFormat {
     pub schema: DmmfSchema,
 
     /// The operations map. Derived from the `schema`.
+    #[tsify(type = "any")]
     pub mappings: DmmfOperationMappings,
 }

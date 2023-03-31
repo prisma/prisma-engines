@@ -1,6 +1,10 @@
+use tsify::Tsify;
+
 // Datamodel serialization AST for the DMMF.
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
+#[derive(Tsify)]
+#[tsify(into_wasm_abi)]
 pub struct Datamodel {
     pub enums: Vec<Enum>,
     pub models: Vec<Model>,
@@ -9,6 +13,8 @@ pub struct Datamodel {
 
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
+#[derive(Tsify)]
+#[tsify(into_wasm_abi)]
 pub struct Field {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -25,6 +31,8 @@ pub struct Field {
     pub field_type: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[tsify(optional)]
+    #[tsify(type = "unknown")]
     pub default: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -58,6 +66,8 @@ pub struct Function {
 
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
+#[derive(Tsify)]
+#[tsify(into_wasm_abi)]
 pub struct Model {
     pub name: String,
     pub db_name: Option<String>,
@@ -75,6 +85,8 @@ pub struct Model {
 
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
+#[derive(Tsify)]
+#[tsify(into_wasm_abi)]
 pub struct UniqueIndex {
     pub name: Option<String>,
     pub fields: Vec<String>,
@@ -83,6 +95,8 @@ pub struct UniqueIndex {
 // TODO(extended indices) add field options here
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
+#[derive(Tsify)]
+#[tsify(into_wasm_abi)]
 pub struct PrimaryKey {
     pub name: Option<String>,
     pub fields: Vec<String>,
@@ -90,6 +104,8 @@ pub struct PrimaryKey {
 
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
+#[derive(Tsify)]
+#[tsify(into_wasm_abi)]
 pub struct Enum {
     pub name: String,
     pub values: Vec<EnumValue>,
@@ -101,6 +117,8 @@ pub struct Enum {
 
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
+#[derive(Tsify)]
+#[tsify(into_wasm_abi)]
 pub struct EnumValue {
     pub name: String,
     pub db_name: Option<String>,

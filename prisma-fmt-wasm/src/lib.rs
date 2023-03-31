@@ -1,3 +1,4 @@
+use prisma_fmt::{DataModelMetaFormat, GetDmmfParams};
 use std::panic;
 use wasm_bindgen::prelude::*;
 
@@ -41,7 +42,7 @@ pub fn get_config(params: String) -> Result<String, JsError> {
 
 /// Docs: https://prisma.github.io/prisma-engines/doc/prisma_fmt/fn.get_dmmf.html
 #[wasm_bindgen]
-pub fn get_dmmf(params: String) -> Result<String, JsError> {
+pub fn get_dmmf(params: GetDmmfParams) -> Result<DataModelMetaFormat, JsError> {
     register_panic_hook();
     prisma_fmt::get_dmmf(params).map_err(|e| JsError::new(&e))
 }
