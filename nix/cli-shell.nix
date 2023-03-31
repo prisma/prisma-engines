@@ -1,6 +1,7 @@
 { config, pkgs, self', ... }:
 
-# Run it with nix develop .#cli-shell.
+# Run it with
+# > nix develop --no-sandbox .#cli-shell
 let
   engines = self'.packages.prisma-engines;
   prisma = self'.packages.cli-prisma;
