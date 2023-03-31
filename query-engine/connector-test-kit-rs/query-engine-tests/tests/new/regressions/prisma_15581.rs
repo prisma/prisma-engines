@@ -30,21 +30,23 @@ mod prisma_15581 {
         .to_owned()
     }
 
-    #[connector_test(exclude(Mongodb))]
+    #[connector_test]
     async fn create_one_model_with_datetime_default_now_in_id(runner: Runner) -> TestResult<()> {
         run_query!(
             runner,
             r#"mutation { createOnetest(data: { reference: 3 }) { reference created_at other } }"#
         );
+
         Ok(())
     }
 
-    #[connector_test(exclude(Mongodb))]
+    #[connector_test]
     async fn create_one_model_with_updated_at_in_id(runner: Runner) -> TestResult<()> {
         run_query!(
             runner,
             r#"mutation { createOnetest2(data: { reference: 3 }) { reference updated_at other } }"#
         );
+
         Ok(())
     }
 

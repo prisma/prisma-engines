@@ -85,21 +85,29 @@ mod default_value {
     }
 
     // "The default value" should "work for enums"
-    // TODO: Flaky test on Cockroach, re-enable once figured out
-    #[connector_test(schema(schema_enum), exclude(Sqlite, SqlServer, CockroachDb))]
+    #[connector_test(schema(schema_enum), exclude(Sqlite, SqlServer))]
     async fn enum_field(runner: Runner) -> TestResult<()> {
+        let res = retry!(
+            {
+                runner.query(
+                    r#"mutation {
+                      createOneService(
+                        data:{
+                          id: 1,
+                          name: "issue1820"
+                        }
+                      ){
+                        name
+                        active
+                      }
+                    }"#,
+                )
+            },
+            5
+        );
+
         insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
-            createOneService(
-              data:{
-                id: 1,
-                name: "issue1820"
-              }
-            ){
-              name
-              active
-            }
-          }"#),
+          res.to_string(),
           @r###"{"data":{"createOneService":{"name":"issue1820","active":"Yes"}}}"###
         );
 
@@ -171,60 +179,90 @@ mod default_value {
     }
 
     // "Remapped enum default values" should "work"
-    // TODO: Flaky test on Cockroach, re-enable once figured out
-    #[connector_test(schema(schema_remapped_enum), exclude(Sqlite, SqlServer, CockroachDb))]
+    #[connector_test(schema(schema_remapped_enum), exclude(Sqlite, SqlServer))]
     async fn remapped_enum_field(runner: Runner) -> TestResult<()> {
+        let res = retry!(
+            {
+                runner.query(
+                    r#"mutation {
+                      createOneUser(data: { id: 1, age: 21 }) {
+                        name
+                      }
+                    }"#,
+                )
+            },
+            5
+        );
+
         insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
-            createOneUser(
-              data:{
-                id: 1,
-                age: 21
-              }
-            ){
-              name
-            }
-          }"#),
+          res.to_string(),
           @r###"{"data":{"createOneUser":{"name":"Spiderman"}}}"###
         );
 
+        let res = retry!(
+            {
+                runner.query(
+                    r#"mutation {
+                      createOneUser(
+                        data:{
+                          id: 2
+                          name: Superman
+                          age: 32
+                        }
+                      ){
+                        name
+                      }
+                    }"#,
+                )
+            },
+            5
+        );
+
         insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation {
-            createOneUser(
-              data:{
-                id: 2
-                name: Superman
-                age: 32
-              }
-            ){
-              name
-            }
-          }"#),
+          res.to_string(),
           @r###"{"data":{"createOneUser":{"name":"Superman"}}}"###
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"query {
-            findUniqueUser(where:{ name: Superman }) {
-              name,
-              age
-            }
-          }"#),
-          @r###"{"data":{"findUniqueUser":{"name":"Superman","age":32}}}"###
+        let res = retry!(
+            {
+                runner.query(
+                    r#"query {
+                      findUniqueUser(where:{ name: Superman }) {
+                        name,
+                        age
+                      }
+                    }"#,
+                )
+            },
+            5
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query {
-            findManyUser(
-              where:{
-                name: { in: [Spiderman, Superman] }
-              }
-              orderBy: { age: asc }
-            ){
-              name,
-              age
-            }
-          }"#),
+          res.to_string(),
+          @r###"{"data":{"findUniqueUser":{"name":"Superman","age":32}}}"###
+        );
+
+        let res = retry!(
+            {
+                runner.query(
+                    r#"query {
+                      findManyUser(
+                        where:{
+                          name: { in: [Spiderman, Superman] }
+                        }
+                        orderBy: { age: asc }
+                      ){
+                        name,
+                        age
+                      }
+                    }"#,
+                )
+            },
+            5
+        );
+
+        insta::assert_snapshot!(
+          res.to_string(),
           @r###"{"data":{"findManyUser":[{"name":"Spiderman","age":21},{"name":"Superman","age":32}]}}"###
         );
 
