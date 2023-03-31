@@ -7,6 +7,7 @@ pub use psl_core::{
     diagnostics::{self, Diagnostics},
     is_reserved_type_name,
     mcf::config_to_mcf_json_value as get_config,
+    mcf::to_config_meta_format as get_config_meta_format,
     mcf::{generators_to_json, render_sources_to_json}, // for tests
     parser_database::{self, SourceFile},
     reformat,

@@ -1,7 +1,11 @@
+use tsify::Tsify;
+
 use crate::configuration::{self, StringFromEnvVar};
 
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
+#[derive(Tsify)]
+#[tsify(into_wasm_abi)]
 pub struct SourceConfig {
     pub name: String,
     pub provider: String,
@@ -15,26 +19,26 @@ pub struct SourceConfig {
 }
 
 pub fn render_sources_to_json_value(sources: &[configuration::Datasource]) -> serde_json::Value {
-    let res = sources_to_json_structs(sources);
+    let res = source_to_serializable_structs(sources);
     serde_json::to_value(res).expect("Failed to render JSON.")
 }
 
 pub fn render_sources_to_json(sources: &[configuration::Datasource]) -> String {
-    let res = sources_to_json_structs(sources);
+    let res = source_to_serializable_structs(sources);
     serde_json::to_string_pretty(&res).expect("Failed to render JSON.")
 }
 
-fn sources_to_json_structs(sources: &[configuration::Datasource]) -> Vec<SourceConfig> {
+pub fn source_to_serializable_structs(sources: &[configuration::Datasource]) -> Vec<SourceConfig> {
     let mut res: Vec<SourceConfig> = Vec::new();
 
     for source in sources {
-        res.push(source_to_json_struct(source));
+        res.push(source_to_serializable_struct(source));
     }
 
     res
 }
 
-fn source_to_json_struct(source: &configuration::Datasource) -> SourceConfig {
+fn source_to_serializable_struct(source: &configuration::Datasource) -> SourceConfig {
     let schemas: Vec<String> = source
         .namespaces
         .iter()

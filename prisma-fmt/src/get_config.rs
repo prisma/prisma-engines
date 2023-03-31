@@ -1,13 +1,16 @@
-use psl::Diagnostics;
+use psl::{get_config::ConfigMetaFormat, Diagnostics};
 use serde::Deserialize;
 use serde_json::json;
 use std::collections::HashMap;
+use tsify::Tsify;
 
 use crate::validate::SCHEMA_PARSER_ERROR_CODE;
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Default)]
 #[serde(rename_all = "camelCase")]
-struct GetConfigParams {
+#[derive(Tsify)]
+#[tsify(from_wasm_abi)]
+pub struct GetConfigParams {
     prisma_schema: String,
     #[serde(default)]
     ignore_env_var_errors: bool,
@@ -23,26 +26,17 @@ struct GetConfigError {
     message: String,
 }
 
-pub(crate) fn get_config(params: &str) -> Result<String, String> {
-    let params: GetConfigParams = match serde_json::from_str(params) {
-        Ok(params) => params,
-        Err(serde_err) => {
-            panic!("Failed to deserialize GetConfigParams: {serde_err}",);
-        }
-    };
-
-    get_config_impl(params)
-        .map_err(|err| {
-            json!({
-                "message": err.message,
-                "error_code": err.error_code,
-            })
-            .to_string()
+pub(crate) fn get_config(params: GetConfigParams) -> Result<ConfigMetaFormat, String> {
+    get_config_impl(params).map_err(|err| {
+        json!({
+            "message": err.message,
+            "error_code": err.error_code,
         })
-        .map(|value| value.to_string())
+        .to_string()
+    })
 }
 
-fn get_config_impl(params: GetConfigParams) -> Result<serde_json::Value, GetConfigError> {
+fn get_config_impl(params: GetConfigParams) -> Result<ConfigMetaFormat, GetConfigError> {
     let wrap_get_config_err = |errors: Diagnostics| -> GetConfigError {
         use std::fmt::Write as _;
 
@@ -65,7 +59,9 @@ fn get_config_impl(params: GetConfigParams) -> Result<serde_json::Value, GetConf
             .map_err(wrap_get_config_err)?;
     }
 
-    Ok(psl::get_config(&config))
+    let config = config;
+
+    Ok(psl::get_config_meta_format(config))
 }
 
 #[cfg(test)]
@@ -83,16 +79,17 @@ mod tests {
             }
         "#;
 
-        let request = json!({
-            "prismaSchema": schema,
-        });
+        let request = GetConfigParams {
+            prisma_schema: schema.to_string(),
+            ..Default::default()
+        };
 
         let expected = expect![[
             r#"{"message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m            \u001b[1;91mdatasøurce yolo {\u001b[0m\n\u001b[1;94m 6 | \u001b[0m            }\n\u001b[1;94m   | \u001b[0m\n\u001b[1;91merror\u001b[0m: \u001b[1mError validating: This line is invalid. It does not start with any known Prisma schema keyword.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:6\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 5 | \u001b[0m            datasøurce yolo {\n\u001b[1;94m 6 | \u001b[0m            \u001b[1;91m}\u001b[0m\n\u001b[1;94m 7 | \u001b[0m        \n\u001b[1;94m   | \u001b[0m\n\u001b[1;91merror\u001b[0m: \u001b[1mArgument \"provider\" is missing in generator block \"js\".\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:2\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 1 | \u001b[0m\n\u001b[1;94m 2 | \u001b[0m            \u001b[1;91mgenerator js {\u001b[0m\n\u001b[1;94m 3 | \u001b[0m            }\n\u001b[1;94m   | \u001b[0m\n\nValidation Error Count: 3","error_code":"P1012"}"#
         ]];
 
-        let response = get_config(&request.to_string()).unwrap_err();
-        expected.assert_eq(&response);
+        let config_error = get_config(request).unwrap_err();
+        expected.assert_eq(&config_error);
     }
 
     #[test]
@@ -104,14 +101,16 @@ mod tests {
             }
         "#;
 
-        let request = json!({
-            "prismaSchema": schema,
-        });
+        let request = GetConfigParams {
+            prisma_schema: schema.to_string(),
+            ..Default::default()
+        };
+
         let expected = expect![[
             r#"{"message":"\u001b[1;91merror\u001b[0m: \u001b[1mEnvironment variable not found: NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:4\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 3 | \u001b[0m                provider = \"postgresql\"\n\u001b[1;94m 4 | \u001b[0m                url = \u001b[1;91menv(\"NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST\")\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\nValidation Error Count: 1","error_code":"P1012"}"#
         ]];
-        let response = get_config(&request.to_string()).unwrap_err();
-        expected.assert_eq(&response);
+        let config_error = get_config(request).unwrap_err();
+        expected.assert_eq(&config_error);
     }
 
     #[test]
@@ -123,15 +122,18 @@ mod tests {
             }
         "#;
 
-        let request = json!({
-            "prismaSchema": schema,
-            "ignoreEnvVarErrors": true,
-        });
+        let request = GetConfigParams {
+            prisma_schema: schema.to_string(),
+            ignore_env_var_errors: true,
+            ..Default::default()
+        };
+
         let expected = expect![[
             r#"{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"NON_EXISTING_ENV_VAR_WE_COUNT_ON_IT_AT_LEAST","value":null},"schemas":[]}],"warnings":[]}"#
         ]];
-        let response = get_config(&request.to_string()).unwrap();
-        expected.assert_eq(&response);
+        let config = get_config(request).unwrap();
+        let config_json = serde_json::to_string(&config).unwrap();
+        expected.assert_eq(&config_json);
     }
 
     #[test]
@@ -143,17 +145,21 @@ mod tests {
             }
         "#;
 
-        let request = json!({
-            "prismaSchema": schema,
-            "env": {
-                "DBURL": "postgresql://example.com/mydb"
-            }
-        });
+        let mut env = HashMap::new();
+        env.insert("DBURL".to_string(), "postgresql://example.com/mydb".to_string());
+
+        let request = GetConfigParams {
+            prisma_schema: schema.to_string(),
+            env,
+            ..Default::default()
+        };
+
         let expected = expect![[
             r#"{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"DBURL","value":"postgresql://example.com/mydb"},"schemas":[]}],"warnings":[]}"#
         ]];
-        let response = get_config(&request.to_string()).unwrap();
-        expected.assert_eq(&response);
+        let config = get_config(request).unwrap();
+        let config_json = serde_json::to_string(&config).unwrap();
+        expected.assert_eq(&config_json);
     }
 
     #[test]
@@ -166,17 +172,21 @@ mod tests {
             }
         "#;
 
-        let request = json!({
-            "prismaSchema": schema,
-            "env": {
-                "DBURL": "postgresql://example.com/mydb"
-            }
-        });
+        let mut env = HashMap::new();
+        env.insert("DBURL".to_string(), "postgresql://example.com/mydb".to_string());
+
+        let request = GetConfigParams {
+            prisma_schema: schema.to_string(),
+            env,
+            ..Default::default()
+        };
+
         let expected = expect![[
             r#"{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"DBURL","value":"postgresql://example.com/mydb"},"directUrl":{"fromEnvVar":null,"value":"postgresql://example.com/direct"},"schemas":[]}],"warnings":[]}"#
         ]];
-        let response = get_config(&request.to_string()).unwrap();
-        expected.assert_eq(&response);
+        let config = get_config(request).unwrap();
+        let config_json = serde_json::to_string(&config).unwrap();
+        expected.assert_eq(&config_json);
     }
 
     #[test]
@@ -189,18 +199,22 @@ mod tests {
             }
         "#;
 
-        let request = json!({
-            "prismaSchema": schema,
-            "env": {
-                "DBURL": "postgresql://example.com/mydb",
-                "DBDIRURL": "postgresql://example.com/direct"
-            }
-        });
+        let mut env = HashMap::new();
+        env.insert("DBURL".to_string(), "postgresql://example.com/mydb".to_string());
+        env.insert("DBDIRURL".to_string(), "postgresql://example.com/direct".to_string());
+
+        let request = GetConfigParams {
+            prisma_schema: schema.to_string(),
+            env,
+            ..Default::default()
+        };
+
         let expected = expect![[
             r#"{"generators":[],"datasources":[{"name":"thedb","provider":"postgresql","activeProvider":"postgresql","url":{"fromEnvVar":"DBURL","value":"postgresql://example.com/mydb"},"directUrl":{"fromEnvVar":"DBDIRURL","value":"postgresql://example.com/direct"},"schemas":[]}],"warnings":[]}"#
         ]];
-        let response = get_config(&request.to_string()).unwrap();
-        expected.assert_eq(&response);
+        let config = get_config(request).unwrap();
+        let config_json = serde_json::to_string(&config).unwrap();
+        expected.assert_eq(&config_json);
     }
 
     #[test]
@@ -213,17 +227,20 @@ mod tests {
             }
         "#;
 
-        let request = json!({
-            "prismaSchema": schema,
-            "env": {
-                "DBURL": "postgresql://example.com/mydb",
-            }
-        });
+        let mut env = HashMap::new();
+        env.insert("DBURL".to_string(), "postgresql://example.com/mydb".to_string());
+
+        let request = GetConfigParams {
+            prisma_schema: schema.to_string(),
+            env,
+            ..Default::default()
+        };
+
         let expected = expect![[
             r#"{"message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating datasource `thedb`: You must provide a nonempty direct URL\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m                url = env(\"DBURL\")\n\u001b[1;94m 5 | \u001b[0m                directUrl = \u001b[1;91m\"\"\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\nValidation Error Count: 1","error_code":"P1012"}"#
         ]];
-        let response = get_config(&request.to_string()).unwrap_err();
-        expected.assert_eq(&response);
+        let config_error = get_config(request).unwrap_err();
+        expected.assert_eq(&config_error);
     }
 
     #[test]
@@ -236,17 +253,20 @@ mod tests {
             }
         "#;
 
-        let request = json!({
-            "prismaSchema": schema,
-            "env": {
-                "DBURL": "postgresql://example.com/mydb",
-            }
-        });
+        let mut env = HashMap::new();
+        env.insert("DBURL".to_string(), "postgresql://example.com/mydb".to_string());
+
+        let request = GetConfigParams {
+            prisma_schema: schema.to_string(),
+            env,
+            ..Default::default()
+        };
+
         let expected = expect![[
             r#"{"message":"\u001b[1;91merror\u001b[0m: \u001b[1mEnvironment variable not found: DOES_NOT_EXIST.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m                url = env(\"DBURL\")\n\u001b[1;94m 5 | \u001b[0m                directUrl = \u001b[1;91menv(\"DOES_NOT_EXIST\")\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\nValidation Error Count: 1","error_code":"P1012"}"#
         ]];
-        let response = get_config(&request.to_string()).unwrap_err();
-        expected.assert_eq(&response);
+        let config_error = get_config(request).unwrap_err();
+        expected.assert_eq(&config_error);
     }
 
     #[test]
@@ -259,17 +279,20 @@ mod tests {
             }
         "#;
 
-        let request = json!({
-            "prismaSchema": schema,
-            "env": {
-                "DBURL": "postgresql://example.com/mydb",
-                "DOES_NOT_EXIST": "",
-            }
-        });
+        let mut env = HashMap::new();
+        env.insert("DBURL".to_string(), "postgresql://example.com/mydb".to_string());
+        env.insert("DOES_NOT_EXIST".to_string(), "".to_string());
+
+        let request = GetConfigParams {
+            prisma_schema: schema.to_string(),
+            env,
+            ..Default::default()
+        };
+
         let expected = expect![[
             r#"{"message":"\u001b[1;91merror\u001b[0m: \u001b[1mError validating datasource `thedb`: You must provide a nonempty direct URL. The environment variable `DOES_NOT_EXIST` resolved to an empty string.\u001b[0m\n  \u001b[1;94m-->\u001b[0m  \u001b[4mschema.prisma:5\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\u001b[1;94m 4 | \u001b[0m                url = env(\"DBURL\")\n\u001b[1;94m 5 | \u001b[0m                directUrl = \u001b[1;91menv(\"DOES_NOT_EXIST\")\u001b[0m\n\u001b[1;94m   | \u001b[0m\n\nValidation Error Count: 1","error_code":"P1012"}"#
         ]];
-        let response = get_config(&request.to_string()).unwrap_err();
-        expected.assert_eq(&response);
+        let config_error = get_config(request).unwrap_err();
+        expected.assert_eq(&config_error);
     }
 }

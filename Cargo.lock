@@ -3277,7 +3277,9 @@ dependencies = [
  "schema-ast",
  "serde",
  "serde_json",
+ "tsify",
  "url",
+ "wasm-bindgen",
 ]
 
 [[package]]

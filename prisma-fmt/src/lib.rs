@@ -10,6 +10,10 @@ mod validate;
 
 pub use dmmf::DataModelMetaFormat;
 pub use get_dmmf::GetDmmfParams;
+
+pub use get_config::GetConfigParams;
+pub use psl::get_config::ConfigMetaFormat;
+
 use log::*;
 use lsp_types::{Position, Range};
 use psl::parser_database::ast;
@@ -105,44 +109,11 @@ pub fn referential_actions(schema: String) -> String {
 
 /// This is the same command as get_config()
 ///
-/// Params is a JSON string with the following shape:
-///
-/// ```ignore
-/// interface GetConfigParams {
-///   prismaSchema: string
-///   ignoreEnvVarErrors?: bool
-///   env?: { [key: string]: string }
-///   datasourceOverrides?: { [key: string]: string }
-/// }
-/// ```
-/// Params example:
-///
-/// ```ignore
-/// {
-///   "prismaSchema": <the prisma schema>,
-///   "env": {
-///     "DBURL": "postgresql://example.com/mydb"
-///   }
-/// }
-/// ```
-///
-/// The response is a JSON string with the following shape:
-///
-/// ```ignore
-/// type GetConfigSuccessResponse = any // same as QE getConfig
-///
-/// interface GetConfigErrorResponse {
-///   error: {
-///     error_code?: string
-///     message: string
-///   }
-/// }
-///
 /// type GetConfigResponse = GetConfigErrorResponse | GetConfigSuccessResponse
 ///
 /// ```
-pub fn get_config(get_config_params: String) -> Result<String, String> {
-    get_config::get_config(&get_config_params)
+pub fn get_config(get_config_params: GetConfigParams) -> Result<ConfigMetaFormat, String> {
+    get_config::get_config(get_config_params)
 }
 
 /// This is the same command as get_dmmf()

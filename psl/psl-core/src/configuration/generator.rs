@@ -2,9 +2,12 @@ use crate::{configuration::StringFromEnvVar, PreviewFeature};
 use enumflags2::BitFlags;
 use serde::{ser::SerializeSeq, Serialize, Serializer};
 use std::collections::HashMap;
+use tsify::Tsify;
 
 #[derive(Debug, Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
+#[derive(Tsify)]
+#[tsify(into_wasm_abi)]
 pub struct Generator {
     pub name: String,
     pub provider: StringFromEnvVar,
