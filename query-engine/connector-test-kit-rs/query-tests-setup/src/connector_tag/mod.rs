@@ -149,6 +149,7 @@ impl ConnectorTag {
         SqlServerConnectorTag::all()
             .into_iter()
             .map(Self::SqlServer)
+            .chain(VitessConnectorTag::all().into_iter().map(Self::Vitess))
             .chain(PostgresConnectorTag::all().into_iter().map(Self::Postgres))
             .chain(MySqlConnectorTag::all().into_iter().map(Self::MySql))
             .chain(MongoDbConnectorTag::all().into_iter().map(Self::MongoDb))
