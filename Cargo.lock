@@ -302,7 +302,7 @@ dependencies = [
 name = "builtin-psl-connectors"
 version = "0.1.0"
 dependencies = [
- "connection-string",
+ "connection-string 0.2.0",
  "either",
  "enumflags2",
  "indoc",
@@ -508,6 +508,12 @@ checksum = "b97faeec45f49581c458f8bf81992c5e3ec17d82cda99f59d3cea14eff62698d"
 dependencies = [
  "wasm-bindgen",
 ]
+
+[[package]]
+name = "connection-string"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "510ca239cf13b7f8d16a2b48f263de7b4f8c566f0af58d901031473c76afb1e3"
 
 [[package]]
 name = "console"
@@ -2024,8 +2030,9 @@ dependencies = [
 
 [[package]]
 name = "mobc"
-version = "0.7.3"
-source = "git+https://github.com/prisma/mobc?tag=1.0.6#80462c4870a2bf6aab49da15c88c021bae531da8"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fc79c4a77e312fee9c7bd4b957c12ad1196db73c4a81e5c0b13f02083c4f7f2f"
 dependencies = [
  "async-trait",
  "futures-channel",
@@ -3088,7 +3095,7 @@ dependencies = [
 name = "qe-setup"
 version = "0.1.0"
 dependencies = [
- "connection-string",
+ "connection-string 0.1.13",
  "enumflags2",
  "mongodb",
  "mongodb-client",
@@ -3105,7 +3112,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#5a708313ed488da9016e37edbb2f774fd7893250"
+source = "git+https://github.com/prisma/quaint?branch=upstream-mobc#86098efb520711f93907acac186f8377589c84f4"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -3114,7 +3121,7 @@ dependencies = [
  "byteorder",
  "bytes",
  "chrono",
- "connection-string",
+ "connection-string 0.2.0",
  "either",
  "futures",
  "hex",
@@ -3185,6 +3192,7 @@ dependencies = [
  "base64 0.12.3",
  "bigdecimal",
  "chrono",
+ "connection-string 0.2.0",
  "crossbeam-channel",
  "cuid",
  "enumflags2",
@@ -3221,7 +3229,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "base64 0.12.3",
- "connection-string",
+ "connection-string 0.2.0",
  "enumflags2",
  "graphql-parser",
  "hyper",
@@ -3274,7 +3282,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "connection-string",
+ "connection-string 0.2.0",
  "futures",
  "napi",
  "napi-build",
@@ -3546,7 +3554,7 @@ name = "request-handlers"
 version = "0.1.0"
 dependencies = [
  "bigdecimal",
- "connection-string",
+ "connection-string 0.2.0",
  "dmmf",
  "futures",
  "graphql-parser",
@@ -3815,7 +3823,7 @@ version = "0.1.0"
 dependencies = [
  "backtrace",
  "base64 0.13.1",
- "connection-string",
+ "connection-string 0.2.0",
  "expect-test",
  "indoc",
  "json-rpc-stdio",
@@ -4139,7 +4147,7 @@ name = "sql-introspection-tests"
 version = "0.1.0"
 dependencies = [
  "barrel",
- "connection-string",
+ "connection-string 0.2.0",
  "enumflags2",
  "expect-test",
  "indoc",
@@ -4166,7 +4174,7 @@ dependencies = [
  "bigdecimal",
  "chrono",
  "colored",
- "connection-string",
+ "connection-string 0.2.0",
  "enumflags2",
  "expect-test",
  "indoc",
@@ -4226,7 +4234,7 @@ name = "sql-schema-connector"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "connection-string",
+ "connection-string 0.2.0",
  "datamodel-renderer",
  "either",
  "enumflags2",
@@ -4464,7 +4472,7 @@ dependencies = [
 name = "test-setup"
 version = "0.1.0"
 dependencies = [
- "connection-string",
+ "connection-string 0.2.0",
  "dissimilar",
  "enumflags2",
  "once_cell",
@@ -4533,7 +4541,7 @@ dependencies = [
  "byteorder",
  "bytes",
  "chrono",
- "connection-string",
+ "connection-string 0.1.13",
  "encoding",
  "enumflags2",
  "futures",

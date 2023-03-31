@@ -23,8 +23,8 @@ tempfile = "3.1.0"
 test-setup = { path = "../../libs/test-setup" }
 test-macros = { path = "../../libs/test-macros" }
 url = "2.1.1"
-connection-string = "0.1"
 indoc.workspace = true
+connection-string = { workspace = true } 
 expect-test = "1.4.0"
 quaint.workspace = true
 

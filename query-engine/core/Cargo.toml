@@ -8,6 +8,7 @@ async-trait = "0.1"
 base64 = "0.12"
 bigdecimal = "0.3"
 chrono = "0.4"
+connection-string = { workspace = true } 
 connector = { path = "../connectors/query-connector", package = "query-connector" }
 crossbeam-channel = "0.5.6"
 psl.workspace = true
