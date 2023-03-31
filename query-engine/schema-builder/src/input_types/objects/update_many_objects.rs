@@ -48,7 +48,7 @@ pub(crate) fn unchecked_update_many_input_type(
     // TODO: This leads to conflicting type names.
     // TODO: See https://github.com/prisma/prisma/issues/18534 for further details.
     let name = match parent_field {
-        Some(ref pf) => format!(
+        Some(pf) => format!(
             "{}UncheckedUpdateManyWithout{}Input",
             model.name(),
             capitalize(pf.name())

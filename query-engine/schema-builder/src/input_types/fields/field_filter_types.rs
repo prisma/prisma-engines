@@ -88,6 +88,13 @@ fn to_many_relation_filter_object(ctx: &mut BuilderContext<'_>, rf: &RelationFie
 }
 
 fn to_one_relation_filter_object(ctx: &mut BuilderContext<'_>, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
+    // TODO: It is important to traverse the related model before going into the cache.
+    // TODO: The ToOneRelationFilterInput is currently broken as it does not take nullability into account.
+    // TODO: This means that the first relation field to be traversed will set the nullability for all other relation field that points to the same related model.
+    // TODO: Moving `filter_objects::where_object_type` _after_ the cache retrieval means that we're changing in which order we traverse the datamodel,
+    // TODO: potentially leading to a different ToOneRelationFilterInput.
+    // TODO: See https://github.com/prisma/prisma/issues/18585 for further info.
+    let related_input_type = filter_objects::where_object_type(ctx, &rf.related_model());
     let ident = Identifier::new_prisma(IdentifierType::ToOneRelationFilterInput(rf.related_model()));
 
     return_cached_input!(ctx, &ident);
@@ -97,8 +104,6 @@ fn to_one_relation_filter_object(ctx: &mut BuilderContext<'_>, rf: &RelationFiel
 
     let object = Arc::new(object);
     ctx.cache_input_type(ident, object.clone());
-
-    let related_input_type = filter_objects::where_object_type(ctx, &rf.related_model());
 
     let fields = vec![
         input_field(ctx, filters::IS, InputType::object(related_input_type.clone()), None)
