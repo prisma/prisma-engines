@@ -1,25 +1,20 @@
 use super::*;
 use constants::filters;
 use prisma_models::{prelude::ParentContainer, CompositeFieldRef};
-use std::sync::Arc;
 
 pub(crate) fn scalar_filter_object_type(
     ctx: &mut BuilderContext<'_>,
     model: &ModelRef,
     include_aggregates: bool,
-) -> InputObjectTypeWeakRef {
-    let aggregate = if include_aggregates { "WithAggregates" } else { "" };
-    let ident = Identifier::new_prisma(format!("{}ScalarWhere{}Input", model.name(), aggregate));
+) -> InputObjectTypeId {
+    let ident = Identifier::new_prisma(IdentifierType::ScalarFilterInput(model.clone(), include_aggregates));
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
     input_object.set_tag(ObjectTag::WhereInputType(ParentContainer::Model(model.clone())));
 
-    let input_object = Arc::new(input_object);
-    ctx.cache_input_type(ident, input_object.clone());
-
-    let weak_ref = Arc::downgrade(&input_object);
-    let object_type = InputType::object(weak_ref.clone());
+    let id = ctx.cache_input_type(ident, input_object);
+    let object_type = InputType::object(id);
 
     let mut input_fields = vec![
         input_field(
@@ -45,26 +40,22 @@ pub(crate) fn scalar_filter_object_type(
         ModelField::Composite(_) => None, // [Composites] todo
     }));
 
-    input_object.set_fields(input_fields);
-    weak_ref
+    ctx.db[id].set_fields(input_fields);
+    id
 }
 
-pub(crate) fn where_object_type<T>(ctx: &mut BuilderContext<'_>, container: T) -> InputObjectTypeWeakRef
+pub(crate) fn where_object_type<T>(ctx: &mut BuilderContext<'_>, container: T) -> InputObjectTypeId
 where
     T: Into<ParentContainer>,
 {
-    let container = container.into();
-    let ident = Identifier::new_prisma(format!("{}WhereInput", container.name()));
+    let container: ParentContainer = container.into();
+    let ident = Identifier::new_prisma(IdentifierType::WhereInput(container.clone()));
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
     input_object.set_tag(ObjectTag::WhereInputType(container.clone()));
-
-    let input_object = Arc::new(input_object);
-    ctx.cache_input_type(ident, input_object.clone());
-
-    let weak_ref = Arc::downgrade(&input_object);
-    let object_type = InputType::object(weak_ref.clone());
+    let id = ctx.cache_input_type(ident, input_object);
+    let object_type = InputType::object(id);
 
     let mut fields = vec![
         input_field(
@@ -91,12 +82,12 @@ where
 
     fields.extend(input_fields);
 
-    input_object.set_fields(fields);
-    weak_ref
+    ctx.db[id].set_fields(fields);
+    id
 }
 
-pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new_prisma(format!("{}WhereUniqueInput", model.name()));
+pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> InputObjectTypeId {
+    let ident = Identifier::new_prisma(IdentifierType::WhereUniqueInput(model.clone()));
     return_cached_input!(ctx, &ident);
 
     // Split unique & ID fields vs all the other fields
@@ -145,17 +136,16 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext<'_>, model: &Mod
             .collect()
     };
 
-    let mut x = init_input_object_type(ident.clone());
+    let mut input_object = init_input_object_type(ident.clone());
 
     if ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {
-        x.require_at_least_one_field();
-        x.apply_constraints_on_fields(constrained_fields);
+        input_object.require_at_least_one_field();
+        input_object.apply_constraints_on_fields(constrained_fields);
     } else {
-        x.require_exactly_one_field();
+        input_object.require_exactly_one_field();
     }
 
-    let input_object = Arc::new(x);
-    ctx.cache_input_type(ident, input_object.clone());
+    let id = ctx.cache_input_type(ident, input_object);
 
     let mut fields: Vec<InputField> = unique_fields
         .into_iter()
@@ -211,9 +201,8 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext<'_>, model: &Mod
         fields.extend(rest_fields);
     }
 
-    input_object.set_fields(fields);
-
-    Arc::downgrade(&input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 /// Generates and caches an input object type for a compound field.
@@ -222,7 +211,7 @@ fn compound_field_unique_object_type(
     model: &ModelRef,
     alias: Option<&str>,
     from_fields: Vec<ScalarFieldRef>,
-) -> InputObjectTypeWeakRef {
+) -> InputObjectTypeId {
     let ident = Identifier::new_prisma(format!(
         "{}{}CompoundUniqueInput",
         model.name(),
@@ -231,8 +220,8 @@ fn compound_field_unique_object_type(
 
     return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, input_object.clone());
+    let input_object = init_input_object_type(ident.clone());
+    let id = ctx.cache_input_type(ident, input_object);
 
     let object_fields = from_fields
         .into_iter()
@@ -244,22 +233,18 @@ fn compound_field_unique_object_type(
         })
         .collect();
 
-    input_object.set_fields(object_fields);
-    Arc::downgrade(&input_object)
+    ctx.db[id].set_fields(object_fields);
+    id
 }
 
 /// Object used for full composite equality, e.g. `{ field: "value", field2: 123 } == { field: "value" }`.
 /// If the composite is a list, only lists are allowed for comparison, no shorthands are used.
-pub(crate) fn composite_equality_object(
-    ctx: &mut BuilderContext<'_>,
-    cf: &CompositeFieldRef,
-) -> InputObjectTypeWeakRef {
+pub(crate) fn composite_equality_object(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputObjectTypeId {
     let ident = Identifier::new_prisma(format!("{}ObjectEqualityInput", cf.typ().name()));
     return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, input_object.clone());
-
+    let input_object = init_input_object_type(ident.clone());
+    let id = ctx.cache_input_type(ident, input_object);
     let mut fields = vec![];
 
     let composite_type = cf.typ();
@@ -268,7 +253,7 @@ pub(crate) fn composite_equality_object(
             let map_scalar_input_type_for_field = map_scalar_input_type_for_field(ctx, &sf);
             input_field(ctx, sf.name(), map_scalar_input_type_for_field, None)
                 .optional_if(!sf.is_required())
-                .nullable_if(!sf.is_required() && !sf.is_list(), &mut ctx.input_field_types)
+                .nullable_if(!sf.is_required() && !sf.is_list(), &mut ctx.db)
         }
 
         ModelField::Composite(cf) => {
@@ -282,14 +267,13 @@ pub(crate) fn composite_equality_object(
 
             input_field(ctx, cf.name(), types, None)
                 .optional_if(!cf.is_required())
-                .nullable_if(!cf.is_required() && !cf.is_list(), &mut ctx.input_field_types)
+                .nullable_if(!cf.is_required() && !cf.is_list(), &mut ctx.db)
         }
 
         ModelField::Relation(_) => unimplemented!(),
     });
 
     fields.extend(input_fields);
-    input_object.set_fields(fields);
-
-    Arc::downgrade(&input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }

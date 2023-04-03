@@ -1,14 +1,14 @@
 use super::*;
 use fmt::Debug;
 use once_cell::sync::OnceCell;
-use prisma_models::ModelRef;
+use prisma_models::{ast::ModelId, ModelRef};
 use std::{fmt, sync::Arc};
 
 #[derive(Debug, Clone)]
 pub enum OutputType {
-    Enum(EnumTypeWeakRef),
+    Enum(EnumTypeId),
     List(OutputTypeRef),
-    Object(ObjectTypeWeakRef),
+    Object(OutputObjectTypeId),
     Scalar(ScalarType),
 }
 
@@ -17,7 +17,7 @@ impl OutputType {
         OutputType::List(Arc::new(containing))
     }
 
-    pub fn object(containing: ObjectTypeWeakRef) -> OutputType {
+    pub fn object(containing: OutputObjectTypeId) -> OutputType {
         OutputType::Object(containing)
     }
 
@@ -45,7 +45,7 @@ impl OutputType {
         OutputType::Scalar(ScalarType::Boolean)
     }
 
-    pub fn enum_type(containing: EnumTypeWeakRef) -> OutputType {
+    pub fn enum_type(containing: EnumTypeId) -> OutputType {
         OutputType::Enum(containing)
     }
 
@@ -71,11 +71,11 @@ impl OutputType {
 
     /// Attempts to recurse through the type until an object type is found.
     /// Returns Some(ObjectTypeStrongRef) if ab object type is found, None otherwise.
-    pub fn as_object_type(&self) -> Option<ObjectTypeStrongRef> {
+    pub fn as_object_type<'a>(&self, db: &'a QuerySchemaDatabase) -> Option<&'a ObjectType> {
         match self {
             OutputType::Enum(_) => None,
-            OutputType::List(inner) => inner.as_object_type(),
-            OutputType::Object(obj) => Some(obj.into_arc()),
+            OutputType::List(inner) => inner.as_object_type(db),
+            OutputType::Object(obj) => Some(&db[*obj]),
             OutputType::Scalar(_) => None,
         }
     }
@@ -116,7 +116,7 @@ pub struct ObjectType {
     fields: OnceCell<Vec<OutputFieldRef>>,
 
     // Object types can directly map to models.
-    model: Option<ModelRef>,
+    model: Option<ModelId>,
 }
 
 impl Debug for ObjectType {
@@ -130,7 +130,7 @@ impl Debug for ObjectType {
 }
 
 impl ObjectType {
-    pub fn new(ident: Identifier, model: Option<ModelRef>) -> Self {
+    pub fn new(ident: Identifier, model: Option<ModelId>) -> Self {
         Self {
             identifier: ident,
             fields: OnceCell::new(),
@@ -172,7 +172,7 @@ pub struct OutputField {
 
     /// Arguments are input fields, but positioned in context of an output field
     /// instead of being attached to an input object.
-    pub arguments: Vec<InputFieldRef>,
+    pub arguments: Vec<InputField>,
 
     /// Indicates the presence of the field on the higher output objects.
     /// States whether or not the field can be null.
@@ -228,8 +228,8 @@ impl OutputField {
 
     // Is relation determines whether the given output field maps to a a relation, i.e.
     // is an object and that object is backed by a model, meaning that it is not an scalar list
-    pub fn maps_to_relation(&self) -> bool {
-        let o = self.field_type.as_object_type();
+    pub fn maps_to_relation(&self, query_schema: &QuerySchema) -> bool {
+        let o = self.field_type.as_object_type(&query_schema.db);
         o.is_some() && o.unwrap().model.is_some()
     }
 }

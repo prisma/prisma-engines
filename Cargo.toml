@@ -1,14 +1,13 @@
 [workspace]
 resolver = "2"
 members = [
-  "introspection-engine/connectors/*",
-  "introspection-engine/datamodel-renderer",
-  "introspection-engine/introspection-engine-tests",
   "migration-engine/cli",
-  "migration-engine/connectors/*",
   "migration-engine/core",
+  "migration-engine/connectors/*",
+  "migration-engine/datamodel-renderer",
   "migration-engine/json-rpc-api-build",
   "migration-engine/migration-engine-tests",
+  "migration-engine/introspection-engine-tests",
   "query-engine/connectors/*",
   "query-engine/connector-test-kit-rs/qe-setup",
   "query-engine/connector-test-kit-rs/query-engine-tests",
@@ -67,3 +66,7 @@ strip = "symbols"
 lto = "fat"
 codegen-units = 1
 opt-level = 's' # Optimize for size.
+
+[profile.profiling]
+inherits = "release"
+debug = true

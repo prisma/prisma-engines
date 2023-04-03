@@ -1,7 +1,4 @@
-use crate::{
-    psl::{parser_database::walkers::Walker, schema_ast::ast},
-    InternalDataModelRef,
-};
+use crate::{psl::parser_database::walkers::Walker, InternalDataModelRef};
 use std::{
     fmt,
     hash::{Hash, Hasher},
@@ -40,6 +37,3 @@ impl<I: Hash> Hash for Zipper<I> {
         self.id.hash(state)
     }
 }
-
-pub type InternalEnum = Zipper<ast::EnumId>;
-pub type InternalEnumValue = Zipper<ast::EnumValueId>;

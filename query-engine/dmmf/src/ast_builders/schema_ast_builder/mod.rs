@@ -11,10 +11,7 @@ use indexmap::map::Entry;
 use object_renderer::*;
 use schema::*;
 use schema_renderer::*;
-use std::{
-    collections::HashSet,
-    sync::{Arc, Weak},
-};
+use std::{collections::HashSet, sync::Arc};
 use type_renderer::*;
 
 pub(crate) fn render(query_schema: QuerySchemaRef) -> (DmmfSchema, DmmfOperationMappings) {
@@ -194,22 +191,22 @@ impl<'a> IntoRenderer for &'a EnumType {
     }
 }
 
-impl IntoRenderer for InputObjectTypeWeakRef {
+impl IntoRenderer for InputObjectTypeId {
     fn into_renderer(&self) -> Box<dyn Renderer> {
-        Box::new(DmmfObjectRenderer::Input(Weak::clone(self)))
+        Box::new(DmmfObjectRenderer::Input(*self))
     }
 
     fn is_already_rendered(&self, ctx: &RenderContext) -> bool {
-        ctx.already_rendered(&self.into_arc().identifier)
+        ctx.already_rendered(&ctx.query_schema.db[*self].identifier)
     }
 }
 
-impl IntoRenderer for ObjectTypeWeakRef {
+impl IntoRenderer for OutputObjectTypeId {
     fn into_renderer(&self) -> Box<dyn Renderer> {
-        Box::new(DmmfObjectRenderer::Output(Weak::clone(self)))
+        Box::new(DmmfObjectRenderer::Output(*self))
     }
 
     fn is_already_rendered(&self, ctx: &RenderContext) -> bool {
-        ctx.already_rendered(&self.into_arc().identifier)
+        ctx.already_rendered(&ctx.query_schema.db[*self].identifier)
     }
 }

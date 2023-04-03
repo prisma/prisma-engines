@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# script/bootstrap-darwin: Resolve all dependencies that the application requires to
+set -e
+cd "$(dirname "$0")/.."
+
+if [ -f "Brewfile" ] && [ "$(uname -s)" = "Darwin" ]; then
+  brew bundle check >/dev/null 2>&1  || {
+    echo "==> Installing Homebrew dependencies…"
+    brew bundle
+  }
+fi
+
+echo "==> Checking for default rust installation"
+rustc --version
+rustup default stable > /dev/null
+
+echo "==> Building the prisma-engines workspace"
+if cargo build --workspace --all-targets; then
+  echo "==> You are all set!"
+fi

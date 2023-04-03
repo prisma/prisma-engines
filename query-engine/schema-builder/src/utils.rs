@@ -1,14 +1,10 @@
 use super::*;
 use once_cell::sync::OnceCell;
-use prisma_models::{
-    dml,
-    walkers::{self, PrimaryKeyWalker},
-    ModelRef,
-};
-use std::{fmt, sync::Arc};
+use prisma_models::{ast, dml, walkers};
+use std::sync::Arc;
 
 /// Object type convenience wrapper function.
-pub fn object_type(ident: Identifier, fields: Vec<OutputField>, model: Option<ModelRef>) -> ObjectType {
+pub fn object_type(ident: Identifier, fields: Vec<OutputField>, model: Option<ast::ModelId>) -> ObjectType {
     let object_type = ObjectType::new(ident, model);
 
     object_type.set_fields(fields);
@@ -45,7 +41,7 @@ where
 {
     OutputField {
         name: name.into(),
-        arguments: arguments.into_iter().map(Arc::new).collect(),
+        arguments,
         field_type: Arc::new(field_type),
         query_info,
         is_nullable: false,
@@ -66,32 +62,9 @@ where
 {
     let mut input_field = InputField::new(name.into(), default_value, true);
     for field_type in field_types {
-        input_field.push_type(field_type, &mut ctx.input_field_types);
+        input_field.push_type(field_type, &mut ctx.db);
     }
     input_field
-}
-
-/// Capitalizes first character.
-/// Assumes 1-byte characters.
-pub fn capitalize(s: &str) -> impl fmt::Display + '_ {
-    struct Capitalized<'a>(&'a str);
-
-    impl fmt::Display for Capitalized<'_> {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            let first_char = if let Some(first_char) = self.0.chars().next() {
-                first_char
-            } else {
-                return Ok(());
-            };
-            debug_assert!(first_char.is_ascii());
-            let first_char = first_char.to_ascii_uppercase();
-
-            fmt::Display::fmt(&first_char, f)?;
-            f.write_str(&self.0[1..])
-        }
-    }
-
-    Capitalized(s)
 }
 
 /// Appends an option of type T to a vector over T if the option is Some.
@@ -109,7 +82,7 @@ pub fn compound_index_field_name(index: &walkers::IndexWalker<'_>) -> String {
 }
 
 /// Computes a compound field name based on a multi-field id.
-pub fn compound_id_field_name(pk: PrimaryKeyWalker<'_>) -> String {
+pub fn compound_id_field_name(pk: walkers::PrimaryKeyWalker<'_>) -> String {
     pk.name()
         .map(ToOwned::to_owned)
         .unwrap_or_else(|| pk.fields().map(|sf| sf.name()).collect::<Vec<_>>().join("_"))

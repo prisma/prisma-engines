@@ -75,7 +75,7 @@ fn map_field_aggregation_object<F, G>(
     type_mapper: F,
     object_mapper: G,
     is_count: bool,
-) -> ObjectTypeWeakRef
+) -> OutputObjectTypeId
 where
     F: Fn(&mut BuilderContext<'_>, &ScalarFieldRef) -> OutputType,
     G: Fn(ObjectType) -> ObjectType,
@@ -95,9 +95,6 @@ where
         .collect();
 
     let object = object_mapper(object_type(ident.clone(), fields, None));
-    let object = Arc::new(object);
 
-    ctx.cache_output_type(ident, object.clone());
-
-    Arc::downgrade(&object)
+    ctx.cache_output_type(ident, object)
 }

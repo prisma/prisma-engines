@@ -28,15 +28,15 @@ impl QueryGraphBuilder {
     pub fn build(self, operation: Operation) -> QueryGraphBuilderResult<(QueryGraph, IrSerializer)> {
         let _span = info_span!("prisma:engine:build_graph");
         match operation {
-            Operation::Read(selection) => self.build_internal(selection, &self.query_schema.query()),
-            Operation::Write(selection) => self.build_internal(selection, &self.query_schema.mutation()),
+            Operation::Read(selection) => self.build_internal(selection, self.query_schema.query()),
+            Operation::Write(selection) => self.build_internal(selection, self.query_schema.mutation()),
         }
     }
 
     fn build_internal(
         &self,
         selection: Selection,
-        root_object: &ObjectTypeStrongRef, // Either the query or mutation object.
+        root_object: &ObjectType, // Either the query or mutation object.
     ) -> QueryGraphBuilderResult<(QueryGraph, IrSerializer)> {
         let mut selections = vec![selection];
         let mut parsed_object = QueryDocumentParser::new(crate::executor::get_request_now()).parse(

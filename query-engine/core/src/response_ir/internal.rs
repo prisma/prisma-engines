@@ -38,10 +38,13 @@ pub(crate) fn serialize_internal(
     result: QueryResult,
     field: &OutputFieldRef,
     is_list: bool,
+    query_schema: &QuerySchema,
 ) -> crate::Result<CheckedItemsWithParents> {
     match result {
-        QueryResult::RecordSelection(rs) => serialize_record_selection(*rs, field, &field.field_type, is_list),
-        QueryResult::RecordAggregations(ras) => serialize_aggregations(field, ras),
+        QueryResult::RecordSelection(rs) => {
+            serialize_record_selection(*rs, field, &field.field_type, is_list, query_schema)
+        }
+        QueryResult::RecordAggregations(ras) => serialize_aggregations(field, ras, query_schema),
         QueryResult::Count(c) => {
             // Todo needs a real implementation or needs to move to RecordAggregation
             let mut map: Map = IndexMap::with_capacity(1);
@@ -61,9 +64,10 @@ pub(crate) fn serialize_internal(
 fn serialize_aggregations(
     output_field: &OutputFieldRef,
     record_aggregations: RecordAggregations,
+    query_schema: &QuerySchema,
 ) -> crate::Result<CheckedItemsWithParents> {
     let ordering = record_aggregations.selection_order;
-    let aggregate_object_type = extract_aggregate_object_type(output_field.field_type.borrow());
+    let aggregate_object_type = extract_aggregate_object_type(output_field.field_type.borrow(), query_schema);
 
     let mut results = vec![];
 
@@ -74,7 +78,10 @@ fn serialize_aggregations(
             match result {
                 AggregationResult::Field(field, value) => {
                     let output_field = aggregate_object_type.find_field(field.name()).unwrap();
-                    flattened.insert(field.name().to_owned(), serialize_scalar(&output_field, value)?);
+                    flattened.insert(
+                        field.name().to_owned(),
+                        serialize_scalar(&output_field, value, query_schema)?,
+                    );
                 }
 
                 AggregationResult::Count(field, count) => {
@@ -86,38 +93,62 @@ fn serialize_aggregations(
                 }
 
                 AggregationResult::Average(field, value) => {
-                    let output_field =
-                        find_nested_aggregate_output_field(&aggregate_object_type, UNDERSCORE_AVG, field.name());
+                    let output_field = find_nested_aggregate_output_field(
+                        aggregate_object_type,
+                        UNDERSCORE_AVG,
+                        field.name(),
+                        query_schema,
+                    );
                     flattened.insert(
                         format!("_avg_{}", field.name()),
-                        serialize_scalar(&output_field, value)?,
+                        serialize_scalar(&output_field, value, query_schema)?,
                     );
                 }
 
                 AggregationResult::Sum(field, value) => {
-                    let output_field =
-                        find_nested_aggregate_output_field(&aggregate_object_type, UNDERSCORE_SUM, field.name());
+                    let output_field = find_nested_aggregate_output_field(
+                        aggregate_object_type,
+                        UNDERSCORE_SUM,
+                        field.name(),
+                        query_schema,
+                    );
                     flattened.insert(
                         format!("_sum_{}", field.name()),
-                        serialize_scalar(&output_field, value)?,
+                        serialize_scalar(&output_field, value, query_schema)?,
                     );
                 }
 
                 AggregationResult::Min(field, value) => {
-                    let output_field =
-                        find_nested_aggregate_output_field(&aggregate_object_type, UNDERSCORE_MIN, field.name());
+                    let output_field = find_nested_aggregate_output_field(
+                        aggregate_object_type,
+                        UNDERSCORE_MIN,
+                        field.name(),
+                        query_schema,
+                    );
                     flattened.insert(
                         format!("_min_{}", field.name()),
-                        serialize_scalar(&output_field, coerce_non_numeric(value, &output_field.field_type))?,
+                        serialize_scalar(
+                            &output_field,
+                            coerce_non_numeric(value, &output_field.field_type),
+                            query_schema,
+                        )?,
                     );
                 }
 
                 AggregationResult::Max(field, value) => {
-                    let output_field =
-                        find_nested_aggregate_output_field(&aggregate_object_type, UNDERSCORE_MAX, field.name());
+                    let output_field = find_nested_aggregate_output_field(
+                        aggregate_object_type,
+                        UNDERSCORE_MAX,
+                        field.name(),
+                        query_schema,
+                    );
                     flattened.insert(
                         format!("_max_{}", field.name()),
-                        serialize_scalar(&output_field, coerce_non_numeric(value, &output_field.field_type))?,
+                        serialize_scalar(
+                            &output_field,
+                            coerce_non_numeric(value, &output_field.field_type),
+                            query_schema,
+                        )?,
                     );
                 }
             }
@@ -188,23 +219,24 @@ fn write_rel_aggregation_row(row: &RelAggregationRow, map: &mut HashMap<String, 
     }
 }
 
-fn extract_aggregate_object_type(output_type: &OutputType) -> ObjectTypeStrongRef {
+fn extract_aggregate_object_type<'a>(output_type: &OutputType, query_schema: &'a QuerySchema) -> &'a ObjectType {
     match output_type {
-        OutputType::Object(obj) => obj.into_arc(),
-        OutputType::List(inner) => extract_aggregate_object_type(inner),
+        OutputType::Object(obj) => &query_schema.db[*obj],
+        OutputType::List(inner) => extract_aggregate_object_type(inner, query_schema),
         _ => unreachable!("Aggregate output must be a list or an object."),
     }
 }
 
 // Workaround until we streamline serialization.
 fn find_nested_aggregate_output_field(
-    object_type: &ObjectTypeStrongRef,
+    object_type: &ObjectType,
     nested_obj_name: &str,
     nested_field_name: &str,
+    query_schema: &QuerySchema,
 ) -> OutputFieldRef {
     let nested_field = object_type.find_field(nested_obj_name).unwrap();
     let nested_object_type = match nested_field.field_type.borrow() {
-        OutputType::Object(obj) => obj.into_arc(),
+        OutputType::Object(obj) => &query_schema.db[*obj],
         _ => unreachable!("{} output must be an object.", nested_obj_name),
     };
 
@@ -223,13 +255,14 @@ fn serialize_record_selection(
     field: &OutputFieldRef,
     typ: &OutputTypeRef, // We additionally pass the type to allow recursing into nested type definitions of a field.
     is_list: bool,
+    query_schema: &QuerySchema,
 ) -> crate::Result<CheckedItemsWithParents> {
     let name = record_selection.name.clone();
 
     match typ.borrow() {
-        OutputType::List(inner) => serialize_record_selection(record_selection, field, inner, true),
+        OutputType::List(inner) => serialize_record_selection(record_selection, field, inner, true, query_schema),
         OutputType::Object(obj) => {
-            let result = serialize_objects(record_selection, obj.into_arc())?;
+            let result = serialize_objects(record_selection, &query_schema.db[*obj], query_schema)?;
             let is_optional = field.is_nullable;
 
             // Items will be ref'ed on the top level to allow cheap clones in nested scenarios.
@@ -285,14 +318,16 @@ fn serialize_record_selection(
 /// Returns a vector of serialized objects (as Item::Map), grouped into a map by parent, if present.
 fn serialize_objects(
     mut result: RecordSelection,
-    typ: ObjectTypeStrongRef,
+    typ: &ObjectType,
+    query_schema: &QuerySchema,
 ) -> crate::Result<UncheckedItemsWithParents> {
     // The way our query execution works, we only need to look at nested + lists if we hit an object.
     // Move nested out of result for separate processing.
     let nested = std::mem::take(&mut result.nested);
 
     // { <nested field name> -> { parent ID -> items } }
-    let mut nested_mapping: HashMap<String, CheckedItemsWithParents> = process_nested_results(nested, &typ)?;
+    let mut nested_mapping: HashMap<String, CheckedItemsWithParents> =
+        process_nested_results(nested, typ, query_schema)?;
 
     // We need the Arcs to solve the issue where we have multiple parents claiming the same data (we want to move the data out of the nested structure
     // to prevent expensive copying during serialization).
@@ -325,11 +360,17 @@ fn serialize_objects(
 
             match field {
                 Field::Composite(cf) => {
-                    object.insert(field.name().to_owned(), serialize_composite(cf, &out_field, val)?);
+                    object.insert(
+                        field.name().to_owned(),
+                        serialize_composite(cf, &out_field, val, query_schema)?,
+                    );
                 }
 
                 _ if !out_field.field_type.is_object() => {
-                    object.insert(field.name().to_owned(), serialize_scalar(&out_field, val)?);
+                    object.insert(
+                        field.name().to_owned(),
+                        serialize_scalar(&out_field, val, query_schema)?,
+                    );
                 }
 
                 _ => (),
@@ -337,7 +378,7 @@ fn serialize_objects(
         }
 
         // Write nested results
-        write_nested_items(&record_id, &mut nested_mapping, &mut object, &typ)?;
+        write_nested_items(&record_id, &mut nested_mapping, &mut object, typ)?;
 
         let aggr_row = result.aggregation_rows.as_ref().map(|rows| rows.get(r_index).unwrap());
         if let Some(aggr_row) = aggr_row {
@@ -385,7 +426,7 @@ fn write_nested_items(
     record_id: &Option<SelectionResult>,
     items_with_parent: &mut HashMap<String, CheckedItemsWithParents>,
     into: &mut HashMap<String, Item>,
-    enclosing_type: &ObjectTypeStrongRef,
+    enclosing_type: &ObjectType,
 ) -> crate::Result<()> {
     for (field_name, inner) in items_with_parent.iter_mut() {
         let val = inner.get(record_id);
@@ -416,7 +457,8 @@ fn write_nested_items(
 /// Processes nested results into a more ergonomic structure of { <nested field name> -> { parent ID -> item (list, map, ...) } }.
 fn process_nested_results(
     nested: Vec<QueryResult>,
-    enclosing_type: &ObjectTypeStrongRef,
+    enclosing_type: &ObjectType,
+    query_schema: &QuerySchema,
 ) -> crate::Result<HashMap<String, CheckedItemsWithParents>> {
     // For each nested selected field we need to map the parents to their items.
     let mut nested_mapping = HashMap::with_capacity(nested.len());
@@ -428,7 +470,7 @@ fn process_nested_results(
         if let QueryResult::RecordSelection(ref rs) = nested_result {
             let name = rs.name.clone();
             let field = enclosing_type.find_field(&name).unwrap();
-            let result = serialize_internal(nested_result, &field, false)?;
+            let result = serialize_internal(nested_result, &field, false, query_schema)?;
 
             nested_mapping.insert(name, result);
         }
@@ -438,14 +480,19 @@ fn process_nested_results(
 }
 
 // Problem: order of selections
-fn serialize_composite(cf: &CompositeFieldRef, out_field: &OutputFieldRef, value: PrismaValue) -> crate::Result<Item> {
+fn serialize_composite(
+    cf: &CompositeFieldRef,
+    out_field: &OutputFieldRef,
+    value: PrismaValue,
+    query_schema: &QuerySchema,
+) -> crate::Result<Item> {
     match value {
         PrismaValue::Null if !cf.is_required() => Ok(Item::Value(PrismaValue::Null)),
 
         PrismaValue::List(values) if cf.is_list() => {
             let values = values
                 .into_iter()
-                .map(|value| serialize_composite(cf, out_field, value))
+                .map(|value| serialize_composite(cf, out_field, value, query_schema))
                 .collect::<crate::Result<Vec<_>>>();
 
             Ok(Item::List(values?.into()))
@@ -455,7 +502,7 @@ fn serialize_composite(cf: &CompositeFieldRef, out_field: &OutputFieldRef, value
             let mut map = Map::new();
             let object_type = out_field
                 .field_type
-                .as_object_type()
+                .as_object_type(&query_schema.db)
                 .expect("Composite output field is not an object.");
 
             let composite_type = cf.typ();
@@ -475,14 +522,14 @@ fn serialize_composite(cf: &CompositeFieldRef, out_field: &OutputFieldRef, value
                     Field::Composite(cf) => {
                         map.insert(
                             inner_field.name().to_owned(),
-                            serialize_composite(cf, &inner_out_field, value)?,
+                            serialize_composite(cf, &inner_out_field, value, query_schema)?,
                         );
                     }
 
                     _ if !inner_out_field.field_type.is_object() => {
                         map.insert(
                             inner_field.name().to_owned(),
-                            serialize_scalar(&inner_out_field, value)?,
+                            serialize_scalar(&inner_out_field, value, query_schema)?,
                         );
                     }
 
@@ -502,10 +549,10 @@ fn serialize_composite(cf: &CompositeFieldRef, out_field: &OutputFieldRef, value
     }
 }
 
-fn serialize_scalar(field: &OutputFieldRef, value: PrismaValue) -> crate::Result<Item> {
+fn serialize_scalar(field: &OutputFieldRef, value: PrismaValue, schema: &QuerySchema) -> crate::Result<Item> {
     match (&value, field.field_type.as_ref()) {
         (PrismaValue::Null, _) if field.is_nullable => Ok(Item::Value(PrismaValue::Null)),
-        (_, OutputType::Enum(et)) => match *et.into_arc() {
+        (_, OutputType::Enum(et)) => match &schema.db[*et] {
             EnumType::Database(ref db) => convert_enum(value, db),
             _ => unreachable!(),
         },
@@ -521,7 +568,7 @@ fn serialize_scalar(field: &OutputFieldRef, value: PrismaValue) -> crate::Result
             OutputType::Enum(et) => {
                 let items = unwrap_prisma_value(value)
                     .into_iter()
-                    .map(|v| match *et.into_arc() {
+                    .map(|v| match &schema.db[*et] {
                         EnumType::Database(ref dbt) => convert_enum(v, dbt),
                         _ => unreachable!(),
                     })

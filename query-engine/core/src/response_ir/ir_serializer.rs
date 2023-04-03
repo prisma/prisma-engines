@@ -1,7 +1,7 @@
 use super::{internal::serialize_internal, response::*, *};
 use crate::{CoreError, ExpressionResult, QueryResult};
 use prisma_models::PrismaValue;
-use schema::{OutputFieldRef, OutputType};
+use schema::{OutputFieldRef, OutputType, QuerySchema};
 use std::borrow::Borrow;
 
 #[derive(Debug)]
@@ -15,7 +15,11 @@ pub struct IrSerializer {
 }
 
 impl IrSerializer {
-    pub(crate) fn serialize(&self, result: ExpressionResult) -> crate::Result<ResponseData> {
+    pub(crate) fn serialize(
+        &self,
+        result: ExpressionResult,
+        query_schema: &QuerySchema,
+    ) -> crate::Result<ResponseData> {
         let _span = info_span!("prisma:engine:serialize", user_facing = true);
         match result {
             ExpressionResult::Query(QueryResult::Json(json)) => {
@@ -23,7 +27,7 @@ impl IrSerializer {
             }
 
             ExpressionResult::Query(r) => {
-                let serialized = serialize_internal(r, &self.output_field, false)?;
+                let serialized = serialize_internal(r, &self.output_field, false, query_schema)?;
 
                 // On the top level, each result boils down to a exactly a single serialized result.
                 // All checks for lists and optionals have already been performed during the recursion,

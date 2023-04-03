@@ -39,15 +39,16 @@ pub(crate) fn order_by_object_type(
     ctx: &mut BuilderContext<'_>,
     container: &ParentContainer,
     options: &OrderByOptions,
-) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new_prisma(format!("{}OrderBy{}Input", container.name(), options.type_suffix()));
+) -> InputObjectTypeId {
+    let ident = Identifier::new_prisma(IdentifierType::OrderByInput(
+        container.clone(),
+        options.type_suffix().to_owned(),
+    ));
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
     input_object.require_at_most_one_field();
-
-    let input_object = Arc::new(input_object);
-    ctx.cache_input_type(ident, input_object.clone());
+    let id = ctx.cache_input_type(ident, input_object);
 
     // Basic orderBy fields.
     let mut fields: Vec<_> = container
@@ -70,8 +71,8 @@ pub(crate) fn order_by_object_type(
         append_opt(&mut fields, order_by_field_text_search(ctx, container))
     }
 
-    input_object.set_fields(fields);
-    Arc::downgrade(&input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 fn compute_scalar_aggregation_fields(ctx: &mut BuilderContext<'_>, container: &ParentContainer) -> Vec<InputField> {
@@ -173,13 +174,12 @@ fn orderby_field_mapper(
     }
 }
 
-fn sort_nulls_object_type(ctx: &mut BuilderContext<'_>) -> InputObjectTypeWeakRef {
+fn sort_nulls_object_type(ctx: &mut BuilderContext<'_>) -> InputObjectTypeId {
     let ident = Identifier::new_prisma("SortOrderInput");
     return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, input_object.clone());
-
+    let input_object = init_input_object_type(ident.clone());
+    let id = ctx.cache_input_type(ident, input_object);
     let sort_order_enum_type = sort_order_enum(ctx);
     let nulls_order_enum_type = nulls_order_enum(ctx);
 
@@ -188,9 +188,8 @@ fn sort_nulls_object_type(ctx: &mut BuilderContext<'_>) -> InputObjectTypeWeakRe
         input_field(ctx, ordering::NULLS, InputType::Enum(nulls_order_enum_type), None).optional(),
     ];
 
-    input_object.set_fields(fields);
-
-    Arc::downgrade(&input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 fn order_by_field_aggregate(
@@ -213,16 +212,17 @@ fn order_by_object_type_aggregate(
     ctx: &mut BuilderContext<'_>,
     container: &ParentContainer,
     scalar_fields: Vec<ScalarFieldRef>,
-) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new_prisma(format!("{}{}OrderByAggregateInput", container.name(), suffix));
+) -> InputObjectTypeId {
+    let ident = Identifier::new_prisma(IdentifierType::OrderByAggregateInput(
+        container.clone(),
+        suffix.to_string(),
+    ));
 
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
     input_object.require_exactly_one_field();
-
-    let input_object = Arc::new(input_object);
-    ctx.cache_input_type(ident, input_object.clone());
+    let id = ctx.cache_input_type(ident, input_object);
 
     let sort_order_enum = InputType::Enum(sort_order_enum(ctx));
     let fields = scalar_fields
@@ -230,34 +230,25 @@ fn order_by_object_type_aggregate(
         .map(|sf| input_field(ctx, sf.name(), sort_order_enum.clone(), None).optional())
         .collect();
 
-    input_object.set_fields(fields);
-    Arc::downgrade(&input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 fn order_by_to_many_aggregate_object_type(
     ctx: &mut BuilderContext<'_>,
     container: &ParentContainer,
-) -> InputObjectTypeWeakRef {
-    let container_type = match container {
-        ParentContainer::Model(_) => "Relation",
-        ParentContainer::CompositeType(_) => "Composite",
-    };
-
-    let ident = Identifier::new_prisma(format!("{}OrderBy{}AggregateInput", container.name(), container_type));
+) -> InputObjectTypeId {
+    let ident = Identifier::new_prisma(IdentifierType::OrderByToManyAggregateInput(container.clone()));
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
     input_object.require_exactly_one_field();
-
-    let input_object = Arc::new(input_object);
-    ctx.cache_input_type(ident, input_object.clone());
+    let id = ctx.cache_input_type(ident, input_object);
 
     let sort_order_enum = InputType::Enum(sort_order_enum(ctx));
     let fields = vec![input_field(ctx, aggregations::UNDERSCORE_COUNT, sort_order_enum, None).optional()];
-
-    input_object.set_fields(fields);
-
-    Arc::downgrade(&input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 fn order_by_field_text_search(ctx: &mut BuilderContext<'_>, container: &ParentContainer) -> Option<InputField> {
@@ -282,17 +273,17 @@ fn order_by_object_type_text_search(
     ctx: &mut BuilderContext<'_>,
     container: &ParentContainer,
     scalar_fields: Vec<ScalarFieldRef>,
-) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new_prisma(format!("{}OrderByRelevanceInput", container.name()));
+) -> InputObjectTypeId {
+    let ident = Identifier::new_prisma(IdentifierType::OrderByRelevanceInput(container.clone()));
 
     return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, input_object.clone());
+    let input_object = init_input_object_type(ident.clone());
+    let id = ctx.cache_input_type(ident, input_object);
 
     let fields_enum_type = InputType::enum_type(order_by_relevance_enum(
         ctx,
-        &container.name(),
+        container,
         scalar_fields.iter().map(|sf| sf.name().to_owned()).collect(),
     ));
     let sort_order_enum = sort_order_enum(ctx);
@@ -308,7 +299,6 @@ fn order_by_object_type_text_search(
         input_field(ctx, ordering::SEARCH, InputType::string(), None),
     ];
 
-    input_object.set_fields(fields);
-
-    Arc::downgrade(&input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
