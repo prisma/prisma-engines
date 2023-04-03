@@ -9,8 +9,6 @@ CREATE TABLE _nodes(
     CONSTRAINT _nodes_node_b_fkey FOREIGN KEY(node_b) REFERENCES nodes(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-
-
 /*
 generator js {
   provider = "prisma-client-js"
@@ -22,21 +20,19 @@ datasource db {
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-model public__nodes {
+model nodes {
   node_a                    Int
   node_b                    Int
-  nodes_nodes_node_aTonodes public_nodes @relation("nodes_node_aTonodes", fields: [node_a], references: [id], onDelete: Cascade)
-  nodes_nodes_node_bTonodes public_nodes @relation("nodes_node_bTonodes", fields: [node_b], references: [id], onDelete: Cascade)
+  nodes_nodes_node_aTonodes nodes @relation("nodes_node_aTonodes", fields: [node_a], references: [id], onDelete: Cascade)
+  nodes_nodes_node_bTonodes nodes @relation("nodes_node_bTonodes", fields: [node_b], references: [id], onDelete: Cascade)
 
   @@map("_nodes")
   @@ignore
 }
 
-model public_nodes {
-  id                        Int             @id @default(autoincrement())
-  nodes_nodes_node_aTonodes public__nodes[] @relation("nodes_node_aTonodes") @ignore
-  nodes_nodes_node_bTonodes public__nodes[] @relation("nodes_node_bTonodes") @ignore
-
-  @@map("nodes")
+model nodes {
+  id                        Int     @id @default(autoincrement())
+  nodes_nodes_node_aTonodes nodes[] @relation("nodes_node_aTonodes") @ignore
+  nodes_nodes_node_bTonodes nodes[] @relation("nodes_node_bTonodes") @ignore
 }
 */
