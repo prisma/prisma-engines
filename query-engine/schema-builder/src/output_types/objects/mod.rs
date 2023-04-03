@@ -16,16 +16,15 @@ pub(crate) fn initialize_caches(ctx: &mut BuilderContext<'_>) {
     composite::initialize_fields(ctx);
 }
 
-pub(crate) fn affected_records_object_type(ctx: &mut BuilderContext<'_>) -> ObjectTypeWeakRef {
+pub(crate) fn affected_records_object_type(ctx: &mut BuilderContext<'_>) -> OutputObjectTypeId {
     let ident = Identifier::new_prisma("AffectedRowsOutput".to_owned());
     return_cached_output!(ctx, &ident);
 
-    let object_type = Arc::new(object_type(
+    let object_type = object_type(
         ident.clone(),
         vec![field(AFFECTED_COUNT, vec![], OutputType::int(), None)],
         None,
-    ));
+    );
 
-    ctx.cache_output_type(ident, object_type.clone());
-    Arc::downgrade(&object_type)
+    ctx.cache_output_type(ident, object_type)
 }

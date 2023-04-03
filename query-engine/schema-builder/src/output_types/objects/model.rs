@@ -8,15 +8,16 @@ use std::convert::identity;
 /// need all models to be present, then we can compute fields in a second pass.
 pub(crate) fn initialize_cache(ctx: &mut BuilderContext<'_>) {
     for model in ctx.internal_data_model.models() {
-        let ident = Identifier::new_model(model.name());
-        ctx.cache_output_type(ident.clone(), Arc::new(ObjectType::new(ident, Some(model.id))));
+        let ident = Identifier::new_model(IdentifierType::Model(model.clone()));
+
+        ctx.cache_output_type(ident.clone(), ObjectType::new(ident, Some(model.id)));
     }
 }
 
 // Compute fields on all cached model object types.
 pub(crate) fn initialize_fields(ctx: &mut BuilderContext<'_>) {
     for model in ctx.internal_data_model.models() {
-        let obj: ObjectTypeWeakRef = map_type(ctx, &model);
+        let obj = map_type(ctx, &model);
         let mut fields = compute_model_object_type_fields(ctx, &model);
 
         // Add _count field. Only include to-many fields.
@@ -34,14 +35,14 @@ pub(crate) fn initialize_fields(ctx: &mut BuilderContext<'_>) {
             ),
         );
 
-        obj.into_arc().set_fields(fields);
+        ctx.db[obj].set_fields(fields);
     }
 }
 
 /// Returns an output object type for the given model.
 /// Relies on the output type cache being initalized.
-pub(crate) fn map_type(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> ObjectTypeWeakRef {
-    let ident = Identifier::new_model(model.name());
+pub(crate) fn map_type(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> OutputObjectTypeId {
+    let ident = Identifier::new_model(IdentifierType::Model(model.clone()));
     ctx.get_output_type(&ident)
         .expect("Invariant violation: Initialized output object type for each model.")
 }

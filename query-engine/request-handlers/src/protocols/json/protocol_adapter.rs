@@ -4,7 +4,7 @@ use indexmap::IndexMap;
 use prisma_models::{decode_bytes, parse_datetime, prelude::ParentContainer, Field};
 use query_core::{
     constants::custom_types,
-    schema::{ObjectTypeStrongRef, OutputFieldRef, QuerySchemaRef},
+    schema::{ObjectType, OutputFieldRef, QuerySchema, QuerySchemaRef},
     ArgumentValue, Operation, Selection,
 };
 use serde_json::Value as JsonValue;
@@ -28,7 +28,7 @@ impl JsonProtocolAdapter {
         let (operation_type, field) = Self::find_schema_field(query_schema, model_name, action)?;
         let container = field.model().map(ParentContainer::from);
 
-        let selection = Self::convert_selection(field, container.as_ref(), query)?;
+        let selection = Self::convert_selection(field, container.as_ref(), query, query_schema)?;
 
         match operation_type {
             OperationType::Read => Ok(Operation::Read(selection)),
@@ -40,6 +40,7 @@ impl JsonProtocolAdapter {
         field: &OutputFieldRef,
         container: Option<&ParentContainer>,
         query: FieldQuery,
+        query_schema: &QuerySchemaRef,
     ) -> crate::Result<Selection> {
         let FieldQuery {
             arguments,
@@ -62,19 +63,20 @@ impl JsonProtocolAdapter {
             match selected {
                 // $scalars: true
                 crate::SelectionSetValue::Shorthand(true) if SelectionSet::is_all_scalars(&selection_name) => {
-                    if let Some(schema_object) = field.field_type.as_object_type() {
-                        Self::default_scalar_selection(&schema_object, &mut selection);
+                    if let Some(schema_object) = field.field_type.as_object_type(&query_schema.db) {
+                        Self::default_scalar_selection(schema_object, &mut selection);
                     }
                 }
                 // $composites: true
                 crate::SelectionSetValue::Shorthand(true) if SelectionSet::is_all_composites(&selection_name) => {
-                    if let Some(schema_object) = field.field_type.as_object_type() {
+                    if let Some(schema_object) = field.field_type.as_object_type(&query_schema.db) {
                         if let Some(container) = container {
                             Self::default_composite_selection(
                                 &mut selection,
                                 container,
-                                &schema_object,
+                                schema_object,
                                 &mut HashSet::<String>::new(),
+                                query_schema,
                             )?;
                         }
                     }
@@ -93,7 +95,7 @@ impl JsonProtocolAdapter {
                 crate::SelectionSetValue::Shorthand(false) => (),
                 // <field_name>: { selection: { ... }, arguments: { ... } }
                 crate::SelectionSetValue::Nested(nested_query) => {
-                    if let Some(schema_object) = field.field_type.as_object_type() {
+                    if let Some(schema_object) = field.field_type.as_object_type(&query_schema.db) {
                         let schema_field = schema_object.find_field(&selection_name).ok_or_else(|| {
                             HandlerError::query_conversion(format!(
                                 "Unknown nested field '{}' for operation {} does not match any query.",
@@ -119,6 +121,7 @@ impl JsonProtocolAdapter {
                             &schema_field,
                             nested_container.as_ref(),
                             nested_query,
+                            query_schema,
                         )?);
                     }
                 }
@@ -245,7 +248,7 @@ impl JsonProtocolAdapter {
         }
     }
 
-    fn default_scalar_selection(schema_object: &ObjectTypeStrongRef, selection: &mut Selection) {
+    fn default_scalar_selection(schema_object: &ObjectType, selection: &mut Selection) {
         for scalar in schema_object.get_fields().iter().filter(|f| {
             f.field_type.is_scalar()
                 || f.field_type.is_scalar_list()
@@ -259,8 +262,9 @@ impl JsonProtocolAdapter {
     fn default_composite_selection(
         selection: &mut Selection,
         container: &ParentContainer,
-        schema_object: &ObjectTypeStrongRef,
+        schema_object: &ObjectType,
         walked_types: &mut HashSet<String>,
+        query_schema: &QuerySchema,
     ) -> crate::Result<()> {
         match container {
             ParentContainer::Model(model) => {
@@ -273,8 +277,9 @@ impl JsonProtocolAdapter {
                         Self::default_composite_selection(
                             &mut nested_selection,
                             &ParentContainer::from(cf.typ()),
-                            &schema_field.field_type.as_object_type().unwrap(),
+                            schema_field.field_type.as_object_type(&query_schema.db).unwrap(),
                             walked_types,
+                            query_schema,
                         )?;
 
                         selection.push_nested_selection(nested_selection);
@@ -304,8 +309,9 @@ impl JsonProtocolAdapter {
                                 Self::default_composite_selection(
                                     &mut nested_selection,
                                     &ParentContainer::from(cf.typ()),
-                                    &schema_field.field_type.as_object_type().unwrap(),
+                                    schema_field.field_type.as_object_type(&query_schema.db).unwrap(),
                                     walked_types,
+                                    query_schema,
                                 )?;
 
                                 selection.push_nested_selection(nested_selection);

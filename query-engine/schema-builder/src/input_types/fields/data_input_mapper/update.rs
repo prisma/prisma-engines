@@ -56,16 +56,14 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
                 let types = vec![map_scalar_input_type_for_field(ctx, sf), base_update_type];
 
                 let input_field = input_field(ctx, sf.name(), types, None);
-                input_field
-                    .optional()
-                    .nullable_if(!sf.is_required(), &mut ctx.input_field_types)
+                input_field.optional().nullable_if(!sf.is_required(), &mut ctx.db)
             }
         }
     }
 
     fn map_scalar_list(&self, ctx: &mut BuilderContext<'_>, sf: &ScalarFieldRef) -> InputField {
         let list_input_type = map_scalar_input_type(ctx, &sf.type_identifier(), sf.is_list());
-        let ident = Identifier::new_prisma(format!("{}Update{}Input", sf.container().name(), sf.name()));
+        let ident = Identifier::new_prisma(IdentifierType::ScalarListUpdateInput(sf.clone()));
 
         let input_object = match ctx.get_input_type(&ident) {
             Some(t) => t,
@@ -84,10 +82,7 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
                 let mut input_object = input_object_type(ident.clone(), object_fields);
                 input_object.require_exactly_one_field();
 
-                let input_object = Arc::new(input_object);
-                ctx.cache_input_type(ident, input_object.clone());
-
-                Arc::downgrade(&input_object)
+                ctx.cache_input_type(ident, input_object)
             }
         };
 
@@ -96,40 +91,24 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
     }
 
     fn map_relation(&self, ctx: &mut BuilderContext<'_>, rf: &RelationFieldRef) -> InputField {
-        let related_model = rf.related_model();
-        let related_field = rf.related_field();
-
-        // Compute input object name
-        let arity_part = match (rf.is_list(), rf.is_required()) {
-            (true, _) => "Many",
-            (false, true) => "OneRequired",
-            (false, false) => "One",
-        };
-
-        let without_part = format!("Without{}", capitalize(related_field.name()));
-        let unchecked_part = if self.unchecked { "Unchecked" } else { "" };
-        let ident = Identifier::new_prisma(format!(
-            "{}{}Update{}{}NestedInput",
-            related_model.name(),
-            unchecked_part,
-            arity_part,
-            without_part
+        let ident = Identifier::new_prisma(IdentifierType::RelationUpdateInput(
+            rf.clone(),
+            rf.related_field(),
+            self.unchecked,
         ));
 
         let input_object = match ctx.get_input_type(&ident) {
             Some(t) => t,
             None => {
-                let input_object = Arc::new(init_input_object_type(ident.clone()));
-                ctx.cache_input_type(ident, input_object.clone());
+                let input_object = init_input_object_type(ident.clone());
+                let id = ctx.cache_input_type(ident, input_object);
 
                 // Enqueue the nested update input for its fields to be
                 // created at a later point, to avoid recursing too deep
                 // (that has caused stack overflows on large schemas in
                 // the past).
-                ctx.nested_update_inputs_queue
-                    .push((Arc::clone(&input_object), rf.clone()));
-
-                Arc::downgrade(&input_object)
+                ctx.nested_update_inputs_queue.push((id, rf.clone()));
+                id
             }
         };
 
@@ -150,7 +129,7 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
         }
 
         input_field(ctx, cf.name(), input_types, None)
-            .nullable_if(cf.is_optional() && !cf.is_list(), &mut ctx.input_field_types)
+            .nullable_if(cf.is_optional() && !cf.is_list(), &mut ctx.db)
             .optional()
     }
 }
@@ -160,23 +139,21 @@ fn update_operations_object_type(
     prefix: &str,
     sf: &ScalarFieldRef,
     with_number_operators: bool,
-) -> InputObjectTypeWeakRef {
-    // Different names are required to construct and cache different objects.
-    // - "Nullable" affects the `set` operation (`set` is nullable)
-    let nullable = if !sf.is_required() { "Nullable" } else { "" };
-    let ident = Identifier::new_prisma(format!("{nullable}{prefix}FieldUpdateOperationsInput"));
+) -> InputObjectTypeId {
+    let ident = Identifier::new_prisma(IdentifierType::FieldUpdateOperationsInput(
+        !sf.is_required(),
+        prefix.to_owned(),
+    ));
     return_cached_input!(ctx, &ident);
 
     let mut obj = init_input_object_type(ident.clone());
     obj.require_exactly_one_field();
-
-    let obj = Arc::new(obj);
-    ctx.cache_input_type(ident, obj.clone());
+    let id = ctx.cache_input_type(ident, obj);
 
     let typ = map_scalar_input_type_for_field(ctx, sf);
     let mut fields = vec![input_field(ctx, operations::SET, typ.clone(), None)
         .optional()
-        .nullable_if(!sf.is_required(), &mut ctx.input_field_types)];
+        .nullable_if(!sf.is_required(), &mut ctx.db)];
 
     if with_number_operators {
         fields.push(input_field(ctx, operations::INCREMENT, typ.clone(), None).optional());
@@ -189,9 +166,8 @@ fn update_operations_object_type(
         fields.push(input_field(ctx, operations::UNSET, InputType::boolean(), None).optional());
     }
 
-    obj.set_fields(fields);
-
-    Arc::downgrade(&obj)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 /// Build an operation envelope object type for composite updates.
@@ -203,29 +179,15 @@ fn update_operations_object_type(
 ///   ... more ops ...
 /// }
 /// ```
-fn composite_update_envelope_object_type(
-    ctx: &mut BuilderContext<'_>,
-    cf: &CompositeFieldRef,
-) -> InputObjectTypeWeakRef {
-    let arity = if cf.is_optional() {
-        "Nullable"
-    } else if cf.is_list() {
-        "List"
-    } else {
-        ""
-    };
-
-    let name = format!("{}{}UpdateEnvelopeInput", cf.typ().name(), arity);
-    let ident = Identifier::new_prisma(name);
+fn composite_update_envelope_object_type(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputObjectTypeId {
+    let ident = Identifier::new_prisma(IdentifierType::CompositeUpdateEnvelopeInput(cf.typ(), cf.arity()));
 
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
     input_object.require_exactly_one_field();
     input_object.set_tag(ObjectTag::CompositeEnvelope);
-
-    let input_object = Arc::new(input_object);
-    ctx.cache_input_type(ident, input_object.clone());
+    let id = ctx.cache_input_type(ident, input_object);
 
     let mut fields = vec![composite_set_update_input_field(ctx, cf)];
 
@@ -236,31 +198,26 @@ fn composite_update_envelope_object_type(
     append_opt(&mut fields, composite_delete_many_update_input_field(ctx, cf));
     append_opt(&mut fields, composite_unset_update_input_field(ctx, cf));
 
-    input_object.set_fields(fields);
-
-    Arc::downgrade(&input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 /// Builds the `update` input object type. Should be used in the envelope type.
-fn composite_update_object_type(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let name = format!("{}UpdateInput", cf.typ().name());
+fn composite_update_object_type(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputObjectTypeId {
+    let ident = Identifier::new_prisma(IdentifierType::CompositeUpdateInput(cf.typ()));
 
-    let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
     input_object.set_min_fields(1);
-
-    let input_object = Arc::new(input_object);
-    ctx.cache_input_type(ident, input_object.clone());
+    let id = ctx.cache_input_type(ident, input_object);
 
     let mapper = UpdateDataInputFieldMapper::new_checked();
     let fields = cf.typ().fields().collect::<Vec<_>>();
     let fields = mapper.map_all(ctx, &fields);
 
-    input_object.set_fields(fields);
-
-    Arc::downgrade(&input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 // Builds an `update` input field. Should only be used in the envelope type.
@@ -294,7 +251,7 @@ fn composite_set_update_input_field(ctx: &mut BuilderContext<'_>, cf: &Composite
     }
 
     input_field(ctx, operations::SET, input_types, None)
-        .nullable_if(!cf.is_required() && !cf.is_list(), &mut ctx.input_field_types)
+        .nullable_if(!cf.is_required() && !cf.is_list(), &mut ctx.db)
         .optional()
 }
 
@@ -311,18 +268,14 @@ fn composite_push_update_input_field(ctx: &mut BuilderContext<'_>, cf: &Composit
 }
 
 /// Builds the `upsert` input object type. Should only be used in the envelope type.
-fn composite_upsert_object_type(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let name = format!("{}UpsertInput", cf.typ().name());
+fn composite_upsert_object_type(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputObjectTypeId {
+    let ident = Identifier::new_prisma(IdentifierType::CompositeUpsertObjectInput(cf.typ()));
 
-    let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
     input_object.set_tag(ObjectTag::CompositeEnvelope);
-
-    let input_object = Arc::new(input_object);
-
-    ctx.cache_input_type(ident, input_object.clone());
+    let id = ctx.cache_input_type(ident, input_object);
 
     let update_object_type = composite_update_object_type(ctx, cf);
     let update_field = input_field(ctx, operations::UPDATE, InputType::Object(update_object_type), None);
@@ -330,9 +283,8 @@ fn composite_upsert_object_type(ctx: &mut BuilderContext<'_>, cf: &CompositeFiel
 
     let fields = vec![set_field, update_field];
 
-    input_object.set_fields(fields);
-
-    Arc::downgrade(&input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 // Builds an `upsert` input field. Should only be used in the envelope type.
@@ -346,18 +298,14 @@ fn composite_upsert_update_input_field(ctx: &mut BuilderContext<'_>, cf: &Compos
     }
 }
 
-fn composite_update_many_object_type(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let name = format!("{}UpdateManyInput", cf.typ().name());
+fn composite_update_many_object_type(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputObjectTypeId {
+    let ident = Identifier::new_prisma(IdentifierType::CompositeUpdateManyInput(cf.typ()));
 
-    let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
     input_object.set_tag(ObjectTag::CompositeEnvelope);
-
-    let input_object = Arc::new(input_object);
-
-    ctx.cache_input_type(ident, input_object.clone());
+    let id = ctx.cache_input_type(ident, input_object);
 
     let where_object_type = objects::filter_objects::where_object_type(ctx, cf.typ());
     let where_field = input_field(ctx, args::WHERE, InputType::object(where_object_type), None);
@@ -367,32 +315,24 @@ fn composite_update_many_object_type(ctx: &mut BuilderContext<'_>, cf: &Composit
 
     let fields = vec![where_field, data_field];
 
-    input_object.set_fields(fields);
-
-    Arc::downgrade(&input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
-fn composite_delete_many_object_type(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let name = format!("{}DeleteManyInput", cf.typ().name());
+fn composite_delete_many_object_type(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputObjectTypeId {
+    let ident = Identifier::new_prisma(IdentifierType::CompositeDeleteManyInput(cf.typ()));
 
-    let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
     input_object.set_tag(ObjectTag::CompositeEnvelope);
-
-    let input_object = Arc::new(input_object);
-
-    ctx.cache_input_type(ident, input_object.clone());
+    let id = ctx.cache_input_type(ident, input_object);
 
     let where_object_type = objects::filter_objects::where_object_type(ctx, cf.typ());
     let where_field = input_field(ctx, args::WHERE, InputType::object(where_object_type), None);
 
-    let fields = vec![where_field];
-
-    input_object.set_fields(fields);
-
-    Arc::downgrade(&input_object)
+    ctx.db[id].set_fields(vec![where_field]);
+    id
 }
 
 // Builds an `updateMany` input field. Should only be used in the envelope type.

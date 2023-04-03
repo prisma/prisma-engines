@@ -5,7 +5,7 @@ use prisma_models::{dml, PrismaValue};
 use psl::datamodel_connector::ConnectorCapability;
 
 /// Builds the root `Mutation` type.
-pub(crate) fn build(ctx: &mut BuilderContext<'_>) -> (OutputType, ObjectTypeStrongRef) {
+pub(crate) fn build(ctx: &mut BuilderContext<'_>) -> OutputObjectTypeId {
     let mut fields: Vec<OutputField> = ctx
         .internal_data_model
         .models()
@@ -41,9 +41,7 @@ pub(crate) fn build(ctx: &mut BuilderContext<'_>) -> (OutputType, ObjectTypeStro
     }
 
     let ident = Identifier::new_prisma("Mutation".to_owned());
-    let strong_ref = Arc::new(object_type(ident, fields, None));
-
-    (OutputType::Object(Arc::downgrade(&strong_ref)), strong_ref)
+    ctx.db.push_output_object_type(object_type(ident, fields, None))
 }
 
 // implementation note: these need to be in the same function, because these vecs interact: the create inputs will enqueue update inputs, and vice versa.
@@ -64,7 +62,7 @@ fn create_nested_inputs(ctx: &mut BuilderContext<'_>) {
             }
 
             fields.push(input_fields::nested_connect_input_field(ctx, &rf));
-            input_object.set_fields(fields);
+            ctx.db[input_object].set_fields(fields);
         }
 
         // Update inputs.
@@ -89,7 +87,7 @@ fn create_nested_inputs(ctx: &mut BuilderContext<'_>) {
             append_opt(&mut fields, input_fields::nested_update_many_field(ctx, &rf));
             append_opt(&mut fields, input_fields::nested_delete_many_field(ctx, &rf));
 
-            input_object.set_fields(fields);
+            ctx.db[input_object].set_fields(fields);
         }
 
         std::mem::swap(&mut nested_create_inputs_queue, &mut ctx.nested_create_inputs_queue);

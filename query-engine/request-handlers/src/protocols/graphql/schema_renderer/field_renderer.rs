@@ -1,22 +1,22 @@
 use super::*;
 
 #[derive(Debug)]
-pub(crate) enum GqlFieldRenderer {
-    Input(InputFieldRef),
+pub(crate) enum GqlFieldRenderer<'a> {
+    Input(&'a InputField),
     Output(OutputFieldRef),
 }
 
-impl Renderer for GqlFieldRenderer {
+impl Renderer for GqlFieldRenderer<'_> {
     fn render(&self, ctx: &mut RenderContext) -> String {
         match self {
-            GqlFieldRenderer::Input(input) => self.render_input_field(Arc::clone(input), ctx),
+            GqlFieldRenderer::Input(input) => self.render_input_field(input, ctx),
             GqlFieldRenderer::Output(output) => self.render_output_field(Arc::clone(output), ctx),
         }
     }
 }
 
-impl GqlFieldRenderer {
-    fn render_input_field(&self, input_field: InputFieldRef, ctx: &mut RenderContext) -> String {
+impl GqlFieldRenderer<'_> {
+    fn render_input_field(&self, input_field: &InputField, ctx: &mut RenderContext) -> String {
         let rendered_type = pick_input_type(input_field.field_types(ctx.query_schema))
             .into_renderer()
             .render(ctx);
@@ -50,7 +50,7 @@ impl GqlFieldRenderer {
         format!("{}{}: {}{}", field.name, rendered_args, rendered_type, bang)
     }
 
-    fn render_arguments(&self, args: &[InputFieldRef], ctx: &mut RenderContext) -> Vec<String> {
+    fn render_arguments(&self, args: &[InputField], ctx: &mut RenderContext) -> Vec<String> {
         let mut output = Vec::with_capacity(args.len());
 
         for arg in args {
@@ -60,7 +60,7 @@ impl GqlFieldRenderer {
         output
     }
 
-    fn render_argument(&self, arg: &InputFieldRef, ctx: &mut RenderContext) -> String {
+    fn render_argument(&self, arg: &InputField, ctx: &mut RenderContext) -> String {
         let rendered_type = pick_input_type(arg.field_types(ctx.query_schema))
             .into_renderer()
             .render(ctx);

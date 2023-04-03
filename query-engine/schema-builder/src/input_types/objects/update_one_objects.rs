@@ -23,24 +23,22 @@ fn checked_update_one_input_type(
     ctx: &mut BuilderContext<'_>,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
-) -> InputObjectTypeWeakRef {
-    let name = match parent_field.map(|pf| pf.related_field()) {
-        Some(ref f) => format!("{}UpdateWithout{}Input", model.name(), capitalize(f.name())),
-        _ => format!("{}UpdateInput", model.name()),
-    };
+) -> InputObjectTypeId {
+    let ident = Identifier::new_prisma(IdentifierType::CheckedUpdateOneInput(
+        model.clone(),
+        parent_field.map(|pf| pf.related_field()),
+    ));
 
-    let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, input_object.clone());
+    let input_object = init_input_object_type(ident.clone());
+    let id = ctx.cache_input_type(ident, input_object);
 
     let filtered_fields = filter_checked_update_fields(ctx, model, parent_field);
     let field_mapper = UpdateDataInputFieldMapper::new_checked();
     let input_fields = field_mapper.map_all(ctx, &filtered_fields);
-
-    input_object.set_fields(input_fields);
-    Arc::downgrade(&input_object)
+    ctx.db[id].set_fields(input_fields);
+    id
 }
 
 /// Builds "<x>UncheckedUpdateInput" input object type.
@@ -48,24 +46,22 @@ fn unchecked_update_one_input_type(
     ctx: &mut BuilderContext<'_>,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
-) -> InputObjectTypeWeakRef {
-    let name = match parent_field.map(|pf| pf.related_field()) {
-        Some(ref f) => format!("{}UncheckedUpdateWithout{}Input", model.name(), capitalize(f.name())),
-        _ => format!("{}UncheckedUpdateInput", model.name()),
-    };
+) -> InputObjectTypeId {
+    let ident = Identifier::new_prisma(IdentifierType::UncheckedUpdateOneInput(
+        model.clone(),
+        parent_field.map(|pf| pf.related_field()),
+    ));
 
-    let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, input_object.clone());
+    let input_object = init_input_object_type(ident.clone());
+    let id = ctx.cache_input_type(ident, input_object);
 
     let filtered_fields = filter_unchecked_update_fields(ctx, model, parent_field);
     let field_mapper = UpdateDataInputFieldMapper::new_unchecked();
     let input_fields = field_mapper.map_all(ctx, &filtered_fields);
-
-    input_object.set_fields(input_fields);
-    Arc::downgrade(&input_object)
+    ctx.db[id].set_fields(input_fields);
+    id
 }
 
 /// Filters the given model's fields down to the allowed ones for checked update.
@@ -176,27 +172,26 @@ pub(crate) fn update_one_where_combination_object(
     ctx: &mut BuilderContext<'_>,
     update_types: Vec<InputType>,
     parent_field: &RelationFieldRef,
-) -> InputObjectTypeWeakRef {
-    let related_model = parent_field.related_model();
-    let where_input_object = filter_objects::where_unique_object_type(ctx, &related_model);
-    let ident = Identifier::new_prisma(format!(
-        "{}UpdateWithWhereUniqueWithout{}Input",
-        related_model.name(),
-        capitalize(parent_field.related_field().name())
+) -> InputObjectTypeId {
+    let ident = Identifier::new_prisma(IdentifierType::UpdateOneWhereCombinationInput(
+        parent_field.related_field(),
     ));
 
     return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, input_object.clone());
+    let related_model = parent_field.related_model();
+    let where_input_object = filter_objects::where_unique_object_type(ctx, &related_model);
+
+    let input_object = init_input_object_type(ident.clone());
+    let id = ctx.cache_input_type(ident, input_object);
 
     let fields = vec![
         input_field(ctx, args::WHERE, InputType::object(where_input_object), None),
         input_field(ctx, args::DATA, update_types, None),
     ];
 
-    input_object.set_fields(fields);
-    Arc::downgrade(&input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 /// Builds "<x>UpdateWithWhereUniqueWithout<y>Input" input object types.
@@ -205,26 +200,23 @@ pub(crate) fn update_to_one_rel_where_combination_object(
     ctx: &mut BuilderContext<'_>,
     update_types: impl IntoIterator<Item = InputType>,
     parent_field: &RelationFieldRef,
-) -> InputObjectTypeWeakRef {
-    let related_model = parent_field.related_model();
-    let ident = Identifier::new_prisma(format!(
-        "{}UpdateToOneWithWhereWithout{}Input",
-        related_model.name(),
-        capitalize(parent_field.related_field().name())
+) -> InputObjectTypeId {
+    let ident = Identifier::new_prisma(IdentifierType::UpdateToOneRelWhereCombinationInput(
+        parent_field.related_field(),
     ));
 
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
     input_object.set_tag(ObjectTag::NestedToOneUpdateEnvelope);
-    let input_object = Arc::new(input_object);
-    ctx.cache_input_type(ident, input_object.clone());
+    let id = ctx.cache_input_type(ident, input_object);
 
+    let related_model = parent_field.related_model();
     let fields = vec![
         arguments::where_argument(ctx, &related_model),
         input_field(ctx, args::DATA, update_types, None),
     ];
 
-    input_object.set_fields(fields);
-    Arc::downgrade(&input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }

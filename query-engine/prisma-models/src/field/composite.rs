@@ -13,7 +13,7 @@ pub type CompositeField = crate::Zipper<CompositeFieldId>;
 pub type CompositeFieldRef = CompositeField;
 
 impl CompositeField {
-    fn arity(&self) -> FieldArity {
+    pub fn arity(&self) -> FieldArity {
         match self.id {
             CompositeFieldId::InModel(sfid) => self.dm.walk(sfid).ast_field().arity,
             CompositeFieldId::InCompositeType(id) => self.dm.walk(id).arity(),

@@ -1,5 +1,4 @@
 use crate::{
-    capitalize,
     constants::args,
     field, init_input_object_type, input_field,
     input_types::{
@@ -11,8 +10,9 @@ use crate::{
 };
 use prisma_models::{ModelRef, RelationFieldRef};
 use psl::datamodel_connector::ConnectorCapability;
-use schema::{Identifier, InputField, InputObjectTypeWeakRef, InputType, OutputField, OutputType, QueryInfo, QueryTag};
-use std::sync::Arc;
+use schema::{
+    Identifier, IdentifierType, InputField, InputObjectTypeId, InputType, OutputField, OutputType, QueryInfo, QueryTag,
+};
 
 /// Builds a create many mutation field (e.g. createManyUsers) for given model.
 pub(crate) fn create_many(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> Option<OutputField> {
@@ -56,24 +56,22 @@ pub(crate) fn create_many_object_type(
     ctx: &mut BuilderContext<'_>,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
-) -> InputObjectTypeWeakRef {
-    let name = match parent_field.map(|pf| pf.related_field()) {
-        Some(ref f) => format!("{}CreateMany{}Input", model.name(), capitalize(f.name())),
-        _ => format!("{}CreateManyInput", model.name()),
-    };
+) -> InputObjectTypeId {
+    let ident = Identifier::new_prisma(IdentifierType::CreateManyInput(
+        model.clone(),
+        parent_field.map(|pf| pf.related_field()),
+    ));
 
-    let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, input_object.clone());
+    let input_object = init_input_object_type(ident.clone());
+    let id = ctx.cache_input_type(ident, input_object);
 
     let filtered_fields = filter_create_many_fields(ctx, model, parent_field);
     let field_mapper = CreateDataInputFieldMapper::new_checked();
     let input_fields = field_mapper.map_all(ctx, &filtered_fields);
-
-    input_object.set_fields(input_fields);
-    Arc::downgrade(&input_object)
+    ctx.db[id].set_fields(input_fields);
+    id
 }
 
 /// Filters the given model's fields down to the allowed ones for checked create.

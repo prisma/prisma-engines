@@ -106,7 +106,7 @@ fn map_field_aggration_relation<F, G>(
     fields: &[RelationFieldRef],
     type_mapper: F,
     object_mapper: G,
-) -> ObjectTypeWeakRef
+) -> OutputObjectTypeId
 where
     F: Fn(&mut BuilderContext<'_>, &RelationFieldRef) -> OutputType,
     G: Fn(ObjectType) -> ObjectType,
@@ -128,9 +128,5 @@ where
         .collect();
 
     let object = object_mapper(object_type(ident.clone(), fields, None));
-    let object = Arc::new(object);
-
-    ctx.cache_output_type(ident, object.clone());
-
-    Arc::downgrade(&object)
+    ctx.cache_output_type(ident, object)
 }

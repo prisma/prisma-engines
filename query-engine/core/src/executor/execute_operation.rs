@@ -8,7 +8,7 @@ use futures::future;
 use query_engine_metrics::{
     histogram, increment_counter, metrics, PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, PRISMA_CLIENT_QUERIES_TOTAL,
 };
-use schema::QuerySchemaRef;
+use schema::{QuerySchema, QuerySchemaRef};
 use std::time::{Duration, Instant};
 use tracing::Instrument;
 use tracing_futures::WithSubscriber;
@@ -21,8 +21,8 @@ pub async fn execute_single_operation(
 ) -> crate::Result<ResponseData> {
     let operation_timer = Instant::now();
 
-    let (graph, serializer) = build_graph(query_schema, operation.clone())?;
-    let result = execute_on(conn, graph, serializer, trace_id).await;
+    let (graph, serializer) = build_graph(query_schema.clone(), operation.clone())?;
+    let result = execute_on(conn, graph, serializer, query_schema.as_ref(), trace_id).await;
 
     histogram!(PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, operation_timer.elapsed());
 
@@ -44,7 +44,7 @@ pub async fn execute_many_operations(
 
     for (i, (graph, serializer)) in queries.into_iter().enumerate() {
         let operation_timer = Instant::now();
-        let result = execute_on(conn, graph, serializer, trace_id.clone()).await;
+        let result = execute_on(conn, graph, serializer, query_schema.as_ref(), trace_id.clone()).await;
         histogram!(PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, operation_timer.elapsed());
 
         match result {
@@ -153,9 +153,9 @@ async fn execute_self_contained(
         )
         .await
     } else {
-        let (graph, serializer) = build_graph(query_schema, operation)?;
+        let (graph, serializer) = build_graph(query_schema.clone(), operation)?;
 
-        execute_self_contained_without_retry(conn, graph, serializer, force_transactions, trace_id).await
+        execute_self_contained_without_retry(conn, graph, serializer, force_transactions, &query_schema, trace_id).await
     };
 
     histogram!(PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, operation_timer.elapsed());
@@ -168,13 +168,14 @@ async fn execute_self_contained_without_retry(
     graph: QueryGraph,
     serializer: IrSerializer,
     force_transactions: bool,
+    query_schema: &QuerySchema,
     trace_id: Option<String>,
 ) -> crate::Result<ResponseData> {
     if force_transactions || graph.needs_transaction() {
-        return execute_in_tx(&mut conn, graph, serializer, trace_id).await;
+        return execute_in_tx(&mut conn, graph, serializer, query_schema, trace_id).await;
     }
 
-    execute_on(conn.as_connection_like(), graph, serializer, trace_id).await
+    execute_on(conn.as_connection_like(), graph, serializer, query_schema, trace_id).await
 }
 
 // As suggested by the MongoDB documentation
@@ -195,7 +196,7 @@ async fn execute_self_contained_with_retry(
     let (graph, serializer) = build_graph(query_schema.clone(), operation.clone())?;
 
     if force_transactions || graph.needs_transaction() {
-        let res = execute_in_tx(conn, graph, serializer, trace_id.clone()).await;
+        let res = execute_in_tx(conn, graph, serializer, query_schema.as_ref(), trace_id.clone()).await;
 
         if !is_transient_error(&res) {
             return res;
@@ -203,7 +204,7 @@ async fn execute_self_contained_with_retry(
 
         loop {
             let (graph, serializer) = build_graph(query_schema.clone(), operation.clone())?;
-            let res = execute_in_tx(conn, graph, serializer, trace_id.clone()).await;
+            let res = execute_in_tx(conn, graph, serializer, query_schema.as_ref(), trace_id.clone()).await;
 
             if is_transient_error(&res) && retry_timeout.elapsed() < MAX_TX_TIMEOUT_RETRY_LIMIT {
                 tokio::time::sleep(TX_RETRY_BACKOFF).await;
@@ -213,7 +214,14 @@ async fn execute_self_contained_with_retry(
             }
         }
     } else {
-        execute_on(conn.as_connection_like(), graph, serializer, trace_id).await
+        execute_on(
+            conn.as_connection_like(),
+            graph,
+            serializer,
+            query_schema.as_ref(),
+            trace_id,
+        )
+        .await
     }
 }
 
@@ -221,10 +229,18 @@ async fn execute_in_tx(
     conn: &mut Box<dyn Connection>,
     graph: QueryGraph,
     serializer: IrSerializer,
+    query_schema: &QuerySchema,
     trace_id: Option<String>,
 ) -> crate::Result<ResponseData> {
     let mut tx = conn.start_transaction(None).await?;
-    let result = execute_on(tx.as_connection_like(), graph, serializer, trace_id.clone()).await;
+    let result = execute_on(
+        tx.as_connection_like(),
+        graph,
+        serializer,
+        query_schema,
+        trace_id.clone(),
+    )
+    .await;
 
     if result.is_ok() {
         tx.commit().await?;
@@ -240,13 +256,14 @@ async fn execute_on(
     conn: &mut dyn ConnectionLike,
     graph: QueryGraph,
     serializer: IrSerializer,
+    query_schema: &QuerySchema,
     trace_id: Option<String>,
 ) -> crate::Result<ResponseData> {
     increment_counter!(PRISMA_CLIENT_QUERIES_TOTAL);
 
     let interpreter = QueryInterpreter::new(conn);
     QueryPipeline::new(graph, interpreter, serializer)
-        .execute(trace_id)
+        .execute(query_schema, trace_id)
         .await
 }
 

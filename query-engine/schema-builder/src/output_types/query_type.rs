@@ -2,7 +2,7 @@ use super::*;
 use input_types::fields::arguments;
 
 /// Builds the root `Query` type.
-pub(crate) fn build(ctx: &mut BuilderContext<'_>) -> (OutputType, ObjectTypeStrongRef) {
+pub(crate) fn build(ctx: &mut BuilderContext<'_>) -> OutputObjectTypeId {
     let fields: Vec<_> = ctx
         .internal_data_model
         .models()
@@ -28,9 +28,7 @@ pub(crate) fn build(ctx: &mut BuilderContext<'_>) -> (OutputType, ObjectTypeStro
         .collect();
 
     let ident = Identifier::new_prisma("Query");
-    let strong_ref = Arc::new(object_type(ident, fields, None));
-
-    (OutputType::Object(Arc::downgrade(&strong_ref)), strong_ref)
+    ctx.db.push_output_object_type(object_type(ident, fields, None))
 }
 
 /// Builds a "single" query arity item field (e.g. "user", "post" ...) for given model.

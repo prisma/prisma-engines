@@ -7,10 +7,7 @@ use enum_renderer::*;
 use field_renderer::*;
 use object_renderer::*;
 use query_core::schema::*;
-use std::{
-    collections::HashMap,
-    sync::{Arc, Weak},
-};
+use std::{collections::HashMap, sync::Arc};
 use type_renderer::*;
 
 /// Top level GraphQL schema renderer.
@@ -103,7 +100,7 @@ enum GqlRenderer<'a> {
     Schema(GqlSchemaRenderer),
     Object(GqlObjectRenderer),
     Type(GqlTypeRenderer<'a>),
-    Field(GqlFieldRenderer),
+    Field(GqlFieldRenderer<'a>),
     Enum(GqlEnumRenderer<'a>),
 }
 
@@ -145,10 +142,10 @@ impl<'a> IntoRenderer<'a> for OutputType {
     }
 }
 
-impl<'a> IntoRenderer<'a> for InputFieldRef {
+impl<'a> IntoRenderer<'a> for InputField {
     #[allow(clippy::wrong_self_convention)]
-    fn into_renderer(&self) -> GqlRenderer<'a> {
-        GqlRenderer::Field(GqlFieldRenderer::Input(Arc::clone(self)))
+    fn into_renderer(&'a self) -> GqlRenderer<'a> {
+        GqlRenderer::Field(GqlFieldRenderer::Input(self))
     }
 }
 
@@ -166,16 +163,16 @@ impl<'a> IntoRenderer<'a> for EnumType {
     }
 }
 
-impl<'a> IntoRenderer<'a> for &'a InputObjectTypeWeakRef {
+impl<'a> IntoRenderer<'a> for InputObjectTypeId {
     #[allow(clippy::wrong_self_convention)]
     fn into_renderer(&self) -> GqlRenderer<'a> {
-        GqlRenderer::Object(GqlObjectRenderer::Input(Weak::clone(self)))
+        GqlRenderer::Object(GqlObjectRenderer::Input(*self))
     }
 }
 
-impl<'a> IntoRenderer<'a> for &'a ObjectTypeWeakRef {
+impl<'a> IntoRenderer<'a> for OutputObjectTypeId {
     #[allow(clippy::wrong_self_convention)]
     fn into_renderer(&self) -> GqlRenderer<'a> {
-        GqlRenderer::Object(GqlObjectRenderer::Output(Weak::clone(self)))
+        GqlRenderer::Object(GqlObjectRenderer::Output(*self))
     }
 }

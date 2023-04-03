@@ -22,7 +22,7 @@ const SNAPSHOTS_PATH: &str = concat!(
 /// This test compares the dmmf output of odoo.prisma against a gzipped snapshot.
 /// If you need to update the snapshot, add `UPDATE_EXPECT=1` to your environment variables.
 fn dmmf_rendering() {
-    let dmmf = dmmf_from_schema(include_str!("../../../schema-builder/benches/odoo.prisma"));
+    let dmmf = dmmf_from_schema(include_str!("../../../schema-builder/test-schemas/odoo.prisma"));
     let snapshot_path = format!("{SNAPSHOTS_PATH}/odoo.snapshot.json.gz");
 
     if std::env::var("UPDATE_EXPECT").as_deref() == Ok("1") {
