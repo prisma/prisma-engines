@@ -18,7 +18,11 @@ use psl::{
 };
 use quaint::{connector::ResultRow, prelude::Queryable, Value::Array};
 use regex::Regex;
-use std::{any::type_name, collections::BTreeMap, convert::TryInto};
+use std::{
+    any::type_name,
+    collections::{BTreeMap, HashMap},
+    convert::TryInto,
+};
 use tracing::trace;
 
 /// A PostgreSQL sequence.
@@ -1092,6 +1096,53 @@ impl<'a> SqlSchemaDescriber<'a> {
         sql_schema: &mut SqlSchema,
     ) -> DescriberResult<()> {
         let namespaces = &sql_schema.namespaces;
+
+        let inherited_tables_sql = r#"
+SELECT
+    parent_schemainfo.nspname AS parent_namespace,
+    parent_tableinfo.relname AS parent_table_name,
+    child_schemainfo.nspname AS child_namespace,
+    child_tableinfo.relname AS child_table_name
+FROM
+    pg_class AS parent_tableinfo
+    INNER JOIN pg_namespace AS parent_schemainfo ON parent_schemainfo.oid = parent_tableinfo.relnamespace
+    INNER JOIN pg_inherits AS inheritinfo ON parent_tableinfo.oid = inheritinfo.inhparent
+    INNER JOIN pg_class AS child_tableinfo ON child_tableinfo.oid = inheritinfo.inhrelid
+    INNER JOIN pg_namespace AS child_schemainfo ON child_schemainfo.oid = child_tableinfo.relnamespace
+WHERE parent_schemainfo.nspname = ANY ( $1 ) AND child_schemainfo.nspname = ANY ( $1 )
+ORDER BY parent_namespace, parent_table_name, child_namespace, child_table_name
+        "#;
+
+        let inherited_rows = self
+            .conn
+            .query_raw(
+                inherited_tables_sql,
+                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
+            )
+            .await?;
+
+        // Hold the inheritance map. The parent is the key as (name, namespace) and the value is
+        // a vector of all the child tables, also as (name, namespace).
+        let mut inheritance_map: HashMap<(String, String), Vec<(String, String)>> = HashMap::new();
+
+        for inh in inherited_rows {
+            let parent_ns = inh.get_expect_string("parent_namespace");
+            let parent_name = inh.get_expect_string("parent_table_name");
+            let child_ns = inh.get_expect_string("child_namespace");
+            let child_name = inh.get_expect_string("child_table_name");
+
+            match inheritance_map.get(&(parent_name.clone(), parent_ns.clone())) {
+                Some(vec) => {
+                    let mut new_vec = vec.clone();
+                    new_vec.push((child_name, child_ns));
+                    inheritance_map.insert((parent_name.clone(), parent_ns.clone()), new_vec);
+                }
+                None => {
+                    inheritance_map.insert((parent_name, parent_ns), vec![(child_name, child_ns)]);
+                }
+            };
+        }
+
         let sql = include_str!("postgres/indexes_query.sql");
         let rows = self
             .conn
@@ -1101,11 +1152,12 @@ impl<'a> SqlSchemaDescriber<'a> {
             )
             .await?;
         let mut current_index: Option<IndexId> = None;
+        let mut child_current_index: HashMap<(String, String), IndexId> = HashMap::new();
 
         for row in rows {
             let namespace = row.get_expect_string("namespace");
             let table_name = row.get_expect_string("table_name");
-            let table_id: TableId = match table_ids.get(&(namespace, table_name)) {
+            let table_id: TableId = match table_ids.get(&(namespace.clone(), table_name.clone())) {
                 Some(id) => *id,
                 None => continue,
             };
@@ -1151,14 +1203,36 @@ impl<'a> SqlSchemaDescriber<'a> {
             if column_index == 0 {
                 // new index!
                 let index_id = if is_primary_key {
-                    sql_schema.push_primary_key(table_id, index_name)
+                    sql_schema.push_primary_key(table_id, index_name.clone())
                 } else if is_unique {
-                    sql_schema.push_unique_constraint(table_id, index_name)
+                    sql_schema.push_unique_constraint(table_id, index_name.clone())
                 } else {
-                    sql_schema.push_index(table_id, index_name)
+                    sql_schema.push_index(table_id, index_name.clone())
                 };
 
                 current_index = Some(index_id);
+
+                if let Some(children) = inheritance_map.get(&(table_name, namespace)) {
+                    for (child_table_name, child_table_namespace) in children {
+                        let child_table_id: TableId =
+                            match table_ids.get(&(child_table_namespace.clone(), child_table_name.clone())) {
+                                Some(id) => *id,
+                                None => continue,
+                            };
+
+                        let child_index_id = if is_primary_key {
+                            sql_schema.push_primary_key(child_table_id, index_name.clone())
+                        } else if is_unique {
+                            sql_schema.push_unique_constraint(child_table_id, index_name.clone())
+                        } else {
+                            sql_schema.push_index(child_table_id, index_name.clone())
+                        };
+                        child_current_index.insert(
+                            (child_table_name.to_string(), child_table_namespace.to_string()),
+                            child_index_id,
+                        );
+                    }
+                };
             }
 
             let index_id = current_index.unwrap();
@@ -1184,6 +1258,42 @@ impl<'a> SqlSchemaDescriber<'a> {
 
             if let Some(opclass) = operator_class {
                 pg_ext.opclasses.push((index_field_id, opclass));
+            }
+
+            for ((name, ns), index_id) in &child_current_index {
+                let operator_class = if !matches!(algorithm, SqlIndexAlgorithm::BTree | SqlIndexAlgorithm::Hash) {
+                    row.get_string("opclass")
+                        .map(|c| (c, row.get_bool("opcdefault").unwrap_or_default()))
+                        .map(|(c, is_default)| SQLOperatorClass {
+                            kind: SQLOperatorClassKind::from(c.as_str()),
+                            is_default,
+                        })
+                } else {
+                    None
+                };
+
+                let table_id: TableId = match table_ids.get(&(ns.clone(), name.clone())) {
+                    Some(id) => *id,
+                    None => continue,
+                };
+
+                let column_id = match sql_schema.walk(table_id).column(&column_name) {
+                    Some(col) => col.id,
+                    _ => continue,
+                };
+
+                let index_field_id = sql_schema.push_index_column(IndexColumn {
+                    index_id: *index_id,
+                    column_id,
+                    sort_order,
+                    length: None,
+                });
+
+                pg_ext.indexes.push((*index_id, algorithm));
+
+                if let Some(opclass) = operator_class {
+                    pg_ext.opclasses.push((index_field_id, opclass));
+                }
             }
         }
 
