@@ -604,7 +604,7 @@ impl QueryDocumentParser {
                     selection_path.segments(),
                     argument_path.segments(),
                     format!("{val:?}"),
-                    typ.name().to_string(),
+                    typ.name(),
                     None,
                 ));
             }
@@ -623,15 +623,15 @@ impl QueryDocumentParser {
         match typ.borrow() {
             EnumType::Database(db) => match db.map_input_value(&raw) {
                 Some(value) => Ok(ParsedInputValue::Single(value)),
-                None => err(db.identifier().name()),
+                None => err(&db.identifier().name()),
             },
             EnumType::String(s) => match s.value_for(raw.as_str()) {
                 Some(val) => Ok(ParsedInputValue::Single(PrismaValue::Enum(val.to_owned()))),
-                None => err(s.identifier().name()),
+                None => err(&s.identifier().name()),
             },
             EnumType::FieldRef(f) => match f.value_for(raw.as_str()) {
                 Some(value) => Ok(ParsedInputValue::ScalarField(value.clone())),
-                None => err(f.identifier().name()),
+                None => err(&f.identifier().name()),
             },
         }
     }
@@ -802,7 +802,7 @@ pub(crate) mod conversions {
     pub(crate) fn schema_object_to_output_type_description(
         o: &schema::ObjectTypeStrongRef,
     ) -> validation::OutputTypeDescription {
-        let name = o.identifier.name().to_string();
+        let name = o.identifier.name();
         let fields: Vec<validation::OutputTypeDescriptionField> = o
             .get_fields()
             .iter()
@@ -834,10 +834,7 @@ pub(crate) mod conversions {
         match input_type {
             InputType::Scalar(s) => InputTypeDescription::Scalar { name: s.to_string() },
             InputType::Enum(e) => InputTypeDescription::Enum {
-                name: e
-                    .upgrade()
-                    .map(|e| e.name().to_string())
-                    .expect("enum type should be upgradeable"),
+                name: e.upgrade().map(|e| e.name()).expect("enum type should be upgradeable"),
             },
             InputType::List(l) => InputTypeDescription::List {
                 element_type: Box::new(input_type_to_input_type_description(l.as_ref(), query_schema)),
@@ -853,7 +850,7 @@ pub(crate) mod conversions {
         i: &schema::InputObjectTypeStrongRef,
         query_schema: &QuerySchema,
     ) -> validation::InputTypeDescription {
-        let name = i.identifier.name().to_string();
+        let name = i.identifier.name();
         let fields: Vec<validation::InputTypeDescriptionField> = i
             .get_fields()
             .iter()
@@ -930,14 +927,11 @@ pub(crate) mod conversions {
 
     fn to_simplified_input_type_name(typ: &InputType) -> String {
         match typ {
-            InputType::Enum(e) => e
-                .upgrade()
-                .map(|e| e.name().to_string())
-                .expect("enum type should be upgradeable"),
+            InputType::Enum(e) => e.upgrade().map(|e| e.name()).expect("enum type should be upgradeable"),
             InputType::List(o) => format!("{}[]", to_simplified_input_type_name(o.as_ref())),
             InputType::Object(o) => o
                 .upgrade()
-                .map(|f| f.identifier.name().to_string())
+                .map(|f| f.identifier.name())
                 .expect("input object type should be upgradeable"),
             InputType::Scalar(s) => s.to_string(),
         }
@@ -945,14 +939,11 @@ pub(crate) mod conversions {
 
     fn to_simplified_output_type_name(typ: &OutputType) -> String {
         match typ {
-            OutputType::Enum(e) => e
-                .upgrade()
-                .map(|e| e.name().to_string())
-                .expect("enum type should be upgradeable"),
+            OutputType::Enum(e) => e.upgrade().map(|e| e.name()).expect("enum type should be upgradeable"),
             OutputType::List(o) => format!("{}[]", to_simplified_output_type_name(o)),
             OutputType::Object(o) => o
                 .upgrade()
-                .map(|f| f.identifier.name().to_string())
+                .map(|f| f.identifier.name())
                 .expect("input object type should be upgradeable"),
             OutputType::Scalar(s) => s.to_string(),
         }

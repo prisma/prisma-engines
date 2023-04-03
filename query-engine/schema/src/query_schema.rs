@@ -1,6 +1,5 @@
 use super::*;
-use fmt::Debug;
-use prisma_models::{InternalDataModelRef, ModelRef};
+use prisma_models::*;
 use psl::{
     datamodel_connector::{ConnectorCapability, RelationMode},
     PreviewFeatures,
@@ -274,7 +273,7 @@ impl From<&str> for QueryTag {
 
 #[derive(PartialEq, Hash, Eq, Debug, Clone)]
 pub struct Identifier {
-    name: String,
+    name: IdentifierType,
     namespace: IdentifierNamespace,
 }
 
@@ -285,28 +284,22 @@ enum IdentifierNamespace {
 }
 
 impl Identifier {
-    pub fn new_prisma<T>(name: T) -> Self
-    where
-        T: Into<String>,
-    {
+    pub fn new_prisma(name: impl Into<IdentifierType>) -> Self {
         Self {
             name: name.into(),
             namespace: IdentifierNamespace::Prisma,
         }
     }
 
-    pub fn new_model<T>(name: T) -> Self
-    where
-        T: Into<String>,
-    {
+    pub fn new_model(name: impl Into<IdentifierType>) -> Self {
         Self {
             name: name.into(),
             namespace: IdentifierNamespace::Model,
         }
     }
 
-    pub fn name(&self) -> &str {
-        &self.name
+    pub fn name(&self) -> String {
+        self.name.to_string()
     }
 
     pub fn namespace(&self) -> &str {
@@ -334,8 +327,8 @@ pub enum ScalarType {
     Bytes,
 }
 
-impl std::fmt::Display for ScalarType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl fmt::Display for ScalarType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let typ = match self {
             ScalarType::Null => "Null",
             ScalarType::String => "String",

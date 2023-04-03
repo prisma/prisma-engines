@@ -227,7 +227,7 @@ impl ValidationError {
     ) -> Self {
         let constraints =
             InputTypeConstraints::new(min_field_count, max_field_count, required_fields, provided_field_count);
-        let message = format!("Some fields are missing: {}", constraints);
+        let message = format!("Some fields are missing: {constraints}");
         ValidationError {
             kind: ValidationErrorKind::SomeFieldsMissing,
             message,
@@ -250,7 +250,7 @@ impl ValidationError {
     ) -> Self {
         let constraints =
             InputTypeConstraints::new(min_field_count, max_field_count, required_fields, provided_field_count);
-        let message = format!("Too many fields given: {}", constraints);
+        let message = format!("Too many fields given: {constraints}");
         ValidationError {
             kind: ValidationErrorKind::TooManyFieldsGiven,
             message,
@@ -462,9 +462,7 @@ impl ValidationError {
     pub fn value_too_large(selection_path: Vec<String>, argument_path: Vec<String>, value: String) -> Self {
         let argument_name = argument_path.last().expect("Argument path cannot not be empty");
         let message = format!(
-            "Unable to fit float value (or large JS integer serialized in exponent notation) '{}' into a 64 Bit signed integer for field '{}'. If you're trying to store large integers, consider using `BigInt`",
-            value,
-            argument_name
+            "Unable to fit float value (or large JS integer serialized in exponent notation) '{value}' into a 64 Bit signed integer for field '{argument_name}'. If you're trying to store large integers, consider using `BigInt`",
         );
         let argument = ArgumentDescription::new(argument_name.to_owned(), vec!["BigInt".to_owned()]);
         ValidationError {

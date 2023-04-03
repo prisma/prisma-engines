@@ -65,8 +65,7 @@ fn to_one_relation_filter_shorthand_types(ctx: &mut BuilderContext<'_>, rf: &Rel
 }
 
 fn to_many_relation_filter_object(ctx: &mut BuilderContext<'_>, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
-    let related_model = rf.related_model();
-    let ident = Identifier::new_prisma(format!("{}ListRelationFilter", capitalize(related_model.name())));
+    let ident = Identifier::new_prisma(IdentifierType::ToManyRelationFilterInput(rf.related_model()));
 
     return_cached_input!(ctx, &ident);
 
@@ -76,7 +75,7 @@ fn to_many_relation_filter_object(ctx: &mut BuilderContext<'_>, rf: &RelationFie
     let object = Arc::new(object);
     ctx.cache_input_type(ident, object.clone());
 
-    let related_input_type = filter_objects::where_object_type(ctx, &related_model);
+    let related_input_type = filter_objects::where_object_type(ctx, &rf.related_model());
 
     let fields = vec![
         input_field(ctx, filters::EVERY, InputType::object(related_input_type.clone()), None).optional(),
@@ -89,11 +88,17 @@ fn to_many_relation_filter_object(ctx: &mut BuilderContext<'_>, rf: &RelationFie
 }
 
 fn to_one_relation_filter_object(ctx: &mut BuilderContext<'_>, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
-    let related_model = rf.related_model();
-    let related_input_type = filter_objects::where_object_type(ctx, &related_model);
-    let ident = Identifier::new_prisma(format!("{}RelationFilter", capitalize(related_model.name())));
+    // TODO: It is important to traverse the related model before going into the cache.
+    // TODO: The ToOneRelationFilterInput is currently broken as it does not take nullability into account.
+    // TODO: This means that the first relation field to be traversed will set the nullability for all other relation field that points to the same related model.
+    // TODO: Moving `filter_objects::where_object_type` _after_ the cache retrieval means that we're changing in which order we traverse the datamodel,
+    // TODO: potentially leading to a different ToOneRelationFilterInput.
+    // TODO: See https://github.com/prisma/prisma/issues/18585 for further info.
+    let related_input_type = filter_objects::where_object_type(ctx, &rf.related_model());
+    let ident = Identifier::new_prisma(IdentifierType::ToOneRelationFilterInput(rf.related_model()));
 
     return_cached_input!(ctx, &ident);
+
     let mut object = init_input_object_type(ident.clone());
     object.set_tag(ObjectTag::RelationEnvelope);
 
@@ -121,8 +126,8 @@ fn to_one_composite_filter_shorthand_types(ctx: &mut BuilderContext<'_>, cf: &Co
 }
 
 fn to_one_composite_filter_object(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let nullable = if cf.is_optional() { "Nullable" } else { "" };
-    let ident = Identifier::new_prisma(format!("{}{}CompositeFilter", capitalize(cf.typ().name()), nullable));
+    let ident = Identifier::new_prisma(IdentifierType::ToOneCompositeFilterInput(cf.typ(), cf.arity()));
+
     return_cached_input!(ctx, &ident);
 
     let mut object = init_input_object_type(ident.clone());
@@ -162,7 +167,8 @@ fn to_one_composite_filter_object(ctx: &mut BuilderContext<'_>, cf: &CompositeFi
 }
 
 fn to_many_composite_filter_object(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new_prisma(format!("{}CompositeListFilter", capitalize(cf.typ().name())));
+    let ident = Identifier::new_prisma(IdentifierType::ToManyCompositeFilterInput(cf.typ()));
+
     return_cached_input!(ctx, &ident);
 
     let mut object = init_input_object_type(ident.clone());
@@ -213,12 +219,9 @@ fn to_many_composite_filter_object(ctx: &mut BuilderContext<'_>, cf: &CompositeF
 }
 
 fn scalar_list_filter_type(ctx: &mut BuilderContext<'_>, sf: &ScalarFieldRef) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new_prisma(scalar_filter_name(
-        &sf.type_identifier().type_name(&ctx.internal_data_model.schema),
-        true,
-        !sf.is_required(),
-        false,
-        false,
+    let ident = Identifier::new_prisma(IdentifierType::ScalarListFilterInput(
+        ctx.internal_data_model.clone().zip(sf.type_identifier()),
+        sf.is_required(),
     ));
     return_cached_input!(ctx, &ident);
 
@@ -553,14 +556,6 @@ fn query_mode_field(ctx: &mut BuilderContext<'_>, nested: bool) -> impl Iterator
     };
 
     fields.into_iter()
-}
-
-fn scalar_filter_name(typ: &str, list: bool, nullable: bool, nested: bool, include_aggregates: bool) -> String {
-    let list = if list { "List" } else { "" };
-    let nullable = if nullable { "Nullable" } else { "" };
-    let nested = if nested { "Nested" } else { "" };
-    let aggregates = if include_aggregates { "WithAggregates" } else { "" };
-    format!("{nested}{typ}{nullable}{list}{aggregates}Filter")
 }
 
 fn aggregate_filter_field(
