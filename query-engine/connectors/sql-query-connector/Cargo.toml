@@ -51,7 +51,7 @@ features = ["sql"]
 path = "../../../libs/user-facing-errors"
 
 [dev-dependencies]
-codspeed-criterion-compat = "1.1.0"
+criterion = {version="0.4.0", features=["async_futures", "async_tokio"]}
 postgres = "0.19"
 tokio-postgres = "0.7"
 
