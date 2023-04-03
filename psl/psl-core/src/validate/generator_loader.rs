@@ -101,6 +101,8 @@ fn lift_generator(ast_generator: &ast::GeneratorConfig, diagnostics: &mut Diagno
         .and_then(|v| coerce_array(v, &coerce::string, diagnostics).map(|arr| (arr, v.span())))
         .map(|(arr, span)| parse_and_validate_preview_features(arr, &ALL_PREVIEW_FEATURES, span, diagnostics));
 
+    let preview_features = preview_features.unwrap_or_default();
+
     for prop in &ast_generator.properties {
         let is_first_class_prop = FIRST_CLASS_PROPERTIES.iter().any(|k| *k == prop.name.name);
         if is_first_class_prop {
@@ -138,6 +140,7 @@ fn lift_generator(ast_generator: &ast::GeneratorConfig, diagnostics: &mut Diagno
         preview_features,
         config: properties,
         documentation: ast_generator.documentation().map(String::from),
+        is_custom_output: false,
     })
 }
 

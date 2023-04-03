@@ -8,7 +8,15 @@ use crate::configuration::{self, StringFromEnvVar};
 #[tsify(into_wasm_abi)]
 pub struct SourceConfig {
     pub name: String,
+
+    #[tsify(
+        type = "'mysql' | 'mongodb' | 'postgresql' | 'postgres' | 'sqlite' | 'sqlserver' | 'cockroachdb' | 'jdbc:sqlserver'"
+    )]
     pub provider: String,
+
+    #[tsify(
+        type = "'mysql' | 'mongodb' | 'postgresql' | 'postgres' | 'sqlite' | 'sqlserver' | 'cockroachdb' | 'jdbc:sqlserver'"
+    )]
     pub active_provider: String,
     pub url: StringFromEnvVar,
     #[serde(skip_serializing_if = "Option::is_none")]

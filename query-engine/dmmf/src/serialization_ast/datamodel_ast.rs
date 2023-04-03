@@ -19,6 +19,8 @@ pub struct Field {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub db_name: Option<String>,
+
+    #[tsify(type = "'scalar' | 'object' | 'enum' | 'unsupported'")]
     pub kind: &'static str,
     pub is_list: bool,
     pub is_required: bool,

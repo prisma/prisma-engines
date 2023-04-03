@@ -108,6 +108,7 @@ pub struct DmmfTypeReference {
     #[serde(rename = "type")]
     pub typ: String,
 
+    #[tsify(type = "'model' | 'prisma'", optional)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub namespace: Option<String>,
     pub location: TypeLocation,

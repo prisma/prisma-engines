@@ -14,21 +14,23 @@ pub struct Generator {
     pub output: Option<StringFromEnvVar>,
     pub config: HashMap<String, String>,
 
-    #[serde(default)]
     pub binary_targets: Vec<StringFromEnvVar>,
 
-    #[serde(default, serialize_with = "mcf_preview_features")]
-    pub preview_features: Option<BitFlags<PreviewFeature>>,
+    #[serde(serialize_with = "mcf_preview_features")]
+    #[tsify(type = "string[]")]
+    pub preview_features: BitFlags<PreviewFeature>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub documentation: Option<String>,
+
+    #[serde(default, skip)]
+    pub is_custom_output: bool,
 }
 
-pub fn mcf_preview_features<S>(feats: &Option<BitFlags<PreviewFeature>>, s: S) -> Result<S::Ok, S::Error>
+pub fn mcf_preview_features<S>(feats: &BitFlags<PreviewFeature>, s: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
-    let feats = feats.unwrap_or_default();
     let mut seq = s.serialize_seq(Some(feats.len()))?;
     for feat in feats.iter() {
         seq.serialize_element(&feat)?;
