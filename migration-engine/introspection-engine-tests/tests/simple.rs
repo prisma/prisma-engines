@@ -162,6 +162,11 @@ source .test_database_urls/mysql_5_6
             api.set_params(params).unwrap();
             api
         }
+        "sqlite" => {
+            let mut api = SqlMigrationConnector::new_sqlite();
+            api.set_params(params).unwrap();
+            api
+        }
         _ => unreachable!(),
     };
 
