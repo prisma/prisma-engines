@@ -2,9 +2,10 @@ use crate::features::{EnabledFeatures, Feature};
 use crate::{logger::Logger, opt::PrismaOpt};
 use crate::{PrismaError, PrismaResult};
 use psl::PreviewFeature;
-use query_core::{executor, protocol::EngineProtocol, schema::QuerySchemaRef, schema_builder, QueryExecutor};
+use query_core::{protocol::EngineProtocol, schema::QuerySchemaRef, schema_builder, QueryExecutor};
 use query_engine_metrics::setup as metric_setup;
 use query_engine_metrics::MetricRegistry;
+use request_handlers::load_executor;
 use std::{env, fmt, sync::Arc};
 use tracing::Instrument;
 
@@ -46,7 +47,7 @@ impl PrismaContext {
         let url = data_source.load_url(|key| env::var(key).ok())?;
 
         // Load executor
-        let executor = executor::load(data_source, config.preview_features(), &url).await?;
+        let executor = load_executor(data_source, config.preview_features(), &url).await?;
 
         // Build internal data model
         let internal_data_model = prisma_models::convert(Arc::new(schema));

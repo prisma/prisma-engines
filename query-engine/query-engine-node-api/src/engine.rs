@@ -5,7 +5,7 @@ use query_core::{
     executor, protocol::EngineProtocol, schema::QuerySchema, schema_builder, telemetry, QueryExecutor, TxId,
 };
 use query_engine_metrics::{MetricFormat, MetricRegistry};
-use request_handlers::{dmmf, render_graphql_schema, RequestBody, RequestHandler};
+use request_handlers::{dmmf, load_executor, render_graphql_schema, RequestBody, RequestHandler};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::{
@@ -242,7 +242,7 @@ impl QueryEngine {
                     .load_url_with_config_dir(&builder.config_dir, |key| builder.env.get(key).map(ToString::to_string))
                     .map_err(|err| crate::error::ApiError::Conversion(err, builder.schema.db.source().to_owned()))?;
 
-                let executor = executor::load(data_source, preview_features, &url).await?;
+                let executor = load_executor(data_source, preview_features, &url).await?;
                 let connector = executor.primary_connector();
                 connector.get_connection().await?;
 

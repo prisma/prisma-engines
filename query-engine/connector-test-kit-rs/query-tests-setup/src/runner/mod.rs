@@ -6,7 +6,7 @@ use crate::{ConnectorTag, ConnectorVersion, QueryResult, TestLogCapture, TestRes
 pub use json_adapter::*;
 use quaint::{prelude::Queryable, single::Quaint};
 use query_core::{
-    executor, protocol::EngineProtocol, schema::QuerySchemaRef, schema_builder, QueryExecutor, TransactionOptions, TxId,
+    protocol::EngineProtocol, schema::QuerySchemaRef, schema_builder, QueryExecutor, TransactionOptions, TxId,
 };
 use query_engine_metrics::MetricRegistry;
 
@@ -14,8 +14,8 @@ pub type TxResult = Result<(), user_facing_errors::Error>;
 
 use colored::Colorize;
 use request_handlers::{
-    BatchTransactionOption, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery, RequestBody,
-    RequestHandler,
+    load_executor, BatchTransactionOption, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery,
+    RequestBody, RequestHandler,
 };
 
 pub(crate) type Executor = Box<dyn QueryExecutor + Send + Sync>;
@@ -43,7 +43,7 @@ impl Runner {
         let schema = psl::parse_schema(datamodel).unwrap();
         let data_source = schema.configuration.datasources.first().unwrap();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
-        let executor = executor::load(data_source, schema.configuration.preview_features(), &url).await?;
+        let executor = load_executor(data_source, schema.configuration.preview_features(), &url).await?;
         let internal_data_model = prisma_models::convert(Arc::new(schema));
 
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(internal_data_model, true));

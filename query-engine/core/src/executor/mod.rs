@@ -8,12 +8,10 @@
 
 mod execute_operation;
 mod interpreting_executor;
-mod loader;
 mod pipeline;
 mod request_context;
 
-pub use execute_operation::*;
-pub use loader::load;
+pub use self::{execute_operation::*, interpreting_executor::InterpretingExecutor};
 
 pub(crate) use request_context::*;
 

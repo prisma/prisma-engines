@@ -133,18 +133,6 @@ impl From<InterpreterError> for CoreError {
     }
 }
 
-impl From<url::ParseError> for CoreError {
-    fn from(e: url::ParseError) -> Self {
-        Self::ConfigurationError(format!("Error parsing connection string: {e}"))
-    }
-}
-
-impl From<connection_string::Error> for CoreError {
-    fn from(e: connection_string::Error) -> Self {
-        Self::ConfigurationError(format!("Error parsing connection string: {e}"))
-    }
-}
-
 impl From<CoreError> for user_facing_errors::Error {
     fn from(err: CoreError) -> user_facing_errors::Error {
         match err {
