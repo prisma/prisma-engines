@@ -56,7 +56,8 @@ impl std::fmt::Display for Line {
 }
 
 fn format_diff(old: &str, new: &str) -> String {
-    let diff = TextDiff::from_lines(old, new);
+    let mut differ = TextDiffConfig::default();
+    let diff = differ.algorithm(Algorithm::Patience).diff_lines(old, new);
     let mut buf = String::new();
 
     for (idx, group) in diff.grouped_ops(2).iter().enumerate() {
