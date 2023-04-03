@@ -2,10 +2,10 @@ use connection_string::JdbcString;
 use enumflags2::BitFlags;
 use indoc::formatdoc;
 use introspection_engine_tests::test_api::Queryable;
-use migration_connector::{CompositeTypeDepth, IntrospectionConnector, IntrospectionContext};
+use migration_connector::{CompositeTypeDepth, ConnectorParams, IntrospectionContext, MigrationConnector};
 use psl::PreviewFeature;
 use quaint::single::Quaint;
-use sql_introspection_connector::SqlIntrospectionConnector;
+use sql_migration_connector::SqlMigrationConnector;
 use std::{fs, io::Write as _, path};
 use test_setup::{
     mssql::init_mssql_database, mysql::create_mysql_database, postgres::create_postgres_database,
@@ -135,7 +135,35 @@ source .test_database_urls/mysql_5_6
 
     tok(conn.raw_cmd(&text)).unwrap();
 
-    let api = tok(SqlIntrospectionConnector::new(&database_url, preview_features)).unwrap();
+    let params = ConnectorParams {
+        connection_string: database_url.to_owned(),
+        preview_features,
+        shadow_database_connection_string: None,
+    };
+
+    let mut api = match provider {
+        "cockroachdb" => {
+            let mut api = SqlMigrationConnector::new_cockroach();
+            api.set_params(params).unwrap();
+            api
+        }
+        "postgres" | "postgresql" => {
+            let mut api = SqlMigrationConnector::new_postgres();
+            api.set_params(params).unwrap();
+            api
+        }
+        "mysql" => {
+            let mut api = SqlMigrationConnector::new_mysql();
+            api.set_params(params).unwrap();
+            api
+        }
+        "sqlserver" => {
+            let mut api = SqlMigrationConnector::new_mssql();
+            api.set_params(params).unwrap();
+            api
+        }
+        _ => unreachable!(),
+    };
 
     let datasource = formatdoc!(
         r#"

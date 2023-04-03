@@ -1,7 +1,7 @@
 use indoc::{formatdoc, indoc};
 use introspection_engine_tests::test_api::*;
-use migration_connector::{IntrospectionConnector, IntrospectionContext};
-use sql_introspection_connector::SqlIntrospectionConnector;
+use migration_connector::{ConnectorParams, IntrospectionContext, MigrationConnector};
+use sql_migration_connector::SqlMigrationConnector;
 use url::Url;
 
 #[test_connector(tags(Mysql))]
@@ -399,7 +399,14 @@ async fn missing_select_rights(api: &mut TestApi) -> TestResult {
     url.set_username("jeffrey").unwrap();
     url.set_password(Some("password")).unwrap();
 
-    let conn = SqlIntrospectionConnector::new(url.as_ref(), Default::default()).await?;
+    let params = ConnectorParams {
+        connection_string: url.to_string(),
+        preview_features: Default::default(),
+        shadow_database_connection_string: None,
+    };
+
+    let mut conn = SqlMigrationConnector::new_mysql();
+    conn.set_params(params).unwrap();
 
     let datasource = formatdoc!(
         r#"

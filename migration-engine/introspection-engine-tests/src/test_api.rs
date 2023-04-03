@@ -334,8 +334,6 @@ impl TestApi {
     pub async fn expect_view_definition(&mut self, view: &str, expectation: &expect_test::Expect) {
         let views = self.introspect_views().await.unwrap().unwrap_or_default();
 
-        dbg!((&views, self.schema_name()));
-
         let view = views
             .into_iter()
             .find(|v| v.schema == self.schema_name() && v.name == view)

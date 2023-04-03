@@ -4,7 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-sql-introspection-connector = { path = "../connectors/sql-introspection-connector" }
 migration-connector = { path = "../../migration-engine/connectors/migration-connector" }
 sql-migration-connector = { path = "../../migration-engine/connectors/sql-migration-connector" }
 sql-schema-describer = { path = "../../libs/sql-schema-describer" }
