@@ -70,8 +70,7 @@ pub(crate) fn order_by_object_type(
         // orderBy Fields for full text searches.
         append_opt(&mut fields, order_by_field_text_search(ctx, container))
     }
-
-    ctx.db[id].set_fields(fields);
+    ctx.db.extend_input_fields(id, &mut fields.into_iter());
     id
 }
 
@@ -183,12 +182,10 @@ fn sort_nulls_object_type(ctx: &mut BuilderContext<'_>) -> InputObjectTypeId {
     let sort_order_enum_type = sort_order_enum(ctx);
     let nulls_order_enum_type = nulls_order_enum(ctx);
 
-    let fields = vec![
-        input_field(ctx, ordering::SORT, InputType::Enum(sort_order_enum_type), None),
-        input_field(ctx, ordering::NULLS, InputType::Enum(nulls_order_enum_type), None).optional(),
-    ];
-
-    ctx.db[id].set_fields(fields);
+    let sorts_field = input_field(ctx, ordering::SORT, InputType::Enum(sort_order_enum_type), None);
+    let nulls_field = input_field(ctx, ordering::NULLS, InputType::Enum(nulls_order_enum_type), None).optional();
+    ctx.db.push_input_field(id, sorts_field);
+    ctx.db.push_input_field(id, nulls_field);
     id
 }
 
@@ -225,12 +222,10 @@ fn order_by_object_type_aggregate(
     let id = ctx.cache_input_type(ident, input_object);
 
     let sort_order_enum = InputType::Enum(sort_order_enum(ctx));
-    let fields = scalar_fields
-        .iter()
-        .map(|sf| input_field(ctx, sf.name(), sort_order_enum.clone(), None).optional())
-        .collect();
-
-    ctx.db[id].set_fields(fields);
+    for sf in scalar_fields {
+        let input_field = input_field(ctx, sf.name(), sort_order_enum.clone(), None).optional();
+        ctx.db.push_input_field(id, input_field);
+    }
     id
 }
 
@@ -246,8 +241,8 @@ fn order_by_to_many_aggregate_object_type(
     let id = ctx.cache_input_type(ident, input_object);
 
     let sort_order_enum = InputType::Enum(sort_order_enum(ctx));
-    let fields = vec![input_field(ctx, aggregations::UNDERSCORE_COUNT, sort_order_enum, None).optional()];
-    ctx.db[id].set_fields(fields);
+    let underscore_count_field = input_field(ctx, aggregations::UNDERSCORE_COUNT, sort_order_enum, None).optional();
+    ctx.db.push_input_field(id, underscore_count_field);
     id
 }
 
@@ -288,17 +283,16 @@ fn order_by_object_type_text_search(
     ));
     let sort_order_enum = sort_order_enum(ctx);
 
-    let fields = vec![
-        input_field(
-            ctx,
-            ordering::FIELDS,
-            vec![fields_enum_type.clone(), InputType::list(fields_enum_type)],
-            None,
-        ),
-        input_field(ctx, ordering::SORT, InputType::Enum(sort_order_enum), None),
-        input_field(ctx, ordering::SEARCH, InputType::string(), None),
-    ];
-
-    ctx.db[id].set_fields(fields);
+    let fields_field = input_field(
+        ctx,
+        ordering::FIELDS,
+        vec![fields_enum_type.clone(), InputType::list(fields_enum_type)],
+        None,
+    );
+    let sort_field = input_field(ctx, ordering::SORT, InputType::Enum(sort_order_enum), None);
+    let search_field = input_field(ctx, ordering::SEARCH, InputType::string(), None);
+    ctx.db.push_input_field(id, fields_field);
+    ctx.db.push_input_field(id, sort_field);
+    ctx.db.push_input_field(id, search_field);
     id
 }

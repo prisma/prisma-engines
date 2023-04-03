@@ -69,8 +69,7 @@ pub(crate) fn create_many_object_type(
 
     let filtered_fields = filter_create_many_fields(ctx, model, parent_field);
     let field_mapper = CreateDataInputFieldMapper::new_checked();
-    let input_fields = field_mapper.map_all(ctx, &filtered_fields);
-    ctx.db[id].set_fields(input_fields);
+    field_mapper.map_all(ctx, id, &mut filtered_fields.iter());
     id
 }
 

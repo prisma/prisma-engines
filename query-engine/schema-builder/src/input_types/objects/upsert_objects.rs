@@ -25,7 +25,8 @@ fn nested_upsert_list_input_object(
     let create_types = create_one::create_one_input_types(ctx, &related_model, Some(parent_field));
     let update_types = update_one_objects::update_one_input_types(ctx, &related_model, Some(parent_field));
 
-    if ctx.db[where_object].is_empty() || create_types.iter().all(|typ| typ.is_empty(&ctx.db)) {
+    if ctx.db.input_object_fields(where_object).next().is_none() || create_types.iter().all(|typ| typ.is_empty(&ctx.db))
+    {
         return None;
     }
 
@@ -35,14 +36,12 @@ fn nested_upsert_list_input_object(
         None => {
             let input_object = init_input_object_type(ident.clone());
             let id = ctx.cache_input_type(ident, input_object);
-
-            let fields = vec![
-                input_field(ctx, args::WHERE, InputType::object(where_object), None),
-                input_field(ctx, args::UPDATE, update_types, None),
-                input_field(ctx, args::CREATE, create_types, None),
-            ];
-
-            ctx.db[id].set_fields(fields);
+            let where_field = input_field(ctx, args::WHERE, InputType::object(where_object), None);
+            let update_field = input_field(ctx, args::UPDATE, update_types, None);
+            let create_field = input_field(ctx, args::CREATE, create_types, None);
+            ctx.db.push_input_field(id, where_field);
+            ctx.db.push_input_field(id, update_field);
+            ctx.db.push_input_field(id, create_field);
             Some(id)
         }
         x => x,
@@ -68,17 +67,16 @@ fn nested_upsert_nonlist_input_object(
         None => {
             let input_object = init_input_object_type(ident.clone());
             let id = ctx.cache_input_type(ident, input_object);
-
-            let mut fields = vec![
-                input_field(ctx, args::UPDATE, update_types, None),
-                input_field(ctx, args::CREATE, create_types, None),
-            ];
+            let update_field = input_field(ctx, args::UPDATE, update_types, None);
+            let create_field = input_field(ctx, args::CREATE, create_types, None);
+            ctx.db.push_input_field(id, update_field);
+            ctx.db.push_input_field(id, create_field);
 
             if ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {
-                fields.push(where_argument(ctx, &related_model));
+                let where_arg = where_argument(ctx, &related_model);
+                ctx.db.push_input_field(id, where_arg);
             }
 
-            ctx.db[id].set_fields(fields);
             Some(id)
         }
         x => x,

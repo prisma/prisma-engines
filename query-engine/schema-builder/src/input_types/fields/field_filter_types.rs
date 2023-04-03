@@ -75,13 +75,13 @@ fn to_many_relation_filter_object(ctx: &mut BuilderContext<'_>, rf: &RelationFie
 
     let related_input_type = filter_objects::where_object_type(ctx, &rf.related_model());
 
-    let fields = vec![
+    for field in [
         input_field(ctx, filters::EVERY, InputType::object(related_input_type), None).optional(),
         input_field(ctx, filters::SOME, InputType::object(related_input_type), None).optional(),
         input_field(ctx, filters::NONE, InputType::object(related_input_type), None).optional(),
-    ];
-
-    ctx.db[id].set_fields(fields);
+    ] {
+        ctx.db.push_input_field(id, field);
+    }
     id
 }
 
@@ -101,16 +101,16 @@ fn to_one_relation_filter_object(ctx: &mut BuilderContext<'_>, rf: &RelationFiel
     object.set_tag(ObjectTag::RelationEnvelope);
     let id = ctx.cache_input_type(ident, object);
 
-    let fields = vec![
+    let mut fields = [
         input_field(ctx, filters::IS, InputType::object(related_input_type), None)
             .optional()
             .nullable_if(!rf.is_required(), &mut ctx.db),
         input_field(ctx, filters::IS_NOT, InputType::object(related_input_type), None)
             .optional()
             .nullable_if(!rf.is_required(), &mut ctx.db),
-    ];
-
-    ctx.db[id].set_fields(fields);
+    ]
+    .into_iter();
+    ctx.db.extend_input_fields(id, &mut fields);
     id
 }
 
@@ -148,8 +148,7 @@ fn to_one_composite_filter_object(ctx: &mut BuilderContext<'_>, cf: &CompositeFi
     if ctx.has_capability(ConnectorCapability::UndefinedType) && cf.is_optional() {
         fields.push(is_set_input_field(ctx));
     }
-
-    ctx.db[id].set_fields(fields);
+    ctx.db.extend_input_fields(id, &mut fields.into_iter());
     id
 }
 
@@ -186,7 +185,7 @@ fn to_many_composite_filter_object(ctx: &mut BuilderContext<'_>, cf: &CompositeF
         fields.push(is_set_input_field(ctx));
     }
 
-    ctx.db[id].set_fields(fields);
+    ctx.db.extend_input_fields(id, &mut fields.into_iter());
     id
 }
 
@@ -224,8 +223,7 @@ fn scalar_list_filter_type(ctx: &mut BuilderContext<'_>, sf: &ScalarFieldRef) ->
     );
     fields.push(input_field(ctx, filters::HAS_SOME, mapped_list_type_with_field_ref_input, None).optional());
     fields.push(input_field(ctx, filters::IS_EMPTY, InputType::boolean(), None).optional());
-
-    ctx.db[id].set_fields(fields);
+    ctx.db.extend_input_fields(id, &mut fields.into_iter());
     id
 }
 
@@ -363,7 +361,7 @@ fn full_scalar_filter_type(
         fields.push(is_set_input_field(ctx));
     }
 
-    ctx.db[id].set_fields(fields);
+    ctx.db.extend_input_fields(id, &mut fields.into_iter());
     id
 }
 

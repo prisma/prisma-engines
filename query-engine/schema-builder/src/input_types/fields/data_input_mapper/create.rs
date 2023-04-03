@@ -42,10 +42,12 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
         let input_object = match ctx.get_input_type(&ident) {
             Some(cached) => cached,
             None => {
-                let object_fields = vec![input_field(ctx, operations::SET, typ.clone(), None)];
-                let mut input_object = input_object_type(ident.clone(), object_fields);
+                let mut input_object = init_input_object_type(ident.clone());
                 input_object.require_exactly_one_field();
-                ctx.cache_input_type(ident, input_object)
+                let id = ctx.cache_input_type(ident, input_object);
+                let set_field = input_field(ctx, operations::SET, typ.clone(), None);
+                ctx.db.push_input_field(id, set_field);
+                id
             }
         };
 
@@ -148,7 +150,7 @@ fn composite_create_envelope_object_type(ctx: &mut BuilderContext<'_>, cf: &Comp
         .nullable_if(!cf.is_required() && !cf.is_list(), &mut ctx.db)
         .optional();
 
-    ctx.db[id].set_fields(vec![set_field]);
+    ctx.db.push_input_field(id, set_field);
     id
 }
 
@@ -162,9 +164,9 @@ pub(crate) fn composite_create_object_type(ctx: &mut BuilderContext<'_>, cf: &Co
     let id = ctx.cache_input_type(ident, input_object);
 
     let mapper = CreateDataInputFieldMapper::new_checked();
-    let fields = cf.typ().fields().collect::<Vec<_>>();
-    let fields = mapper.map_all(ctx, &fields);
-
-    ctx.db[id].set_fields(fields);
+    let typ = cf.typ();
+    for field in typ.fields() {
+        mapper.map_field(ctx, id, &field);
+    }
     id
 }

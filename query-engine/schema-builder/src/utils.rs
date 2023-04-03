@@ -10,20 +10,11 @@ pub fn object_type(ident: Identifier, fields: Vec<OutputField>, model: Option<as
     object_type
 }
 
-/// Input object type convenience wrapper function.
-pub fn input_object_type(ident: Identifier, fields: Vec<InputField>) -> InputObjectType {
-    let object_type = init_input_object_type(ident);
-
-    object_type.set_fields(fields);
-    object_type
-}
-
 /// Input object type initializer for cases where only the name is known, and fields are computed later.
 pub fn init_input_object_type(ident: Identifier) -> InputObjectType {
     InputObjectType {
         identifier: ident,
         constraints: InputObjectTypeConstraints::default(),
-        fields: OnceCell::new(),
         tag: None,
     }
 }

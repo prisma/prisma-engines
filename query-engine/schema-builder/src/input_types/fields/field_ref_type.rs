@@ -26,8 +26,8 @@ fn field_ref_input_object_type(ctx: &mut BuilderContext<'_>, allow_type: InputTy
     object.set_tag(ObjectTag::FieldRefType(allow_type));
     let id = ctx.cache_input_type(ident, object);
 
-    let fields = vec![input_field(ctx, filters::UNDERSCORE_REF, InputType::string(), None)];
-    ctx.db[id].set_fields(fields);
+    let f = input_field(ctx, filters::UNDERSCORE_REF, InputType::string(), None);
+    ctx.db.push_input_field(id, f);
     id
 }
 

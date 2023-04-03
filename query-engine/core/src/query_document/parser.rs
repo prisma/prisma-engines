@@ -307,7 +307,7 @@ impl QueryDocumentParser {
                         selection_path.clone(),
                         argument_path.clone(),
                         o.clone(),
-                        &query_schema.db[*obj],
+                        *obj,
                         query_schema,
                     )
                     .map(ParsedInputValue::Map),
@@ -653,12 +653,13 @@ impl QueryDocumentParser {
         selection_path: Path,
         argument_path: Path,
         object: ArgumentValueObject,
-        schema_object: &InputObjectType,
+        input_object_id: InputObjectTypeId,
         query_schema: &QuerySchema,
     ) -> QueryParserResult<ParsedInputMap> {
-        let valid_field_names: IndexSet<&str> = schema_object
-            .get_fields()
-            .iter()
+        let schema_object = &query_schema.db[input_object_id];
+        let valid_field_names: IndexSet<&str> = query_schema
+            .db
+            .input_object_fields(input_object_id)
             .map(|field| field.name.as_str())
             .collect();
         let given_field_names: IndexSet<&str> = object.iter().map(|(k, _)| k.as_str()).collect();
@@ -668,7 +669,10 @@ impl QueryDocumentParser {
         // As in practise, it is like if they were given with said default value.
         let defaults = missing_field_names
             .filter_map(|unset_field_name| {
-                let field = schema_object.find_field(*unset_field_name).unwrap();
+                let field = query_schema
+                    .db
+                    .find_input_object_field(input_object_id, *unset_field_name)
+                    .unwrap();
                 let argument_path = argument_path.add(field.name.clone());
 
                 // If the input field has a default, add the default to the result.
@@ -716,13 +720,20 @@ impl QueryDocumentParser {
         let mut map = object
             .into_iter()
             .map(|(field_name, value)| {
-                let field = schema_object.find_field(field_name.as_str()).ok_or_else(|| {
-                    ValidationError::unknown_input_field(
-                        selection_path.segments(),
-                        argument_path.add(field_name.clone()).segments(),
-                        conversions::schema_input_object_type_to_input_type_description(schema_object, query_schema),
-                    )
-                })?;
+                let field = query_schema
+                    .db
+                    .find_input_object_field(input_object_id, field_name.as_str())
+                    .ok_or_else(|| {
+                        ValidationError::unknown_input_field(
+                            selection_path.segments(),
+                            argument_path.add(field_name.clone()).segments(),
+                            conversions::schema_input_object_type_to_input_type_description(
+                                input_object_id,
+                                schema_object,
+                                query_schema,
+                            ),
+                        )
+                    })?;
 
                 let argument_path = argument_path.add(field.name.clone());
                 let parsed = self.parse_input_value(
@@ -770,7 +781,11 @@ impl QueryDocumentParser {
                 schema_object.constraints.max_num_fields,
                 schema_object.constraints.fields.as_ref().cloned(),
                 num_fields,
-                &conversions::schema_input_object_type_to_input_type_description(schema_object, query_schema),
+                &conversions::schema_input_object_type_to_input_type_description(
+                    input_object_id,
+                    schema_object,
+                    query_schema,
+                ),
             ));
         }
 
@@ -787,7 +802,11 @@ impl QueryDocumentParser {
                 schema_object.constraints.max_num_fields,
                 schema_object.constraints.fields.as_ref().cloned(),
                 num_fields,
-                &conversions::schema_input_object_type_to_input_type_description(schema_object, query_schema),
+                &conversions::schema_input_object_type_to_input_type_description(
+                    input_object_id,
+                    schema_object,
+                    query_schema,
+                ),
             ));
         }
 
@@ -803,7 +822,7 @@ pub(crate) mod conversions {
         ArgumentValue,
     };
     use prisma_models::PrismaValue;
-    use schema::QuerySchema;
+    use schema::{InputObjectTypeId, QuerySchema};
     use user_facing_errors::query_engine::validation::{self, InputTypeDescription};
 
     /// converts an schema object to the narrower validation::OutputTypeDescription
@@ -849,20 +868,23 @@ pub(crate) mod conversions {
             InputType::List(l) => InputTypeDescription::List {
                 element_type: Box::new(input_type_to_input_type_description(l.as_ref(), query_schema)),
             },
-            InputType::Object(object_id) => {
-                schema_input_object_type_to_input_type_description(&query_schema.db[*object_id], query_schema)
-            }
+            InputType::Object(object_id) => schema_input_object_type_to_input_type_description(
+                *object_id,
+                &query_schema.db[*object_id],
+                query_schema,
+            ),
         }
     }
 
     pub(crate) fn schema_input_object_type_to_input_type_description(
+        input_object_id: InputObjectTypeId,
         i: &schema::InputObjectType,
         query_schema: &QuerySchema,
     ) -> validation::InputTypeDescription {
         let name = i.identifier.name();
-        let fields: Vec<validation::InputTypeDescriptionField> = i
-            .get_fields()
-            .iter()
+        let fields: Vec<validation::InputTypeDescriptionField> = query_schema
+            .db
+            .input_object_fields(input_object_id)
             .map(|field| {
                 let name = field.name.clone();
                 let type_names: Vec<String> = field

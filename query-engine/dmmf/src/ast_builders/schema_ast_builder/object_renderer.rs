@@ -13,17 +13,22 @@ impl Renderer for DmmfObjectRenderer {
                 let input_object = &ctx.query_schema.db[*input];
 
                 match &input_object.tag {
-                    Some(ObjectTag::FieldRefType(_)) => self.render_field_ref_type(input_object, ctx),
-                    _ => self.render_input_object(input_object, ctx),
+                    Some(ObjectTag::FieldRefType(_)) => self.render_field_ref_type(*input, input_object, ctx),
+                    _ => self.render_input_object(*input, input_object, ctx),
                 }
             }
-            DmmfObjectRenderer::Output(output) => self.render_output_object(&ctx.query_schema.db[*output], ctx),
+            DmmfObjectRenderer::Output(output) => self.render_output_object(*output, ctx),
         }
     }
 }
 
 impl DmmfObjectRenderer {
-    fn render_input_object(&self, input_object: &InputObjectType, ctx: &mut RenderContext) {
+    fn render_input_object(
+        &self,
+        input_object_id: InputObjectTypeId,
+        input_object: &InputObjectType,
+        ctx: &mut RenderContext,
+    ) {
         if ctx.already_rendered(&input_object.identifier) {
             return;
         }
@@ -31,8 +36,8 @@ impl DmmfObjectRenderer {
         // This will prevent the type and its fields to be re-rendered.
         ctx.mark_as_rendered(input_object.identifier.clone());
 
-        let fields = input_object.get_fields();
-        let mut rendered_fields = Vec::with_capacity(fields.len());
+        let fields = ctx.query_schema.db.input_object_fields(input_object_id);
+        let mut rendered_fields = Vec::new();
 
         for field in fields {
             rendered_fields.push(render_input_field(field, ctx));
@@ -59,7 +64,12 @@ impl DmmfObjectRenderer {
         ctx.add_input_type(input_object.identifier.clone(), input_type);
     }
 
-    fn render_field_ref_type(&self, input_object: &InputObjectType, ctx: &mut RenderContext) {
+    fn render_field_ref_type(
+        &self,
+        input_object_id: InputObjectTypeId,
+        input_object: &InputObjectType,
+        ctx: &mut RenderContext,
+    ) {
         if ctx.already_rendered(&input_object.identifier) {
             return;
         }
@@ -67,8 +77,8 @@ impl DmmfObjectRenderer {
         // This will prevent the type and its fields to be re-rendered.
         ctx.mark_as_rendered(input_object.identifier.clone());
 
-        let fields = input_object.get_fields();
-        let mut rendered_fields = Vec::with_capacity(fields.len());
+        let fields = ctx.query_schema.db.input_object_fields(input_object_id);
+        let mut rendered_fields = Vec::new();
 
         for field in fields {
             rendered_fields.push(render_input_field(field, ctx));
@@ -88,7 +98,8 @@ impl DmmfObjectRenderer {
         ctx.add_field_ref_type(input_object.identifier.clone(), field_ref_type);
     }
 
-    fn render_output_object(&self, output_object: &ObjectType, ctx: &mut RenderContext) {
+    fn render_output_object(&self, output_object_id: OutputObjectTypeId, ctx: &mut RenderContext) {
+        let output_object = &ctx.query_schema.db[output_object_id];
         if ctx.already_rendered(&output_object.identifier) {
             return;
         }

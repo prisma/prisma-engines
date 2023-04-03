@@ -1,16 +1,15 @@
+use crate::TestResult;
 use indexmap::IndexMap;
 use itertools::Itertools;
 use prisma_models::PrismaValue;
 use query_core::{
     constants::custom_types,
-    schema::{InputField, InputObjectType, InputType, OutputField, QuerySchema, QuerySchemaRef},
+    schema::{InputField, InputObjectType, InputObjectTypeId, InputType, OutputField, QuerySchema, QuerySchemaRef},
     schema_builder::constants::{self, json_null},
     ArgumentValue, ArgumentValueObject, Selection,
 };
 use request_handlers::{Action, FieldQuery, GraphQLProtocolAdapter, JsonSingleQuery, SelectionSet, SelectionSetValue};
 use serde_json::{json, Value as JsonValue};
-
-use crate::TestResult;
 
 pub struct JsonRequest;
 
@@ -73,10 +72,10 @@ fn graphql_args_to_json_args(
 
 fn arg_value_to_json(value: ArgumentValue, typ: InferredType, query_schema: &QuerySchema) -> JsonValue {
     match (value, typ) {
-        (ArgumentValue::Object(obj), InferredType::Object(typ)) => JsonValue::Object(
+        (ArgumentValue::Object(obj), InferredType::Object(typ_id, _)) => JsonValue::Object(
             obj.into_iter()
                 .map(|(k, v)| {
-                    let field = typ.find_field(&k);
+                    let field = query_schema.db.find_input_object_field(typ_id, &k);
                     let inferrer = FieldTypeInferrer::from_field(field, query_schema);
                     let inferred_type = inferrer.infer(&v, query_schema);
 
@@ -214,9 +213,9 @@ impl<'a> FieldTypeInferrer<'a> {
                 let schema_objects = self.get_object_types(query_schema);
 
                 match schema_objects {
-                    Some(schema_objects) => match Self::obj_val_fits_obj_types(obj, &schema_objects) {
+                    Some(schema_objects) => match Self::obj_val_fits_obj_types(obj, &schema_objects, query_schema) {
                         Some(_) if is_field_ref_obj => InferredType::FieldRef,
-                        Some(typ) => InferredType::Object(typ),
+                        Some((id, typ)) => InferredType::Object(id, typ),
                         None => InferredType::Unknown,
                     },
                     _ => InferredType::Unknown,
@@ -245,7 +244,10 @@ impl<'a> FieldTypeInferrer<'a> {
             .unwrap_or(false)
     }
 
-    fn get_object_types<'b>(&self, query_schema: &'b QuerySchema) -> Option<Vec<&'b InputObjectType>> {
+    fn get_object_types<'b>(
+        &self,
+        query_schema: &'b QuerySchema,
+    ) -> Option<Vec<(InputObjectTypeId, &'b InputObjectType)>> {
         self.types.map(|types| {
             types
                 .iter()
@@ -266,18 +268,22 @@ impl<'a> FieldTypeInferrer<'a> {
 
     fn obj_val_fits_obj_types<'b>(
         val: &ArgumentValueObject,
-        schema_objects: &[&'b InputObjectType],
-    ) -> Option<&'b InputObjectType> {
+        schema_objects: &[(InputObjectTypeId, &'b InputObjectType)],
+        query_schema: &QuerySchema,
+    ) -> Option<(InputObjectTypeId, &'b InputObjectType)> {
         schema_objects
             .iter()
-            .find(|schema_object| val.keys().all(|key| schema_object.find_field(key).is_some()))
+            .find(|(input_type_id, _schema_object)| {
+                val.keys()
+                    .all(|key| query_schema.db.find_input_object_field(*input_type_id, key).is_some())
+            })
             .cloned()
     }
 }
 
 #[derive(Debug)]
 enum InferredType<'a> {
-    Object(&'a InputObjectType),
+    Object(InputObjectTypeId, &'a InputObjectType),
     List(InputType),
     Json,
     JsonNullEnum,

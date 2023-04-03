@@ -82,9 +82,7 @@ fn checked_create_input_type(
 
     let filtered_fields = filter_checked_create_fields(model, parent_field);
     let field_mapper = CreateDataInputFieldMapper::new_checked();
-    let input_fields = field_mapper.map_all(ctx, &filtered_fields);
-
-    ctx.db[id].set_fields(input_fields);
+    field_mapper.map_all(ctx, id, &mut filtered_fields.iter());
     id
 }
 
@@ -112,9 +110,7 @@ fn unchecked_create_input_type(
 
     let filtered_fields = filter_unchecked_create_fields(model, parent_field);
     let field_mapper = CreateDataInputFieldMapper::new_unchecked();
-    let input_fields = field_mapper.map_all(ctx, &filtered_fields);
-
-    ctx.db[id].set_fields(input_fields);
+    field_mapper.map_all(ctx, id, &mut filtered_fields.iter());
     id
 }
 

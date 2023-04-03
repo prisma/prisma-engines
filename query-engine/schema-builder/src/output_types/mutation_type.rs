@@ -46,17 +46,21 @@ fn create_nested_inputs(ctx: &mut BuilderContext<'_>) {
     while !(nested_create_inputs_queue.is_empty() && nested_update_inputs_queue.is_empty()) {
         // Create inputs.
         for (input_object, rf) in nested_create_inputs_queue.drain(..) {
-            let mut fields = vec![];
-
             if rf.related_model().supports_create_operation() {
-                fields.push(input_fields::nested_create_one_input_field(ctx, &rf));
+                let nested_create_one_field = input_fields::nested_create_one_input_field(ctx, &rf);
+                ctx.db.push_input_field(input_object, nested_create_one_field);
 
-                append_opt(&mut fields, input_fields::nested_connect_or_create_field(ctx, &rf));
-                append_opt(&mut fields, input_fields::nested_create_many_input_field(ctx, &rf));
+                if let Some(field) = input_fields::nested_connect_or_create_field(ctx, &rf) {
+                    ctx.db.push_input_field(input_object, field);
+                }
+
+                if let Some(field) = input_fields::nested_create_many_input_field(ctx, &rf) {
+                    ctx.db.push_input_field(input_object, field);
+                }
             }
 
-            fields.push(input_fields::nested_connect_input_field(ctx, &rf));
-            ctx.db[input_object].set_fields(fields);
+            let nested_connect_input_field = input_fields::nested_connect_input_field(ctx, &rf);
+            ctx.db.push_input_field(input_object, nested_connect_input_field);
         }
 
         // Update inputs.
@@ -81,7 +85,9 @@ fn create_nested_inputs(ctx: &mut BuilderContext<'_>) {
             append_opt(&mut fields, input_fields::nested_update_many_field(ctx, &rf));
             append_opt(&mut fields, input_fields::nested_delete_many_field(ctx, &rf));
 
-            ctx.db[input_object].set_fields(fields);
+            for field in fields {
+                ctx.db.push_input_field(input_object, field);
+            }
         }
 
         std::mem::swap(&mut nested_create_inputs_queue, &mut ctx.nested_create_inputs_queue);

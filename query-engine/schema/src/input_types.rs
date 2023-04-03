@@ -8,8 +8,9 @@ use std::{boxed::Box, fmt};
 pub struct InputObjectType {
     pub identifier: Identifier,
     pub constraints: InputObjectTypeConstraints,
-    pub fields: OnceCell<Vec<InputField>>,
     pub tag: Option<ObjectTag>,
+    /// (start, len)
+    pub fields: (usize, usize),
 }
 
 /// Object tags help differentiating objects during parsing / raw input data processing,
@@ -42,35 +43,11 @@ impl Debug for InputObjectType {
         f.debug_struct("InputObjectType")
             .field("identifier", &self.identifier)
             .field("constraints", &self.constraints)
-            .field("fields", &"#Input Fields Cell#")
             .finish()
     }
 }
 
 impl InputObjectType {
-    pub fn get_fields(&self) -> &Vec<InputField> {
-        self.fields.get().unwrap()
-    }
-
-    pub fn set_fields(&self, fields: Vec<InputField>) {
-        self.fields
-            .set(fields)
-            .unwrap_or_else(|_| panic!("Fields of {:?} are already set", self.identifier));
-    }
-
-    /// True if fields are empty, false otherwise.
-    pub fn is_empty(&self) -> bool {
-        self.get_fields().is_empty()
-    }
-
-    pub fn find_field<T>(&self, name: T) -> Option<&InputField>
-    where
-        T: Into<String>,
-    {
-        let name = name.into();
-        self.get_fields().iter().find(|f| f.name == name)
-    }
-
     /// Require exactly one field of the possible ones to be in the input.
     pub fn require_exactly_one_field(&mut self) {
         self.set_max_fields(1);
@@ -292,7 +269,7 @@ impl InputType {
             Self::Scalar(_) => false,
             Self::Enum(_) => false,
             Self::List(inner) => inner.is_empty(query_schema),
-            Self::Object(id) => query_schema[*id].is_empty(),
+            Self::Object(id) => query_schema.input_object_fields(*id).next().is_none(),
         }
     }
 
@@ -303,9 +280,12 @@ impl InputType {
         )
     }
 
-    pub fn as_object<'a>(&self, query_schema: &'a QuerySchemaDatabase) -> Option<&'a InputObjectType> {
+    pub fn as_object<'a>(
+        &self,
+        query_schema: &'a QuerySchemaDatabase,
+    ) -> Option<(InputObjectTypeId, &'a InputObjectType)> {
         if let Self::Object(v) = self {
-            Some(&query_schema[*v])
+            Some((*v, &query_schema[*v]))
         } else {
             None
         }

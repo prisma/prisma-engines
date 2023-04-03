@@ -16,7 +16,7 @@ pub(crate) fn where_argument(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> 
 pub(crate) fn where_unique_argument(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> Option<InputField> {
     let input_object_type = filter_objects::where_unique_object_type(ctx, model);
 
-    if ctx.db[input_object_type].is_empty() {
+    if ctx.db.input_object_fields(input_object_type).next().is_none() {
         None
     } else {
         Some(input_field(

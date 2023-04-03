@@ -39,8 +39,7 @@ pub(crate) fn scalar_filter_object_type(
         ModelField::Relation(_) => None,
         ModelField::Composite(_) => None, // [Composites] todo
     }));
-
-    ctx.db[id].set_fields(input_fields);
+    ctx.db.extend_input_fields(id, &mut input_fields.into_iter());
     id
 }
 
@@ -81,8 +80,7 @@ where
         .map(|f| input_fields::filter_input_field(ctx, &f, false));
 
     fields.extend(input_fields);
-
-    ctx.db[id].set_fields(fields);
+    ctx.db.extend_input_fields(id, &mut fields.into_iter());
     id
 }
 
@@ -201,7 +199,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext<'_>, model: &Mod
         fields.extend(rest_fields);
     }
 
-    ctx.db[id].set_fields(fields);
+    ctx.db.extend_input_fields(id, &mut fields.into_iter());
     id
 }
 
@@ -223,17 +221,13 @@ fn compound_field_unique_object_type(
     let input_object = init_input_object_type(ident.clone());
     let id = ctx.cache_input_type(ident, input_object);
 
-    let object_fields = from_fields
-        .into_iter()
-        .map(|field| {
-            let name = field.name();
-            let typ = map_scalar_input_type_for_field(ctx, &field);
+    for field in from_fields {
+        let name = field.name();
+        let typ = map_scalar_input_type_for_field(ctx, &field);
+        let field = input_field(ctx, name, typ, None);
+        ctx.db.push_input_field(id, field);
+    }
 
-            input_field(ctx, name, typ, None)
-        })
-        .collect();
-
-    ctx.db[id].set_fields(object_fields);
     id
 }
 
@@ -274,6 +268,6 @@ pub(crate) fn composite_equality_object(ctx: &mut BuilderContext<'_>, cf: &Compo
     });
 
     fields.extend(input_fields);
-    ctx.db[id].set_fields(fields);
+    ctx.db.extend_input_fields(id, &mut fields.into_iter());
     id
 }

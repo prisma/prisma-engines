@@ -36,8 +36,7 @@ fn checked_update_one_input_type(
 
     let filtered_fields = filter_checked_update_fields(ctx, model, parent_field);
     let field_mapper = UpdateDataInputFieldMapper::new_checked();
-    let input_fields = field_mapper.map_all(ctx, &filtered_fields);
-    ctx.db[id].set_fields(input_fields);
+    field_mapper.map_all(ctx, id, &mut filtered_fields.iter());
     id
 }
 
@@ -59,8 +58,7 @@ fn unchecked_update_one_input_type(
 
     let filtered_fields = filter_unchecked_update_fields(ctx, model, parent_field);
     let field_mapper = UpdateDataInputFieldMapper::new_unchecked();
-    let input_fields = field_mapper.map_all(ctx, &filtered_fields);
-    ctx.db[id].set_fields(input_fields);
+    field_mapper.map_all(ctx, id, &mut filtered_fields.iter());
     id
 }
 
@@ -185,12 +183,10 @@ pub(crate) fn update_one_where_combination_object(
     let input_object = init_input_object_type(ident.clone());
     let id = ctx.cache_input_type(ident, input_object);
 
-    let fields = vec![
-        input_field(ctx, args::WHERE, InputType::object(where_input_object), None),
-        input_field(ctx, args::DATA, update_types, None),
-    ];
-
-    ctx.db[id].set_fields(fields);
+    let where_arg = input_field(ctx, args::WHERE, InputType::object(where_input_object), None);
+    let data_field = input_field(ctx, args::DATA, update_types, None);
+    ctx.db.push_input_field(id, where_arg);
+    ctx.db.push_input_field(id, data_field);
     id
 }
 
@@ -212,11 +208,9 @@ pub(crate) fn update_to_one_rel_where_combination_object(
     let id = ctx.cache_input_type(ident, input_object);
 
     let related_model = parent_field.related_model();
-    let fields = vec![
-        arguments::where_argument(ctx, &related_model),
-        input_field(ctx, args::DATA, update_types, None),
-    ];
-
-    ctx.db[id].set_fields(fields);
+    let where_field = arguments::where_argument(ctx, &related_model);
+    let data_field = input_field(ctx, args::DATA, update_types, None);
+    ctx.db.push_input_field(id, where_field);
+    ctx.db.push_input_field(id, data_field);
     id
 }

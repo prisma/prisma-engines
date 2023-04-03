@@ -72,15 +72,12 @@ fn nested_create_many_envelope(ctx: &mut BuilderContext<'_>, parent_field: &Rela
     let create_many_type = InputType::object(create_type);
     let data_arg = input_field(ctx, args::DATA, list_union_type(create_many_type, true), None);
 
-    let fields = if ctx.has_capability(ConnectorCapability::CreateSkipDuplicates) {
+    ctx.db.push_input_field(id, data_arg);
+    if ctx.has_capability(ConnectorCapability::CreateSkipDuplicates) {
         let skip_arg = input_field(ctx, args::SKIP_DUPLICATES, InputType::boolean(), None).optional();
+        ctx.db.push_input_field(id, skip_arg);
+    }
 
-        vec![data_arg, skip_arg]
-    } else {
-        vec![data_arg]
-    };
-
-    ctx.db[id].set_fields(fields);
     id
 }
 

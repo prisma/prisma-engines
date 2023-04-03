@@ -79,10 +79,13 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
                     )
                 }
 
-                let mut input_object = input_object_type(ident.clone(), object_fields);
+                let mut input_object = init_input_object_type(ident.clone());
                 input_object.require_exactly_one_field();
-
-                ctx.cache_input_type(ident, input_object)
+                let id = ctx.cache_input_type(ident, input_object);
+                for field in object_fields {
+                    ctx.db.push_input_field(id, field);
+                }
+                id
             }
         };
 
@@ -151,22 +154,28 @@ fn update_operations_object_type(
     let id = ctx.cache_input_type(ident, obj);
 
     let typ = map_scalar_input_type_for_field(ctx, sf);
-    let mut fields = vec![input_field(ctx, operations::SET, typ.clone(), None)
+
+    let set_field = input_field(ctx, operations::SET, typ.clone(), None)
         .optional()
-        .nullable_if(!sf.is_required(), &mut ctx.db)];
+        .nullable_if(!sf.is_required(), &mut ctx.db);
+    ctx.db.push_input_field(id, set_field);
 
     if with_number_operators {
-        fields.push(input_field(ctx, operations::INCREMENT, typ.clone(), None).optional());
-        fields.push(input_field(ctx, operations::DECREMENT, typ.clone(), None).optional());
-        fields.push(input_field(ctx, operations::MULTIPLY, typ.clone(), None).optional());
-        fields.push(input_field(ctx, operations::DIVIDE, typ, None).optional());
+        let increment_field = input_field(ctx, operations::INCREMENT, typ.clone(), None).optional();
+        let decrement_field = input_field(ctx, operations::DECREMENT, typ.clone(), None).optional();
+        let multiply_field = input_field(ctx, operations::MULTIPLY, typ.clone(), None).optional();
+        let divide_field = input_field(ctx, operations::DIVIDE, typ, None).optional();
+        ctx.db.extend_input_fields(
+            id,
+            &mut [increment_field, decrement_field, multiply_field, divide_field].into_iter(),
+        );
     }
 
     if ctx.has_capability(ConnectorCapability::UndefinedType) && !sf.is_required() {
-        fields.push(input_field(ctx, operations::UNSET, InputType::boolean(), None).optional());
+        let unset_field = input_field(ctx, operations::UNSET, InputType::boolean(), None).optional();
+        ctx.db.push_input_field(id, unset_field);
     }
 
-    ctx.db[id].set_fields(fields);
     id
 }
 
@@ -197,8 +206,10 @@ fn composite_update_envelope_object_type(ctx: &mut BuilderContext<'_>, cf: &Comp
     append_opt(&mut fields, composite_update_many_update_input_field(ctx, cf));
     append_opt(&mut fields, composite_delete_many_update_input_field(ctx, cf));
     append_opt(&mut fields, composite_unset_update_input_field(ctx, cf));
+    for field in fields {
+        ctx.db.push_input_field(id, field);
+    }
 
-    ctx.db[id].set_fields(fields);
     id
 }
 
@@ -213,10 +224,11 @@ fn composite_update_object_type(ctx: &mut BuilderContext<'_>, cf: &CompositeFiel
     let id = ctx.cache_input_type(ident, input_object);
 
     let mapper = UpdateDataInputFieldMapper::new_checked();
-    let fields = cf.typ().fields().collect::<Vec<_>>();
-    let fields = mapper.map_all(ctx, &fields);
+    let typ = cf.typ();
+    for field in typ.fields() {
+        mapper.map_field(ctx, id, &field)
+    }
 
-    ctx.db[id].set_fields(fields);
     id
 }
 
@@ -281,9 +293,8 @@ fn composite_upsert_object_type(ctx: &mut BuilderContext<'_>, cf: &CompositeFiel
     let update_field = input_field(ctx, operations::UPDATE, InputType::Object(update_object_type), None);
     let set_field = composite_set_update_input_field(ctx, cf).required();
 
-    let fields = vec![set_field, update_field];
-
-    ctx.db[id].set_fields(fields);
+    ctx.db
+        .extend_input_fields(id, &mut [set_field, update_field].into_iter());
     id
 }
 
@@ -313,9 +324,8 @@ fn composite_update_many_object_type(ctx: &mut BuilderContext<'_>, cf: &Composit
     let update_object_type = composite_update_object_type(ctx, cf);
     let data_field = input_field(ctx, args::DATA, InputType::Object(update_object_type), None);
 
-    let fields = vec![where_field, data_field];
-
-    ctx.db[id].set_fields(fields);
+    ctx.db
+        .extend_input_fields(id, &mut [where_field, data_field].into_iter());
     id
 }
 
@@ -330,8 +340,7 @@ fn composite_delete_many_object_type(ctx: &mut BuilderContext<'_>, cf: &Composit
 
     let where_object_type = objects::filter_objects::where_object_type(ctx, cf.typ());
     let where_field = input_field(ctx, args::WHERE, InputType::object(where_object_type), None);
-
-    ctx.db[id].set_fields(vec![where_field]);
+    ctx.db.push_input_field(id, where_field);
     id
 }
 

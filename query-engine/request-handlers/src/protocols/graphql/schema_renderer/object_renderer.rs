@@ -16,8 +16,8 @@ impl Renderer for GqlObjectRenderer {
 }
 
 impl GqlObjectRenderer {
-    fn render_input_object(&self, input_object: InputObjectTypeId, ctx: &mut RenderContext) -> String {
-        let input_object = &ctx.query_schema.db[input_object];
+    fn render_input_object(&self, input_object_id: InputObjectTypeId, ctx: &mut RenderContext) -> String {
+        let input_object = &ctx.query_schema.db[input_object_id];
         if ctx.already_rendered(&input_object.identifier.name()) {
             return "".into();
         } else {
@@ -25,8 +25,8 @@ impl GqlObjectRenderer {
             ctx.mark_as_rendered(input_object.identifier.name())
         }
 
-        let fields = input_object.get_fields();
-        let mut rendered_fields = Vec::with_capacity(fields.len());
+        let fields = ctx.query_schema.db.input_object_fields(input_object_id);
+        let mut rendered_fields = Vec::new();
 
         for field in fields {
             rendered_fields.push(field.into_renderer().render(ctx))
