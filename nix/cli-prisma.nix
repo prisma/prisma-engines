@@ -15,10 +15,6 @@ in
       # This means the build can freely talk to the Internet.
       __noChroot = true;
 
-      nativeBuildInputs = [
-        pkgs.autoPatchelfHook
-      ];
-
       buildInputs = [
         pkgs.nodejs
       ];
