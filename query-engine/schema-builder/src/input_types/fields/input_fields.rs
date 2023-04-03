@@ -19,7 +19,7 @@ pub(crate) fn filter_input_field(
 
     input_field(ctx, field.name().to_owned(), types, None)
         .optional()
-        .nullable_if(nullable, &mut ctx.input_field_types)
+        .nullable_if(nullable, &mut ctx.db)
 }
 
 pub(crate) fn nested_create_one_input_field(
@@ -58,21 +58,17 @@ pub(crate) fn nested_create_many_input_field(
     }
 }
 
-fn nested_create_many_envelope(
-    ctx: &mut BuilderContext<'_>,
-    parent_field: &RelationFieldRef,
-) -> InputObjectTypeWeakRef {
+fn nested_create_many_envelope(ctx: &mut BuilderContext<'_>, parent_field: &RelationFieldRef) -> InputObjectTypeId {
     let create_type = create_many::create_many_object_type(ctx, &parent_field.related_model(), Some(parent_field));
 
-    let nested_ident = &create_type.into_arc().identifier;
+    let nested_ident = &ctx.db[create_type].identifier;
     let name = format!("{}Envelope", nested_ident.name());
 
     let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, input_object.clone());
-
+    let input_object = init_input_object_type(ident.clone());
+    let id = ctx.cache_input_type(ident, input_object);
     let create_many_type = InputType::object(create_type);
     let data_arg = input_field(ctx, args::DATA, list_union_type(create_many_type, true), None);
 
@@ -84,8 +80,8 @@ fn nested_create_many_envelope(
         vec![data_arg]
     };
 
-    input_object.set_fields(fields);
-    Arc::downgrade(&input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 pub(crate) fn nested_connect_or_create_field(

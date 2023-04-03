@@ -2,9 +2,9 @@ use super::{
     type_renderer::{render_input_types, render_output_type},
     DmmfInputField, DmmfOutputField, RenderContext,
 };
-use schema::{InputFieldRef, InputType, OutputFieldRef, ScalarType};
+use schema::{InputField, InputType, OutputFieldRef, ScalarType};
 
-pub(super) fn render_input_field(input_field: &InputFieldRef, ctx: &mut RenderContext) -> DmmfInputField {
+pub(super) fn render_input_field(input_field: &InputField, ctx: &mut RenderContext) -> DmmfInputField {
     let type_references = render_input_types(input_field.field_types(ctx.query_schema), ctx);
     let nullable = input_field
         .field_types(ctx.query_schema)

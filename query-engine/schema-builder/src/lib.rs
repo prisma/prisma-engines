@@ -23,14 +23,6 @@
 //!
 //! Without caching, processing D (in fact, visiting any type after the intial computation) would also
 //! trigger a complete recomputation of A, B, C.
-//!
-//! Hence, all builders that produce input or output object types are required to
-//! implement CachedBuilder in some form to break recursive type building.
-//!
-//! Additionally, the cache also acts as the component to prevent memory leaks from circular dependencies
-//! in the query schema later on, as described on the QuerySchema type.
-//! The cache can be consumed to produce a list of strong references to the individual input and output
-//! object types, which are then moved to the query schema to keep weak references alive (see TypeRefCache for additional infos).
 
 pub mod constants;
 
@@ -51,16 +43,15 @@ use psl::{
     PreviewFeature, PreviewFeatures,
 };
 use schema::*;
-use std::sync::Arc;
 use utils::*;
 
 pub(crate) struct BuilderContext<'a> {
-    pub(crate) input_field_types: Vec<InputType>,
     internal_data_model: &'a InternalDataModel,
     enable_raw_queries: bool,
-    input_types: TypeRefCache<InputObjectType>,
-    output_types: TypeRefCache<ObjectType>,
-    enum_types: TypeRefCache<EnumType>,
+    db: QuerySchemaDatabase,
+    input_types: TypeRefCache<InputObjectTypeId>,
+    output_types: TypeRefCache<OutputObjectTypeId>,
+    enum_types: TypeRefCache<EnumTypeId>,
     connector: &'static dyn Connector,
     preview_features: PreviewFeatures,
     nested_create_inputs_queue: NestedInputsQueue,
@@ -75,13 +66,19 @@ impl<'a> BuilderContext<'a> {
     ) -> Self {
         let connector = internal_data_model.schema.connector;
         let models_count = internal_data_model.schema.db.models_count();
+        let input_types_estimate = models_count * 3;
+        let output_types_estimate = models_count;
+        let enum_types_estimate = 0; // not all connectors have enums
+        let mut db = QuerySchemaDatabase::default();
+        db.input_field_types
+            .reserve(internal_data_model.schema.db.models_count() * 5);
         Self {
-            input_field_types: Vec::with_capacity(internal_data_model.schema.db.models_count() * 5),
             internal_data_model,
             enable_raw_queries,
-            input_types: TypeRefCache::with_capacity(models_count * 3),
-            output_types: TypeRefCache::with_capacity(models_count),
-            enum_types: TypeRefCache::with_capacity(0),
+            input_types: TypeRefCache::with_capacity(input_types_estimate),
+            output_types: TypeRefCache::with_capacity(output_types_estimate),
+            enum_types: TypeRefCache::with_capacity(enum_types_estimate),
+            db,
             connector,
             preview_features,
             nested_create_inputs_queue: Vec::new(),
@@ -98,33 +95,39 @@ impl<'a> BuilderContext<'a> {
     }
 
     /// Get an input (object) type.
-    fn get_input_type(&mut self, ident: &Identifier) -> Option<InputObjectTypeWeakRef> {
+    fn get_input_type(&mut self, ident: &Identifier) -> Option<InputObjectTypeId> {
         self.input_types.get(ident)
     }
 
     /// Get an output (object) type.
-    pub(crate) fn get_output_type(&mut self, ident: &Identifier) -> Option<ObjectTypeWeakRef> {
+    pub(crate) fn get_output_type(&mut self, ident: &Identifier) -> Option<OutputObjectTypeId> {
         self.output_types.get(ident)
     }
 
     /// Get an enum type.
-    pub(crate) fn get_enum_type(&mut self, ident: &Identifier) -> Option<EnumTypeWeakRef> {
+    pub(crate) fn get_enum_type(&mut self, ident: &Identifier) -> Option<EnumTypeId> {
         self.enum_types.get(ident)
     }
 
     /// Caches an input (object) type.
-    pub(crate) fn cache_input_type(&mut self, ident: Identifier, typ: InputObjectTypeStrongRef) {
-        self.input_types.insert(ident, typ);
+    pub(crate) fn cache_input_type(&mut self, ident: Identifier, typ: InputObjectType) -> InputObjectTypeId {
+        let id = self.db.push_input_object_type(typ);
+        self.input_types.insert(ident, id);
+        id
     }
 
     /// Caches an output (object) type.
-    pub fn cache_output_type(&mut self, ident: Identifier, typ: ObjectTypeStrongRef) {
-        self.output_types.insert(ident, typ);
+    pub fn cache_output_type(&mut self, ident: Identifier, typ: ObjectType) -> OutputObjectTypeId {
+        let id = self.db.push_output_object_type(typ);
+        self.output_types.insert(ident, id);
+        id
     }
 
     /// Caches an enum type.
-    pub fn cache_enum_type(&mut self, ident: Identifier, e: EnumTypeRef) {
-        self.enum_types.insert(ident, e);
+    pub fn cache_enum_type(&mut self, ident: Identifier, e: EnumType) -> EnumTypeId {
+        let id = self.db.push_enum_type(e);
+        self.enum_types.insert(ident, id);
+        id
     }
 
     pub fn can_full_text_search(&self) -> bool {
@@ -152,35 +155,15 @@ pub fn build_with_features(
 
     output_types::objects::initialize_caches(&mut ctx);
 
-    let (query_type, query_object_ref) = output_types::query_type::build(&mut ctx);
-    let (mutation_type, mutation_object_ref) = output_types::mutation_type::build(&mut ctx);
+    let query_type = output_types::query_type::build(&mut ctx);
+    let mutation_type = output_types::mutation_type::build(&mut ctx);
 
     // Add iTX isolation levels to the schema.
     enum_types::itx_isolation_levels(&mut ctx);
 
-    let input_objects = ctx.input_types.into();
-    let mut output_objects: Vec<_> = ctx.output_types.into();
-    let enum_types = ctx.enum_types.into();
-
-    // The mutation and query object types need to be part of the strong refs.
-    output_objects.push(query_object_ref);
-    output_objects.push(mutation_object_ref);
-
-    let query_type = Arc::new(query_type);
-    let mutation_type = Arc::new(mutation_type);
     let capabilities = ctx.connector.capabilities().to_owned();
-    let input_field_types = ctx.input_field_types;
 
-    QuerySchema::new(
-        query_type,
-        mutation_type,
-        input_field_types,
-        input_objects,
-        output_objects,
-        enum_types,
-        internal_data_model,
-        capabilities,
-    )
+    QuerySchema::new(query_type, mutation_type, ctx.db, internal_data_model, capabilities)
 }
 
-type NestedInputsQueue = Vec<(Arc<InputObjectType>, RelationFieldRef)>;
+type NestedInputsQueue = Vec<(InputObjectTypeId, RelationFieldRef)>;

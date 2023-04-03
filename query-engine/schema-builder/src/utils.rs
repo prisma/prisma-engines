@@ -1,9 +1,6 @@
 use super::*;
 use once_cell::sync::OnceCell;
-use prisma_models::{
-    ast, dml,
-    walkers::{self, PrimaryKeyWalker},
-};
+use prisma_models::{ast, dml, walkers};
 use std::sync::Arc;
 
 /// Object type convenience wrapper function.
@@ -44,7 +41,7 @@ where
 {
     OutputField {
         name: name.into(),
-        arguments: arguments.into_iter().map(Arc::new).collect(),
+        arguments,
         field_type: Arc::new(field_type),
         query_info,
         is_nullable: false,
@@ -65,7 +62,7 @@ where
 {
     let mut input_field = InputField::new(name.into(), default_value, true);
     for field_type in field_types {
-        input_field.push_type(field_type, &mut ctx.input_field_types);
+        input_field.push_type(field_type, &mut ctx.db);
     }
     input_field
 }
@@ -85,7 +82,7 @@ pub fn compound_index_field_name(index: &walkers::IndexWalker<'_>) -> String {
 }
 
 /// Computes a compound field name based on a multi-field id.
-pub fn compound_id_field_name(pk: PrimaryKeyWalker<'_>) -> String {
+pub fn compound_id_field_name(pk: walkers::PrimaryKeyWalker<'_>) -> String {
     pk.name()
         .map(ToOwned::to_owned)
         .unwrap_or_else(|| pk.fields().map(|sf| sf.name()).collect::<Vec<_>>().join("_"))

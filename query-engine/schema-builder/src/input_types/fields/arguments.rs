@@ -16,7 +16,7 @@ pub(crate) fn where_argument(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> 
 pub(crate) fn where_unique_argument(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> Option<InputField> {
     let input_object_type = filter_objects::where_unique_object_type(ctx, model);
 
-    if input_object_type.into_arc().is_empty() {
+    if ctx.db[input_object_type].is_empty() {
         None
     } else {
         Some(input_field(
@@ -48,7 +48,8 @@ pub(crate) fn upsert_arguments(ctx: &mut BuilderContext<'_>, model: &ModelRef) -
         let update_types = update_one_objects::update_one_input_types(ctx, model, None);
         let create_types = create_one::create_one_input_types(ctx, model, None);
 
-        if update_types.iter().all(|typ| typ.is_empty()) || create_types.iter().all(|typ| typ.is_empty()) {
+        if update_types.iter().all(|typ| typ.is_empty(&ctx.db)) || create_types.iter().all(|typ| typ.is_empty(&ctx.db))
+        {
             None
         } else {
             Some(vec![

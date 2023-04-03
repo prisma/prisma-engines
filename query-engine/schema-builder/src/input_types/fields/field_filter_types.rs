@@ -64,30 +64,28 @@ fn to_one_relation_filter_shorthand_types(ctx: &mut BuilderContext<'_>, rf: &Rel
     InputType::object(related_input_type)
 }
 
-fn to_many_relation_filter_object(ctx: &mut BuilderContext<'_>, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
+fn to_many_relation_filter_object(ctx: &mut BuilderContext<'_>, rf: &RelationFieldRef) -> InputObjectTypeId {
     let ident = Identifier::new_prisma(IdentifierType::ToManyRelationFilterInput(rf.related_model()));
 
     return_cached_input!(ctx, &ident);
 
     let mut object = init_input_object_type(ident.clone());
     object.set_tag(ObjectTag::RelationEnvelope);
-
-    let object = Arc::new(object);
-    ctx.cache_input_type(ident, object.clone());
+    let id = ctx.cache_input_type(ident, object);
 
     let related_input_type = filter_objects::where_object_type(ctx, &rf.related_model());
 
     let fields = vec![
-        input_field(ctx, filters::EVERY, InputType::object(related_input_type.clone()), None).optional(),
-        input_field(ctx, filters::SOME, InputType::object(related_input_type.clone()), None).optional(),
+        input_field(ctx, filters::EVERY, InputType::object(related_input_type), None).optional(),
+        input_field(ctx, filters::SOME, InputType::object(related_input_type), None).optional(),
         input_field(ctx, filters::NONE, InputType::object(related_input_type), None).optional(),
     ];
 
-    object.set_fields(fields);
-    Arc::downgrade(&object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
-fn to_one_relation_filter_object(ctx: &mut BuilderContext<'_>, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
+fn to_one_relation_filter_object(ctx: &mut BuilderContext<'_>, rf: &RelationFieldRef) -> InputObjectTypeId {
     // TODO: It is important to traverse the related model before going into the cache.
     // TODO: The ToOneRelationFilterInput is currently broken as it does not take nullability into account.
     // TODO: This means that the first relation field to be traversed will set the nullability for all other relation field that points to the same related model.
@@ -101,21 +99,19 @@ fn to_one_relation_filter_object(ctx: &mut BuilderContext<'_>, rf: &RelationFiel
 
     let mut object = init_input_object_type(ident.clone());
     object.set_tag(ObjectTag::RelationEnvelope);
-
-    let object = Arc::new(object);
-    ctx.cache_input_type(ident, object.clone());
+    let id = ctx.cache_input_type(ident, object);
 
     let fields = vec![
-        input_field(ctx, filters::IS, InputType::object(related_input_type.clone()), None)
+        input_field(ctx, filters::IS, InputType::object(related_input_type), None)
             .optional()
-            .nullable_if(!rf.is_required(), &mut ctx.input_field_types),
+            .nullable_if(!rf.is_required(), &mut ctx.db),
         input_field(ctx, filters::IS_NOT, InputType::object(related_input_type), None)
             .optional()
-            .nullable_if(!rf.is_required(), &mut ctx.input_field_types),
+            .nullable_if(!rf.is_required(), &mut ctx.db),
     ];
 
-    object.set_fields(fields);
-    Arc::downgrade(&object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 /// Builds shorthand composite equality (`equals`) filter for to-one: `where: { composite_field: { ... } }` (no `equals` in between).
@@ -125,18 +121,14 @@ fn to_one_composite_filter_shorthand_types(ctx: &mut BuilderContext<'_>, cf: &Co
     InputType::object(equality_object_type)
 }
 
-fn to_one_composite_filter_object(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+fn to_one_composite_filter_object(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputObjectTypeId {
     let ident = Identifier::new_prisma(IdentifierType::ToOneCompositeFilterInput(cf.typ(), cf.arity()));
-
     return_cached_input!(ctx, &ident);
 
     let mut object = init_input_object_type(ident.clone());
     object.require_exactly_one_field();
     object.set_tag(ObjectTag::CompositeEnvelope);
-
-    let object = Arc::new(object);
-
-    ctx.cache_input_type(ident, object.clone());
+    let id = ctx.cache_input_type(ident, object);
 
     let composite_where_object = filter_objects::where_object_type(ctx, cf.typ());
     let composite_equals_object = filter_objects::composite_equality_object(ctx, cf);
@@ -144,39 +136,31 @@ fn to_one_composite_filter_object(ctx: &mut BuilderContext<'_>, cf: &CompositeFi
     let mut fields = vec![
         input_field(ctx, filters::EQUALS, InputType::object(composite_equals_object), None)
             .optional()
-            .nullable_if(!cf.is_required(), &mut ctx.input_field_types),
-        input_field(
-            ctx,
-            filters::IS,
-            InputType::object(composite_where_object.clone()),
-            None,
-        )
-        .optional()
-        .nullable_if(!cf.is_required(), &mut ctx.input_field_types),
+            .nullable_if(!cf.is_required(), &mut ctx.db),
+        input_field(ctx, filters::IS, InputType::object(composite_where_object), None)
+            .optional()
+            .nullable_if(!cf.is_required(), &mut ctx.db),
         input_field(ctx, filters::IS_NOT, InputType::object(composite_where_object), None)
             .optional()
-            .nullable_if(!cf.is_required(), &mut ctx.input_field_types),
+            .nullable_if(!cf.is_required(), &mut ctx.db),
     ];
 
     if ctx.has_capability(ConnectorCapability::UndefinedType) && cf.is_optional() {
         fields.push(is_set_input_field(ctx));
     }
 
-    object.set_fields(fields);
-    Arc::downgrade(&object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
-fn to_many_composite_filter_object(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+fn to_many_composite_filter_object(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputObjectTypeId {
     let ident = Identifier::new_prisma(IdentifierType::ToManyCompositeFilterInput(cf.typ()));
-
     return_cached_input!(ctx, &ident);
 
     let mut object = init_input_object_type(ident.clone());
     object.require_exactly_one_field();
     object.set_tag(ObjectTag::CompositeEnvelope);
-
-    let object = Arc::new(object);
-    ctx.cache_input_type(ident, object.clone());
+    let id = ctx.cache_input_type(ident, object);
 
     let composite_where_object = filter_objects::where_object_type(ctx, cf.typ());
     let composite_equals_object = filter_objects::composite_equality_object(ctx, cf);
@@ -191,20 +175,8 @@ fn to_many_composite_filter_object(ctx: &mut BuilderContext<'_>, cf: &CompositeF
             None,
         )
         .optional(),
-        input_field(
-            ctx,
-            filters::EVERY,
-            InputType::object(composite_where_object.clone()),
-            None,
-        )
-        .optional(),
-        input_field(
-            ctx,
-            filters::SOME,
-            InputType::object(composite_where_object.clone()),
-            None,
-        )
-        .optional(),
+        input_field(ctx, filters::EVERY, InputType::object(composite_where_object), None).optional(),
+        input_field(ctx, filters::SOME, InputType::object(composite_where_object), None).optional(),
         input_field(ctx, filters::NONE, InputType::object(composite_where_object), None).optional(),
         input_field(ctx, filters::IS_EMPTY, InputType::boolean(), None).optional(),
     ];
@@ -214,11 +186,11 @@ fn to_many_composite_filter_object(ctx: &mut BuilderContext<'_>, cf: &CompositeF
         fields.push(is_set_input_field(ctx));
     }
 
-    object.set_fields(fields);
-    Arc::downgrade(&object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
-fn scalar_list_filter_type(ctx: &mut BuilderContext<'_>, sf: &ScalarFieldRef) -> InputObjectTypeWeakRef {
+fn scalar_list_filter_type(ctx: &mut BuilderContext<'_>, sf: &ScalarFieldRef) -> InputObjectTypeId {
     let ident = Identifier::new_prisma(IdentifierType::ScalarListFilterInput(
         ctx.internal_data_model.clone().zip(sf.type_identifier()),
         sf.is_required(),
@@ -227,9 +199,7 @@ fn scalar_list_filter_type(ctx: &mut BuilderContext<'_>, sf: &ScalarFieldRef) ->
 
     let mut object = init_input_object_type(ident.clone());
     object.require_exactly_one_field();
-
-    let object = Arc::new(object);
-    ctx.cache_input_type(ident, object.clone());
+    let id = ctx.cache_input_type(ident, object);
 
     let mapped_nonlist_type = map_scalar_input_type(ctx, &sf.type_identifier(), false);
     let mapped_list_type = InputType::list(mapped_nonlist_type.clone());
@@ -239,7 +209,7 @@ fn scalar_list_filter_type(ctx: &mut BuilderContext<'_>, sf: &ScalarFieldRef) ->
     fields.push(
         input_field(ctx, filters::HAS, mapped_nonlist_type_with_field_ref_input, None)
             .optional()
-            .nullable_if(!sf.is_required(), &mut ctx.input_field_types),
+            .nullable_if(!sf.is_required(), &mut ctx.db),
     );
 
     let mapped_list_type_with_field_ref_input = mapped_list_type.with_field_ref_input(ctx);
@@ -255,8 +225,8 @@ fn scalar_list_filter_type(ctx: &mut BuilderContext<'_>, sf: &ScalarFieldRef) ->
     fields.push(input_field(ctx, filters::HAS_SOME, mapped_list_type_with_field_ref_input, None).optional());
     fields.push(input_field(ctx, filters::IS_EMPTY, InputType::boolean(), None).optional());
 
-    object.set_fields(fields);
-    Arc::downgrade(&object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 fn full_scalar_filter_type(
@@ -267,7 +237,7 @@ fn full_scalar_filter_type(
     nullable: bool,
     nested: bool,
     include_aggregates: bool,
-) -> InputObjectTypeWeakRef {
+) -> InputObjectTypeId {
     let native_type_name = native_type.map(|nt| nt.name());
     let scalar_type_name = typ.type_name(&ctx.internal_data_model.schema).into_owned();
     let type_name = ctx.connector.scalar_filter_name(scalar_type_name, native_type_name);
@@ -281,8 +251,8 @@ fn full_scalar_filter_type(
 
     return_cached_input!(ctx, &ident);
 
-    let object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, object.clone());
+    let object = init_input_object_type(ident.clone());
+    let id = ctx.cache_input_type(ident, object);
 
     let mapped_scalar_type = map_scalar_input_type(ctx, typ, list);
 
@@ -393,8 +363,8 @@ fn full_scalar_filter_type(
         fields.push(is_set_input_field(ctx));
     }
 
-    object.set_fields(fields);
-    Arc::downgrade(&object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 fn is_set_input_field(ctx: &mut BuilderContext<'_>) -> InputField {
@@ -411,7 +381,7 @@ fn equality_filters(
     std::iter::once(
         input_field(ctx, filters::EQUALS, types, None)
             .optional()
-            .nullable_if(nullable, &mut ctx.input_field_types),
+            .nullable_if(nullable, &mut ctx.db),
     )
 }
 
@@ -430,7 +400,7 @@ fn json_equality_filters(
         let inner = mapped_type.with_field_ref_input(ctx);
         input_field(ctx, filters::EQUALS, inner, None)
             .optional()
-            .nullable_if(nullable, &mut ctx.input_field_types)
+            .nullable_if(nullable, &mut ctx.db)
     };
 
     std::iter::once(field)
@@ -452,10 +422,10 @@ fn inclusion_filters(
     vec![
         input_field(ctx, filters::IN, field_types.clone(), None)
             .optional()
-            .nullable_if(nullable, &mut ctx.input_field_types),
+            .nullable_if(nullable, &mut ctx.db),
         input_field(ctx, filters::NOT_IN, field_types, None)
             .optional()
-            .nullable_if(nullable, &mut ctx.input_field_types), // Kept for legacy reasons!
+            .nullable_if(nullable, &mut ctx.db), // Kept for legacy reasons!
     ]
     .into_iter()
 }
@@ -525,13 +495,13 @@ fn json_filters(ctx: &mut BuilderContext<'_>) -> impl Iterator<Item = InputField
         input_field(ctx, filters::STRING_ENDS_WITH, string_with_field_ref_input, None).optional(),
         input_field(ctx, filters::ARRAY_CONTAINS, json_with_field_ref_input.clone(), None)
             .optional()
-            .nullable(&mut ctx.input_field_types),
+            .nullable(&mut ctx.db),
         input_field(ctx, filters::ARRAY_STARTS_WITH, json_with_field_ref_input.clone(), None)
             .optional()
-            .nullable(&mut ctx.input_field_types),
+            .nullable(&mut ctx.db),
         input_field(ctx, filters::ARRAY_ENDS_WITH, json_with_field_ref_input, None)
             .optional()
-            .nullable(&mut ctx.input_field_types),
+            .nullable(&mut ctx.db),
     ]
     .into_iter()
 }
@@ -602,7 +572,7 @@ fn not_filter_field(
             let ty = mapped_scalar_type.with_field_ref_input(ctx);
             input_field(ctx, filters::NOT_LOWERCASE, ty, None)
                 .optional()
-                .nullable_if(is_nullable, &mut ctx.input_field_types)
+                .nullable_if(is_nullable, &mut ctx.db)
         }
 
         _ => {
@@ -619,7 +589,7 @@ fn not_filter_field(
 
             input_field(ctx, filters::NOT_LOWERCASE, vec![mapped_scalar_type, shorthand], None)
                 .optional()
-                .nullable_if(is_nullable, &mut ctx.input_field_types)
+                .nullable_if(is_nullable, &mut ctx.db)
         }
     }
 }
