@@ -100,18 +100,16 @@
 <a href="#100" id="100">100</a>
 <a href="#101" id="101">101</a>
 <a href="#102" id="102">102</a>
-<a href="#103" id="103">103</a>
-<a href="#104" id="104">104</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::constants::aggregations::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::convert::identity;
 
 <span class="doccomment">/// Builds group by aggregation object type for given model (e.g. GroupByUserOutputType).
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>group_by_output_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; ObjectTypeWeakRef {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>group_by_output_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; OutputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}GroupByOutputType&quot;</span>, capitalize(model.name())));
     <span class="macro">return_cached_output!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let </span>object = Arc::new(ObjectType::new(ident.clone(), <span class="prelude-val">Some</span>(model.id)));
+    <span class="kw">let </span>object = ObjectType::new(ident.clone(), <span class="prelude-val">Some</span>(model.id));
 
     <span class="comment">// Model fields that can be grouped by value.
     </span><span class="kw">let </span><span class="kw-2">mut </span>object_fields = scalar_output_fields(ctx, model);
@@ -190,9 +188,7 @@
     );
 
     object.set_fields(object_fields);
-    ctx.cache_output_type(ident, ObjectTypeStrongRef::clone(<span class="kw-2">&amp;</span>object));
-
-    ObjectTypeStrongRef::downgrade(<span class="kw-2">&amp;</span>object)
+    ctx.cache_output_type(ident, object)
 }
 
 <span class="kw">fn </span>scalar_output_fields(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; Vec&lt;OutputField&gt; {

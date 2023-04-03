@@ -344,19 +344,17 @@
 <a href="#344" id="344">344</a>
 <a href="#345" id="345">345</a>
 <a href="#346" id="346">346</a>
-<a href="#347" id="347">347</a>
-<a href="#348" id="348">348</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>fmt::Debug;
 <span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>prisma_models::{dml, prelude::ParentContainer};
-<span class="kw">use </span>std::{boxed::Box, fmt, sync::Arc};
+<span class="kw">use </span>std::{boxed::Box, fmt};
 
 <span class="attr">#[derive(PartialEq)]
 </span><span class="kw">pub struct </span>InputObjectType {
     <span class="kw">pub </span>identifier: Identifier,
     <span class="kw">pub </span>constraints: InputObjectTypeConstraints,
-    <span class="kw">pub </span>fields: OnceCell&lt;Vec&lt;InputFieldRef&gt;&gt;,
+    <span class="kw">pub </span>fields: OnceCell&lt;Vec&lt;InputField&gt;&gt;,
     <span class="kw">pub </span>tag: <span class="prelude-ty">Option</span>&lt;ObjectTag&gt;,
 }
 
@@ -396,13 +394,13 @@
 }
 
 <span class="kw">impl </span>InputObjectType {
-    <span class="kw">pub fn </span>get_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Vec&lt;InputFieldRef&gt; {
+    <span class="kw">pub fn </span>get_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Vec&lt;InputField&gt; {
         <span class="self">self</span>.fields.get().unwrap()
     }
 
     <span class="kw">pub fn </span>set_fields(<span class="kw-2">&amp;</span><span class="self">self</span>, fields: Vec&lt;InputField&gt;) {
         <span class="self">self</span>.fields
-            .set(fields.into_iter().map(Arc::new).collect())
+            .set(fields)
             .unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;Fields of {:?} are already set&quot;</span>, <span class="self">self</span>.identifier));
     }
 
@@ -411,12 +409,12 @@
         <span class="self">self</span>.get_fields().is_empty()
     }
 
-    <span class="kw">pub fn </span>find_field&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: T) -&gt; <span class="prelude-ty">Option</span>&lt;InputFieldRef&gt;
+    <span class="kw">pub fn </span>find_field&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: T) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>InputField&gt;
     <span class="kw">where
         </span>T: Into&lt;String&gt;,
     {
         <span class="kw">let </span>name = name.into();
-        <span class="self">self</span>.get_fields().iter().find(|f| f.name == name).cloned()
+        <span class="self">self</span>.get_fields().iter().find(|f| f.name == name)
     }
 
     <span class="doccomment">/// Require exactly one field of the possible ones to be in the input.
@@ -483,7 +481,7 @@
 
     <span class="kw">pub fn </span>field_types&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[InputType] {
         <span class="kw">let </span>(start, len) = <span class="self">self</span>.field_types.unwrap_or_default();
-        <span class="kw-2">&amp;</span>query_schema.input_field_types[start..(start + len)]
+        <span class="kw-2">&amp;</span>query_schema.db.input_field_types[start..(start + len)]
     }
 
     <span class="doccomment">/// Sets the field as optional (not required to be present on the input).
@@ -508,35 +506,35 @@
     }
 
     <span class="doccomment">/// Sets the field as nullable (accepting null inputs).
-    </span><span class="kw">pub fn </span>nullable(<span class="self">self</span>, input_types: <span class="kw-2">&amp;mut </span>Vec&lt;InputType&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.add_type(InputType::null(), input_types)
+    </span><span class="kw">pub fn </span>nullable(<span class="self">self</span>, db: <span class="kw-2">&amp;mut </span>QuerySchemaDatabase) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.add_type(InputType::null(), db)
     }
 
     <span class="doccomment">/// Sets the field as nullable if the condition is true.
-    </span><span class="kw">pub fn </span>nullable_if(<span class="self">self</span>, condition: bool, input_types: <span class="kw-2">&amp;mut </span>Vec&lt;InputType&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>nullable_if(<span class="self">self</span>, condition: bool, db: <span class="kw-2">&amp;mut </span>QuerySchemaDatabase) -&gt; <span class="self">Self </span>{
         <span class="kw">if </span>condition {
-            <span class="self">self</span>.nullable(input_types)
+            <span class="self">self</span>.nullable(db)
         } <span class="kw">else </span>{
             <span class="self">self
         </span>}
     }
 
-    <span class="kw">pub fn </span>push_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, typ: InputType, input_types: <span class="kw-2">&amp;mut </span>Vec&lt;InputType&gt;) {
+    <span class="kw">pub fn </span>push_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, typ: InputType, db: <span class="kw-2">&amp;mut </span>QuerySchemaDatabase) {
         <span class="kw">match </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.field_types {
             <span class="prelude-val">Some</span>((_start, len)) =&gt; {
                 <span class="kw-2">*</span>len += <span class="number">1</span>;
-                input_types.push(typ);
+                db.input_field_types.push(typ);
             }
             <span class="prelude-val">None </span>=&gt; {
-                <span class="self">self</span>.field_types = <span class="prelude-val">Some</span>((input_types.len(), <span class="number">1</span>));
-                input_types.push(typ);
+                <span class="self">self</span>.field_types = <span class="prelude-val">Some</span>((db.input_field_types.len(), <span class="number">1</span>));
+                db.input_field_types.push(typ);
             }
         }
     }
 
     <span class="doccomment">/// Adds possible input type to this input field&#39;s type union.
-    </span><span class="kw">pub fn </span>add_type(<span class="kw-2">mut </span><span class="self">self</span>, typ: InputType, input_types: <span class="kw-2">&amp;mut </span>Vec&lt;InputType&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.push_type(typ, input_types);
+    </span><span class="kw">pub fn </span>add_type(<span class="kw-2">mut </span><span class="self">self</span>, typ: InputType, db: <span class="kw-2">&amp;mut </span>QuerySchemaDatabase) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.push_type(typ, db);
         <span class="self">self
     </span>}
 
@@ -558,9 +556,9 @@
 <span class="attr">#[derive(Clone)]
 </span><span class="kw">pub enum </span>InputType {
     Scalar(ScalarType),
-    Enum(EnumTypeWeakRef),
+    Enum(EnumTypeId),
     List(Box&lt;InputType&gt;),
-    Object(InputObjectTypeWeakRef),
+    Object(InputObjectTypeId),
 }
 
 <span class="kw">impl </span>PartialEq <span class="kw">for </span>InputType {
@@ -569,9 +567,7 @@
             (InputType::Scalar(st), InputType::Scalar(ost)) =&gt; st.eq(ost),
             (InputType::Enum(<span class="kw">_</span>), InputType::Enum(<span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
             (InputType::List(lt), InputType::List(olt)) =&gt; lt.eq(olt),
-            (InputType::Object(obj), InputType::Object(oobj)) =&gt; {
-                obj.into_arc().identifier == oobj.into_arc().identifier
-            }
+            (InputType::Object(obj), InputType::Object(oobj)) =&gt; obj == oobj,
             <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
@@ -580,7 +576,7 @@
 <span class="kw">impl </span>Debug <span class="kw">for </span>InputType {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Object(obj) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Object({})&quot;</span>, obj.into_arc().identifier.name()),
+            <span class="self">Self</span>::Object(obj) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Object({obj:?})&quot;</span>),
             <span class="self">Self</span>::Scalar(s) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{s:?}&quot;</span>),
             <span class="self">Self</span>::Enum(e) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{e:?}&quot;</span>),
             <span class="self">Self</span>::List(l) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{l:?}&quot;</span>),
@@ -593,7 +589,7 @@
         InputType::List(Box::new(containing))
     }
 
-    <span class="kw">pub fn </span>object(containing: InputObjectTypeWeakRef) -&gt; InputType {
+    <span class="kw">pub fn </span>object(containing: InputObjectTypeId) -&gt; InputType {
         InputType::Object(containing)
     }
 
@@ -649,16 +645,16 @@
         InputType::Scalar(ScalarType::Null)
     }
 
-    <span class="kw">pub fn </span>enum_type(containing: EnumTypeWeakRef) -&gt; InputType {
+    <span class="kw">pub fn </span>enum_type(containing: EnumTypeId) -&gt; InputType {
         InputType::Enum(containing)
     }
 
-    <span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+    <span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>, query_schema: <span class="kw-2">&amp;</span>QuerySchemaDatabase) -&gt; bool {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Scalar(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
             <span class="self">Self</span>::Enum(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-            <span class="self">Self</span>::List(inner) =&gt; inner.is_empty(),
-            <span class="self">Self</span>::Object(weak) =&gt; weak.into_arc().is_empty(),
+            <span class="self">Self</span>::List(inner) =&gt; inner.is_empty(query_schema),
+            <span class="self">Self</span>::Object(id) =&gt; query_schema[<span class="kw-2">*</span>id].is_empty(),
         }
     }
 
@@ -669,9 +665,9 @@
         )
     }
 
-    <span class="kw">pub fn </span>as_object(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;InputObjectTypeStrongRef&gt; {
+    <span class="kw">pub fn </span>as_object&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchemaDatabase) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>InputObjectType&gt; {
         <span class="kw">if let </span><span class="self">Self</span>::Object(v) = <span class="self">self </span>{
-            <span class="prelude-val">Some</span>(v.into_arc())
+            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>query_schema[<span class="kw-2">*</span>v])
         } <span class="kw">else </span>{
             <span class="prelude-val">None
         </span>}

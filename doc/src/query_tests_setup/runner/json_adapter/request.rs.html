@@ -263,12 +263,16 @@
 <a href="#263" id="263">263</a>
 <a href="#264" id="264">264</a>
 <a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
 </pre><pre class="rust"><code><span class="kw">use </span>indexmap::IndexMap;
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>prisma_models::PrismaValue;
 <span class="kw">use </span>query_core::{
     constants::custom_types,
-    schema::{InputFieldRef, InputObjectTypeStrongRef, InputType, OutputFieldRef, QuerySchema, QuerySchemaRef},
+    schema::{InputField, InputObjectType, InputType, OutputFieldRef, QuerySchema, QuerySchemaRef},
     schema_builder::constants::{<span class="self">self</span>, json_null},
     ArgumentValue, ArgumentValueObject, Selection,
 };
@@ -314,7 +318,7 @@
 
 <span class="kw">fn </span>graphql_args_to_json_args(
     selection: <span class="kw-2">&amp;mut </span>Selection,
-    args_fields: <span class="kw-2">&amp;</span>[InputFieldRef],
+    args_fields: <span class="kw-2">&amp;</span>[InputField],
     query_schema: <span class="kw-2">&amp;</span>QuerySchema,
 ) -&gt; <span class="prelude-ty">Option</span>&lt;IndexMap&lt;String, JsonValue&gt;&gt; {
     <span class="kw">if </span>selection.arguments().is_empty() {
@@ -326,7 +330,7 @@
     <span class="kw">for </span>(arg_name, arg_value) <span class="kw">in </span>selection.arguments().iter().cloned() {
         <span class="kw">let </span>arg_field = args_fields.iter().find(|arg_field| arg_field.name == arg_name);
 
-        <span class="kw">let </span>inferrer = FieldTypeInferrer::from_field(arg_field, query_schema).infer(<span class="kw-2">&amp;</span>arg_value);
+        <span class="kw">let </span>inferrer = FieldTypeInferrer::from_field(arg_field, query_schema).infer(<span class="kw-2">&amp;</span>arg_value, query_schema);
 
         <span class="kw">let </span>json = arg_value_to_json(arg_value, inferrer, query_schema);
 
@@ -342,8 +346,8 @@
             obj.into_iter()
                 .map(|(k, v)| {
                     <span class="kw">let </span>field = typ.find_field(<span class="kw-2">&amp;</span>k);
-                    <span class="kw">let </span>inferrer = FieldTypeInferrer::from_field(field.as_ref(), query_schema);
-                    <span class="kw">let </span>inferred_type = inferrer.infer(<span class="kw-2">&amp;</span>v);
+                    <span class="kw">let </span>inferrer = FieldTypeInferrer::from_field(field, query_schema);
+                    <span class="kw">let </span>inferred_type = inferrer.infer(<span class="kw-2">&amp;</span>v, query_schema);
 
                     (k, arg_value_to_json(v, inferred_type, query_schema))
                 })
@@ -374,7 +378,7 @@
             <span class="kw">let </span>values = list
                 .into_iter()
                 .map(|val| {
-                    <span class="kw">let </span>inferred_typ = FieldTypeInferrer::new(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[typ.clone()])).infer(<span class="kw-2">&amp;</span>val);
+                    <span class="kw">let </span>inferred_typ = FieldTypeInferrer::new(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[typ.clone()])).infer(<span class="kw-2">&amp;</span>val, query_schema);
 
                     arg_value_to_json(val, inferred_typ, query_schema)
                 })
@@ -408,7 +412,7 @@
         } <span class="kw">else </span>{
             <span class="kw">let </span>nested_field = schema_field
                 .field_type
-                .as_object_type()
+                .as_object_type(<span class="kw-2">&amp;</span>query_schema.db)
                 .unwrap()
                 .find_field(<span class="kw-2">&amp;</span>selection_name)
                 .unwrap();
@@ -442,7 +446,7 @@
         <span class="self">Self </span>{ types }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_field(field: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>InputFieldRef&gt;, query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_field(field: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>InputField&gt;, query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             types: field.map(|field| field.field_types(query_schema)),
         }
@@ -451,7 +455,7 @@
     <span class="doccomment">/// Given a list of input types and an ArgumentValue, attempts to infer to the best of our ability
     /// what types it should be transformed to.
     /// If we cannot confidently infer the type, we return InferredType::Unknown.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>infer(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>ArgumentValue) -&gt; InferredType {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>infer&lt;<span class="lifetime">&#39;b</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>ArgumentValue, query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>QuerySchema) -&gt; InferredType&lt;<span class="lifetime">&#39;b</span>&gt; {
         <span class="kw">if </span><span class="self">self</span>.types.is_none() {
             <span class="kw">return </span>InferredType::Unknown;
         }
@@ -459,7 +463,7 @@
         <span class="kw">match </span>value {
             ArgumentValue::Object(obj) =&gt; {
                 <span class="kw">let </span>is_field_ref_obj = obj.contains_key(constants::filters::UNDERSCORE_REF) &amp;&amp; obj.len() == <span class="number">1</span>;
-                <span class="kw">let </span>schema_objects = <span class="self">self</span>.get_object_types();
+                <span class="kw">let </span>schema_objects = <span class="self">self</span>.get_object_types(query_schema);
 
                 <span class="kw">match </span>schema_objects {
                     <span class="prelude-val">Some</span>(schema_objects) =&gt; <span class="kw">match </span><span class="self">Self</span>::obj_val_fits_obj_types(obj, <span class="kw-2">&amp;</span>schema_objects) {
@@ -493,9 +497,13 @@
             .unwrap_or(<span class="bool-val">false</span>)
     }
 
-    <span class="kw">fn </span>get_object_types(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;InputObjectTypeStrongRef&gt;&gt; {
-        <span class="self">self</span>.types
-            .map(|types| types.iter().filter_map(|typ| typ.as_object()).collect_vec())
+    <span class="kw">fn </span>get_object_types&lt;<span class="lifetime">&#39;b</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>QuerySchema) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>InputObjectType&gt;&gt; {
+        <span class="self">self</span>.types.map(|types| {
+            types
+                .iter()
+                .filter_map(|typ| typ.as_object(<span class="kw-2">&amp;</span>query_schema.db))
+                .collect_vec()
+        })
     }
 
     <span class="kw">fn </span>get_list_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;InputType&gt; {
@@ -508,10 +516,10 @@
         [json_null::DB_NULL, json_null::JSON_NULL, json_null::ANY_NULL].contains(<span class="kw-2">&amp;</span>val)
     }
 
-    <span class="kw">fn </span>obj_val_fits_obj_types(
+    <span class="kw">fn </span>obj_val_fits_obj_types&lt;<span class="lifetime">&#39;b</span>&gt;(
         val: <span class="kw-2">&amp;</span>ArgumentValueObject,
-        schema_objects: <span class="kw-2">&amp;</span>[InputObjectTypeStrongRef],
-    ) -&gt; <span class="prelude-ty">Option</span>&lt;InputObjectTypeStrongRef&gt; {
+        schema_objects: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>InputObjectType],
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>InputObjectType&gt; {
         schema_objects
             .iter()
             .find(|schema_object| val.keys().all(|key| schema_object.find_field(key).is_some()))
@@ -520,8 +528,8 @@
 }
 
 <span class="attr">#[derive(Debug)]
-</span><span class="kw">enum </span>InferredType {
-    Object(InputObjectTypeStrongRef),
+</span><span class="kw">enum </span>InferredType&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Object(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>InputObjectType),
     List(InputType),
     Json,
     JsonNullEnum,

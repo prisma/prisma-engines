@@ -175,6 +175,7 @@
 <a href="#175" id="175">175</a>
 <a href="#176" id="176">176</a>
 <a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::input_types::objects::order_by_objects::OrderByOptions;
 <span class="kw">use </span><span class="kw">crate</span>::mutations::create_one;
@@ -193,7 +194,7 @@
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>where_unique_argument(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
     <span class="kw">let </span>input_object_type = filter_objects::where_unique_object_type(ctx, model);
 
-    <span class="kw">if </span>input_object_type.into_arc().is_empty() {
+    <span class="kw">if </span>ctx.db[input_object_type].is_empty() {
         <span class="prelude-val">None
     </span>} <span class="kw">else </span>{
         <span class="prelude-val">Some</span>(input_field(
@@ -225,7 +226,8 @@
         <span class="kw">let </span>update_types = update_one_objects::update_one_input_types(ctx, model, <span class="prelude-val">None</span>);
         <span class="kw">let </span>create_types = create_one::create_one_input_types(ctx, model, <span class="prelude-val">None</span>);
 
-        <span class="kw">if </span>update_types.iter().all(|typ| typ.is_empty()) || create_types.iter().all(|typ| typ.is_empty()) {
+        <span class="kw">if </span>update_types.iter().all(|typ| typ.is_empty(<span class="kw-2">&amp;</span>ctx.db)) || create_types.iter().all(|typ| typ.is_empty(<span class="kw-2">&amp;</span>ctx.db))
+        {
             <span class="prelude-val">None
         </span>} <span class="kw">else </span>{
             <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[

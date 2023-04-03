@@ -362,39 +362,6 @@
 <a href="#362" id="362">362</a>
 <a href="#363" id="363">363</a>
 <a href="#364" id="364">364</a>
-<a href="#365" id="365">365</a>
-<a href="#366" id="366">366</a>
-<a href="#367" id="367">367</a>
-<a href="#368" id="368">368</a>
-<a href="#369" id="369">369</a>
-<a href="#370" id="370">370</a>
-<a href="#371" id="371">371</a>
-<a href="#372" id="372">372</a>
-<a href="#373" id="373">373</a>
-<a href="#374" id="374">374</a>
-<a href="#375" id="375">375</a>
-<a href="#376" id="376">376</a>
-<a href="#377" id="377">377</a>
-<a href="#378" id="378">378</a>
-<a href="#379" id="379">379</a>
-<a href="#380" id="380">380</a>
-<a href="#381" id="381">381</a>
-<a href="#382" id="382">382</a>
-<a href="#383" id="383">383</a>
-<a href="#384" id="384">384</a>
-<a href="#385" id="385">385</a>
-<a href="#386" id="386">386</a>
-<a href="#387" id="387">387</a>
-<a href="#388" id="388">388</a>
-<a href="#389" id="389">389</a>
-<a href="#390" id="390">390</a>
-<a href="#391" id="391">391</a>
-<a href="#392" id="392">392</a>
-<a href="#393" id="393">393</a>
-<a href="#394" id="394">394</a>
-<a href="#395" id="395">395</a>
-<a href="#396" id="396">396</a>
-<a href="#397" id="397">397</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{constants::<span class="kw-2">*</span>, enum_types::<span class="kw-2">*</span>};
 <span class="kw">use </span>prisma_models::CompositeFieldRef;
@@ -453,9 +420,7 @@
                 <span class="kw">let </span>types = <span class="macro">vec!</span>[map_scalar_input_type_for_field(ctx, sf), base_update_type];
 
                 <span class="kw">let </span>input_field = input_field(ctx, sf.name(), types, <span class="prelude-val">None</span>);
-                input_field
-                    .optional()
-                    .nullable_if(!sf.is_required(), <span class="kw-2">&amp;mut </span>ctx.input_field_types)
+                input_field.optional().nullable_if(!sf.is_required(), <span class="kw-2">&amp;mut </span>ctx.db)
             }
         }
     }
@@ -481,10 +446,7 @@
                 <span class="kw">let </span><span class="kw-2">mut </span>input_object = input_object_type(ident.clone(), object_fields);
                 input_object.require_exactly_one_field();
 
-                <span class="kw">let </span>input_object = Arc::new(input_object);
-                ctx.cache_input_type(ident, input_object.clone());
-
-                Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
+                ctx.cache_input_type(ident, input_object)
             }
         };
 
@@ -502,17 +464,15 @@
         <span class="kw">let </span>input_object = <span class="kw">match </span>ctx.get_input_type(<span class="kw-2">&amp;</span>ident) {
             <span class="prelude-val">Some</span>(t) =&gt; t,
             <span class="prelude-val">None </span>=&gt; {
-                <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));
-                ctx.cache_input_type(ident, input_object.clone());
+                <span class="kw">let </span>input_object = init_input_object_type(ident.clone());
+                <span class="kw">let </span>id = ctx.cache_input_type(ident, input_object);
 
                 <span class="comment">// Enqueue the nested update input for its fields to be
                 // created at a later point, to avoid recursing too deep
                 // (that has caused stack overflows on large schemas in
                 // the past).
-                </span>ctx.nested_update_inputs_queue
-                    .push((Arc::clone(<span class="kw-2">&amp;</span>input_object), rf.clone()));
-
-                Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
+                </span>ctx.nested_update_inputs_queue.push((id, rf.clone()));
+                id
             }
         };
 
@@ -533,7 +493,7 @@
         }
 
         input_field(ctx, cf.name(), input_types, <span class="prelude-val">None</span>)
-            .nullable_if(cf.is_optional() &amp;&amp; !cf.is_list(), <span class="kw-2">&amp;mut </span>ctx.input_field_types)
+            .nullable_if(cf.is_optional() &amp;&amp; !cf.is_list(), <span class="kw-2">&amp;mut </span>ctx.db)
             .optional()
     }
 }
@@ -543,7 +503,7 @@
     prefix: <span class="kw-2">&amp;</span>str,
     sf: <span class="kw-2">&amp;</span>ScalarFieldRef,
     with_number_operators: bool,
-) -&gt; InputObjectTypeWeakRef {
+) -&gt; InputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::FieldUpdateOperationsInput(
         !sf.is_required(),
         prefix.to_owned(),
@@ -552,14 +512,12 @@
 
     <span class="kw">let </span><span class="kw-2">mut </span>obj = init_input_object_type(ident.clone());
     obj.require_exactly_one_field();
-
-    <span class="kw">let </span>obj = Arc::new(obj);
-    ctx.cache_input_type(ident, obj.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, obj);
 
     <span class="kw">let </span>typ = map_scalar_input_type_for_field(ctx, sf);
     <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="macro">vec!</span>[input_field(ctx, operations::SET, typ.clone(), <span class="prelude-val">None</span>)
         .optional()
-        .nullable_if(!sf.is_required(), <span class="kw-2">&amp;mut </span>ctx.input_field_types)];
+        .nullable_if(!sf.is_required(), <span class="kw-2">&amp;mut </span>ctx.db)];
 
     <span class="kw">if </span>with_number_operators {
         fields.push(input_field(ctx, operations::INCREMENT, typ.clone(), <span class="prelude-val">None</span>).optional());
@@ -572,9 +530,8 @@
         fields.push(input_field(ctx, operations::UNSET, InputType::boolean(), <span class="prelude-val">None</span>).optional());
     }
 
-    obj.set_fields(fields);
-
-    Arc::downgrade(<span class="kw-2">&amp;</span>obj)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 <span class="doccomment">/// Build an operation envelope object type for composite updates.
@@ -586,10 +543,7 @@
 ///   ... more ops ...
 /// }
 /// ```
-</span><span class="kw">fn </span>composite_update_envelope_object_type(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
-    cf: <span class="kw-2">&amp;</span>CompositeFieldRef,
-) -&gt; InputObjectTypeWeakRef {
+</span><span class="kw">fn </span>composite_update_envelope_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::CompositeUpdateEnvelopeInput(cf.typ(), cf.arity()));
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
@@ -597,9 +551,7 @@
     <span class="kw">let </span><span class="kw-2">mut </span>input_object = init_input_object_type(ident.clone());
     input_object.require_exactly_one_field();
     input_object.set_tag(ObjectTag::CompositeEnvelope);
-
-    <span class="kw">let </span>input_object = Arc::new(input_object);
-    ctx.cache_input_type(ident, input_object.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, input_object);
 
     <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="macro">vec!</span>[composite_set_update_input_field(ctx, cf)];
 
@@ -610,30 +562,26 @@
     append_opt(<span class="kw-2">&amp;mut </span>fields, composite_delete_many_update_input_field(ctx, cf));
     append_opt(<span class="kw-2">&amp;mut </span>fields, composite_unset_update_input_field(ctx, cf));
 
-    input_object.set_fields(fields);
-
-    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 <span class="doccomment">/// Builds the `update` input object type. Should be used in the envelope type.
-</span><span class="kw">fn </span>composite_update_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
+</span><span class="kw">fn </span>composite_update_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::CompositeUpdateInput(cf.typ()));
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span><span class="kw-2">mut </span>input_object = init_input_object_type(ident.clone());
     input_object.set_min_fields(<span class="number">1</span>);
-
-    <span class="kw">let </span>input_object = Arc::new(input_object);
-    ctx.cache_input_type(ident, input_object.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, input_object);
 
     <span class="kw">let </span>mapper = UpdateDataInputFieldMapper::new_checked();
     <span class="kw">let </span>fields = cf.typ().fields().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
     <span class="kw">let </span>fields = mapper.map_all(ctx, <span class="kw-2">&amp;</span>fields);
 
-    input_object.set_fields(fields);
-
-    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 <span class="comment">// Builds an `update` input field. Should only be used in the envelope type.
@@ -667,7 +615,7 @@
     }
 
     input_field(ctx, operations::SET, input_types, <span class="prelude-val">None</span>)
-        .nullable_if(!cf.is_required() &amp;&amp; !cf.is_list(), <span class="kw-2">&amp;mut </span>ctx.input_field_types)
+        .nullable_if(!cf.is_required() &amp;&amp; !cf.is_list(), <span class="kw-2">&amp;mut </span>ctx.db)
         .optional()
 }
 
@@ -684,17 +632,14 @@
 }
 
 <span class="doccomment">/// Builds the `upsert` input object type. Should only be used in the envelope type.
-</span><span class="kw">fn </span>composite_upsert_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
+</span><span class="kw">fn </span>composite_upsert_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::CompositeUpsertObjectInput(cf.typ()));
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span><span class="kw-2">mut </span>input_object = init_input_object_type(ident.clone());
     input_object.set_tag(ObjectTag::CompositeEnvelope);
-
-    <span class="kw">let </span>input_object = Arc::new(input_object);
-
-    ctx.cache_input_type(ident, input_object.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, input_object);
 
     <span class="kw">let </span>update_object_type = composite_update_object_type(ctx, cf);
     <span class="kw">let </span>update_field = input_field(ctx, operations::UPDATE, InputType::Object(update_object_type), <span class="prelude-val">None</span>);
@@ -702,9 +647,8 @@
 
     <span class="kw">let </span>fields = <span class="macro">vec!</span>[set_field, update_field];
 
-    input_object.set_fields(fields);
-
-    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 <span class="comment">// Builds an `upsert` input field. Should only be used in the envelope type.
@@ -718,17 +662,14 @@
     </span>}
 }
 
-<span class="kw">fn </span>composite_update_many_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
+<span class="kw">fn </span>composite_update_many_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::CompositeUpdateManyInput(cf.typ()));
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span><span class="kw-2">mut </span>input_object = init_input_object_type(ident.clone());
     input_object.set_tag(ObjectTag::CompositeEnvelope);
-
-    <span class="kw">let </span>input_object = Arc::new(input_object);
-
-    ctx.cache_input_type(ident, input_object.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, input_object);
 
     <span class="kw">let </span>where_object_type = objects::filter_objects::where_object_type(ctx, cf.typ());
     <span class="kw">let </span>where_field = input_field(ctx, args::WHERE, InputType::object(where_object_type), <span class="prelude-val">None</span>);
@@ -738,31 +679,24 @@
 
     <span class="kw">let </span>fields = <span class="macro">vec!</span>[where_field, data_field];
 
-    input_object.set_fields(fields);
-
-    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
-<span class="kw">fn </span>composite_delete_many_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
+<span class="kw">fn </span>composite_delete_many_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::CompositeDeleteManyInput(cf.typ()));
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span><span class="kw-2">mut </span>input_object = init_input_object_type(ident.clone());
     input_object.set_tag(ObjectTag::CompositeEnvelope);
-
-    <span class="kw">let </span>input_object = Arc::new(input_object);
-
-    ctx.cache_input_type(ident, input_object.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, input_object);
 
     <span class="kw">let </span>where_object_type = objects::filter_objects::where_object_type(ctx, cf.typ());
     <span class="kw">let </span>where_field = input_field(ctx, args::WHERE, InputType::object(where_object_type), <span class="prelude-val">None</span>);
 
-    <span class="kw">let </span>fields = <span class="macro">vec!</span>[where_field];
-
-    input_object.set_fields(fields);
-
-    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
+    ctx.db[id].set_fields(<span class="macro">vec!</span>[where_field]);
+    id
 }
 
 <span class="comment">// Builds an `updateMany` input field. Should only be used in the envelope type.

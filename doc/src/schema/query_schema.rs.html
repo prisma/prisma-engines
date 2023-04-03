@@ -318,64 +318,26 @@
 <a href="#318" id="318">318</a>
 <a href="#319" id="319">319</a>
 <a href="#320" id="320">320</a>
-<a href="#321" id="321">321</a>
-<a href="#322" id="322">322</a>
-<a href="#323" id="323">323</a>
-<a href="#324" id="324">324</a>
-<a href="#325" id="325">325</a>
-<a href="#326" id="326">326</a>
-<a href="#327" id="327">327</a>
-<a href="#328" id="328">328</a>
-<a href="#329" id="329">329</a>
-<a href="#330" id="330">330</a>
-<a href="#331" id="331">331</a>
-<a href="#332" id="332">332</a>
-<a href="#333" id="333">333</a>
-<a href="#334" id="334">334</a>
-<a href="#335" id="335">335</a>
-<a href="#336" id="336">336</a>
-<a href="#337" id="337">337</a>
-<a href="#338" id="338">338</a>
-<a href="#339" id="339">339</a>
-<a href="#340" id="340">340</a>
-<a href="#341" id="341">341</a>
-<a href="#342" id="342">342</a>
-<a href="#343" id="343">343</a>
-<a href="#344" id="344">344</a>
-<a href="#345" id="345">345</a>
-<a href="#346" id="346">346</a>
-<a href="#347" id="347">347</a>
-<a href="#348" id="348">348</a>
-<a href="#349" id="349">349</a>
-<a href="#350" id="350">350</a>
-</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
-<span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{EnumType, IdentifierType, ObjectType, OutputFieldRef, OutputObjectTypeId, QuerySchemaDatabase};
+<span class="kw">use </span>prisma_models::{InternalDataModelRef, ModelRef};
 <span class="kw">use </span>psl::{
     datamodel_connector::{ConnectorCapability, RelationMode},
     PreviewFeatures,
 };
-<span class="kw">use </span>std::{borrow::Borrow, collections::HashMap, fmt};
+<span class="kw">use </span>std::{collections::HashMap, fmt};
 
-<span class="doccomment">/// The query schema.
-/// Defines which operations (query/mutations) are possible on a database, based on the (internal) data model.
+<span class="doccomment">/// The query schema defines which operations (query/mutations) are possible on a database, based
+/// on a Prisma schema.
 ///
-/// Conceptually, a query schema stores two trees (query / mutation) that consist of
-/// input and output types. Special consideration is required when dealing with object types.
-///
-/// Object types can be referenced multiple times throughout the schema, also recursively, which requires the use
-/// of weak references to prevent memory leaks. To simplify the overall management of Arcs and weaks, the
-/// query schema is subject to a number of invariants.
-/// The most important one is that the only strong references (Arc) to a single object types
-/// is only ever held by the top-level QuerySchema struct, never by the trees, which only ever hold weak refs.
-///
-/// Using a QuerySchema should never involve dealing with the strong references.
+/// Conceptually, a query schema stores two trees (query/mutation) that consist of input and output
+/// types.
 </span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>QuerySchema {
     <span class="doccomment">/// Root query object (read queries).
-    </span><span class="kw">pub </span>query: OutputTypeRef,
+    </span><span class="kw">pub </span>query: OutputObjectTypeId,
 
     <span class="doccomment">/// Root mutation object (write queries).
-    </span><span class="kw">pub </span>mutation: OutputTypeRef,
+    </span><span class="kw">pub </span>mutation: OutputObjectTypeId,
 
     <span class="doccomment">/// Internal abstraction over the datamodel AST.
     </span><span class="kw">pub </span>internal_data_model: InternalDataModelRef,
@@ -383,24 +345,14 @@
     <span class="doccomment">/// Information about the connector this schema was build for.
     </span><span class="kw">pub </span>context: ConnectorContext,
 
-    <span class="doccomment">/// Possible types for input fields. This is an internal implementation detail, it should stay
-    /// private.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) input_field_types: Vec&lt;InputType&gt;,
+    <span class="doccomment">/// The primary source of truth for schema data.
+    </span><span class="kw">pub </span>db: QuerySchemaDatabase,
 
     <span class="comment">// Indexes query fields by their own query info for easier access.
     </span>query_map: HashMap&lt;QueryInfo, OutputFieldRef&gt;,
 
     <span class="comment">// Indexes mutation fields by their own query info for easier access.
     </span>mutation_map: HashMap&lt;QueryInfo, OutputFieldRef&gt;,
-
-    <span class="doccomment">/// Internal. Stores all strong Arc refs to the input object types.
-    </span>_input_object_types: Vec&lt;InputObjectTypeStrongRef&gt;,
-
-    <span class="doccomment">/// Internal. Stores all strong Arc refs to the output object types.
-    </span>_output_object_types: Vec&lt;ObjectTypeStrongRef&gt;,
-
-    <span class="doccomment">/// Internal. Stores all enum refs.
-    </span>enum_types: Vec&lt;EnumTypeRef&gt;,
 }
 
 <span class="doccomment">/// Connector meta information, to be used in query execution if necessary.
@@ -433,12 +385,9 @@
 <span class="kw">impl </span>QuerySchema {
     <span class="attr">#[allow(clippy::too_many_arguments)]
     </span><span class="kw">pub fn </span>new(
-        query: OutputTypeRef,
-        mutation: OutputTypeRef,
-        input_field_types: Vec&lt;InputType&gt;,
-        _input_object_types: Vec&lt;InputObjectTypeStrongRef&gt;,
-        _output_object_types: Vec&lt;ObjectTypeStrongRef&gt;,
-        enum_types: Vec&lt;EnumTypeRef&gt;,
+        query: OutputObjectTypeId,
+        mutation: OutputObjectTypeId,
+        db: QuerySchemaDatabase,
         internal_data_model: InternalDataModelRef,
         capabilities: Vec&lt;ConnectorCapability&gt;,
     ) -&gt; <span class="self">Self </span>{
@@ -447,13 +396,13 @@
         <span class="kw">let </span><span class="kw-2">mut </span>query_map: HashMap&lt;QueryInfo, OutputFieldRef&gt; = HashMap::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mutation_map: HashMap&lt;QueryInfo, OutputFieldRef&gt; = HashMap::new();
 
-        <span class="kw">for </span>field <span class="kw">in </span>query.as_object_type().unwrap().get_fields() {
+        <span class="kw">for </span>field <span class="kw">in </span>db[query].get_fields() {
             <span class="kw">if let </span><span class="prelude-val">Some</span>(query_info) = field.query_info() {
                 query_map.insert(query_info.to_owned(), field.clone());
             }
         }
 
-        <span class="kw">for </span>field <span class="kw">in </span>mutation.as_object_type().unwrap().get_fields() {
+        <span class="kw">for </span>field <span class="kw">in </span>db[mutation].get_fields() {
             <span class="kw">if let </span><span class="prelude-val">Some</span>(query_info) = field.query_info() {
                 mutation_map.insert(query_info.to_owned(), field.clone());
             }
@@ -464,10 +413,7 @@
             mutation,
             query_map,
             mutation_map,
-            input_field_types,
-            _input_object_types,
-            _output_object_types,
-            enum_types,
+            db,
             internal_data_model,
             context: ConnectorContext::new(capabilities, features, relation_mode),
         }
@@ -511,22 +457,16 @@
         <span class="self">self</span>.mutation_map.get(<span class="kw-2">&amp;</span>query_info)
     }
 
-    <span class="kw">pub fn </span>mutation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ObjectTypeStrongRef {
-        <span class="kw">match </span><span class="self">self</span>.mutation.borrow() {
-            OutputType::Object(<span class="kw-2">ref </span>o) =&gt; o.into_arc(),
-            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
-        }
+    <span class="kw">pub fn </span>mutation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ObjectType {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.db[<span class="self">self</span>.mutation]
     }
 
-    <span class="kw">pub fn </span>query(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ObjectTypeStrongRef {
-        <span class="kw">match </span><span class="self">self</span>.query.borrow() {
-            OutputType::Object(<span class="kw-2">ref </span>o) =&gt; o.into_arc(),
-            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
-        }
+    <span class="kw">pub fn </span>query(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ObjectType {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.db[<span class="self">self</span>.query]
     }
 
     <span class="kw">pub fn </span>enum_types(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>EnumType&gt; {
-        <span class="self">self</span>.enum_types.iter().map(|e| e.as_ref())
+        <span class="self">self</span>.db.iter_enum_types()
     }
 
     <span class="kw">pub fn </span>context(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ConnectorContext {

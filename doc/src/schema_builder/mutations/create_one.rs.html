@@ -178,12 +178,7 @@
 <a href="#178" id="178">178</a>
 <a href="#179" id="179">179</a>
 <a href="#180" id="180">180</a>
-<a href="#181" id="181">181</a>
-<a href="#182" id="182">182</a>
-<a href="#183" id="183">183</a>
-</pre><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
-
-<span class="kw">use crate</span>::{
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
     constants::args,
     field, init_input_object_type, input_field,
     input_types::fields::data_input_mapper::{CreateDataInputFieldMapper, DataInputFieldMapper},
@@ -192,8 +187,7 @@
 };
 <span class="kw">use </span>prisma_models::{ModelRef, RelationFieldRef};
 <span class="kw">use </span>schema::{
-    Identifier, IdentifierType, InputField, InputObjectTypeWeakRef, InputType, OutputField, OutputType, QueryInfo,
-    QueryTag,
+    Identifier, IdentifierType, InputField, InputObjectTypeId, InputType, OutputField, OutputType, QueryInfo, QueryTag,
 };
 
 <span class="doccomment">/// Builds a create mutation field (e.g. createUser) for given model.
@@ -216,8 +210,8 @@
 /// The data argument is not present if no data can be created.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_one_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;InputField&gt;&gt; {
     <span class="kw">let </span>create_types = create_one_input_types(ctx, model, <span class="prelude-val">None</span>);
-    <span class="kw">let </span>any_empty = create_types.iter().any(|typ| typ.is_empty());
-    <span class="kw">let </span>all_empty = create_types.iter().all(|typ| typ.is_empty());
+    <span class="kw">let </span>any_empty = create_types.iter().any(|typ| typ.is_empty(<span class="kw-2">&amp;</span>ctx.db));
+    <span class="kw">let </span>all_empty = create_types.iter().all(|typ| typ.is_empty(<span class="kw-2">&amp;</span>ctx.db));
 
     <span class="kw">if </span>all_empty {
         <span class="prelude-val">None
@@ -252,7 +246,7 @@
     ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     model: <span class="kw-2">&amp;</span>ModelRef,
     parent_field: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>RelationFieldRef&gt;,
-) -&gt; InputObjectTypeWeakRef {
+) -&gt; InputObjectTypeId {
     <span class="comment">// We allow creation from both sides of the relation - which would lead to an endless loop of input types
     // if we would allow to create the parent from a child create that is already a nested create.
     // To solve it, we remove the parent relation from the input (&quot;Without&lt;Parent&gt;&quot;).
@@ -263,15 +257,15 @@
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, input_object.clone());
+    <span class="kw">let </span>input_object = init_input_object_type(ident.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, input_object);
 
     <span class="kw">let </span>filtered_fields = filter_checked_create_fields(model, parent_field);
     <span class="kw">let </span>field_mapper = CreateDataInputFieldMapper::new_checked();
     <span class="kw">let </span>input_fields = field_mapper.map_all(ctx, <span class="kw-2">&amp;</span>filtered_fields);
 
-    input_object.set_fields(input_fields);
-    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
+    ctx.db[id].set_fields(input_fields);
+    id
 }
 
 <span class="doccomment">/// Builds the create input type (&lt;x&gt;UncheckedCreateInput / &lt;x&gt;UncheckedCreateWithout&lt;y&gt;Input)
@@ -282,7 +276,7 @@
     ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     model: <span class="kw-2">&amp;</span>ModelRef,
     parent_field: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>RelationFieldRef&gt;,
-) -&gt; InputObjectTypeWeakRef {
+) -&gt; InputObjectTypeId {
     <span class="comment">// We allow creation from both sides of the relation - which would lead to an endless loop of input types
     // if we would allow to create the parent from a child create that is already a nested create.
     // To solve it, we remove the parent relation from the input (&quot;Without&lt;Parent&gt;&quot;).
@@ -293,15 +287,15 @@
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, input_object.clone());
+    <span class="kw">let </span>input_object = init_input_object_type(ident.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, input_object);
 
     <span class="kw">let </span>filtered_fields = filter_unchecked_create_fields(model, parent_field);
     <span class="kw">let </span>field_mapper = CreateDataInputFieldMapper::new_unchecked();
     <span class="kw">let </span>input_fields = field_mapper.map_all(ctx, <span class="kw-2">&amp;</span>filtered_fields);
 
-    input_object.set_fields(input_fields);
-    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
+    ctx.db[id].set_fields(input_fields);
+    id
 }
 
 <span class="doccomment">/// Filters the given model&#39;s fields down to the allowed ones for checked create.

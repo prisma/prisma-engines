@@ -100,7 +100,6 @@
 <a href="#100" id="100">100</a>
 <a href="#101" id="101">101</a>
 <a href="#102" id="102">102</a>
-<a href="#103" id="103">103</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::fields::data_input_mapper::<span class="kw-2">*</span>;
 <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>constants::args;
@@ -122,13 +121,13 @@
 }
 
 <span class="doccomment">/// Builds &quot;&lt;x&gt;UpdateManyMutationInput&quot; input object type.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>checked_update_many_input_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; InputObjectTypeWeakRef {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>checked_update_many_input_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; InputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::CheckedUpdateManyInput(model.clone()));
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, input_object.clone());
+    <span class="kw">let </span>input_object = init_input_object_type(ident.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, input_object);
 
     <span class="kw">let </span>filtered_fields: Vec&lt;<span class="kw">_</span>&gt; = update_one_objects::filter_checked_update_fields(ctx, model, <span class="prelude-val">None</span>)
         .into_iter()
@@ -137,9 +136,8 @@
 
     <span class="kw">let </span>field_mapper = UpdateDataInputFieldMapper::new_checked();
     <span class="kw">let </span>input_fields = field_mapper.map_all(ctx, <span class="kw-2">&amp;</span>filtered_fields);
-
-    input_object.set_fields(input_fields);
-    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
+    ctx.db[id].set_fields(input_fields);
+    id
 }
 
 <span class="doccomment">/// Builds &quot;&lt;x&gt;UncheckedUpdateManyWithout&lt;y&gt;MutationInput&quot; input object type
@@ -147,7 +145,7 @@
     ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     model: <span class="kw-2">&amp;</span>ModelRef,
     parent_field: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>RelationFieldRef&gt;,
-) -&gt; InputObjectTypeWeakRef {
+) -&gt; InputObjectTypeId {
     <span class="comment">// TODO: This leads to conflicting type names.
     // TODO: See https://github.com/prisma/prisma/issues/18534 for further details.
     </span><span class="kw">let </span>name = <span class="kw">match </span>parent_field {
@@ -163,8 +161,8 @@
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, input_object.clone());
+    <span class="kw">let </span>input_object = init_input_object_type(ident.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, input_object);
 
     <span class="kw">let </span>filtered_fields: Vec&lt;<span class="kw">_</span>&gt; = update_one_objects::filter_unchecked_update_fields(ctx, model, parent_field)
         .into_iter()
@@ -173,9 +171,8 @@
 
     <span class="kw">let </span>field_mapper = UpdateDataInputFieldMapper::new_unchecked();
     <span class="kw">let </span>input_fields = field_mapper.map_all(ctx, <span class="kw-2">&amp;</span>filtered_fields);
-
-    input_object.set_fields(input_fields);
-    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
+    ctx.db[id].set_fields(input_fields);
+    id
 }
 
 <span class="doccomment">/// Builds &quot;&lt;x&gt;UpdateManyWithWhereWithout&lt;y&gt;Input&quot; input object type.
@@ -183,26 +180,27 @@
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update_many_where_combination_object(
     ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     parent_field: <span class="kw-2">&amp;</span>RelationFieldRef,
-) -&gt; InputObjectTypeWeakRef {
+) -&gt; InputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::UpdateManyWhereCombinationInput(
         parent_field.related_field(),
     ));
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, input_object.clone());
+    <span class="kw">let </span>input_object = init_input_object_type(ident.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, input_object);
 
     <span class="kw">let </span>related_model = parent_field.related_model();
     <span class="kw">let </span>where_input_object = filter_objects::scalar_filter_object_type(ctx, <span class="kw-2">&amp;</span>related_model, <span class="bool-val">false</span>);
     <span class="kw">let </span>update_types = update_many_input_types(ctx, <span class="kw-2">&amp;</span>related_model, <span class="prelude-val">Some</span>(parent_field));
 
-    input_object.set_fields(<span class="macro">vec!</span>[
+    <span class="kw">let </span>fields = <span class="macro">vec!</span>[
         input_field(ctx, args::WHERE, InputType::object(where_input_object), <span class="prelude-val">None</span>),
         input_field(ctx, args::DATA, update_types, <span class="prelude-val">None</span>),
-    ]);
+    ];
 
-    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="schema_builder" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>

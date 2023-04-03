@@ -85,20 +85,16 @@
 <a href="#85" id="85">85</a>
 <a href="#86" id="86">86</a>
 <a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
-<a href="#90" id="90">90</a>
-</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::constants::aggregations::<span class="kw-2">*</span>;
-
-<span class="kw">use super</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::constants::aggregations::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::convert::identity;
 
 <span class="doccomment">/// Builds plain aggregation object type for given model (e.g. AggregateUser).
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>aggregation_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; ObjectTypeWeakRef {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>aggregation_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; OutputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;Aggregate{}&quot;</span>, capitalize(model.name())));
     <span class="macro">return_cached_output!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let </span>object = ObjectTypeStrongRef::new(ObjectType::new(ident.clone(), <span class="prelude-val">Some</span>(model.id)));
+    <span class="kw">let </span>object = ObjectType::new(ident.clone(), <span class="prelude-val">Some</span>(model.id));
     <span class="kw">let </span><span class="kw-2">mut </span>object_fields = <span class="macro">vec!</span>[];
 
     <span class="kw">let </span>non_list_nor_json_fields = collect_non_list_nor_json_fields(<span class="kw-2">&amp;</span>model.into());
@@ -174,9 +170,7 @@
     );
 
     object.set_fields(object_fields);
-    ctx.cache_output_type(ident, ObjectTypeStrongRef::clone(<span class="kw-2">&amp;</span>object));
-
-    ObjectTypeStrongRef::downgrade(<span class="kw-2">&amp;</span>object)
+    ctx.cache_output_type(ident, object)
 }
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="schema_builder" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>

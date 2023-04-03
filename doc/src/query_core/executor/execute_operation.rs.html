@@ -262,6 +262,23 @@
 <a href="#262" id="262">262</a>
 <a href="#263" id="263">263</a>
 <a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::pipeline::QueryPipeline;
 <span class="kw">use crate</span>::{
     executor::request_context, protocol::EngineProtocol, CoreError, IrSerializer, Operation, QueryGraph,
@@ -272,7 +289,7 @@
 <span class="kw">use </span>query_engine_metrics::{
     histogram, increment_counter, metrics, PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, PRISMA_CLIENT_QUERIES_TOTAL,
 };
-<span class="kw">use </span>schema::QuerySchemaRef;
+<span class="kw">use </span>schema::{QuerySchema, QuerySchemaRef};
 <span class="kw">use </span>std::time::{Duration, Instant};
 <span class="kw">use </span>tracing::Instrument;
 <span class="kw">use </span>tracing_futures::WithSubscriber;
@@ -285,8 +302,8 @@
 ) -&gt; <span class="kw">crate</span>::Result&lt;ResponseData&gt; {
     <span class="kw">let </span>operation_timer = Instant::now();
 
-    <span class="kw">let </span>(graph, serializer) = build_graph(query_schema, operation.clone())<span class="question-mark">?</span>;
-    <span class="kw">let </span>result = execute_on(conn, graph, serializer, trace_id).<span class="kw">await</span>;
+    <span class="kw">let </span>(graph, serializer) = build_graph(query_schema.clone(), operation.clone())<span class="question-mark">?</span>;
+    <span class="kw">let </span>result = execute_on(conn, graph, serializer, query_schema.as_ref(), trace_id).<span class="kw">await</span>;
 
     <span class="macro">histogram!</span>(PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, operation_timer.elapsed());
 
@@ -308,7 +325,7 @@
 
     <span class="kw">for </span>(i, (graph, serializer)) <span class="kw">in </span>queries.into_iter().enumerate() {
         <span class="kw">let </span>operation_timer = Instant::now();
-        <span class="kw">let </span>result = execute_on(conn, graph, serializer, trace_id.clone()).<span class="kw">await</span>;
+        <span class="kw">let </span>result = execute_on(conn, graph, serializer, query_schema.as_ref(), trace_id.clone()).<span class="kw">await</span>;
         <span class="macro">histogram!</span>(PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, operation_timer.elapsed());
 
         <span class="kw">match </span>result {
@@ -417,9 +434,9 @@
         )
         .<span class="kw">await
     </span>} <span class="kw">else </span>{
-        <span class="kw">let </span>(graph, serializer) = build_graph(query_schema, operation)<span class="question-mark">?</span>;
+        <span class="kw">let </span>(graph, serializer) = build_graph(query_schema.clone(), operation)<span class="question-mark">?</span>;
 
-        execute_self_contained_without_retry(conn, graph, serializer, force_transactions, trace_id).<span class="kw">await
+        execute_self_contained_without_retry(conn, graph, serializer, force_transactions, <span class="kw-2">&amp;</span>query_schema, trace_id).<span class="kw">await
     </span>};
 
     <span class="macro">histogram!</span>(PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, operation_timer.elapsed());
@@ -432,13 +449,14 @@
     graph: QueryGraph,
     serializer: IrSerializer,
     force_transactions: bool,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;ResponseData&gt; {
     <span class="kw">if </span>force_transactions || graph.needs_transaction() {
-        <span class="kw">return </span>execute_in_tx(<span class="kw-2">&amp;mut </span>conn, graph, serializer, trace_id).<span class="kw">await</span>;
+        <span class="kw">return </span>execute_in_tx(<span class="kw-2">&amp;mut </span>conn, graph, serializer, query_schema, trace_id).<span class="kw">await</span>;
     }
 
-    execute_on(conn.as_connection_like(), graph, serializer, trace_id).<span class="kw">await
+    execute_on(conn.as_connection_like(), graph, serializer, query_schema, trace_id).<span class="kw">await
 </span>}
 
 <span class="comment">// As suggested by the MongoDB documentation
@@ -459,7 +477,7 @@
     <span class="kw">let </span>(graph, serializer) = build_graph(query_schema.clone(), operation.clone())<span class="question-mark">?</span>;
 
     <span class="kw">if </span>force_transactions || graph.needs_transaction() {
-        <span class="kw">let </span>res = execute_in_tx(conn, graph, serializer, trace_id.clone()).<span class="kw">await</span>;
+        <span class="kw">let </span>res = execute_in_tx(conn, graph, serializer, query_schema.as_ref(), trace_id.clone()).<span class="kw">await</span>;
 
         <span class="kw">if </span>!is_transient_error(<span class="kw-2">&amp;</span>res) {
             <span class="kw">return </span>res;
@@ -467,7 +485,7 @@
 
         <span class="kw">loop </span>{
             <span class="kw">let </span>(graph, serializer) = build_graph(query_schema.clone(), operation.clone())<span class="question-mark">?</span>;
-            <span class="kw">let </span>res = execute_in_tx(conn, graph, serializer, trace_id.clone()).<span class="kw">await</span>;
+            <span class="kw">let </span>res = execute_in_tx(conn, graph, serializer, query_schema.as_ref(), trace_id.clone()).<span class="kw">await</span>;
 
             <span class="kw">if </span>is_transient_error(<span class="kw-2">&amp;</span>res) &amp;&amp; retry_timeout.elapsed() &lt; MAX_TX_TIMEOUT_RETRY_LIMIT {
                 tokio::time::sleep(TX_RETRY_BACKOFF).<span class="kw">await</span>;
@@ -477,7 +495,14 @@
             }
         }
     } <span class="kw">else </span>{
-        execute_on(conn.as_connection_like(), graph, serializer, trace_id).<span class="kw">await
+        execute_on(
+            conn.as_connection_like(),
+            graph,
+            serializer,
+            query_schema.as_ref(),
+            trace_id,
+        )
+        .<span class="kw">await
     </span>}
 }
 
@@ -485,10 +510,18 @@
     conn: <span class="kw-2">&amp;mut </span>Box&lt;<span class="kw">dyn </span>Connection&gt;,
     graph: QueryGraph,
     serializer: IrSerializer,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;ResponseData&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>tx = conn.start_transaction(<span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="kw">let </span>result = execute_on(tx.as_connection_like(), graph, serializer, trace_id.clone()).<span class="kw">await</span>;
+    <span class="kw">let </span>result = execute_on(
+        tx.as_connection_like(),
+        graph,
+        serializer,
+        query_schema,
+        trace_id.clone(),
+    )
+    .<span class="kw">await</span>;
 
     <span class="kw">if </span>result.is_ok() {
         tx.commit().<span class="kw">await</span><span class="question-mark">?</span>;
@@ -504,13 +537,14 @@
     conn: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>ConnectionLike,
     graph: QueryGraph,
     serializer: IrSerializer,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;ResponseData&gt; {
     <span class="macro">increment_counter!</span>(PRISMA_CLIENT_QUERIES_TOTAL);
 
     <span class="kw">let </span>interpreter = QueryInterpreter::new(conn);
     QueryPipeline::new(graph, interpreter, serializer)
-        .execute(trace_id)
+        .execute(query_schema, trace_id)
         .<span class="kw">await
 </span>}
 

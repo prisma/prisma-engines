@@ -111,34 +111,32 @@
 <a href="#111" id="111">111</a>
 <a href="#112" id="112">112</a>
 <a href="#113" id="113">113</a>
-<a href="#114" id="114">114</a>
-<a href="#115" id="115">115</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub enum </span>DmmfObjectRenderer {
-    Input(InputObjectTypeWeakRef),
-    Output(ObjectTypeWeakRef),
+    Input(InputObjectTypeId),
+    Output(OutputObjectTypeId),
 }
 
 <span class="kw">impl </span>Renderer <span class="kw">for </span>DmmfObjectRenderer {
     <span class="kw">fn </span>render(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>RenderContext) {
         <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self </span>{
             DmmfObjectRenderer::Input(input) =&gt; {
-                <span class="kw">let </span>input_object = input.into_arc();
+                <span class="kw">let </span>input_object = <span class="kw-2">&amp;</span>ctx.query_schema.db[<span class="kw-2">*</span>input];
 
                 <span class="kw">match </span><span class="kw-2">&amp;</span>input_object.tag {
                     <span class="prelude-val">Some</span>(ObjectTag::FieldRefType(<span class="kw">_</span>)) =&gt; <span class="self">self</span>.render_field_ref_type(input_object, ctx),
                     <span class="kw">_ </span>=&gt; <span class="self">self</span>.render_input_object(input_object, ctx),
                 }
             }
-            DmmfObjectRenderer::Output(output) =&gt; <span class="self">self</span>.render_output_object(output, ctx),
+            DmmfObjectRenderer::Output(output) =&gt; <span class="self">self</span>.render_output_object(<span class="kw-2">&amp;</span>ctx.query_schema.db[<span class="kw-2">*</span>output], ctx),
         }
     }
 }
 
 <span class="kw">impl </span>DmmfObjectRenderer {
-    <span class="kw">fn </span>render_input_object(<span class="kw-2">&amp;</span><span class="self">self</span>, input_object: InputObjectTypeStrongRef, ctx: <span class="kw-2">&amp;mut </span>RenderContext) {
+    <span class="kw">fn </span>render_input_object(<span class="kw-2">&amp;</span><span class="self">self</span>, input_object: <span class="kw-2">&amp;</span>InputObjectType, ctx: <span class="kw-2">&amp;mut </span>RenderContext) {
         <span class="kw">if </span>ctx.already_rendered(<span class="kw-2">&amp;</span>input_object.identifier) {
             <span class="kw">return</span>;
         }
@@ -174,7 +172,7 @@
         ctx.add_input_type(input_object.identifier.clone(), input_type);
     }
 
-    <span class="kw">fn </span>render_field_ref_type(<span class="kw-2">&amp;</span><span class="self">self</span>, input_object: InputObjectTypeStrongRef, ctx: <span class="kw-2">&amp;mut </span>RenderContext) {
+    <span class="kw">fn </span>render_field_ref_type(<span class="kw-2">&amp;</span><span class="self">self</span>, input_object: <span class="kw-2">&amp;</span>InputObjectType, ctx: <span class="kw-2">&amp;mut </span>RenderContext) {
         <span class="kw">if </span>ctx.already_rendered(<span class="kw-2">&amp;</span>input_object.identifier) {
             <span class="kw">return</span>;
         }
@@ -203,9 +201,7 @@
         ctx.add_field_ref_type(input_object.identifier.clone(), field_ref_type);
     }
 
-    <span class="kw">fn </span>render_output_object(<span class="kw-2">&amp;</span><span class="self">self</span>, output_object: <span class="kw-2">&amp;</span>ObjectTypeWeakRef, ctx: <span class="kw-2">&amp;mut </span>RenderContext) {
-        <span class="kw">let </span>output_object = output_object.into_arc();
-
+    <span class="kw">fn </span>render_output_object(<span class="kw-2">&amp;</span><span class="self">self</span>, output_object: <span class="kw-2">&amp;</span>ObjectType, ctx: <span class="kw-2">&amp;mut </span>RenderContext) {
         <span class="kw">if </span>ctx.already_rendered(<span class="kw-2">&amp;</span>output_object.identifier) {
             <span class="kw">return</span>;
         }

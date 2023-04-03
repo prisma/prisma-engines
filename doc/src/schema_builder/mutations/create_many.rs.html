@@ -110,9 +110,6 @@
 <a href="#110" id="110">110</a>
 <a href="#111" id="111">111</a>
 <a href="#112" id="112">112</a>
-<a href="#113" id="113">113</a>
-<a href="#114" id="114">114</a>
-<a href="#115" id="115">115</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     constants::args,
     field, init_input_object_type, input_field,
@@ -126,10 +123,8 @@
 <span class="kw">use </span>prisma_models::{ModelRef, RelationFieldRef};
 <span class="kw">use </span>psl::datamodel_connector::ConnectorCapability;
 <span class="kw">use </span>schema::{
-    Identifier, IdentifierType, InputField, InputObjectTypeWeakRef, InputType, OutputField, OutputType, QueryInfo,
-    QueryTag,
+    Identifier, IdentifierType, InputField, InputObjectTypeId, InputType, OutputField, OutputType, QueryInfo, QueryTag,
 };
-<span class="kw">use </span>std::sync::Arc;
 
 <span class="doccomment">/// Builds a create many mutation field (e.g. createManyUsers) for given model.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_many(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;OutputField&gt; {
@@ -173,7 +168,7 @@
     ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     model: <span class="kw-2">&amp;</span>ModelRef,
     parent_field: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>RelationFieldRef&gt;,
-) -&gt; InputObjectTypeWeakRef {
+) -&gt; InputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::CreateManyInput(
         model.clone(),
         parent_field.map(|pf| pf.related_field()),
@@ -181,15 +176,14 @@
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, input_object.clone());
+    <span class="kw">let </span>input_object = init_input_object_type(ident.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, input_object);
 
     <span class="kw">let </span>filtered_fields = filter_create_many_fields(ctx, model, parent_field);
     <span class="kw">let </span>field_mapper = CreateDataInputFieldMapper::new_checked();
     <span class="kw">let </span>input_fields = field_mapper.map_all(ctx, <span class="kw-2">&amp;</span>filtered_fields);
-
-    input_object.set_fields(input_fields);
-    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
+    ctx.db[id].set_fields(input_fields);
+    id
 }
 
 <span class="doccomment">/// Filters the given model&#39;s fields down to the allowed ones for checked create.

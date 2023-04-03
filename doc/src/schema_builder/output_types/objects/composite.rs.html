@@ -32,7 +32,6 @@
 <a href="#32" id="32">32</a>
 <a href="#33" id="33">33</a>
 <a href="#34" id="34">34</a>
-<a href="#35" id="35">35</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(clippy::unnecessary_to_owned)]
 
 </span><span class="kw">use super</span>::<span class="kw-2">*</span>;
@@ -43,7 +42,7 @@
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>initialize_cache(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) {
     <span class="kw">for </span>composite <span class="kw">in </span>ctx.internal_data_model.composite_types() {
         <span class="kw">let </span>ident = Identifier::new_model(composite.name().to_owned());
-        ctx.cache_output_type(ident.clone(), Arc::new(ObjectType::new(ident, <span class="prelude-val">None</span>)));
+        ctx.cache_output_type(ident.clone(), ObjectType::new(ident, <span class="prelude-val">None</span>));
     }
 }
 
@@ -51,13 +50,12 @@
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>initialize_fields(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) {
     <span class="kw">for </span>composite <span class="kw">in </span>ctx.internal_data_model.composite_types() {
         <span class="kw">let </span>fields = compute_composite_object_type_fields(ctx, <span class="kw-2">&amp;</span>composite);
-        <span class="kw">let </span>obj: ObjectTypeWeakRef = map_type(ctx, <span class="kw-2">&amp;</span>composite);
-
-        obj.into_arc().set_fields(fields);
+        <span class="kw">let </span>obj = map_type(ctx, <span class="kw-2">&amp;</span>composite);
+        ctx.db[obj].set_fields(fields);
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, ct: <span class="kw-2">&amp;</span>CompositeType) -&gt; ObjectTypeWeakRef {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, ct: <span class="kw-2">&amp;</span>CompositeType) -&gt; OutputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_model(ct.name().to_owned());
     ctx.get_output_type(<span class="kw-2">&amp;</span>ident)
         .expect(<span class="string">&quot;Invariant violation: Initialized output object type for each composite.&quot;</span>)

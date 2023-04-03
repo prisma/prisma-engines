@@ -661,6 +661,53 @@
 <a href="#661" id="661">661</a>
 <a href="#662" id="662">662</a>
 <a href="#663" id="663">663</a>
+<a href="#664" id="664">664</a>
+<a href="#665" id="665">665</a>
+<a href="#666" id="666">666</a>
+<a href="#667" id="667">667</a>
+<a href="#668" id="668">668</a>
+<a href="#669" id="669">669</a>
+<a href="#670" id="670">670</a>
+<a href="#671" id="671">671</a>
+<a href="#672" id="672">672</a>
+<a href="#673" id="673">673</a>
+<a href="#674" id="674">674</a>
+<a href="#675" id="675">675</a>
+<a href="#676" id="676">676</a>
+<a href="#677" id="677">677</a>
+<a href="#678" id="678">678</a>
+<a href="#679" id="679">679</a>
+<a href="#680" id="680">680</a>
+<a href="#681" id="681">681</a>
+<a href="#682" id="682">682</a>
+<a href="#683" id="683">683</a>
+<a href="#684" id="684">684</a>
+<a href="#685" id="685">685</a>
+<a href="#686" id="686">686</a>
+<a href="#687" id="687">687</a>
+<a href="#688" id="688">688</a>
+<a href="#689" id="689">689</a>
+<a href="#690" id="690">690</a>
+<a href="#691" id="691">691</a>
+<a href="#692" id="692">692</a>
+<a href="#693" id="693">693</a>
+<a href="#694" id="694">694</a>
+<a href="#695" id="695">695</a>
+<a href="#696" id="696">696</a>
+<a href="#697" id="697">697</a>
+<a href="#698" id="698">698</a>
+<a href="#699" id="699">699</a>
+<a href="#700" id="700">700</a>
+<a href="#701" id="701">701</a>
+<a href="#702" id="702">702</a>
+<a href="#703" id="703">703</a>
+<a href="#704" id="704">704</a>
+<a href="#705" id="705">705</a>
+<a href="#706" id="706">706</a>
+<a href="#707" id="707">707</a>
+<a href="#708" id="708">708</a>
+<a href="#709" id="709">709</a>
+<a href="#710" id="710">710</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     constants::custom_types, protocol::EngineProtocol, CoreError, QueryResult, RecordAggregations, RecordSelection,
@@ -701,10 +748,13 @@
     result: QueryResult,
     field: <span class="kw-2">&amp;</span>OutputFieldRef,
     is_list: bool,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
 ) -&gt; <span class="kw">crate</span>::Result&lt;CheckedItemsWithParents&gt; {
     <span class="kw">match </span>result {
-        QueryResult::RecordSelection(rs) =&gt; serialize_record_selection(<span class="kw-2">*</span>rs, field, <span class="kw-2">&amp;</span>field.field_type, is_list),
-        QueryResult::RecordAggregations(ras) =&gt; serialize_aggregations(field, ras),
+        QueryResult::RecordSelection(rs) =&gt; {
+            serialize_record_selection(<span class="kw-2">*</span>rs, field, <span class="kw-2">&amp;</span>field.field_type, is_list, query_schema)
+        }
+        QueryResult::RecordAggregations(ras) =&gt; serialize_aggregations(field, ras, query_schema),
         QueryResult::Count(c) =&gt; {
             <span class="comment">// Todo needs a real implementation or needs to move to RecordAggregation
             </span><span class="kw">let </span><span class="kw-2">mut </span>map: Map = IndexMap::with_capacity(<span class="number">1</span>);
@@ -724,9 +774,10 @@
 <span class="kw">fn </span>serialize_aggregations(
     output_field: <span class="kw-2">&amp;</span>OutputFieldRef,
     record_aggregations: RecordAggregations,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
 ) -&gt; <span class="kw">crate</span>::Result&lt;CheckedItemsWithParents&gt; {
     <span class="kw">let </span>ordering = record_aggregations.selection_order;
-    <span class="kw">let </span>aggregate_object_type = extract_aggregate_object_type(output_field.field_type.borrow());
+    <span class="kw">let </span>aggregate_object_type = extract_aggregate_object_type(output_field.field_type.borrow(), query_schema);
 
     <span class="kw">let </span><span class="kw-2">mut </span>results = <span class="macro">vec!</span>[];
 
@@ -737,7 +788,10 @@
             <span class="kw">match </span>result {
                 AggregationResult::Field(field, value) =&gt; {
                     <span class="kw">let </span>output_field = aggregate_object_type.find_field(field.name()).unwrap();
-                    flattened.insert(field.name().to_owned(), serialize_scalar(<span class="kw-2">&amp;</span>output_field, value)<span class="question-mark">?</span>);
+                    flattened.insert(
+                        field.name().to_owned(),
+                        serialize_scalar(<span class="kw-2">&amp;</span>output_field, value, query_schema)<span class="question-mark">?</span>,
+                    );
                 }
 
                 AggregationResult::Count(field, count) =&gt; {
@@ -749,38 +803,62 @@
                 }
 
                 AggregationResult::Average(field, value) =&gt; {
-                    <span class="kw">let </span>output_field =
-                        find_nested_aggregate_output_field(<span class="kw-2">&amp;</span>aggregate_object_type, UNDERSCORE_AVG, field.name());
+                    <span class="kw">let </span>output_field = find_nested_aggregate_output_field(
+                        aggregate_object_type,
+                        UNDERSCORE_AVG,
+                        field.name(),
+                        query_schema,
+                    );
                     flattened.insert(
                         <span class="macro">format!</span>(<span class="string">&quot;_avg_{}&quot;</span>, field.name()),
-                        serialize_scalar(<span class="kw-2">&amp;</span>output_field, value)<span class="question-mark">?</span>,
+                        serialize_scalar(<span class="kw-2">&amp;</span>output_field, value, query_schema)<span class="question-mark">?</span>,
                     );
                 }
 
                 AggregationResult::Sum(field, value) =&gt; {
-                    <span class="kw">let </span>output_field =
-                        find_nested_aggregate_output_field(<span class="kw-2">&amp;</span>aggregate_object_type, UNDERSCORE_SUM, field.name());
+                    <span class="kw">let </span>output_field = find_nested_aggregate_output_field(
+                        aggregate_object_type,
+                        UNDERSCORE_SUM,
+                        field.name(),
+                        query_schema,
+                    );
                     flattened.insert(
                         <span class="macro">format!</span>(<span class="string">&quot;_sum_{}&quot;</span>, field.name()),
-                        serialize_scalar(<span class="kw-2">&amp;</span>output_field, value)<span class="question-mark">?</span>,
+                        serialize_scalar(<span class="kw-2">&amp;</span>output_field, value, query_schema)<span class="question-mark">?</span>,
                     );
                 }
 
                 AggregationResult::Min(field, value) =&gt; {
-                    <span class="kw">let </span>output_field =
-                        find_nested_aggregate_output_field(<span class="kw-2">&amp;</span>aggregate_object_type, UNDERSCORE_MIN, field.name());
+                    <span class="kw">let </span>output_field = find_nested_aggregate_output_field(
+                        aggregate_object_type,
+                        UNDERSCORE_MIN,
+                        field.name(),
+                        query_schema,
+                    );
                     flattened.insert(
                         <span class="macro">format!</span>(<span class="string">&quot;_min_{}&quot;</span>, field.name()),
-                        serialize_scalar(<span class="kw-2">&amp;</span>output_field, coerce_non_numeric(value, <span class="kw-2">&amp;</span>output_field.field_type))<span class="question-mark">?</span>,
+                        serialize_scalar(
+                            <span class="kw-2">&amp;</span>output_field,
+                            coerce_non_numeric(value, <span class="kw-2">&amp;</span>output_field.field_type),
+                            query_schema,
+                        )<span class="question-mark">?</span>,
                     );
                 }
 
                 AggregationResult::Max(field, value) =&gt; {
-                    <span class="kw">let </span>output_field =
-                        find_nested_aggregate_output_field(<span class="kw-2">&amp;</span>aggregate_object_type, UNDERSCORE_MAX, field.name());
+                    <span class="kw">let </span>output_field = find_nested_aggregate_output_field(
+                        aggregate_object_type,
+                        UNDERSCORE_MAX,
+                        field.name(),
+                        query_schema,
+                    );
                     flattened.insert(
                         <span class="macro">format!</span>(<span class="string">&quot;_max_{}&quot;</span>, field.name()),
-                        serialize_scalar(<span class="kw-2">&amp;</span>output_field, coerce_non_numeric(value, <span class="kw-2">&amp;</span>output_field.field_type))<span class="question-mark">?</span>,
+                        serialize_scalar(
+                            <span class="kw-2">&amp;</span>output_field,
+                            coerce_non_numeric(value, <span class="kw-2">&amp;</span>output_field.field_type),
+                            query_schema,
+                        )<span class="question-mark">?</span>,
                     );
                 }
             }
@@ -851,23 +929,24 @@
     }
 }
 
-<span class="kw">fn </span>extract_aggregate_object_type(output_type: <span class="kw-2">&amp;</span>OutputType) -&gt; ObjectTypeStrongRef {
+<span class="kw">fn </span>extract_aggregate_object_type&lt;<span class="lifetime">&#39;a</span>&gt;(output_type: <span class="kw-2">&amp;</span>OutputType, query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ObjectType {
     <span class="kw">match </span>output_type {
-        OutputType::Object(obj) =&gt; obj.into_arc(),
-        OutputType::List(inner) =&gt; extract_aggregate_object_type(inner),
+        OutputType::Object(obj) =&gt; <span class="kw-2">&amp;</span>query_schema.db[<span class="kw-2">*</span>obj],
+        OutputType::List(inner) =&gt; extract_aggregate_object_type(inner, query_schema),
         <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Aggregate output must be a list or an object.&quot;</span>),
     }
 }
 
 <span class="comment">// Workaround until we streamline serialization.
 </span><span class="kw">fn </span>find_nested_aggregate_output_field(
-    object_type: <span class="kw-2">&amp;</span>ObjectTypeStrongRef,
+    object_type: <span class="kw-2">&amp;</span>ObjectType,
     nested_obj_name: <span class="kw-2">&amp;</span>str,
     nested_field_name: <span class="kw-2">&amp;</span>str,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
 ) -&gt; OutputFieldRef {
     <span class="kw">let </span>nested_field = object_type.find_field(nested_obj_name).unwrap();
     <span class="kw">let </span>nested_object_type = <span class="kw">match </span>nested_field.field_type.borrow() {
-        OutputType::Object(obj) =&gt; obj.into_arc(),
+        OutputType::Object(obj) =&gt; <span class="kw-2">&amp;</span>query_schema.db[<span class="kw-2">*</span>obj],
         <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;{} output must be an object.&quot;</span>, nested_obj_name),
     };
 
@@ -886,13 +965,14 @@
     field: <span class="kw-2">&amp;</span>OutputFieldRef,
     typ: <span class="kw-2">&amp;</span>OutputTypeRef, <span class="comment">// We additionally pass the type to allow recursing into nested type definitions of a field.
     </span>is_list: bool,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
 ) -&gt; <span class="kw">crate</span>::Result&lt;CheckedItemsWithParents&gt; {
     <span class="kw">let </span>name = record_selection.name.clone();
 
     <span class="kw">match </span>typ.borrow() {
-        OutputType::List(inner) =&gt; serialize_record_selection(record_selection, field, inner, <span class="bool-val">true</span>),
+        OutputType::List(inner) =&gt; serialize_record_selection(record_selection, field, inner, <span class="bool-val">true</span>, query_schema),
         OutputType::Object(obj) =&gt; {
-            <span class="kw">let </span>result = serialize_objects(record_selection, obj.into_arc())<span class="question-mark">?</span>;
+            <span class="kw">let </span>result = serialize_objects(record_selection, <span class="kw-2">&amp;</span>query_schema.db[<span class="kw-2">*</span>obj], query_schema)<span class="question-mark">?</span>;
             <span class="kw">let </span>is_optional = field.is_nullable;
 
             <span class="comment">// Items will be ref&#39;ed on the top level to allow cheap clones in nested scenarios.
@@ -948,14 +1028,16 @@
 /// Returns a vector of serialized objects (as Item::Map), grouped into a map by parent, if present.
 </span><span class="kw">fn </span>serialize_objects(
     <span class="kw-2">mut </span>result: RecordSelection,
-    typ: ObjectTypeStrongRef,
+    typ: <span class="kw-2">&amp;</span>ObjectType,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
 ) -&gt; <span class="kw">crate</span>::Result&lt;UncheckedItemsWithParents&gt; {
     <span class="comment">// The way our query execution works, we only need to look at nested + lists if we hit an object.
     // Move nested out of result for separate processing.
     </span><span class="kw">let </span>nested = std::mem::take(<span class="kw-2">&amp;mut </span>result.nested);
 
     <span class="comment">// { &lt;nested field name&gt; -&gt; { parent ID -&gt; items } }
-    </span><span class="kw">let </span><span class="kw-2">mut </span>nested_mapping: HashMap&lt;String, CheckedItemsWithParents&gt; = process_nested_results(nested, <span class="kw-2">&amp;</span>typ)<span class="question-mark">?</span>;
+    </span><span class="kw">let </span><span class="kw-2">mut </span>nested_mapping: HashMap&lt;String, CheckedItemsWithParents&gt; =
+        process_nested_results(nested, typ, query_schema)<span class="question-mark">?</span>;
 
     <span class="comment">// We need the Arcs to solve the issue where we have multiple parents claiming the same data (we want to move the data out of the nested structure
     // to prevent expensive copying during serialization).
@@ -988,11 +1070,17 @@
 
             <span class="kw">match </span>field {
                 Field::Composite(cf) =&gt; {
-                    object.insert(field.name().to_owned(), serialize_composite(cf, <span class="kw-2">&amp;</span>out_field, val)<span class="question-mark">?</span>);
+                    object.insert(
+                        field.name().to_owned(),
+                        serialize_composite(cf, <span class="kw-2">&amp;</span>out_field, val, query_schema)<span class="question-mark">?</span>,
+                    );
                 }
 
                 <span class="kw">_ if </span>!out_field.field_type.is_object() =&gt; {
-                    object.insert(field.name().to_owned(), serialize_scalar(<span class="kw-2">&amp;</span>out_field, val)<span class="question-mark">?</span>);
+                    object.insert(
+                        field.name().to_owned(),
+                        serialize_scalar(<span class="kw-2">&amp;</span>out_field, val, query_schema)<span class="question-mark">?</span>,
+                    );
                 }
 
                 <span class="kw">_ </span>=&gt; (),
@@ -1000,7 +1088,7 @@
         }
 
         <span class="comment">// Write nested results
-        </span>write_nested_items(<span class="kw-2">&amp;</span>record_id, <span class="kw-2">&amp;mut </span>nested_mapping, <span class="kw-2">&amp;mut </span>object, <span class="kw-2">&amp;</span>typ)<span class="question-mark">?</span>;
+        </span>write_nested_items(<span class="kw-2">&amp;</span>record_id, <span class="kw-2">&amp;mut </span>nested_mapping, <span class="kw-2">&amp;mut </span>object, typ)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>aggr_row = result.aggregation_rows.as_ref().map(|rows| rows.get(r_index).unwrap());
         <span class="kw">if let </span><span class="prelude-val">Some</span>(aggr_row) = aggr_row {
@@ -1048,7 +1136,7 @@
     record_id: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;SelectionResult&gt;,
     items_with_parent: <span class="kw-2">&amp;mut </span>HashMap&lt;String, CheckedItemsWithParents&gt;,
     into: <span class="kw-2">&amp;mut </span>HashMap&lt;String, Item&gt;,
-    enclosing_type: <span class="kw-2">&amp;</span>ObjectTypeStrongRef,
+    enclosing_type: <span class="kw-2">&amp;</span>ObjectType,
 ) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
     <span class="kw">for </span>(field_name, inner) <span class="kw">in </span>items_with_parent.iter_mut() {
         <span class="kw">let </span>val = inner.get(record_id);
@@ -1079,7 +1167,8 @@
 <span class="doccomment">/// Processes nested results into a more ergonomic structure of { &lt;nested field name&gt; -&gt; { parent ID -&gt; item (list, map, ...) } }.
 </span><span class="kw">fn </span>process_nested_results(
     nested: Vec&lt;QueryResult&gt;,
-    enclosing_type: <span class="kw-2">&amp;</span>ObjectTypeStrongRef,
+    enclosing_type: <span class="kw-2">&amp;</span>ObjectType,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
 ) -&gt; <span class="kw">crate</span>::Result&lt;HashMap&lt;String, CheckedItemsWithParents&gt;&gt; {
     <span class="comment">// For each nested selected field we need to map the parents to their items.
     </span><span class="kw">let </span><span class="kw-2">mut </span>nested_mapping = HashMap::with_capacity(nested.len());
@@ -1091,7 +1180,7 @@
         </span><span class="kw">if let </span>QueryResult::RecordSelection(<span class="kw-2">ref </span>rs) = nested_result {
             <span class="kw">let </span>name = rs.name.clone();
             <span class="kw">let </span>field = enclosing_type.find_field(<span class="kw-2">&amp;</span>name).unwrap();
-            <span class="kw">let </span>result = serialize_internal(nested_result, <span class="kw-2">&amp;</span>field, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>result = serialize_internal(nested_result, <span class="kw-2">&amp;</span>field, <span class="bool-val">false</span>, query_schema)<span class="question-mark">?</span>;
 
             nested_mapping.insert(name, result);
         }
@@ -1101,14 +1190,19 @@
 }
 
 <span class="comment">// Problem: order of selections
-</span><span class="kw">fn </span>serialize_composite(cf: <span class="kw-2">&amp;</span>CompositeFieldRef, out_field: <span class="kw-2">&amp;</span>OutputFieldRef, value: PrismaValue) -&gt; <span class="kw">crate</span>::Result&lt;Item&gt; {
+</span><span class="kw">fn </span>serialize_composite(
+    cf: <span class="kw-2">&amp;</span>CompositeFieldRef,
+    out_field: <span class="kw-2">&amp;</span>OutputFieldRef,
+    value: PrismaValue,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
+) -&gt; <span class="kw">crate</span>::Result&lt;Item&gt; {
     <span class="kw">match </span>value {
         PrismaValue::Null <span class="kw">if </span>!cf.is_required() =&gt; <span class="prelude-val">Ok</span>(Item::Value(PrismaValue::Null)),
 
         PrismaValue::List(values) <span class="kw">if </span>cf.is_list() =&gt; {
             <span class="kw">let </span>values = values
                 .into_iter()
-                .map(|value| serialize_composite(cf, out_field, value))
+                .map(|value| serialize_composite(cf, out_field, value, query_schema))
                 .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;();
 
             <span class="prelude-val">Ok</span>(Item::List(values<span class="question-mark">?</span>.into()))
@@ -1118,7 +1212,7 @@
             <span class="kw">let </span><span class="kw-2">mut </span>map = Map::new();
             <span class="kw">let </span>object_type = out_field
                 .field_type
-                .as_object_type()
+                .as_object_type(<span class="kw-2">&amp;</span>query_schema.db)
                 .expect(<span class="string">&quot;Composite output field is not an object.&quot;</span>);
 
             <span class="kw">let </span>composite_type = cf.typ();
@@ -1138,14 +1232,14 @@
                     Field::Composite(cf) =&gt; {
                         map.insert(
                             inner_field.name().to_owned(),
-                            serialize_composite(cf, <span class="kw-2">&amp;</span>inner_out_field, value)<span class="question-mark">?</span>,
+                            serialize_composite(cf, <span class="kw-2">&amp;</span>inner_out_field, value, query_schema)<span class="question-mark">?</span>,
                         );
                     }
 
                     <span class="kw">_ if </span>!inner_out_field.field_type.is_object() =&gt; {
                         map.insert(
                             inner_field.name().to_owned(),
-                            serialize_scalar(<span class="kw-2">&amp;</span>inner_out_field, value)<span class="question-mark">?</span>,
+                            serialize_scalar(<span class="kw-2">&amp;</span>inner_out_field, value, query_schema)<span class="question-mark">?</span>,
                         );
                     }
 
@@ -1165,10 +1259,10 @@
     }
 }
 
-<span class="kw">fn </span>serialize_scalar(field: <span class="kw-2">&amp;</span>OutputFieldRef, value: PrismaValue) -&gt; <span class="kw">crate</span>::Result&lt;Item&gt; {
+<span class="kw">fn </span>serialize_scalar(field: <span class="kw-2">&amp;</span>OutputFieldRef, value: PrismaValue, schema: <span class="kw-2">&amp;</span>QuerySchema) -&gt; <span class="kw">crate</span>::Result&lt;Item&gt; {
     <span class="kw">match </span>(<span class="kw-2">&amp;</span>value, field.field_type.as_ref()) {
         (PrismaValue::Null, <span class="kw">_</span>) <span class="kw">if </span>field.is_nullable =&gt; <span class="prelude-val">Ok</span>(Item::Value(PrismaValue::Null)),
-        (<span class="kw">_</span>, OutputType::Enum(et)) =&gt; <span class="kw">match </span><span class="kw-2">*</span>et.into_arc() {
+        (<span class="kw">_</span>, OutputType::Enum(et)) =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>schema.db[<span class="kw-2">*</span>et] {
             EnumType::Database(<span class="kw-2">ref </span>db) =&gt; convert_enum(value, db),
             <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         },
@@ -1184,7 +1278,7 @@
             OutputType::Enum(et) =&gt; {
                 <span class="kw">let </span>items = unwrap_prisma_value(value)
                     .into_iter()
-                    .map(|v| <span class="kw">match </span><span class="kw-2">*</span>et.into_arc() {
+                    .map(|v| <span class="kw">match </span><span class="kw-2">&amp;</span>schema.db[<span class="kw-2">*</span>et] {
                         EnumType::Database(<span class="kw-2">ref </span>dbt) =&gt; convert_enum(v, dbt),
                         <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
                     })

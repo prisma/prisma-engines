@@ -64,89 +64,43 @@
 <a href="#64" id="64">64</a>
 <a href="#65" id="65">65</a>
 <a href="#66" id="66">66</a>
-<a href="#67" id="67">67</a>
-<a href="#68" id="68">68</a>
-<a href="#69" id="69">69</a>
-<a href="#70" id="70">70</a>
-<a href="#71" id="71">71</a>
-<a href="#72" id="72">72</a>
-<a href="#73" id="73">73</a>
-<a href="#74" id="74">74</a>
-<a href="#75" id="75">75</a>
-<a href="#76" id="76">76</a>
-<a href="#77" id="77">77</a>
-<a href="#78" id="78">78</a>
-<a href="#79" id="79">79</a>
-<a href="#80" id="80">80</a>
-<a href="#81" id="81">81</a>
-<a href="#82" id="82">82</a>
-<a href="#83" id="83">83</a>
-<a href="#84" id="84">84</a>
-<a href="#85" id="85">85</a>
-<a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
-</pre><pre class="rust"><code><span class="doccomment">//! Every builder is required to cache input and output type refs that are created inside
-//! of them, e.g. as soon as the builder produces a ref, it must be retrievable later,
-//! without leaking memory due to Arcs pointing to each other.
+</pre><pre class="rust"><code><span class="doccomment">//! Every builder is required to cache input and output type ids that are created inside
+//! of them, e.g. as soon as the builder produces a type, it must be retrievable later.
 //!
 //! The cache has two purposes:
 //! - First, break circular dependencies, as they can happen in recursive input / output types.
 //! - Second, it serves as a central list of build types of that builder, which are used later to
 //!   collect all types of the query schema.
-//!
-//! The cached types are stored as Arcs, and the cache owns these (strong) Arcs,
-//! while the cache will only hand out weak arcs. Not only does this simplify the builder architecture,
-//! but also prevents issues with memory leaks in the schema, as well as issues that when all strong
-//! arcs are dropped due to visitor operations, the schema can&#39;t be traversed anymore due to invalid references.
-</span><span class="kw">use super</span>::<span class="kw-2">*</span>;
-<span class="kw">use </span>std::{collections::HashMap, fmt::Debug, sync::Weak};
 
-<span class="doccomment">/// Cache wrapper over Arc&lt;T&gt;.
-/// Caches keys at most once, and errors on repeated insertion of the same key
-/// to uphold schema building consistency guarantees.
+</span><span class="kw">use </span><span class="kw">super</span>::Identifier;
+<span class="kw">use </span>std::{collections::HashMap, fmt::Debug};
+
+<span class="doccomment">/// HashMap wrapper. Caches keys at most once, and errors on repeated insertion of the same key to
+/// uphold schema building consistency guarantees.
 </span><span class="attr">#[derive(Debug, Default)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TypeRefCache&lt;T&gt; {
-    cache: HashMap&lt;Identifier, usize&gt;,
-    storage: Vec&lt;Arc&lt;T&gt;&gt;,
+    cache: HashMap&lt;Identifier, T&gt;,
 }
 
-<span class="kw">impl</span>&lt;T: Debug&gt; TypeRefCache&lt;T&gt; {
+<span class="kw">impl</span>&lt;T: Copy + Debug&gt; TypeRefCache&lt;T&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>with_capacity(capacity: usize) -&gt; <span class="self">Self </span>{
         TypeRefCache {
             cache: HashMap::with_capacity(capacity),
-            storage: Vec::with_capacity(capacity),
         }
     }
 
-    <span class="comment">// Retrieves a cached Arc if present, and hands out a weak reference to the contents.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, ident: <span class="kw-2">&amp;</span>Identifier) -&gt; <span class="prelude-ty">Option</span>&lt;Weak&lt;T&gt;&gt; {
-        <span class="self">self</span>.cache.get(ident).map(|idx| Arc::downgrade(<span class="kw-2">&amp;</span><span class="self">self</span>.storage[<span class="kw-2">*</span>idx]))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, ident: <span class="kw-2">&amp;</span>Identifier) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
+        <span class="self">self</span>.cache.get(ident).copied()
     }
 
     <span class="doccomment">/// Caches given value with given identifier. Panics if the cache key already exists.
-    /// The reason is that for the query schema to work, we need weak references to be valid,
-    /// which might be violated if we insert a new arc into the cache that replaces the old one,
-    /// as it invalidates all weak refs pointing to the replaced arc, assuming that the contents
-    /// changed as well. While this restriction could be lifted by comparing the contents, it is
-    /// not required in the context of the schema builders.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ident: Identifier, value: Arc&lt;T&gt;) {
-        <span class="kw">let </span>idx = <span class="self">self</span>.storage.len();
-        <span class="self">self</span>.storage.push(value);
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(old) = <span class="self">self</span>.cache.insert(ident, idx) {
-            <span class="macro">panic!</span>(
-                <span class="string">&quot;Invariant violation: Inserted identifier twice, this is a bug and invalidates weak arc references. {old:?}&quot;
-            </span>)
+    /// The reason is that for the query schema to work, we need identifiers to be valid.
+    /// If we insert a new object into the cache that replaces the old one, the reference would be
+    /// broken.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ident: Identifier, value: T) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(old) = <span class="self">self</span>.cache.insert(ident, value) {
+            <span class="macro">panic!</span>(<span class="string">&quot;Invariant violation: Inserted identifier twice, this is a bug. {old:?}&quot;</span>)
         }
-    }
-}
-
-<span class="doccomment">/// Consumes the cache and returns all contents as vector of the cached values.
-</span><span class="attr">#[allow(clippy::from_over_into)]
-</span><span class="kw">impl</span>&lt;T&gt; Into&lt;Vec&lt;Arc&lt;T&gt;&gt;&gt; <span class="kw">for </span>TypeRefCache&lt;T&gt; {
-    <span class="kw">fn </span>into(<span class="self">self</span>) -&gt; Vec&lt;Arc&lt;T&gt;&gt; {
-        <span class="self">self</span>.storage
     }
 }
 

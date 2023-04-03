@@ -1394,13 +1394,19 @@
 <a href="#1394" id="1394">1394</a>
 <a href="#1395" id="1395">1395</a>
 <a href="#1396" id="1396">1396</a>
+<a href="#1397" id="1397">1397</a>
+<a href="#1398" id="1398">1398</a>
+<a href="#1399" id="1399">1399</a>
+<a href="#1400" id="1400">1400</a>
+<a href="#1401" id="1401">1401</a>
+<a href="#1402" id="1402">1402</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{FieldQuery, HandlerError, JsonSingleQuery, SelectionSet};
 <span class="kw">use </span>bigdecimal::{BigDecimal, FromPrimitive};
 <span class="kw">use </span>indexmap::IndexMap;
 <span class="kw">use </span>prisma_models::{decode_bytes, parse_datetime, prelude::ParentContainer, Field};
 <span class="kw">use </span>query_core::{
     constants::custom_types,
-    schema::{ObjectTypeStrongRef, OutputFieldRef, QuerySchemaRef},
+    schema::{ObjectType, OutputFieldRef, QuerySchema, QuerySchemaRef},
     ArgumentValue, Operation, Selection,
 };
 <span class="kw">use </span>serde_json::Value <span class="kw">as </span>JsonValue;
@@ -1424,7 +1430,7 @@
         <span class="kw">let </span>(operation_type, field) = <span class="self">Self</span>::find_schema_field(query_schema, model_name, action)<span class="question-mark">?</span>;
         <span class="kw">let </span>container = field.model().map(ParentContainer::from);
 
-        <span class="kw">let </span>selection = <span class="self">Self</span>::convert_selection(field, container.as_ref(), query)<span class="question-mark">?</span>;
+        <span class="kw">let </span>selection = <span class="self">Self</span>::convert_selection(field, container.as_ref(), query, query_schema)<span class="question-mark">?</span>;
 
         <span class="kw">match </span>operation_type {
             OperationType::Read =&gt; <span class="prelude-val">Ok</span>(Operation::Read(selection)),
@@ -1436,6 +1442,7 @@
         field: <span class="kw-2">&amp;</span>OutputFieldRef,
         container: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ParentContainer&gt;,
         query: FieldQuery,
+        query_schema: <span class="kw-2">&amp;</span>QuerySchemaRef,
     ) -&gt; <span class="kw">crate</span>::Result&lt;Selection&gt; {
         <span class="kw">let </span>FieldQuery {
             arguments,
@@ -1458,19 +1465,20 @@
             <span class="kw">match </span>selected {
                 <span class="comment">// $scalars: true
                 </span><span class="kw">crate</span>::SelectionSetValue::Shorthand(<span class="bool-val">true</span>) <span class="kw">if </span>SelectionSet::is_all_scalars(<span class="kw-2">&amp;</span>selection_name) =&gt; {
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>(schema_object) = field.field_type.as_object_type() {
-                        <span class="self">Self</span>::default_scalar_selection(<span class="kw-2">&amp;</span>schema_object, <span class="kw-2">&amp;mut </span>selection);
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(schema_object) = field.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db) {
+                        <span class="self">Self</span>::default_scalar_selection(schema_object, <span class="kw-2">&amp;mut </span>selection);
                     }
                 }
                 <span class="comment">// $composites: true
                 </span><span class="kw">crate</span>::SelectionSetValue::Shorthand(<span class="bool-val">true</span>) <span class="kw">if </span>SelectionSet::is_all_composites(<span class="kw-2">&amp;</span>selection_name) =&gt; {
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>(schema_object) = field.field_type.as_object_type() {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(schema_object) = field.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db) {
                         <span class="kw">if let </span><span class="prelude-val">Some</span>(container) = container {
                             <span class="self">Self</span>::default_composite_selection(
                                 <span class="kw-2">&amp;mut </span>selection,
                                 container,
-                                <span class="kw-2">&amp;</span>schema_object,
+                                schema_object,
                                 <span class="kw-2">&amp;mut </span>HashSet::&lt;String&gt;::new(),
+                                query_schema,
                             )<span class="question-mark">?</span>;
                         }
                     }
@@ -1489,7 +1497,7 @@
                 </span><span class="kw">crate</span>::SelectionSetValue::Shorthand(<span class="bool-val">false</span>) =&gt; (),
                 <span class="comment">// &lt;field_name&gt;: { selection: { ... }, arguments: { ... } }
                 </span><span class="kw">crate</span>::SelectionSetValue::Nested(nested_query) =&gt; {
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>(schema_object) = field.field_type.as_object_type() {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(schema_object) = field.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db) {
                         <span class="kw">let </span>schema_field = schema_object.find_field(<span class="kw-2">&amp;</span>selection_name).ok_or_else(|| {
                             HandlerError::query_conversion(<span class="macro">format!</span>(
                                 <span class="string">&quot;Unknown nested field &#39;{}&#39; for operation {} does not match any query.&quot;</span>,
@@ -1515,6 +1523,7 @@
                             <span class="kw-2">&amp;</span>schema_field,
                             nested_container.as_ref(),
                             nested_query,
+                            query_schema,
                         )<span class="question-mark">?</span>);
                     }
                 }
@@ -1641,7 +1650,7 @@
         }
     }
 
-    <span class="kw">fn </span>default_scalar_selection(schema_object: <span class="kw-2">&amp;</span>ObjectTypeStrongRef, selection: <span class="kw-2">&amp;mut </span>Selection) {
+    <span class="kw">fn </span>default_scalar_selection(schema_object: <span class="kw-2">&amp;</span>ObjectType, selection: <span class="kw-2">&amp;mut </span>Selection) {
         <span class="kw">for </span>scalar <span class="kw">in </span>schema_object.get_fields().iter().filter(|f| {
             f.field_type.is_scalar()
                 || f.field_type.is_scalar_list()
@@ -1655,8 +1664,9 @@
     <span class="kw">fn </span>default_composite_selection(
         selection: <span class="kw-2">&amp;mut </span>Selection,
         container: <span class="kw-2">&amp;</span>ParentContainer,
-        schema_object: <span class="kw-2">&amp;</span>ObjectTypeStrongRef,
+        schema_object: <span class="kw-2">&amp;</span>ObjectType,
         walked_types: <span class="kw-2">&amp;mut </span>HashSet&lt;String&gt;,
+        query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     ) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
         <span class="kw">match </span>container {
             ParentContainer::Model(model) =&gt; {
@@ -1669,8 +1679,9 @@
                         <span class="self">Self</span>::default_composite_selection(
                             <span class="kw-2">&amp;mut </span>nested_selection,
                             <span class="kw-2">&amp;</span>ParentContainer::from(cf.typ()),
-                            <span class="kw-2">&amp;</span>schema_field.field_type.as_object_type().unwrap(),
+                            schema_field.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db).unwrap(),
                             walked_types,
+                            query_schema,
                         )<span class="question-mark">?</span>;
 
                         selection.push_nested_selection(nested_selection);
@@ -1700,8 +1711,9 @@
                                 <span class="self">Self</span>::default_composite_selection(
                                     <span class="kw-2">&amp;mut </span>nested_selection,
                                     <span class="kw-2">&amp;</span>ParentContainer::from(cf.typ()),
-                                    <span class="kw-2">&amp;</span>schema_field.field_type.as_object_type().unwrap(),
+                                    schema_field.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db).unwrap(),
                                     walked_types,
+                                    query_schema,
                                 )<span class="question-mark">?</span>;
 
                                 selection.push_nested_selection(nested_selection);

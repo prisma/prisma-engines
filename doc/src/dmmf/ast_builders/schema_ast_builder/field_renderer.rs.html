@@ -42,9 +42,9 @@
     type_renderer::{render_input_types, render_output_type},
     DmmfInputField, DmmfOutputField, RenderContext,
 };
-<span class="kw">use </span>schema::{InputFieldRef, InputType, OutputFieldRef, ScalarType};
+<span class="kw">use </span>schema::{InputField, InputType, OutputFieldRef, ScalarType};
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render_input_field(input_field: <span class="kw-2">&amp;</span>InputFieldRef, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; DmmfInputField {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render_input_field(input_field: <span class="kw-2">&amp;</span>InputField, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; DmmfInputField {
     <span class="kw">let </span>type_references = render_input_types(input_field.field_types(ctx.query_schema), ctx);
     <span class="kw">let </span>nullable = input_field
         .field_types(ctx.query_schema)

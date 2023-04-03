@@ -127,16 +127,15 @@
 <a href="#127" id="127">127</a>
 <a href="#128" id="128">128</a>
 <a href="#129" id="129">129</a>
-<a href="#130" id="130">130</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{DmmfTypeReference, RenderContext, TypeLocation};
-<span class="kw">use </span>schema::{InputType, IntoArc, ObjectTag, OutputType, ScalarType};
+<span class="kw">use </span>schema::{InputType, ObjectTag, OutputType, ScalarType};
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render_output_type(output_type: <span class="kw-2">&amp;</span>OutputType, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; DmmfTypeReference {
     <span class="kw">match </span>output_type {
         OutputType::Object(<span class="kw-2">ref </span>obj) =&gt; {
             ctx.mark_to_be_rendered(obj);
+            <span class="kw">let </span>obj = <span class="kw-2">&amp;</span>ctx.query_schema.db[<span class="kw-2">*</span>obj];
 
-            <span class="kw">let </span>obj = obj.into_arc();
             <span class="kw">let </span>type_reference = DmmfTypeReference {
                 typ: obj.identifier.name(),
                 namespace: <span class="prelude-val">Some</span>(obj.identifier.namespace().to_string()),
@@ -148,8 +147,8 @@
         }
 
         OutputType::Enum(et) =&gt; {
-            <span class="kw">let </span>et = et.into_arc();
-            ctx.mark_to_be_rendered(<span class="kw-2">&amp;</span>et.as_ref());
+            <span class="kw">let </span>et = <span class="kw-2">&amp;</span>ctx.query_schema.db[<span class="kw-2">*</span>et];
+            ctx.mark_to_be_rendered(<span class="kw-2">&amp;</span>et);
 
             <span class="kw">let </span>ident = et.identifier();
             <span class="kw">let </span>type_reference = DmmfTypeReference {
@@ -206,8 +205,7 @@
     <span class="kw">match </span>input_type {
         InputType::Object(<span class="kw-2">ref </span>obj) =&gt; {
             ctx.mark_to_be_rendered(obj);
-
-            <span class="kw">let </span>obj = obj.into_arc();
+            <span class="kw">let </span>obj = <span class="kw-2">&amp;</span>ctx.query_schema.db[<span class="kw-2">*</span>obj];
 
             <span class="kw">let </span>location = <span class="kw">match </span><span class="kw-2">&amp;</span>obj.tag {
                 <span class="prelude-val">Some</span>(ObjectTag::FieldRefType(<span class="kw">_</span>)) =&gt; TypeLocation::FieldRefTypes,
@@ -225,8 +223,8 @@
         }
 
         InputType::Enum(et) =&gt; {
-            <span class="kw">let </span>et = et.into_arc();
-            ctx.mark_to_be_rendered(<span class="kw-2">&amp;</span>et.as_ref());
+            <span class="kw">let </span>et = <span class="kw-2">&amp;</span>ctx.query_schema.db[<span class="kw-2">*</span>et];
+            ctx.mark_to_be_rendered(<span class="kw-2">&amp;</span>et);
 
             <span class="kw">let </span>ident = et.identifier();
             <span class="kw">let </span>type_reference = DmmfTypeReference {

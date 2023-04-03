@@ -593,36 +593,6 @@
 <a href="#593" id="593">593</a>
 <a href="#594" id="594">594</a>
 <a href="#595" id="595">595</a>
-<a href="#596" id="596">596</a>
-<a href="#597" id="597">597</a>
-<a href="#598" id="598">598</a>
-<a href="#599" id="599">599</a>
-<a href="#600" id="600">600</a>
-<a href="#601" id="601">601</a>
-<a href="#602" id="602">602</a>
-<a href="#603" id="603">603</a>
-<a href="#604" id="604">604</a>
-<a href="#605" id="605">605</a>
-<a href="#606" id="606">606</a>
-<a href="#607" id="607">607</a>
-<a href="#608" id="608">608</a>
-<a href="#609" id="609">609</a>
-<a href="#610" id="610">610</a>
-<a href="#611" id="611">611</a>
-<a href="#612" id="612">612</a>
-<a href="#613" id="613">613</a>
-<a href="#614" id="614">614</a>
-<a href="#615" id="615">615</a>
-<a href="#616" id="616">616</a>
-<a href="#617" id="617">617</a>
-<a href="#618" id="618">618</a>
-<a href="#619" id="619">619</a>
-<a href="#620" id="620">620</a>
-<a href="#621" id="621">621</a>
-<a href="#622" id="622">622</a>
-<a href="#623" id="623">623</a>
-<a href="#624" id="624">624</a>
-<a href="#625" id="625">625</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{field_ref_type::WithFieldRefInputExt, objects::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
 <span class="kw">use </span>constants::{aggregations, filters};
 <span class="kw">use </span>prisma_models::{dml, CompositeFieldRef, PrismaValue};
@@ -689,30 +659,28 @@
     InputType::object(related_input_type)
 }
 
-<span class="kw">fn </span>to_many_relation_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputObjectTypeWeakRef {
+<span class="kw">fn </span>to_many_relation_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::ToManyRelationFilterInput(rf.related_model()));
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span><span class="kw-2">mut </span>object = init_input_object_type(ident.clone());
     object.set_tag(ObjectTag::RelationEnvelope);
-
-    <span class="kw">let </span>object = Arc::new(object);
-    ctx.cache_input_type(ident, object.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, object);
 
     <span class="kw">let </span>related_input_type = filter_objects::where_object_type(ctx, <span class="kw-2">&amp;</span>rf.related_model());
 
     <span class="kw">let </span>fields = <span class="macro">vec!</span>[
-        input_field(ctx, filters::EVERY, InputType::object(related_input_type.clone()), <span class="prelude-val">None</span>).optional(),
-        input_field(ctx, filters::SOME, InputType::object(related_input_type.clone()), <span class="prelude-val">None</span>).optional(),
+        input_field(ctx, filters::EVERY, InputType::object(related_input_type), <span class="prelude-val">None</span>).optional(),
+        input_field(ctx, filters::SOME, InputType::object(related_input_type), <span class="prelude-val">None</span>).optional(),
         input_field(ctx, filters::NONE, InputType::object(related_input_type), <span class="prelude-val">None</span>).optional(),
     ];
 
-    object.set_fields(fields);
-    Arc::downgrade(<span class="kw-2">&amp;</span>object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
-<span class="kw">fn </span>to_one_relation_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputObjectTypeWeakRef {
+<span class="kw">fn </span>to_one_relation_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputObjectTypeId {
     <span class="comment">// TODO: It is important to traverse the related model before going into the cache.
     // TODO: The ToOneRelationFilterInput is currently broken as it does not take nullability into account.
     // TODO: This means that the first relation field to be traversed will set the nullability for all other relation field that points to the same related model.
@@ -726,21 +694,19 @@
 
     <span class="kw">let </span><span class="kw-2">mut </span>object = init_input_object_type(ident.clone());
     object.set_tag(ObjectTag::RelationEnvelope);
-
-    <span class="kw">let </span>object = Arc::new(object);
-    ctx.cache_input_type(ident, object.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, object);
 
     <span class="kw">let </span>fields = <span class="macro">vec!</span>[
-        input_field(ctx, filters::IS, InputType::object(related_input_type.clone()), <span class="prelude-val">None</span>)
+        input_field(ctx, filters::IS, InputType::object(related_input_type), <span class="prelude-val">None</span>)
             .optional()
-            .nullable_if(!rf.is_required(), <span class="kw-2">&amp;mut </span>ctx.input_field_types),
+            .nullable_if(!rf.is_required(), <span class="kw-2">&amp;mut </span>ctx.db),
         input_field(ctx, filters::IS_NOT, InputType::object(related_input_type), <span class="prelude-val">None</span>)
             .optional()
-            .nullable_if(!rf.is_required(), <span class="kw-2">&amp;mut </span>ctx.input_field_types),
+            .nullable_if(!rf.is_required(), <span class="kw-2">&amp;mut </span>ctx.db),
     ];
 
-    object.set_fields(fields);
-    Arc::downgrade(<span class="kw-2">&amp;</span>object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 <span class="doccomment">/// Builds shorthand composite equality (`equals`) filter for to-one: `where: { composite_field: { ... } }` (no `equals` in between).
@@ -750,18 +716,14 @@
     InputType::object(equality_object_type)
 }
 
-<span class="kw">fn </span>to_one_composite_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
+<span class="kw">fn </span>to_one_composite_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::ToOneCompositeFilterInput(cf.typ(), cf.arity()));
-
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span><span class="kw-2">mut </span>object = init_input_object_type(ident.clone());
     object.require_exactly_one_field();
     object.set_tag(ObjectTag::CompositeEnvelope);
-
-    <span class="kw">let </span>object = Arc::new(object);
-
-    ctx.cache_input_type(ident, object.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, object);
 
     <span class="kw">let </span>composite_where_object = filter_objects::where_object_type(ctx, cf.typ());
     <span class="kw">let </span>composite_equals_object = filter_objects::composite_equality_object(ctx, cf);
@@ -769,39 +731,31 @@
     <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="macro">vec!</span>[
         input_field(ctx, filters::EQUALS, InputType::object(composite_equals_object), <span class="prelude-val">None</span>)
             .optional()
-            .nullable_if(!cf.is_required(), <span class="kw-2">&amp;mut </span>ctx.input_field_types),
-        input_field(
-            ctx,
-            filters::IS,
-            InputType::object(composite_where_object.clone()),
-            <span class="prelude-val">None</span>,
-        )
-        .optional()
-        .nullable_if(!cf.is_required(), <span class="kw-2">&amp;mut </span>ctx.input_field_types),
+            .nullable_if(!cf.is_required(), <span class="kw-2">&amp;mut </span>ctx.db),
+        input_field(ctx, filters::IS, InputType::object(composite_where_object), <span class="prelude-val">None</span>)
+            .optional()
+            .nullable_if(!cf.is_required(), <span class="kw-2">&amp;mut </span>ctx.db),
         input_field(ctx, filters::IS_NOT, InputType::object(composite_where_object), <span class="prelude-val">None</span>)
             .optional()
-            .nullable_if(!cf.is_required(), <span class="kw-2">&amp;mut </span>ctx.input_field_types),
+            .nullable_if(!cf.is_required(), <span class="kw-2">&amp;mut </span>ctx.db),
     ];
 
     <span class="kw">if </span>ctx.has_capability(ConnectorCapability::UndefinedType) &amp;&amp; cf.is_optional() {
         fields.push(is_set_input_field(ctx));
     }
 
-    object.set_fields(fields);
-    Arc::downgrade(<span class="kw-2">&amp;</span>object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
-<span class="kw">fn </span>to_many_composite_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
+<span class="kw">fn </span>to_many_composite_filter_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::ToManyCompositeFilterInput(cf.typ()));
-
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span><span class="kw-2">mut </span>object = init_input_object_type(ident.clone());
     object.require_exactly_one_field();
     object.set_tag(ObjectTag::CompositeEnvelope);
-
-    <span class="kw">let </span>object = Arc::new(object);
-    ctx.cache_input_type(ident, object.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, object);
 
     <span class="kw">let </span>composite_where_object = filter_objects::where_object_type(ctx, cf.typ());
     <span class="kw">let </span>composite_equals_object = filter_objects::composite_equality_object(ctx, cf);
@@ -816,20 +770,8 @@
             <span class="prelude-val">None</span>,
         )
         .optional(),
-        input_field(
-            ctx,
-            filters::EVERY,
-            InputType::object(composite_where_object.clone()),
-            <span class="prelude-val">None</span>,
-        )
-        .optional(),
-        input_field(
-            ctx,
-            filters::SOME,
-            InputType::object(composite_where_object.clone()),
-            <span class="prelude-val">None</span>,
-        )
-        .optional(),
+        input_field(ctx, filters::EVERY, InputType::object(composite_where_object), <span class="prelude-val">None</span>).optional(),
+        input_field(ctx, filters::SOME, InputType::object(composite_where_object), <span class="prelude-val">None</span>).optional(),
         input_field(ctx, filters::NONE, InputType::object(composite_where_object), <span class="prelude-val">None</span>).optional(),
         input_field(ctx, filters::IS_EMPTY, InputType::boolean(), <span class="prelude-val">None</span>).optional(),
     ];
@@ -839,11 +781,11 @@
         fields.push(is_set_input_field(ctx));
     }
 
-    object.set_fields(fields);
-    Arc::downgrade(<span class="kw-2">&amp;</span>object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
-<span class="kw">fn </span>scalar_list_filter_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; InputObjectTypeWeakRef {
+<span class="kw">fn </span>scalar_list_filter_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; InputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::ScalarListFilterInput(
         ctx.internal_data_model.clone().zip(sf.type_identifier()),
         sf.is_required(),
@@ -852,9 +794,7 @@
 
     <span class="kw">let </span><span class="kw-2">mut </span>object = init_input_object_type(ident.clone());
     object.require_exactly_one_field();
-
-    <span class="kw">let </span>object = Arc::new(object);
-    ctx.cache_input_type(ident, object.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, object);
 
     <span class="kw">let </span>mapped_nonlist_type = map_scalar_input_type(ctx, <span class="kw-2">&amp;</span>sf.type_identifier(), <span class="bool-val">false</span>);
     <span class="kw">let </span>mapped_list_type = InputType::list(mapped_nonlist_type.clone());
@@ -864,7 +804,7 @@
     fields.push(
         input_field(ctx, filters::HAS, mapped_nonlist_type_with_field_ref_input, <span class="prelude-val">None</span>)
             .optional()
-            .nullable_if(!sf.is_required(), <span class="kw-2">&amp;mut </span>ctx.input_field_types),
+            .nullable_if(!sf.is_required(), <span class="kw-2">&amp;mut </span>ctx.db),
     );
 
     <span class="kw">let </span>mapped_list_type_with_field_ref_input = mapped_list_type.with_field_ref_input(ctx);
@@ -880,8 +820,8 @@
     fields.push(input_field(ctx, filters::HAS_SOME, mapped_list_type_with_field_ref_input, <span class="prelude-val">None</span>).optional());
     fields.push(input_field(ctx, filters::IS_EMPTY, InputType::boolean(), <span class="prelude-val">None</span>).optional());
 
-    object.set_fields(fields);
-    Arc::downgrade(<span class="kw-2">&amp;</span>object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 <span class="kw">fn </span>full_scalar_filter_type(
@@ -892,7 +832,7 @@
     nullable: bool,
     nested: bool,
     include_aggregates: bool,
-) -&gt; InputObjectTypeWeakRef {
+) -&gt; InputObjectTypeId {
     <span class="kw">let </span>native_type_name = native_type.map(|nt| nt.name());
     <span class="kw">let </span>scalar_type_name = typ.type_name(<span class="kw-2">&amp;</span>ctx.internal_data_model.schema).into_owned();
     <span class="kw">let </span>type_name = ctx.connector.scalar_filter_name(scalar_type_name, native_type_name);
@@ -906,8 +846,8 @@
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let </span>object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, object.clone());
+    <span class="kw">let </span>object = init_input_object_type(ident.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, object);
 
     <span class="kw">let </span>mapped_scalar_type = map_scalar_input_type(ctx, typ, list);
 
@@ -1018,8 +958,8 @@
         fields.push(is_set_input_field(ctx));
     }
 
-    object.set_fields(fields);
-    Arc::downgrade(<span class="kw-2">&amp;</span>object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 <span class="kw">fn </span>is_set_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; InputField {
@@ -1036,7 +976,7 @@
     std::iter::once(
         input_field(ctx, filters::EQUALS, types, <span class="prelude-val">None</span>)
             .optional()
-            .nullable_if(nullable, <span class="kw-2">&amp;mut </span>ctx.input_field_types),
+            .nullable_if(nullable, <span class="kw-2">&amp;mut </span>ctx.db),
     )
 }
 
@@ -1055,7 +995,7 @@
         <span class="kw">let </span>inner = mapped_type.with_field_ref_input(ctx);
         input_field(ctx, filters::EQUALS, inner, <span class="prelude-val">None</span>)
             .optional()
-            .nullable_if(nullable, <span class="kw-2">&amp;mut </span>ctx.input_field_types)
+            .nullable_if(nullable, <span class="kw-2">&amp;mut </span>ctx.db)
     };
 
     std::iter::once(field)
@@ -1077,10 +1017,10 @@
     <span class="macro">vec!</span>[
         input_field(ctx, filters::IN, field_types.clone(), <span class="prelude-val">None</span>)
             .optional()
-            .nullable_if(nullable, <span class="kw-2">&amp;mut </span>ctx.input_field_types),
+            .nullable_if(nullable, <span class="kw-2">&amp;mut </span>ctx.db),
         input_field(ctx, filters::NOT_IN, field_types, <span class="prelude-val">None</span>)
             .optional()
-            .nullable_if(nullable, <span class="kw-2">&amp;mut </span>ctx.input_field_types), <span class="comment">// Kept for legacy reasons!
+            .nullable_if(nullable, <span class="kw-2">&amp;mut </span>ctx.db), <span class="comment">// Kept for legacy reasons!
     </span>]
     .into_iter()
 }
@@ -1150,13 +1090,13 @@
         input_field(ctx, filters::STRING_ENDS_WITH, string_with_field_ref_input, <span class="prelude-val">None</span>).optional(),
         input_field(ctx, filters::ARRAY_CONTAINS, json_with_field_ref_input.clone(), <span class="prelude-val">None</span>)
             .optional()
-            .nullable(<span class="kw-2">&amp;mut </span>ctx.input_field_types),
+            .nullable(<span class="kw-2">&amp;mut </span>ctx.db),
         input_field(ctx, filters::ARRAY_STARTS_WITH, json_with_field_ref_input.clone(), <span class="prelude-val">None</span>)
             .optional()
-            .nullable(<span class="kw-2">&amp;mut </span>ctx.input_field_types),
+            .nullable(<span class="kw-2">&amp;mut </span>ctx.db),
         input_field(ctx, filters::ARRAY_ENDS_WITH, json_with_field_ref_input, <span class="prelude-val">None</span>)
             .optional()
-            .nullable(<span class="kw-2">&amp;mut </span>ctx.input_field_types),
+            .nullable(<span class="kw-2">&amp;mut </span>ctx.db),
     ]
     .into_iter()
 }
@@ -1227,7 +1167,7 @@
             <span class="kw">let </span>ty = mapped_scalar_type.with_field_ref_input(ctx);
             input_field(ctx, filters::NOT_LOWERCASE, ty, <span class="prelude-val">None</span>)
                 .optional()
-                .nullable_if(is_nullable, <span class="kw-2">&amp;mut </span>ctx.input_field_types)
+                .nullable_if(is_nullable, <span class="kw-2">&amp;mut </span>ctx.db)
         }
 
         <span class="kw">_ </span>=&gt; {
@@ -1244,7 +1184,7 @@
 
             input_field(ctx, filters::NOT_LOWERCASE, <span class="macro">vec!</span>[mapped_scalar_type, shorthand], <span class="prelude-val">None</span>)
                 .optional()
-                .nullable_if(is_nullable, <span class="kw-2">&amp;mut </span>ctx.input_field_types)
+                .nullable_if(is_nullable, <span class="kw-2">&amp;mut </span>ctx.db)
         }
     }
 }

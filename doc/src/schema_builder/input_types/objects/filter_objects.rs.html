@@ -277,43 +277,23 @@
 <a href="#277" id="277">277</a>
 <a href="#278" id="278">278</a>
 <a href="#279" id="279">279</a>
-<a href="#280" id="280">280</a>
-<a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
-<a href="#283" id="283">283</a>
-<a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
-<a href="#286" id="286">286</a>
-<a href="#287" id="287">287</a>
-<a href="#288" id="288">288</a>
-<a href="#289" id="289">289</a>
-<a href="#290" id="290">290</a>
-<a href="#291" id="291">291</a>
-<a href="#292" id="292">292</a>
-<a href="#293" id="293">293</a>
-<a href="#294" id="294">294</a>
-<a href="#295" id="295">295</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>constants::filters;
 <span class="kw">use </span>prisma_models::{prelude::ParentContainer, CompositeFieldRef};
-<span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>scalar_filter_object_type(
     ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     model: <span class="kw-2">&amp;</span>ModelRef,
     include_aggregates: bool,
-) -&gt; InputObjectTypeWeakRef {
+) -&gt; InputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::ScalarFilterInput(model.clone(), include_aggregates));
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span><span class="kw-2">mut </span>input_object = init_input_object_type(ident.clone());
     input_object.set_tag(ObjectTag::WhereInputType(ParentContainer::Model(model.clone())));
 
-    <span class="kw">let </span>input_object = Arc::new(input_object);
-    ctx.cache_input_type(ident, input_object.clone());
-
-    <span class="kw">let </span>weak_ref = Arc::downgrade(<span class="kw-2">&amp;</span>input_object);
-    <span class="kw">let </span>object_type = InputType::object(weak_ref.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, input_object);
+    <span class="kw">let </span>object_type = InputType::object(id);
 
     <span class="kw">let </span><span class="kw-2">mut </span>input_fields = <span class="macro">vec!</span>[
         input_field(
@@ -339,11 +319,11 @@
         ModelField::Composite(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>, <span class="comment">// [Composites] todo
     </span>}));
 
-    input_object.set_fields(input_fields);
-    weak_ref
+    ctx.db[id].set_fields(input_fields);
+    id
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>where_object_type&lt;T&gt;(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, container: T) -&gt; InputObjectTypeWeakRef
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>where_object_type&lt;T&gt;(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, container: T) -&gt; InputObjectTypeId
 <span class="kw">where
     </span>T: Into&lt;ParentContainer&gt;,
 {
@@ -353,12 +333,8 @@
 
     <span class="kw">let </span><span class="kw-2">mut </span>input_object = init_input_object_type(ident.clone());
     input_object.set_tag(ObjectTag::WhereInputType(container.clone()));
-
-    <span class="kw">let </span>input_object = Arc::new(input_object);
-    ctx.cache_input_type(ident, input_object.clone());
-
-    <span class="kw">let </span>weak_ref = Arc::downgrade(<span class="kw-2">&amp;</span>input_object);
-    <span class="kw">let </span>object_type = InputType::object(weak_ref.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, input_object);
+    <span class="kw">let </span>object_type = InputType::object(id);
 
     <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="macro">vec!</span>[
         input_field(
@@ -385,13 +361,12 @@
 
     fields.extend(input_fields);
 
-    input_object.set_fields(fields);
-    weak_ref
+    ctx.db[id].set_fields(fields);
+    id
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>where_unique_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; InputObjectTypeWeakRef {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>where_unique_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; InputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::WhereUniqueInput(model.clone()));
-
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="comment">// Split unique &amp; ID fields vs all the other fields
@@ -440,17 +415,16 @@
             .collect()
     };
 
-    <span class="kw">let </span><span class="kw-2">mut </span>x = init_input_object_type(ident.clone());
+    <span class="kw">let </span><span class="kw-2">mut </span>input_object = init_input_object_type(ident.clone());
 
     <span class="kw">if </span>ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {
-        x.require_at_least_one_field();
-        x.apply_constraints_on_fields(constrained_fields);
+        input_object.require_at_least_one_field();
+        input_object.apply_constraints_on_fields(constrained_fields);
     } <span class="kw">else </span>{
-        x.require_exactly_one_field();
+        input_object.require_exactly_one_field();
     }
 
-    <span class="kw">let </span>input_object = Arc::new(x);
-    ctx.cache_input_type(ident, input_object.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, input_object);
 
     <span class="kw">let </span><span class="kw-2">mut </span>fields: Vec&lt;InputField&gt; = unique_fields
         .into_iter()
@@ -506,9 +480,8 @@
         fields.extend(rest_fields);
     }
 
-    input_object.set_fields(fields);
-
-    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 <span class="doccomment">/// Generates and caches an input object type for a compound field.
@@ -517,7 +490,7 @@
     model: <span class="kw-2">&amp;</span>ModelRef,
     alias: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     from_fields: Vec&lt;ScalarFieldRef&gt;,
-) -&gt; InputObjectTypeWeakRef {
+) -&gt; InputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(
         <span class="string">&quot;{}{}CompoundUniqueInput&quot;</span>,
         model.name(),
@@ -526,8 +499,8 @@
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, input_object.clone());
+    <span class="kw">let </span>input_object = init_input_object_type(ident.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, input_object);
 
     <span class="kw">let </span>object_fields = from_fields
         .into_iter()
@@ -539,22 +512,18 @@
         })
         .collect();
 
-    input_object.set_fields(object_fields);
-    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
+    ctx.db[id].set_fields(object_fields);
+    id
 }
 
 <span class="doccomment">/// Object used for full composite equality, e.g. `{ field: &quot;value&quot;, field2: 123 } == { field: &quot;value&quot; }`.
 /// If the composite is a list, only lists are allowed for comparison, no shorthands are used.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>composite_equality_object(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
-    cf: <span class="kw-2">&amp;</span>CompositeFieldRef,
-) -&gt; InputObjectTypeWeakRef {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>composite_equality_object(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}ObjectEqualityInput&quot;</span>, cf.typ().name()));
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, input_object.clone());
-
+    <span class="kw">let </span>input_object = init_input_object_type(ident.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, input_object);
     <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="macro">vec!</span>[];
 
     <span class="kw">let </span>composite_type = cf.typ();
@@ -563,7 +532,7 @@
             <span class="kw">let </span>map_scalar_input_type_for_field = map_scalar_input_type_for_field(ctx, <span class="kw-2">&amp;</span>sf);
             input_field(ctx, sf.name(), map_scalar_input_type_for_field, <span class="prelude-val">None</span>)
                 .optional_if(!sf.is_required())
-                .nullable_if(!sf.is_required() &amp;&amp; !sf.is_list(), <span class="kw-2">&amp;mut </span>ctx.input_field_types)
+                .nullable_if(!sf.is_required() &amp;&amp; !sf.is_list(), <span class="kw-2">&amp;mut </span>ctx.db)
         }
 
         ModelField::Composite(cf) =&gt; {
@@ -577,16 +546,15 @@
 
             input_field(ctx, cf.name(), types, <span class="prelude-val">None</span>)
                 .optional_if(!cf.is_required())
-                .nullable_if(!cf.is_required() &amp;&amp; !cf.is_list(), <span class="kw-2">&amp;mut </span>ctx.input_field_types)
+                .nullable_if(!cf.is_required() &amp;&amp; !cf.is_list(), <span class="kw-2">&amp;mut </span>ctx.db)
         }
 
         ModelField::Relation(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
     });
 
     fields.extend(input_fields);
-    input_object.set_fields(fields);
-
-    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="schema_builder" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>

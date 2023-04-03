@@ -28,7 +28,6 @@
 <a href="#28" id="28">28</a>
 <a href="#29" id="29">29</a>
 <a href="#30" id="30">30</a>
-<a href="#31" id="31">31</a>
 </pre><pre class="rust"><code><span class="kw">pub mod </span>composite;
 <span class="kw">pub mod </span>model;
 
@@ -47,18 +46,17 @@
     composite::initialize_fields(ctx);
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>affected_records_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; ObjectTypeWeakRef {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>affected_records_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; OutputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_prisma(<span class="string">&quot;AffectedRowsOutput&quot;</span>.to_owned());
     <span class="macro">return_cached_output!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let </span>object_type = Arc::new(object_type(
+    <span class="kw">let </span>object_type = object_type(
         ident.clone(),
         <span class="macro">vec!</span>[field(AFFECTED_COUNT, <span class="macro">vec!</span>[], OutputType::int(), <span class="prelude-val">None</span>)],
         <span class="prelude-val">None</span>,
-    ));
+    );
 
-    ctx.cache_output_type(ident, object_type.clone());
-    Arc::downgrade(<span class="kw-2">&amp;</span>object_type)
+    ctx.cache_output_type(ident, object_type)
 }
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="schema_builder" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>

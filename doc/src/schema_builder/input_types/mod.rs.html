@@ -100,7 +100,7 @@
 
 <span class="doccomment">/// Convenience function to return [object_type, list_object_type]
 /// (shorthand + full type) if the field is a list.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>list_union_object_type(input: InputObjectTypeWeakRef, as_list: bool) -&gt; Vec&lt;InputType&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>list_union_object_type(input: InputObjectTypeId, as_list: bool) -&gt; Vec&lt;InputType&gt; {
     <span class="kw">let </span>input_type = InputType::object(input);
     list_union_type(input_type, as_list)
 }

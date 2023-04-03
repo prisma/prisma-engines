@@ -89,22 +89,22 @@
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
 <span class="attr">#[derive(Debug)]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>GqlFieldRenderer {
-    Input(InputFieldRef),
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>GqlFieldRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Input(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>InputField),
     Output(OutputFieldRef),
 }
 
-<span class="kw">impl </span>Renderer <span class="kw">for </span>GqlFieldRenderer {
+<span class="kw">impl </span>Renderer <span class="kw">for </span>GqlFieldRenderer&lt;<span class="lifetime">&#39;_</span>&gt; {
     <span class="kw">fn </span>render(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
         <span class="kw">match </span><span class="self">self </span>{
-            GqlFieldRenderer::Input(input) =&gt; <span class="self">self</span>.render_input_field(Arc::clone(input), ctx),
+            GqlFieldRenderer::Input(input) =&gt; <span class="self">self</span>.render_input_field(input, ctx),
             GqlFieldRenderer::Output(output) =&gt; <span class="self">self</span>.render_output_field(Arc::clone(output), ctx),
         }
     }
 }
 
-<span class="kw">impl </span>GqlFieldRenderer {
-    <span class="kw">fn </span>render_input_field(<span class="kw-2">&amp;</span><span class="self">self</span>, input_field: InputFieldRef, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
+<span class="kw">impl </span>GqlFieldRenderer&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>render_input_field(<span class="kw-2">&amp;</span><span class="self">self</span>, input_field: <span class="kw-2">&amp;</span>InputField, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
         <span class="kw">let </span>rendered_type = pick_input_type(input_field.field_types(ctx.query_schema))
             .into_renderer()
             .render(ctx);
@@ -138,7 +138,7 @@
         <span class="macro">format!</span>(<span class="string">&quot;{}{}: {}{}&quot;</span>, field.name, rendered_args, rendered_type, bang)
     }
 
-    <span class="kw">fn </span>render_arguments(<span class="kw-2">&amp;</span><span class="self">self</span>, args: <span class="kw-2">&amp;</span>[InputFieldRef], ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; Vec&lt;String&gt; {
+    <span class="kw">fn </span>render_arguments(<span class="kw-2">&amp;</span><span class="self">self</span>, args: <span class="kw-2">&amp;</span>[InputField], ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; Vec&lt;String&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>output = Vec::with_capacity(args.len());
 
         <span class="kw">for </span>arg <span class="kw">in </span>args {
@@ -148,7 +148,7 @@
         output
     }
 
-    <span class="kw">fn </span>render_argument(<span class="kw-2">&amp;</span><span class="self">self</span>, arg: <span class="kw-2">&amp;</span>InputFieldRef, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
+    <span class="kw">fn </span>render_argument(<span class="kw-2">&amp;</span><span class="self">self</span>, arg: <span class="kw-2">&amp;</span>InputField, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
         <span class="kw">let </span>rendered_type = pick_input_type(arg.field_types(ctx.query_schema))
             .into_renderer()
             .render(ctx);

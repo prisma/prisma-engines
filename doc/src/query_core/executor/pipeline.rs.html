@@ -33,7 +33,13 @@
 <a href="#33" id="33">33</a>
 <a href="#34" id="34">34</a>
 <a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
+<a href="#38" id="38">38</a>
+<a href="#39" id="39">39</a>
+<a href="#40" id="40">40</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{Env, Expressionista, IrSerializer, QueryGraph, QueryInterpreter, ResponseData};
+<span class="kw">use </span>schema::QuerySchema;
 <span class="kw">use </span>tracing::Instrument;
 
 <span class="attr">#[derive(Debug)]
@@ -52,7 +58,11 @@
         }
     }
 
-    <span class="kw">pub async fn </span>execute(<span class="kw-2">mut </span><span class="self">self</span>, trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="kw">crate</span>::Result&lt;ResponseData&gt; {
+    <span class="kw">pub async fn </span>execute(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        query_schema: <span class="kw-2">&amp;</span>QuerySchema,
+        trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;ResponseData&gt; {
         <span class="kw">let </span>serializer = <span class="self">self</span>.serializer;
         <span class="kw">let </span>expr = Expressionista::translate(<span class="self">self</span>.graph)<span class="question-mark">?</span>;
 
@@ -65,7 +75,7 @@
             .<span class="kw">await</span>;
 
         <span class="macro">trace!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.interpreter.log_output());
-        serializer.serialize(result<span class="question-mark">?</span>)
+        serializer.serialize(result<span class="question-mark">?</span>, query_schema)
     }
 }
 </code></pre></div>

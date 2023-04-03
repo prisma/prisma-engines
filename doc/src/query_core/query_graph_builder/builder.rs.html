@@ -146,15 +146,15 @@
     </span><span class="kw">pub fn </span>build(<span class="self">self</span>, operation: Operation) -&gt; QueryGraphBuilderResult&lt;(QueryGraph, IrSerializer)&gt; {
         <span class="kw">let </span>_span = <span class="macro">info_span!</span>(<span class="string">&quot;prisma:engine:build_graph&quot;</span>);
         <span class="kw">match </span>operation {
-            Operation::Read(selection) =&gt; <span class="self">self</span>.build_internal(selection, <span class="kw-2">&amp;</span><span class="self">self</span>.query_schema.query()),
-            Operation::Write(selection) =&gt; <span class="self">self</span>.build_internal(selection, <span class="kw-2">&amp;</span><span class="self">self</span>.query_schema.mutation()),
+            Operation::Read(selection) =&gt; <span class="self">self</span>.build_internal(selection, <span class="self">self</span>.query_schema.query()),
+            Operation::Write(selection) =&gt; <span class="self">self</span>.build_internal(selection, <span class="self">self</span>.query_schema.mutation()),
         }
     }
 
     <span class="kw">fn </span>build_internal(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         selection: Selection,
-        root_object: <span class="kw-2">&amp;</span>ObjectTypeStrongRef, <span class="comment">// Either the query or mutation object.
+        root_object: <span class="kw-2">&amp;</span>ObjectType, <span class="comment">// Either the query or mutation object.
     </span>) -&gt; QueryGraphBuilderResult&lt;(QueryGraph, IrSerializer)&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>selections = <span class="macro">vec!</span>[selection];
         <span class="kw">let </span><span class="kw-2">mut </span>parsed_object = QueryDocumentParser::new(<span class="kw">crate</span>::executor::get_request_now()).parse(

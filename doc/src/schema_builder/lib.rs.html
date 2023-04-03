@@ -167,23 +167,6 @@
 <a href="#167" id="167">167</a>
 <a href="#168" id="168">168</a>
 <a href="#169" id="169">169</a>
-<a href="#170" id="170">170</a>
-<a href="#171" id="171">171</a>
-<a href="#172" id="172">172</a>
-<a href="#173" id="173">173</a>
-<a href="#174" id="174">174</a>
-<a href="#175" id="175">175</a>
-<a href="#176" id="176">176</a>
-<a href="#177" id="177">177</a>
-<a href="#178" id="178">178</a>
-<a href="#179" id="179">179</a>
-<a href="#180" id="180">180</a>
-<a href="#181" id="181">181</a>
-<a href="#182" id="182">182</a>
-<a href="#183" id="183">183</a>
-<a href="#184" id="184">184</a>
-<a href="#185" id="185">185</a>
-<a href="#186" id="186">186</a>
 </pre><pre class="rust"><code><span class="attr">#![deny(rust_2018_idioms, unsafe_code)]
 
 </span><span class="doccomment">//! Query schema builder. Root for query schema building.
@@ -209,14 +192,6 @@
 //!
 //! Without caching, processing D (in fact, visiting any type after the intial computation) would also
 //! trigger a complete recomputation of A, B, C.
-//!
-//! Hence, all builders that produce input or output object types are required to
-//! implement CachedBuilder in some form to break recursive type building.
-//!
-//! Additionally, the cache also acts as the component to prevent memory leaks from circular dependencies
-//! in the query schema later on, as described on the QuerySchema type.
-//! The cache can be consumed to produce a list of strong references to the individual input and output
-//! object types, which are then moved to the query schema to keep weak references alive (see TypeRefCache for additional infos).
 
 </span><span class="kw">pub mod </span>constants;
 
@@ -237,16 +212,15 @@
     PreviewFeature, PreviewFeatures,
 };
 <span class="kw">use </span>schema::<span class="kw-2">*</span>;
-<span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>utils::<span class="kw-2">*</span>;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>BuilderContext&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) input_field_types: Vec&lt;InputType&gt;,
     internal_data_model: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>InternalDataModel,
     enable_raw_queries: bool,
-    input_types: TypeRefCache&lt;InputObjectType&gt;,
-    output_types: TypeRefCache&lt;ObjectType&gt;,
-    enum_types: TypeRefCache&lt;EnumType&gt;,
+    db: QuerySchemaDatabase,
+    input_types: TypeRefCache&lt;InputObjectTypeId&gt;,
+    output_types: TypeRefCache&lt;OutputObjectTypeId&gt;,
+    enum_types: TypeRefCache&lt;EnumTypeId&gt;,
     connector: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Connector,
     preview_features: PreviewFeatures,
     nested_create_inputs_queue: NestedInputsQueue,
@@ -261,13 +235,19 @@
     ) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>connector = internal_data_model.schema.connector;
         <span class="kw">let </span>models_count = internal_data_model.schema.db.models_count();
+        <span class="kw">let </span>input_types_estimate = models_count * <span class="number">3</span>;
+        <span class="kw">let </span>output_types_estimate = models_count;
+        <span class="kw">let </span>enum_types_estimate = <span class="number">0</span>; <span class="comment">// not all connectors have enums
+        </span><span class="kw">let </span><span class="kw-2">mut </span>db = QuerySchemaDatabase::default();
+        db.input_field_types
+            .reserve(internal_data_model.schema.db.models_count() * <span class="number">5</span>);
         <span class="self">Self </span>{
-            input_field_types: Vec::with_capacity(internal_data_model.schema.db.models_count() * <span class="number">5</span>),
             internal_data_model,
             enable_raw_queries,
-            input_types: TypeRefCache::with_capacity(models_count * <span class="number">3</span>),
-            output_types: TypeRefCache::with_capacity(models_count),
-            enum_types: TypeRefCache::with_capacity(<span class="number">0</span>),
+            input_types: TypeRefCache::with_capacity(input_types_estimate),
+            output_types: TypeRefCache::with_capacity(output_types_estimate),
+            enum_types: TypeRefCache::with_capacity(enum_types_estimate),
+            db,
             connector,
             preview_features,
             nested_create_inputs_queue: Vec::new(),
@@ -284,33 +264,39 @@
     }
 
     <span class="doccomment">/// Get an input (object) type.
-    </span><span class="kw">fn </span>get_input_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ident: <span class="kw-2">&amp;</span>Identifier) -&gt; <span class="prelude-ty">Option</span>&lt;InputObjectTypeWeakRef&gt; {
+    </span><span class="kw">fn </span>get_input_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ident: <span class="kw-2">&amp;</span>Identifier) -&gt; <span class="prelude-ty">Option</span>&lt;InputObjectTypeId&gt; {
         <span class="self">self</span>.input_types.get(ident)
     }
 
     <span class="doccomment">/// Get an output (object) type.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_output_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ident: <span class="kw-2">&amp;</span>Identifier) -&gt; <span class="prelude-ty">Option</span>&lt;ObjectTypeWeakRef&gt; {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_output_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ident: <span class="kw-2">&amp;</span>Identifier) -&gt; <span class="prelude-ty">Option</span>&lt;OutputObjectTypeId&gt; {
         <span class="self">self</span>.output_types.get(ident)
     }
 
     <span class="doccomment">/// Get an enum type.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_enum_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ident: <span class="kw-2">&amp;</span>Identifier) -&gt; <span class="prelude-ty">Option</span>&lt;EnumTypeWeakRef&gt; {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_enum_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ident: <span class="kw-2">&amp;</span>Identifier) -&gt; <span class="prelude-ty">Option</span>&lt;EnumTypeId&gt; {
         <span class="self">self</span>.enum_types.get(ident)
     }
 
     <span class="doccomment">/// Caches an input (object) type.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>cache_input_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ident: Identifier, typ: InputObjectTypeStrongRef) {
-        <span class="self">self</span>.input_types.insert(ident, typ);
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>cache_input_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ident: Identifier, typ: InputObjectType) -&gt; InputObjectTypeId {
+        <span class="kw">let </span>id = <span class="self">self</span>.db.push_input_object_type(typ);
+        <span class="self">self</span>.input_types.insert(ident, id);
+        id
     }
 
     <span class="doccomment">/// Caches an output (object) type.
-    </span><span class="kw">pub fn </span>cache_output_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ident: Identifier, typ: ObjectTypeStrongRef) {
-        <span class="self">self</span>.output_types.insert(ident, typ);
+    </span><span class="kw">pub fn </span>cache_output_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ident: Identifier, typ: ObjectType) -&gt; OutputObjectTypeId {
+        <span class="kw">let </span>id = <span class="self">self</span>.db.push_output_object_type(typ);
+        <span class="self">self</span>.output_types.insert(ident, id);
+        id
     }
 
     <span class="doccomment">/// Caches an enum type.
-    </span><span class="kw">pub fn </span>cache_enum_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ident: Identifier, e: EnumTypeRef) {
-        <span class="self">self</span>.enum_types.insert(ident, e);
+    </span><span class="kw">pub fn </span>cache_enum_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ident: Identifier, e: EnumType) -&gt; EnumTypeId {
+        <span class="kw">let </span>id = <span class="self">self</span>.db.push_enum_type(e);
+        <span class="self">self</span>.enum_types.insert(ident, id);
+        id
     }
 
     <span class="kw">pub fn </span>can_full_text_search(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
@@ -338,37 +324,17 @@
 
     output_types::objects::initialize_caches(<span class="kw-2">&amp;mut </span>ctx);
 
-    <span class="kw">let </span>(query_type, query_object_ref) = output_types::query_type::build(<span class="kw-2">&amp;mut </span>ctx);
-    <span class="kw">let </span>(mutation_type, mutation_object_ref) = output_types::mutation_type::build(<span class="kw-2">&amp;mut </span>ctx);
+    <span class="kw">let </span>query_type = output_types::query_type::build(<span class="kw-2">&amp;mut </span>ctx);
+    <span class="kw">let </span>mutation_type = output_types::mutation_type::build(<span class="kw-2">&amp;mut </span>ctx);
 
     <span class="comment">// Add iTX isolation levels to the schema.
     </span>enum_types::itx_isolation_levels(<span class="kw-2">&amp;mut </span>ctx);
 
-    <span class="kw">let </span>input_objects = ctx.input_types.into();
-    <span class="kw">let </span><span class="kw-2">mut </span>output_objects: Vec&lt;<span class="kw">_</span>&gt; = ctx.output_types.into();
-    <span class="kw">let </span>enum_types = ctx.enum_types.into();
-
-    <span class="comment">// The mutation and query object types need to be part of the strong refs.
-    </span>output_objects.push(query_object_ref);
-    output_objects.push(mutation_object_ref);
-
-    <span class="kw">let </span>query_type = Arc::new(query_type);
-    <span class="kw">let </span>mutation_type = Arc::new(mutation_type);
     <span class="kw">let </span>capabilities = ctx.connector.capabilities().to_owned();
-    <span class="kw">let </span>input_field_types = ctx.input_field_types;
 
-    QuerySchema::new(
-        query_type,
-        mutation_type,
-        input_field_types,
-        input_objects,
-        output_objects,
-        enum_types,
-        internal_data_model,
-        capabilities,
-    )
+    QuerySchema::new(query_type, mutation_type, ctx.db, internal_data_model, capabilities)
 }
 
-<span class="kw">type </span>NestedInputsQueue = Vec&lt;(Arc&lt;InputObjectType&gt;, RelationFieldRef)&gt;;
+<span class="kw">type </span>NestedInputsQueue = Vec&lt;(InputObjectTypeId, RelationFieldRef)&gt;;
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="schema_builder" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>

@@ -261,10 +261,6 @@
 <a href="#261" id="261">261</a>
 <a href="#262" id="262">262</a>
 <a href="#263" id="263">263</a>
-<a href="#264" id="264">264</a>
-<a href="#265" id="265">265</a>
-<a href="#266" id="266">266</a>
-<a href="#267" id="267">267</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::objects::<span class="kw-2">*</span>;
 <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::mutations::{create_many, create_one};
@@ -286,7 +282,7 @@
 
     input_field(ctx, field.name().to_owned(), types, <span class="prelude-val">None</span>)
         .optional()
-        .nullable_if(nullable, <span class="kw-2">&amp;mut </span>ctx.input_field_types)
+        .nullable_if(nullable, <span class="kw-2">&amp;mut </span>ctx.db)
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nested_create_one_input_field(
@@ -325,21 +321,17 @@
     </span>}
 }
 
-<span class="kw">fn </span>nested_create_many_envelope(
-    ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
-    parent_field: <span class="kw-2">&amp;</span>RelationFieldRef,
-) -&gt; InputObjectTypeWeakRef {
+<span class="kw">fn </span>nested_create_many_envelope(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, parent_field: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputObjectTypeId {
     <span class="kw">let </span>create_type = create_many::create_many_object_type(ctx, <span class="kw-2">&amp;</span>parent_field.related_model(), <span class="prelude-val">Some</span>(parent_field));
 
-    <span class="kw">let </span>nested_ident = <span class="kw-2">&amp;</span>create_type.into_arc().identifier;
+    <span class="kw">let </span>nested_ident = <span class="kw-2">&amp;</span>ctx.db[create_type].identifier;
     <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}Envelope&quot;</span>, nested_ident.name());
 
     <span class="kw">let </span>ident = Identifier::new_prisma(name);
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, input_object.clone());
-
+    <span class="kw">let </span>input_object = init_input_object_type(ident.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, input_object);
     <span class="kw">let </span>create_many_type = InputType::object(create_type);
     <span class="kw">let </span>data_arg = input_field(ctx, args::DATA, list_union_type(create_many_type, <span class="bool-val">true</span>), <span class="prelude-val">None</span>);
 
@@ -351,8 +343,8 @@
         <span class="macro">vec!</span>[data_arg]
     };
 
-    input_object.set_fields(fields);
-    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nested_connect_or_create_field(

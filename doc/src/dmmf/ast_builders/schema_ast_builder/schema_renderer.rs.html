@@ -28,8 +28,8 @@
     <span class="kw">fn </span>render(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>RenderContext) {
         <span class="comment">// This ensures that all enums are rendered, even if not reached by the output and input types.
         </span>render_enum_types(ctx, <span class="self">self</span>.query_schema.enum_types());
-        render_output_type(<span class="kw-2">&amp;</span><span class="self">self</span>.query_schema.query, ctx);
-        render_output_type(<span class="kw-2">&amp;</span><span class="self">self</span>.query_schema.mutation, ctx);
+        render_output_type(<span class="kw-2">&amp;</span>OutputType::Object(<span class="self">self</span>.query_schema.query), ctx);
+        render_output_type(<span class="kw-2">&amp;</span>OutputType::Object(<span class="self">self</span>.query_schema.mutation), ctx);
     }
 }
 

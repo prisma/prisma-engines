@@ -975,6 +975,14 @@
 <a href="#975" id="975">975</a>
 <a href="#976" id="976">976</a>
 <a href="#977" id="977">977</a>
+<a href="#978" id="978">978</a>
+<a href="#979" id="979">979</a>
+<a href="#980" id="980">980</a>
+<a href="#981" id="981">981</a>
+<a href="#982" id="982">982</a>
+<a href="#983" id="983">983</a>
+<a href="#984" id="984">984</a>
+<a href="#985" id="985">985</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{executor::get_engine_protocol, schema::<span class="kw-2">*</span>};
 <span class="kw">use </span>bigdecimal::{BigDecimal, ToPrimitive};
@@ -1001,7 +1009,7 @@
     </span><span class="kw">pub fn </span>parse(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         selections: <span class="kw-2">&amp;</span>[Selection],
-        schema_object: <span class="kw-2">&amp;</span>ObjectTypeStrongRef,
+        schema_object: <span class="kw-2">&amp;</span>ObjectType,
         query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     ) -&gt; QueryParserResult&lt;ParsedObject&gt; {
         <span class="self">self</span>.parse_object(
@@ -1023,13 +1031,13 @@
         selection_path: Path,
         argument_path: Path,
         selections: <span class="kw-2">&amp;</span>[Selection],
-        schema_object: <span class="kw-2">&amp;</span>ObjectTypeStrongRef,
+        schema_object: <span class="kw-2">&amp;</span>ObjectType,
         query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     ) -&gt; QueryParserResult&lt;ParsedObject&gt; {
         <span class="kw">if </span>selections.is_empty() {
             <span class="kw">return </span><span class="prelude-val">Err</span>(ValidationError::empty_selection(
                 selection_path.segments(),
-                conversions::schema_object_to_output_type_description(schema_object),
+                conversions::schema_object_to_output_type_description(schema_object, query_schema),
             ));
         }
 
@@ -1047,7 +1055,7 @@
                     ),
                     <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(ValidationError::unknown_selection_field(
                         selection_path.add(field_name.to_owned()).segments(),
-                        conversions::schema_object_to_output_type_description(schema_object),
+                        conversions::schema_object_to_output_type_description(schema_object, query_schema),
                     )),
                 }
             })
@@ -1082,12 +1090,12 @@
                 ))
             } <span class="kw">else </span>{
                 <span class="comment">// If the output type of the field is an object type of any form, validate the sub selection as well.
-                </span><span class="kw">let </span>nested_fields = schema_field.field_type.as_object_type().map(|obj| {
+                </span><span class="kw">let </span>nested_fields = schema_field.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db).map(|obj| {
                     <span class="self">self</span>.parse_object(
                         selection_path.clone(),
                         argument_path.clone(),
                         selection.nested_selections(),
-                        <span class="kw-2">&amp;</span>obj,
+                        obj,
                         query_schema,
                     )
                 });
@@ -1241,18 +1249,26 @@
                     )),
                     <span class="comment">// Scalar handling
                     </span>(pv, InputType::Scalar(st)) =&gt; <span class="self">self
-                        </span>.parse_scalar(<span class="kw-2">&amp;</span>selection_path, <span class="kw-2">&amp;</span>argument_path, pv, st, <span class="kw-2">&amp;</span>value, input_type)
+                        </span>.parse_scalar(
+                            <span class="kw-2">&amp;</span>selection_path,
+                            <span class="kw-2">&amp;</span>argument_path,
+                            pv,
+                            st,
+                            <span class="kw-2">&amp;</span>value,
+                            input_type,
+                            query_schema,
+                        )
                         .map(ParsedInputValue::Single),
 
                     <span class="comment">// Enum handling
                     </span>(pv @ PrismaValue::Enum(<span class="kw">_</span>), InputType::Enum(et)) =&gt; {
-                        <span class="self">self</span>.parse_enum(<span class="kw-2">&amp;</span>selection_path, <span class="kw-2">&amp;</span>argument_path, pv, <span class="kw-2">&amp;</span>et.into_arc())
+                        <span class="self">self</span>.parse_enum(<span class="kw-2">&amp;</span>selection_path, <span class="kw-2">&amp;</span>argument_path, pv, <span class="kw-2">&amp;</span>query_schema.db[<span class="kw-2">*</span>et])
                     }
                     (pv @ PrismaValue::String(<span class="kw">_</span>), InputType::Enum(et)) =&gt; {
-                        <span class="self">self</span>.parse_enum(<span class="kw-2">&amp;</span>selection_path, <span class="kw-2">&amp;</span>argument_path, pv, <span class="kw-2">&amp;</span>et.into_arc())
+                        <span class="self">self</span>.parse_enum(<span class="kw-2">&amp;</span>selection_path, <span class="kw-2">&amp;</span>argument_path, pv, <span class="kw-2">&amp;</span>query_schema.db[<span class="kw-2">*</span>et])
                     }
                     (pv @ PrismaValue::Boolean(<span class="kw">_</span>), InputType::Enum(et)) =&gt; {
-                        <span class="self">self</span>.parse_enum(<span class="kw-2">&amp;</span>selection_path, <span class="kw-2">&amp;</span>argument_path, pv, <span class="kw-2">&amp;</span>et.into_arc())
+                        <span class="self">self</span>.parse_enum(<span class="kw-2">&amp;</span>selection_path, <span class="kw-2">&amp;</span>argument_path, pv, <span class="kw-2">&amp;</span>query_schema.db[<span class="kw-2">*</span>et])
                     }
                     <span class="comment">// Invalid combinations
                     </span><span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(ValidationError::invalid_argument_type(
@@ -1261,6 +1277,7 @@
                         conversions::input_type_to_argument_description(
                             argument_path.last().unwrap_or_default().to_string(),
                             input_type,
+                            query_schema,
                         ),
                         conversions::argument_value_to_type_name(<span class="kw-2">&amp;</span>value),
                     )),
@@ -1277,7 +1294,7 @@
                         selection_path.clone(),
                         argument_path.clone(),
                         o.clone(),
-                        obj.into_arc(),
+                        <span class="kw-2">&amp;</span>query_schema.db[<span class="kw-2">*</span>obj],
                         query_schema,
                     )
                     .map(ParsedInputValue::Map),
@@ -1289,6 +1306,7 @@
                     conversions::input_type_to_argument_description(
                         argument_path.last().unwrap_or_default().to_string(),
                         input_type,
+                        query_schema,
                     ),
                     conversions::argument_value_to_type_name(<span class="kw-2">&amp;</span>value),
                 )),
@@ -1319,6 +1337,7 @@
     }
 
     <span class="doccomment">/// Attempts to parse given query value into a concrete PrismaValue based on given scalar type.
+    </span><span class="attr">#[allow(clippy::too_many_arguments)]
     </span><span class="kw">fn </span>parse_scalar(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         selection_path: <span class="kw-2">&amp;</span>Path,
@@ -1327,6 +1346,7 @@
         scalar_type: <span class="kw-2">&amp;</span>ScalarType,
         argument_value: <span class="kw-2">&amp;</span>ArgumentValue,
         input_type: <span class="kw-2">&amp;</span>InputType,
+        query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     ) -&gt; QueryParserResult&lt;PrismaValue&gt; {
         <span class="kw">match </span>(value, scalar_type.clone()) {
             <span class="comment">// Identity matchers
@@ -1386,6 +1406,7 @@
                 conversions::input_type_to_argument_description(
                     argument_path.last().unwrap_or_default().to_string(),
                     input_type,
+                    query_schema,
                 ),
                 conversions::argument_value_to_type_name(argument_value),
             )),
@@ -1570,7 +1591,7 @@
         selection_path: <span class="kw-2">&amp;</span>Path,
         argument_path: <span class="kw-2">&amp;</span>Path,
         val: PrismaValue,
-        typ: <span class="kw-2">&amp;</span>EnumTypeRef,
+        typ: <span class="kw-2">&amp;</span>EnumType,
     ) -&gt; QueryParserResult&lt;ParsedInputValue&gt; {
         <span class="kw">let </span>raw = <span class="kw">match </span>val {
             PrismaValue::Enum(s) =&gt; s,
@@ -1619,7 +1640,7 @@
         selection_path: Path,
         argument_path: Path,
         object: ArgumentValueObject,
-        schema_object: InputObjectTypeStrongRef,
+        schema_object: <span class="kw-2">&amp;</span>InputObjectType,
         query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     ) -&gt; QueryParserResult&lt;ParsedInputMap&gt; {
         <span class="kw">let </span>valid_field_names: IndexSet&lt;<span class="kw-2">&amp;</span>str&gt; = schema_object
@@ -1688,7 +1709,7 @@
                     ValidationError::unknown_input_field(
                         selection_path.segments(),
                         argument_path.add(field_name.clone()).segments(),
-                        conversions::schema_input_object_type_to_input_type_description(<span class="kw-2">&amp;</span>schema_object, query_schema),
+                        conversions::schema_input_object_type_to_input_type_description(schema_object, query_schema),
                     )
                 })<span class="question-mark">?</span>;
 
@@ -1738,7 +1759,7 @@
                 schema_object.constraints.max_num_fields,
                 schema_object.constraints.fields.as_ref().cloned(),
                 num_fields,
-                <span class="kw-2">&amp;</span>conversions::schema_input_object_type_to_input_type_description(<span class="kw-2">&amp;</span>schema_object, query_schema),
+                <span class="kw-2">&amp;</span>conversions::schema_input_object_type_to_input_type_description(schema_object, query_schema),
             ));
         }
 
@@ -1755,7 +1776,7 @@
                 schema_object.constraints.max_num_fields,
                 schema_object.constraints.fields.as_ref().cloned(),
                 num_fields,
-                <span class="kw-2">&amp;</span>conversions::schema_input_object_type_to_input_type_description(<span class="kw-2">&amp;</span>schema_object, query_schema),
+                <span class="kw-2">&amp;</span>conversions::schema_input_object_type_to_input_type_description(schema_object, query_schema),
             ));
         }
 
@@ -1777,7 +1798,8 @@
     <span class="doccomment">/// converts an schema object to the narrower validation::OutputTypeDescription
     /// representation of an output field that is part of a validation error information.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>schema_object_to_output_type_description(
-        o: <span class="kw-2">&amp;</span>schema::ObjectTypeStrongRef,
+        o: <span class="kw-2">&amp;</span>schema::ObjectType,
+        query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     ) -&gt; validation::OutputTypeDescription {
         <span class="kw">let </span>name = o.identifier.name();
         <span class="kw">let </span>fields: Vec&lt;validation::OutputTypeDescriptionField&gt; = o
@@ -1785,8 +1807,8 @@
             .iter()
             .map(|field| {
                 <span class="kw">let </span>name = field.name.to_owned();
-                <span class="kw">let </span>type_name = to_simplified_output_type_name(field.field_type.as_ref());
-                <span class="kw">let </span>is_relation = field.maps_to_relation();
+                <span class="kw">let </span>type_name = to_simplified_output_type_name(field.field_type.as_ref(), query_schema);
+                <span class="kw">let </span>is_relation = field.maps_to_relation(query_schema);
 
                 validation::OutputTypeDescriptionField::new(name, type_name, is_relation)
             })
@@ -1811,20 +1833,19 @@
         <span class="kw">match </span>input_type {
             InputType::Scalar(s) =&gt; InputTypeDescription::Scalar { name: s.to_string() },
             InputType::Enum(e) =&gt; InputTypeDescription::Enum {
-                name: e.upgrade().map(|e| e.name()).expect(<span class="string">&quot;enum type should be upgradeable&quot;</span>),
+                name: query_schema.db[<span class="kw-2">*</span>e].name(),
             },
             InputType::List(l) =&gt; InputTypeDescription::List {
                 element_type: Box::new(input_type_to_input_type_description(l.as_ref(), query_schema)),
             },
-            InputType::Object(o) =&gt; {
-                <span class="kw">let </span>o = o.upgrade().expect(<span class="string">&quot;input object type should be upgradeable&quot;</span>);
-                schema_input_object_type_to_input_type_description(<span class="kw-2">&amp;</span>o, query_schema)
+            InputType::Object(object_id) =&gt; {
+                schema_input_object_type_to_input_type_description(<span class="kw-2">&amp;</span>query_schema.db[<span class="kw-2">*</span>object_id], query_schema)
             }
         }
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>schema_input_object_type_to_input_type_description(
-        i: <span class="kw-2">&amp;</span>schema::InputObjectTypeStrongRef,
+        i: <span class="kw-2">&amp;</span>schema::InputObjectType,
         query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     ) -&gt; validation::InputTypeDescription {
         <span class="kw">let </span>name = i.identifier.name();
@@ -1836,7 +1857,7 @@
                 <span class="kw">let </span>type_names: Vec&lt;String&gt; = field
                     .field_types(query_schema)
                     .iter()
-                    .map(to_simplified_input_type_name)
+                    .map(|t| to_simplified_input_type_name(t, query_schema))
                     .collect();
                 validation::InputTypeDescriptionField::new(name, type_names, field.is_required)
             })
@@ -1845,7 +1866,7 @@
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>schema_arguments_to_argument_description_vec(
-        arguments: <span class="kw-2">&amp;</span>[schema::InputFieldRef],
+        arguments: <span class="kw-2">&amp;</span>[schema::InputField],
         query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     ) -&gt; Vec&lt;validation::ArgumentDescription&gt; {
         arguments
@@ -1856,7 +1877,7 @@
                     input_field_ref
                         .field_types(query_schema)
                         .iter()
-                        .map(to_simplified_input_type_name)
+                        .map(|t| to_simplified_input_type_name(t, query_schema))
                         .collect(),
                 )
             })
@@ -1866,8 +1887,9 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>input_type_to_argument_description(
         arg_name: String,
         input_type: <span class="kw-2">&amp;</span>InputType,
+        query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     ) -&gt; validation::ArgumentDescription {
-        validation::ArgumentDescription::new(arg_name, <span class="macro">vec!</span>[to_simplified_input_type_name(input_type)])
+        validation::ArgumentDescription::new(arg_name, <span class="macro">vec!</span>[to_simplified_input_type_name(input_type, query_schema)])
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>argument_value_to_type_name(value: <span class="kw-2">&amp;</span>ArgumentValue) -&gt; String {
@@ -1902,26 +1924,20 @@
         }
     }
 
-    <span class="kw">fn </span>to_simplified_input_type_name(typ: <span class="kw-2">&amp;</span>InputType) -&gt; String {
+    <span class="kw">fn </span>to_simplified_input_type_name(typ: <span class="kw-2">&amp;</span>InputType, query_schema: <span class="kw-2">&amp;</span>QuerySchema) -&gt; String {
         <span class="kw">match </span>typ {
-            InputType::Enum(e) =&gt; e.upgrade().map(|e| e.name()).expect(<span class="string">&quot;enum type should be upgradeable&quot;</span>),
-            InputType::List(o) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}[]&quot;</span>, to_simplified_input_type_name(o.as_ref())),
-            InputType::Object(o) =&gt; o
-                .upgrade()
-                .map(|f| f.identifier.name())
-                .expect(<span class="string">&quot;input object type should be upgradeable&quot;</span>),
+            InputType::Enum(e) =&gt; query_schema.db[<span class="kw-2">*</span>e].name(),
+            InputType::List(o) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}[]&quot;</span>, to_simplified_input_type_name(o.as_ref(), query_schema)),
+            InputType::Object(object_id) =&gt; query_schema.db[<span class="kw-2">*</span>object_id].identifier.name(),
             InputType::Scalar(s) =&gt; s.to_string(),
         }
     }
 
-    <span class="kw">fn </span>to_simplified_output_type_name(typ: <span class="kw-2">&amp;</span>OutputType) -&gt; String {
+    <span class="kw">fn </span>to_simplified_output_type_name(typ: <span class="kw-2">&amp;</span>OutputType, query_schema: <span class="kw-2">&amp;</span>QuerySchema) -&gt; String {
         <span class="kw">match </span>typ {
-            OutputType::Enum(e) =&gt; e.upgrade().map(|e| e.name()).expect(<span class="string">&quot;enum type should be upgradeable&quot;</span>),
-            OutputType::List(o) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}[]&quot;</span>, to_simplified_output_type_name(o)),
-            OutputType::Object(o) =&gt; o
-                .upgrade()
-                .map(|f| f.identifier.name())
-                .expect(<span class="string">&quot;input object type should be upgradeable&quot;</span>),
+            OutputType::Enum(e) =&gt; query_schema.db[<span class="kw-2">*</span>e].name(),
+            OutputType::List(o) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}[]&quot;</span>, to_simplified_output_type_name(o, query_schema)),
+            OutputType::Object(o) =&gt; query_schema.db[<span class="kw-2">*</span>o].identifier.name(),
             OutputType::Scalar(s) =&gt; s.to_string(),
         }
     }

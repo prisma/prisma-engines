@@ -130,10 +130,6 @@
 <a href="#130" id="130">130</a>
 <a href="#131" id="131">131</a>
 <a href="#132" id="132">132</a>
-<a href="#133" id="133">133</a>
-<a href="#134" id="134">134</a>
-<a href="#135" id="135">135</a>
-<a href="#136" id="136">136</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::enum_types::<span class="kw-2">*</span>;
 <span class="kw">use </span>input_types::fields::arguments;
@@ -242,7 +238,7 @@
     fields: <span class="kw-2">&amp;</span>[RelationFieldRef],
     type_mapper: F,
     object_mapper: G,
-) -&gt; ObjectTypeWeakRef
+) -&gt; OutputObjectTypeId
 <span class="kw">where
     </span>F: Fn(<span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; OutputType,
     G: Fn(ObjectType) -&gt; ObjectType,
@@ -264,11 +260,7 @@
         .collect();
 
     <span class="kw">let </span>object = object_mapper(object_type(ident.clone(), fields, <span class="prelude-val">None</span>));
-    <span class="kw">let </span>object = Arc::new(object);
-
-    ctx.cache_output_type(ident, object.clone());
-
-    Arc::downgrade(<span class="kw-2">&amp;</span>object)
+    ctx.cache_output_type(ident, object)
 }
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="schema_builder" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>

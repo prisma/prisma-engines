@@ -302,17 +302,6 @@
 <a href="#302" id="302">302</a>
 <a href="#303" id="303">303</a>
 <a href="#304" id="304">304</a>
-<a href="#305" id="305">305</a>
-<a href="#306" id="306">306</a>
-<a href="#307" id="307">307</a>
-<a href="#308" id="308">308</a>
-<a href="#309" id="309">309</a>
-<a href="#310" id="310">310</a>
-<a href="#311" id="311">311</a>
-<a href="#312" id="312">312</a>
-<a href="#313" id="313">313</a>
-<a href="#314" id="314">314</a>
-<a href="#315" id="315">315</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>constants::{aggregations, ordering};
 <span class="kw">use </span>output_types::aggregation;
@@ -354,7 +343,7 @@
     ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     container: <span class="kw-2">&amp;</span>ParentContainer,
     options: <span class="kw-2">&amp;</span>OrderByOptions,
-) -&gt; InputObjectTypeWeakRef {
+) -&gt; InputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::OrderByInput(
         container.clone(),
         options.type_suffix().to_owned(),
@@ -363,9 +352,7 @@
 
     <span class="kw">let </span><span class="kw-2">mut </span>input_object = init_input_object_type(ident.clone());
     input_object.require_at_most_one_field();
-
-    <span class="kw">let </span>input_object = Arc::new(input_object);
-    ctx.cache_input_type(ident, input_object.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, input_object);
 
     <span class="comment">// Basic orderBy fields.
     </span><span class="kw">let </span><span class="kw-2">mut </span>fields: Vec&lt;<span class="kw">_</span>&gt; = container
@@ -388,8 +375,8 @@
         </span>append_opt(<span class="kw-2">&amp;mut </span>fields, order_by_field_text_search(ctx, container))
     }
 
-    input_object.set_fields(fields);
-    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 <span class="kw">fn </span>compute_scalar_aggregation_fields(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, container: <span class="kw-2">&amp;</span>ParentContainer) -&gt; Vec&lt;InputField&gt; {
@@ -491,13 +478,12 @@
     }
 }
 
-<span class="kw">fn </span>sort_nulls_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; InputObjectTypeWeakRef {
+<span class="kw">fn </span>sort_nulls_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; InputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_prisma(<span class="string">&quot;SortOrderInput&quot;</span>);
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, input_object.clone());
-
+    <span class="kw">let </span>input_object = init_input_object_type(ident.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, input_object);
     <span class="kw">let </span>sort_order_enum_type = sort_order_enum(ctx);
     <span class="kw">let </span>nulls_order_enum_type = nulls_order_enum(ctx);
 
@@ -506,9 +492,8 @@
         input_field(ctx, ordering::NULLS, InputType::Enum(nulls_order_enum_type), <span class="prelude-val">None</span>).optional(),
     ];
 
-    input_object.set_fields(fields);
-
-    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 <span class="kw">fn </span>order_by_field_aggregate(
@@ -531,7 +516,7 @@
     ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     container: <span class="kw-2">&amp;</span>ParentContainer,
     scalar_fields: Vec&lt;ScalarFieldRef&gt;,
-) -&gt; InputObjectTypeWeakRef {
+) -&gt; InputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::OrderByAggregateInput(
         container.clone(),
         suffix.to_string(),
@@ -541,9 +526,7 @@
 
     <span class="kw">let </span><span class="kw-2">mut </span>input_object = init_input_object_type(ident.clone());
     input_object.require_exactly_one_field();
-
-    <span class="kw">let </span>input_object = Arc::new(input_object);
-    ctx.cache_input_type(ident, input_object.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, input_object);
 
     <span class="kw">let </span>sort_order_enum = InputType::Enum(sort_order_enum(ctx));
     <span class="kw">let </span>fields = scalar_fields
@@ -551,29 +534,25 @@
         .map(|sf| input_field(ctx, sf.name(), sort_order_enum.clone(), <span class="prelude-val">None</span>).optional())
         .collect();
 
-    input_object.set_fields(fields);
-    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 <span class="kw">fn </span>order_by_to_many_aggregate_object_type(
     ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     container: <span class="kw-2">&amp;</span>ParentContainer,
-) -&gt; InputObjectTypeWeakRef {
+) -&gt; InputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::OrderByToManyAggregateInput(container.clone()));
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span><span class="kw-2">mut </span>input_object = init_input_object_type(ident.clone());
     input_object.require_exactly_one_field();
-
-    <span class="kw">let </span>input_object = Arc::new(input_object);
-    ctx.cache_input_type(ident, input_object.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, input_object);
 
     <span class="kw">let </span>sort_order_enum = InputType::Enum(sort_order_enum(ctx));
     <span class="kw">let </span>fields = <span class="macro">vec!</span>[input_field(ctx, aggregations::UNDERSCORE_COUNT, sort_order_enum, <span class="prelude-val">None</span>).optional()];
-
-    input_object.set_fields(fields);
-
-    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 <span class="kw">fn </span>order_by_field_text_search(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, container: <span class="kw-2">&amp;</span>ParentContainer) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
@@ -598,13 +577,13 @@
     ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     container: <span class="kw-2">&amp;</span>ParentContainer,
     scalar_fields: Vec&lt;ScalarFieldRef&gt;,
-) -&gt; InputObjectTypeWeakRef {
+) -&gt; InputObjectTypeId {
     <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::OrderByRelevanceInput(container.clone()));
 
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, input_object.clone());
+    <span class="kw">let </span>input_object = init_input_object_type(ident.clone());
+    <span class="kw">let </span>id = ctx.cache_input_type(ident, input_object);
 
     <span class="kw">let </span>fields_enum_type = InputType::enum_type(order_by_relevance_enum(
         ctx,
@@ -624,9 +603,8 @@
         input_field(ctx, ordering::SEARCH, InputType::string(), <span class="prelude-val">None</span>),
     ];
 
-    input_object.set_fields(fields);
-
-    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="schema_builder" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>

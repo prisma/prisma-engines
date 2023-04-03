@@ -241,9 +241,9 @@
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub enum </span>OutputType {
-    Enum(EnumTypeWeakRef),
+    Enum(EnumTypeId),
     List(OutputTypeRef),
-    Object(ObjectTypeWeakRef),
+    Object(OutputObjectTypeId),
     Scalar(ScalarType),
 }
 
@@ -252,7 +252,7 @@
         OutputType::List(Arc::new(containing))
     }
 
-    <span class="kw">pub fn </span>object(containing: ObjectTypeWeakRef) -&gt; OutputType {
+    <span class="kw">pub fn </span>object(containing: OutputObjectTypeId) -&gt; OutputType {
         OutputType::Object(containing)
     }
 
@@ -280,7 +280,7 @@
         OutputType::Scalar(ScalarType::Boolean)
     }
 
-    <span class="kw">pub fn </span>enum_type(containing: EnumTypeWeakRef) -&gt; OutputType {
+    <span class="kw">pub fn </span>enum_type(containing: EnumTypeId) -&gt; OutputType {
         OutputType::Enum(containing)
     }
 
@@ -306,11 +306,11 @@
 
     <span class="doccomment">/// Attempts to recurse through the type until an object type is found.
     /// Returns Some(ObjectTypeStrongRef) if ab object type is found, None otherwise.
-    </span><span class="kw">pub fn </span>as_object_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ObjectTypeStrongRef&gt; {
+    </span><span class="kw">pub fn </span>as_object_type&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, db: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchemaDatabase) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ObjectType&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             OutputType::Enum(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-            OutputType::List(inner) =&gt; inner.as_object_type(),
-            OutputType::Object(obj) =&gt; <span class="prelude-val">Some</span>(obj.into_arc()),
+            OutputType::List(inner) =&gt; inner.as_object_type(db),
+            OutputType::Object(obj) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>db[<span class="kw-2">*</span>obj]),
             OutputType::Scalar(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
@@ -407,7 +407,7 @@
 
     <span class="doccomment">/// Arguments are input fields, but positioned in context of an output field
     /// instead of being attached to an input object.
-    </span><span class="kw">pub </span>arguments: Vec&lt;InputFieldRef&gt;,
+    </span><span class="kw">pub </span>arguments: Vec&lt;InputField&gt;,
 
     <span class="doccomment">/// Indicates the presence of the field on the higher output objects.
     /// States whether or not the field can be null.
@@ -463,8 +463,8 @@
 
     <span class="comment">// Is relation determines whether the given output field maps to a a relation, i.e.
     // is an object and that object is backed by a model, meaning that it is not an scalar list
-    </span><span class="kw">pub fn </span>maps_to_relation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="kw">let </span>o = <span class="self">self</span>.field_type.as_object_type();
+    </span><span class="kw">pub fn </span>maps_to_relation(<span class="kw-2">&amp;</span><span class="self">self</span>, query_schema: <span class="kw-2">&amp;</span>QuerySchema) -&gt; bool {
+        <span class="kw">let </span>o = <span class="self">self</span>.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db);
         o.is_some() &amp;&amp; o.unwrap().model.is_some()
     }
 }

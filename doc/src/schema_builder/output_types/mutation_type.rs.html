@@ -233,8 +233,6 @@
 <a href="#233" id="233">233</a>
 <a href="#234" id="234">234</a>
 <a href="#235" id="235">235</a>
-<a href="#236" id="236">236</a>
-<a href="#237" id="237">237</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::mutations::{create_many, create_one};
 <span class="kw">use </span>input_types::fields::{arguments, input_fields};
@@ -242,7 +240,7 @@
 <span class="kw">use </span>psl::datamodel_connector::ConnectorCapability;
 
 <span class="doccomment">/// Builds the root `Mutation` type.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; (OutputType, ObjectTypeStrongRef) {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; OutputObjectTypeId {
     <span class="kw">let </span><span class="kw-2">mut </span>fields: Vec&lt;OutputField&gt; = ctx
         .internal_data_model
         .models()
@@ -278,9 +276,7 @@
     }
 
     <span class="kw">let </span>ident = Identifier::new_prisma(<span class="string">&quot;Mutation&quot;</span>.to_owned());
-    <span class="kw">let </span>strong_ref = Arc::new(object_type(ident, fields, <span class="prelude-val">None</span>));
-
-    (OutputType::Object(Arc::downgrade(<span class="kw-2">&amp;</span>strong_ref)), strong_ref)
+    ctx.db.push_output_object_type(object_type(ident, fields, <span class="prelude-val">None</span>))
 }
 
 <span class="comment">// implementation note: these need to be in the same function, because these vecs interact: the create inputs will enqueue update inputs, and vice versa.
@@ -301,7 +297,7 @@
             }
 
             fields.push(input_fields::nested_connect_input_field(ctx, <span class="kw-2">&amp;</span>rf));
-            input_object.set_fields(fields);
+            ctx.db[input_object].set_fields(fields);
         }
 
         <span class="comment">// Update inputs.
@@ -326,7 +322,7 @@
             append_opt(<span class="kw-2">&amp;mut </span>fields, input_fields::nested_update_many_field(ctx, <span class="kw-2">&amp;</span>rf));
             append_opt(<span class="kw-2">&amp;mut </span>fields, input_fields::nested_delete_many_field(ctx, <span class="kw-2">&amp;</span>rf));
 
-            input_object.set_fields(fields);
+            ctx.db[input_object].set_fields(fields);
         }
 
         std::mem::swap(<span class="kw-2">&amp;mut </span>nested_create_inputs_queue, <span class="kw-2">&amp;mut </span>ctx.nested_create_inputs_queue);

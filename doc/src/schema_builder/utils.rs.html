@@ -87,15 +87,9 @@
 <a href="#87" id="87">87</a>
 <a href="#88" id="88">88</a>
 <a href="#89" id="89">89</a>
-<a href="#90" id="90">90</a>
-<a href="#91" id="91">91</a>
-<a href="#92" id="92">92</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>once_cell::sync::OnceCell;
-<span class="kw">use </span>prisma_models::{
-    ast, dml,
-    walkers::{<span class="self">self</span>, PrimaryKeyWalker},
-};
+<span class="kw">use </span>prisma_models::{ast, dml, walkers};
 <span class="kw">use </span>std::sync::Arc;
 
 <span class="doccomment">/// Object type convenience wrapper function.
@@ -136,7 +130,7 @@
 {
     OutputField {
         name: name.into(),
-        arguments: arguments.into_iter().map(Arc::new).collect(),
+        arguments,
         field_type: Arc::new(field_type),
         query_info,
         is_nullable: <span class="bool-val">false</span>,
@@ -157,7 +151,7 @@
 {
     <span class="kw">let </span><span class="kw-2">mut </span>input_field = InputField::new(name.into(), default_value, <span class="bool-val">true</span>);
     <span class="kw">for </span>field_type <span class="kw">in </span>field_types {
-        input_field.push_type(field_type, <span class="kw-2">&amp;mut </span>ctx.input_field_types);
+        input_field.push_type(field_type, <span class="kw-2">&amp;mut </span>ctx.db);
     }
     input_field
 }
@@ -177,7 +171,7 @@
 }
 
 <span class="doccomment">/// Computes a compound field name based on a multi-field id.
-</span><span class="kw">pub fn </span>compound_id_field_name(pk: PrimaryKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
+</span><span class="kw">pub fn </span>compound_id_field_name(pk: walkers::PrimaryKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
     pk.name()
         .map(ToOwned::to_owned)
         .unwrap_or_else(|| pk.fields().map(|sf| sf.name()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;().join(<span class="string">&quot;_&quot;</span>))

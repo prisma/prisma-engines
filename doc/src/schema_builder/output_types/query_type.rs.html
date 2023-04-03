@@ -182,13 +182,11 @@
 <a href="#182" id="182">182</a>
 <a href="#183" id="183">183</a>
 <a href="#184" id="184">184</a>
-<a href="#185" id="185">185</a>
-<a href="#186" id="186">186</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>input_types::fields::arguments;
 
 <span class="doccomment">/// Builds the root `Query` type.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; (OutputType, ObjectTypeStrongRef) {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; OutputObjectTypeId {
     <span class="kw">let </span>fields: Vec&lt;<span class="kw">_</span>&gt; = ctx
         .internal_data_model
         .models()
@@ -214,9 +212,7 @@
         .collect();
 
     <span class="kw">let </span>ident = Identifier::new_prisma(<span class="string">&quot;Query&quot;</span>);
-    <span class="kw">let </span>strong_ref = Arc::new(object_type(ident, fields, <span class="prelude-val">None</span>));
-
-    (OutputType::Object(Arc::downgrade(<span class="kw-2">&amp;</span>strong_ref)), strong_ref)
+    ctx.db.push_output_object_type(object_type(ident, fields, <span class="prelude-val">None</span>))
 }
 
 <span class="doccomment">/// Builds a &quot;single&quot; query arity item field (e.g. &quot;user&quot;, &quot;post&quot; ...) for given model.

@@ -46,11 +46,11 @@
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nested_connect_or_create_input_object(
     ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     parent_field: <span class="kw-2">&amp;</span>RelationFieldRef,
-) -&gt; <span class="prelude-ty">Option</span>&lt;InputObjectTypeWeakRef&gt; {
+) -&gt; <span class="prelude-ty">Option</span>&lt;InputObjectTypeId&gt; {
     <span class="kw">let </span>related_model = parent_field.related_model();
     <span class="kw">let </span>where_object = filter_objects::where_unique_object_type(ctx, <span class="kw-2">&amp;</span>related_model);
 
-    <span class="kw">if </span>where_object.into_arc().is_empty() {
+    <span class="kw">if </span>ctx.db[where_object].is_empty() {
         <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
@@ -64,16 +64,16 @@
 
     <span class="kw">match </span>ctx.get_input_type(<span class="kw-2">&amp;</span>ident) {
         <span class="prelude-val">None </span>=&gt; {
-            <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));
-            ctx.cache_input_type(ident, input_object.clone());
+            <span class="kw">let </span>input_object = init_input_object_type(ident.clone());
+            <span class="kw">let </span>id = ctx.cache_input_type(ident, input_object);
 
             <span class="kw">let </span>fields = <span class="macro">vec!</span>[
                 input_field(ctx, args::WHERE, InputType::object(where_object), <span class="prelude-val">None</span>),
                 input_field(ctx, args::CREATE, create_types, <span class="prelude-val">None</span>),
             ];
 
-            input_object.set_fields(fields);
-            <span class="prelude-val">Some</span>(Arc::downgrade(<span class="kw-2">&amp;</span>input_object))
+            ctx.db[id].set_fields(fields);
+            <span class="prelude-val">Some</span>(id)
         }
         x =&gt; x,
     }
