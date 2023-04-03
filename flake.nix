@@ -1,7 +1,4 @@
 {
-  # This is needed for ./nix/cli-shell.nix in order to be allowed to have an
-  # impure build.
-
   inputs = {
     crane = {
       url = "github:ipetkov/crane";
