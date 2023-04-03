@@ -1,7 +1,7 @@
 use introspection_engine_tests::{test_api::*, TestResult};
 
 #[test_connector(tags(Mssql))]
-async fn multiple_schemas_without_schema_property_are_not_introspected(api: &TestApi) -> TestResult {
+async fn multiple_schemas_without_schema_property_are_not_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let other_name = "second";
 
@@ -43,7 +43,7 @@ async fn multiple_schemas_without_schema_property_are_not_introspected(api: &Tes
 }
 
 #[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("first", "second"))]
-async fn multiple_schemas_w_tables_are_introspected(api: &TestApi) -> TestResult {
+async fn multiple_schemas_w_tables_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
 
@@ -122,7 +122,7 @@ async fn multiple_schemas_w_tables_are_introspected(api: &TestApi) -> TestResult
 }
 
 #[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("first", "second"))]
-async fn multiple_schemas_w_tables_are_reintrospected(api: &TestApi) -> TestResult {
+async fn multiple_schemas_w_tables_are_reintrospected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
 
@@ -204,7 +204,7 @@ async fn multiple_schemas_w_tables_are_reintrospected(api: &TestApi) -> TestResu
 }
 
 #[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("first", "second"))]
-async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &TestApi) -> TestResult {
+async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
 
@@ -251,7 +251,7 @@ async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &TestApi
 }
 
 #[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("first", "second"))]
-async fn multiple_schemas_w_cross_schema_are_introspected(api: &TestApi) -> TestResult {
+async fn multiple_schemas_w_cross_schema_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
 
@@ -307,7 +307,7 @@ async fn multiple_schemas_w_cross_schema_are_introspected(api: &TestApi) -> Test
 }
 
 #[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("first", "second"))]
-async fn multiple_schemas_w_cross_schema_are_reintrospected(api: &TestApi) -> TestResult {
+async fn multiple_schemas_w_cross_schema_are_reintrospected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
 
@@ -369,7 +369,7 @@ async fn multiple_schemas_w_cross_schema_are_reintrospected(api: &TestApi) -> Te
 }
 
 #[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("first", "second"))]
-async fn multiple_schemas_w_cross_schema_fks_w_duplicate_names_are_introspected(api: &TestApi) -> TestResult {
+async fn multiple_schemas_w_cross_schema_fks_w_duplicate_names_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
 
@@ -427,7 +427,7 @@ async fn multiple_schemas_w_cross_schema_fks_w_duplicate_names_are_introspected(
 }
 
 #[test_connector(tags(Mssql), preview_features("multiSchema"), namespaces("first", "second"))]
-async fn defaults_are_introspected(api: &TestApi) -> TestResult {
+async fn defaults_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
 

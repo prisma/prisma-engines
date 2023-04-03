@@ -11,7 +11,7 @@ use introspection_engine_tests::test_api::*;
 use quaint::prelude::Queryable;
 
 #[test_connector(tags(Mysql57))]
-async fn nul_default_bytes(api: &TestApi) -> TestResult {
+async fn nul_default_bytes(api: &mut TestApi) -> TestResult {
     let create_table = indoc! {r#"
         CREATE TABLE nul_default_bytes
         (
@@ -30,13 +30,14 @@ async fn nul_default_bytes(api: &TestApi) -> TestResult {
         }
     "#]];
 
-    expected.assert_eq(&api.introspect_dml().await?);
+    let result = api.introspect_dml().await?;
+    expected.assert_eq(&result);
 
     Ok(())
 }
 
 #[test_connector(exclude(CockroachDb))]
-async fn a_simple_table_with_gql_types(api: &TestApi) -> TestResult {
+async fn a_simple_table_with_gql_types(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Blog", move |t| {
@@ -84,13 +85,14 @@ async fn a_simple_table_with_gql_types(api: &TestApi) -> TestResult {
         }}
     "##, float_native = float_native, timestamp_native = timestamp_native, text_native = text_native};
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(&dm, &result);
 
     Ok(())
 }
 
 #[test_connector(exclude(CockroachDb))]
-async fn should_ignore_prisma_helper_tables(api: &TestApi) -> TestResult {
+async fn should_ignore_prisma_helper_tables(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Blog", move |t| {
@@ -136,13 +138,14 @@ async fn should_ignore_prisma_helper_tables(api: &TestApi) -> TestResult {
         }
     "##};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
 
 #[test_connector]
-async fn a_table_with_compound_primary_keys(api: &TestApi) -> TestResult {
+async fn a_table_with_compound_primary_keys(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Blog", |t| {
@@ -162,13 +165,14 @@ async fn a_table_with_compound_primary_keys(api: &TestApi) -> TestResult {
         }
     "##};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
 
 #[test_connector(exclude(CockroachDb))]
-async fn a_table_with_unique_index(api: &TestApi) -> TestResult {
+async fn a_table_with_unique_index(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Blog", |t| {
@@ -188,13 +192,14 @@ async fn a_table_with_unique_index(api: &TestApi) -> TestResult {
         }
     "##};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
 
 #[test_connector(exclude(CockroachDb))]
-async fn a_table_with_multi_column_unique_index(api: &TestApi) -> TestResult {
+async fn a_table_with_multi_column_unique_index(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -216,13 +221,14 @@ async fn a_table_with_multi_column_unique_index(api: &TestApi) -> TestResult {
         }
     "##};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
 
 #[test_connector(exclude(CockroachDb))]
-async fn a_table_with_required_and_optional_columns(api: &TestApi) -> TestResult {
+async fn a_table_with_required_and_optional_columns(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -243,13 +249,14 @@ async fn a_table_with_required_and_optional_columns(api: &TestApi) -> TestResult
         }
     "##};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
 
 #[test_connector(exclude(Mssql, CockroachDb))]
-async fn a_table_with_default_values(api: &TestApi) -> TestResult {
+async fn a_table_with_default_values(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -287,13 +294,14 @@ async fn a_table_with_default_values(api: &TestApi) -> TestResult {
         }}
     "##, float_string, native_string};
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(&dm, &result);
 
     Ok(())
 }
 
 #[test_connector(exclude(CockroachDb))]
-async fn a_table_with_a_non_unique_index(api: &TestApi) -> TestResult {
+async fn a_table_with_a_non_unique_index(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -314,13 +322,14 @@ async fn a_table_with_a_non_unique_index(api: &TestApi) -> TestResult {
         }
     "##};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
 
 #[test_connector(exclude(CockroachDb))]
-async fn a_table_with_a_multi_column_non_unique_index(api: &TestApi) -> TestResult {
+async fn a_table_with_a_multi_column_non_unique_index(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -343,14 +352,15 @@ async fn a_table_with_a_multi_column_non_unique_index(api: &TestApi) -> TestResu
         }
     "##};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
 
 // SQLite does not have a serial type that's not a primary key.
 #[test_connector(exclude(Sqlite, Mysql, CockroachDb))]
-async fn a_table_with_non_id_autoincrement(api: &TestApi) -> TestResult {
+async fn a_table_with_non_id_autoincrement(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Test", |t| {
@@ -376,7 +386,7 @@ async fn a_table_with_non_id_autoincrement(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(exclude(Mssql, CockroachDb))]
-async fn default_values(api: &TestApi) -> TestResult {
+async fn default_values(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Test", move |t| {
@@ -445,13 +455,14 @@ async fn default_values(api: &TestApi) -> TestResult {
         }}
     "#, char_native, char_native, varchar_native, float_native,  timestamp_native};
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(&dm, &result);
 
     Ok(())
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb, Postgres14, Postgres15))]
-async fn pg_default_value_as_dbgenerated(api: &TestApi) -> TestResult {
+async fn pg_default_value_as_dbgenerated(api: &mut TestApi) -> TestResult {
     let sequence = "CREATE SEQUENCE test_seq START 1".to_string();
     api.database().execute_raw(&sequence, &[]).await?;
 
@@ -487,7 +498,7 @@ async fn pg_default_value_as_dbgenerated(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14))]
-async fn pg14_default_value_as_dbgenerated(api: &TestApi) -> TestResult {
+async fn pg14_default_value_as_dbgenerated(api: &mut TestApi) -> TestResult {
     let sequence = "CREATE SEQUENCE test_seq START 1".to_string();
     api.database().execute_raw(&sequence, &[]).await?;
 
@@ -526,7 +537,7 @@ async fn pg14_default_value_as_dbgenerated(api: &TestApi) -> TestResult {
 // no function default values on mysql 5.7 and 8.0 -.-
 // maria db allows this
 #[test_connector(tags(Mysql))]
-async fn my_default_value_as_dbgenerated(api: &TestApi) -> TestResult {
+async fn my_default_value_as_dbgenerated(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Test", |t| {
@@ -545,13 +556,14 @@ async fn my_default_value_as_dbgenerated(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
 
 #[test_connector(tags(Mysql8))]
-async fn a_table_with_an_index_that_contains_expressions_should_be_ignored(api: &TestApi) -> TestResult {
+async fn a_table_with_an_index_that_contains_expressions_should_be_ignored(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Test", |t| {
@@ -571,14 +583,15 @@ async fn a_table_with_an_index_that_contains_expressions_should_be_ignored(api: 
         }
     "#};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
 
 // MySQL doesn't have partial indices.
 #[test_connector(exclude(Mysql, CockroachDb))]
-async fn a_table_with_partial_indexes_should_ignore_them(api: &TestApi) -> TestResult {
+async fn a_table_with_partial_indexes_should_ignore_them(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("pages", move |t| {
@@ -605,13 +618,14 @@ async fn a_table_with_partial_indexes_should_ignore_them(api: &TestApi) -> TestR
         "#
     };
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
 
 #[test_connector(tags(Mariadb))]
-async fn different_default_values_should_work(api: &TestApi) -> TestResult {
+async fn different_default_values_should_work(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Blog", move |t| {
@@ -638,13 +652,14 @@ async fn different_default_values_should_work(api: &TestApi) -> TestResult {
         }
     "##};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
 
 #[test_connector(exclude(Sqlite, Mssql, CockroachDb))]
-async fn negative_default_values_should_work(api: &TestApi) -> TestResult {
+async fn negative_default_values_should_work(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Blog", move |t| {
@@ -679,13 +694,14 @@ async fn negative_default_values_should_work(api: &TestApi) -> TestResult {
         }}
     "##, float_native = float_native};
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(&dm, &result);
 
     Ok(())
 }
 
 #[test_connector(tags(Sqlite))]
-async fn expression_indexes_should_be_ignored_on_sqlite(api: &TestApi) -> TestResult {
+async fn expression_indexes_should_be_ignored_on_sqlite(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Blog", move |t| {
@@ -709,7 +725,7 @@ async fn expression_indexes_should_be_ignored_on_sqlite(api: &TestApi) -> TestRe
 }
 
 #[test_connector(tags(Mysql), exclude(Vitess))]
-async fn casing_should_not_lead_to_mix_ups(api: &TestApi) -> TestResult {
+async fn casing_should_not_lead_to_mix_ups(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("address", move |t| {
@@ -757,7 +773,7 @@ async fn casing_should_not_lead_to_mix_ups(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql), exclude(Mariadb))]
-async fn unique_and_index_on_same_field_works_mysql(api: &TestApi) -> TestResult {
+async fn unique_and_index_on_same_field_works_mysql(api: &mut TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE users (
             id SERIAL PRIMARY KEY NOT NULL
@@ -772,14 +788,14 @@ async fn unique_and_index_on_same_field_works_mysql(api: &TestApi) -> TestResult
         }
     "##};
 
-    let result = &api.introspect().await?;
-    api.assert_eq_datamodels(dm, result);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
 
 #[test_connector(tags(Mariadb))]
-async fn unique_and_index_on_same_field_works_mariadb(api: &TestApi) -> TestResult {
+async fn unique_and_index_on_same_field_works_mariadb(api: &mut TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE users (
             id INTEGER PRIMARY KEY NOT NULL,
@@ -795,13 +811,14 @@ async fn unique_and_index_on_same_field_works_mariadb(api: &TestApi) -> TestResu
         }
     "##};
 
-    let result = &api.introspect().await?;
-    api.assert_eq_datamodels(dm, result);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(dm, &result);
+
     Ok(())
 }
 
 #[test_connector(tags(Sqlite))]
-async fn unique_and_id_on_same_field_works_sqlite(api: &TestApi) -> TestResult {
+async fn unique_and_id_on_same_field_works_sqlite(api: &mut TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE users (
             id INTEGER PRIMARY KEY NOT NULL UNIQUE
@@ -823,7 +840,7 @@ async fn unique_and_id_on_same_field_works_sqlite(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn unique_and_id_on_same_field_works_mssql(api: &TestApi) -> TestResult {
+async fn unique_and_id_on_same_field_works_mssql(api: &mut TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE users (
             id INT IDENTITY,
@@ -841,8 +858,8 @@ async fn unique_and_id_on_same_field_works_mssql(api: &TestApi) -> TestResult {
         }
     "##};
 
-    let result = &api.introspect().await?;
-    api.assert_eq_datamodels(dm, result);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
@@ -855,7 +872,7 @@ async fn unique_and_id_on_same_field_works_mssql(api: &TestApi) -> TestResult {
 // entity and can be introspected.
 // In CockroachDB, index OIDs are statically hashed. However, the ordering means that either index
 // can be returned. As such, the test is skipped. See https://github.com/cockroachdb/cockroach/issues/71098.
-async fn unique_and_index_on_same_field_works_postgres(api: &TestApi) -> TestResult {
+async fn unique_and_index_on_same_field_works_postgres(api: &mut TestApi) -> TestResult {
     api.raw_cmd(
         "
         CREATE TABLE users (

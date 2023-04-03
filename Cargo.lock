@@ -1578,7 +1578,6 @@ dependencies = [
  "enumflags2",
  "expect-test",
  "indoc",
- "introspection-connector",
  "migration-connector",
  "pretty_assertions",
  "psl",

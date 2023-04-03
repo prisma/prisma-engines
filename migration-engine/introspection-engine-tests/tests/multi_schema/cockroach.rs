@@ -1,7 +1,7 @@
 use introspection_engine_tests::{test_api::*, TestResult};
 
 #[test_connector(tags(CockroachDb), preview_features("multiSchema"), namespaces("first", "second"))]
-async fn multiple_schemas_w_tables_are_reintrospected(api: &TestApi) -> TestResult {
+async fn multiple_schemas_w_tables_are_reintrospected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
     let create_schema = format!("CREATE Schema \"{schema_name}\"",);
@@ -62,7 +62,7 @@ async fn multiple_schemas_w_tables_are_reintrospected(api: &TestApi) -> TestResu
 }
 
 #[test_connector(tags(CockroachDb), preview_features("multiSchema"), namespaces("first", "second"))]
-async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &TestApi) -> TestResult {
+async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
     let setup = formatdoc! {
@@ -108,7 +108,7 @@ async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &TestApi
 }
 
 #[test_connector(tags(CockroachDb), preview_features("multiSchema"), namespaces("first", "second"))]
-async fn multiple_schemas_w_cross_schema_are_reintrospected(api: &TestApi) -> TestResult {
+async fn multiple_schemas_w_cross_schema_are_reintrospected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
     let create_schema = format!("CREATE Schema \"{schema_name}\"",);
@@ -169,7 +169,7 @@ async fn multiple_schemas_w_cross_schema_are_reintrospected(api: &TestApi) -> Te
     preview_features("multiSchema"),
     namespaces("first", "second_schema")
 )]
-async fn multiple_schemas_w_enums_are_introspected(api: &TestApi) -> TestResult {
+async fn multiple_schemas_w_enums_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second_schema";
     let sql = format! {
@@ -213,7 +213,7 @@ async fn multiple_schemas_w_enums_are_introspected(api: &TestApi) -> TestResult 
 }
 
 #[test_connector(tags(CockroachDb), preview_features("multiSchema"), namespaces("first", "second"))]
-async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &TestApi) -> TestResult {
+async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &mut TestApi) -> TestResult {
     let schema_name = "first";
     let other_name = "second";
     let setup = formatdoc! {
@@ -288,7 +288,7 @@ async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &TestApi) -> T
     preview_features("multiSchema"),
     namespaces("first", "second_schema")
 )]
-async fn same_table_name_with_relation_in_two_schemas(api: &TestApi) -> TestResult {
+async fn same_table_name_with_relation_in_two_schemas(api: &mut TestApi) -> TestResult {
     let sql = r#"
         CREATE SCHEMA "first";
         CREATE SCHEMA "second_schema";

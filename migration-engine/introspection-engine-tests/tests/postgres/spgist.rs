@@ -4,7 +4,7 @@ use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn spgist_raw_ops(api: &TestApi) -> TestResult {
+async fn spgist_raw_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data box)",);
     let create_primary = format!("CREATE INDEX \"A_data_idx\" ON \"{schema_name}\".\"A\" USING SPGIST (data);",);
@@ -28,7 +28,7 @@ async fn spgist_raw_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb, Postgres9))]
-async fn spgist_inet_ops(api: &TestApi) -> TestResult {
+async fn spgist_inet_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data inet)",);
     let create_primary = format!("CREATE INDEX \"A_data_idx\" ON \"{schema_name}\".\"A\" USING SPGIST (data);",);
@@ -52,7 +52,7 @@ async fn spgist_inet_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn spgist_text_ops(api: &TestApi) -> TestResult {
+async fn spgist_text_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data text)",);
     let create_primary = format!("CREATE INDEX \"A_data_idx\" ON \"{schema_name}\".\"A\" USING SPGIST (data);",);
@@ -76,7 +76,7 @@ async fn spgist_text_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn spgist_text_ops_varchar(api: &TestApi) -> TestResult {
+async fn spgist_text_ops_varchar(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data varchar(420))",);
     let create_primary = format!("CREATE INDEX \"A_data_idx\" ON \"{schema_name}\".\"A\" USING SPGIST (data);",);

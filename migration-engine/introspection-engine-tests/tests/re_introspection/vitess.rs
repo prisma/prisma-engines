@@ -5,7 +5,7 @@ use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
 #[test_connector(tags(Vitess))]
-async fn relation_mode_parameter_is_not_removed(api: &TestApi) -> TestResult {
+async fn relation_mode_parameter_is_not_removed(api: &mut TestApi) -> TestResult {
     let result = api.re_introspect("").await?;
     assert!(result.contains(r#"relationMode = "prisma""#));
 
@@ -13,7 +13,7 @@ async fn relation_mode_parameter_is_not_removed(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Vitess))]
-async fn relations_are_not_removed(api: &TestApi) -> TestResult {
+async fn relations_are_not_removed(api: &mut TestApi) -> TestResult {
     let dml = indoc! {r#"
         CREATE TABLE `A` (
             id INT AUTO_INCREMENT PRIMARY KEY
@@ -59,7 +59,7 @@ async fn relations_are_not_removed(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Vitess))]
-async fn warning_is_given_for_copied_relations(api: &TestApi) -> TestResult {
+async fn warning_is_given_for_copied_relations(api: &mut TestApi) -> TestResult {
     let dml = indoc! {r#"
         CREATE TABLE `A` (
             id INT AUTO_INCREMENT PRIMARY KEY
@@ -109,7 +109,7 @@ async fn warning_is_given_for_copied_relations(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Vitess))]
-async fn no_warnings_are_given_for_if_no_relations_were_copied(api: &TestApi) -> TestResult {
+async fn no_warnings_are_given_for_if_no_relations_were_copied(api: &mut TestApi) -> TestResult {
     let dml = indoc! {r#"
         CREATE TABLE `A` (
             id INT AUTO_INCREMENT PRIMARY KEY
@@ -142,7 +142,7 @@ async fn no_warnings_are_given_for_if_no_relations_were_copied(api: &TestApi) ->
 }
 
 #[test_connector(tags(Vitess))]
-async fn relations_field_order_is_kept(api: &TestApi) -> TestResult {
+async fn relations_field_order_is_kept(api: &mut TestApi) -> TestResult {
     let dml = indoc! {r#"
         CREATE TABLE `A` (
             id INT AUTO_INCREMENT PRIMARY KEY
@@ -188,7 +188,7 @@ async fn relations_field_order_is_kept(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Vitess))]
-async fn relations_field_order_is_kept_if_having_new_fields(api: &TestApi) -> TestResult {
+async fn relations_field_order_is_kept_if_having_new_fields(api: &mut TestApi) -> TestResult {
     let dml = indoc! {r#"
         CREATE TABLE `A` (
             new VARCHAR(255) NOT NULL, 
@@ -236,7 +236,7 @@ async fn relations_field_order_is_kept_if_having_new_fields(api: &TestApi) -> Te
 }
 
 #[test_connector(tags(Vitess))]
-async fn relations_field_order_is_kept_if_removing_fields(api: &TestApi) -> TestResult {
+async fn relations_field_order_is_kept_if_removing_fields(api: &mut TestApi) -> TestResult {
     let dml = indoc! {r#"
         CREATE TABLE `A` (
             id INT AUTO_INCREMENT PRIMARY KEY
@@ -283,7 +283,7 @@ async fn relations_field_order_is_kept_if_removing_fields(api: &TestApi) -> Test
 }
 
 #[test_connector(tags(Vitess))]
-async fn deleting_models_will_delete_relations(api: &TestApi) -> TestResult {
+async fn deleting_models_will_delete_relations(api: &mut TestApi) -> TestResult {
     let dml = indoc! {r#"
         CREATE TABLE `A` (
             id INT AUTO_INCREMENT PRIMARY KEY
@@ -336,7 +336,7 @@ async fn deleting_models_will_delete_relations(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Vitess))]
-async fn field_renames_keeps_the_relation_intact(api: &TestApi) -> TestResult {
+async fn field_renames_keeps_the_relation_intact(api: &mut TestApi) -> TestResult {
     let dml = indoc! {r#"
         CREATE TABLE `A` (
             id INT AUTO_INCREMENT PRIMARY KEY
@@ -382,7 +382,7 @@ async fn field_renames_keeps_the_relation_intact(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Vitess))]
-async fn referential_actions_are_kept_intact(api: &TestApi) -> TestResult {
+async fn referential_actions_are_kept_intact(api: &mut TestApi) -> TestResult {
     let dml = indoc! {r#"
         CREATE TABLE `A` (
             id INT AUTO_INCREMENT PRIMARY KEY

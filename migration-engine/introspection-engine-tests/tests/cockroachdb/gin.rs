@@ -1,7 +1,7 @@
 use introspection_engine_tests::test_api::*;
 
 #[test_connector(tags(CockroachDb), preview_features("cockroachDb"))]
-async fn gin_unsupported_type(api: &TestApi) -> TestResult {
+async fn gin_unsupported_type(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
 
     let setup = formatdoc!(
@@ -35,7 +35,7 @@ async fn gin_unsupported_type(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(CockroachDb), preview_features("cockroachDb"))]
-async fn array_ops(api: &TestApi) -> TestResult {
+async fn array_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
 
     let setup = formatdoc!(
@@ -69,7 +69,7 @@ async fn array_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(CockroachDb), preview_features("cockroachDb"))]
-async fn jsonb_ops(api: &TestApi) -> TestResult {
+async fn jsonb_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
 
     let setup = formatdoc!(

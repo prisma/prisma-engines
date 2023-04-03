@@ -1,8 +1,8 @@
 use connection_string::JdbcString;
 use enumflags2::BitFlags;
 use indoc::formatdoc;
-use introspection_connector::{CompositeTypeDepth, IntrospectionConnector, IntrospectionContext};
 use introspection_engine_tests::test_api::Queryable;
+use migration_connector::{CompositeTypeDepth, IntrospectionConnector, IntrospectionContext};
 use psl::PreviewFeature;
 use quaint::single::Quaint;
 use sql_introspection_connector::SqlIntrospectionConnector;

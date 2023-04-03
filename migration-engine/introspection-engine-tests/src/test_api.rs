@@ -1,28 +1,28 @@
 pub use super::TestResult;
 pub use expect_test::expect;
 pub use indoc::{formatdoc, indoc};
-use introspection_connector::ViewDefinition;
+use migration_connector::CompositeTypeDepth;
+use migration_connector::ConnectorResult;
+use migration_connector::IntrospectionContext;
+use migration_connector::IntrospectionResult;
+use migration_connector::Version;
+use migration_connector::ViewDefinition;
 pub use quaint::prelude::Queryable;
 pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::{BarrelMigrationExecutor, Result};
-use introspection_connector::{
-    CompositeTypeDepth, ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext,
-    IntrospectionResult, Version,
-};
 use migration_connector::{ConnectorParams, MigrationConnector};
 use psl::Configuration;
 use psl::PreviewFeature;
 use quaint::{prelude::SqlFamily, single::Quaint};
-use sql_introspection_connector::SqlIntrospectionConnector;
 use sql_migration_connector::SqlMigrationConnector;
 use std::fmt::Write;
 use test_setup::{sqlite_test_url, DatasourceBlock, TestApiArgs};
 use tracing::Instrument;
 
 pub struct TestApi {
-    pub api: SqlIntrospectionConnector,
+    pub api: SqlMigrationConnector,
     database: Quaint,
     args: TestApiArgs,
     connection_string: String,
@@ -42,51 +42,89 @@ impl TestApi {
             .collect();
 
         let namespaces: Vec<String> = args.namespaces().iter().map(|ns| ns.to_string()).collect();
+        let (database, connection_string, api): (Quaint, String, SqlMigrationConnector) =
+            if tags.intersects(Tags::Vitess) {
+                let mut me = SqlMigrationConnector::new_mysql();
 
-        let (database, connection_string): (Quaint, String) = if tags.intersects(Tags::Vitess) {
-            let params = ConnectorParams {
-                connection_string: connection_string.to_owned(),
-                preview_features,
-                shadow_database_connection_string: None,
-            };
-            let mut me = SqlMigrationConnector::new_mysql();
-            me.set_params(params).unwrap();
+                let params = ConnectorParams {
+                    connection_string: connection_string.to_owned(),
+                    preview_features,
+                    shadow_database_connection_string: None,
+                };
+                me.set_params(params).unwrap();
 
-            me.reset(true, migration_connector::Namespaces::from_vec(&mut namespaces.clone()))
-                .await
-                .unwrap();
+                me.reset(true, migration_connector::Namespaces::from_vec(&mut namespaces.clone()))
+                    .await
+                    .unwrap();
 
-            (
-                Quaint::new(connection_string).await.unwrap(),
-                connection_string.to_owned(),
-            )
-        } else if tags.contains(Tags::Mysql) {
-            let (_, cs) = args.create_mysql_database().await;
-            (Quaint::new(&cs).await.unwrap(), cs)
-        } else if tags.contains(Tags::Postgres) {
-            let (_, q, cs) = args.create_postgres_database().await;
-            if tags.contains(Tags::CockroachDb) {
-                q.raw_cmd(
-                    r#"
+                (
+                    Quaint::new(connection_string).await.unwrap(),
+                    connection_string.to_owned(),
+                    me,
+                )
+            } else if tags.contains(Tags::Mysql) {
+                let (_, cs) = args.create_mysql_database().await;
+                let mut me = SqlMigrationConnector::new_mysql();
+
+                let params = ConnectorParams {
+                    connection_string: cs.to_owned(),
+                    preview_features,
+                    shadow_database_connection_string: None,
+                };
+                me.set_params(params).unwrap();
+
+                (Quaint::new(&cs).await.unwrap(), cs, me)
+            } else if tags.contains(Tags::Postgres) {
+                let (_, q, cs) = args.create_postgres_database().await;
+                if tags.contains(Tags::CockroachDb) {
+                    q.raw_cmd(
+                        r#"
                     SET default_int_size = 4;
                     "#,
-                )
-                .await
-                .unwrap();
-            }
-            (q, cs)
-        } else if tags.contains(Tags::Mssql) {
-            args.create_mssql_database().await
-        } else if tags.contains(Tags::Sqlite) {
-            let url = sqlite_test_url(args.test_function_name());
-            (Quaint::new(&url).await.unwrap(), url)
-        } else {
-            unreachable!()
-        };
+                    )
+                    .await
+                    .unwrap();
+                }
 
-        let api = SqlIntrospectionConnector::new(&connection_string, preview_features)
-            .await
-            .unwrap();
+                let mut me = SqlMigrationConnector::new_postgres();
+
+                let params = ConnectorParams {
+                    connection_string: cs.to_owned(),
+                    preview_features,
+                    shadow_database_connection_string: None,
+                };
+                me.set_params(params).unwrap();
+
+                (q, cs, me)
+            } else if tags.contains(Tags::Mssql) {
+                let (q, cs) = args.create_mssql_database().await;
+
+                let mut me = SqlMigrationConnector::new_mssql();
+
+                let params = ConnectorParams {
+                    connection_string: cs.to_owned(),
+                    preview_features,
+                    shadow_database_connection_string: None,
+                };
+                me.set_params(params).unwrap();
+
+                (q, cs, me)
+            } else if tags.contains(Tags::Sqlite) {
+                let url = sqlite_test_url(args.test_function_name());
+
+                let mut me = SqlMigrationConnector::new_sqlite();
+
+                let params = ConnectorParams {
+                    connection_string: url.to_owned(),
+                    preview_features,
+                    shadow_database_connection_string: None,
+                };
+                me.set_params(params).unwrap();
+
+                (Quaint::new(&url).await.unwrap(), url, me)
+            } else {
+                unreachable!()
+            };
 
         TestApi {
             api,
@@ -102,29 +140,25 @@ impl TestApi {
         &self.connection_string
     }
 
-    pub async fn list_databases(&self) -> Result<Vec<String>> {
-        Ok(self.api.list_databases().await?)
-    }
-
     pub fn database(&self) -> &Quaint {
         &self.database
     }
 
-    pub async fn introspect(&self) -> Result<String> {
+    pub async fn introspect(&mut self) -> Result<String> {
         let previous_schema = psl::validate(self.pure_config().into());
         let introspection_result = self.test_introspect_internal(previous_schema, true).await?;
 
         Ok(introspection_result.data_model)
     }
 
-    pub async fn introspect_views(&self) -> Result<Option<Vec<ViewDefinition>>> {
+    pub async fn introspect_views(&mut self) -> Result<Option<Vec<ViewDefinition>>> {
         let previous_schema = psl::validate(self.pure_config().into());
         let introspection_result = self.test_introspect_internal(previous_schema, true).await?;
 
         Ok(introspection_result.views)
     }
 
-    pub async fn introspect_dml(&self) -> Result<String> {
+    pub async fn introspect_dml(&mut self) -> Result<String> {
         let previous_schema = psl::validate(self.pure_config().into());
         let introspection_result = self.test_introspect_internal(previous_schema, false).await?;
 
@@ -153,7 +187,7 @@ impl TestApi {
     }
 
     async fn test_introspect_internal(
-        &self,
+        &mut self,
         previous_schema: psl::ValidatedSchema,
         render_config: bool,
     ) -> ConnectorResult<IntrospectionResult> {
@@ -167,7 +201,7 @@ impl TestApi {
     }
 
     #[tracing::instrument(skip(self, data_model_string))]
-    pub async fn re_introspect(&self, data_model_string: &str) -> Result<String> {
+    pub async fn re_introspect(&mut self, data_model_string: &str) -> Result<String> {
         let schema = format!("{}{}", self.pure_config(), data_model_string);
         let schema = parse_datamodel(&schema);
         let introspection_result = self.test_introspect_internal(schema, true).await?;
@@ -176,7 +210,7 @@ impl TestApi {
     }
 
     #[tracing::instrument(skip(self, data_model_string))]
-    pub async fn re_introspect_dml(&self, data_model_string: &str) -> Result<String> {
+    pub async fn re_introspect_dml(&mut self, data_model_string: &str) -> Result<String> {
         let data_model = parse_datamodel(&format!("{}{}", self.pure_config(), data_model_string));
         let introspection_result = self.test_introspect_internal(data_model, false).await?;
 
@@ -184,44 +218,32 @@ impl TestApi {
     }
 
     #[tracing::instrument(skip(self, data_model_string))]
-    pub async fn re_introspect_config(&self, data_model_string: &str) -> Result<String> {
+    pub async fn re_introspect_config(&mut self, data_model_string: &str) -> Result<String> {
         let data_model = parse_datamodel(data_model_string);
         let introspection_result = self.test_introspect_internal(data_model, true).await?;
 
         Ok(introspection_result.data_model)
     }
 
-    pub async fn re_introspect_warnings(&self, data_model_string: &str) -> Result<String> {
+    pub async fn re_introspect_warnings(&mut self, data_model_string: &str) -> Result<String> {
         let data_model = parse_datamodel(&format!("{}{}", self.pure_config(), data_model_string));
         let introspection_result = self.test_introspect_internal(data_model, false).await?;
 
         Ok(serde_json::to_string(&introspection_result.warnings)?)
     }
 
-    pub async fn introspect_version(&self) -> Result<Version> {
+    pub async fn introspect_version(&mut self) -> Result<Version> {
         let previous_schema = psl::validate(self.pure_config().into());
         let introspection_result = self.test_introspect_internal(previous_schema, false).await?;
 
         Ok(introspection_result.version)
     }
 
-    pub async fn introspection_warnings(&self) -> Result<String> {
+    pub async fn introspection_warnings(&mut self) -> Result<String> {
         let previous_schema = psl::validate(self.pure_config().into());
         let introspection_result = self.test_introspect_internal(previous_schema, false).await?;
 
         Ok(serde_json::to_string(&introspection_result.warnings)?)
-    }
-
-    pub async fn get_metadata(&self) -> Result<DatabaseMetadata> {
-        Ok(self.api.get_metadata().await?)
-    }
-
-    pub async fn get_database_description(&self) -> Result<String> {
-        Ok(self.api.get_database_description().await?)
-    }
-
-    pub async fn get_database_version(&self) -> Result<String> {
-        Ok(self.api.get_database_version().await?)
     }
 
     pub fn sql_family(&self) -> SqlFamily {
@@ -304,12 +326,30 @@ impl TestApi {
         psl::parse_configuration(&self.pure_config()).unwrap()
     }
 
-    pub async fn expect_datamodel(&self, expectation: &expect_test::Expect) {
+    pub async fn expect_datamodel(&mut self, expectation: &expect_test::Expect) {
         let found = self.introspect().await.unwrap();
         expectation.assert_eq(&found);
     }
 
-    pub async fn expect_view_definition(&self, schema: &str, view: &str, expectation: &expect_test::Expect) {
+    pub async fn expect_view_definition(&mut self, view: &str, expectation: &expect_test::Expect) {
+        let views = self.introspect_views().await.unwrap().unwrap_or_default();
+
+        dbg!((&views, self.schema_name()));
+
+        let view = views
+            .into_iter()
+            .find(|v| v.schema == self.schema_name() && v.name == view)
+            .expect("Could not find view with the given name.");
+
+        expectation.assert_eq(&view.definition);
+    }
+
+    pub async fn expect_view_definition_in_schema(
+        &mut self,
+        schema: &str,
+        view: &str,
+        expectation: &expect_test::Expect,
+    ) {
         let views = self.introspect_views().await.unwrap().unwrap_or_default();
 
         let view = views
@@ -320,14 +360,14 @@ impl TestApi {
         expectation.assert_eq(&view.definition);
     }
 
-    pub async fn expect_warnings(&self, expectation: &expect_test::Expect) {
+    pub async fn expect_warnings(&mut self, expectation: &expect_test::Expect) {
         let previous_schema = psl::validate(self.pure_config().into());
         let introspection_result = self.test_introspect_internal(previous_schema, true).await.unwrap();
 
         expectation.assert_eq(&serde_json::to_string_pretty(&introspection_result.warnings).unwrap());
     }
 
-    pub async fn expect_no_warnings(&self) {
+    pub async fn expect_no_warnings(&mut self) {
         let previous_schema = psl::validate(self.pure_config().into());
         let introspection_result = self.test_introspect_internal(previous_schema, true).await.unwrap();
 
@@ -335,14 +375,14 @@ impl TestApi {
         assert!(introspection_result.warnings.is_empty())
     }
 
-    pub async fn expect_re_introspected_datamodel(&self, schema: &str, expectation: expect_test::Expect) {
+    pub async fn expect_re_introspected_datamodel(&mut self, schema: &str, expectation: expect_test::Expect) {
         let data_model = parse_datamodel(&format!("{}{}", self.pure_config(), schema));
         let reintrospected = self.test_introspect_internal(data_model, false).await.unwrap();
 
         expectation.assert_eq(&reintrospected.data_model);
     }
 
-    pub async fn expect_re_introspect_warnings(&self, schema: &str, expectation: expect_test::Expect) {
+    pub async fn expect_re_introspect_warnings(&mut self, schema: &str, expectation: expect_test::Expect) {
         let data_model = parse_datamodel(&format!("{}{}", self.pure_config(), schema));
         let introspection_result = self.test_introspect_internal(data_model, false).await.unwrap();
 

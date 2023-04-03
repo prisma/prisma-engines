@@ -3,7 +3,7 @@ use introspection_engine_tests::test_api::*;
 use test_macros::test_connector;
 
 #[test_connector(tags(CockroachDb221))]
-async fn compound_foreign_keys_with_defaults_v_22_1(api: &TestApi) -> TestResult {
+async fn compound_foreign_keys_with_defaults_v_22_1(api: &mut TestApi) -> TestResult {
     api.raw_cmd(
         r#"
         CREATE TABLE "Person" (
@@ -39,7 +39,7 @@ async fn compound_foreign_keys_with_defaults_v_22_1(api: &TestApi) -> TestResult
 }
 
 #[test_connector(tags(CockroachDb222))]
-async fn compound_foreign_keys_with_defaults_v_22_2(api: &TestApi) -> TestResult {
+async fn compound_foreign_keys_with_defaults_v_22_2(api: &mut TestApi) -> TestResult {
     api.raw_cmd(
         r#"
         CREATE TABLE "Person" (

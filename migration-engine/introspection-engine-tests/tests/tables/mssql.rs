@@ -2,7 +2,7 @@ use indoc::formatdoc;
 use introspection_engine_tests::test_api::*;
 
 #[test_connector(tags(Mssql))]
-async fn default_values(api: &TestApi) -> TestResult {
+async fn default_values(api: &mut TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE [dbo].[Test] (
             id INTEGER,
@@ -40,7 +40,7 @@ async fn default_values(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn negative_default_values_should_work(api: &TestApi) -> TestResult {
+async fn negative_default_values_should_work(api: &mut TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE [Blog] (
             id INTEGER IDENTITY,
@@ -76,7 +76,7 @@ async fn negative_default_values_should_work(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn a_table_with_descending_primary_key(api: &TestApi) -> TestResult {
+async fn a_table_with_descending_primary_key(api: &mut TestApi) -> TestResult {
     let setup = formatdoc! {r#"
        CREATE TABLE [{}].[A] (
            id INTEGER IDENTITY,
@@ -98,7 +98,7 @@ async fn a_table_with_descending_primary_key(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn a_table_with_descending_unique(api: &TestApi) -> TestResult {
+async fn a_table_with_descending_unique(api: &mut TestApi) -> TestResult {
     let setup = formatdoc! {r#"
        CREATE TABLE [{}].[A] (
            id INTEGER IDENTITY,
@@ -123,7 +123,7 @@ async fn a_table_with_descending_unique(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn a_table_with_descending_compound_unique(api: &TestApi) -> TestResult {
+async fn a_table_with_descending_compound_unique(api: &mut TestApi) -> TestResult {
     let setup = formatdoc! {r#"
        CREATE TABLE [{}].[A] (
            id INTEGER IDENTITY,
@@ -152,7 +152,7 @@ async fn a_table_with_descending_compound_unique(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn a_table_with_descending_index(api: &TestApi) -> TestResult {
+async fn a_table_with_descending_index(api: &mut TestApi) -> TestResult {
     let setup = formatdoc! {r#"
        CREATE TABLE [{schema_name}].[A] (
            id INTEGER IDENTITY,

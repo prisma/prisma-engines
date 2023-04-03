@@ -3,7 +3,7 @@ use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 
 #[test_connector(tags(Mssql))]
-async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
+async fn multiple_changed_relation_names(api: &mut TestApi) -> TestResult {
     let setup = format!(
         r#"
         CREATE TABLE [{schema}].[Employee] (
@@ -76,7 +76,7 @@ async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> TestResult {
+async fn multiple_changed_relation_names_due_to_mapped_models(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -155,7 +155,7 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
 }
 
 #[test_connector(tags(Mssql))]
-async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
+async fn mapped_model_and_field_name(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -227,7 +227,7 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn updated_at(api: &TestApi) {
+async fn updated_at(api: &mut TestApi) {
     let setup = format!(
         r#"
         CREATE TABLE [{schema_name}].[User] (
@@ -269,11 +269,12 @@ async fn updated_at(api: &TestApi) {
         }
     "#};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await.unwrap());
+    let result = api.re_introspect(input_dm).await.unwrap();
+    api.assert_eq_datamodels(final_dm, &result);
 }
 
 #[test_connector(tags(Mssql))]
-async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult {
+async fn re_introspecting_custom_compound_id_names(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE [User] (
             first INT NOT NULL,
@@ -355,7 +356,7 @@ async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult 
 }
 
 #[test_connector(tags(Mssql))]
-async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestResult {
+async fn re_introspecting_custom_compound_unique_names(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE [User] (
             id INT IDENTITY,
@@ -403,7 +404,7 @@ async fn re_introspecting_custom_compound_unique_names(api: &TestApi) -> TestRes
 }
 
 #[test_connector(tags(Mssql))]
-async fn direct_url(api: &TestApi) {
+async fn direct_url(api: &mut TestApi) {
     let setup = format!(
         r#"
         CREATE TABLE [{schema_name}].[User] (

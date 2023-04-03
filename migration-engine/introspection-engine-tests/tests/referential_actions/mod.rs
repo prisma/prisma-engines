@@ -10,7 +10,7 @@ use introspection_engine_tests::TestResult;
 use test_macros::test_connector;
 
 #[test_connector(exclude(Mysql, Mssql, Sqlite, CockroachDb))]
-async fn referential_actions(api: &TestApi) -> TestResult {
+async fn referential_actions(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("a", |t| {
@@ -47,7 +47,7 @@ async fn referential_actions(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql), exclude(Vitess))]
-async fn referential_actions_mysql(api: &TestApi) -> TestResult {
+async fn referential_actions_mysql(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("a", |t| {
@@ -86,7 +86,7 @@ async fn referential_actions_mysql(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn default_referential_actions_with_restrict_postgres(api: &TestApi) -> TestResult {
+async fn default_referential_actions_with_restrict_postgres(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("a", |t| {
@@ -122,7 +122,7 @@ async fn default_referential_actions_with_restrict_postgres(api: &TestApi) -> Te
 }
 
 #[test_connector(tags(Sqlite))]
-async fn default_referential_actions_with_restrict_sqlite(api: &TestApi) -> TestResult {
+async fn default_referential_actions_with_restrict_sqlite(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("a", |t| {
@@ -158,7 +158,7 @@ async fn default_referential_actions_with_restrict_sqlite(api: &TestApi) -> Test
 }
 
 #[test_connector(tags(Mysql), exclude(Vitess))]
-async fn default_referential_actions_with_restrict_mysql(api: &TestApi) -> TestResult {
+async fn default_referential_actions_with_restrict_mysql(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("a", |t| {
@@ -196,7 +196,7 @@ async fn default_referential_actions_with_restrict_mysql(api: &TestApi) -> TestR
 }
 
 #[test_connector(tags(Mysql), exclude(Vitess))]
-async fn default_optional_actions_mysql(api: &TestApi) -> TestResult {
+async fn default_optional_actions_mysql(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("a", |t| {

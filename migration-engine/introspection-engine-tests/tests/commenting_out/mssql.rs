@@ -2,7 +2,7 @@ use barrel::types;
 use introspection_engine_tests::test_api::*;
 
 #[test_connector(tags(Mssql))]
-async fn a_table_without_uniques_should_ignore(api: &TestApi) -> TestResult {
+async fn a_table_without_uniques_should_ignore(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -44,7 +44,7 @@ async fn a_table_without_uniques_should_ignore(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn remapping_field_names_to_empty(api: &TestApi) -> TestResult {
+async fn remapping_field_names_to_empty(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {

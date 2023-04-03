@@ -4,7 +4,7 @@ use introspection_engine_tests::test_api::*;
 use test_macros::test_connector;
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn compound_foreign_keys_for_one_to_many_relations(api: &TestApi) -> TestResult {
+async fn compound_foreign_keys_for_one_to_many_relations(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -52,7 +52,7 @@ async fn compound_foreign_keys_for_one_to_many_relations(api: &TestApi) -> TestR
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn compound_foreign_keys_for_required_one_to_one_relations(api: &TestApi) -> TestResult {
+async fn compound_foreign_keys_for_required_one_to_one_relations(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", |t| {
@@ -104,7 +104,7 @@ async fn compound_foreign_keys_for_required_one_to_one_relations(api: &TestApi) 
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn compound_foreign_keys_for_one_to_many_relations_with_non_unique_index(api: &TestApi) -> TestResult {
+async fn compound_foreign_keys_for_one_to_many_relations_with_non_unique_index(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", move |t| {
@@ -150,7 +150,7 @@ async fn compound_foreign_keys_for_one_to_many_relations_with_non_unique_index(a
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn compound_foreign_keys_for_one_to_many_relations_with_mixed_requiredness(api: &TestApi) -> TestResult {
+async fn compound_foreign_keys_for_one_to_many_relations_with_mixed_requiredness(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -196,7 +196,7 @@ async fn compound_foreign_keys_for_one_to_many_relations_with_mixed_requiredness
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn compound_foreign_keys_with_defaults(api: &TestApi) -> TestResult {
+async fn compound_foreign_keys_with_defaults(api: &mut TestApi) -> TestResult {
     api.raw_cmd(r#"
         CREATE TABLE "Person" (
             id          SERIAL,

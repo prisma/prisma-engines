@@ -6,7 +6,7 @@ use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn kanjis(api: &TestApi) -> TestResult {
+async fn kanjis(api: &mut TestApi) -> TestResult {
     let migration = indoc! {r#"
         CREATE TABLE "A"
         (
@@ -45,7 +45,7 @@ async fn kanjis(api: &TestApi) -> TestResult {
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 // Cockroach can return either order for multiple foreign keys. This is hard to deterministically
 // test, so disable for now. See: https://github.com/cockroachdb/cockroach/issues/71098.
-async fn multiple_foreign_key_constraints_are_taken_always_in_the_same_order(api: &TestApi) -> TestResult {
+async fn multiple_foreign_key_constraints_are_taken_always_in_the_same_order(api: &mut TestApi) -> TestResult {
     let migration = indoc! {r#"
         CREATE TABLE "A"
         (
@@ -85,7 +85,7 @@ async fn multiple_foreign_key_constraints_are_taken_always_in_the_same_order(api
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> TestResult {
+async fn relations_should_avoid_name_clashes_2(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("x", move |t| {
@@ -140,7 +140,7 @@ async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn default_values_on_relations(api: &TestApi) -> TestResult {
+async fn default_values_on_relations(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -173,7 +173,7 @@ async fn default_values_on_relations(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn name_ambiguity_with_a_scalar_field(api: &TestApi) -> TestResult {
+async fn name_ambiguity_with_a_scalar_field(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE "b" (
             id SERIAL PRIMARY KEY,
@@ -218,7 +218,7 @@ async fn name_ambiguity_with_a_scalar_field(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn a_prisma_many_to_many_relation(api: &TestApi) -> TestResult {
+async fn a_prisma_many_to_many_relation(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE "User" (
             id SERIAL PRIMARY KEY

@@ -5,7 +5,7 @@ use introspection_engine_tests::{test_api::*, TestResult};
 use test_macros::test_connector;
 
 #[test_connector(tags(Sqlite))]
-async fn introspecting_custom_fk_names_does_not_return_them(api: &TestApi) -> TestResult {
+async fn introspecting_custom_fk_names_does_not_return_them(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", |t| {

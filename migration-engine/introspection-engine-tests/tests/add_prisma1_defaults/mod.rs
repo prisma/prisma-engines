@@ -4,7 +4,7 @@ use introspection_engine_tests::{test_api::*, TestResult};
 use test_macros::test_connector;
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn add_cuid_default_postgres(api: &TestApi) -> TestResult {
+async fn add_cuid_default_postgres(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("Book", move |t| {
@@ -29,7 +29,7 @@ async fn add_cuid_default_postgres(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql))]
-async fn add_cuid_default_mysql(api: &TestApi) -> TestResult {
+async fn add_cuid_default_mysql(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("Book", move |t| {
@@ -54,7 +54,7 @@ async fn add_cuid_default_mysql(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn add_uuid_default_postgres(api: &TestApi) -> TestResult {
+async fn add_uuid_default_postgres(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("Book", move |t| {
@@ -79,7 +79,7 @@ async fn add_uuid_default_postgres(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql))]
-async fn add_uuid_default_mysql(api: &TestApi) -> TestResult {
+async fn add_uuid_default_mysql(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("Book", move |t| {

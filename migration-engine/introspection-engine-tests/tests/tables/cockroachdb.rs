@@ -3,7 +3,7 @@ use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 
 #[test_connector(tags(CockroachDb))]
-async fn negative_default_values_should_work(api: &TestApi) -> TestResult {
+async fn negative_default_values_should_work(api: &mut TestApi) -> TestResult {
     let sql = r#"
         CREATE TABLE "Blog" (
             id          SERIAL PRIMARY KEY,
@@ -45,7 +45,7 @@ async fn negative_default_values_should_work(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(CockroachDb))]
-async fn should_ignore_prisma_helper_tables(api: &TestApi) -> TestResult {
+async fn should_ignore_prisma_helper_tables(api: &mut TestApi) -> TestResult {
     let sql = r#"
         CREATE TABLE "Blog" (
             id SERIAL PRIMARY KEY
@@ -105,7 +105,7 @@ async fn should_ignore_prisma_helper_tables(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(CockroachDb))]
-async fn default_values(api: &TestApi) -> TestResult {
+async fn default_values(api: &mut TestApi) -> TestResult {
     let sql = r#"
         CREATE TABLE "Test" (
             id SERIAL PRIMARY KEY,
@@ -148,7 +148,7 @@ async fn default_values(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(CockroachDb))]
-async fn a_simple_table_with_gql_types(api: &TestApi) -> TestResult {
+async fn a_simple_table_with_gql_types(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Blog", move |t| {
@@ -190,7 +190,7 @@ async fn a_simple_table_with_gql_types(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(CockroachDb))]
-async fn introspecting_a_table_with_json_type_must_work_cockroach(api: &TestApi) -> TestResult {
+async fn introspecting_a_table_with_json_type_must_work_cockroach(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Blog", |t| {
@@ -218,7 +218,7 @@ async fn introspecting_a_table_with_json_type_must_work_cockroach(api: &TestApi)
 // (it does not collapse similar unique constraints). This variation does not include the
 // doubly defined unique constraint.
 #[test_connector(tags(CockroachDb))]
-async fn a_table_with_non_id_autoincrement_cockroach(api: &TestApi) -> TestResult {
+async fn a_table_with_non_id_autoincrement_cockroach(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Test", |t| {
@@ -237,13 +237,14 @@ async fn a_table_with_non_id_autoincrement_cockroach(api: &TestApi) -> TestResul
         }
     "#};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
 
 #[test_connector(tags(CockroachDb))]
-async fn introspecting_json_defaults_on_cockroach(api: &TestApi) -> TestResult {
+async fn introspecting_json_defaults_on_cockroach(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
        CREATE TABLE "A" (
            id INTEGER NOT NULL PRIMARY KEY,
@@ -272,7 +273,7 @@ async fn introspecting_json_defaults_on_cockroach(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(CockroachDb))]
-async fn string_defaults_that_need_escaping(api: &TestApi) -> TestResult {
+async fn string_defaults_that_need_escaping(api: &mut TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE "stringstest" (
             id INTEGER PRIMARY KEY,
@@ -310,7 +311,7 @@ $$
 }
 
 #[test_connector(tags(CockroachDb))]
-async fn datetime_default_expressions_are_not_truncated(api: &TestApi) -> TestResult {
+async fn datetime_default_expressions_are_not_truncated(api: &mut TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE "Foo" (
             "id" INTEGER NOT NULL,

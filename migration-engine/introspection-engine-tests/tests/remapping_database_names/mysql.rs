@@ -4,7 +4,7 @@ use introspection_engine_tests::test_api::*;
 use test_macros::test_connector;
 
 #[test_connector(tags(Mysql), exclude(Vitess))]
-async fn remapping_enum_names(api: &TestApi) -> TestResult {
+async fn remapping_enum_names(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `123Book` (
           id INT NOT NULL AUTO_INCREMENT,

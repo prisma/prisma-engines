@@ -1,11 +1,11 @@
 use indoc::{formatdoc, indoc};
-use introspection_connector::{IntrospectionConnector, IntrospectionContext};
 use introspection_engine_tests::test_api::*;
+use migration_connector::{IntrospectionConnector, IntrospectionContext};
 use sql_introspection_connector::SqlIntrospectionConnector;
 use url::Url;
 
 #[test_connector(tags(Mysql))]
-async fn a_table_with_non_id_autoincrement(api: &TestApi) -> TestResult {
+async fn a_table_with_non_id_autoincrement(api: &mut TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE `Test` (
             `id` INTEGER PRIMARY KEY,
@@ -28,7 +28,7 @@ async fn a_table_with_non_id_autoincrement(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql8))]
-async fn a_table_with_length_prefixed_primary_key(api: &TestApi) -> TestResult {
+async fn a_table_with_length_prefixed_primary_key(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
             `id` TEXT NOT NULL,
@@ -50,7 +50,7 @@ async fn a_table_with_length_prefixed_primary_key(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql8))]
-async fn a_table_with_length_prefixed_unique(api: &TestApi) -> TestResult {
+async fn a_table_with_length_prefixed_unique(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
             `id` INT  PRIMARY KEY,
@@ -74,7 +74,7 @@ async fn a_table_with_length_prefixed_unique(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql8))]
-async fn a_table_with_length_prefixed_compound_unique(api: &TestApi) -> TestResult {
+async fn a_table_with_length_prefixed_compound_unique(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
             `id` INT  PRIMARY KEY,
@@ -102,7 +102,7 @@ async fn a_table_with_length_prefixed_compound_unique(api: &TestApi) -> TestResu
 }
 
 #[test_connector(tags(Mysql8))]
-async fn a_table_with_length_prefixed_index(api: &TestApi) -> TestResult {
+async fn a_table_with_length_prefixed_index(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
             `id` INT  PRIMARY KEY,
@@ -131,7 +131,7 @@ async fn a_table_with_length_prefixed_index(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql8))]
-async fn a_table_with_non_length_prefixed_index(api: &TestApi) -> TestResult {
+async fn a_table_with_non_length_prefixed_index(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
             `id` INT  PRIMARY KEY,
@@ -162,7 +162,7 @@ async fn a_table_with_non_length_prefixed_index(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql8))]
-async fn a_table_with_descending_index(api: &TestApi) -> TestResult {
+async fn a_table_with_descending_index(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
             `id` INT  PRIMARY KEY,
@@ -191,7 +191,7 @@ async fn a_table_with_descending_index(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql8))]
-async fn a_table_with_descending_unique(api: &TestApi) -> TestResult {
+async fn a_table_with_descending_unique(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
             `id` INT  PRIMARY KEY,
@@ -220,7 +220,7 @@ async fn a_table_with_descending_unique(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql), preview_features("fullTextIndex"))]
-async fn a_table_with_fulltext_index(api: &TestApi) -> TestResult {
+async fn a_table_with_fulltext_index(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
             `id` INT          PRIMARY KEY,
@@ -249,7 +249,7 @@ async fn a_table_with_fulltext_index(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql), preview_features("fullTextIndex"))]
-async fn a_table_with_fulltext_index_with_custom_name(api: &TestApi) -> TestResult {
+async fn a_table_with_fulltext_index_with_custom_name(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
             `id` INT          PRIMARY KEY,
@@ -278,7 +278,7 @@ async fn a_table_with_fulltext_index_with_custom_name(api: &TestApi) -> TestResu
 }
 
 #[test_connector(tags(Mysql))]
-async fn a_table_with_fulltext_index_without_preview_flag(api: &TestApi) -> TestResult {
+async fn a_table_with_fulltext_index_without_preview_flag(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
             `id` INT          PRIMARY KEY,
@@ -307,7 +307,7 @@ async fn a_table_with_fulltext_index_without_preview_flag(api: &TestApi) -> Test
 }
 
 #[test_connector(tags(Mysql), exclude(Mariadb))]
-async fn date_time_defaults(api: &TestApi) -> TestResult {
+async fn date_time_defaults(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
             id INT PRIMARY KEY auto_increment,
@@ -334,7 +334,7 @@ async fn date_time_defaults(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mariadb))]
-async fn date_time_defaults_mariadb(api: &TestApi) -> TestResult {
+async fn date_time_defaults_mariadb(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (
             id INT PRIMARY KEY auto_increment,
@@ -361,7 +361,7 @@ async fn date_time_defaults_mariadb(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql8), exclude(Vitess))]
-async fn missing_select_rights(api: &TestApi) -> TestResult {
+async fn missing_select_rights(api: &mut TestApi) -> TestResult {
     let setup = formatdoc!(
         r#"
         CREATE TABLE `A` (

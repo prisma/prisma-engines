@@ -2,7 +2,7 @@ use barrel::types;
 use introspection_engine_tests::test_api::*;
 
 #[test_connector(tags(Sqlite))]
-async fn a_table_without_required_uniques(api: &TestApi) -> TestResult {
+async fn a_table_without_required_uniques(api: &mut TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE "Post" (
             id INTEGER NOT NULL,
@@ -30,7 +30,7 @@ async fn a_table_without_required_uniques(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Sqlite))]
-async fn ignore_on_model_with_only_optional_id(api: &TestApi) -> TestResult {
+async fn ignore_on_model_with_only_optional_id(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("ValidId", |t| {
@@ -77,7 +77,7 @@ async fn ignore_on_model_with_only_optional_id(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Sqlite))]
-async fn field_with_empty_name(api: &TestApi) -> TestResult {
+async fn field_with_empty_name(api: &mut TestApi) -> TestResult {
     api.raw_cmd(r#"CREATE TABLE "A"(" " INTEGER PRIMARY KEY)"#).await;
 
     let expectation = expect![[r#"
@@ -94,7 +94,7 @@ async fn field_with_empty_name(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Sqlite))]
-async fn remapping_field_names_to_empty(api: &TestApi) -> TestResult {
+async fn remapping_field_names_to_empty(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {

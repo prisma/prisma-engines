@@ -58,7 +58,7 @@ fn render_model(model: ModelPair<'_>, sql_family: SqlFamily) -> renderer::Model<
         rendered.documentation(docs);
     }
 
-    if let Some(namespace) = model.namespace() {
+    if let Some(namespace) = dbg!(model.namespace()) {
         rendered.schema(namespace);
     }
 
