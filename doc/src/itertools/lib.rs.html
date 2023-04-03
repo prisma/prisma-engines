@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/8mg57l6l8chdqbb7bq5d2n8cyca1m7w0-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/itertools-0.10.3/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-93196c7a1c3542a8.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../itertools/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/ghn5icyfpg0ly3yk0ygjsb10z7rj1c1z-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/itertools-0.10.5/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-93196c7a1c3542a8.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../itertools/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -3606,6 +3606,182 @@
 <a href="#3606" id="3606">3606</a>
 <a href="#3607" id="3607">3607</a>
 <a href="#3608" id="3608">3608</a>
+<a href="#3609" id="3609">3609</a>
+<a href="#3610" id="3610">3610</a>
+<a href="#3611" id="3611">3611</a>
+<a href="#3612" id="3612">3612</a>
+<a href="#3613" id="3613">3613</a>
+<a href="#3614" id="3614">3614</a>
+<a href="#3615" id="3615">3615</a>
+<a href="#3616" id="3616">3616</a>
+<a href="#3617" id="3617">3617</a>
+<a href="#3618" id="3618">3618</a>
+<a href="#3619" id="3619">3619</a>
+<a href="#3620" id="3620">3620</a>
+<a href="#3621" id="3621">3621</a>
+<a href="#3622" id="3622">3622</a>
+<a href="#3623" id="3623">3623</a>
+<a href="#3624" id="3624">3624</a>
+<a href="#3625" id="3625">3625</a>
+<a href="#3626" id="3626">3626</a>
+<a href="#3627" id="3627">3627</a>
+<a href="#3628" id="3628">3628</a>
+<a href="#3629" id="3629">3629</a>
+<a href="#3630" id="3630">3630</a>
+<a href="#3631" id="3631">3631</a>
+<a href="#3632" id="3632">3632</a>
+<a href="#3633" id="3633">3633</a>
+<a href="#3634" id="3634">3634</a>
+<a href="#3635" id="3635">3635</a>
+<a href="#3636" id="3636">3636</a>
+<a href="#3637" id="3637">3637</a>
+<a href="#3638" id="3638">3638</a>
+<a href="#3639" id="3639">3639</a>
+<a href="#3640" id="3640">3640</a>
+<a href="#3641" id="3641">3641</a>
+<a href="#3642" id="3642">3642</a>
+<a href="#3643" id="3643">3643</a>
+<a href="#3644" id="3644">3644</a>
+<a href="#3645" id="3645">3645</a>
+<a href="#3646" id="3646">3646</a>
+<a href="#3647" id="3647">3647</a>
+<a href="#3648" id="3648">3648</a>
+<a href="#3649" id="3649">3649</a>
+<a href="#3650" id="3650">3650</a>
+<a href="#3651" id="3651">3651</a>
+<a href="#3652" id="3652">3652</a>
+<a href="#3653" id="3653">3653</a>
+<a href="#3654" id="3654">3654</a>
+<a href="#3655" id="3655">3655</a>
+<a href="#3656" id="3656">3656</a>
+<a href="#3657" id="3657">3657</a>
+<a href="#3658" id="3658">3658</a>
+<a href="#3659" id="3659">3659</a>
+<a href="#3660" id="3660">3660</a>
+<a href="#3661" id="3661">3661</a>
+<a href="#3662" id="3662">3662</a>
+<a href="#3663" id="3663">3663</a>
+<a href="#3664" id="3664">3664</a>
+<a href="#3665" id="3665">3665</a>
+<a href="#3666" id="3666">3666</a>
+<a href="#3667" id="3667">3667</a>
+<a href="#3668" id="3668">3668</a>
+<a href="#3669" id="3669">3669</a>
+<a href="#3670" id="3670">3670</a>
+<a href="#3671" id="3671">3671</a>
+<a href="#3672" id="3672">3672</a>
+<a href="#3673" id="3673">3673</a>
+<a href="#3674" id="3674">3674</a>
+<a href="#3675" id="3675">3675</a>
+<a href="#3676" id="3676">3676</a>
+<a href="#3677" id="3677">3677</a>
+<a href="#3678" id="3678">3678</a>
+<a href="#3679" id="3679">3679</a>
+<a href="#3680" id="3680">3680</a>
+<a href="#3681" id="3681">3681</a>
+<a href="#3682" id="3682">3682</a>
+<a href="#3683" id="3683">3683</a>
+<a href="#3684" id="3684">3684</a>
+<a href="#3685" id="3685">3685</a>
+<a href="#3686" id="3686">3686</a>
+<a href="#3687" id="3687">3687</a>
+<a href="#3688" id="3688">3688</a>
+<a href="#3689" id="3689">3689</a>
+<a href="#3690" id="3690">3690</a>
+<a href="#3691" id="3691">3691</a>
+<a href="#3692" id="3692">3692</a>
+<a href="#3693" id="3693">3693</a>
+<a href="#3694" id="3694">3694</a>
+<a href="#3695" id="3695">3695</a>
+<a href="#3696" id="3696">3696</a>
+<a href="#3697" id="3697">3697</a>
+<a href="#3698" id="3698">3698</a>
+<a href="#3699" id="3699">3699</a>
+<a href="#3700" id="3700">3700</a>
+<a href="#3701" id="3701">3701</a>
+<a href="#3702" id="3702">3702</a>
+<a href="#3703" id="3703">3703</a>
+<a href="#3704" id="3704">3704</a>
+<a href="#3705" id="3705">3705</a>
+<a href="#3706" id="3706">3706</a>
+<a href="#3707" id="3707">3707</a>
+<a href="#3708" id="3708">3708</a>
+<a href="#3709" id="3709">3709</a>
+<a href="#3710" id="3710">3710</a>
+<a href="#3711" id="3711">3711</a>
+<a href="#3712" id="3712">3712</a>
+<a href="#3713" id="3713">3713</a>
+<a href="#3714" id="3714">3714</a>
+<a href="#3715" id="3715">3715</a>
+<a href="#3716" id="3716">3716</a>
+<a href="#3717" id="3717">3717</a>
+<a href="#3718" id="3718">3718</a>
+<a href="#3719" id="3719">3719</a>
+<a href="#3720" id="3720">3720</a>
+<a href="#3721" id="3721">3721</a>
+<a href="#3722" id="3722">3722</a>
+<a href="#3723" id="3723">3723</a>
+<a href="#3724" id="3724">3724</a>
+<a href="#3725" id="3725">3725</a>
+<a href="#3726" id="3726">3726</a>
+<a href="#3727" id="3727">3727</a>
+<a href="#3728" id="3728">3728</a>
+<a href="#3729" id="3729">3729</a>
+<a href="#3730" id="3730">3730</a>
+<a href="#3731" id="3731">3731</a>
+<a href="#3732" id="3732">3732</a>
+<a href="#3733" id="3733">3733</a>
+<a href="#3734" id="3734">3734</a>
+<a href="#3735" id="3735">3735</a>
+<a href="#3736" id="3736">3736</a>
+<a href="#3737" id="3737">3737</a>
+<a href="#3738" id="3738">3738</a>
+<a href="#3739" id="3739">3739</a>
+<a href="#3740" id="3740">3740</a>
+<a href="#3741" id="3741">3741</a>
+<a href="#3742" id="3742">3742</a>
+<a href="#3743" id="3743">3743</a>
+<a href="#3744" id="3744">3744</a>
+<a href="#3745" id="3745">3745</a>
+<a href="#3746" id="3746">3746</a>
+<a href="#3747" id="3747">3747</a>
+<a href="#3748" id="3748">3748</a>
+<a href="#3749" id="3749">3749</a>
+<a href="#3750" id="3750">3750</a>
+<a href="#3751" id="3751">3751</a>
+<a href="#3752" id="3752">3752</a>
+<a href="#3753" id="3753">3753</a>
+<a href="#3754" id="3754">3754</a>
+<a href="#3755" id="3755">3755</a>
+<a href="#3756" id="3756">3756</a>
+<a href="#3757" id="3757">3757</a>
+<a href="#3758" id="3758">3758</a>
+<a href="#3759" id="3759">3759</a>
+<a href="#3760" id="3760">3760</a>
+<a href="#3761" id="3761">3761</a>
+<a href="#3762" id="3762">3762</a>
+<a href="#3763" id="3763">3763</a>
+<a href="#3764" id="3764">3764</a>
+<a href="#3765" id="3765">3765</a>
+<a href="#3766" id="3766">3766</a>
+<a href="#3767" id="3767">3767</a>
+<a href="#3768" id="3768">3768</a>
+<a href="#3769" id="3769">3769</a>
+<a href="#3770" id="3770">3770</a>
+<a href="#3771" id="3771">3771</a>
+<a href="#3772" id="3772">3772</a>
+<a href="#3773" id="3773">3773</a>
+<a href="#3774" id="3774">3774</a>
+<a href="#3775" id="3775">3775</a>
+<a href="#3776" id="3776">3776</a>
+<a href="#3777" id="3777">3777</a>
+<a href="#3778" id="3778">3778</a>
+<a href="#3779" id="3779">3779</a>
+<a href="#3780" id="3780">3780</a>
+<a href="#3781" id="3781">3781</a>
+<a href="#3782" id="3782">3782</a>
+<a href="#3783" id="3783">3783</a>
+<a href="#3784" id="3784">3784</a>
 </pre><pre class="rust"><code><span class="attr">#![warn(missing_docs)]
 #![crate_name=<span class="string">&quot;itertools&quot;</span>]
 #![cfg_attr(not(feature = <span class="string">&quot;use_std&quot;</span>), no_std)]
@@ -3805,6 +3981,8 @@
 <span class="kw">mod </span>exactly_one_err;
 <span class="kw">mod </span>diff;
 <span class="kw">mod </span>flatten_ok;
+<span class="attr">#[cfg(feature = <span class="string">&quot;use_std&quot;</span>)]
+</span><span class="kw">mod </span>extrema_set;
 <span class="kw">mod </span>format;
 <span class="attr">#[cfg(feature = <span class="string">&quot;use_std&quot;</span>)]
 </span><span class="kw">mod </span>grouping_map;
@@ -3995,7 +4173,7 @@
 /// let with_macro:  Chain&lt;Chain&lt;Once&lt;_&gt;, Take&lt;Repeat&lt;_&gt;&gt;&gt;, slice::Iter&lt;_&gt;&gt; =
 ///     chain![once(&amp;0), repeat(&amp;1).take(2), &amp;[2, 3, 5],];
 ///
-/// // ...is equivalant to this:
+/// // ...is equivalent to this:
 /// let with_method: Chain&lt;Chain&lt;Once&lt;_&gt;, Take&lt;Repeat&lt;_&gt;&gt;&gt;, slice::Iter&lt;_&gt;&gt; =
 ///     once(&amp;0)
 ///         .chain(repeat(&amp;1).take(2))
@@ -4386,7 +4564,7 @@
     /// the original iterator.
     ///
     /// **Note:** If the iterator is clonable, prefer using that instead
-    /// of using this method. It is likely to be more efficient.
+    /// of using this method. Cloning is likely to be more efficient.
     ///
     /// Iterator element type is `Self::Item`.
     ///
@@ -4512,7 +4690,7 @@
     /// a series of `Result::Ok` values. `Result::Err` values are unchanged.
     /// 
     /// This is useful when you have some common error type for your crate and
-    /// need to propogate it upwards, but the `Result::Ok` case needs to be flattened.
+    /// need to propagate it upwards, but the `Result::Ok` case needs to be flattened.
     ///
     /// ```
     /// use itertools::Itertools;
@@ -4521,7 +4699,7 @@
     /// let it = input.iter().cloned().flatten_ok();
     /// itertools::assert_equal(it.clone(), vec![Ok(0), Ok(1), Err(false), Ok(2), Ok(3)]);
     /// 
-    /// // This can also be used to propogate errors when collecting.
+    /// // This can also be used to propagate errors when collecting.
     /// let output_result: Result&lt;Vec&lt;i32&gt;, bool&gt; = it.collect();
     /// assert_eq!(output_result, Err(false));
     /// ```
@@ -4717,7 +4895,7 @@
     /// ```
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;use_alloc&quot;</span>)]
     </span><span class="kw">fn </span>multi_cartesian_product(<span class="self">self</span>) -&gt; MultiProduct&lt;&lt;<span class="self">Self</span>::Item <span class="kw">as </span>IntoIterator&gt;::IntoIter&gt;
-        <span class="kw">where </span><span class="self">Self</span>: Iterator + Sized,
+        <span class="kw">where </span><span class="self">Self</span>: Sized,
               <span class="self">Self</span>::Item: IntoIterator,
               &lt;<span class="self">Self</span>::Item <span class="kw">as </span>IntoIterator&gt;::IntoIter: Clone,
               &lt;<span class="self">Self</span>::Item <span class="kw">as </span>IntoIterator&gt;::Item: Clone
@@ -5354,12 +5532,10 @@
     </span><span class="kw">fn </span>find_position&lt;P&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>pred: P) -&gt; <span class="prelude-ty">Option</span>&lt;(usize, <span class="self">Self</span>::Item)&gt;
         <span class="kw">where </span>P: FnMut(<span class="kw-2">&amp;</span><span class="self">Self</span>::Item) -&gt; bool
     {
-        <span class="kw">let </span><span class="kw-2">mut </span>index = <span class="number">0usize</span>;
-        <span class="kw">for </span>elt <span class="kw">in </span><span class="self">self </span>{
+        <span class="kw">for </span>(index, elt) <span class="kw">in </span><span class="self">self</span>.enumerate() {
             <span class="kw">if </span>pred(<span class="kw-2">&amp;</span>elt) {
                 <span class="kw">return </span><span class="prelude-val">Some</span>((index, elt));
             }
-            index += <span class="number">1</span>;
         }
         <span class="prelude-val">None
     </span>}
@@ -5403,7 +5579,7 @@
         <span class="prelude-val">Some</span>(<span class="kw">if </span>predicate(<span class="kw-2">&amp;</span>first) {
             first
         } <span class="kw">else </span>{
-            <span class="self">self</span>.find(|x| predicate(<span class="kw-2">&amp;</span>x)).unwrap_or(first)
+            <span class="self">self</span>.find(|x| predicate(x)).unwrap_or(first)
         })
     }
     <span class="doccomment">/// Returns `true` if the given item is present in this iterator.
@@ -5561,7 +5737,7 @@
         <span class="kw">where </span>F: FnMut(<span class="self">Self</span>::Item),
               <span class="self">Self</span>: Sized,
     {
-        <span class="self">self</span>.for_each(f)
+        <span class="self">self</span>.for_each(f);
     }
 
     <span class="doccomment">/// Combine all an iterator&#39;s elements into one element by using [`Extend`].
@@ -5879,7 +6055,7 @@
     /// ```
     ///
     /// Which, for non-associative functions, will typically produce a different
-    /// result than the linear call tree used by `fold1`:
+    /// result than the linear call tree used by [`Iterator::reduce`]:
     ///
     /// ```text
     /// 1 2 3 4 5 6 7
@@ -5887,7 +6063,7 @@
     /// └─f─f─f─f─f─f
     /// ```
     ///
-    /// If `f` is associative, prefer the normal `fold1` instead.
+    /// If `f` is associative, prefer the normal [`Iterator::reduce`] instead.
     ///
     /// ```
     /// use itertools::Itertools;
@@ -6300,7 +6476,6 @@
     /// itertools::assert_equal(oldest_people_first,
     ///                         vec![&quot;Jill&quot;, &quot;Jack&quot;, &quot;Jane&quot;, &quot;John&quot;]);
     /// ```
-    /// ```
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;use_alloc&quot;</span>)]
     </span><span class="kw">fn </span>sorted_by_cached_key&lt;K, F&gt;(<span class="self">self</span>, f: F) -&gt; VecIntoIter&lt;<span class="self">Self</span>::Item&gt;
     <span class="kw">where
@@ -6508,6 +6683,194 @@
               F: FnMut(<span class="kw-2">&amp;</span>V) -&gt; K
     {
         grouping_map::new(grouping_map::MapForGrouping::new(<span class="self">self</span>, key_mapper))
+    }
+
+    <span class="doccomment">/// Return all minimum elements of an iterator.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use itertools::Itertools;
+    ///
+    /// let a: [i32; 0] = [];
+    /// assert_eq!(a.iter().min_set(), Vec::&lt;&amp;i32&gt;::new());
+    ///
+    /// let a = [1];
+    /// assert_eq!(a.iter().min_set(), vec![&amp;1]);
+    ///
+    /// let a = [1, 2, 3, 4, 5];
+    /// assert_eq!(a.iter().min_set(), vec![&amp;1]);
+    ///
+    /// let a = [1, 1, 1, 1];
+    /// assert_eq!(a.iter().min_set(), vec![&amp;1, &amp;1, &amp;1, &amp;1]);
+    /// ```
+    ///
+    /// The elements can be floats but no particular result is guaranteed
+    /// if an element is NaN.
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;use_std&quot;</span>)]
+    </span><span class="kw">fn </span>min_set(<span class="self">self</span>) -&gt; Vec&lt;<span class="self">Self</span>::Item&gt;
+        <span class="kw">where </span><span class="self">Self</span>: Sized, <span class="self">Self</span>::Item: Ord
+    {
+        extrema_set::min_set_impl(<span class="self">self</span>, |<span class="kw">_</span>| (), |x, y, <span class="kw">_</span>, <span class="kw">_</span>| x.cmp(y))
+    }
+
+    <span class="doccomment">/// Return all minimum elements of an iterator, as determined by
+    /// the specified function.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use std::cmp::Ordering;
+    /// use itertools::Itertools;
+    ///
+    /// let a: [(i32, i32); 0] = [];
+    /// assert_eq!(a.iter().min_set_by(|_, _| Ordering::Equal), Vec::&lt;&amp;(i32, i32)&gt;::new());
+    ///
+    /// let a = [(1, 2)];
+    /// assert_eq!(a.iter().min_set_by(|&amp;&amp;(k1,_), &amp;&amp;(k2, _)| k1.cmp(&amp;k2)), vec![&amp;(1, 2)]);
+    ///
+    /// let a = [(1, 2), (2, 2), (3, 9), (4, 8), (5, 9)];
+    /// assert_eq!(a.iter().min_set_by(|&amp;&amp;(_,k1), &amp;&amp;(_,k2)| k1.cmp(&amp;k2)), vec![&amp;(1, 2), &amp;(2, 2)]);
+    ///
+    /// let a = [(1, 2), (1, 3), (1, 4), (1, 5)];
+    /// assert_eq!(a.iter().min_set_by(|&amp;&amp;(k1,_), &amp;&amp;(k2, _)| k1.cmp(&amp;k2)), vec![&amp;(1, 2), &amp;(1, 3), &amp;(1, 4), &amp;(1, 5)]);
+    /// ```
+    ///
+    /// The elements can be floats but no particular result is guaranteed
+    /// if an element is NaN.
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;use_std&quot;</span>)]
+    </span><span class="kw">fn </span>min_set_by&lt;F&gt;(<span class="self">self</span>, <span class="kw-2">mut </span>compare: F) -&gt; Vec&lt;<span class="self">Self</span>::Item&gt;
+        <span class="kw">where </span><span class="self">Self</span>: Sized, F: FnMut(<span class="kw-2">&amp;</span><span class="self">Self</span>::Item, <span class="kw-2">&amp;</span><span class="self">Self</span>::Item) -&gt; Ordering
+    {
+        extrema_set::min_set_impl(
+            <span class="self">self</span>,
+            |<span class="kw">_</span>| (),
+            |x, y, <span class="kw">_</span>, <span class="kw">_</span>| compare(x, y)
+        )
+    }
+
+    <span class="doccomment">/// Return all minimum elements of an iterator, as determined by
+    /// the specified function.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use itertools::Itertools;
+    ///
+    /// let a: [(i32, i32); 0] = [];
+    /// assert_eq!(a.iter().min_set_by_key(|_| ()), Vec::&lt;&amp;(i32, i32)&gt;::new());
+    ///
+    /// let a = [(1, 2)];
+    /// assert_eq!(a.iter().min_set_by_key(|&amp;&amp;(k,_)| k), vec![&amp;(1, 2)]);
+    ///
+    /// let a = [(1, 2), (2, 2), (3, 9), (4, 8), (5, 9)];
+    /// assert_eq!(a.iter().min_set_by_key(|&amp;&amp;(_, k)| k), vec![&amp;(1, 2), &amp;(2, 2)]);
+    ///
+    /// let a = [(1, 2), (1, 3), (1, 4), (1, 5)];
+    /// assert_eq!(a.iter().min_set_by_key(|&amp;&amp;(k, _)| k), vec![&amp;(1, 2), &amp;(1, 3), &amp;(1, 4), &amp;(1, 5)]);
+    /// ```
+    ///
+    /// The elements can be floats but no particular result is guaranteed
+    /// if an element is NaN.
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;use_std&quot;</span>)]
+    </span><span class="kw">fn </span>min_set_by_key&lt;K, F&gt;(<span class="self">self</span>, key: F) -&gt; Vec&lt;<span class="self">Self</span>::Item&gt;
+        <span class="kw">where </span><span class="self">Self</span>: Sized, K: Ord, F: FnMut(<span class="kw-2">&amp;</span><span class="self">Self</span>::Item) -&gt; K
+    {
+        extrema_set::min_set_impl(<span class="self">self</span>, key, |<span class="kw">_</span>, <span class="kw">_</span>, kx, ky| kx.cmp(ky))
+    }
+
+    <span class="doccomment">/// Return all maximum elements of an iterator.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use itertools::Itertools;
+    ///
+    /// let a: [i32; 0] = [];
+    /// assert_eq!(a.iter().max_set(), Vec::&lt;&amp;i32&gt;::new());
+    ///
+    /// let a = [1];
+    /// assert_eq!(a.iter().max_set(), vec![&amp;1]);
+    ///
+    /// let a = [1, 2, 3, 4, 5];
+    /// assert_eq!(a.iter().max_set(), vec![&amp;5]);
+    ///
+    /// let a = [1, 1, 1, 1];
+    /// assert_eq!(a.iter().max_set(), vec![&amp;1, &amp;1, &amp;1, &amp;1]);
+    /// ```
+    ///
+    /// The elements can be floats but no particular result is guaranteed
+    /// if an element is NaN.
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;use_std&quot;</span>)]
+    </span><span class="kw">fn </span>max_set(<span class="self">self</span>) -&gt; Vec&lt;<span class="self">Self</span>::Item&gt;
+        <span class="kw">where </span><span class="self">Self</span>: Sized, <span class="self">Self</span>::Item: Ord
+    {
+        extrema_set::max_set_impl(<span class="self">self</span>, |<span class="kw">_</span>| (), |x, y, <span class="kw">_</span>, <span class="kw">_</span>| x.cmp(y))
+    }
+
+    <span class="doccomment">/// Return all maximum elements of an iterator, as determined by
+    /// the specified function.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use std::cmp::Ordering;
+    /// use itertools::Itertools;
+    ///
+    /// let a: [(i32, i32); 0] = [];
+    /// assert_eq!(a.iter().max_set_by(|_, _| Ordering::Equal), Vec::&lt;&amp;(i32, i32)&gt;::new());
+    ///
+    /// let a = [(1, 2)];
+    /// assert_eq!(a.iter().max_set_by(|&amp;&amp;(k1,_), &amp;&amp;(k2, _)| k1.cmp(&amp;k2)), vec![&amp;(1, 2)]);
+    ///
+    /// let a = [(1, 2), (2, 2), (3, 9), (4, 8), (5, 9)];
+    /// assert_eq!(a.iter().max_set_by(|&amp;&amp;(_,k1), &amp;&amp;(_,k2)| k1.cmp(&amp;k2)), vec![&amp;(3, 9), &amp;(5, 9)]);
+    ///
+    /// let a = [(1, 2), (1, 3), (1, 4), (1, 5)];
+    /// assert_eq!(a.iter().max_set_by(|&amp;&amp;(k1,_), &amp;&amp;(k2, _)| k1.cmp(&amp;k2)), vec![&amp;(1, 2), &amp;(1, 3), &amp;(1, 4), &amp;(1, 5)]);
+    /// ```
+    ///
+    /// The elements can be floats but no particular result is guaranteed
+    /// if an element is NaN.
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;use_std&quot;</span>)]
+    </span><span class="kw">fn </span>max_set_by&lt;F&gt;(<span class="self">self</span>, <span class="kw-2">mut </span>compare: F) -&gt; Vec&lt;<span class="self">Self</span>::Item&gt;
+        <span class="kw">where </span><span class="self">Self</span>: Sized, F: FnMut(<span class="kw-2">&amp;</span><span class="self">Self</span>::Item, <span class="kw-2">&amp;</span><span class="self">Self</span>::Item) -&gt; Ordering
+    {
+        extrema_set::max_set_impl(
+            <span class="self">self</span>,
+            |<span class="kw">_</span>| (),
+            |x, y, <span class="kw">_</span>, <span class="kw">_</span>| compare(x, y)
+        )
+    }
+
+    <span class="doccomment">/// Return all minimum elements of an iterator, as determined by
+    /// the specified function.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use itertools::Itertools;
+    ///
+    /// let a: [(i32, i32); 0] = [];
+    /// assert_eq!(a.iter().max_set_by_key(|_| ()), Vec::&lt;&amp;(i32, i32)&gt;::new());
+    ///
+    /// let a = [(1, 2)];
+    /// assert_eq!(a.iter().max_set_by_key(|&amp;&amp;(k,_)| k), vec![&amp;(1, 2)]);
+    ///
+    /// let a = [(1, 2), (2, 2), (3, 9), (4, 8), (5, 9)];
+    /// assert_eq!(a.iter().max_set_by_key(|&amp;&amp;(_, k)| k), vec![&amp;(3, 9), &amp;(5, 9)]);
+    ///
+    /// let a = [(1, 2), (1, 3), (1, 4), (1, 5)];
+    /// assert_eq!(a.iter().max_set_by_key(|&amp;&amp;(k, _)| k), vec![&amp;(1, 2), &amp;(1, 3), &amp;(1, 4), &amp;(1, 5)]);
+    /// ```
+    ///
+    /// The elements can be floats but no particular result is guaranteed
+    /// if an element is NaN.
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;use_std&quot;</span>)]
+    </span><span class="kw">fn </span>max_set_by_key&lt;K, F&gt;(<span class="self">self</span>, key: F) -&gt; Vec&lt;<span class="self">Self</span>::Item&gt;
+        <span class="kw">where </span><span class="self">Self</span>: Sized, K: Ord, F: FnMut(<span class="kw-2">&amp;</span><span class="self">Self</span>::Item) -&gt; K
+    {
+        extrema_set::max_set_impl(<span class="self">self</span>, key, |<span class="kw">_</span>, <span class="kw">_</span>, kx, ky| kx.cmp(ky))
     }
 
     <span class="doccomment">/// Return the minimum and maximum elements in the iterator.
@@ -6765,7 +7128,7 @@
     ///    be equal to `ypos`.
     ///
     /// On an iterator of length `n`, `position_minmax` does `1.5 * n`
-    /// comparisons, and so is faster than calling `positon_min` and
+    /// comparisons, and so is faster than calling `position_min` and
     /// `position_max` separately which does `2 * n` comparisons.
     ///
     /// For the minimum, if several elements are equally minimum, the
@@ -7086,8 +7449,7 @@
 /// (elements pairwise equal and sequences of the same length),
 /// `false` otherwise.
 ///
-/// This is an [`IntoIterator`] enabled function that is similar to the standard
-/// library method [`Iterator::eq`].
+/// [`IntoIterator`] enabled version of [`Iterator::eq`].
 ///
 /// ```
 /// assert!(itertools::equal(vec![1, 2, 3], 1..4));
@@ -7098,17 +7460,7 @@
           J: IntoIterator,
           I::Item: PartialEq&lt;J::Item&gt;
 {
-    <span class="kw">let </span><span class="kw-2">mut </span>ia = a.into_iter();
-    <span class="kw">let </span><span class="kw-2">mut </span>ib = b.into_iter();
-    <span class="kw">loop </span>{
-        <span class="kw">match </span>ia.next() {
-            <span class="prelude-val">Some</span>(x) =&gt; <span class="kw">match </span>ib.next() {
-                <span class="prelude-val">Some</span>(y) =&gt; <span class="kw">if </span>x != y { <span class="kw">return </span><span class="bool-val">false</span>; },
-                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="bool-val">false</span>,
-            },
-            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span>ib.next().is_none()
-        }
-    }
+    a.into_iter().eq(b)
 }
 
 <span class="doccomment">/// Assert that two iterables produce equal sequences, with the same

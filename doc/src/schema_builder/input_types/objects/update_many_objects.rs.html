@@ -100,6 +100,7 @@
 <a href="#100" id="100">100</a>
 <a href="#101" id="101">101</a>
 <a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::fields::data_input_mapper::<span class="kw-2">*</span>;
 <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>constants::args;
@@ -122,7 +123,8 @@
 
 <span class="doccomment">/// Builds &quot;&lt;x&gt;UpdateManyMutationInput&quot; input object type.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>checked_update_many_input_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(<span class="string">&quot;{}UpdateManyMutationInput&quot;</span>, model.name()));
+    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::CheckedUpdateManyInput(model.clone()));
+
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));
@@ -146,16 +148,19 @@
     model: <span class="kw-2">&amp;</span>ModelRef,
     parent_field: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>RelationFieldRef&gt;,
 ) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>name = <span class="kw">match </span>parent_field.map(|pf| pf.related_field()) {
-        <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>f) =&gt; <span class="macro">format!</span>(
+    <span class="comment">// TODO: This leads to conflicting type names.
+    // TODO: See https://github.com/prisma/prisma/issues/18534 for further details.
+    </span><span class="kw">let </span>name = <span class="kw">match </span>parent_field {
+        <span class="prelude-val">Some</span>(pf) =&gt; <span class="macro">format!</span>(
             <span class="string">&quot;{}UncheckedUpdateManyWithout{}Input&quot;</span>,
             model.name(),
-            capitalize(f.related_field().name())
+            capitalize(pf.name())
         ),
         <span class="kw">_ </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;{}UncheckedUpdateManyInput&quot;</span>, model.name()),
     };
 
     <span class="kw">let </span>ident = Identifier::new_prisma(name);
+
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));
@@ -179,19 +184,16 @@
     ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     parent_field: <span class="kw-2">&amp;</span>RelationFieldRef,
 ) -&gt; InputObjectTypeWeakRef {
-    <span class="kw">let </span>related_model = parent_field.related_model();
-    <span class="kw">let </span>name = <span class="macro">format!</span>(
-        <span class="string">&quot;{}UpdateManyWithWhereWithout{}Input&quot;</span>,
-        related_model.name(),
-        capitalize(parent_field.related_field().name())
-    );
+    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::UpdateManyWhereCombinationInput(
+        parent_field.related_field(),
+    ));
 
-    <span class="kw">let </span>ident = Identifier::new_prisma(name);
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
 
+    <span class="kw">let </span>related_model = parent_field.related_model();
     <span class="kw">let </span>where_input_object = filter_objects::scalar_filter_object_type(ctx, <span class="kw-2">&amp;</span>related_model, <span class="bool-val">false</span>);
     <span class="kw">let </span>update_types = update_many_input_types(ctx, <span class="kw-2">&amp;</span>related_model, <span class="prelude-val">Some</span>(parent_field));
 

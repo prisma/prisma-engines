@@ -39,14 +39,14 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Renderer <span class="kw">for </span>GqlEnumRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">fn </span>render(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
-        <span class="kw">if </span>ctx.already_rendered(<span class="self">self</span>.enum_type.name()) {
+        <span class="kw">if </span>ctx.already_rendered(<span class="kw-2">&amp;</span><span class="self">self</span>.enum_type.name()) {
             <span class="kw">return </span><span class="string">&quot;&quot;</span>.to_owned();
         }
 
         <span class="kw">let </span>values = <span class="self">self</span>.format_enum_values();
         <span class="kw">let </span>rendered = <span class="macro">format!</span>(<span class="string">&quot;enum {} {{\n{}\n}}&quot;</span>, <span class="self">self</span>.enum_type.name(), values.join(<span class="string">&quot;\n&quot;</span>));
 
-        ctx.add(<span class="self">self</span>.enum_type.name().to_owned(), rendered.clone());
+        ctx.add(<span class="self">self</span>.enum_type.name(), rendered.clone());
         rendered
     }
 }

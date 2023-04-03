@@ -184,7 +184,6 @@
 </pre><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use crate</span>::{
-    capitalize,
     constants::args,
     field, init_input_object_type, input_field,
     input_types::fields::data_input_mapper::{CreateDataInputFieldMapper, DataInputFieldMapper},
@@ -192,7 +191,10 @@
     BuilderContext, ModelField,
 };
 <span class="kw">use </span>prisma_models::{ModelRef, RelationFieldRef};
-<span class="kw">use </span>schema::{Identifier, InputField, InputObjectTypeWeakRef, InputType, OutputField, OutputType, QueryInfo, QueryTag};
+<span class="kw">use </span>schema::{
+    Identifier, IdentifierType, InputField, InputObjectTypeWeakRef, InputType, OutputField, OutputType, QueryInfo,
+    QueryTag,
+};
 
 <span class="doccomment">/// Builds a create mutation field (e.g. createUser) for given model.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_one(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; OutputField {
@@ -254,12 +256,11 @@
     <span class="comment">// We allow creation from both sides of the relation - which would lead to an endless loop of input types
     // if we would allow to create the parent from a child create that is already a nested create.
     // To solve it, we remove the parent relation from the input (&quot;Without&lt;Parent&gt;&quot;).
-    </span><span class="kw">let </span>name = <span class="kw">match </span>parent_field.map(|pf| pf.related_field()) {
-        <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>f) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}CreateWithout{}Input&quot;</span>, model.name(), capitalize(f.name())),
-        <span class="kw">_ </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;{}CreateInput&quot;</span>, model.name()),
-    };
+    </span><span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::CheckedCreateInput(
+        model.clone(),
+        parent_field.map(|pf| pf.related_field()),
+    ));
 
-    <span class="kw">let </span>ident = Identifier::new_prisma(name);
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));
@@ -285,12 +286,11 @@
     <span class="comment">// We allow creation from both sides of the relation - which would lead to an endless loop of input types
     // if we would allow to create the parent from a child create that is already a nested create.
     // To solve it, we remove the parent relation from the input (&quot;Without&lt;Parent&gt;&quot;).
-    </span><span class="kw">let </span>name = <span class="kw">match </span>parent_field.map(|pf| pf.related_field()) {
-        <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>f) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}UncheckedCreateWithout{}Input&quot;</span>, model.name(), capitalize(f.name())),
-        <span class="kw">_ </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;{}UncheckedCreateInput&quot;</span>, model.name()),
-    };
+    </span><span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::UncheckedCreateInput(
+        model.clone(),
+        parent_field.map(|pf| pf.related_field()),
+    ));
 
-    <span class="kw">let </span>ident = Identifier::new_prisma(name);
     <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
     <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));

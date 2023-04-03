@@ -161,7 +161,7 @@
         });
 
         <span class="kw">let </span>input_type = DmmfInputType {
-            name: input_object.identifier.name().to_owned(),
+            name: input_object.identifier.name(),
             constraints: DmmfInputTypeConstraints {
                 max_num_fields: input_object.constraints.max_num_fields,
                 min_num_fields: input_object.constraints.min_num_fields,
@@ -195,7 +195,7 @@
         };
 
         <span class="kw">let </span>field_ref_type = DmmfFieldRefType {
-            name: input_object.identifier.name().to_owned(),
+            name: input_object.identifier.name(),
             allow_types: <span class="macro">vec!</span>[render_input_type(allow_type, ctx)],
             fields: rendered_fields,
         };
@@ -221,7 +221,7 @@
         }
 
         <span class="kw">let </span>output_type = DmmfOutputType {
-            name: output_object.identifier.name().to_string(),
+            name: output_object.identifier.name(),
             fields: rendered_fields,
         };
 

@@ -138,7 +138,7 @@
 
             <span class="kw">let </span>obj = obj.into_arc();
             <span class="kw">let </span>type_reference = DmmfTypeReference {
-                typ: obj.identifier.name().to_string(),
+                typ: obj.identifier.name(),
                 namespace: <span class="prelude-val">Some</span>(obj.identifier.namespace().to_string()),
                 location: TypeLocation::OutputObjectTypes,
                 is_list: <span class="bool-val">false</span>,
@@ -153,7 +153,7 @@
 
             <span class="kw">let </span>ident = et.identifier();
             <span class="kw">let </span>type_reference = DmmfTypeReference {
-                typ: ident.name().to_owned(),
+                typ: ident.name(),
                 namespace: <span class="prelude-val">Some</span>(ident.namespace().to_owned()),
                 location: TypeLocation::EnumTypes,
                 is_list: <span class="bool-val">false</span>,
@@ -215,7 +215,7 @@
             };
 
             <span class="kw">let </span>type_reference = DmmfTypeReference {
-                typ: obj.identifier.name().to_owned(),
+                typ: obj.identifier.name(),
                 namespace: <span class="prelude-val">Some</span>(obj.identifier.namespace().to_owned()),
                 location,
                 is_list: <span class="bool-val">false</span>,
@@ -230,7 +230,7 @@
 
             <span class="kw">let </span>ident = et.identifier();
             <span class="kw">let </span>type_reference = DmmfTypeReference {
-                typ: ident.name().to_owned(),
+                typ: ident.name(),
                 namespace: <span class="prelude-val">Some</span>(ident.namespace().to_owned()),
                 location: TypeLocation::EnumTypes,
                 is_list: <span class="bool-val">false</span>,

@@ -85,7 +85,7 @@
 <span class="kw">pub type </span>CompositeFieldRef = CompositeField;
 
 <span class="kw">impl </span>CompositeField {
-    <span class="kw">fn </span>arity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FieldArity {
+    <span class="kw">pub fn </span>arity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FieldArity {
         <span class="kw">match </span><span class="self">self</span>.id {
             CompositeFieldId::InModel(sfid) =&gt; <span class="self">self</span>.dm.walk(sfid).ast_field().arity,
             CompositeFieldId::InCompositeType(id) =&gt; <span class="self">self</span>.dm.walk(id).arity(),

@@ -42,7 +42,7 @@
 /// need all composites to be present, then we can compute fields in a second pass.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>initialize_cache(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) {
     <span class="kw">for </span>composite <span class="kw">in </span>ctx.internal_data_model.composite_types() {
-        <span class="kw">let </span>ident = Identifier::new_model(composite.name());
+        <span class="kw">let </span>ident = Identifier::new_model(composite.name().to_owned());
         ctx.cache_output_type(ident.clone(), Arc::new(ObjectType::new(ident, <span class="prelude-val">None</span>)));
     }
 }
@@ -58,7 +58,7 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;, ct: <span class="kw-2">&amp;</span>CompositeType) -&gt; ObjectTypeWeakRef {
-    <span class="kw">let </span>ident = Identifier::new_model(ct.name());
+    <span class="kw">let </span>ident = Identifier::new_model(ct.name().to_owned());
     ctx.get_output_type(<span class="kw-2">&amp;</span>ident)
         .expect(<span class="string">&quot;Invariant violation: Initialized output object type for each composite.&quot;</span>)
 }

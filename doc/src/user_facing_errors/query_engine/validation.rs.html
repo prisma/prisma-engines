@@ -634,8 +634,6 @@
 <a href="#634" id="634">634</a>
 <a href="#635" id="635">635</a>
 <a href="#636" id="636">636</a>
-<a href="#637" id="637">637</a>
-<a href="#638" id="638">638</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::KnownError;
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>serde::Serialize;
@@ -865,7 +863,7 @@
     ) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>constraints =
             InputTypeConstraints::new(min_field_count, max_field_count, required_fields, provided_field_count);
-        <span class="kw">let </span>message = <span class="macro">format!</span>(<span class="string">&quot;Some fields are missing: {}&quot;</span>, constraints);
+        <span class="kw">let </span>message = <span class="macro">format!</span>(<span class="string">&quot;Some fields are missing: {constraints}&quot;</span>);
         ValidationError {
             kind: ValidationErrorKind::SomeFieldsMissing,
             message,
@@ -888,7 +886,7 @@
     ) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>constraints =
             InputTypeConstraints::new(min_field_count, max_field_count, required_fields, provided_field_count);
-        <span class="kw">let </span>message = <span class="macro">format!</span>(<span class="string">&quot;Too many fields given: {}&quot;</span>, constraints);
+        <span class="kw">let </span>message = <span class="macro">format!</span>(<span class="string">&quot;Too many fields given: {constraints}&quot;</span>);
         ValidationError {
             kind: ValidationErrorKind::TooManyFieldsGiven,
             message,
@@ -1100,9 +1098,7 @@
     </span><span class="kw">pub fn </span>value_too_large(selection_path: Vec&lt;String&gt;, argument_path: Vec&lt;String&gt;, value: String) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>argument_name = argument_path.last().expect(<span class="string">&quot;Argument path cannot not be empty&quot;</span>);
         <span class="kw">let </span>message = <span class="macro">format!</span>(
-            <span class="string">&quot;Unable to fit float value (or large JS integer serialized in exponent notation) &#39;{}&#39; into a 64 Bit signed integer for field &#39;{}&#39;. If you&#39;re trying to store large integers, consider using `BigInt`&quot;</span>,
-            value,
-            argument_name
+            <span class="string">&quot;Unable to fit float value (or large JS integer serialized in exponent notation) &#39;{value}&#39; into a 64 Bit signed integer for field &#39;{argument_name}&#39;. If you&#39;re trying to store large integers, consider using `BigInt`&quot;</span>,
         );
         <span class="kw">let </span>argument = ArgumentDescription::new(argument_name.to_owned(), <span class="macro">vec!</span>[<span class="string">&quot;BigInt&quot;</span>.to_owned()]);
         ValidationError {

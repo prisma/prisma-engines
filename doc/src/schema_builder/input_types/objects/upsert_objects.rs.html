@@ -84,14 +84,6 @@
 <a href="#84" id="84">84</a>
 <a href="#85" id="85">85</a>
 <a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
-<a href="#90" id="90">90</a>
-<a href="#91" id="91">91</a>
-<a href="#92" id="92">92</a>
-<a href="#93" id="93">93</a>
-<a href="#94" id="94">94</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::constants::args;
 <span class="kw">use </span><span class="kw">crate</span>::input_types::fields::arguments::where_argument;
 <span class="kw">use </span><span class="kw">crate</span>::mutations::create_one;
@@ -123,11 +115,7 @@
         <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(
-        <span class="string">&quot;{}UpsertWithWhereUniqueWithout{}Input&quot;</span>,
-        related_model.name(),
-        capitalize(parent_field.related_field().name())
-    ));
+    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::NestedUpsertManyInput(parent_field.related_field()));
 
     <span class="kw">match </span>ctx.get_input_type(<span class="kw-2">&amp;</span>ident) {
         <span class="prelude-val">None </span>=&gt; {
@@ -160,11 +148,7 @@
         <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">let </span>ident = Identifier::new_prisma(<span class="macro">format!</span>(
-        <span class="string">&quot;{}UpsertWithout{}Input&quot;</span>,
-        related_model.name(),
-        capitalize(parent_field.related_field().name())
-    ));
+    <span class="kw">let </span>ident = Identifier::new_prisma(IdentifierType::NestedUpsertOneInput(parent_field.related_field()));
 
     <span class="kw">match </span>ctx.get_input_type(<span class="kw-2">&amp;</span>ident) {
         <span class="prelude-val">None </span>=&gt; {

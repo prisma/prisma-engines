@@ -975,15 +975,6 @@
 <a href="#975" id="975">975</a>
 <a href="#976" id="976">976</a>
 <a href="#977" id="977">977</a>
-<a href="#978" id="978">978</a>
-<a href="#979" id="979">979</a>
-<a href="#980" id="980">980</a>
-<a href="#981" id="981">981</a>
-<a href="#982" id="982">982</a>
-<a href="#983" id="983">983</a>
-<a href="#984" id="984">984</a>
-<a href="#985" id="985">985</a>
-<a href="#986" id="986">986</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{executor::get_engine_protocol, schema::<span class="kw-2">*</span>};
 <span class="kw">use </span>bigdecimal::{BigDecimal, ToPrimitive};
@@ -1590,7 +1581,7 @@
                     selection_path.segments(),
                     argument_path.segments(),
                     <span class="macro">format!</span>(<span class="string">&quot;{val:?}&quot;</span>),
-                    typ.name().to_string(),
+                    typ.name(),
                     <span class="prelude-val">None</span>,
                 ));
             }
@@ -1609,15 +1600,15 @@
         <span class="kw">match </span>typ.borrow() {
             EnumType::Database(db) =&gt; <span class="kw">match </span>db.map_input_value(<span class="kw-2">&amp;</span>raw) {
                 <span class="prelude-val">Some</span>(value) =&gt; <span class="prelude-val">Ok</span>(ParsedInputValue::Single(value)),
-                <span class="prelude-val">None </span>=&gt; err(db.identifier().name()),
+                <span class="prelude-val">None </span>=&gt; err(<span class="kw-2">&amp;</span>db.identifier().name()),
             },
             EnumType::String(s) =&gt; <span class="kw">match </span>s.value_for(raw.as_str()) {
                 <span class="prelude-val">Some</span>(val) =&gt; <span class="prelude-val">Ok</span>(ParsedInputValue::Single(PrismaValue::Enum(val.to_owned()))),
-                <span class="prelude-val">None </span>=&gt; err(s.identifier().name()),
+                <span class="prelude-val">None </span>=&gt; err(<span class="kw-2">&amp;</span>s.identifier().name()),
             },
             EnumType::FieldRef(f) =&gt; <span class="kw">match </span>f.value_for(raw.as_str()) {
                 <span class="prelude-val">Some</span>(value) =&gt; <span class="prelude-val">Ok</span>(ParsedInputValue::ScalarField(value.clone())),
-                <span class="prelude-val">None </span>=&gt; err(f.identifier().name()),
+                <span class="prelude-val">None </span>=&gt; err(<span class="kw-2">&amp;</span>f.identifier().name()),
             },
         }
     }
@@ -1788,7 +1779,7 @@
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>schema_object_to_output_type_description(
         o: <span class="kw-2">&amp;</span>schema::ObjectTypeStrongRef,
     ) -&gt; validation::OutputTypeDescription {
-        <span class="kw">let </span>name = o.identifier.name().to_string();
+        <span class="kw">let </span>name = o.identifier.name();
         <span class="kw">let </span>fields: Vec&lt;validation::OutputTypeDescriptionField&gt; = o
             .get_fields()
             .iter()
@@ -1820,10 +1811,7 @@
         <span class="kw">match </span>input_type {
             InputType::Scalar(s) =&gt; InputTypeDescription::Scalar { name: s.to_string() },
             InputType::Enum(e) =&gt; InputTypeDescription::Enum {
-                name: e
-                    .upgrade()
-                    .map(|e| e.name().to_string())
-                    .expect(<span class="string">&quot;enum type should be upgradeable&quot;</span>),
+                name: e.upgrade().map(|e| e.name()).expect(<span class="string">&quot;enum type should be upgradeable&quot;</span>),
             },
             InputType::List(l) =&gt; InputTypeDescription::List {
                 element_type: Box::new(input_type_to_input_type_description(l.as_ref(), query_schema)),
@@ -1839,7 +1827,7 @@
         i: <span class="kw-2">&amp;</span>schema::InputObjectTypeStrongRef,
         query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     ) -&gt; validation::InputTypeDescription {
-        <span class="kw">let </span>name = i.identifier.name().to_string();
+        <span class="kw">let </span>name = i.identifier.name();
         <span class="kw">let </span>fields: Vec&lt;validation::InputTypeDescriptionField&gt; = i
             .get_fields()
             .iter()
@@ -1916,14 +1904,11 @@
 
     <span class="kw">fn </span>to_simplified_input_type_name(typ: <span class="kw-2">&amp;</span>InputType) -&gt; String {
         <span class="kw">match </span>typ {
-            InputType::Enum(e) =&gt; e
-                .upgrade()
-                .map(|e| e.name().to_string())
-                .expect(<span class="string">&quot;enum type should be upgradeable&quot;</span>),
+            InputType::Enum(e) =&gt; e.upgrade().map(|e| e.name()).expect(<span class="string">&quot;enum type should be upgradeable&quot;</span>),
             InputType::List(o) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}[]&quot;</span>, to_simplified_input_type_name(o.as_ref())),
             InputType::Object(o) =&gt; o
                 .upgrade()
-                .map(|f| f.identifier.name().to_string())
+                .map(|f| f.identifier.name())
                 .expect(<span class="string">&quot;input object type should be upgradeable&quot;</span>),
             InputType::Scalar(s) =&gt; s.to_string(),
         }
@@ -1931,14 +1916,11 @@
 
     <span class="kw">fn </span>to_simplified_output_type_name(typ: <span class="kw-2">&amp;</span>OutputType) -&gt; String {
         <span class="kw">match </span>typ {
-            OutputType::Enum(e) =&gt; e
-                .upgrade()
-                .map(|e| e.name().to_string())
-                .expect(<span class="string">&quot;enum type should be upgradeable&quot;</span>),
+            OutputType::Enum(e) =&gt; e.upgrade().map(|e| e.name()).expect(<span class="string">&quot;enum type should be upgradeable&quot;</span>),
             OutputType::List(o) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}[]&quot;</span>, to_simplified_output_type_name(o)),
             OutputType::Object(o) =&gt; o
                 .upgrade()
-                .map(|f| f.identifier.name().to_string())
+                .map(|f| f.identifier.name())
                 .expect(<span class="string">&quot;input object type should be upgradeable&quot;</span>),
             OutputType::Scalar(s) =&gt; s.to_string(),
         }

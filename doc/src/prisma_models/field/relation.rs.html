@@ -145,6 +145,7 @@
 <a href="#145" id="145">145</a>
 <a href="#146" id="146">146</a>
 <a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>psl::parser_database::{
     ast::FieldArity,
@@ -261,6 +262,7 @@
     <span class="kw">fn </span>linking_fields_impl(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ScalarFieldRef&gt; {
         <span class="kw">let </span>walker = <span class="self">self</span>.walker();
         <span class="kw">let </span>relation = walker.relation();
+
         <span class="kw">match </span>relation.refine() {
             walkers::RefinedRelationWalker::Inline(rel) =&gt; {
                 <span class="kw">let </span>forward = rel.forward_relation_field().unwrap();
