@@ -28,14 +28,14 @@ jobs:
           toolchain: stable
           default: true
 
-      - run: cargo bench --benches
+      - run: cargo bench --bench schema_builder_bench
 
       - name: Install cargo-codspeed
         run: cargo install cargo-codspeed
 
       - name: Build the benchmark target(s)
         run: cargo codspeed build
-        working-directory: .
+        working-directory: ./query-engine/schema-builder
 
       - name: Run the benchmarks
         uses: CodSpeedHQ/action@v1
