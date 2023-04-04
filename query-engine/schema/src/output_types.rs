@@ -167,7 +167,7 @@ impl ObjectType {
 #[derive(Debug)]
 pub struct OutputField {
     pub name: String,
-    pub field_type: OutputTypeRef,
+    pub field_type: OutputType,
     pub deprecation: Option<Deprecation>,
 
     /// Arguments are input fields, but positioned in context of an output field

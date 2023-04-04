@@ -253,7 +253,7 @@ fn coerce_non_numeric(value: PrismaValue, output: &OutputType) -> PrismaValue {
 fn serialize_record_selection(
     record_selection: RecordSelection,
     field: &OutputField,
-    typ: &OutputTypeRef, // We additionally pass the type to allow recursing into nested type definitions of a field.
+    typ: &OutputType, // We additionally pass the type to allow recursing into nested type definitions of a field.
     is_list: bool,
     query_schema: &QuerySchema,
 ) -> crate::Result<CheckedItemsWithParents> {
@@ -550,7 +550,7 @@ fn serialize_composite(
 }
 
 fn serialize_scalar(field: &OutputField, value: PrismaValue, schema: &QuerySchema) -> crate::Result<Item> {
-    match (&value, field.field_type.as_ref()) {
+    match (&value, &field.field_type) {
         (PrismaValue::Null, _) if field.is_nullable => Ok(Item::Value(PrismaValue::Null)),
         (_, OutputType::Enum(et)) => match &schema.db[*et] {
             EnumType::Database(ref db) => convert_enum(value, db),
