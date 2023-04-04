@@ -36,7 +36,7 @@ type UncheckedItemsWithParents = IndexMap<Option<SelectionResult>, Vec<Item>>;
 /// Returns a map of pairs of (parent ID, response)
 pub(crate) fn serialize_internal(
     result: QueryResult,
-    field: &OutputFieldRef,
+    field: &OutputField,
     is_list: bool,
     query_schema: &QuerySchema,
 ) -> crate::Result<CheckedItemsWithParents> {
@@ -252,7 +252,7 @@ fn coerce_non_numeric(value: PrismaValue, output: &OutputType) -> PrismaValue {
 
 fn serialize_record_selection(
     record_selection: RecordSelection,
-    field: &OutputFieldRef,
+    field: &OutputField,
     typ: &OutputTypeRef, // We additionally pass the type to allow recursing into nested type definitions of a field.
     is_list: bool,
     query_schema: &QuerySchema,

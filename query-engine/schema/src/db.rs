@@ -47,6 +47,8 @@ pub struct OutputObjectTypeId(usize);
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct EnumTypeId(usize);
 
+pub type OutputFieldId = (OutputObjectTypeId, usize);
+
 impl ops::Index<InputObjectTypeId> for QuerySchemaDatabase {
     type Output = InputObjectType;
 
