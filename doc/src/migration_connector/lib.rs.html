@@ -220,6 +220,8 @@
 <a href="#220" id="220">220</a>
 <a href="#221" id="221">221</a>
 <a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
 </pre><pre class="rust"><code><span class="attr">#![deny(rust_2018_idioms, unsafe_code, missing_docs)]
 
 </span><span class="doccomment">//! This crate defines the API exposed by the connectors to the migration engine core. The entry point for this API is the [MigrationConnector](trait.MigrationConnector.html) trait.
@@ -242,7 +244,9 @@
 <span class="kw">pub use </span>diff::DiffTarget;
 <span class="kw">use </span>enumflags2::BitFlags;
 <span class="kw">pub use </span>error::{ConnectorError, ConnectorResult};
-<span class="kw">pub use </span>introspection_connector::{IntrospectionConnector, IntrospectionContext, IntrospectionResult};
+<span class="kw">pub use </span>introspection_connector::{
+    CompositeTypeDepth, IntrospectionConnector, IntrospectionContext, IntrospectionResult, Version, ViewDefinition,
+};
 <span class="kw">pub use </span>migration_persistence::{MigrationPersistence, MigrationRecord, PersistenceNotInitializedError, Timestamp};
 
 <span class="kw">use </span>migrations_directory::MigrationDirectory;

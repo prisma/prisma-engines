@@ -212,6 +212,8 @@
 <a href="#212" id="212">212</a>
 <a href="#213" id="213">213</a>
 <a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
 </pre><pre class="rust"><code><span class="kw">extern crate </span>proc_macro;
 
 <span class="kw">use </span>proc_macro::TokenStream;
@@ -298,7 +300,7 @@
                 ) { <span class="kw">return </span>}
 
                 test_setup::runtime::run_with_thread_local_runtime::&lt;#return_ty&gt;(<span class="kw">async </span>{
-                    <span class="kw">let </span>#arg_name = <span class="kw-2">&amp;</span>#arg_type::new(args).<span class="kw">await</span>;
+                    <span class="kw">let </span>#arg_name = <span class="kw-2">&amp;mut </span>#arg_type::new(args).<span class="kw">await</span>;
 
                     #body
 
@@ -395,7 +397,7 @@
             span,
             <span class="macro">format!</span>(
                 <span class="string">&quot;Unsupported syntax. Arguments to test functions should be of the form `fn test_fn(api: {}TestApi)`&quot;</span>,
-                <span class="kw">if </span>sig.asyncness.is_some() { <span class="string">&quot;&amp;&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>}
+                <span class="kw">if </span>sig.asyncness.is_some() { <span class="string">&quot;&amp;mut &quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>}
             ),
         ))
     };
@@ -409,7 +411,9 @@
 
             <span class="kw">let </span>arg_type = <span class="kw">match </span>pattype.ty.as_ref() {
                 syn::Type::Reference(syn::TypeReference {
-                    mutability: <span class="prelude-val">None</span>, elem, ..
+                    mutability: <span class="prelude-val">Some</span>(<span class="kw">_</span>),
+                    elem,
+                    ..
                 }) <span class="kw">if </span>sig.asyncness.is_some() =&gt; <span class="kw">match </span>elem.as_ref() {
                     syn::Type::Path(ident) =&gt; ident.path.get_ident().unwrap(),
                     other =&gt; <span class="kw">return </span>err(other.span()),

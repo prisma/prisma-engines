@@ -1472,6 +1472,7 @@
 <a href="#1472" id="1472">1472</a>
 <a href="#1473" id="1473">1473</a>
 <a href="#1474" id="1474">1474</a>
+<a href="#1475" id="1475">1475</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.
 
 </span><span class="kw">mod </span>default;
@@ -2129,6 +2130,7 @@
             } <span class="kw">else </span>{
                 BitFlags::empty()
             };
+
             <span class="kw">let </span>id = sql_schema.push_table_with_properties(
                 table_name,
                 sql_schema.get_namespace_id(<span class="kw-2">&amp;</span>namespace).unwrap(),

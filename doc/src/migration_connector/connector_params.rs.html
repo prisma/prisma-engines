@@ -10,10 +10,12 @@
 <a href="#10" id="10">10</a>
 <a href="#11" id="11">11</a>
 <a href="#12" id="12">12</a>
+<a href="#13" id="13">13</a>
 </pre><pre class="rust"><code><span class="kw">use </span>enumflags2::BitFlags;
 <span class="kw">use </span>psl::PreviewFeature;
 
 <span class="doccomment">/// Parameters passed from the core to connectors on initialization.
+</span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>ConnectorParams {
     <span class="doccomment">/// The raw connection string or `url` datasource property.
     </span><span class="kw">pub </span>connection_string: String,
