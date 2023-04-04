@@ -8,7 +8,7 @@ use std::{
     io::{Read, Write},
 };
 
-pub(crate) fn write_compressed_snapshot(dmmf: &DataModelMetaFormat, path: &str) -> () {
+pub(crate) fn write_compressed_snapshot(dmmf: &DataModelMetaFormat, path: &str) {
     let mut encoder = write::GzEncoder::new(File::create(path).unwrap(), Compression::best());
     let json = serde_json::to_vec(dmmf).unwrap();
 
