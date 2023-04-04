@@ -2,7 +2,7 @@ use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 
 #[test_connector(tags(Mssql), preview_features("views"))]
-async fn simple_view_from_one_table(api: &TestApi) -> TestResult {
+async fn simple_view_from_one_table(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE A (
             id INT NOT NULL,
@@ -57,7 +57,7 @@ async fn simple_view_from_one_table(api: &TestApi) -> TestResult {
         FROM
           A;"#]];
 
-    api.expect_view_definition(api.schema_name(), "B", &expected).await;
+    api.expect_view_definition("B", &expected).await;
 
     let expected = expect![[r#"
         [
@@ -78,7 +78,7 @@ async fn simple_view_from_one_table(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql), preview_features("views"))]
-async fn simple_view_with_cte(api: &TestApi) -> TestResult {
+async fn simple_view_with_cte(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE VIEW A AS WITH foo AS (SELECT 1 AS bar) SELECT bar FROM foo;
     "#};
@@ -116,13 +116,13 @@ async fn simple_view_with_cte(api: &TestApi) -> TestResult {
         FROM
           foo;"#]];
 
-    api.expect_view_definition(api.schema_name(), "A", &expected).await;
+    api.expect_view_definition("A", &expected).await;
 
     Ok(())
 }
 
 #[test_connector(tags(Mssql), preview_features("views"))]
-async fn simple_view_from_two_tables(api: &TestApi) -> TestResult {
+async fn simple_view_from_two_tables(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE A (
             id INT,
@@ -198,13 +198,13 @@ async fn simple_view_from_two_tables(api: &TestApi) -> TestResult {
           A AS a
           JOIN B AS b ON a.id = b.user_id;"#]];
 
-    api.expect_view_definition(api.schema_name(), "AB", &expected).await;
+    api.expect_view_definition("AB", &expected).await;
 
     Ok(())
 }
 
 #[test_connector(tags(Mssql), preview_features("views"))]
-async fn re_intro_keeps_view_uniques(api: &TestApi) -> TestResult {
+async fn re_intro_keeps_view_uniques(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE A (
             id INT NOT NULL,
@@ -257,7 +257,7 @@ async fn re_intro_keeps_view_uniques(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql), preview_features("views"))]
-async fn re_intro_keeps_id(api: &TestApi) -> TestResult {
+async fn re_intro_keeps_id(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE A (
             id INT,
@@ -310,7 +310,7 @@ async fn re_intro_keeps_id(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql), preview_features("views"))]
-async fn re_intro_keeps_compound_unique(api: &TestApi) -> TestResult {
+async fn re_intro_keeps_compound_unique(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE A (
             side_a INT NOT NULL,
@@ -375,7 +375,7 @@ async fn re_intro_keeps_compound_unique(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql), preview_features("views"))]
-async fn re_intro_keeps_view_to_view_relations(api: &TestApi) -> TestResult {
+async fn re_intro_keeps_view_to_view_relations(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE VIEW A AS SELECT 1 AS id;
     "#};
@@ -420,7 +420,7 @@ async fn re_intro_keeps_view_to_view_relations(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql), preview_features("views"))]
-async fn views_cannot_have_default_values(api: &TestApi) -> TestResult {
+async fn views_cannot_have_default_values(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE A (id INT CONSTRAINT A_pkey PRIMARY KEY, val INT CONSTRAINT A_val_df DEFAULT 2);
     "#};
@@ -464,7 +464,7 @@ async fn views_cannot_have_default_values(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql), preview_features("views"))]
-async fn prisma_defaults_are_kept(api: &TestApi) -> TestResult {
+async fn prisma_defaults_are_kept(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE A (id INT CONSTRAINT A_pkey PRIMARY KEY, val VARCHAR(255));
     "#};

@@ -6,7 +6,7 @@ use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
 #[test_connector(tags(Sqlite))]
-async fn a_many_to_many_relation_with_an_id(api: &TestApi) -> TestResult {
+async fn a_many_to_many_relation_with_an_id(api: &mut TestApi) -> TestResult {
     let sql = r#"
         CREATE TABLE "User" (
             id INTEGER PRIMARY KEY
@@ -50,7 +50,7 @@ async fn a_many_to_many_relation_with_an_id(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Sqlite))]
-async fn a_one_to_one_relation_referencing_non_id(api: &TestApi) -> TestResult {
+async fn a_one_to_one_relation_referencing_non_id(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -86,7 +86,7 @@ async fn a_one_to_one_relation_referencing_non_id(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Sqlite))]
-async fn relations_should_avoid_name_clashes(api: &TestApi) -> TestResult {
+async fn relations_should_avoid_name_clashes(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("y", |t| {
@@ -122,7 +122,7 @@ async fn relations_should_avoid_name_clashes(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Sqlite))]
-async fn a_one_to_one_relation(api: &TestApi) -> TestResult {
+async fn a_one_to_one_relation(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -156,7 +156,7 @@ async fn a_one_to_one_relation(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Sqlite))]
-async fn one_to_one_req_relation(api: &TestApi) -> TestResult {
+async fn one_to_one_req_relation(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", |t| {
@@ -190,7 +190,7 @@ async fn one_to_one_req_relation(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Sqlite))]
-async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> TestResult {
+async fn two_one_to_one_relations_between_the_same_models(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", move |t| {
@@ -229,7 +229,7 @@ async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> Test
 }
 
 #[test_connector(tags(Sqlite))]
-async fn one_to_one_relation_on_a_singular_primary_key(api: &TestApi) -> TestResult {
+async fn one_to_one_relation_on_a_singular_primary_key(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -261,7 +261,7 @@ async fn one_to_one_relation_on_a_singular_primary_key(api: &TestApi) -> TestRes
 }
 
 #[test_connector(tags(Sqlite))]
-async fn multiple_foreign_key_constraints_are_taken_always_in_the_same_order(api: &TestApi) -> TestResult {
+async fn multiple_foreign_key_constraints_are_taken_always_in_the_same_order(api: &mut TestApi) -> TestResult {
     let migration = indoc! {r#"
         CREATE TABLE A
         (
@@ -297,7 +297,7 @@ async fn multiple_foreign_key_constraints_are_taken_always_in_the_same_order(api
 }
 
 #[test_connector(tags(Sqlite))]
-async fn a_self_relation(api: &TestApi) -> TestResult {
+async fn a_self_relation(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", move |t| {
@@ -336,7 +336,7 @@ async fn a_self_relation(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Sqlite))]
-async fn a_one_to_many_relation(api: &TestApi) -> TestResult {
+async fn a_one_to_many_relation(api: &mut TestApi) -> TestResult {
     let sql = r#"
         CREATE TABLE "User" (
             id INTEGER PRIMARY KEY
@@ -369,7 +369,7 @@ async fn a_one_to_many_relation(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Sqlite))]
-async fn relations_should_avoid_name_clashes_2(api: &TestApi) -> TestResult {
+async fn relations_should_avoid_name_clashes_2(api: &mut TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     api.barrel()

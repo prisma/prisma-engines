@@ -1,12 +1,12 @@
 use barrel::types;
-use introspection_connector::Version;
 use introspection_engine_tests::{test_api::*, TestResult};
+use migration_connector::Version;
 use pretty_assertions::assert_eq;
 use test_macros::test_connector;
 
 //Sqlite
 #[test_connector(tags(Sqlite))]
-async fn introspect_sqlite_non_prisma(api: &TestApi) -> TestResult {
+async fn introspect_sqlite_non_prisma(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
@@ -21,7 +21,7 @@ async fn introspect_sqlite_non_prisma(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Sqlite))]
-async fn sqlite_non_prisma_due_to_types(api: &TestApi) -> TestResult {
+async fn sqlite_non_prisma_due_to_types(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("_Migration", |t| {
@@ -50,7 +50,7 @@ async fn sqlite_non_prisma_due_to_types(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Sqlite))]
-async fn introspect_sqlite_prisma2(api: &TestApi) -> TestResult {
+async fn introspect_sqlite_prisma2(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("_Migration", |t| {
@@ -80,7 +80,7 @@ async fn introspect_sqlite_prisma2(api: &TestApi) -> TestResult {
 //Postgres
 
 #[test_connector(tags(Postgres))]
-async fn introspect_postgres_non_prisma(api: &TestApi) -> TestResult {
+async fn introspect_postgres_non_prisma(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
@@ -96,7 +96,7 @@ async fn introspect_postgres_non_prisma(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn introspect_postgres_prisma_1(api: &TestApi) -> TestResult {
+async fn introspect_postgres_prisma_1(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
@@ -128,7 +128,7 @@ async fn introspect_postgres_prisma_1(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(CockroachDb))]
-async fn introspect_cockroach_prisma_1(api: &TestApi) -> TestResult {
+async fn introspect_cockroach_prisma_1(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
@@ -160,7 +160,7 @@ async fn introspect_cockroach_prisma_1(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn introspect_postgres_prisma_1_1(api: &TestApi) -> TestResult {
+async fn introspect_postgres_prisma_1_1(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
@@ -186,7 +186,7 @@ async fn introspect_postgres_prisma_1_1(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn introspect_postgres_prisma2(api: &TestApi) -> TestResult {
+async fn introspect_postgres_prisma2(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("_Migration", |t| {
@@ -216,7 +216,7 @@ async fn introspect_postgres_prisma2(api: &TestApi) -> TestResult {
 //Mysql
 
 #[test_connector(tags(Mysql))]
-async fn introspect_mysql_non_prisma(api: &TestApi) -> TestResult {
+async fn introspect_mysql_non_prisma(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
@@ -232,7 +232,7 @@ async fn introspect_mysql_non_prisma(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql))]
-async fn introspect_mysql_prisma_1(api: &TestApi) -> TestResult {
+async fn introspect_mysql_prisma_1(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
@@ -257,7 +257,7 @@ async fn introspect_mysql_prisma_1(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql))]
-async fn introspect_mysql_prisma_1_1_if_not_for_default_value(api: &TestApi) -> TestResult {
+async fn introspect_mysql_prisma_1_1_if_not_for_default_value(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
@@ -276,7 +276,7 @@ async fn introspect_mysql_prisma_1_1_if_not_for_default_value(api: &TestApi) -> 
 }
 
 #[test_connector(tags(Mysql))]
-async fn introspect_mysql_prisma_1_1(api: &TestApi) -> TestResult {
+async fn introspect_mysql_prisma_1_1(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
@@ -296,7 +296,7 @@ async fn introspect_mysql_prisma_1_1(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql))]
-async fn introspect_mysql_prisma2(api: &TestApi) -> TestResult {
+async fn introspect_mysql_prisma2(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("_Migration", |t| {
@@ -324,7 +324,7 @@ async fn introspect_mysql_prisma2(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql))]
-async fn introspect_mysql_non_prisma_empty(api: &TestApi) -> TestResult {
+async fn introspect_mysql_non_prisma_empty(api: &mut TestApi) -> TestResult {
     api.barrel().execute(|_migration| {}).await?;
 
     assert_eq!(Version::NonPrisma, api.introspect_version().await?);
@@ -333,7 +333,7 @@ async fn introspect_mysql_non_prisma_empty(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn introspect_mssql_non_prisma_empty(api: &TestApi) -> TestResult {
+async fn introspect_mssql_non_prisma_empty(api: &mut TestApi) -> TestResult {
     api.barrel().execute(|_migration| {}).await?;
 
     assert_eq!(Version::NonPrisma, api.introspect_version().await?);

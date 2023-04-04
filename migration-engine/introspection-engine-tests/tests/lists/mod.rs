@@ -4,7 +4,7 @@ use introspection_engine_tests::test_api::*;
 use test_macros::test_connector;
 
 #[test_connector(capabilities(ScalarLists))]
-async fn scalar_list_types(api: &TestApi) -> TestResult {
+async fn scalar_list_types(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Post", |t| {

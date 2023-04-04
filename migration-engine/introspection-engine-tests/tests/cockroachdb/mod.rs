@@ -1,8 +1,8 @@
 mod gin;
 
 use indoc::indoc;
-use introspection_connector::{CompositeTypeDepth, IntrospectionConnector, IntrospectionContext};
 use introspection_engine_tests::test_api::*;
+use migration_connector::{CompositeTypeDepth, IntrospectionContext, MigrationConnector};
 
 #[test_connector(tags(CockroachDb))]
 async fn introspecting_cockroach_db_with_postgres_provider(api: TestApi) {
@@ -130,7 +130,7 @@ async fn identity_with_options_introspects_to_sequence_with_options(api: TestApi
 }
 
 #[test_connector(tags(CockroachDb))]
-async fn dbgenerated_type_casts_should_work(api: &TestApi) -> TestResult {
+async fn dbgenerated_type_casts_should_work(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("A", move |t| {
@@ -152,7 +152,7 @@ async fn dbgenerated_type_casts_should_work(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(CockroachDb221))]
-async fn scalar_list_defaults_work_on_22_1(api: &TestApi) -> TestResult {
+async fn scalar_list_defaults_work_on_22_1(api: &mut TestApi) -> TestResult {
     let schema = r#"
         CREATE TYPE "color" AS ENUM ('RED', 'GREEN', 'BLUE');
 
@@ -206,7 +206,7 @@ async fn scalar_list_defaults_work_on_22_1(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(CockroachDb222))]
-async fn scalar_list_defaults_work_on_22_2(api: &TestApi) -> TestResult {
+async fn scalar_list_defaults_work_on_22_2(api: &mut TestApi) -> TestResult {
     let schema = r#"
         CREATE TYPE "color" AS ENUM ('RED', 'GREEN', 'BLUE');
 
@@ -260,7 +260,7 @@ async fn scalar_list_defaults_work_on_22_2(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(CockroachDb))]
-async fn string_col_with_length(api: &TestApi) -> TestResult {
+async fn string_col_with_length(api: &mut TestApi) -> TestResult {
     let schema = r#"
         CREATE TABLE "User" (
           id INT8 PRIMARY KEY DEFAULT unique_rowid(),

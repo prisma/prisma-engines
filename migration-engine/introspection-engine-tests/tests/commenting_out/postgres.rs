@@ -3,7 +3,7 @@ use introspection_engine_tests::{assert_eq_json, test_api::*};
 use serde_json::json;
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn relations_between_ignored_models_should_not_have_field_level_ignores(api: &TestApi) -> TestResult {
+async fn relations_between_ignored_models_should_not_have_field_level_ignores(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -42,7 +42,7 @@ async fn relations_between_ignored_models_should_not_have_field_level_ignores(ap
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn fields_we_cannot_sanitize_are_commented_out_and_warned(api: &TestApi) -> TestResult {
+async fn fields_we_cannot_sanitize_are_commented_out_and_warned(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE "Test" (
             "id" SERIAL PRIMARY KEY,
@@ -91,7 +91,7 @@ async fn fields_we_cannot_sanitize_are_commented_out_and_warned(api: &TestApi) -
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn unsupported_type_keeps_its_usages(api: &TestApi) -> TestResult {
+async fn unsupported_type_keeps_its_usages(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Test", |t| {
@@ -139,7 +139,7 @@ async fn unsupported_type_keeps_its_usages(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn a_table_with_only_an_unsupported_id(api: &TestApi) -> TestResult {
+async fn a_table_with_only_an_unsupported_id(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Test", |t| {
@@ -183,13 +183,14 @@ async fn a_table_with_only_an_unsupported_id(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(&dm, &result);
 
     Ok(())
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn a_table_with_unsupported_types_in_a_relation(api: &TestApi) -> TestResult {
+async fn a_table_with_unsupported_types_in_a_relation(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -224,7 +225,7 @@ async fn a_table_with_unsupported_types_in_a_relation(api: &TestApi) -> TestResu
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn dbgenerated_in_unsupported(api: &TestApi) -> TestResult {
+async fn dbgenerated_in_unsupported(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE "Blog" (
           id SERIAL PRIMARY KEY,
@@ -260,7 +261,7 @@ async fn dbgenerated_in_unsupported(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn commenting_out_a_table_without_columns(api: &TestApi) -> TestResult {
+async fn commenting_out_a_table_without_columns(api: &mut TestApi) -> TestResult {
     api.raw_cmd("CREATE TABLE \"Test\" ();").await;
 
     let expected = json!([{
@@ -294,7 +295,7 @@ async fn commenting_out_a_table_without_columns(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &TestApi) -> TestResult {
+async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -337,7 +338,7 @@ async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &TestAp
     tags(Postgres11, Postgres12, Postgres13, Postgres14, Postgres15),
     exclude(CockroachDb)
 )]
-async fn partition_table_gets_comment(api: &TestApi) -> TestResult {
+async fn partition_table_gets_comment(api: &mut TestApi) -> TestResult {
     api.raw_cmd(
         r#"
 CREATE TABLE IF NOT EXISTS blocks

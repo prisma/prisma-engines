@@ -2,7 +2,7 @@ use barrel::types;
 use introspection_engine_tests::test_api::*;
 
 #[test_connector(tags(Sqlite))]
-async fn remapping_models_in_compound_relations(api: &TestApi) -> TestResult {
+async fn remapping_models_in_compound_relations(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User with Space", move |t| {
@@ -56,7 +56,7 @@ async fn remapping_models_in_compound_relations(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Sqlite))]
-async fn remapping_models_in_relations(api: &TestApi) -> TestResult {
+async fn remapping_models_in_relations(api: &mut TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     api.barrel()
@@ -108,7 +108,7 @@ async fn remapping_models_in_relations(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Sqlite))]
-async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestApi) -> TestResult {
+async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &mut TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     api.barrel()

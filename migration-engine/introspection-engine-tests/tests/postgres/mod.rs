@@ -10,7 +10,7 @@ use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn sequences_should_work(api: &TestApi) -> TestResult {
+async fn sequences_should_work(api: &mut TestApi) -> TestResult {
     let setup = r#"
         CREATE SEQUENCE "first_Sequence";
         CREATE SEQUENCE "second_sequence";
@@ -52,7 +52,7 @@ async fn sequences_should_work(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn dbgenerated_type_casts_should_work(api: &TestApi) -> TestResult {
+async fn dbgenerated_type_casts_should_work(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("A", move |t| {
@@ -74,7 +74,7 @@ async fn dbgenerated_type_casts_should_work(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn pg_xml_indexes_are_skipped(api: &TestApi) -> TestResult {
+async fn pg_xml_indexes_are_skipped(api: &mut TestApi) -> TestResult {
     let create_table = format!(
         "CREATE TABLE \"{schema_name}\".xml_test (id SERIAL PRIMARY KEY, data XML)",
         schema_name = api.schema_name()
@@ -102,7 +102,7 @@ async fn pg_xml_indexes_are_skipped(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn scalar_list_defaults_work(api: &TestApi) -> TestResult {
+async fn scalar_list_defaults_work(api: &mut TestApi) -> TestResult {
     let schema = r#"
         CREATE TYPE "color" AS ENUM ('RED', 'GREEN', 'BLUE');
 

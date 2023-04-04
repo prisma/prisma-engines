@@ -37,7 +37,7 @@ const TYPES: &[(&str, &str)] = &[
 ];
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn native_type_columns_feature_on(api: &TestApi) -> TestResult {
+async fn native_type_columns_feature_on(api: &mut TestApi) -> TestResult {
     let columns: Vec<String> = TYPES
         .iter()
         .map(|(name, db_type)| format!("\"{name}\" {db_type} Not Null"))
@@ -101,7 +101,7 @@ async fn native_type_columns_feature_on(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn native_type_array_columns_feature_on(api: &TestApi) -> TestResult {
+async fn native_type_array_columns_feature_on(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("Blog", move |t| {
@@ -156,7 +156,7 @@ async fn native_type_array_columns_feature_on(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(CockroachDb))]
-async fn cdb_char_is_a_char(api: &TestApi) -> TestResult {
+async fn cdb_char_is_a_char(api: &mut TestApi) -> TestResult {
     // https://github.com/prisma/prisma/issues/12281
 
     api.barrel()

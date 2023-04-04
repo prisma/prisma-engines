@@ -3,7 +3,7 @@ use introspection_engine_tests::test_api::*;
 
 // referentialIntegrity="prisma" is renamed as relationMode="prisma", and @relations are preserved.
 #[test_connector(tags(Sqlite))]
-async fn referential_integrity_prisma(api: &TestApi) -> TestResult {
+async fn referential_integrity_prisma(api: &mut TestApi) -> TestResult {
     let init = indoc! {r#"
         CREATE TABLE "Foo" (
             "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -73,7 +73,7 @@ async fn referential_integrity_prisma(api: &TestApi) -> TestResult {
 
 // referentialIntegrity="foreignKeys" is renamed as relationMode="foreignKeys", and @relations are preserved but moved to the bottom.
 #[test_connector(tags(Sqlite))]
-async fn referential_integrity_foreign_keys(api: &TestApi) -> TestResult {
+async fn referential_integrity_foreign_keys(api: &mut TestApi) -> TestResult {
     let init = indoc! {r#"
         CREATE TABLE "Foo" (
             "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -144,7 +144,7 @@ async fn referential_integrity_foreign_keys(api: &TestApi) -> TestResult {
 
 // relationMode="prisma" preserves the relation policy ("prisma") as well as @relations.
 #[test_connector(tags(Sqlite))]
-async fn relation_mode_prisma(api: &TestApi) -> TestResult {
+async fn relation_mode_prisma(api: &mut TestApi) -> TestResult {
     let init = indoc! {r#"
         CREATE TABLE "Foo" (
             "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -214,7 +214,7 @@ async fn relation_mode_prisma(api: &TestApi) -> TestResult {
 
 // relationMode="foreignKeys" preserves the relation policy ("foreignKeys") as well as @relations, which are moved to the bottom.
 #[test_connector(tags(Sqlite))]
-async fn relation_mode_foreign_keys(api: &TestApi) -> TestResult {
+async fn relation_mode_foreign_keys(api: &mut TestApi) -> TestResult {
     let init = indoc! {r#"
         CREATE TABLE "Foo" (
             "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -290,7 +290,7 @@ mod at_at_map {
 
     // referentialIntegrity="prisma" is renamed as relationMode="prisma", and @relations are preserved.
     #[test_connector(tags(Sqlite))]
-    async fn referential_integrity_prisma_at_map_map(api: &TestApi) -> TestResult {
+    async fn referential_integrity_prisma_at_map_map(api: &mut TestApi) -> TestResult {
         let init = indoc! {r#"
             CREATE TABLE "foo_table" (
                 "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -368,7 +368,7 @@ mod at_at_map {
 
     // referentialIntegrity="foreignKeys" is renamed as relationMode="foreignKeys", and @relations are preserved.
     #[test_connector(tags(Sqlite))]
-    async fn referential_integrity_foreign_keys_at_map_map(api: &TestApi) -> TestResult {
+    async fn referential_integrity_foreign_keys_at_map_map(api: &mut TestApi) -> TestResult {
         let init = indoc! {r#"
             CREATE TABLE "foo_table" (
                 "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -447,7 +447,7 @@ mod at_at_map {
 
     // relationMode="prisma" preserves the relation policy ("prisma") as well as @relations.
     #[test_connector(tags(Sqlite))]
-    async fn relation_mode_prisma_at_map_map(api: &TestApi) -> TestResult {
+    async fn relation_mode_prisma_at_map_map(api: &mut TestApi) -> TestResult {
         let init = indoc! {r#"
             CREATE TABLE "foo_table" (
                 "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -525,7 +525,7 @@ mod at_at_map {
 
     // relationMode="foreignKeys" preserves the relation policy ("foreignKeys") as well as @relations., which are moved to the bottom.
     #[test_connector(tags(Sqlite))]
-    async fn relation_mode_foreign_keys_at_map_map(api: &TestApi) -> TestResult {
+    async fn relation_mode_foreign_keys_at_map_map(api: &mut TestApi) -> TestResult {
         let init = indoc! {r#"
             CREATE TABLE "foo_table" (
                 "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,

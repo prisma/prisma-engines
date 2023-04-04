@@ -4,7 +4,7 @@ use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
 #[test_connector(tags(Mssql))]
-async fn user_defined_type_aliases_should_map_to_the_system_type(api: &TestApi) -> TestResult {
+async fn user_defined_type_aliases_should_map_to_the_system_type(api: &mut TestApi) -> TestResult {
     let create_type = format!("CREATE TYPE [{}].[Name] FROM [nvarchar](50) NULL", api.schema_name());
     api.database().raw_cmd(&create_type).await?;
 
@@ -35,7 +35,7 @@ async fn user_defined_type_aliases_should_map_to_the_system_type(api: &TestApi) 
 }
 
 #[test_connector(tags(Mssql))]
-async fn ms_xml_indexes_are_skipped(api: &TestApi) -> TestResult {
+async fn ms_xml_indexes_are_skipped(api: &mut TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE [$schema].[xml_test] (
             id INT IDENTITY,
@@ -65,7 +65,7 @@ async fn ms_xml_indexes_are_skipped(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn non_standard_id_clustering(api: &TestApi) -> TestResult {
+async fn non_standard_id_clustering(api: &mut TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE [$schema].[test] (
             id INT IDENTITY,
@@ -89,7 +89,7 @@ async fn non_standard_id_clustering(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn standard_id_clustering(api: &TestApi) -> TestResult {
+async fn standard_id_clustering(api: &mut TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE [$schema].[test] (
             id INT IDENTITY,
@@ -113,7 +113,7 @@ async fn standard_id_clustering(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn non_standard_compound_id_clustering(api: &TestApi) -> TestResult {
+async fn non_standard_compound_id_clustering(api: &mut TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE [$schema].[test] (
             a INT,
@@ -141,7 +141,7 @@ async fn non_standard_compound_id_clustering(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn standard_compound_id_clustering(api: &TestApi) -> TestResult {
+async fn standard_compound_id_clustering(api: &mut TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE [$schema].[test] (
             a INT,
@@ -169,7 +169,7 @@ async fn standard_compound_id_clustering(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn non_standard_unique_clustering(api: &TestApi) -> TestResult {
+async fn non_standard_unique_clustering(api: &mut TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE [$schema].[test] (
             a INT NOT NULL,
@@ -193,7 +193,7 @@ async fn non_standard_unique_clustering(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn standard_unique_clustering(api: &TestApi) -> TestResult {
+async fn standard_unique_clustering(api: &mut TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE [$schema].[test] (
             a INT NOT NULL,
@@ -217,7 +217,7 @@ async fn standard_unique_clustering(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn non_standard_compound_unique_clustering(api: &TestApi) -> TestResult {
+async fn non_standard_compound_unique_clustering(api: &mut TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE [$schema].[test] (
             a INT NOT NULL,
@@ -245,7 +245,7 @@ async fn non_standard_compound_unique_clustering(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn standard_compound_unique_clustering(api: &TestApi) -> TestResult {
+async fn standard_compound_unique_clustering(api: &mut TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE [$schema].[test] (
             a INT NOT NULL,
@@ -273,7 +273,7 @@ async fn standard_compound_unique_clustering(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn non_standard_index_clustering(api: &TestApi) -> TestResult {
+async fn non_standard_index_clustering(api: &mut TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE [$schema].[test] (
             id INT IDENTITY,
@@ -303,7 +303,7 @@ async fn non_standard_index_clustering(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn standard_index_clustering(api: &TestApi) -> TestResult {
+async fn standard_index_clustering(api: &mut TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE [$schema].[test] (
             id INT IDENTITY,

@@ -3,7 +3,7 @@ use introspection_engine_tests::{assert_eq_json, test_api::*, TestResult};
 use serde_json::json;
 
 #[test_connector(tags(Mysql))]
-async fn a_table_without_required_uniques(api: &TestApi) -> TestResult {
+async fn a_table_without_required_uniques(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Post", |t| {
@@ -29,7 +29,7 @@ async fn a_table_without_required_uniques(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql), exclude(Vitess))]
-async fn a_table_without_uniques_should_ignore(api: &TestApi) -> TestResult {
+async fn a_table_without_uniques_should_ignore(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -70,7 +70,7 @@ async fn a_table_without_uniques_should_ignore(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql), exclude(Vitess))]
-async fn remapping_field_names_to_empty_mysql(api: &TestApi) -> TestResult {
+async fn remapping_field_names_to_empty_mysql(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -105,7 +105,7 @@ async fn remapping_field_names_to_empty_mysql(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql), exclude(Vitess))]
-async fn partition_table_gets_comment(api: &TestApi) -> TestResult {
+async fn partition_table_gets_comment(api: &mut TestApi) -> TestResult {
     api.raw_cmd(
         r#"
 CREATE TABLE `blocks` (

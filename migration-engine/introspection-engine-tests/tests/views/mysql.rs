@@ -2,7 +2,7 @@ use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 
 #[test_connector(tags(Mysql), exclude(Vitess), preview_features("views"))]
-async fn simple_view_from_one_table(api: &TestApi) -> TestResult {
+async fn simple_view_from_one_table(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE A (
             id INT PRIMARY KEY,
@@ -52,7 +52,7 @@ async fn simple_view_from_one_table(api: &TestApi) -> TestResult {
         FROM
           `simple_view_from_one_table`.`A`"#]];
 
-    api.expect_view_definition(api.schema_name(), "B", &expected).await;
+    api.expect_view_definition("B", &expected).await;
 
     let expected = expect![[r#"
         [
@@ -73,7 +73,7 @@ async fn simple_view_from_one_table(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql), exclude(Vitess, Mariadb), preview_features("views"))]
-async fn simple_view_from_two_tables(api: &TestApi) -> TestResult {
+async fn simple_view_from_two_tables(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE User (
             id INT PRIMARY KEY,
@@ -145,14 +145,13 @@ async fn simple_view_from_two_tables(api: &TestApi) -> TestResult {
             JOIN `simple_view_from_two_tables`.`Profile` `p` ON((`u`.`id` = `p`.`user_id`))
           )"#]];
 
-    api.expect_view_definition(api.schema_name(), "Schwuser", &expected)
-        .await;
+    api.expect_view_definition("Schwuser", &expected).await;
 
     Ok(())
 }
 
 #[test_connector(tags(Mysql), exclude(Vitess), preview_features("views"))]
-async fn re_intro_keeps_view_uniques(api: &TestApi) -> TestResult {
+async fn re_intro_keeps_view_uniques(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE User (
             id INT PRIMARY KEY,
@@ -200,7 +199,7 @@ async fn re_intro_keeps_view_uniques(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql), exclude(Vitess), preview_features("views"))]
-async fn re_intro_keeps_id(api: &TestApi) -> TestResult {
+async fn re_intro_keeps_id(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE User (
             id INT PRIMARY KEY,
@@ -248,7 +247,7 @@ async fn re_intro_keeps_id(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql), exclude(Vitess), preview_features("views"))]
-async fn re_intro_keeps_compound_unique(api: &TestApi) -> TestResult {
+async fn re_intro_keeps_compound_unique(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE User (
             side_a INT NOT NULL,
@@ -310,7 +309,7 @@ async fn re_intro_keeps_compound_unique(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql), exclude(Vitess), preview_features("views"))]
-async fn re_intro_keeps_view_to_view_relations(api: &TestApi) -> TestResult {
+async fn re_intro_keeps_view_to_view_relations(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE VIEW A AS SELECT 1 AS id;
         CREATE VIEW B AS SELECT 2 AS id, 1 AS a_id;
@@ -350,7 +349,7 @@ async fn re_intro_keeps_view_to_view_relations(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql), exclude(Vitess), preview_features("views"))]
-async fn defaults_are_introspected(api: &TestApi) -> TestResult {
+async fn defaults_are_introspected(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE A (id INT PRIMARY KEY, val INT DEFAULT 2);
         CREATE VIEW B AS SELECT id, val FROM A;
@@ -389,7 +388,7 @@ async fn defaults_are_introspected(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql8), exclude(Vitess), preview_features("views"))]
-async fn views_are_rendered_with_enums(api: &TestApi) -> TestResult {
+async fn views_are_rendered_with_enums(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE A (
             id INT PRIMARY KEY,

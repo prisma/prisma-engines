@@ -11,7 +11,7 @@ use introspection_engine_tests::test_api::*;
 use test_macros::test_connector;
 
 #[test_connector(exclude(Mssql, Mysql, Sqlite, CockroachDb))]
-async fn one_to_one_req_relation(api: &TestApi) -> TestResult {
+async fn one_to_one_req_relation(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", |t| {
@@ -45,7 +45,7 @@ async fn one_to_one_req_relation(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(exclude(Mssql, Mysql, Sqlite, CockroachDb))]
-async fn one_to_one_relation_on_a_singular_primary_key(api: &TestApi) -> TestResult {
+async fn one_to_one_relation_on_a_singular_primary_key(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -77,7 +77,7 @@ async fn one_to_one_relation_on_a_singular_primary_key(api: &TestApi) -> TestRes
 }
 
 #[test_connector(exclude(Mssql, Mysql, Sqlite, CockroachDb))]
-async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> TestResult {
+async fn two_one_to_one_relations_between_the_same_models(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", move |t| {
@@ -119,7 +119,7 @@ async fn two_one_to_one_relations_between_the_same_models(api: &TestApi) -> Test
 }
 
 #[test_connector(exclude(Mysql, Sqlite, CockroachDb))]
-async fn a_one_to_one_relation(api: &TestApi) -> TestResult {
+async fn a_one_to_one_relation(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -160,7 +160,7 @@ async fn a_one_to_one_relation(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(exclude(Sqlite, Mysql, CockroachDb))]
-async fn a_one_to_one_relation_referencing_non_id(api: &TestApi) -> TestResult {
+async fn a_one_to_one_relation_referencing_non_id(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -205,7 +205,7 @@ async fn a_one_to_one_relation_referencing_non_id(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(exclude(Mysql, Sqlite, CockroachDb))]
-async fn a_one_to_many_relation(api: &TestApi) -> TestResult {
+async fn a_one_to_many_relation(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -244,7 +244,7 @@ async fn a_one_to_many_relation(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(exclude(Mysql, Mssql, CockroachDb))]
-async fn a_one_req_to_many_relation(api: &TestApi) -> TestResult {
+async fn a_one_req_to_many_relation(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -278,7 +278,7 @@ async fn a_one_req_to_many_relation(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(exclude(Postgres, Vitess, CockroachDb))]
-async fn a_prisma_many_to_many_relation(api: &TestApi) -> TestResult {
+async fn a_prisma_many_to_many_relation(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -316,13 +316,14 @@ async fn a_prisma_many_to_many_relation(api: &TestApi) -> TestResult {
         }
     "##};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
 
 #[test_connector(exclude(Mysql, Mssql, CockroachDb, Sqlite))]
-async fn a_many_to_many_relation_with_an_id(api: &TestApi) -> TestResult {
+async fn a_many_to_many_relation_with_an_id(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -370,7 +371,7 @@ async fn a_many_to_many_relation_with_an_id(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(exclude(Mysql, Sqlite, CockroachDb, Mssql))]
-async fn a_self_relation(api: &TestApi) -> TestResult {
+async fn a_self_relation(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", move |t| {
@@ -411,7 +412,7 @@ async fn a_self_relation(api: &TestApi) -> TestResult {
 // SQLite will always make the primary key autoincrement, which makes no sense
 // to build.
 #[test_connector(exclude(Sqlite, Mssql, Mysql, CockroachDb))]
-async fn id_fields_with_foreign_key(api: &TestApi) -> TestResult {
+async fn id_fields_with_foreign_key(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", |t| {
@@ -443,7 +444,7 @@ async fn id_fields_with_foreign_key(api: &TestApi) -> TestResult {
 
 // SQLite cannot alter tables to add foreign keys, so skipping the tests.
 #[test_connector(exclude(Sqlite, Mysql, CockroachDb))]
-async fn duplicate_fks_should_ignore_one_of_them(api: &TestApi) -> TestResult {
+async fn duplicate_fks_should_ignore_one_of_them(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -486,7 +487,7 @@ async fn duplicate_fks_should_ignore_one_of_them(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(exclude(Mssql), exclude(Vitess))]
-async fn prisma_1_0_relations(api: &TestApi) -> TestResult {
+async fn prisma_1_0_relations(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
@@ -529,13 +530,14 @@ async fn prisma_1_0_relations(api: &TestApi) -> TestResult {
         }}
     "##};
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(&dm, &result);
 
     Ok(())
 }
 
 #[test_connector(exclude(Mysql, Sqlite, Mssql))]
-async fn relations_should_avoid_name_clashes(api: &TestApi) -> TestResult {
+async fn relations_should_avoid_name_clashes(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("y", |t| {
@@ -572,7 +574,7 @@ async fn relations_should_avoid_name_clashes(api: &TestApi) -> TestResult {
 
 #[test_connector(exclude(Mysql, Mssql, CockroachDb))]
 async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_relation_field_names(
-    api: &TestApi,
+    api: &mut TestApi,
 ) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -625,7 +627,7 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
 }
 
 #[test_connector(exclude(Sqlite, Mssql, Mysql, CockroachDb))]
-async fn one_to_one_req_relation_with_custom_fk_name(api: &TestApi) -> TestResult {
+async fn one_to_one_req_relation_with_custom_fk_name(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", |t| {

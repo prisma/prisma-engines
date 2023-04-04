@@ -4,7 +4,7 @@ use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn full_text_functions_filtered_out(api: &TestApi) -> TestResult {
+async fn full_text_functions_filtered_out(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data text not null)",);
     let create_idx =
@@ -27,7 +27,7 @@ async fn full_text_functions_filtered_out(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn gin_raw_ops(api: &TestApi) -> TestResult {
+async fn gin_raw_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data tsvector not null)",);
     let create_idx = format!("CREATE INDEX \"A_data_idx\" ON \"{schema_name}\".\"A\" USING GIN (data);",);
@@ -51,7 +51,7 @@ async fn gin_raw_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn array_ops(api: &TestApi) -> TestResult {
+async fn array_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data int[] not null)",);
     let create_idx = format!("CREATE INDEX \"A_data_idx\" ON \"{schema_name}\".\"A\" USING GIN (data);",);
@@ -75,7 +75,7 @@ async fn array_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn array_ops_with_native_type(api: &TestApi) -> TestResult {
+async fn array_ops_with_native_type(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data int[] not null)",);
     let create_idx = format!("CREATE INDEX \"A_data_idx\" ON \"{schema_name}\".\"A\" USING GIN (data);",);
@@ -99,7 +99,7 @@ async fn array_ops_with_native_type(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn jsonb_ops(api: &TestApi) -> TestResult {
+async fn jsonb_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
 
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data jsonb not null)",);
@@ -125,7 +125,7 @@ async fn jsonb_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn jsonb_path_ops(api: &TestApi) -> TestResult {
+async fn jsonb_path_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
 
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data jsonb not null)",);

@@ -3,7 +3,7 @@ use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 
 #[test_connector(tags(Mysql))]
-async fn empty_preview_features_are_kept(api: &TestApi) -> TestResult {
+async fn empty_preview_features_are_kept(api: &mut TestApi) -> TestResult {
     let schema = indoc! {r#"
         generator client {
           provider        = "prisma-client-js"
@@ -34,7 +34,7 @@ async fn empty_preview_features_are_kept(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql), exclude(Vitess))]
-async fn relation_mode_parameter_is_not_added(api: &TestApi) -> TestResult {
+async fn relation_mode_parameter_is_not_added(api: &mut TestApi) -> TestResult {
     let result = api.re_introspect("").await?;
     assert!(!result.contains(r#"relationMode = "#));
 
@@ -42,7 +42,7 @@ async fn relation_mode_parameter_is_not_added(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql), exclude(Vitess))]
-async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
+async fn multiple_changed_relation_names(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Employee", |t| {
@@ -117,7 +117,7 @@ async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql), exclude(Vitess))]
-async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
+async fn mapped_model_and_field_name(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -188,7 +188,7 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql), exclude(Vitess))]
-async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> TestResult {
+async fn multiple_changed_relation_names_due_to_mapped_models(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -260,7 +260,7 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
 }
 
 #[test_connector(tags(Mysql))]
-async fn mysql_keeps_renamed_enum_defaults(api: &TestApi) -> TestResult {
+async fn mysql_keeps_renamed_enum_defaults(api: &mut TestApi) -> TestResult {
     let init = formatdoc! {r#"
         CREATE TABLE `A` (
           `id` int NOT NULL AUTO_INCREMENT,
@@ -308,7 +308,7 @@ async fn mysql_keeps_renamed_enum_defaults(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql))]
-async fn mapped_enum_value_name(api: &TestApi) -> TestResult {
+async fn mapped_enum_value_name(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `User` (
             id INT NOT NULL AUTO_INCREMENT,

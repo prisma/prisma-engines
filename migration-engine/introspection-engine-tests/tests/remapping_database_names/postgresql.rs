@@ -4,7 +4,7 @@ use introspection_engine_tests::test_api::*;
 use test_macros::test_connector;
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn remapping_enum_names(api: &TestApi) -> TestResult {
+async fn remapping_enum_names(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TYPE "123color" AS ENUM ('black');
 

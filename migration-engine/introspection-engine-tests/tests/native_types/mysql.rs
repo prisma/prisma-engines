@@ -47,7 +47,7 @@ const TYPES: &[(&str, &str)] = &[
 // NOTE: The MariaDB expectations broke with 10.11.2
 // (https://prisma-company.slack.com/archives/C4GCG53BP/p1668766257151269)
 #[test_connector(tags(Mariadb, Mysql8))]
-async fn native_type_columns_feature_on(api: &TestApi) -> TestResult {
+async fn native_type_columns_feature_on(api: &mut TestApi) -> TestResult {
     let columns: Vec<String> = TYPES
         .iter()
         .map(|(name, db_type)| format!("`{name}` {db_type} Not Null"))

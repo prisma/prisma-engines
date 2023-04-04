@@ -20,7 +20,9 @@ pub use destructive_change_checker::{
 pub use diff::DiffTarget;
 use enumflags2::BitFlags;
 pub use error::{ConnectorError, ConnectorResult};
-pub use introspection_connector::{IntrospectionConnector, IntrospectionContext, IntrospectionResult};
+pub use introspection_connector::{
+    CompositeTypeDepth, IntrospectionConnector, IntrospectionContext, IntrospectionResult, Version, ViewDefinition,
+};
 pub use migration_persistence::{MigrationPersistence, MigrationRecord, PersistenceNotInitializedError, Timestamp};
 
 use migrations_directory::MigrationDirectory;
