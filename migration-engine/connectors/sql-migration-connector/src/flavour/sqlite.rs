@@ -363,7 +363,7 @@ impl SqlFlavour for SqliteFlavour {
     }
 
     fn search_path(&self) -> &str {
-        self.state.params().map(|p| p.file_path.as_str()).unwrap_or("dev.db")
+        "main"
     }
 }
 

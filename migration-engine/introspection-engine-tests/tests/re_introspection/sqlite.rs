@@ -2,7 +2,7 @@ use barrel::types;
 use introspection_engine_tests::test_api::*;
 
 #[test_connector(tags(Sqlite))]
-async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> TestResult {
+async fn multiple_changed_relation_names_due_to_mapped_models(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -70,7 +70,7 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
 }
 
 #[test_connector(tags(Sqlite))]
-async fn do_not_try_to_keep_custom_many_to_many_self_relation_field_names(api: &TestApi) -> TestResult {
+async fn do_not_try_to_keep_custom_many_to_many_self_relation_field_names(api: &mut TestApi) -> TestResult {
     // We do not have enough information to correctly assign which field should point to column A in the
     // join table and which one to B
     // Upon table creation this is dependant on lexicographic order of the names of the fields, but we
@@ -114,7 +114,7 @@ async fn do_not_try_to_keep_custom_many_to_many_self_relation_field_names(api: &
 }
 
 #[test_connector(tags(Sqlite))]
-async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
+async fn multiple_changed_relation_names(api: &mut TestApi) -> TestResult {
     let sql = r#"
         CREATE TABLE "Employee" (
             id INTEGER PRIMARY KEY

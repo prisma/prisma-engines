@@ -2,7 +2,7 @@ use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn string_defaults_that_need_escaping(api: &TestApi) -> TestResult {
+async fn string_defaults_that_need_escaping(api: &mut TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE "stringstest" (
             id INTEGER PRIMARY KEY,
@@ -40,7 +40,7 @@ $$
 }
 
 #[test_connector(tags(Postgres))]
-async fn a_table_with_descending_unique(api: &TestApi) -> TestResult {
+async fn a_table_with_descending_unique(api: &mut TestApi) -> TestResult {
     let setup = r#"
        CREATE TABLE "A" (
            id INTEGER NOT NULL,
@@ -66,7 +66,7 @@ async fn a_table_with_descending_unique(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres))]
-async fn a_table_with_descending_compound_unique(api: &TestApi) -> TestResult {
+async fn a_table_with_descending_compound_unique(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
        CREATE TABLE "A" (
            id INTEGER NOT NULL,
@@ -96,7 +96,7 @@ async fn a_table_with_descending_compound_unique(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres))]
-async fn a_table_with_descending_index(api: &TestApi) -> TestResult {
+async fn a_table_with_descending_index(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
        CREATE TABLE "A" (
            id INTEGER NOT NULL,
@@ -126,7 +126,7 @@ async fn a_table_with_descending_index(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn a_table_with_a_hash_index(api: &TestApi) -> TestResult {
+async fn a_table_with_a_hash_index(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
        CREATE TABLE "A" (
            id INTEGER NOT NULL,
@@ -154,7 +154,7 @@ async fn a_table_with_a_hash_index(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres))]
-async fn ignoring_of_partial_indices(api: &TestApi) -> TestResult {
+async fn ignoring_of_partial_indices(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
        CREATE TABLE "A" (
            id INTEGER NOT NULL,
@@ -180,7 +180,7 @@ async fn ignoring_of_partial_indices(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres))]
-async fn introspecting_now_functions(api: &TestApi) -> TestResult {
+async fn introspecting_now_functions(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
        CREATE TABLE "A" (
            id INTEGER NOT NULL Primary Key,
@@ -214,7 +214,7 @@ async fn introspecting_now_functions(api: &TestApi) -> TestResult {
 
 // https://github.com/prisma/prisma/issues/12095
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn a_table_with_json_columns(api: &TestApi) -> TestResult {
+async fn a_table_with_json_columns(api: &mut TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE "Foo" (
             "id" INTEGER NOT NULL,
@@ -247,7 +247,7 @@ async fn a_table_with_json_columns(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn datetime_default_expressions_are_not_truncated(api: &TestApi) -> TestResult {
+async fn datetime_default_expressions_are_not_truncated(api: &mut TestApi) -> TestResult {
     let setup = r#"
         CREATE TABLE "Foo" (
             "id" INTEGER NOT NULL,

@@ -8,7 +8,7 @@ use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
 #[test_connector(exclude(CockroachDb), capabilities(Enums))]
-async fn a_table_with_enums(api: &TestApi) -> TestResult {
+async fn a_table_with_enums(api: &mut TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     if sql_family.is_postgres() {
@@ -60,14 +60,15 @@ async fn a_table_with_enums(api: &TestApi) -> TestResult {
     );
 
     for _ in 0..4 {
-        api.assert_eq_datamodels(&dm, &api.introspect().await?);
+        let result = api.introspect().await?;
+        api.assert_eq_datamodels(&dm, &result);
     }
 
     Ok(())
 }
 
 #[test_connector(exclude(CockroachDb), capabilities(Enums))]
-async fn a_table_enums_should_return_alphabetically_even_when_in_different_order(api: &TestApi) -> TestResult {
+async fn a_table_enums_should_return_alphabetically_even_when_in_different_order(api: &mut TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     if sql_family.is_postgres() {
@@ -121,14 +122,15 @@ async fn a_table_enums_should_return_alphabetically_even_when_in_different_order
     );
 
     for _ in 0..4 {
-        api.assert_eq_datamodels(&dm, &api.introspect().await?);
+        let result = api.introspect().await?;
+        api.assert_eq_datamodels(&dm, &result);
     }
 
     Ok(())
 }
 
 #[test_connector(exclude(CockroachDb), capabilities(Enums))]
-async fn a_table_with_enum_default_values(api: &TestApi) -> TestResult {
+async fn a_table_with_enum_default_values(api: &mut TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     if sql_family.is_postgres() {
@@ -169,7 +171,8 @@ async fn a_table_with_enum_default_values(api: &TestApi) -> TestResult {
     "#,
     );
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(&dm, &result);
 
     Ok(())
 }

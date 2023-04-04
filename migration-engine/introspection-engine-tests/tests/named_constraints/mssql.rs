@@ -5,7 +5,7 @@ use introspection_engine_tests::{test_api::*, TestResult};
 use test_macros::test_connector;
 
 #[test_connector(tags(Mssql))]
-async fn introspecting_custom_fk_names_works(api: &TestApi) -> TestResult {
+async fn introspecting_custom_fk_names_works(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", |t| {
@@ -47,7 +47,7 @@ async fn introspecting_custom_fk_names_works(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn introspecting_default_fk_names_works(api: &TestApi) -> TestResult {
+async fn introspecting_default_fk_names_works(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", |t| {

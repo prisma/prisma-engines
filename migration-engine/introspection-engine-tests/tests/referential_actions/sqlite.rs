@@ -2,7 +2,7 @@ use barrel::types;
 use introspection_engine_tests::test_api::*;
 
 #[test_connector(tags(Sqlite))]
-async fn referential_actions(api: &TestApi) -> TestResult {
+async fn referential_actions(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("a", |t| {

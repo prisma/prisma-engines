@@ -2,7 +2,7 @@ use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 
 #[test_connector(tags(Sqlite), preview_features("views"))]
-async fn basic_view_intro(api: &TestApi) -> TestResult {
+async fn basic_view_intro(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE User (
             id INT NOT NULL PRIMARY KEY,
@@ -53,14 +53,13 @@ async fn basic_view_intro(api: &TestApi) -> TestResult {
         FROM
           User;"#]];
 
-    api.expect_view_definition(api.schema_name(), "Schwuser", &expected)
-        .await;
+    api.expect_view_definition("Schwuser", &expected).await;
 
     Ok(())
 }
 
 #[test_connector(tags(Sqlite), preview_features("views"))]
-async fn re_intro_keeps_column_arity_and_unique(api: &TestApi) -> TestResult {
+async fn re_intro_keeps_column_arity_and_unique(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE User (
             id INT NOT NULL PRIMARY KEY,
@@ -108,7 +107,7 @@ async fn re_intro_keeps_column_arity_and_unique(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Sqlite), preview_features("views"))]
-async fn defaults_are_introspected(api: &TestApi) -> TestResult {
+async fn defaults_are_introspected(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE A (id INT NOT NULL PRIMARY KEY, val INT DEFAULT 2);
         CREATE VIEW B AS SELECT id, val FROM A;

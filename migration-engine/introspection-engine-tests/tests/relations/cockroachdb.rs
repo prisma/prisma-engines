@@ -2,7 +2,7 @@ use barrel::types;
 use introspection_engine_tests::test_api::*;
 
 #[test_connector(tags(CockroachDb))]
-async fn a_one_to_one_relation_referencing_non_id(api: &TestApi) -> TestResult {
+async fn a_one_to_one_relation_referencing_non_id(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -47,7 +47,7 @@ async fn a_one_to_one_relation_referencing_non_id(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(CockroachDb))]
-async fn default_values_on_relations(api: &TestApi) -> TestResult {
+async fn default_values_on_relations(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -80,7 +80,7 @@ async fn default_values_on_relations(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(CockroachDb))]
-async fn a_self_relation(api: &TestApi) -> TestResult {
+async fn a_self_relation(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", move |t| {
@@ -119,7 +119,7 @@ async fn a_self_relation(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(CockroachDb))]
-async fn a_many_to_many_relation_with_an_id(api: &TestApi) -> TestResult {
+async fn a_many_to_many_relation_with_an_id(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {

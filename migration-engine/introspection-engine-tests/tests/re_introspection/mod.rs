@@ -12,7 +12,7 @@ use quaint::prelude::Queryable;
 use serde_json::json;
 
 #[test_connector(exclude(CockroachDb))]
-async fn mapped_model_name(api: &TestApi) -> TestResult {
+async fn mapped_model_name(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("_User", |t| {
@@ -47,7 +47,8 @@ async fn mapped_model_name(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+    let result = api.re_introspect(input_dm).await?;
+    api.assert_eq_datamodels(final_dm, &result);
 
     let expected = json!([{
         "code": 7,
@@ -63,7 +64,7 @@ async fn mapped_model_name(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(exclude(CockroachDb))]
-async fn manually_overwritten_mapped_field_name(api: &TestApi) -> TestResult {
+async fn manually_overwritten_mapped_field_name(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -98,7 +99,8 @@ async fn manually_overwritten_mapped_field_name(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+    let result = api.re_introspect(input_dm).await?;
+    api.assert_eq_datamodels(final_dm, &result);
 
     let expected = json!([{
         "code": 8,
@@ -115,7 +117,7 @@ async fn manually_overwritten_mapped_field_name(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(exclude(Mssql, Mysql, CockroachDb))]
-async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
+async fn mapped_model_and_field_name(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -180,7 +182,7 @@ async fn mapped_model_and_field_name(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn manually_mapped_model_and_field_name(api: &TestApi) -> TestResult {
+async fn manually_mapped_model_and_field_name(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("_User", |t| {
@@ -245,7 +247,7 @@ async fn manually_mapped_model_and_field_name(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(exclude(CockroachDb))]
-async fn mapped_field_name(api: &TestApi) -> TestResult {
+async fn mapped_field_name(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -304,7 +306,8 @@ async fn mapped_field_name(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+    let result = api.re_introspect(input_dm).await?;
+    api.assert_eq_datamodels(final_dm, &result);
 
     let expected = json!([{
         "code": 8,
@@ -330,7 +333,7 @@ async fn mapped_field_name(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(capabilities(Enums), exclude(CockroachDb))]
-async fn mapped_enum_name(api: &TestApi) -> TestResult {
+async fn mapped_enum_name(api: &mut TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     if sql_family.is_postgres() {
@@ -399,7 +402,8 @@ async fn mapped_enum_name(api: &TestApi) -> TestResult {
     "#
     );
 
-    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await?);
+    let result = api.re_introspect(&input_dm).await?;
+    api.assert_eq_datamodels(&final_dm, &result);
 
     let expected = json!([{
         "code": 9,
@@ -413,7 +417,7 @@ async fn mapped_enum_name(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn manually_remapped_enum_value_name(api: &TestApi) -> TestResult {
+async fn manually_remapped_enum_value_name(api: &mut TestApi) -> TestResult {
     let sql = "CREATE Type color as ENUM (\'_black\', \'white\')";
     api.database().execute_raw(sql, &[]).await?;
 
@@ -459,7 +463,8 @@ async fn manually_remapped_enum_value_name(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+    let result = api.re_introspect(&input_dm).await?;
+    api.assert_eq_datamodels(final_dm, &result);
 
     let expected = json!([{
         "code": 10,
@@ -476,7 +481,7 @@ async fn manually_remapped_enum_value_name(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn manually_re_mapped_enum_name(api: &TestApi) -> TestResult {
+async fn manually_re_mapped_enum_name(api: &mut TestApi) -> TestResult {
     let sql = "CREATE Type _color as ENUM (\'black\', \'white\')";
     api.database().execute_raw(sql, &[]).await?;
 
@@ -525,7 +530,8 @@ async fn manually_re_mapped_enum_name(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+    let result = api.re_introspect(&input_dm).await?;
+    api.assert_eq_datamodels(final_dm, &result);
 
     let expected = json!([{
         "code": 9,
@@ -541,7 +547,7 @@ async fn manually_re_mapped_enum_name(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn manually_re_mapped_invalid_enum_values(api: &TestApi) -> TestResult {
+async fn manually_re_mapped_invalid_enum_values(api: &mut TestApi) -> TestResult {
     api.raw_cmd(r#"CREATE TYPE "invalid" as ENUM ('@', '-')"#).await;
 
     api.barrel()
@@ -585,7 +591,8 @@ async fn manually_re_mapped_invalid_enum_values(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+    let result = api.re_introspect(&input_dm).await?;
+    api.assert_eq_datamodels(final_dm, &result);
 
     let expected = json!([{
         "code": 10,
@@ -602,7 +609,7 @@ async fn manually_re_mapped_invalid_enum_values(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(exclude(Mysql, Mssql, CockroachDb, Sqlite))]
-async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
+async fn multiple_changed_relation_names(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Employee", |t| {
@@ -666,7 +673,7 @@ async fn multiple_changed_relation_names(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn custom_virtual_relation_field_names(api: &TestApi) -> TestResult {
+async fn custom_virtual_relation_field_names(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -721,7 +728,7 @@ async fn custom_virtual_relation_field_names(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(exclude(CockroachDb))]
-async fn custom_model_order(api: &TestApi) -> TestResult {
+async fn custom_model_order(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("A", |t| {
@@ -815,13 +822,14 @@ async fn custom_model_order(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+    let result = api.re_introspect(&input_dm).await?;
+    api.assert_eq_datamodels(final_dm, &result);
 
     Ok(())
 }
 
 #[test_connector(tags(Postgres))]
-async fn custom_enum_order(api: &TestApi) -> TestResult {
+async fn custom_enum_order(api: &mut TestApi) -> TestResult {
     let sql = r#"
         CREATE TYPE a AS ENUM ('id');
         CREATE TYPE b AS ENUM ('id');
@@ -893,13 +901,14 @@ async fn custom_enum_order(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+    let result = api.re_introspect(&input_dm).await?;
+    api.assert_eq_datamodels(final_dm, &result);
 
     Ok(())
 }
 
 #[test_connector(exclude(Mssql, Mysql, Sqlite, CockroachDb))]
-async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> TestResult {
+async fn multiple_changed_relation_names_due_to_mapped_models(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -967,7 +976,7 @@ async fn multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) -> 
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn virtual_cuid_default(api: &TestApi) {
+async fn virtual_cuid_default(api: &mut TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -1024,11 +1033,12 @@ async fn virtual_cuid_default(api: &TestApi) {
         }
     "#};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await.unwrap());
+    let result = api.re_introspect(&input_dm).await.unwrap();
+    api.assert_eq_datamodels(final_dm, &result);
 }
 
 #[test_connector(tags(CockroachDb))]
-async fn virtual_cuid_default_cockroach(api: &TestApi) {
+async fn virtual_cuid_default_cockroach(api: &mut TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -1073,11 +1083,12 @@ async fn virtual_cuid_default_cockroach(api: &TestApi) {
         }
     "#};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await.unwrap());
+    let result = api.re_introspect(&input_dm).await.unwrap();
+    api.assert_eq_datamodels(final_dm, &result);
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn comments_should_be_kept(api: &TestApi) -> TestResult {
+async fn comments_should_be_kept(api: &mut TestApi) -> TestResult {
     api.raw_cmd("CREATE TYPE a AS ENUM (\'A\')").await;
 
     api.barrel()
@@ -1142,7 +1153,7 @@ async fn comments_should_be_kept(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(exclude(Mssql, CockroachDb))]
-async fn updated_at(api: &TestApi) {
+async fn updated_at(api: &mut TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
@@ -1184,11 +1195,12 @@ async fn updated_at(api: &TestApi) {
         "#
     };
 
-    api.assert_eq_datamodels(&final_dm, &api.re_introspect(&input_dm).await.unwrap());
+    let result = api.re_introspect(&input_dm).await.unwrap();
+    api.assert_eq_datamodels(&final_dm, &result);
 }
 
 #[test_connector(exclude(Vitess, CockroachDb))]
-async fn multiple_many_to_many_on_same_model(api: &TestApi) -> TestResult {
+async fn multiple_many_to_many_on_same_model(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("A", |t| {
@@ -1268,7 +1280,7 @@ async fn multiple_many_to_many_on_same_model(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql))]
-async fn re_introspecting_mysql_enum_names(api: &TestApi) -> TestResult {
+async fn re_introspecting_mysql_enum_names(api: &mut TestApi) -> TestResult {
     let sql = r#"
         CREATE TABLE `User` (
             id INTEGER AUTO_INCREMENT PRIMARY KEY,
@@ -1308,7 +1320,10 @@ async fn re_introspecting_mysql_enum_names(api: &TestApi) -> TestResult {
                 white
             }
         "#;
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+
+    let result = api.re_introspect(&input_dm).await.unwrap();
+    api.assert_eq_datamodels(final_dm, &result);
+
     assert_eq_json!(
         serde_json::Value::Array(vec![]),
         &api.re_introspect_warnings(input_dm).await?
@@ -1318,7 +1333,7 @@ async fn re_introspecting_mysql_enum_names(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql))]
-async fn re_introspecting_mysql_enum_names_if_enum_is_reused(api: &TestApi) -> TestResult {
+async fn re_introspecting_mysql_enum_names_if_enum_is_reused(api: &mut TestApi) -> TestResult {
     let sql = r#"
         CREATE TABLE `User` (
             id INTEGER AUTO_INCREMENT PRIMARY KEY,
@@ -1366,7 +1381,7 @@ async fn re_introspecting_mysql_enum_names_if_enum_is_reused(api: &TestApi) -> T
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn custom_repro(api: &TestApi) -> TestResult {
+async fn custom_repro(api: &mut TestApi) -> TestResult {
     let sql = r#"
         CREATE TABLE "tag" (
             id SERIAL PRIMARY KEY,
@@ -1425,7 +1440,7 @@ async fn custom_repro(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(exclude(CockroachDb))]
-async fn re_introspecting_ignore(api: &TestApi) -> TestResult {
+async fn re_introspecting_ignore(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
@@ -1481,13 +1496,14 @@ async fn re_introspecting_ignore(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+    let result = api.re_introspect(&input_dm).await.unwrap();
+    api.assert_eq_datamodels(final_dm, &result);
 
     Ok(())
 }
 
 #[test_connector(exclude(Vitess, CockroachDb, Sqlite))]
-async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestApi) -> TestResult {
+async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &mut TestApi) -> TestResult {
     // We do not have enough information to correctly assign which field should point to column A in the
     // join table and which one to B
     // Upon table creation this is dependant on lexicographic order of the names of the fields, but we
@@ -1536,7 +1552,7 @@ async fn do_not_try_to_keep_custom_many_to_many_self_relation_names(api: &TestAp
 }
 
 #[test_connector(tags(Postgres, Mssql, Mysql, Sqlite), exclude(CockroachDb))]
-async fn re_introspecting_custom_compound_unique_upgrade(api: &TestApi) -> TestResult {
+async fn re_introspecting_custom_compound_unique_upgrade(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -1578,12 +1594,14 @@ async fn re_introspecting_custom_compound_unique_upgrade(api: &TestApi) -> TestR
          }
      "#};
 
-    api.assert_eq_datamodels(final_dm, &api.re_introspect(input_dm).await?);
+    let result = api.re_introspect(&input_dm).await?;
+    api.assert_eq_datamodels(final_dm, &result);
+
     Ok(())
 }
 
 #[test_connector(tags(Postgres12))]
-async fn re_introspecting_custom_index_order(api: &TestApi) -> TestResult {
+async fn re_introspecting_custom_index_order(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table =
         format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, a jsonb not null, b jsonb not null, c jsonb not null)",);
@@ -1627,8 +1645,8 @@ async fn re_introspecting_custom_index_order(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
-async fn re_introspecting_with_schemas_property(api: &TestApi) -> TestResult {
+#[test_connector(tags(Postgres), preview_features("multiSchema"))]
+async fn re_introspecting_with_schemas_property(api: &mut TestApi) -> TestResult {
     let create_schema = "CREATE SCHEMA \"first\"";
     let create_table = "CREATE TABLE \"first\".\"A\" (id TEXT PRIMARY KEY)";
 

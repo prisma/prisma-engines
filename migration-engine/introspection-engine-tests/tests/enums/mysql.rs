@@ -1,7 +1,7 @@
 use introspection_engine_tests::test_api::*;
 
 #[test_connector(tags(Mysql), exclude(Vitess))]
-async fn an_enum_with_invalid_value_names_should_have_them_commented_out(api: &TestApi) -> TestResult {
+async fn an_enum_with_invalid_value_names_should_have_them_commented_out(api: &mut TestApi) -> TestResult {
     let sql = r#"CREATE TABLE `test` ( `threechars` ENUM ('123', 'wow','$§!') );"#;
     api.raw_cmd(sql).await;
     let expected = expect![[r#"
@@ -32,7 +32,7 @@ async fn an_enum_with_invalid_value_names_should_have_them_commented_out(api: &T
 }
 
 #[test_connector(tags(Mysql), exclude(Vitess))]
-async fn a_table_with_an_enum_default_value_that_is_an_empty_string(api: &TestApi) -> TestResult {
+async fn a_table_with_an_enum_default_value_that_is_an_empty_string(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `Book` (
             id INT NOT NULL AUTO_INCREMENT,
@@ -70,7 +70,7 @@ async fn a_table_with_an_enum_default_value_that_is_an_empty_string(api: &TestAp
 }
 
 #[test_connector(tags(Mysql), exclude(Vitess))]
-async fn a_table_with_enum_default_values_that_look_like_booleans(api: &TestApi) -> TestResult {
+async fn a_table_with_enum_default_values_that_look_like_booleans(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `News` (
             id INT NOT NULL AUTO_INCREMENT,

@@ -4,7 +4,7 @@ use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn bit_minmax_ops(api: &TestApi) -> TestResult {
+async fn bit_minmax_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data bit)",);
     let create_idx =
@@ -29,7 +29,7 @@ async fn bit_minmax_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn varbit_minmax_ops(api: &TestApi) -> TestResult {
+async fn varbit_minmax_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data varbit)",);
     let create_idx =
@@ -54,7 +54,7 @@ async fn varbit_minmax_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn bpchar_minmax_ops(api: &TestApi) -> TestResult {
+async fn bpchar_minmax_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data bpchar)",);
     let create_idx =
@@ -79,7 +79,7 @@ async fn bpchar_minmax_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn bpchar_bloom_ops(api: &TestApi) -> TestResult {
+async fn bpchar_bloom_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data bpchar)",);
     let create_idx =
@@ -104,7 +104,7 @@ async fn bpchar_bloom_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn bytea_minmax_ops(api: &TestApi) -> TestResult {
+async fn bytea_minmax_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data bytea)",);
     let create_idx =
@@ -129,7 +129,7 @@ async fn bytea_minmax_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn bytea_bloom_ops(api: &TestApi) -> TestResult {
+async fn bytea_bloom_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data bytea)",);
     let create_idx =
@@ -154,7 +154,7 @@ async fn bytea_bloom_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn date_minmax_ops(api: &TestApi) -> TestResult {
+async fn date_minmax_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data date)",);
     let create_idx =
@@ -179,7 +179,7 @@ async fn date_minmax_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn date_bloom_ops(api: &TestApi) -> TestResult {
+async fn date_bloom_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data date)",);
     let create_idx =
@@ -204,7 +204,7 @@ async fn date_bloom_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn date_minmax_multi_ops(api: &TestApi) -> TestResult {
+async fn date_minmax_multi_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data date)",);
     let create_idx =
@@ -229,7 +229,7 @@ async fn date_minmax_multi_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn float_minmax_ops(api: &TestApi) -> TestResult {
+async fn float_minmax_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data real)",);
     let create_idx =
@@ -254,7 +254,7 @@ async fn float_minmax_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn float_bloom_ops(api: &TestApi) -> TestResult {
+async fn float_bloom_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data real)",);
     let create_idx =
@@ -279,7 +279,7 @@ async fn float_bloom_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn float_minmax_multi_ops(api: &TestApi) -> TestResult {
+async fn float_minmax_multi_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data real)",);
     let create_idx =
@@ -304,7 +304,7 @@ async fn float_minmax_multi_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn double_minmax_ops(api: &TestApi) -> TestResult {
+async fn double_minmax_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data double precision)",);
     let create_idx =
@@ -329,7 +329,7 @@ async fn double_minmax_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn double_bloom_ops(api: &TestApi) -> TestResult {
+async fn double_bloom_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data double precision)",);
     let create_idx =
@@ -354,7 +354,7 @@ async fn double_bloom_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn double_minmax_multi_ops(api: &TestApi) -> TestResult {
+async fn double_minmax_multi_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data double precision)",);
     let create_idx =
@@ -379,7 +379,7 @@ async fn double_minmax_multi_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn inet_inclusion_ops(api: &TestApi) -> TestResult {
+async fn inet_inclusion_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data inet)",);
     let create_idx =
@@ -404,7 +404,7 @@ async fn inet_inclusion_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn inet_bloom_ops(api: &TestApi) -> TestResult {
+async fn inet_bloom_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data inet)",);
     let create_idx =
@@ -429,7 +429,7 @@ async fn inet_bloom_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn inet_minmax_ops(api: &TestApi) -> TestResult {
+async fn inet_minmax_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data inet)",);
     let create_idx =
@@ -454,7 +454,7 @@ async fn inet_minmax_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn inet_minmax_multi_ops(api: &TestApi) -> TestResult {
+async fn inet_minmax_multi_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data inet)",);
     let create_idx =
@@ -479,7 +479,7 @@ async fn inet_minmax_multi_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn int2_bloom_ops(api: &TestApi) -> TestResult {
+async fn int2_bloom_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data smallint)",);
     let create_idx =
@@ -504,7 +504,7 @@ async fn int2_bloom_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn int2_minmax_ops(api: &TestApi) -> TestResult {
+async fn int2_minmax_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data smallint)",);
     let create_idx =
@@ -529,7 +529,7 @@ async fn int2_minmax_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn int2_minmax_multi_ops(api: &TestApi) -> TestResult {
+async fn int2_minmax_multi_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data smallint)",);
     let create_idx =
@@ -554,7 +554,7 @@ async fn int2_minmax_multi_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn int4_bloom_ops(api: &TestApi) -> TestResult {
+async fn int4_bloom_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data int)",);
     let create_idx =
@@ -579,7 +579,7 @@ async fn int4_bloom_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn int4_minmax_ops(api: &TestApi) -> TestResult {
+async fn int4_minmax_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data int)",);
     let create_idx =
@@ -604,7 +604,7 @@ async fn int4_minmax_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn int4_minmax_multi_ops(api: &TestApi) -> TestResult {
+async fn int4_minmax_multi_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data int)",);
     let create_idx =
@@ -629,7 +629,7 @@ async fn int4_minmax_multi_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn int8_bloom_ops(api: &TestApi) -> TestResult {
+async fn int8_bloom_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data bigint)",);
     let create_idx =
@@ -654,7 +654,7 @@ async fn int8_bloom_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn int8_minmax_ops(api: &TestApi) -> TestResult {
+async fn int8_minmax_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data bigint)",);
     let create_idx =
@@ -679,7 +679,7 @@ async fn int8_minmax_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn int8_minmax_multi_ops(api: &TestApi) -> TestResult {
+async fn int8_minmax_multi_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data bigint)",);
     let create_idx =
@@ -704,7 +704,7 @@ async fn int8_minmax_multi_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn numeric_bloom_ops(api: &TestApi) -> TestResult {
+async fn numeric_bloom_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data decimal)",);
     let create_idx =
@@ -729,7 +729,7 @@ async fn numeric_bloom_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn numeric_minmax_ops(api: &TestApi) -> TestResult {
+async fn numeric_minmax_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data decimal)",);
     let create_idx =
@@ -754,7 +754,7 @@ async fn numeric_minmax_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn numeric_minmax_multi_ops(api: &TestApi) -> TestResult {
+async fn numeric_minmax_multi_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data decimal)",);
     let create_idx =
@@ -779,7 +779,7 @@ async fn numeric_minmax_multi_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn oid_bloom_ops(api: &TestApi) -> TestResult {
+async fn oid_bloom_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data oid)",);
     let create_idx =
@@ -804,7 +804,7 @@ async fn oid_bloom_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn oid_minmax_ops(api: &TestApi) -> TestResult {
+async fn oid_minmax_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data oid)",);
     let create_idx =
@@ -829,7 +829,7 @@ async fn oid_minmax_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn oid_minmax_multi_ops(api: &TestApi) -> TestResult {
+async fn oid_minmax_multi_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data oid)",);
     let create_idx =
@@ -854,7 +854,7 @@ async fn oid_minmax_multi_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn text_bloom_ops(api: &TestApi) -> TestResult {
+async fn text_bloom_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data text)",);
     let create_idx =
@@ -879,7 +879,7 @@ async fn text_bloom_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn text_minmax_ops(api: &TestApi) -> TestResult {
+async fn text_minmax_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data text)",);
     let create_idx =
@@ -904,7 +904,7 @@ async fn text_minmax_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn timestamp_bloom_ops(api: &TestApi) -> TestResult {
+async fn timestamp_bloom_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data timestamp)",);
     let create_idx =
@@ -929,7 +929,7 @@ async fn timestamp_bloom_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn timestamp_minmax_ops(api: &TestApi) -> TestResult {
+async fn timestamp_minmax_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data timestamp)",);
     let create_idx =
@@ -954,7 +954,7 @@ async fn timestamp_minmax_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn timestamp_minmax_multi_ops(api: &TestApi) -> TestResult {
+async fn timestamp_minmax_multi_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data timestamp)",);
     let create_idx = format!(
@@ -980,7 +980,7 @@ async fn timestamp_minmax_multi_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn timestamptz_bloom_ops(api: &TestApi) -> TestResult {
+async fn timestamptz_bloom_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data timestamptz)",);
     let create_idx =
@@ -1005,7 +1005,7 @@ async fn timestamptz_bloom_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn timestamptz_minmax_ops(api: &TestApi) -> TestResult {
+async fn timestamptz_minmax_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data timestamptz)",);
     let create_idx =
@@ -1030,7 +1030,7 @@ async fn timestamptz_minmax_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn timestamptz_minmax_multi_ops(api: &TestApi) -> TestResult {
+async fn timestamptz_minmax_multi_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data timestamptz)",);
     let create_idx = format!(
@@ -1056,7 +1056,7 @@ async fn timestamptz_minmax_multi_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn time_bloom_ops(api: &TestApi) -> TestResult {
+async fn time_bloom_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data time)",);
     let create_idx =
@@ -1081,7 +1081,7 @@ async fn time_bloom_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn time_minmax_ops(api: &TestApi) -> TestResult {
+async fn time_minmax_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data time)",);
     let create_idx =
@@ -1106,7 +1106,7 @@ async fn time_minmax_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn time_minmax_multi_ops(api: &TestApi) -> TestResult {
+async fn time_minmax_multi_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data time)",);
     let create_idx =
@@ -1131,7 +1131,7 @@ async fn time_minmax_multi_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn timetz_bloom_ops(api: &TestApi) -> TestResult {
+async fn timetz_bloom_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data timetz)",);
     let create_idx =
@@ -1156,7 +1156,7 @@ async fn timetz_bloom_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn timetz_minmax_ops(api: &TestApi) -> TestResult {
+async fn timetz_minmax_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data timetz)",);
     let create_idx =
@@ -1181,7 +1181,7 @@ async fn timetz_minmax_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn timetz_minmax_multi_ops(api: &TestApi) -> TestResult {
+async fn timetz_minmax_multi_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data timetz)",);
     let create_idx =
@@ -1206,7 +1206,7 @@ async fn timetz_minmax_multi_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn uuid_bloom_ops(api: &TestApi) -> TestResult {
+async fn uuid_bloom_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data uuid)",);
     let create_idx =
@@ -1231,7 +1231,7 @@ async fn uuid_bloom_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn uuid_minmax_ops(api: &TestApi) -> TestResult {
+async fn uuid_minmax_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data uuid)",);
     let create_idx =
@@ -1256,7 +1256,7 @@ async fn uuid_minmax_ops(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres14), exclude(CockroachDb))]
-async fn uuid_minmax_multi_ops(api: &TestApi) -> TestResult {
+async fn uuid_minmax_multi_ops(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
     let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data uuid)",);
     let create_idx =

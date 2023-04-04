@@ -4,7 +4,7 @@ use introspection_engine_tests::{test_api::*, TestResult};
 use test_macros::test_connector;
 
 #[test_connector(exclude(Postgres, CockroachDb))]
-async fn a_table_with_reserved_name(api: &TestApi) -> TestResult {
+async fn a_table_with_reserved_name(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("PrismaClient", |t| {
@@ -23,13 +23,14 @@ async fn a_table_with_reserved_name(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    let result = api.introspect().await.unwrap();
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
 
 #[test_connector(exclude(CockroachDb))]
-async fn reserved_names_case_sensitivity(api: &TestApi) -> TestResult {
+async fn reserved_names_case_sensitivity(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("prismaclient", |t| {
@@ -45,7 +46,8 @@ async fn reserved_names_case_sensitivity(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    let result = api.introspect().await.unwrap();
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }

@@ -13,7 +13,7 @@ use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
 #[test_connector(tags(Mssql, Postgres), exclude(CockroachDb))]
-async fn introspecting_non_default_pkey_names_works(api: &TestApi) -> TestResult {
+async fn introspecting_non_default_pkey_names_works(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Single", move |t| {
@@ -48,7 +48,7 @@ async fn introspecting_non_default_pkey_names_works(api: &TestApi) -> TestResult
 }
 
 #[test_connector(tags(Mssql, Postgres), exclude(CockroachDb))]
-async fn introspecting_default_pkey_names_works(api: &TestApi) -> TestResult {
+async fn introspecting_default_pkey_names_works(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Single", move |t| {
@@ -83,7 +83,7 @@ async fn introspecting_default_pkey_names_works(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql, Postgres), exclude(CockroachDb))]
-async fn introspecting_non_default_unique_constraint_names_works(api: &TestApi) -> TestResult {
+async fn introspecting_non_default_unique_constraint_names_works(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Single", move |t| {
@@ -118,7 +118,7 @@ async fn introspecting_non_default_unique_constraint_names_works(api: &TestApi) 
 }
 
 #[test_connector(tags(Mssql, Postgres), exclude(CockroachDb))]
-async fn introspecting_default_unique_names_works(api: &TestApi) -> TestResult {
+async fn introspecting_default_unique_names_works(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Single", move |t| {
@@ -153,7 +153,7 @@ async fn introspecting_default_unique_names_works(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql, Postgres), exclude(CockroachDb))]
-async fn introspecting_non_default_index_names_works(api: &TestApi) -> TestResult {
+async fn introspecting_non_default_index_names_works(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Single", move |t| {
@@ -194,7 +194,7 @@ async fn introspecting_non_default_index_names_works(api: &TestApi) -> TestResul
 }
 
 #[test_connector(tags(Mssql, Postgres), exclude(CockroachDb))]
-async fn introspecting_default_index_names_works(api: &TestApi) -> TestResult {
+async fn introspecting_default_index_names_works(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Single", move |t| {
@@ -235,7 +235,7 @@ async fn introspecting_default_index_names_works(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(exclude(Mssql, Mysql), exclude(CockroachDb))]
-async fn introspecting_default_fk_names_works(api: &TestApi) -> TestResult {
+async fn introspecting_default_fk_names_works(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", |t| {
@@ -277,7 +277,7 @@ async fn introspecting_default_fk_names_works(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(exclude(Sqlite, Mssql, Mysql, CockroachDb))]
-async fn introspecting_custom_fk_names_works(api: &TestApi) -> TestResult {
+async fn introspecting_custom_fk_names_works(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("User", |t| {
@@ -319,7 +319,7 @@ async fn introspecting_custom_fk_names_works(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mssql))]
-async fn introspecting_custom_default_names_should_output_to_dml(api: &TestApi) -> TestResult {
+async fn introspecting_custom_default_names_should_output_to_dml(api: &mut TestApi) -> TestResult {
     let create_table = format!(
         "CREATE TABLE [{}].[custom_defaults_test] (id INT CONSTRAINT pk_meow PRIMARY KEY, data NVARCHAR(255) CONSTRAINT meow DEFAULT 'foo')",
         api.schema_name()
@@ -340,7 +340,7 @@ async fn introspecting_custom_default_names_should_output_to_dml(api: &TestApi) 
 }
 
 #[test_connector(tags(Mssql))]
-async fn introspecting_default_default_names_should_not_output_to_dml(api: &TestApi) -> TestResult {
+async fn introspecting_default_default_names_should_not_output_to_dml(api: &mut TestApi) -> TestResult {
     let create_table = format!(
         "CREATE TABLE [{}].[custom_defaults_test] (id INT CONSTRAINT pk_meow PRIMARY KEY, data NVARCHAR(255) CONSTRAINT custom_defaults_test_data_df DEFAULT 'foo')",
         api.schema_name()

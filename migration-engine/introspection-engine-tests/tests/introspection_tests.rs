@@ -15,6 +15,5 @@ mod referential_actions;
 mod relations;
 mod relations_with_compound_fk;
 mod remapping_database_names;
-mod rpc_calls;
 mod tables;
 mod views;

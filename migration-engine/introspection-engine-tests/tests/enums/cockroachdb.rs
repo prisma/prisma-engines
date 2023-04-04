@@ -5,7 +5,7 @@ use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
 #[test_connector(tags(CockroachDb), capabilities(Enums))]
-async fn a_table_with_enums(api: &TestApi) -> TestResult {
+async fn a_table_with_enums(api: &mut TestApi) -> TestResult {
     api.database()
         .raw_cmd(r#"CREATE TYPE "color" AS ENUM ('black', 'white')"#)
         .await?;
@@ -46,14 +46,15 @@ async fn a_table_with_enums(api: &TestApi) -> TestResult {
     "#;
 
     for _ in 0..4 {
-        api.assert_eq_datamodels(dm, &api.introspect().await?);
+        let result = api.introspect().await?;
+        api.assert_eq_datamodels(&dm, &result);
     }
 
     Ok(())
 }
 
 #[test_connector(tags(CockroachDb), capabilities(Enums))]
-async fn a_table_with_an_enum_default_value_that_is_an_empty_string(api: &TestApi) -> TestResult {
+async fn a_table_with_an_enum_default_value_that_is_an_empty_string(api: &mut TestApi) -> TestResult {
     api.database()
         .raw_cmd(r#"CREATE TYPE "color" AS ENUM ('black', '')"#)
         .await?;
@@ -85,13 +86,14 @@ async fn a_table_with_an_enum_default_value_that_is_an_empty_string(api: &TestAp
         "color",
     );
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(&dm, &result);
 
     Ok(())
 }
 
 #[test_connector(tags(CockroachDb), capabilities(Enums))]
-async fn a_table_enums_should_return_alphabetically_even_when_in_different_order(api: &TestApi) -> TestResult {
+async fn a_table_enums_should_return_alphabetically_even_when_in_different_order(api: &mut TestApi) -> TestResult {
     api.database()
         .raw_cmd(r#"CREATE TYPE "color2" AS ENUM ('black2', 'white2')"#)
         .await?;
@@ -135,14 +137,15 @@ async fn a_table_enums_should_return_alphabetically_even_when_in_different_order
     );
 
     for _ in 0..4 {
-        api.assert_eq_datamodels(&dm, &api.introspect().await?);
+        let result = api.introspect().await?;
+        api.assert_eq_datamodels(&dm, &result);
     }
 
     Ok(())
 }
 
 #[test_connector(tags(CockroachDb), capabilities(Enums))]
-async fn a_table_with_enum_default_values(api: &TestApi) -> TestResult {
+async fn a_table_with_enum_default_values(api: &mut TestApi) -> TestResult {
     api.database()
         .raw_cmd(r#"CREATE TYPE "color" AS ENUM ('black', 'white')"#)
         .await?;
@@ -186,7 +189,7 @@ async fn a_table_with_enum_default_values(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(CockroachDb), capabilities(Enums, ScalarLists))]
-async fn a_table_enums_array(api: &TestApi) -> TestResult {
+async fn a_table_enums_array(api: &mut TestApi) -> TestResult {
     api.database()
         .raw_cmd(r#"CREATE Type "color" as ENUM ('black','white')"#)
         .await?;
@@ -222,7 +225,7 @@ async fn a_table_enums_array(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(CockroachDb), capabilities(Enums))]
-async fn a_table_with_enum_default_values_that_look_like_booleans(api: &TestApi) -> TestResult {
+async fn a_table_with_enum_default_values_that_look_like_booleans(api: &mut TestApi) -> TestResult {
     api.database()
         .raw_cmd("CREATE Type truth as ENUM ('true', 'false', 'rumor')")
         .await?;
@@ -255,13 +258,14 @@ async fn a_table_with_enum_default_values_that_look_like_booleans(api: &TestApi)
     "#,
     );
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(&dm, &result);
 
     Ok(())
 }
 
 #[test_connector(tags(CockroachDb))]
-async fn an_enum_with_invalid_value_names_should_have_them_commented_out(api: &TestApi) -> TestResult {
+async fn an_enum_with_invalid_value_names_should_have_them_commented_out(api: &mut TestApi) -> TestResult {
     let sql = r#"CREATE TYPE "threechars" AS ENUM ('123', 'wow','$§!');"#;
     api.raw_cmd(sql).await;
     let expected = expect![[r#"

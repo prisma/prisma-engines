@@ -3,7 +3,7 @@ use introspection_engine_tests::{assert_eq_json, test_api::*};
 use serde_json::json;
 
 #[test_connector(tags(CockroachDb))]
-async fn a_table_without_uniques_should_ignore(api: &TestApi) -> TestResult {
+async fn a_table_without_uniques_should_ignore(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -41,7 +41,7 @@ async fn a_table_without_uniques_should_ignore(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(CockroachDb))]
-async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &TestApi) -> TestResult {
+async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -79,7 +79,7 @@ async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &TestAp
 }
 
 #[test_connector(tags(CockroachDb))]
-async fn unsupported_type_keeps_its_usages_cockroach(api: &TestApi) -> TestResult {
+async fn unsupported_type_keeps_its_usages_cockroach(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Test", |t| {

@@ -84,7 +84,7 @@ pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
                 ) { return }
 
                 test_setup::runtime::run_with_thread_local_runtime::<#return_ty>(async {
-                    let #arg_name = &#arg_type::new(args).await;
+                    let #arg_name = &mut #arg_type::new(args).await;
 
                     #body
 
@@ -181,7 +181,7 @@ fn extract_api_arg(sig: &Signature) -> Result<(&syn::Ident, &syn::Ident), syn::E
             span,
             format!(
                 "Unsupported syntax. Arguments to test functions should be of the form `fn test_fn(api: {}TestApi)`",
-                if sig.asyncness.is_some() { "&" } else { "" }
+                if sig.asyncness.is_some() { "&mut " } else { "" }
             ),
         ))
     };
@@ -195,7 +195,9 @@ fn extract_api_arg(sig: &Signature) -> Result<(&syn::Ident, &syn::Ident), syn::E
 
             let arg_type = match pattype.ty.as_ref() {
                 syn::Type::Reference(syn::TypeReference {
-                    mutability: None, elem, ..
+                    mutability: Some(_),
+                    elem,
+                    ..
                 }) if sig.asyncness.is_some() => match elem.as_ref() {
                     syn::Type::Path(ident) => ident.path.get_ident().unwrap(),
                     other => return err(other.span()),

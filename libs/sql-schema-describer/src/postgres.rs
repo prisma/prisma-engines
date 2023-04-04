@@ -655,6 +655,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             } else {
                 BitFlags::empty()
             };
+
             let id = sql_schema.push_table_with_properties(
                 table_name,
                 sql_schema.get_namespace_id(&namespace).unwrap(),

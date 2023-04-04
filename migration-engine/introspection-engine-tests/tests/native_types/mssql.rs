@@ -37,7 +37,7 @@ const TYPES: &[(&str, &str)] = &[
 ];
 
 #[test_connector(tags(Mssql))]
-async fn native_type_columns_feature_on(api: &TestApi) -> TestResult {
+async fn native_type_columns_feature_on(api: &mut TestApi) -> TestResult {
     let columns: Vec<String> = TYPES
         .iter()
         .map(|(name, db_type)| format!("[{name}] {db_type} NOT NULL"))

@@ -12,7 +12,7 @@ use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
 #[test_connector(exclude(CockroachDb))]
-async fn remapping_fields_with_invalid_characters(api: &TestApi) -> TestResult {
+async fn remapping_fields_with_invalid_characters(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -53,13 +53,14 @@ async fn remapping_fields_with_invalid_characters(api: &TestApi) -> TestResult {
         }}
     "#, native_string = native_string};
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(&dm, &result);
 
     Ok(())
 }
 
 #[test_connector(exclude(CockroachDb))]
-async fn remapping_tables_with_invalid_characters(api: &TestApi) -> TestResult {
+async fn remapping_tables_with_invalid_characters(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("?User", |t| {
@@ -88,13 +89,14 @@ async fn remapping_tables_with_invalid_characters(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
 
 #[test_connector(exclude(Mssql, Sqlite, Vitess, CockroachDb))]
-async fn remapping_models_in_relations(api: &TestApi) -> TestResult {
+async fn remapping_models_in_relations(api: &mut TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     api.barrel()
@@ -146,7 +148,7 @@ async fn remapping_models_in_relations(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(exclude(Mssql, Sqlite, Vitess, CockroachDb))]
-async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestApi) -> TestResult {
+async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &mut TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     api.barrel()
@@ -198,7 +200,7 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
 }
 
 #[test_connector(exclude(Sqlite, Mssql, Vitess, CockroachDb))]
-async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
+async fn remapping_fields_in_compound_relations(api: &mut TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     api.barrel()
@@ -261,7 +263,7 @@ async fn remapping_fields_in_compound_relations(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(capabilities(Enums), exclude(CockroachDb))]
-async fn remapping_enum_values(api: &TestApi) -> TestResult {
+async fn remapping_enum_values(api: &mut TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     if sql_family.is_postgres() {
@@ -302,13 +304,14 @@ async fn remapping_enum_values(api: &TestApi) -> TestResult {
     "#
     );
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(&dm, &result);
 
     Ok(())
 }
 
 #[test_connector(capabilities(Enums), exclude(CockroachDb))]
-async fn remapping_enum_default_values(api: &TestApi) -> TestResult {
+async fn remapping_enum_default_values(api: &mut TestApi) -> TestResult {
     let sql_family = api.sql_family();
 
     if sql_family.is_postgres() {
@@ -349,13 +352,14 @@ async fn remapping_enum_default_values(api: &TestApi) -> TestResult {
     "#
     );
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(&dm, &result);
 
     Ok(())
 }
 
 #[test_connector]
-async fn remapping_compound_primary_keys(api: &TestApi) -> TestResult {
+async fn remapping_compound_primary_keys(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -375,13 +379,14 @@ async fn remapping_compound_primary_keys(api: &TestApi) -> TestResult {
         }
     "#};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
 
 #[test_connector(exclude(CockroachDb))]
-async fn not_automatically_remapping_invalid_compound_unique_key_names(api: &TestApi) -> TestResult {
+async fn not_automatically_remapping_invalid_compound_unique_key_names(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -407,13 +412,14 @@ async fn not_automatically_remapping_invalid_compound_unique_key_names(api: &Tes
          }
      "#};
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
 
 #[test_connector]
-async fn not_automatically_remapping_invalid_compound_primary_key_names(api: &TestApi) -> TestResult {
+async fn not_automatically_remapping_invalid_compound_primary_key_names(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -442,6 +448,8 @@ async fn not_automatically_remapping_invalid_compound_primary_key_names(api: &Te
          }}
      "#};
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    let result = api.introspect().await?;
+    api.assert_eq_datamodels(&dm, &result);
+
     Ok(())
 }

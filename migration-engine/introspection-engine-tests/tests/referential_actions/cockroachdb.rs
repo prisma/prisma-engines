@@ -2,7 +2,7 @@ use barrel::types;
 use introspection_engine_tests::test_api::*;
 
 #[test_connector(tags(CockroachDb))]
-async fn default_referential_actions_with_restrict(api: &TestApi) -> TestResult {
+async fn default_referential_actions_with_restrict(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("a", |t| {
@@ -38,7 +38,7 @@ async fn default_referential_actions_with_restrict(api: &TestApi) -> TestResult 
 }
 
 #[test_connector(tags(CockroachDb))]
-async fn referential_actions(api: &TestApi) -> TestResult {
+async fn referential_actions(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
             migration.create_table("a", |t| {
