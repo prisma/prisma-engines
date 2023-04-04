@@ -13,4 +13,4 @@ default = ["postgres", "mysql", "sqlite", "mssql"]
 [dependencies]
 
 [dev-dependencies]
-indoc = "1.0"
+indoc.workspace = true

@@ -299,7 +299,7 @@ dependencies = [
  "connection-string",
  "either",
  "enumflags2",
- "indoc 1.0.7",
+ "indoc 2.0.1",
  "lsp-types",
  "once_cell",
  "psl-core",
@@ -770,7 +770,7 @@ version = "0.1.0"
 dependencies = [
  "base64 0.13.1",
  "expect-test",
- "indoc 1.0.7",
+ "indoc 2.0.1",
  "once_cell",
  "psl",
  "regex",
@@ -792,7 +792,7 @@ name = "diagnostics"
 version = "0.1.0"
 dependencies = [
  "colored",
- "indoc 1.0.7",
+ "indoc 2.0.1",
  "pest",
 ]
 
@@ -1564,7 +1564,7 @@ dependencies = [
  "connection-string",
  "enumflags2",
  "expect-test",
- "indoc 1.0.7",
+ "indoc 2.0.1",
  "migration-connector",
  "pretty_assertions",
  "psl",
@@ -2057,7 +2057,7 @@ dependencies = [
  "base64 0.13.1",
  "connection-string",
  "expect-test",
- "indoc 1.0.7",
+ "indoc 2.0.1",
  "json-rpc-stdio",
  "migration-connector",
  "migration-core",
@@ -2085,7 +2085,7 @@ dependencies = [
  "connection-string",
  "enumflags2",
  "expect-test",
- "indoc 1.0.7",
+ "indoc 2.0.1",
  "jsonrpc-core",
  "migration-core",
  "once_cell",
@@ -3024,7 +3024,7 @@ dependencies = [
  "dmmf",
  "enumflags2",
  "expect-test",
- "indoc 1.0.7",
+ "indoc 2.0.1",
  "log",
  "lsp-types",
  "once_cell",
@@ -3170,7 +3170,7 @@ dependencies = [
  "dissimilar",
  "either",
  "expect-test",
- "indoc 1.0.7",
+ "indoc 2.0.1",
  "psl-core",
 ]
 
@@ -3182,7 +3182,7 @@ dependencies = [
  "chrono",
  "diagnostics",
  "enumflags2",
- "indoc 1.0.7",
+ "indoc 2.0.1",
  "itertools",
  "lsp-types",
  "once_cell",
@@ -3344,7 +3344,7 @@ dependencies = [
  "enumflags2",
  "graphql-parser",
  "hyper",
- "indoc 1.0.7",
+ "indoc 2.0.1",
  "mongodb-query-connector",
  "opentelemetry",
  "opentelemetry-otlp",
@@ -3427,7 +3427,7 @@ dependencies = [
  "chrono",
  "colored",
  "futures",
- "indoc 1.0.7",
+ "indoc 2.0.1",
  "insta",
  "once_cell",
  "prisma-value",
@@ -3448,7 +3448,7 @@ name = "query-test-macros"
 version = "0.1.0"
 dependencies = [
  "darling",
- "indoc 1.0.7",
+ "indoc 2.0.1",
  "itertools",
  "proc-macro2",
  "query-tests-setup",
@@ -3466,7 +3466,7 @@ dependencies = [
  "enumflags2",
  "hyper",
  "indexmap",
- "indoc 1.0.7",
+ "indoc 2.0.1",
  "itertools",
  "lazy_static",
  "nom",
@@ -4177,7 +4177,7 @@ checksum = "6e63cff320ae2c57904679ba7cb63280a3dc4613885beafb148ee7bf9aa9042d"
 name = "sql-ddl"
 version = "0.1.0"
 dependencies = [
- "indoc 1.0.7",
+ "indoc 2.0.1",
 ]
 
 [[package]]
@@ -4189,7 +4189,7 @@ dependencies = [
  "datamodel-renderer",
  "either",
  "enumflags2",
- "indoc 1.0.7",
+ "indoc 2.0.1",
  "migration-connector",
  "once_cell",
  "prisma-value",
@@ -4250,7 +4250,7 @@ dependencies = [
  "enumflags2",
  "expect-test",
  "indexmap",
- "indoc 1.0.7",
+ "indoc 2.0.1",
  "once_cell",
  "pretty_assertions",
  "prisma-value",
@@ -5082,7 +5082,7 @@ name = "user-facing-errors"
 version = "0.1.0"
 dependencies = [
  "backtrace",
- "indoc 1.0.7",
+ "indoc 2.0.1",
  "itertools",
  "quaint",
  "serde",

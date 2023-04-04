@@ -24,7 +24,7 @@ test-setup = { path = "../../libs/test-setup" }
 test-macros = { path = "../../libs/test-macros" }
 url = "2.1.1"
 connection-string = "0.1"
-indoc = "1.0.3"
+indoc.workspace = true
 expect-test = "1.4.0"
 quaint.workspace = true
 

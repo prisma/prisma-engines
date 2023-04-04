@@ -9,7 +9,7 @@ serde_json.workspace = true
 serde.workspace = true
 backtrace = "0.3.40"
 tracing = "0.1"
-indoc = "1"
+indoc.workspace = true
 itertools = "0.10"
 quaint = { workspace = true, optional = true }
 
