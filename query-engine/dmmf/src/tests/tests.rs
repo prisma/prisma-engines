@@ -1,5 +1,5 @@
 use crate::{dmmf_from_schema, tests::setup::*};
-use serde_json;
+
 
 #[test]
 fn sqlite_ignore() {

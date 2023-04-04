@@ -80,7 +80,7 @@ fn serialize_aggregations(
                     let output_field = aggregate_object_type.find_field(field.name()).unwrap();
                     flattened.insert(
                         field.name().to_owned(),
-                        serialize_scalar(&output_field.1, value, query_schema)?,
+                        serialize_scalar(output_field.1, value, query_schema)?,
                     );
                 }
 
@@ -101,7 +101,7 @@ fn serialize_aggregations(
                     );
                     flattened.insert(
                         format!("_avg_{}", field.name()),
-                        serialize_scalar(&output_field, value, query_schema)?,
+                        serialize_scalar(output_field, value, query_schema)?,
                     );
                 }
 
@@ -114,7 +114,7 @@ fn serialize_aggregations(
                     );
                     flattened.insert(
                         format!("_sum_{}", field.name()),
-                        serialize_scalar(&output_field, value, query_schema)?,
+                        serialize_scalar(output_field, value, query_schema)?,
                     );
                 }
 
@@ -128,7 +128,7 @@ fn serialize_aggregations(
                     flattened.insert(
                         format!("_min_{}", field.name()),
                         serialize_scalar(
-                            &output_field,
+                            output_field,
                             coerce_non_numeric(value, &output_field.field_type),
                             query_schema,
                         )?,
@@ -145,7 +145,7 @@ fn serialize_aggregations(
                     flattened.insert(
                         format!("_max_{}", field.name()),
                         serialize_scalar(
-                            &output_field,
+                            output_field,
                             coerce_non_numeric(value, &output_field.field_type),
                             query_schema,
                         )?,
@@ -362,14 +362,14 @@ fn serialize_objects(
                 Field::Composite(cf) => {
                     object.insert(
                         field.name().to_owned(),
-                        serialize_composite(cf, &out_field, val, query_schema)?,
+                        serialize_composite(cf, out_field, val, query_schema)?,
                     );
                 }
 
                 _ if !out_field.field_type.is_object() => {
                     object.insert(
                         field.name().to_owned(),
-                        serialize_scalar(&out_field, val, query_schema)?,
+                        serialize_scalar(out_field, val, query_schema)?,
                     );
                 }
 
@@ -470,7 +470,7 @@ fn process_nested_results(
         if let QueryResult::RecordSelection(ref rs) = nested_result {
             let name = rs.name.clone();
             let (_, field) = enclosing_type.find_field(&name).unwrap();
-            let result = serialize_internal(nested_result, &field, false, query_schema)?;
+            let result = serialize_internal(nested_result, field, false, query_schema)?;
 
             nested_mapping.insert(name, result);
         }
@@ -522,14 +522,14 @@ fn serialize_composite(
                     Field::Composite(cf) => {
                         map.insert(
                             inner_field.name().to_owned(),
-                            serialize_composite(cf, &inner_out_field, value, query_schema)?,
+                            serialize_composite(cf, inner_out_field, value, query_schema)?,
                         );
                     }
 
                     _ if !inner_out_field.field_type.is_object() => {
                         map.insert(
                             inner_field.name().to_owned(),
-                            serialize_scalar(&inner_out_field, value, query_schema)?,
+                            serialize_scalar(inner_out_field, value, query_schema)?,
                         );
                     }
 
@@ -560,7 +560,7 @@ fn serialize_scalar(field: &OutputField, value: PrismaValue, schema: &QuerySchem
             OutputType::Scalar(subtype) => {
                 let items = unwrap_prisma_value(value)
                     .into_iter()
-                    .map(|v| convert_prisma_value(field, v, &subtype))
+                    .map(|v| convert_prisma_value(field, v, subtype))
                     .map(|pv| pv.map(Item::Value))
                     .collect::<Result<Vec<Item>, CoreError>>()?;
                 Ok(Item::list(items))
@@ -580,7 +580,7 @@ fn serialize_scalar(field: &OutputField, value: PrismaValue, schema: &QuerySchem
                 arc_type, field.name
             ))),
         },
-        (_, OutputType::Scalar(st)) => Ok(Item::Value(convert_prisma_value(field, value, &st)?)),
+        (_, OutputType::Scalar(st)) => Ok(Item::Value(convert_prisma_value(field, value, st)?)),
         (pv, ot) => Err(CoreError::SerializationError(format!(
             "Attempted to serialize scalar '{}' with non-scalar compatible type '{:?}' for field {}.",
             pv, ot, field.name
