@@ -84,7 +84,7 @@ impl QueryDocumentParser {
         selection_path: Path,
         argument_path: Path,
         selection: &Selection,
-        schema_field: &OutputFieldRef,
+        schema_field: OutputFieldId,
         query_schema: &QuerySchema,
     ) -> QueryParserResult<FieldPair> {
         let selection_path = selection_path.add(schema_field.name.clone());
@@ -120,7 +120,6 @@ impl QueryDocumentParser {
                     None => None,
                 };
 
-                let schema_field = Arc::clone(schema_field);
                 let parsed_field = ParsedField {
                     name: selection.name().to_string(),
                     alias: selection.alias().clone(),
@@ -141,7 +140,7 @@ impl QueryDocumentParser {
         &self,
         selection_path: Path,
         argument_path: Path,
-        schema_field: &OutputFieldRef,
+        schema_field: &OutputField,
         given_arguments: &[(String, ArgumentValue)],
         query_schema: &QuerySchema,
     ) -> QueryParserResult<Vec<ParsedArgument>> {

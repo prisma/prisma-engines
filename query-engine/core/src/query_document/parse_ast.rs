@@ -1,11 +1,10 @@
 //! Parsed query document tree. Naming is WIP.
 //! Structures represent parsed and validated parts of the query document, used by the query builders.
+use crate::QueryParserResult;
 use indexmap::IndexMap;
 use prisma_models::{OrderBy, PrismaValue, ScalarFieldRef};
-use schema::{ObjectTag, OutputFieldRef};
+use schema::{ObjectTag, OutputObjectTypeId};
 use std::ops::{Deref, DerefMut};
-
-use crate::QueryParserResult;
 
 pub(crate) type ParsedInputList = Vec<ParsedInputValue>;
 
@@ -86,7 +85,7 @@ pub struct FieldPair {
     pub parsed_field: ParsedField,
 
     /// The schema field that the parsed field corresponds to.
-    pub schema_field: OutputFieldRef,
+    pub schema_field: (OutputObjectTypeId, usize),
 }
 
 #[derive(Debug, Clone)]

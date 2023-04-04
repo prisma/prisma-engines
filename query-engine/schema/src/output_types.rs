@@ -113,7 +113,7 @@ impl OutputType {
 
 pub struct ObjectType {
     pub identifier: Identifier,
-    fields: OnceCell<Vec<OutputFieldRef>>,
+    fields: OnceCell<Vec<OutputField>>,
 
     // Object types can directly map to models.
     model: Option<ModelId>,
@@ -143,19 +143,19 @@ impl ObjectType {
     }
 
     pub fn add_field(&mut self, field: OutputField) {
-        self.fields.get_mut().unwrap().push(Arc::new(field));
+        self.fields.get_mut().unwrap().push(field)
     }
 
-    pub fn get_fields(&self) -> &[OutputFieldRef] {
+    pub fn get_fields(&self) -> &[OutputField] {
         self.fields.get().unwrap()
     }
 
     pub fn set_fields(&self, fields: Vec<OutputField>) {
-        self.fields.set(fields.into_iter().map(Arc::new).collect()).unwrap();
+        self.fields.set(fields).unwrap();
     }
 
-    pub fn find_field(&self, name: &str) -> Option<OutputFieldRef> {
-        self.get_fields().iter().find(|f| f.name == name).cloned()
+    pub fn find_field<'a>(&'a self, name: &str) -> Option<&'a OutputField> {
+        self.get_fields().iter().find(|f| f.name == name)
     }
 
     /// True if fields are empty, false otherwise.

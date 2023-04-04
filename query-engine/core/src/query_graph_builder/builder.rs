@@ -47,9 +47,10 @@ impl QueryGraphBuilder {
 
         // Because we're processing root objects, there can only be one query / mutation.
         let field_pair = parsed_object.fields.pop().unwrap();
-        let serializer = Self::derive_serializer(&selections.pop().unwrap(), &field_pair.schema_field);
+        let serializer = Self::derive_serializer(&selections.pop().unwrap(), field_pair.schema_field);
+        let schema_field = &self.query_schema.db[field_pair.schema_field.0].get_fields()[field_pair.schema_field.1];
 
-        if field_pair.schema_field.query_info.is_some() {
+        if schema_field.query_info.is_some() {
             let graph = self.dispatch_build(field_pair)?;
             Ok((graph, serializer))
         } else {
@@ -63,7 +64,8 @@ impl QueryGraphBuilder {
 
     #[rustfmt::skip]
     fn dispatch_build(&self, field_pair: FieldPair) -> QueryGraphBuilderResult<QueryGraph> {
-        let query_info = field_pair.schema_field.query_info.as_ref().unwrap();
+        let schema_field = &self.query_schema.db[field_pair.schema_field.0].get_fields()[field_pair.schema_field.1];
+        let query_info = schema_field.query_info.as_ref().unwrap();
         let parsed_field = field_pair.parsed_field;
         let connector_ctx = self.query_schema.context();
 
@@ -106,13 +108,13 @@ impl QueryGraphBuilder {
         Ok(graph)
     }
 
-    fn derive_serializer(selection: &Selection, field: &OutputFieldRef) -> IrSerializer {
+    fn derive_serializer(selection: &Selection, field: (OutputObjectTypeId, usize)) -> IrSerializer {
         IrSerializer {
             key: selection
                 .alias()
                 .clone()
                 .unwrap_or_else(|| selection.name().to_string()),
-            output_field: field.clone(),
+            output_field: field,
         }
     }
 }

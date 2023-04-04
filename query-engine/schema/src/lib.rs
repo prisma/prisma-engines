@@ -20,7 +20,6 @@ use std::sync::Arc;
 
 pub type QuerySchemaRef = Arc<QuerySchema>;
 pub type OutputTypeRef = Arc<OutputType>;
-pub type OutputFieldRef = Arc<OutputField>;
 
 #[derive(Debug, PartialEq)]
 pub struct Deprecation {
