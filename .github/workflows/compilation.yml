@@ -26,7 +26,7 @@ jobs:
           toolchain: stable
           default: true
 
-      - run: "cargo clean && cargo build --release -p migration-engine-cli"
+      - run: "cargo clean && cargo build --release -p schema-engine-cli"
         name: "Compile Migration Engine"
 
       - run: "cargo clean && cargo build --release -p prisma-fmt"

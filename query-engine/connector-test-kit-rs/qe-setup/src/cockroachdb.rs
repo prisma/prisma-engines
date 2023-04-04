@@ -1,6 +1,6 @@
-use migration_core::migration_connector::{ConnectorError, ConnectorResult};
 use once_cell::sync::OnceCell;
 use quaint::{prelude::*, single::Quaint};
+use schema_core::schema_connector::{ConnectorError, ConnectorResult};
 use url::Url;
 
 pub(crate) async fn cockroach_setup(url: String, prisma_schema: &str) -> ConnectorResult<()> {
