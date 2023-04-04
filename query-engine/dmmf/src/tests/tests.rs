@@ -1,6 +1,5 @@
 use crate::{dmmf_from_schema, tests::setup::*};
 
-
 #[test]
 fn sqlite_ignore() {
     let dmmf = dmmf_from_schema(include_str!("./test-schemas/sqlite_ignore.prisma"));
