@@ -3,7 +3,7 @@
 use crate::QueryParserResult;
 use indexmap::IndexMap;
 use prisma_models::{OrderBy, PrismaValue, ScalarFieldRef};
-use schema::{ObjectTag, OutputObjectTypeId};
+use schema::{ObjectTag, OutputFieldId};
 use std::ops::{Deref, DerefMut};
 
 pub(crate) type ParsedInputList = Vec<ParsedInputValue>;
@@ -85,7 +85,7 @@ pub struct FieldPair {
     pub parsed_field: ParsedField,
 
     /// The schema field that the parsed field corresponds to.
-    pub schema_field: (OutputObjectTypeId, usize),
+    pub schema_field: OutputFieldId,
 }
 
 #[derive(Debug, Clone)]

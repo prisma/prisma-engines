@@ -6,7 +6,7 @@ use core::fmt;
 use indexmap::IndexSet;
 use prisma_models::dml::{self, ValueGeneratorFn};
 use prisma_value::PrismaValue;
-use std::{borrow::Borrow, convert::TryFrom, str::FromStr, sync::Arc, vec};
+use std::{convert::TryFrom, str::FromStr};
 use user_facing_errors::query_engine::validation::ValidationError;
 use uuid::Uuid;
 
@@ -24,7 +24,7 @@ impl QueryDocumentParser {
     pub fn parse(
         &self,
         selections: &[Selection],
-        schema_object: &ObjectType,
+        schema_object: (OutputObjectTypeId, &ObjectType),
         query_schema: &QuerySchema,
     ) -> QueryParserResult<ParsedObject> {
         self.parse_object(
@@ -46,7 +46,7 @@ impl QueryDocumentParser {
         selection_path: Path,
         argument_path: Path,
         selections: &[Selection],
-        schema_object: &ObjectType,
+        (object_id, schema_object): (OutputObjectTypeId, &ObjectType),
         query_schema: &QuerySchema,
     ) -> QueryParserResult<ParsedObject> {
         if selections.is_empty() {
@@ -61,11 +61,11 @@ impl QueryDocumentParser {
             .map(|selection| {
                 let field_name = selection.name();
                 match schema_object.find_field(field_name) {
-                    Some(ref field) => self.parse_field(
+                    Some((field_idx, field)) => self.parse_field(
                         selection_path.clone(),
                         argument_path.clone(),
                         selection,
-                        field,
+                        ((object_id, field_idx), field),
                         query_schema,
                     ),
                     None => Err(ValidationError::unknown_selection_field(
@@ -84,7 +84,7 @@ impl QueryDocumentParser {
         selection_path: Path,
         argument_path: Path,
         selection: &Selection,
-        schema_field: OutputFieldId,
+        (field_id, schema_field): (OutputFieldId, &OutputField),
         query_schema: &QuerySchema,
     ) -> QueryParserResult<FieldPair> {
         let selection_path = selection_path.add(schema_field.name.clone());
@@ -129,7 +129,7 @@ impl QueryDocumentParser {
 
                 Ok(FieldPair {
                     parsed_field,
-                    schema_field,
+                    schema_field: field_id,
                 })
             }
         })
@@ -632,7 +632,7 @@ impl QueryDocumentParser {
             ))
         };
 
-        match typ.borrow() {
+        match typ {
             EnumType::Database(db) => match db.map_input_value(&raw) {
                 Some(value) => Ok(ParsedInputValue::Single(value)),
                 None => err(&db.identifier().name()),

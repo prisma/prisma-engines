@@ -3,7 +3,7 @@ use itertools::Itertools;
 use prisma_models::PrismaValue;
 use query_core::{
     constants::custom_types,
-    schema::{InputField, InputObjectType, InputType, OutputFieldRef, QuerySchema, QuerySchemaRef},
+    schema::{InputField, InputObjectType, InputType, OutputField, QuerySchema, QuerySchemaRef},
     schema_builder::constants::{self, json_null},
     ArgumentValue, ArgumentValueObject, Selection,
 };
@@ -38,7 +38,7 @@ impl JsonRequest {
 
 fn graphql_selection_to_json_field_query(
     mut selection: Selection,
-    schema_field: &OutputFieldRef,
+    schema_field: &OutputField,
     query_schema: &QuerySchema,
 ) -> FieldQuery {
     FieldQuery {
@@ -128,7 +128,7 @@ fn arg_value_to_json(value: ArgumentValue, typ: InferredType, query_schema: &Que
 
 fn graphql_selection_to_json_selection(
     selection: Selection,
-    schema_field: &OutputFieldRef,
+    schema_field: &OutputField,
     query_schema: &QuerySchema,
 ) -> SelectionSet {
     let mut res: IndexMap<String, SelectionSetValue> = IndexMap::new();
@@ -141,10 +141,11 @@ fn graphql_selection_to_json_selection(
         if no_args && no_nested_selection {
             res.insert(selection_name, SelectionSetValue::Shorthand(true));
         } else {
-            let nested_field = schema_field
+            let (_, nested_field) = schema_field
                 .field_type
                 .as_object_type(&query_schema.db)
                 .unwrap()
+                .1
                 .find_field(&selection_name)
                 .unwrap();
 
