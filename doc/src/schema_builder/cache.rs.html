@@ -73,20 +73,20 @@
 //!   collect all types of the query schema.
 
 </span><span class="kw">use </span><span class="kw">super</span>::Identifier;
-<span class="kw">use </span>std::{collections::HashMap, fmt::Debug};
+<span class="kw">use </span>std::fmt::Debug;
 
 <span class="doccomment">/// HashMap wrapper. Caches keys at most once, and errors on repeated insertion of the same key to
 /// uphold schema building consistency guarantees.
 </span><span class="attr">#[derive(Debug, Default)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TypeRefCache&lt;T&gt; {
-    cache: HashMap&lt;Identifier, T&gt;,
+    cache: rustc_hash::FxHashMap&lt;Identifier, T&gt;,
 }
 
 <span class="kw">impl</span>&lt;T: Copy + Debug&gt; TypeRefCache&lt;T&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>with_capacity(capacity: usize) -&gt; <span class="self">Self </span>{
-        TypeRefCache {
-            cache: HashMap::with_capacity(capacity),
-        }
+        <span class="kw">let </span><span class="kw-2">mut </span>cache = rustc_hash::FxHashMap::default();
+        cache.reserve(capacity);
+        TypeRefCache { cache }
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, ident: <span class="kw-2">&amp;</span>Identifier) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
