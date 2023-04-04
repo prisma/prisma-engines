@@ -71,11 +71,11 @@ impl OutputType {
 
     /// Attempts to recurse through the type until an object type is found.
     /// Returns Some(ObjectTypeStrongRef) if ab object type is found, None otherwise.
-    pub fn as_object_type<'a>(&self, db: &'a QuerySchemaDatabase) -> Option<&'a ObjectType> {
+    pub fn as_object_type<'a>(&self, db: &'a QuerySchemaDatabase) -> Option<(OutputObjectTypeId, &'a ObjectType)> {
         match self {
             OutputType::Enum(_) => None,
             OutputType::List(inner) => inner.as_object_type(db),
-            OutputType::Object(obj) => Some(&db[*obj]),
+            OutputType::Object(obj) => Some((*obj, &db[*obj])),
             OutputType::Scalar(_) => None,
         }
     }
@@ -154,8 +154,8 @@ impl ObjectType {
         self.fields.set(fields).unwrap();
     }
 
-    pub fn find_field<'a>(&'a self, name: &str) -> Option<&'a OutputField> {
-        self.get_fields().iter().find(|f| f.name == name)
+    pub fn find_field<'a>(&'a self, name: &str) -> Option<(usize, &'a OutputField)> {
+        self.get_fields().iter().enumerate().find(|(_, f)| f.name == name)
     }
 
     /// True if fields are empty, false otherwise.
@@ -230,6 +230,6 @@ impl OutputField {
     // is an object and that object is backed by a model, meaning that it is not an scalar list
     pub fn maps_to_relation(&self, query_schema: &QuerySchema) -> bool {
         let o = self.field_type.as_object_type(&query_schema.db);
-        o.is_some() && o.unwrap().model.is_some()
+        o.is_some() && o.unwrap().1.model.is_some()
     }
 }
