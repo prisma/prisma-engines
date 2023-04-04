@@ -2,19 +2,19 @@ use super::*;
 use fmt::Debug;
 use once_cell::sync::OnceCell;
 use prisma_models::{ast::ModelId, ModelRef};
-use std::{fmt, sync::Arc};
+use std::fmt;
 
 #[derive(Debug, Clone)]
 pub enum OutputType {
     Enum(EnumTypeId),
-    List(OutputTypeRef),
+    List(Box<OutputType>),
     Object(OutputObjectTypeId),
     Scalar(ScalarType),
 }
 
 impl OutputType {
     pub fn list(containing: OutputType) -> OutputType {
-        OutputType::List(Arc::new(containing))
+        OutputType::List(Box::new(containing))
     }
 
     pub fn object(containing: OutputObjectTypeId) -> OutputType {

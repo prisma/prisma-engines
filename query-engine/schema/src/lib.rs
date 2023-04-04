@@ -19,7 +19,6 @@ pub use utils::*;
 use std::sync::Arc;
 
 pub type QuerySchemaRef = Arc<QuerySchema>;
-pub type OutputTypeRef = Arc<OutputType>;
 
 #[derive(Debug, PartialEq)]
 pub struct Deprecation {
