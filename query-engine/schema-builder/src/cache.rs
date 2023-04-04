@@ -13,13 +13,13 @@ use std::{collections::HashMap, fmt::Debug};
 /// uphold schema building consistency guarantees.
 #[derive(Debug, Default)]
 pub(crate) struct TypeRefCache<T> {
-    cache: HashMap<Identifier, T>,
+    cache: HashMap<Identifier, T, ahash::RandomState>,
 }
 
 impl<T: Copy + Debug> TypeRefCache<T> {
     pub(crate) fn with_capacity(capacity: usize) -> Self {
         TypeRefCache {
-            cache: HashMap::with_capacity(capacity),
+            cache: HashMap::with_capacity_and_hasher(capacity, ahash::RandomState::new()),
         }
     }
 
