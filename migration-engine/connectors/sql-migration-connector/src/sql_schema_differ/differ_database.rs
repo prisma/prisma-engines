@@ -1,5 +1,5 @@
 use super::{column, enums::EnumDiffer, table::TableDiffer};
-use crate::{flavour::SqlFlavour, pair::Pair, SqlDatabaseSchema};
+use crate::{flavour::SqlFlavour, migration_pair::MigrationPair, SqlDatabaseSchema};
 use sql_schema_describer::{
     postgres::{ExtensionId, ExtensionWalker, PostgresSchemaExt},
     walkers::{EnumWalker, TableColumnWalker, TableWalker},
@@ -16,25 +16,25 @@ type Table<'a> = (Option<Cow<'a, str>>, Cow<'a, str>);
 pub(crate) struct DifferDatabase<'a> {
     pub(super) flavour: &'a dyn SqlFlavour,
     /// The schemas being diffed
-    pub(crate) schemas: Pair<&'a SqlDatabaseSchema>,
+    pub(crate) schemas: MigrationPair<&'a SqlDatabaseSchema>,
     /// Namespace name -> namespace indexes.
-    namespaces: HashMap<Cow<'a, str>, Pair<Option<NamespaceId>>>,
+    namespaces: HashMap<Cow<'a, str>, MigrationPair<Option<NamespaceId>>>,
     /// Table name -> table indexes.
-    tables: HashMap<Table<'a>, Pair<Option<TableId>>>,
+    tables: HashMap<Table<'a>, MigrationPair<Option<TableId>>>,
     /// (table_idxs, column_name) -> column_idxs. BTreeMap because we want range
     /// queries (-> all the columns in a table).
-    columns: BTreeMap<(Pair<TableId>, &'a str), Pair<Option<TableColumnId>>>,
+    columns: BTreeMap<(MigrationPair<TableId>, &'a str), MigrationPair<Option<TableColumnId>>>,
     /// (table_idx, column_idx) -> ColumnChanges
-    column_changes: HashMap<Pair<TableColumnId>, column::ColumnChanges>,
+    column_changes: HashMap<MigrationPair<TableColumnId>, column::ColumnChanges>,
     /// Postgres extension name -> extension indexes.
-    pub(super) extensions: HashMap<&'a str, Pair<Option<ExtensionId>>>,
+    pub(super) extensions: HashMap<&'a str, MigrationPair<Option<ExtensionId>>>,
     /// Tables that will need to be completely redefined (dropped and recreated) for the migration
     /// to succeed. It needs to be crate public because it is set from the flavour.
-    pub(crate) tables_to_redefine: BTreeSet<Pair<TableId>>,
+    pub(crate) tables_to_redefine: BTreeSet<MigrationPair<TableId>>,
 }
 
 impl<'a> DifferDatabase<'a> {
-    pub(crate) fn new(schemas: Pair<&'a SqlDatabaseSchema>, flavour: &'a dyn SqlFlavour) -> Self {
+    pub(crate) fn new(schemas: MigrationPair<&'a SqlDatabaseSchema>, flavour: &'a dyn SqlFlavour) -> Self {
         let namespace_count_lb = std::cmp::max(
             schemas.previous.describer_schema.namespaces_count(),
             schemas.next.describer_schema.namespaces_count(),
@@ -68,7 +68,7 @@ impl<'a> DifferDatabase<'a> {
                 Cow::Borrowed(namespace.name())
             };
             db.namespaces
-                .insert(namespace_name, Pair::new(Some(namespace.id), None));
+                .insert(namespace_name, MigrationPair::new(Some(namespace.id), None));
         }
 
         // Then insert all namespaces from the next schema.
@@ -96,7 +96,7 @@ impl<'a> DifferDatabase<'a> {
             };
             db.tables.insert(
                 (table.namespace().map(Cow::Borrowed), table_name),
-                Pair::new(Some(table.id), None),
+                MigrationPair::new(Some(table.id), None),
             );
         }
 
@@ -128,7 +128,7 @@ impl<'a> DifferDatabase<'a> {
 
                 // Same as for tables, walk the previous columns first.
                 for column in tables.previous.columns() {
-                    columns_cache.insert(column.name(), Pair::new(Some(column.id), None));
+                    columns_cache.insert(column.name(), MigrationPair::new(Some(column.id), None));
                 }
 
                 for column in tables.next.columns() {
@@ -156,23 +156,29 @@ impl<'a> DifferDatabase<'a> {
         db
     }
 
-    pub(crate) fn all_column_pairs(&self) -> impl Iterator<Item = Pair<TableColumnId>> + '_ {
+    pub(crate) fn all_column_pairs(&self) -> impl Iterator<Item = MigrationPair<TableColumnId>> + '_ {
         self.columns.iter().filter_map(|(_, cols)| cols.transpose())
     }
 
-    pub(crate) fn column_pairs(&self, table: Pair<TableId>) -> impl Iterator<Item = Pair<TableColumnId>> + '_ {
+    pub(crate) fn column_pairs(
+        &self,
+        table: MigrationPair<TableId>,
+    ) -> impl Iterator<Item = MigrationPair<TableColumnId>> + '_ {
         self.range_columns(table).filter_map(|(_k, v)| v.transpose())
     }
 
-    pub(crate) fn column_changes(&self, column: Pair<TableColumnId>) -> column::ColumnChanges {
+    pub(crate) fn column_changes(&self, column: MigrationPair<TableColumnId>) -> column::ColumnChanges {
         self.column_changes[&column]
     }
 
-    pub(crate) fn column_changes_for_walkers(&self, walkers: Pair<TableColumnWalker<'_>>) -> column::ColumnChanges {
+    pub(crate) fn column_changes_for_walkers(
+        &self,
+        walkers: MigrationPair<TableColumnWalker<'_>>,
+    ) -> column::ColumnChanges {
         self.column_changes(walkers.map(|c| c.id))
     }
 
-    pub(crate) fn created_columns(&self, table: Pair<TableId>) -> impl Iterator<Item = TableColumnId> + '_ {
+    pub(crate) fn created_columns(&self, table: MigrationPair<TableId>) -> impl Iterator<Item = TableColumnId> + '_ {
         self.range_columns(table)
             .filter(|(_k, v)| v.previous.is_none())
             .filter_map(|(_k, v)| v.next)
@@ -194,7 +200,7 @@ impl<'a> DifferDatabase<'a> {
             .map(move |namespace_id| self.schemas.next.walk(namespace_id))
     }
 
-    pub(crate) fn dropped_columns(&self, table: Pair<TableId>) -> impl Iterator<Item = TableColumnId> + '_ {
+    pub(crate) fn dropped_columns(&self, table: MigrationPair<TableId>) -> impl Iterator<Item = TableColumnId> + '_ {
         self.range_columns(table)
             .filter(|(_k, v)| v.next.is_none())
             .filter_map(|(_k, v)| v.previous)
@@ -210,8 +216,13 @@ impl<'a> DifferDatabase<'a> {
 
     fn range_columns(
         &self,
-        table: Pair<TableId>,
-    ) -> impl Iterator<Item = (&(Pair<TableId>, &'a str), &Pair<Option<TableColumnId>>)> {
+        table: MigrationPair<TableId>,
+    ) -> impl Iterator<
+        Item = (
+            &(MigrationPair<TableId>, &'a str),
+            &MigrationPair<Option<TableColumnId>>,
+        ),
+    > {
         self.columns
             .range((Bound::Included(&(table, "")), Bound::Unbounded))
             .take_while(move |((t, _), _)| *t == table)
@@ -247,7 +258,7 @@ impl<'a> DifferDatabase<'a> {
             self.next_enums()
                 .find(|next| enums_match(&previous, next))
                 .map(|next| EnumDiffer {
-                    enums: Pair::new(previous, next),
+                    enums: MigrationPair::new(previous, next),
                 })
         })
     }
@@ -273,7 +284,7 @@ impl<'a> DifferDatabase<'a> {
     /// Non-relocatable extensions present in both schemas with changed values.
     pub(crate) fn non_relocatable_extension_pairs<'db>(
         &'db self,
-    ) -> impl Iterator<Item = Pair<ExtensionWalker<'a>>> + 'db {
+    ) -> impl Iterator<Item = MigrationPair<ExtensionWalker<'a>>> + 'db {
         self.previous_extensions().filter_map(move |previous| {
             self.next_extensions()
                 .find(|next| {
@@ -281,12 +292,14 @@ impl<'a> DifferDatabase<'a> {
                         && !extensions_match(previous, *next)
                         && (!previous.relocatable() && !next.relocatable())
                 })
-                .map(|next| Pair::new(previous, next))
+                .map(|next| MigrationPair::new(previous, next))
         })
     }
 
     /// Relocatable extensions present in both schemas with changed values.
-    pub(crate) fn relocatable_extension_pairs<'db>(&'db self) -> impl Iterator<Item = Pair<ExtensionWalker<'a>>> + 'db {
+    pub(crate) fn relocatable_extension_pairs<'db>(
+        &'db self,
+    ) -> impl Iterator<Item = MigrationPair<ExtensionWalker<'a>>> + 'db {
         self.previous_extensions().filter_map(move |previous| {
             self.next_extensions()
                 .find(|next| {
@@ -294,7 +307,7 @@ impl<'a> DifferDatabase<'a> {
                         && !extensions_match(previous, *next)
                         && (previous.relocatable() || next.relocatable())
                 })
-                .map(|next| Pair::new(previous, next))
+                .map(|next| MigrationPair::new(previous, next))
         })
     }
 

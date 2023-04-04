@@ -1,7 +1,7 @@
 use super::DestructiveChangeCheckerFlavour;
 use crate::{
     flavour::{MssqlFlavour, SqlFlavour},
-    pair::Pair,
+    migration_pair::MigrationPair,
     sql_destructive_change_checker::{
         check::{Column, Table},
         destructive_check_plan::DestructiveCheckPlan,
@@ -18,7 +18,7 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
     fn check_alter_column(
         &self,
         alter_column: &AlterColumn,
-        columns: &Pair<TableColumnWalker<'_>>,
+        columns: &MigrationPair<TableColumnWalker<'_>>,
         plan: &mut DestructiveCheckPlan,
         step_index: usize,
     ) {
@@ -79,7 +79,7 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
 
     fn check_drop_and_recreate_column(
         &self,
-        columns: &Pair<TableColumnWalker<'_>>,
+        columns: &MigrationPair<TableColumnWalker<'_>>,
         changes: &ColumnChanges,
         plan: &mut DestructiveCheckPlan,
         step_index: usize,

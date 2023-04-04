@@ -8,6 +8,8 @@ members = [
   "migration-engine/json-rpc-api-build",
   "migration-engine/migration-engine-tests",
   "migration-engine/introspection-engine-tests",
+  "migration-engine/mongodb-schema-describer",
+  "migration-engine/sql-schema-describer",
   "query-engine/connectors/*",
   "query-engine/connector-test-kit-rs/qe-setup",
   "query-engine/connector-test-kit-rs/query-engine-tests",

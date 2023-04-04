@@ -3,7 +3,7 @@ mod alter_table;
 use super::{common::*, IteratorJoin, Quoted, SqlRenderer};
 use crate::{
     flavour::MssqlFlavour,
-    pair::Pair,
+    migration_pair::MigrationPair,
     sql_migration::{AlterEnum, AlterTable, RedefineTable},
 };
 use indoc::{formatdoc, indoc};
@@ -79,17 +79,17 @@ impl SqlRenderer for MssqlFlavour {
         Quoted::mssql_ident(name)
     }
 
-    fn render_alter_table(&self, alter_table: &AlterTable, schemas: Pair<&sql::SqlSchema>) -> Vec<String> {
+    fn render_alter_table(&self, alter_table: &AlterTable, schemas: MigrationPair<&sql::SqlSchema>) -> Vec<String> {
         let AlterTable { table_ids, changes } = alter_table;
         let tables = schemas.walk(*table_ids);
         alter_table::create_statements(self, tables, changes)
     }
 
-    fn render_alter_enum(&self, _: &AlterEnum, _: Pair<&sql::SqlSchema>) -> Vec<String> {
+    fn render_alter_enum(&self, _: &AlterEnum, _: MigrationPair<&sql::SqlSchema>) -> Vec<String> {
         unreachable!("render_alter_enum on Microsoft SQL Server")
     }
 
-    fn render_rename_index(&self, indexes: Pair<sql::IndexWalker<'_>>) -> Vec<String> {
+    fn render_rename_index(&self, indexes: MigrationPair<sql::IndexWalker<'_>>) -> Vec<String> {
         let index_with_table = format!(
             "{}.{}.{}",
             indexes
@@ -258,7 +258,7 @@ impl SqlRenderer for MssqlFlavour {
         }
     }
 
-    fn render_redefine_tables(&self, tables: &[RedefineTable], schemas: Pair<&sql::SqlSchema>) -> Vec<String> {
+    fn render_redefine_tables(&self, tables: &[RedefineTable], schemas: MigrationPair<&sql::SqlSchema>) -> Vec<String> {
         // All needs to be inside a transaction.
         let mut result = vec!["BEGIN TRANSACTION".to_string()];
 
@@ -452,7 +452,7 @@ impl SqlRenderer for MssqlFlavour {
         )
     }
 
-    fn render_rename_foreign_key(&self, fks: Pair<sql::ForeignKeyWalker<'_>>) -> String {
+    fn render_rename_foreign_key(&self, fks: MigrationPair<sql::ForeignKeyWalker<'_>>) -> String {
         format!(
             r#"EXEC sp_rename '{schema}.{previous}', '{next}', 'OBJECT'"#,
             schema = fks.previous.table().namespace().unwrap_or_else(|| self.schema_name()),

@@ -11,7 +11,7 @@ pub(crate) use sql_schema_differ_flavour::SqlSchemaDifferFlavour;
 use self::differ_database::DifferDatabase;
 use crate::{
     database_schema::SqlDatabaseSchema,
-    pair::Pair,
+    migration_pair::MigrationPair,
     sql_migration::{self, AlterColumn, AlterTable, RedefineTable, SqlMigrationStep, TableChange},
     SqlFlavour,
 };
@@ -20,7 +20,10 @@ use sql_schema_describer::{walkers::ForeignKeyWalker, IndexId, TableColumnId};
 use std::{borrow::Cow, collections::HashSet};
 use table::TableDiffer;
 
-pub(crate) fn calculate_steps(schemas: Pair<&SqlDatabaseSchema>, flavour: &dyn SqlFlavour) -> Vec<SqlMigrationStep> {
+pub(crate) fn calculate_steps(
+    schemas: MigrationPair<&SqlDatabaseSchema>,
+    flavour: &dyn SqlFlavour,
+) -> Vec<SqlMigrationStep> {
     let db = DifferDatabase::new(schemas, flavour);
     let mut steps: Vec<SqlMigrationStep> = Vec::new();
 
@@ -116,7 +119,7 @@ fn push_altered_table_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
             .index_pairs()
             .filter(|pair| db.flavour.index_should_be_renamed(*pair))
         {
-            let index: Pair<IndexId> = i.map(|i| i.id);
+            let index: MigrationPair<IndexId> = i.map(|i| i.id);
 
             let step = if db.flavour.can_rename_index() {
                 SqlMigrationStep::RenameIndex { index }
@@ -190,7 +193,7 @@ fn alter_columns(table_differ: &TableDiffer<'_, '_>) -> Vec<TableChange> {
                 return None;
             }
 
-            let column_id = Pair::new(column_differ.previous.id, column_differ.next.id);
+            let column_id = MigrationPair::new(column_differ.previous.id, column_differ.next.id);
 
             match changes.type_change {
                 Some(ColumnTypeChange::NotCastable) => Some(TableChange::DropAndRecreateColumn { column_id, changes }),
@@ -432,7 +435,7 @@ fn push_redefined_table_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferData
 
 /// Compare two foreign keys and return whether they should be considered
 /// equivalent for schema diffing purposes.
-fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, db: &DifferDatabase<'_>) -> bool {
+fn foreign_keys_match(fks: MigrationPair<&ForeignKeyWalker<'_>>, db: &DifferDatabase<'_>) -> bool {
     let references_same_table = db.flavour.table_names_match(fks.map(|fk| fk.referenced_table().name()));
 
     let references_same_column_count = fks.previous.referenced_columns().len() == fks.next.referenced_columns().len();
@@ -466,7 +469,7 @@ fn foreign_keys_match(fks: Pair<&ForeignKeyWalker<'_>>, db: &DifferDatabase<'_>)
 }
 
 fn push_foreign_key_pair_changes(
-    fk: Pair<ForeignKeyWalker<'_>>,
+    fk: MigrationPair<ForeignKeyWalker<'_>>,
     steps: &mut Vec<SqlMigrationStep>,
     db: &DifferDatabase<'_>,
 ) {

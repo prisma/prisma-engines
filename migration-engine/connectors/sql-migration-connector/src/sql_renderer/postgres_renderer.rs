@@ -1,7 +1,7 @@
 use super::{common::*, SqlRenderer};
 use crate::{
     flavour::PostgresFlavour,
-    pair::Pair,
+    migration_pair::MigrationPair,
     sql_migration::{
         AlterColumn, AlterEnum, AlterExtension, AlterTable, CreateExtension, DropExtension, ExtensionChange,
         RedefineTable, SequenceChange, SequenceChanges, TableChange,
@@ -42,11 +42,11 @@ impl SqlRenderer for PostgresFlavour {
     // TODO(MultiSchema): We only do alter_sequence on CockroachDB.
     fn render_alter_sequence(
         &self,
-        sequence_idx: Pair<u32>,
+        sequence_idx: MigrationPair<u32>,
         changes: SequenceChanges,
-        schemas: Pair<&SqlSchema>,
+        schemas: MigrationPair<&SqlSchema>,
     ) -> Vec<String> {
-        let exts: Pair<&PostgresSchemaExt> = schemas.map(|schema| schema.downcast_connector_data());
+        let exts: MigrationPair<&PostgresSchemaExt> = schemas.map(|schema| schema.downcast_connector_data());
         let (prev_seq, next_seq) = exts
             .zip(sequence_idx)
             .map(|(ext, idx)| &ext.sequences[idx as usize])
@@ -122,8 +122,8 @@ impl SqlRenderer for PostgresFlavour {
         })
     }
 
-    fn render_alter_extension(&self, alter: &AlterExtension, schemas: Pair<&SqlSchema>) -> Vec<String> {
-        let exts: Pair<&PostgresSchemaExt> = schemas.map(|schema| schema.downcast_connector_data());
+    fn render_alter_extension(&self, alter: &AlterExtension, schemas: MigrationPair<&SqlSchema>) -> Vec<String> {
+        let exts: MigrationPair<&PostgresSchemaExt> = schemas.map(|schema| schema.downcast_connector_data());
         let extensions = exts.zip(alter.ids).map(|(ext, id)| ext.get_extension(id));
 
         alter
@@ -179,7 +179,7 @@ impl SqlRenderer for PostgresFlavour {
         .to_string()
     }
 
-    fn render_alter_enum(&self, alter_enum: &AlterEnum, schemas: Pair<&SqlSchema>) -> Vec<String> {
+    fn render_alter_enum(&self, alter_enum: &AlterEnum, schemas: MigrationPair<&SqlSchema>) -> Vec<String> {
         // ALTER TYPE is much more limited on postgres than on cockroachdb.
         //
         // On Postgres:
@@ -195,7 +195,7 @@ impl SqlRenderer for PostgresFlavour {
         }
     }
 
-    fn render_alter_primary_key(&self, tables: Pair<TableWalker<'_>>) -> Vec<String> {
+    fn render_alter_primary_key(&self, tables: MigrationPair<TableWalker<'_>>) -> Vec<String> {
         render_step(&mut |step| {
             step.render_statement(&mut |stmt| {
                 stmt.push_str("ALTER TABLE ");
@@ -213,7 +213,7 @@ impl SqlRenderer for PostgresFlavour {
         })
     }
 
-    fn render_rename_index(&self, indexes: Pair<IndexWalker<'_>>) -> Vec<String> {
+    fn render_rename_index(&self, indexes: MigrationPair<IndexWalker<'_>>) -> Vec<String> {
         render_step(&mut |step| {
             step.render_statement(&mut |stmt| {
                 let previous_table = indexes.previous.table();
@@ -228,7 +228,7 @@ impl SqlRenderer for PostgresFlavour {
         })
     }
 
-    fn render_alter_table(&self, alter_table: &AlterTable, schemas: Pair<&SqlSchema>) -> Vec<String> {
+    fn render_alter_table(&self, alter_table: &AlterTable, schemas: MigrationPair<&SqlSchema>) -> Vec<String> {
         let AlterTable { changes, table_ids } = alter_table;
         let mut lines = Vec::new();
         let mut before_statements = Vec::new();
@@ -454,7 +454,7 @@ impl SqlRenderer for PostgresFlavour {
         .to_string()
     }
 
-    fn render_redefine_tables(&self, tables: &[RedefineTable], schemas: Pair<&SqlSchema>) -> Vec<String> {
+    fn render_redefine_tables(&self, tables: &[RedefineTable], schemas: MigrationPair<&SqlSchema>) -> Vec<String> {
         let mut result = Vec::new();
 
         for redefine_table in tables {
@@ -520,7 +520,7 @@ impl SqlRenderer for PostgresFlavour {
         unreachable!("render_drop_user_defined_type on PostgreSQL")
     }
 
-    fn render_rename_foreign_key(&self, fks: Pair<ForeignKeyWalker<'_>>) -> String {
+    fn render_rename_foreign_key(&self, fks: MigrationPair<ForeignKeyWalker<'_>>) -> String {
         format!(
             r#"ALTER TABLE {table} RENAME CONSTRAINT {previous} TO {next}"#,
             table = QuotedWithPrefix::pg_from_table_walker(fks.previous.table()),
@@ -679,7 +679,7 @@ fn escape_string_literal(s: &str) -> Cow<'_, str> {
 }
 
 fn render_alter_column(
-    columns: Pair<TableColumnWalker<'_>>,
+    columns: MigrationPair<TableColumnWalker<'_>>,
     column_changes: &ColumnChanges,
     before_statements: &mut Vec<String>,
     clauses: &mut Vec<String>,
@@ -751,7 +751,7 @@ fn render_alter_column(
 }
 
 fn expand_alter_column(
-    columns: Pair<TableColumnWalker<'_>>,
+    columns: MigrationPair<TableColumnWalker<'_>>,
     column_changes: &ColumnChanges,
 ) -> Vec<PostgresAlterColumn> {
     let mut changes = Vec::new();
@@ -872,7 +872,7 @@ fn render_default<'a>(default: &'a DefaultValue, full_data_type: &str) -> Cow<'a
 
 fn render_postgres_alter_enum(
     alter_enum: &AlterEnum,
-    schemas: Pair<&SqlSchema>,
+    schemas: MigrationPair<&SqlSchema>,
     flavour: &PostgresFlavour,
 ) -> Vec<String> {
     if alter_enum.dropped_variants.is_empty() {
@@ -1002,7 +1002,7 @@ fn render_postgres_alter_enum(
         for (columns, next_default) in alter_enum
             .previous_usages_as_default
             .iter()
-            .filter_map(|(prev, next)| next.map(|next| schemas.walk(Pair::new(*prev, next))))
+            .filter_map(|(prev, next)| next.map(|next| schemas.walk(MigrationPair::new(*prev, next))))
             .filter_map(|columns| columns.next.default().map(|next_default| (columns, next_default)))
         {
             let table_name = columns.previous.table().name();
@@ -1026,7 +1026,11 @@ fn render_postgres_alter_enum(
     stmts
 }
 
-fn render_cockroach_alter_enum(alter_enum: &AlterEnum, schemas: Pair<&SqlSchema>, renderer: &mut StepRenderer) {
+fn render_cockroach_alter_enum(
+    alter_enum: &AlterEnum,
+    schemas: MigrationPair<&SqlSchema>,
+    renderer: &mut StepRenderer,
+) {
     let enums = schemas.walk(alter_enum.id);
     let mut prefix = String::new();
     prefix.push_str("ALTER TYPE ");

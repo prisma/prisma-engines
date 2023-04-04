@@ -1,7 +1,7 @@
 use super::SqlSchemaDifferFlavour;
 use crate::{
     flavour::MysqlFlavour,
-    pair::Pair,
+    migration_pair::MigrationPair,
     sql_schema_differ::{all_match, ColumnTypeChange},
 };
 use psl::builtin_connectors::MySqlType;
@@ -23,7 +23,7 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
         false
     }
 
-    fn column_type_change(&self, differ: Pair<TableColumnWalker<'_>>) -> Option<ColumnTypeChange> {
+    fn column_type_change(&self, differ: MigrationPair<TableColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         // On MariaDB, JSON is an alias for LONGTEXT. https://mariadb.com/kb/en/json-data-type/
         if self.is_mariadb() {
             match (
@@ -72,7 +72,7 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
         None
     }
 
-    fn index_should_be_renamed(&self, indexes: Pair<IndexWalker<'_>>) -> bool {
+    fn index_should_be_renamed(&self, indexes: MigrationPair<IndexWalker<'_>>) -> bool {
         // Implements correct comparison for truncated index names.
         let (previous_name, next_name) = indexes.as_ref().map(|idx| idx.name()).into_tuple();
 
@@ -95,7 +95,7 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
         true
     }
 
-    fn table_names_match(&self, names: Pair<&str>) -> bool {
+    fn table_names_match(&self, names: MigrationPair<&str>) -> bool {
         if self.lower_cases_table_names() {
             names.previous.eq_ignore_ascii_case(names.next)
         } else {
@@ -116,7 +116,7 @@ fn safe() -> ColumnTypeChange {
     ColumnTypeChange::SafeCast
 }
 
-fn native_type_change(types: Pair<&MySqlType>) -> Option<ColumnTypeChange> {
+fn native_type_change(types: MigrationPair<&MySqlType>) -> Option<ColumnTypeChange> {
     let next = &types.next;
 
     Some(match &types.previous {

@@ -299,7 +299,7 @@ dependencies = [
  "connection-string",
  "either",
  "enumflags2",
- "indoc",
+ "indoc 1.0.7",
  "lsp-types",
  "once_cell",
  "psl-core",
@@ -515,12 +515,6 @@ dependencies = [
  "terminal_size",
  "winapi",
 ]
-
-[[package]]
-name = "convert_case"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fb4a24b1aaf0fd0ce8b45161144d6f42cd91677fd5940fd431183eb023b3a2b8"
 
 [[package]]
 name = "convert_case"
@@ -776,7 +770,7 @@ version = "0.1.0"
 dependencies = [
  "base64 0.13.1",
  "expect-test",
- "indoc",
+ "indoc 1.0.7",
  "once_cell",
  "psl",
  "regex",
@@ -798,7 +792,7 @@ name = "diagnostics"
 version = "0.1.0"
 dependencies = [
  "colored",
- "indoc",
+ "indoc 1.0.7",
  "pest",
 ]
 
@@ -855,7 +849,7 @@ dependencies = [
  "expect-test",
  "flate2",
  "indexmap",
- "indoc",
+ "indoc 1.0.7",
  "itertools",
  "pretty_assertions",
  "prisma-models",
@@ -1535,6 +1529,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "adab1eaa3408fb7f0c777a73e7465fd5656136fc93b670eb6df3c88c2c1344e3"
 
 [[package]]
+name = "indoc"
+version = "2.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9f2cb48b81b1dc9f39676bf99f5499babfec7cd8fe14307f7b3d747208fb5690"
+
+[[package]]
 name = "insta"
 version = "1.21.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1557,20 +1557,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "introspection-connector"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "enumflags2",
- "psl",
- "serde",
- "serde_json",
- "thiserror",
- "user-facing-errors",
-]
-
-[[package]]
 name = "introspection-engine-tests"
 version = "0.1.0"
 dependencies = [
@@ -1578,7 +1564,7 @@ dependencies = [
  "connection-string",
  "enumflags2",
  "expect-test",
- "indoc",
+ "indoc 1.0.7",
  "migration-connector",
  "pretty_assertions",
  "psl",
@@ -2030,8 +2016,10 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "enumflags2",
- "introspection-connector",
  "psl",
+ "quaint",
+ "serde",
+ "serde_json",
  "sha2 0.9.9",
  "tracing",
  "tracing-error",
@@ -2069,7 +2057,7 @@ dependencies = [
  "base64 0.13.1",
  "connection-string",
  "expect-test",
- "indoc",
+ "indoc 1.0.7",
  "json-rpc-stdio",
  "migration-connector",
  "migration-core",
@@ -2097,7 +2085,7 @@ dependencies = [
  "connection-string",
  "enumflags2",
  "expect-test",
- "indoc",
+ "indoc 1.0.7",
  "jsonrpc-core",
  "migration-core",
  "once_cell",
@@ -2221,17 +2209,17 @@ dependencies = [
 ]
 
 [[package]]
-name = "mongodb-introspection-connector"
+name = "mongodb-migration-connector"
 version = "0.1.0"
 dependencies = [
- "async-trait",
- "convert_case 0.5.0",
+ "convert_case",
  "datamodel-renderer",
+ "dissimilar",
  "enumflags2",
  "expect-test",
  "futures",
- "indoc",
- "introspection-connector",
+ "indoc 2.0.1",
+ "migration-connector",
  "mongodb",
  "mongodb-client",
  "mongodb-schema-describer",
@@ -2239,32 +2227,12 @@ dependencies = [
  "once_cell",
  "psl",
  "regex",
- "serde_json",
- "thiserror",
- "tokio",
- "url",
- "user-facing-errors",
-]
-
-[[package]]
-name = "mongodb-migration-connector"
-version = "0.1.0"
-dependencies = [
- "dissimilar",
- "enumflags2",
- "futures",
- "migration-connector",
- "mongodb",
- "mongodb-client",
- "mongodb-introspection-connector",
- "mongodb-schema-describer",
- "once_cell",
- "psl",
  "serde",
  "serde_json",
  "tokio",
  "tracing",
  "url",
+ "user-facing-errors",
 ]
 
 [[package]]
@@ -2429,7 +2397,7 @@ version = "2.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "af4e44e34e70aa61be9036ae652e27c20db5bca80e006be0f482419f6601352a"
 dependencies = [
- "convert_case 0.6.0",
+ "convert_case",
  "napi-derive-backend",
  "proc-macro2",
  "quote",
@@ -2442,7 +2410,7 @@ version = "1.0.40"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "17925fff04b6fa636f8e4b4608cc1a4f1360b64ac8ecbfdb7da1be1dc74f6843"
 dependencies = [
- "convert_case 0.6.0",
+ "convert_case",
  "once_cell",
  "proc-macro2",
  "quote",
@@ -3056,7 +3024,7 @@ dependencies = [
  "dmmf",
  "enumflags2",
  "expect-test",
- "indoc",
+ "indoc 1.0.7",
  "log",
  "lsp-types",
  "once_cell",
@@ -3202,7 +3170,7 @@ dependencies = [
  "dissimilar",
  "either",
  "expect-test",
- "indoc",
+ "indoc 1.0.7",
  "psl-core",
 ]
 
@@ -3214,7 +3182,7 @@ dependencies = [
  "chrono",
  "diagnostics",
  "enumflags2",
- "indoc",
+ "indoc 1.0.7",
  "itertools",
  "lsp-types",
  "once_cell",
@@ -3376,7 +3344,7 @@ dependencies = [
  "enumflags2",
  "graphql-parser",
  "hyper",
- "indoc",
+ "indoc 1.0.7",
  "mongodb-query-connector",
  "opentelemetry",
  "opentelemetry-otlp",
@@ -3459,7 +3427,7 @@ dependencies = [
  "chrono",
  "colored",
  "futures",
- "indoc",
+ "indoc 1.0.7",
  "insta",
  "once_cell",
  "prisma-value",
@@ -3480,7 +3448,7 @@ name = "query-test-macros"
 version = "0.1.0"
 dependencies = [
  "darling",
- "indoc",
+ "indoc 1.0.7",
  "itertools",
  "proc-macro2",
  "query-tests-setup",
@@ -3498,7 +3466,7 @@ dependencies = [
  "enumflags2",
  "hyper",
  "indexmap",
- "indoc",
+ "indoc 1.0.7",
  "itertools",
  "lazy_static",
  "nom",
@@ -3668,9 +3636,9 @@ dependencies = [
 
 [[package]]
 name = "regex"
-version = "1.7.0"
+version = "1.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e076559ef8e241f2ae3479e36f97bd5741c0330689e217ad51ce2c76808b868a"
+checksum = "8b1f693b24f6ac912f4893ef08244d70b6067480d2f1a46e950c9691e6749d1d"
 dependencies = [
  "aho-corasick",
  "memchr",
@@ -3688,9 +3656,9 @@ dependencies = [
 
 [[package]]
 name = "regex-syntax"
-version = "0.6.27"
+version = "0.6.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a3f87b73ce11b1619a3c6332f45341e0047173771e8b8b73f87bfeefb7b56244"
+checksum = "f162c6dd7b008981e4d40210aca20b4bd0f9b60ca9271061b07f78537722f2e1"
 
 [[package]]
 name = "request-handlers"
@@ -4208,36 +4176,7 @@ checksum = "6e63cff320ae2c57904679ba7cb63280a3dc4613885beafb148ee7bf9aa9042d"
 name = "sql-ddl"
 version = "0.1.0"
 dependencies = [
- "indoc",
-]
-
-[[package]]
-name = "sql-introspection-connector"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "bigdecimal",
- "datamodel-renderer",
- "either",
- "enumflags2",
- "expect-test",
- "introspection-connector",
- "once_cell",
- "pretty_assertions",
- "prisma-value",
- "psl",
- "quaint",
- "regex",
- "serde",
- "serde_json",
- "sql-schema-describer",
- "sqlformat",
- "sqlparser",
- "thiserror",
- "tracing",
- "tracing-futures",
- "user-facing-errors",
+ "indoc 1.0.7",
 ]
 
 [[package]]
@@ -4246,18 +4185,22 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "connection-string",
+ "datamodel-renderer",
  "either",
  "enumflags2",
- "indoc",
+ "indoc 1.0.7",
  "migration-connector",
  "once_cell",
+ "prisma-value",
  "psl",
  "quaint",
  "regex",
+ "serde",
  "serde_json",
  "sql-ddl",
- "sql-introspection-connector",
  "sql-schema-describer",
+ "sqlformat",
+ "sqlparser",
  "tokio",
  "tracing",
  "tracing-futures",
@@ -4306,7 +4249,7 @@ dependencies = [
  "enumflags2",
  "expect-test",
  "indexmap",
- "indoc",
+ "indoc 1.0.7",
  "once_cell",
  "pretty_assertions",
  "prisma-value",
@@ -4474,7 +4417,6 @@ dependencies = [
  "colored",
  "dmmf",
  "enumflags2",
- "introspection-connector",
  "migration-connector",
  "migration-core",
  "psl",
@@ -5139,7 +5081,7 @@ name = "user-facing-errors"
 version = "0.1.0"
 dependencies = [
  "backtrace",
- "indoc",
+ "indoc 1.0.7",
  "itertools",
  "quaint",
  "serde",

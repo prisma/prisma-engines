@@ -1,7 +1,7 @@
 use super::SqlSchemaDifferFlavour;
 use crate::{
     flavour::MssqlFlavour,
-    pair::Pair,
+    migration_pair::MigrationPair,
     sql_migration::SqlMigrationStep,
     sql_schema_differ::{column::ColumnTypeChange, differ_database::DifferDatabase, table::TableDiffer, ColumnChanges},
 };
@@ -53,7 +53,7 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
             .collect();
     }
 
-    fn column_type_change(&self, differ: Pair<sql::TableColumnWalker<'_>>) -> Option<ColumnTypeChange> {
+    fn column_type_change(&self, differ: MigrationPair<sql::TableColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         let previous_family = differ.previous.column_type_family();
         let next_family = differ.next.column_type_family();
         let previous_type: Option<&MsSqlType> = differ.previous.column_native_type();
@@ -65,7 +65,7 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
         }
     }
 
-    fn primary_key_changed(&self, tables: Pair<sql::TableWalker<'_>>) -> bool {
+    fn primary_key_changed(&self, tables: MigrationPair<sql::TableWalker<'_>>) -> bool {
         let pk_clusterings = tables.map(|t| {
             let ext: &MssqlSchemaExt = t.schema.downcast_connector_data();
             t.primary_key().map(|pk| ext.index_is_clustered(pk.id)).unwrap_or(false)
@@ -76,7 +76,7 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
     fn push_index_changes_for_column_changes(
         &self,
         table: &TableDiffer<'_, '_>,
-        column_id: Pair<TableColumnId>,
+        column_id: MigrationPair<TableColumnId>,
         column_changes: ColumnChanges,
         steps: &mut Vec<SqlMigrationStep>,
     ) {

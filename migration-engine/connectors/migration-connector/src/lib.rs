@@ -9,6 +9,8 @@ mod database_schema;
 mod destructive_change_checker;
 mod diff;
 mod error;
+mod introspection_context;
+mod introspection_result;
 mod migration;
 mod migration_connector;
 mod migration_persistence;
@@ -25,9 +27,8 @@ pub use destructive_change_checker::{
 };
 pub use diff::DiffTarget;
 pub use error::{ConnectorError, ConnectorResult};
-pub use introspection_connector::{
-    CompositeTypeDepth, IntrospectionConnector, IntrospectionContext, IntrospectionResult, Version, ViewDefinition,
-};
+pub use introspection_context::{CompositeTypeDepth, IntrospectionContext};
+pub use introspection_result::{IntrospectionResult, IntrospectionResultOutput, Version, ViewDefinition, Warning};
 pub use migration::Migration;
 pub use migration_connector::MigrationConnector;
 pub use migration_persistence::{MigrationPersistence, MigrationRecord, PersistenceNotInitializedError, Timestamp};

@@ -1,5 +1,5 @@
 use crate::{
-    pair::Pair,
+    migration_pair::MigrationPair,
     sql_renderer::IteratorJoin,
     sql_schema_differ::{ColumnChange, ColumnChanges},
 };
@@ -20,8 +20,8 @@ pub struct SqlMigration {
 }
 
 impl SqlMigration {
-    pub(crate) fn schemas(&self) -> Pair<&SqlSchema> {
-        Pair::new(&self.before, &self.after)
+    pub(crate) fn schemas(&self) -> MigrationPair<&SqlSchema> {
+        MigrationPair::new(&self.before, &self.after)
     }
 
     /// Exposed for tests.
@@ -412,7 +412,7 @@ impl SqlMigration {
     }
 }
 
-fn render_column_changes(columns: Pair<TableColumnWalker<'_>>, changes: &ColumnChanges, sink: &mut String) {
+fn render_column_changes(columns: MigrationPair<TableColumnWalker<'_>>, changes: &ColumnChanges, sink: &mut String) {
     let readable_changes = changes
         .iter()
         .map(|change| match change {
@@ -452,7 +452,7 @@ pub(crate) enum SqlMigrationStep {
     DropExtension(DropExtension),
     CreateExtension(CreateExtension),
     AlterExtension(AlterExtension),
-    AlterSequence(Pair<u32>, SequenceChanges),
+    AlterSequence(MigrationPair<u32>, SequenceChanges),
     DropView(DropView),
     DropUserDefinedType(DropUserDefinedType),
     CreateEnum(sql_schema_describer::EnumId),
@@ -464,7 +464,7 @@ pub(crate) enum SqlMigrationStep {
         index_id: IndexId,
     },
     AlterTable(AlterTable),
-    AlterPrimaryKey(Pair<TableId>),
+    AlterPrimaryKey(MigrationPair<TableId>),
     // Order matters: we must drop tables before we create indexes,
     // because on Postgres and SQLite, we may create indexes whose names
     // clash with the names of indexes on the dropped tables.
@@ -490,7 +490,7 @@ pub(crate) enum SqlMigrationStep {
         from_drop_and_recreate: bool,
     },
     RenameForeignKey {
-        foreign_key_id: Pair<ForeignKeyId>,
+        foreign_key_id: MigrationPair<ForeignKeyId>,
     },
     // Order matters: this needs to come after create_indexes, because the foreign keys can depend on unique
     // indexes created there.
@@ -498,10 +498,10 @@ pub(crate) enum SqlMigrationStep {
         foreign_key_id: ForeignKeyId,
     },
     RenameIndex {
-        index: Pair<IndexId>,
+        index: MigrationPair<IndexId>,
     },
     RedefineIndex {
-        index: Pair<IndexId>,
+        index: MigrationPair<IndexId>,
     },
 }
 
@@ -536,7 +536,7 @@ impl SqlMigrationStep {
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct AlterExtension {
-    pub ids: Pair<postgres::ExtensionId>,
+    pub ids: MigrationPair<postgres::ExtensionId>,
     pub changes: Vec<ExtensionChange>,
 }
 
@@ -558,7 +558,7 @@ pub(crate) enum ExtensionChange {
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct AlterTable {
-    pub table_ids: Pair<TableId>,
+    pub table_ids: MigrationPair<TableId>,
     pub changes: Vec<TableChange>,
 }
 
@@ -573,7 +573,7 @@ pub(crate) enum TableChange {
         column_id: TableColumnId,
     },
     DropAndRecreateColumn {
-        column_id: Pair<TableColumnId>,
+        column_id: MigrationPair<TableColumnId>,
         /// The change mask for the column.
         changes: ColumnChanges,
     },
@@ -606,7 +606,7 @@ impl DropUserDefinedType {
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct AlterColumn {
-    pub column_id: Pair<TableColumnId>,
+    pub column_id: MigrationPair<TableColumnId>,
     pub changes: ColumnChanges,
     pub type_change: Option<ColumnTypeChange>,
 }
@@ -620,7 +620,7 @@ pub(crate) enum ColumnTypeChange {
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct AlterEnum {
-    pub id: Pair<EnumId>,
+    pub id: MigrationPair<EnumId>,
     pub created_variants: Vec<String>,
     pub dropped_variants: Vec<String>,
     /// This should be intepreted as prev_colidx, Option<next_colidx>) The second item in the tuple
@@ -642,8 +642,8 @@ pub(crate) struct RedefineTable {
     pub added_columns_with_virtual_defaults: Vec<TableColumnId>,
     pub dropped_columns: Vec<TableColumnId>,
     pub dropped_primary_key: bool,
-    pub column_pairs: Vec<(Pair<TableColumnId>, ColumnChanges, Option<ColumnTypeChange>)>,
-    pub table_ids: Pair<TableId>,
+    pub column_pairs: Vec<(MigrationPair<TableColumnId>, ColumnChanges, Option<ColumnTypeChange>)>,
+    pub table_ids: MigrationPair<TableId>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

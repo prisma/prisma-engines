@@ -1,17 +1,17 @@
 use super::{differ_database::DifferDatabase, foreign_keys_match};
-use crate::{flavour::SqlFlavour, pair::Pair};
+use crate::{flavour::SqlFlavour, migration_pair::MigrationPair};
 use sql_schema_describer::{
     walkers::{ForeignKeyWalker, IndexWalker, TableColumnWalker, TableWalker},
     TableId,
 };
 
 pub(crate) struct TableDiffer<'a, 'b> {
-    pub(crate) tables: Pair<TableWalker<'a>>,
+    pub(crate) tables: MigrationPair<TableWalker<'a>>,
     pub(crate) db: &'b DifferDatabase<'a>,
 }
 
 impl<'schema, 'b> TableDiffer<'schema, 'b> {
-    pub(crate) fn column_pairs(&self) -> impl Iterator<Item = Pair<TableColumnWalker<'schema>>> + '_ {
+    pub(crate) fn column_pairs(&self) -> impl Iterator<Item = MigrationPair<TableColumnWalker<'schema>>> + '_ {
         self.db
             .column_pairs(self.tables.map(|t| t.id))
             .map(move |colids| self.db.schemas.walk(colids))
@@ -38,7 +38,7 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
         self.next_foreign_keys().filter(move |next_fk| {
             !self
                 .previous_foreign_keys()
-                .any(|previous_fk| super::foreign_keys_match(Pair::new(&previous_fk, next_fk), self.db))
+                .any(|previous_fk| super::foreign_keys_match(MigrationPair::new(&previous_fk, next_fk), self.db))
         })
     }
 
@@ -46,7 +46,7 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
         self.previous_foreign_keys().filter(move |previous_fk| {
             !self
                 .next_foreign_keys()
-                .any(|next_fk| super::foreign_keys_match(Pair::new(previous_fk, &next_fk), self.db))
+                .any(|next_fk| super::foreign_keys_match(MigrationPair::new(previous_fk, &next_fk), self.db))
         })
     }
 
@@ -66,15 +66,15 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
         })
     }
 
-    pub(crate) fn foreign_key_pairs(&self) -> impl Iterator<Item = Pair<ForeignKeyWalker<'schema>>> + '_ {
+    pub(crate) fn foreign_key_pairs(&self) -> impl Iterator<Item = MigrationPair<ForeignKeyWalker<'schema>>> + '_ {
         self.previous_foreign_keys().filter_map(move |previous_fk| {
             self.next_foreign_keys()
-                .find(move |next_fk| foreign_keys_match(Pair::new(&previous_fk, next_fk), self.db))
-                .map(move |next_fk| Pair::new(previous_fk, next_fk))
+                .find(move |next_fk| foreign_keys_match(MigrationPair::new(&previous_fk, next_fk), self.db))
+                .map(move |next_fk| MigrationPair::new(previous_fk, next_fk))
         })
     }
 
-    pub(crate) fn index_pairs<'a>(&'a self) -> impl Iterator<Item = Pair<IndexWalker<'schema>>> + 'a {
+    pub(crate) fn index_pairs<'a>(&'a self) -> impl Iterator<Item = MigrationPair<IndexWalker<'schema>>> + 'a {
         let singular_indexes = self.previous_indexes().filter(move |left| {
             // Renaming an index in a situation where we have multiple indexes
             // with the same columns, but a different name, is highly unstable.
@@ -94,7 +94,7 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
         singular_indexes.filter_map(move |previous_index| {
             self.next_indexes()
                 .find(|next_index| indexes_match(previous_index, *next_index, self.db.flavour))
-                .map(|renamed_index| Pair::new(previous_index, renamed_index))
+                .map(|renamed_index| MigrationPair::new(previous_index, renamed_index))
         })
     }
 
@@ -174,7 +174,7 @@ impl<'schema, 'b> TableDiffer<'schema, 'b> {
         self.tables.next
     }
 
-    pub(super) fn table_ids(&self) -> Pair<TableId> {
+    pub(super) fn table_ids(&self) -> MigrationPair<TableId> {
         self.tables.map(|t| t.id)
     }
 }
