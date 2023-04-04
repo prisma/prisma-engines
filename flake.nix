@@ -33,6 +33,7 @@
           ./nix/args.nix
           ./nix/cargo-doc.nix
           ./nix/cli-shell.nix
+          ./nix/cli-prisma.nix
           ./nix/dev-vm.nix
           ./nix/memory-profiling.nix
           ./nix/prisma-fmt-wasm.nix

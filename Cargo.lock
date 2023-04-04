@@ -3883,6 +3883,7 @@ dependencies = [
  "once_cell",
  "prisma-models",
  "psl",
+ "rustc-hash",
  "schema",
 ]
 
