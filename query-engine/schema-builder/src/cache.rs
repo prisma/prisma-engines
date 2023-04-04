@@ -7,20 +7,20 @@
 //!   collect all types of the query schema.
 
 use super::Identifier;
-use std::{collections::HashMap, fmt::Debug};
+use std::fmt::Debug;
 
 /// HashMap wrapper. Caches keys at most once, and errors on repeated insertion of the same key to
 /// uphold schema building consistency guarantees.
 #[derive(Debug, Default)]
 pub(crate) struct TypeRefCache<T> {
-    cache: HashMap<Identifier, T>,
+    cache: rustc_hash::FxHashMap<Identifier, T>,
 }
 
 impl<T: Copy + Debug> TypeRefCache<T> {
     pub(crate) fn with_capacity(capacity: usize) -> Self {
-        TypeRefCache {
-            cache: HashMap::with_capacity(capacity),
-        }
+        let mut cache = rustc_hash::FxHashMap::default();
+        cache.reserve(capacity);
+        TypeRefCache { cache }
     }
 
     pub(crate) fn get(&self, ident: &Identifier) -> Option<T> {
