@@ -821,7 +821,7 @@ pub(crate) mod conversions {
             .iter()
             .map(|field| {
                 let name = field.name.to_owned();
-                let type_name = to_simplified_output_type_name(field.field_type.as_ref(), query_schema);
+                let type_name = to_simplified_output_type_name(&field.field_type, query_schema);
                 let is_relation = field.maps_to_relation(query_schema);
 
                 validation::OutputTypeDescriptionField::new(name, type_name, is_relation)
