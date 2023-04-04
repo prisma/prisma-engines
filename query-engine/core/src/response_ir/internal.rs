@@ -367,10 +367,7 @@ fn serialize_objects(
                 }
 
                 _ if !out_field.field_type.is_object() => {
-                    object.insert(
-                        field.name().to_owned(),
-                        serialize_scalar(out_field, val, query_schema)?,
-                    );
+                    object.insert(field.name().to_owned(), serialize_scalar(out_field, val, query_schema)?);
                 }
 
                 _ => (),
