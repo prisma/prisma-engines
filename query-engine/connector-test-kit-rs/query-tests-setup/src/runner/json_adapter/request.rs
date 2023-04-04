@@ -29,7 +29,7 @@ impl JsonRequest {
         let output = JsonSingleQuery {
             model_name,
             action: Action::new(query_tag),
-            query: graphql_selection_to_json_field_query(selection, &schema_field, query_schema.as_ref()),
+            query: graphql_selection_to_json_field_query(selection, schema_field, query_schema.as_ref()),
         };
 
         Ok(output)
@@ -151,7 +151,7 @@ fn graphql_selection_to_json_selection(
 
             let nested = SelectionSetValue::Nested(graphql_selection_to_json_field_query(
                 nested_selection,
-                &nested_field,
+                nested_field,
                 query_schema,
             ));
 

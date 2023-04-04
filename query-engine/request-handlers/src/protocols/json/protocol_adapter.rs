@@ -118,7 +118,7 @@ impl JsonProtocolAdapter {
                         }
 
                         selection.push_nested_selection(Self::convert_selection(
-                            &schema_field,
+                            schema_field,
                             nested_container.as_ref(),
                             nested_query,
                             query_schema,
