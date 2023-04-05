@@ -43,6 +43,7 @@
 <a href="#43" id="43">43</a>
 <a href="#44" id="44">44</a>
 <a href="#45" id="45">45</a>
+<a href="#46" id="46">46</a>
 </pre><pre class="rust"><code><span class="attr">#![deny(rust_2018_idioms)]
 
 #[macro_use]
@@ -63,6 +64,7 @@
     query_document::<span class="kw-2">*</span>,
     telemetry::<span class="kw-2">*</span>,
 };
+<span class="kw">pub use </span>connector::{error::ConnectorError, Connector};
 
 <span class="kw">mod </span>error;
 <span class="kw">mod </span>interactive_transactions;

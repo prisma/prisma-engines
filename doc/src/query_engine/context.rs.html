@@ -129,13 +129,15 @@
 <a href="#129" id="129">129</a>
 <a href="#130" id="130">130</a>
 <a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::features::{EnabledFeatures, Feature};
 <span class="kw">use crate</span>::{logger::Logger, opt::PrismaOpt};
 <span class="kw">use crate</span>::{PrismaError, PrismaResult};
 <span class="kw">use </span>psl::PreviewFeature;
-<span class="kw">use </span>query_core::{executor, protocol::EngineProtocol, schema::QuerySchemaRef, schema_builder, QueryExecutor};
+<span class="kw">use </span>query_core::{protocol::EngineProtocol, schema::QuerySchemaRef, schema_builder, QueryExecutor};
 <span class="kw">use </span>query_engine_metrics::setup <span class="kw">as </span>metric_setup;
 <span class="kw">use </span>query_engine_metrics::MetricRegistry;
+<span class="kw">use </span>request_handlers::load_executor;
 <span class="kw">use </span>std::{env, fmt, sync::Arc};
 <span class="kw">use </span>tracing::Instrument;
 
@@ -177,7 +179,7 @@
         <span class="kw">let </span>url = data_source.load_url(|key| env::var(key).ok())<span class="question-mark">?</span>;
 
         <span class="comment">// Load executor
-        </span><span class="kw">let </span>executor = executor::load(data_source, config.preview_features(), <span class="kw-2">&amp;</span>url).<span class="kw">await</span><span class="question-mark">?</span>;
+        </span><span class="kw">let </span>executor = load_executor(data_source, config.preview_features(), <span class="kw-2">&amp;</span>url).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="comment">// Build internal data model
         </span><span class="kw">let </span>internal_data_model = prisma_models::convert(Arc::new(schema));

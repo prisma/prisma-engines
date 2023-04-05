@@ -284,7 +284,7 @@
 <span class="kw">pub use </span>json_adapter::<span class="kw-2">*</span>;
 <span class="kw">use </span>quaint::{prelude::Queryable, single::Quaint};
 <span class="kw">use </span>query_core::{
-    executor, protocol::EngineProtocol, schema::QuerySchemaRef, schema_builder, QueryExecutor, TransactionOptions, TxId,
+    protocol::EngineProtocol, schema::QuerySchemaRef, schema_builder, QueryExecutor, TransactionOptions, TxId,
 };
 <span class="kw">use </span>query_engine_metrics::MetricRegistry;
 
@@ -292,8 +292,8 @@
 
 <span class="kw">use </span>colored::Colorize;
 <span class="kw">use </span>request_handlers::{
-    BatchTransactionOption, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery, RequestBody,
-    RequestHandler,
+    load_executor, BatchTransactionOption, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery,
+    RequestBody, RequestHandler,
 };
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>Executor = Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync&gt;;
@@ -321,7 +321,7 @@
         <span class="kw">let </span>schema = psl::parse_schema(datamodel).unwrap();
         <span class="kw">let </span>data_source = schema.configuration.datasources.first().unwrap();
         <span class="kw">let </span>url = data_source.load_url(|key| env::var(key).ok()).unwrap();
-        <span class="kw">let </span>executor = executor::load(data_source, schema.configuration.preview_features(), <span class="kw-2">&amp;</span>url).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>executor = load_executor(data_source, schema.configuration.preview_features(), <span class="kw-2">&amp;</span>url).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let </span>internal_data_model = prisma_models::convert(Arc::new(schema));
 
         <span class="kw">let </span>query_schema: QuerySchemaRef = Arc::new(schema_builder::build(internal_data_model, <span class="bool-val">true</span>));

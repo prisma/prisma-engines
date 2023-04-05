@@ -263,18 +263,6 @@
 <a href="#263" id="263">263</a>
 <a href="#264" id="264">264</a>
 <a href="#265" id="265">265</a>
-<a href="#266" id="266">266</a>
-<a href="#267" id="267">267</a>
-<a href="#268" id="268">268</a>
-<a href="#269" id="269">269</a>
-<a href="#270" id="270">270</a>
-<a href="#271" id="271">271</a>
-<a href="#272" id="272">272</a>
-<a href="#273" id="273">273</a>
-<a href="#274" id="274">274</a>
-<a href="#275" id="275">275</a>
-<a href="#276" id="276">276</a>
-<a href="#277" id="277">277</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{InterpreterError, QueryGraphBuilderError, QueryGraphError, RelationViolation, TransactionError};
 <span class="kw">use </span>bigdecimal::BigDecimal;
 <span class="kw">use </span>connector::error::ConnectorError;
@@ -407,18 +395,6 @@
 <span class="kw">impl </span>From&lt;InterpreterError&gt; <span class="kw">for </span>CoreError {
     <span class="kw">fn </span>from(e: InterpreterError) -&gt; CoreError {
         CoreError::InterpreterError(e)
-    }
-}
-
-<span class="kw">impl </span>From&lt;url::ParseError&gt; <span class="kw">for </span>CoreError {
-    <span class="kw">fn </span>from(e: url::ParseError) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::ConfigurationError(<span class="macro">format!</span>(<span class="string">&quot;Error parsing connection string: {e}&quot;</span>))
-    }
-}
-
-<span class="kw">impl </span>From&lt;connection_string::Error&gt; <span class="kw">for </span>CoreError {
-    <span class="kw">fn </span>from(e: connection_string::Error) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::ConfigurationError(<span class="macro">format!</span>(<span class="string">&quot;Error parsing connection string: {e}&quot;</span>))
     }
 }
 

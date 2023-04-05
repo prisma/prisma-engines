@@ -36,16 +36,18 @@
 <a href="#36" id="36">36</a>
 <a href="#37" id="37">37</a>
 <a href="#38" id="38">38</a>
+<a href="#39" id="39">39</a>
 </pre><pre class="rust"><code><span class="attr">#![allow(clippy::upper_case_acronyms)]
 
 </span><span class="kw">pub mod </span>dmmf;
 
 <span class="kw">mod </span>error;
 <span class="kw">mod </span>handler;
+<span class="kw">mod </span>load_executor;
 <span class="kw">mod </span>protocols;
 <span class="kw">mod </span>response;
 
-<span class="kw">pub use </span>error::HandlerError;
+<span class="kw">pub use </span><span class="self">self</span>::{error::HandlerError, load_executor::load <span class="kw">as </span>load_executor};
 <span class="kw">pub use </span>handler::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>protocols::{graphql::<span class="kw-2">*</span>, json::<span class="kw-2">*</span>, RequestBody};
 <span class="kw">pub use </span>response::<span class="kw-2">*</span>;
