@@ -13,7 +13,7 @@ use url::Url;
 use user_facing_errors::{common::DatabaseDoesNotExist, UserFacingError};
 
 fn migration_engine_bin_path() -> &'static str {
-    env!("CARGO_BIN_EXE_schema-engine")
+    env!("CARGO_BIN_EXE_migration-engine")
 }
 
 fn run(args: &[&str]) -> Output {

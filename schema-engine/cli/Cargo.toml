@@ -29,7 +29,8 @@ expect-test = "1.4.0"
 quaint.workspace = true
 
 [[bin]]
-name = "schema-engine"
+# Rename to schema-engine when releasing Prisma 5
+name = "migration-engine"
 path = "src/main.rs"
 
 [features]
