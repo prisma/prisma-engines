@@ -15,7 +15,7 @@ use percent_encoding::percent_decode;
 use postgres_native_tls::MakeTlsConnector;
 use std::{
     borrow::{Borrow, Cow},
-    fmt::{Debug, Display},
+    fmt::Debug,
     fs,
     future::Future,
     sync::atomic::{AtomicBool, Ordering},
@@ -486,7 +486,11 @@ impl PostgresUrl {
 
         if let Some(connect_timeout) = self.query_params.connect_timeout {
             config.connect_timeout(connect_timeout);
-        };
+        }
+
+        if let Some(schema) = &self.query_params.schema {
+            config.search_path(schema.clone());
+        }
 
         config.ssl_mode(self.query_params.ssl_mode);
 
@@ -546,20 +550,6 @@ impl PostgreSql {
                 tracing::error!("Error in PostgreSQL connection: {:?}", e);
             }
         }));
-
-        // SET NAMES sets the client text encoding. It needs to be explicitly set for automatic
-        // conversion to and from UTF-8 to happen server-side.
-        //
-        // Relevant docs: https://www.postgresql.org/docs/current/multibyte.html
-        let session_variables = format!(
-            r##"
-            {set_search_path}
-            SET NAMES 'UTF8';
-            "##,
-            set_search_path = SetSearchPath(url.query_params.schema.as_deref())
-        );
-
-        client.simple_query(session_variables.as_str()).await?;
 
         Ok(Self {
             client: PostgresClient(client),
@@ -638,21 +628,6 @@ impl PostgreSql {
         } else {
             Ok(())
         }
-    }
-}
-
-// A SetSearchPath statement (Display-impl) for connection initialization.
-struct SetSearchPath<'a>(Option<&'a str>);
-
-impl Display for SetSearchPath<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if let Some(schema) = self.0 {
-            f.write_str("SET search_path = \"")?;
-            f.write_str(schema)?;
-            f.write_str("\";\n")?;
-        }
-
-        Ok(())
     }
 }
 
@@ -916,7 +891,7 @@ mod tests {
         let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
         let row = result_set.first().unwrap();
 
-        assert_eq!(Some("\"musti-test\""), row[0].as_str());
+        assert_eq!(Some("musti-test"), row[0].as_str());
     }
 
     #[tokio::test]
