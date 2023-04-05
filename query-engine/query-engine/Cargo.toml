@@ -40,6 +40,6 @@ query-engine-metrics = {path = "../metrics"}
 user-facing-errors = {path = "../../libs/user-facing-errors"}
 
 [dev-dependencies]
-indoc = "1"
 serial_test = "*"
 quaint.workspace = true
+indoc.workspace = true

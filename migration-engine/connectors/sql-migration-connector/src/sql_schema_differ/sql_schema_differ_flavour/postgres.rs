@@ -2,7 +2,7 @@ use super::SqlSchemaDifferFlavour;
 use crate::{
     database_schema::SqlDatabaseSchema,
     flavour::PostgresFlavour,
-    pair::Pair,
+    migration_pair::MigrationPair,
     sql_migration::{
         AlterEnum, AlterExtension, CreateExtension, DropExtension, ExtensionChange, SequenceChange, SequenceChanges,
         SqlMigrationStep,
@@ -44,7 +44,7 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         true
     }
 
-    fn column_autoincrement_changed(&self, columns: Pair<TableColumnWalker<'_>>) -> bool {
+    fn column_autoincrement_changed(&self, columns: MigrationPair<TableColumnWalker<'_>>) -> bool {
         if self.is_cockroachdb() {
             return false;
         }
@@ -52,7 +52,7 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         columns.previous.is_autoincrement() != columns.next.is_autoincrement()
     }
 
-    fn column_type_change(&self, columns: Pair<TableColumnWalker<'_>>) -> Option<ColumnTypeChange> {
+    fn column_type_change(&self, columns: MigrationPair<TableColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         // Handle the enum cases first.
         match columns
             .map(|col| col.column_type_family_as_enum().map(|e| (e.name(), e.namespace())))
@@ -102,7 +102,7 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
             return;
         }
 
-        let schemas: Pair<(&SqlDatabaseSchema, &PostgresSchemaExt)> = db
+        let schemas: MigrationPair<(&SqlDatabaseSchema, &PostgresSchemaExt)> = db
             .schemas
             .map(|schema| (schema, schema.describer_schema.downcast_connector_data()));
 
@@ -187,7 +187,7 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         true
     }
 
-    fn index_should_be_renamed(&self, pair: Pair<IndexWalker<'_>>) -> bool {
+    fn index_should_be_renamed(&self, pair: MigrationPair<IndexWalker<'_>>) -> bool {
         // Implements correct comparison for truncated index names.
         let (previous_name, next_name) = pair.map(|idx| idx.name()).into_tuple();
 
@@ -263,7 +263,7 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
             }
 
             steps.push(SqlMigrationStep::AlterExtension(AlterExtension {
-                ids: Pair::new(ext.previous.id, ext.next.id),
+                ids: MigrationPair::new(ext.previous.id, ext.next.id),
                 changes,
             }));
         }
@@ -274,13 +274,13 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
     }
 
     fn define_extensions(&self, db: &mut DifferDatabase<'_>) {
-        let schemas: Pair<(&SqlDatabaseSchema, &PostgresSchemaExt)> = db
+        let schemas: MigrationPair<(&SqlDatabaseSchema, &PostgresSchemaExt)> = db
             .schemas
             .map(|schema| (schema, schema.describer_schema.downcast_connector_data()));
 
         for extension in schemas.previous.1.extension_walkers() {
             db.extensions
-                .insert(extension.name(), Pair::new(Some(extension.id), None));
+                .insert(extension.name(), MigrationPair::new(Some(extension.id), None));
         }
 
         for extension in schemas.next.1.extension_walkers() {
@@ -290,7 +290,7 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
     }
 }
 
-fn cockroach_column_type_change(columns: Pair<TableColumnWalker<'_>>) -> Option<ColumnTypeChange> {
+fn cockroach_column_type_change(columns: MigrationPair<TableColumnWalker<'_>>) -> Option<ColumnTypeChange> {
     use ColumnTypeChange::*;
 
     let previous_type: Option<&CockroachType> = columns.previous.column_native_type();
@@ -320,7 +320,7 @@ fn cockroach_column_type_change(columns: Pair<TableColumnWalker<'_>>) -> Option<
 fn cockroach_native_type_change_riskyness(
     previous: CockroachType,
     next: CockroachType,
-    columns: Pair<TableColumnWalker<'_>>,
+    columns: MigrationPair<TableColumnWalker<'_>>,
 ) -> Option<ColumnTypeChange> {
     let covered_by_index = columns
         .map(|col| col.is_part_of_secondary_index() || col.is_part_of_primary_key())
@@ -344,7 +344,7 @@ fn cockroach_native_type_change_riskyness(
     }
 }
 
-fn postgres_column_type_change(columns: Pair<TableColumnWalker<'_>>) -> Option<ColumnTypeChange> {
+fn postgres_column_type_change(columns: MigrationPair<TableColumnWalker<'_>>) -> Option<ColumnTypeChange> {
     use ColumnTypeChange::*;
     let previous_type: Option<&PostgresType> = columns.previous.column_native_type();
     let next_type: Option<&PostgresType> = columns.next.column_native_type();

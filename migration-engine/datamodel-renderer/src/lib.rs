@@ -29,7 +29,6 @@
 //!       provider = "postgres"
 //!       url      = env("DATABASE_URL")
 //!     }
-//!
 //! "#};
 //!
 //! assert_eq!(expected, &rendered);
@@ -57,7 +56,6 @@
 //!     model A {
 //!       id Int @id
 //!     }
-//!
 //! "#};
 //!
 //! assert_eq!(expected, &rendered);

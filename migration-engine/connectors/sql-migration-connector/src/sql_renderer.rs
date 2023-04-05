@@ -18,7 +18,7 @@ pub(crate) use common::IteratorJoin;
 
 use self::common::{Quoted, QuotedWithPrefix};
 use crate::{
-    pair::Pair,
+    migration_pair::MigrationPair,
     sql_migration::{
         AlterEnum, AlterExtension, AlterTable, CreateExtension, DropExtension, RedefineTable, SequenceChanges,
     },
@@ -34,25 +34,30 @@ pub(crate) trait SqlRenderer {
 
     fn render_add_foreign_key(&self, foreign_key: ForeignKeyWalker<'_>) -> String;
 
-    fn render_alter_enum(&self, alter_enum: &AlterEnum, schemas: Pair<&SqlSchema>) -> Vec<String>;
+    fn render_alter_enum(&self, alter_enum: &AlterEnum, schemas: MigrationPair<&SqlSchema>) -> Vec<String>;
 
-    fn render_alter_primary_key(&self, _tables: Pair<TableWalker<'_>>) -> Vec<String> {
+    fn render_alter_primary_key(&self, _tables: MigrationPair<TableWalker<'_>>) -> Vec<String> {
         unreachable!("unreachable render_alter_primary_key()")
     }
 
-    fn render_alter_sequence(&self, _idx: Pair<u32>, _: SequenceChanges, _: Pair<&SqlSchema>) -> Vec<String> {
+    fn render_alter_sequence(
+        &self,
+        _idx: MigrationPair<u32>,
+        _: SequenceChanges,
+        _: MigrationPair<&SqlSchema>,
+    ) -> Vec<String> {
         unreachable!("unreachable render_alter_sequence");
     }
 
-    fn render_rename_index(&self, _indexes: Pair<IndexWalker<'_>>) -> Vec<String> {
+    fn render_rename_index(&self, _indexes: MigrationPair<IndexWalker<'_>>) -> Vec<String> {
         unreachable!("unreachable render_alter_index")
     }
 
-    fn render_rename_primary_key(&self, _tables: Pair<TableWalker<'_>>) -> Vec<String> {
+    fn render_rename_primary_key(&self, _tables: MigrationPair<TableWalker<'_>>) -> Vec<String> {
         unreachable!("unreachable render_rename_index")
     }
 
-    fn render_alter_table(&self, alter_table: &AlterTable, schemas: Pair<&SqlSchema>) -> Vec<String>;
+    fn render_alter_table(&self, alter_table: &AlterTable, schemas: MigrationPair<&SqlSchema>) -> Vec<String>;
 
     /// Render a `CreateEnum` step.
     fn render_create_enum(&self, create_enum: EnumWalker<'_>) -> Vec<String>;
@@ -65,7 +70,7 @@ pub(crate) trait SqlRenderer {
     /// Render a table creation with the provided table name.
     fn render_create_table_as(&self, table: TableWalker<'_>, table_name: QuotedWithPrefix<&str>) -> String;
 
-    fn render_drop_and_recreate_index(&self, _indexes: Pair<IndexWalker<'_>>) -> Vec<String> {
+    fn render_drop_and_recreate_index(&self, _indexes: MigrationPair<IndexWalker<'_>>) -> Vec<String> {
         unreachable!("unreachable render_drop_and_recreate_index")
     }
 
@@ -88,7 +93,7 @@ pub(crate) trait SqlRenderer {
     }
 
     /// Render a `RedefineTables` step.
-    fn render_redefine_tables(&self, tables: &[RedefineTable], schemas: Pair<&SqlSchema>) -> Vec<String>;
+    fn render_redefine_tables(&self, tables: &[RedefineTable], schemas: MigrationPair<&SqlSchema>) -> Vec<String>;
 
     /// Render a table renaming step.
     fn render_rename_table(&self, namespace: Option<&str>, name: &str, new_name: &str) -> String;
@@ -110,7 +115,7 @@ pub(crate) trait SqlRenderer {
     }
 
     /// Render a `RenameForeignKey` step.
-    fn render_rename_foreign_key(&self, fks: Pair<ForeignKeyWalker<'_>>) -> String;
+    fn render_rename_foreign_key(&self, fks: MigrationPair<ForeignKeyWalker<'_>>) -> String;
 
     fn render_create_namespace(&self, _namespace: sql::NamespaceWalker<'_>) -> String {
         unreachable!()
@@ -120,7 +125,7 @@ pub(crate) trait SqlRenderer {
         unreachable!("render_create_extension")
     }
 
-    fn render_alter_extension(&self, _alter: &AlterExtension, _schemas: Pair<&SqlSchema>) -> Vec<String> {
+    fn render_alter_extension(&self, _alter: &AlterExtension, _schemas: MigrationPair<&SqlSchema>) -> Vec<String> {
         unreachable!("render_alter_extension")
     }
 

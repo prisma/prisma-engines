@@ -9,9 +9,9 @@ dmmf = { path = "../query-engine/dmmf"}
 psl.workspace = true
 serde_json.workspace = true
 serde.workspace = true
+indoc.workspace = true
 lsp-types = "0.91.1"
 log = "0.4.14"
-indoc = "1"
 enumflags2 = "0.7"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]

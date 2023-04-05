@@ -7,7 +7,7 @@ use super::{
     check::{Column, Table},
     DestructiveCheckPlan,
 };
-use crate::{pair::Pair, sql_migration::AlterColumn, sql_schema_differ::ColumnChanges};
+use crate::{migration_pair::MigrationPair, sql_migration::AlterColumn, sql_schema_differ::ColumnChanges};
 use migration_connector::{BoxFuture, ConnectorError, ConnectorResult};
 use sql_schema_describer::walkers::TableColumnWalker;
 
@@ -17,7 +17,7 @@ pub(crate) trait DestructiveChangeCheckerFlavour {
     fn check_alter_column(
         &self,
         alter_column: &AlterColumn,
-        columns: &Pair<TableColumnWalker<'_>>,
+        columns: &MigrationPair<TableColumnWalker<'_>>,
         plan: &mut DestructiveCheckPlan,
         step_index: usize,
     );
@@ -25,7 +25,7 @@ pub(crate) trait DestructiveChangeCheckerFlavour {
     /// Check a DropAndRecreateColumn step.
     fn check_drop_and_recreate_column(
         &self,
-        columns: &Pair<TableColumnWalker<'_>>,
+        columns: &MigrationPair<TableColumnWalker<'_>>,
         changes: &ColumnChanges,
         plan: &mut DestructiveCheckPlan,
         step_index: usize,

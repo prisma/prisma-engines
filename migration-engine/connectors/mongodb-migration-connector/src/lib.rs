@@ -9,9 +9,11 @@ mod differ;
 mod migration;
 mod migration_persistence;
 mod migration_step_applier;
+mod sampler;
 mod schema_calculator;
+mod warnings;
 
-use client_wrapper::Client;
+use client_wrapper::{mongo_error_to_connector_error, Client};
 use enumflags2::BitFlags;
 use migration::MongoDbMigration;
 use migration_connector::{migrations_directory::MigrationDirectory, *};
@@ -168,21 +170,12 @@ impl MigrationConnector for MongoDbMigrationConnector {
         ctx: &'a IntrospectionContext,
     ) -> BoxFuture<'a, ConnectorResult<IntrospectionResult>> {
         Box::pin(async move {
-            let url: String = ctx
-                .datasource()
-                .load_direct_url(|v| std::env::var(v).ok())
-                .map_err(|err| {
-                    migration_connector::ConnectorError::new_schema_parser_error(
-                        err.to_pretty_string("schema.prisma", ctx.schema_string()),
-                    )
-                })?;
-            let connector = mongodb_introspection_connector::MongoDbIntrospectionConnector::new(&url)
+            let client = self.client().await?;
+            let schema = client.describe().await?;
+
+            sampler::sample(client.database(), schema, ctx)
                 .await
-                .map_err(|err| ConnectorError::from_source(err, "Introspection error"))?;
-            connector
-                .introspect(ctx)
-                .await
-                .map_err(|err| ConnectorError::from_source(err, "Introspection error"))
+                .map_err(mongo_error_to_connector_error)
         })
     }
 

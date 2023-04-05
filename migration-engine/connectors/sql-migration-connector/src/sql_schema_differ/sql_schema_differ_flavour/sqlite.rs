@@ -1,6 +1,6 @@
 use super::SqlSchemaDifferFlavour;
 use crate::{
-    flavour::SqliteFlavour, pair::Pair, sql_schema_differ::column::ColumnTypeChange,
+    flavour::SqliteFlavour, migration_pair::MigrationPair, sql_schema_differ::column::ColumnTypeChange,
     sql_schema_differ::differ_database::DifferDatabase,
 };
 use sql_schema_describer::{walkers::TableColumnWalker, ColumnTypeFamily};
@@ -18,11 +18,11 @@ impl SqlSchemaDifferFlavour for SqliteFlavour {
         false
     }
 
-    fn column_autoincrement_changed(&self, _columns: Pair<TableColumnWalker<'_>>) -> bool {
+    fn column_autoincrement_changed(&self, _columns: MigrationPair<TableColumnWalker<'_>>) -> bool {
         false
     }
 
-    fn column_type_change(&self, differ: Pair<TableColumnWalker<'_>>) -> Option<ColumnTypeChange> {
+    fn column_type_change(&self, differ: MigrationPair<TableColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         match (differ.previous.column_type_family(), differ.next.column_type_family()) {
             (a, b) if a == b => None,
             (_, ColumnTypeFamily::String) => Some(ColumnTypeChange::SafeCast),

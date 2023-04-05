@@ -1,7 +1,7 @@
 use super::{common::*, IteratorJoin, SqlRenderer};
 use crate::{
     flavour::MysqlFlavour,
-    pair::Pair,
+    migration_pair::MigrationPair,
     sql_migration::{AlterColumn, AlterEnum, AlterTable, RedefineTable, TableChange},
     sql_schema_differ::ColumnChanges,
 };
@@ -81,11 +81,11 @@ impl SqlRenderer for MysqlFlavour {
         .to_string()
     }
 
-    fn render_alter_enum(&self, _alter_enum: &AlterEnum, _differ: Pair<&SqlSchema>) -> Vec<String> {
+    fn render_alter_enum(&self, _alter_enum: &AlterEnum, _differ: MigrationPair<&SqlSchema>) -> Vec<String> {
         unreachable!("render_alter_enum on MySQL")
     }
 
-    fn render_rename_index(&self, indexes: Pair<IndexWalker<'_>>) -> Vec<String> {
+    fn render_rename_index(&self, indexes: MigrationPair<IndexWalker<'_>>) -> Vec<String> {
         render_step(&mut |step| {
             step.render_statement(&mut |stmt| {
                 stmt.push_display(&ddl::AlterTable {
@@ -99,7 +99,7 @@ impl SqlRenderer for MysqlFlavour {
         })
     }
 
-    fn render_alter_table(&self, alter_table: &AlterTable, schemas: Pair<&SqlSchema>) -> Vec<String> {
+    fn render_alter_table(&self, alter_table: &AlterTable, schemas: MigrationPair<&SqlSchema>) -> Vec<String> {
         let AlterTable {
             table_ids: table_index,
             changes,
@@ -270,7 +270,7 @@ impl SqlRenderer for MysqlFlavour {
         .to_string()
     }
 
-    fn render_drop_and_recreate_index(&self, indexes: Pair<IndexWalker<'_>>) -> Vec<String> {
+    fn render_drop_and_recreate_index(&self, indexes: MigrationPair<IndexWalker<'_>>) -> Vec<String> {
         // Order matters: dropping the old index first wouldn't work when foreign key constraints are still relying on it.
         vec![
             self.render_create_index(indexes.next),
@@ -314,7 +314,7 @@ impl SqlRenderer for MysqlFlavour {
         })
     }
 
-    fn render_redefine_tables(&self, _names: &[RedefineTable], _schemas: Pair<&SqlSchema>) -> Vec<String> {
+    fn render_redefine_tables(&self, _names: &[RedefineTable], _schemas: MigrationPair<&SqlSchema>) -> Vec<String> {
         unreachable!("render_redefine_table on MySQL")
     }
 
@@ -340,7 +340,7 @@ impl SqlRenderer for MysqlFlavour {
         unreachable!("render_drop_user_defined_type on MySQL")
     }
 
-    fn render_rename_foreign_key(&self, _fks: Pair<ForeignKeyWalker<'_>>) -> String {
+    fn render_rename_foreign_key(&self, _fks: MigrationPair<ForeignKeyWalker<'_>>) -> String {
         unreachable!("render RenameForeignKey on MySQL")
     }
 }
@@ -472,7 +472,7 @@ enum MysqlAlterColumn {
 }
 
 impl MysqlAlterColumn {
-    fn new(columns: Pair<TableColumnWalker<'_>>, changes: ColumnChanges) -> Self {
+    fn new(columns: MigrationPair<TableColumnWalker<'_>>, changes: ColumnChanges) -> Self {
         if changes.only_default_changed() && columns.next.default().is_none() {
             return MysqlAlterColumn::DropDefault;
         }

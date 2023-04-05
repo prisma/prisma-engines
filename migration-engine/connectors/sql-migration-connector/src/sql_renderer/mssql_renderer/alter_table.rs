@@ -1,7 +1,7 @@
 use super::render_default;
 use crate::{
     flavour::MssqlFlavour,
-    pair::Pair,
+    migration_pair::MigrationPair,
     sql_migration::AlterColumn,
     sql_migration::TableChange,
     sql_renderer::{
@@ -21,7 +21,7 @@ use std::collections::BTreeSet;
 /// Creates a set of `ALTER TABLE` statements in a correct execution order.
 pub(crate) fn create_statements(
     renderer: &MssqlFlavour,
-    tables: Pair<TableWalker<'_>>,
+    tables: MigrationPair<TableWalker<'_>>,
     changes: &[TableChange],
 ) -> Vec<String> {
     let constructor = AlterTableConstructor {
@@ -41,7 +41,7 @@ pub(crate) fn create_statements(
 
 struct AlterTableConstructor<'a> {
     renderer: &'a MssqlFlavour,
-    tables: Pair<TableWalker<'a>>,
+    tables: MigrationPair<TableWalker<'a>>,
     changes: &'a [TableChange],
     drop_constraints: BTreeSet<String>,
     add_constraints: BTreeSet<String>,
@@ -200,7 +200,7 @@ impl<'a> AlterTableConstructor<'a> {
         self.drop_columns.push(format!("{name}"));
     }
 
-    fn drop_and_recreate_column(&mut self, columns: Pair<TableColumnId>) {
+    fn drop_and_recreate_column(&mut self, columns: MigrationPair<TableColumnId>) {
         let columns = self.tables.walk(columns);
 
         self.drop_columns
@@ -209,7 +209,7 @@ impl<'a> AlterTableConstructor<'a> {
         self.add_columns.push(self.renderer.render_column(columns.next));
     }
 
-    fn alter_column(&mut self, columns: Pair<TableColumnId>, changes: &ColumnChanges) {
+    fn alter_column(&mut self, columns: MigrationPair<TableColumnId>, changes: &ColumnChanges) {
         let columns = self.tables.walk(columns);
         let expanded = expand_alter_column(&columns, changes);
 
@@ -261,7 +261,10 @@ enum MsSqlAlterColumn {
     Modify,
 }
 
-fn expand_alter_column(columns: &Pair<TableColumnWalker<'_>>, column_changes: &ColumnChanges) -> Vec<MsSqlAlterColumn> {
+fn expand_alter_column(
+    columns: &MigrationPair<TableColumnWalker<'_>>,
+    column_changes: &ColumnChanges,
+) -> Vec<MsSqlAlterColumn> {
     let mut changes = Vec::new();
 
     // Default value changes require us to re-create the constraint, which we

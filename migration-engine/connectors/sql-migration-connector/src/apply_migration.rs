@@ -1,5 +1,5 @@
 use crate::{
-    pair::Pair,
+    migration_pair::MigrationPair,
     sql_migration::{SqlMigration, SqlMigrationStep},
     SqlFlavour, SqlMigrationConnector,
 };
@@ -16,7 +16,7 @@ pub(crate) async fn apply_migration(
     tracing::debug!("{} steps to execute", migration.steps.len());
 
     for step in &migration.steps {
-        for sql_string in render_raw_sql(step, flavour, Pair::new(&migration.before, &migration.after)) {
+        for sql_string in render_raw_sql(step, flavour, MigrationPair::new(&migration.before, &migration.after)) {
             assert!(!sql_string.is_empty());
             let span = tracing::info_span!("migration_step", ?step);
             flavour.raw_cmd(&sql_string).instrument(span).await?;
@@ -70,7 +70,8 @@ pub(crate) fn render_script(
     }
 
     for step in &migration.steps {
-        let statements: Vec<String> = render_raw_sql(step, flavour, Pair::new(&migration.before, &migration.after));
+        let statements: Vec<String> =
+            render_raw_sql(step, flavour, MigrationPair::new(&migration.before, &migration.after));
 
         if !statements.is_empty() {
             if is_first_step {
@@ -119,7 +120,7 @@ pub(crate) async fn apply_script(
 fn render_raw_sql(
     step: &SqlMigrationStep,
     renderer: &(dyn SqlFlavour + Send + Sync),
-    schemas: Pair<&SqlSchema>,
+    schemas: MigrationPair<&SqlSchema>,
 ) -> Vec<String> {
     match step {
         SqlMigrationStep::AlterSequence(sequence_ids, changes) => {
@@ -180,7 +181,7 @@ fn render_raw_sql(
             renderer.render_create_extension(create_extension, schemas.next)
         }
         SqlMigrationStep::AlterExtension(alter_extension) => {
-            renderer.render_alter_extension(alter_extension, Pair::new(schemas.previous, schemas.next))
+            renderer.render_alter_extension(alter_extension, MigrationPair::new(schemas.previous, schemas.next))
         }
         SqlMigrationStep::DropExtension(drop_extension) => {
             renderer.render_drop_extension(drop_extension, schemas.previous)

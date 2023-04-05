@@ -8,6 +8,8 @@ members = [
   "migration-engine/json-rpc-api-build",
   "migration-engine/migration-engine-tests",
   "migration-engine/introspection-engine-tests",
+  "migration-engine/mongodb-schema-describer",
+  "migration-engine/sql-schema-describer",
   "query-engine/connectors/*",
   "query-engine/connector-test-kit-rs/qe-setup",
   "query-engine/connector-test-kit-rs/query-engine-tests",
@@ -36,6 +38,7 @@ serde = { version = "1", features = ["derive"] }
 tokio = { version = "1.25", features = ["rt-multi-thread", "macros", "sync", "io-std", "io-util", "parking_lot", "time"] }
 user-facing-errors = { path = "./libs/user-facing-errors" }
 uuid = { version = "1", features = ["serde"] }
+indoc = "2.0.1"
 
 [workspace.dependencies.quaint]
 git = "https://github.com/prisma/quaint"

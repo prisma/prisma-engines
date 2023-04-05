@@ -5,23 +5,30 @@
 
 mod apply_migration;
 mod database_schema;
+mod datamodel_calculator;
 mod error;
 mod flavour;
-mod pair;
+mod introspection_helpers;
+mod introspection_map;
+mod introspection_pair;
+mod migration_pair;
+mod rendering;
+mod sanitize_datamodel_names;
 mod sql_destructive_change_checker;
 mod sql_migration;
 mod sql_migration_persistence;
 mod sql_renderer;
 mod sql_schema_calculator;
 mod sql_schema_differ;
+mod version_checker;
+mod warnings;
 
 use database_schema::SqlDatabaseSchema;
 use enumflags2::BitFlags;
 use flavour::{MssqlFlavour, MysqlFlavour, PostgresFlavour, SqlFlavour, SqliteFlavour};
 use migration_connector::{migrations_directory::MigrationDirectory, *};
-use pair::Pair;
+use migration_pair::MigrationPair;
 use psl::ValidatedSchema;
-use sql_introspection_connector::datamodel_calculator;
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
 use sql_schema_describer as sql;
 use std::sync::Arc;
@@ -219,7 +226,7 @@ impl MigrationConnector for SqlMigrationConnector {
     fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> Migration {
         let previous = SqlDatabaseSchema::from_erased(from);
         let next = SqlDatabaseSchema::from_erased(to);
-        let steps = sql_schema_differ::calculate_steps(Pair::new(&previous, &next), self.flavour.as_ref());
+        let steps = sql_schema_differ::calculate_steps(MigrationPair::new(&previous, &next), self.flavour.as_ref());
         tracing::debug!(?steps, "Inferred migration steps.");
 
         Migration::new(SqlMigration {
@@ -246,9 +253,7 @@ impl MigrationConnector for SqlMigrationConnector {
             let namespaces = Namespaces::from_vec(&mut namespace_names);
             let sql_schema = self.flavour.introspect(namespaces, ctx).await?;
             let search_path = self.flavour.search_path();
-
-            let datamodel = datamodel_calculator::calculate(&sql_schema, ctx, search_path)
-                .map_err(|err| ConnectorError::from_source(err, "Introspection error"))?;
+            let datamodel = datamodel_calculator::calculate(&sql_schema, ctx, search_path);
 
             Ok(datamodel)
         })
@@ -363,7 +368,7 @@ async fn best_effort_reset_impl(
 
     steps.extend(drop_views);
 
-    let diffables: Pair<SqlDatabaseSchema> = Pair::new(source_schema, target_schema).map(From::from);
+    let diffables: MigrationPair<SqlDatabaseSchema> = MigrationPair::new(source_schema, target_schema).map(From::from);
     steps.extend(sql_schema_differ::calculate_steps(diffables.as_ref(), flavour));
     let (source_schema, target_schema) = diffables.map(|s| s.describer_schema).into_tuple();
 

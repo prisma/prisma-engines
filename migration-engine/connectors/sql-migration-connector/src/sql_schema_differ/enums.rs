@@ -1,9 +1,9 @@
 use sql_schema_describer::walkers::EnumWalker;
 
-use crate::pair::Pair;
+use crate::migration_pair::MigrationPair;
 
 pub(crate) struct EnumDiffer<'a> {
-    pub(crate) enums: Pair<EnumWalker<'a>>,
+    pub(crate) enums: MigrationPair<EnumWalker<'a>>,
 }
 
 impl<'a> EnumDiffer<'a> {

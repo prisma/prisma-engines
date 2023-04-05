@@ -1,7 +1,7 @@
 use super::{common::*, SqlRenderer};
 use crate::{
     flavour::SqliteFlavour,
-    pair::Pair,
+    migration_pair::MigrationPair,
     sql_migration::{AlterEnum, AlterTable, RedefineTable, TableChange},
 };
 use indoc::formatdoc;
@@ -16,7 +16,7 @@ impl SqlRenderer for SqliteFlavour {
         Quoted::Double(name)
     }
 
-    fn render_alter_enum(&self, _alter_enum: &AlterEnum, _schemas: Pair<&SqlSchema>) -> Vec<String> {
+    fn render_alter_enum(&self, _alter_enum: &AlterEnum, _schemas: MigrationPair<&SqlSchema>) -> Vec<String> {
         unreachable!("render_alter_enum on sqlite")
     }
 
@@ -60,7 +60,7 @@ impl SqlRenderer for SqliteFlavour {
         unreachable!("AddForeignKey on SQLite")
     }
 
-    fn render_alter_table(&self, alter_table: &AlterTable, schemas: Pair<&SqlSchema>) -> Vec<String> {
+    fn render_alter_table(&self, alter_table: &AlterTable, schemas: MigrationPair<&SqlSchema>) -> Vec<String> {
         let AlterTable { changes, table_ids } = alter_table;
         let tables = schemas.walk(*table_ids);
         let mut statements = Vec::new();
@@ -156,7 +156,7 @@ impl SqlRenderer for SqliteFlavour {
         format!("DROP INDEX {}", self.quote(index.name()))
     }
 
-    fn render_drop_and_recreate_index(&self, indexes: Pair<IndexWalker<'_>>) -> Vec<String> {
+    fn render_drop_and_recreate_index(&self, indexes: MigrationPair<IndexWalker<'_>>) -> Vec<String> {
         vec![
             self.render_drop_index(indexes.previous),
             self.render_create_index(indexes.next),
@@ -182,7 +182,7 @@ impl SqlRenderer for SqliteFlavour {
         })
     }
 
-    fn render_redefine_tables(&self, tables: &[RedefineTable], schemas: Pair<&SqlSchema>) -> Vec<String> {
+    fn render_redefine_tables(&self, tables: &[RedefineTable], schemas: MigrationPair<&SqlSchema>) -> Vec<String> {
         // Based on 'Making Other Kinds Of Table Schema Changes' from https://www.sqlite.org/lang_altertable.html
         let mut result = vec!["PRAGMA foreign_keys=OFF".to_string()];
 
@@ -228,7 +228,7 @@ impl SqlRenderer for SqliteFlavour {
         unreachable!("render_drop_user_defined_type on SQLite")
     }
 
-    fn render_rename_foreign_key(&self, _fks: Pair<ForeignKeyWalker<'_>>) -> String {
+    fn render_rename_foreign_key(&self, _fks: MigrationPair<ForeignKeyWalker<'_>>) -> String {
         unreachable!("render RenameForeignKey on SQLite")
     }
 }
@@ -264,7 +264,7 @@ fn escape_quotes(s: &str) -> Cow<'_, str> {
 fn copy_current_table_into_new_table(
     steps: &mut Vec<String>,
     redefine_table: &RedefineTable,
-    tables: Pair<TableWalker<'_>>,
+    tables: MigrationPair<TableWalker<'_>>,
     temporary_table_name: &str,
 ) {
     if redefine_table.column_pairs.is_empty() {

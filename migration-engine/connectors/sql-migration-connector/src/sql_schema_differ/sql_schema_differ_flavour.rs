@@ -1,5 +1,5 @@
 use super::{differ_database::DifferDatabase, ColumnTypeChange};
-use crate::{pair::Pair, sql_migration::SqlMigrationStep, sql_schema_differ};
+use crate::{migration_pair::MigrationPair, sql_migration::SqlMigrationStep, sql_schema_differ};
 use sql_schema_describer::{
     walkers::{IndexWalker, TableColumnWalker, TableWalker},
     TableColumnId,
@@ -37,12 +37,12 @@ pub(crate) trait SqlSchemaDifferFlavour {
     fn can_rename_foreign_key(&self) -> bool;
 
     /// This method must return whether a column became or ceased to be autoincrementing.
-    fn column_autoincrement_changed(&self, columns: Pair<TableColumnWalker<'_>>) -> bool {
+    fn column_autoincrement_changed(&self, columns: MigrationPair<TableColumnWalker<'_>>) -> bool {
         columns.previous.is_autoincrement() != columns.next.is_autoincrement()
     }
 
     /// Return whether a column's type needs to be migrated, and how.
-    fn column_type_change(&self, differ: Pair<TableColumnWalker<'_>>) -> Option<ColumnTypeChange>;
+    fn column_type_change(&self, differ: MigrationPair<TableColumnWalker<'_>>) -> Option<ColumnTypeChange>;
 
     /// Push enum-related steps.
     fn push_enum_steps(&self, _steps: &mut Vec<SqlMigrationStep>, _db: &DifferDatabase<'_>) {}
@@ -67,7 +67,7 @@ pub(crate) trait SqlSchemaDifferFlavour {
     }
 
     /// Return whether an index should be renamed by the migration.
-    fn index_should_be_renamed(&self, indexes: Pair<IndexWalker<'_>>) -> bool {
+    fn index_should_be_renamed(&self, indexes: MigrationPair<IndexWalker<'_>>) -> bool {
         indexes.previous.name() != indexes.next.name()
     }
 
@@ -76,7 +76,7 @@ pub(crate) trait SqlSchemaDifferFlavour {
     }
 
     /// Did something connector-specific change in the primary key definition?
-    fn primary_key_changed(&self, _tables: Pair<TableWalker<'_>>) -> bool {
+    fn primary_key_changed(&self, _tables: MigrationPair<TableWalker<'_>>) -> bool {
         false
     }
 
@@ -84,7 +84,7 @@ pub(crate) trait SqlSchemaDifferFlavour {
     fn push_index_changes_for_column_changes(
         &self,
         _table: &sql_schema_differ::TableDiffer<'_, '_>,
-        _column_index: Pair<TableColumnId>,
+        _column_index: MigrationPair<TableColumnId>,
         _column_changes: sql_schema_differ::ColumnChanges,
         _steps: &mut Vec<SqlMigrationStep>,
     ) {
@@ -139,7 +139,7 @@ pub(crate) trait SqlSchemaDifferFlavour {
         string.as_bytes() == bytes
     }
 
-    fn table_names_match(&self, names: Pair<&str>) -> bool {
+    fn table_names_match(&self, names: MigrationPair<&str>) -> bool {
         names.previous == names.next
     }
 
