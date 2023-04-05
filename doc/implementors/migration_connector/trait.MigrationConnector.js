@@ -1,4 +1,0 @@
-(function() {var implementors = {
-"mongodb_migration_connector":[["impl <a class=\"trait\" href=\"migration_connector/trait.MigrationConnector.html\" title=\"trait migration_connector::MigrationConnector\">MigrationConnector</a> for <a class=\"struct\" href=\"mongodb_migration_connector/struct.MongoDbMigrationConnector.html\" title=\"struct mongodb_migration_connector::MongoDbMigrationConnector\">MongoDbMigrationConnector</a>"]],
-"sql_migration_connector":[["impl <a class=\"trait\" href=\"migration_connector/trait.MigrationConnector.html\" title=\"trait migration_connector::MigrationConnector\">MigrationConnector</a> for <a class=\"struct\" href=\"sql_migration_connector/struct.SqlMigrationConnector.html\" title=\"struct sql_migration_connector::SqlMigrationConnector\">SqlMigrationConnector</a>"]]
-};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

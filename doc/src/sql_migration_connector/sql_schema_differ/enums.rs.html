@@ -33,10 +33,10 @@
 <a href="#33" id="33">33</a>
 </pre><pre class="rust"><code><span class="kw">use </span>sql_schema_describer::walkers::EnumWalker;
 
-<span class="kw">use </span><span class="kw">crate</span>::pair::Pair;
+<span class="kw">use </span><span class="kw">crate</span>::migration_pair::MigrationPair;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>EnumDiffer&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) enums: Pair&lt;EnumWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) enums: MigrationPair&lt;EnumWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; EnumDiffer&lt;<span class="lifetime">&#39;a</span>&gt; {

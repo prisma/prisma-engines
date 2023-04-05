@@ -1374,7 +1374,7 @@
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::SqlSchemaDifferFlavour;
 <span class="kw">use crate</span>::{
     flavour::MysqlFlavour,
-    pair::Pair,
+    migration_pair::MigrationPair,
     sql_schema_differ::{all_match, ColumnTypeChange},
 };
 <span class="kw">use </span>psl::builtin_connectors::MySqlType;
@@ -1396,7 +1396,7 @@
         <span class="bool-val">false
     </span>}
 
-    <span class="kw">fn </span>column_type_change(<span class="kw-2">&amp;</span><span class="self">self</span>, differ: Pair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt; {
+    <span class="kw">fn </span>column_type_change(<span class="kw-2">&amp;</span><span class="self">self</span>, differ: MigrationPair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt; {
         <span class="comment">// On MariaDB, JSON is an alias for LONGTEXT. https://mariadb.com/kb/en/json-data-type/
         </span><span class="kw">if </span><span class="self">self</span>.is_mariadb() {
             <span class="kw">match </span>(
@@ -1445,7 +1445,7 @@
         <span class="prelude-val">None
     </span>}
 
-    <span class="kw">fn </span>index_should_be_renamed(<span class="kw-2">&amp;</span><span class="self">self</span>, indexes: Pair&lt;IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; bool {
+    <span class="kw">fn </span>index_should_be_renamed(<span class="kw-2">&amp;</span><span class="self">self</span>, indexes: MigrationPair&lt;IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; bool {
         <span class="comment">// Implements correct comparison for truncated index names.
         </span><span class="kw">let </span>(previous_name, next_name) = indexes.as_ref().map(|idx| idx.name()).into_tuple();
 
@@ -1468,7 +1468,7 @@
         <span class="bool-val">true
     </span>}
 
-    <span class="kw">fn </span>table_names_match(<span class="kw-2">&amp;</span><span class="self">self</span>, names: Pair&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; bool {
+    <span class="kw">fn </span>table_names_match(<span class="kw-2">&amp;</span><span class="self">self</span>, names: MigrationPair&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; bool {
         <span class="kw">if </span><span class="self">self</span>.lower_cases_table_names() {
             names.previous.eq_ignore_ascii_case(names.next)
         } <span class="kw">else </span>{
@@ -1489,7 +1489,7 @@
     ColumnTypeChange::SafeCast
 }
 
-<span class="kw">fn </span>native_type_change(types: Pair&lt;<span class="kw-2">&amp;</span>MySqlType&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt; {
+<span class="kw">fn </span>native_type_change(types: MigrationPair&lt;<span class="kw-2">&amp;</span>MySqlType&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt; {
     <span class="kw">let </span>next = <span class="kw-2">&amp;</span>types.next;
 
     <span class="prelude-val">Some</span>(<span class="kw">match </span><span class="kw-2">&amp;</span>types.previous {

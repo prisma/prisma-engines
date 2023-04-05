@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/ghn5icyfpg0ly3yk0ygjsb10z7rj1c1z-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/convert_case-0.5.0/src/segmentation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>segmentation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-93196c7a1c3542a8.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../convert_case/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/48a25fgh0lz8fsqbpx7a7a853vi61msh-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/convert_case-0.6.0/src/segmentation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>segmentation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-93196c7a1c3542a8.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../convert_case/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -430,10 +430,39 @@
 <a href="#430" id="430">430</a>
 <a href="#431" id="431">431</a>
 <a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
+<a href="#450" id="450">450</a>
+<a href="#451" id="451">451</a>
+<a href="#452" id="452">452</a>
+<a href="#453" id="453">453</a>
+<a href="#454" id="454">454</a>
+<a href="#455" id="455">455</a>
+<a href="#456" id="456">456</a>
+<a href="#457" id="457">457</a>
+<a href="#458" id="458">458</a>
+<a href="#459" id="459">459</a>
 </pre><pre class="rust"><code><span class="attr">#[cfg(test)]
 </span><span class="kw">use </span>strum_macros::EnumIter;
 
-<span class="doccomment">/// A boundary defines how a string is split into words.  Some boundaries, `Hyphen`, `Underscore`,
+<span class="kw">use </span>unicode_segmentation::{UnicodeSegmentation}; <span class="comment">//, GraphemeCursor};
+
+</span><span class="doccomment">/// A boundary defines how a string is split into words.  Some boundaries, `Hyphen`, `Underscore`,
 /// and `Space`, consume the character they split on, whereas the other boundaries
 /// do not.
 ///
@@ -589,9 +618,9 @@
     /// ```
     </span><span class="kw">pub fn </span>list_from(s: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;<span class="self">Self</span>&gt; {
         Boundary::all().iter().filter(|boundary| {
-            <span class="kw">let </span>left_iter = s.chars();
-            <span class="kw">let </span>mid_iter = s.chars().skip(<span class="number">1</span>);
-            <span class="kw">let </span>right_iter = s.chars().skip(<span class="number">2</span>);
+            <span class="kw">let </span>left_iter = s.graphemes(<span class="bool-val">true</span>);
+            <span class="kw">let </span>mid_iter = s.graphemes(<span class="bool-val">true</span>).skip(<span class="number">1</span>);
+            <span class="kw">let </span>right_iter = s.graphemes(<span class="bool-val">true</span>).skip(<span class="number">2</span>);
 
             <span class="kw">let </span><span class="kw-2">mut </span>one_iter = left_iter.clone();
 
@@ -600,7 +629,7 @@
             </span><span class="kw">let </span>two_iter = left_iter.clone().zip(mid_iter.clone());
             <span class="kw">let </span><span class="kw-2">mut </span>two_iter_and_upper = two_iter.clone()
                 .zip(std::iter::once(<span class="bool-val">false</span>).chain(
-                        two_iter.map(|(a, b)| a.is_uppercase() &amp;&amp; b.is_uppercase())
+                        two_iter.map(|(a, b)| grapheme_is_uppercase(a) &amp;&amp; grapheme_is_uppercase(b))
                 ));
 
             <span class="kw">let </span><span class="kw-2">mut </span>three_iter = left_iter.zip(mid_iter).zip(right_iter);
@@ -608,7 +637,7 @@
             one_iter.any(|a| boundary.detect_one(a))
                 || two_iter_and_upper.any(|((a, b), is_acro)| boundary.detect_two(a, b) &amp;&amp; !is_acro)
                 || three_iter.any(|((a, b), c)| boundary.detect_three(a, b, c))
-        }).map(|b| <span class="kw-2">*</span>b).collect()
+        }).copied().collect()
     }
 
     <span class="doccomment">/// The default list of boundaries used when `Casing::to_case` is called directly
@@ -713,115 +742,136 @@
         ]
     }
 
-    <span class="kw">fn </span>detect_one(<span class="kw-2">&amp;</span><span class="self">self</span>, c: char) -&gt; bool {
+    <span class="kw">fn </span>detect_one(<span class="kw-2">&amp;</span><span class="self">self</span>, c: <span class="kw-2">&amp;</span>str) -&gt; bool {
         <span class="kw">use </span>Boundary::<span class="kw-2">*</span>;
         <span class="kw">match </span><span class="self">self </span>{
-            Hyphen =&gt; c == <span class="string">&#39;-&#39;</span>,
-            Underscore =&gt; c == <span class="string">&#39;_&#39;</span>,
-            Space =&gt; c == <span class="string">&#39; &#39;</span>,
+            Hyphen =&gt; c == <span class="string">&quot;-&quot;</span>,
+            Underscore =&gt; c == <span class="string">&quot;_&quot;</span>,
+            Space =&gt; c == <span class="string">&quot; &quot;</span>,
             <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">fn </span>detect_two(<span class="kw-2">&amp;</span><span class="self">self</span>, c: char, d: char) -&gt; bool {
+    <span class="kw">fn </span>detect_two(<span class="kw-2">&amp;</span><span class="self">self</span>, c: <span class="kw-2">&amp;</span>str, d: <span class="kw-2">&amp;</span>str) -&gt; bool {
         <span class="kw">use </span>Boundary::<span class="kw-2">*</span>;
         <span class="kw">match </span><span class="self">self </span>{
-            UpperLower =&gt; c.is_uppercase() &amp;&amp; d.is_lowercase(),
-            LowerUpper =&gt; c.is_lowercase() &amp;&amp; d.is_uppercase(),
-            DigitUpper =&gt; c.is_ascii_digit() &amp;&amp; d.is_uppercase(),
-            UpperDigit =&gt; c.is_uppercase() &amp;&amp; d.is_ascii_digit(),
-            DigitLower =&gt; c.is_ascii_digit() &amp;&amp; d.is_lowercase(),
-            LowerDigit =&gt; c.is_lowercase() &amp;&amp; d.is_ascii_digit(),
+            UpperLower =&gt; grapheme_is_uppercase(c) &amp;&amp; grapheme_is_lowercase(d),
+            LowerUpper =&gt; grapheme_is_lowercase(c) &amp;&amp; grapheme_is_uppercase(d),
+            DigitUpper =&gt; grapheme_is_digit(c) &amp;&amp; grapheme_is_uppercase(d),
+            UpperDigit =&gt; grapheme_is_uppercase(c) &amp;&amp; grapheme_is_digit(d),
+            DigitLower =&gt; grapheme_is_digit(c) &amp;&amp; grapheme_is_lowercase(d),
+            LowerDigit =&gt; grapheme_is_lowercase(c) &amp;&amp; grapheme_is_digit(d),
             <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">fn </span>detect_three(<span class="kw-2">&amp;</span><span class="self">self</span>, c: char, d: char, e: char) -&gt; bool {
+    <span class="kw">fn </span>detect_three(<span class="kw-2">&amp;</span><span class="self">self</span>, c: <span class="kw-2">&amp;</span>str, d: <span class="kw-2">&amp;</span>str, e: <span class="kw-2">&amp;</span>str) -&gt; bool {
         <span class="kw">use </span>Boundary::<span class="kw-2">*</span>;
         <span class="kw">if let </span>Acronym = <span class="self">self </span>{
-            c.is_uppercase() &amp;&amp; d.is_uppercase() &amp;&amp; e.is_lowercase()
+            grapheme_is_uppercase(c)
+                &amp;&amp; grapheme_is_uppercase(d)
+                &amp;&amp; grapheme_is_lowercase(e)
         } <span class="kw">else </span>{
             <span class="bool-val">false
         </span>}
     }
 }
 
-<span class="comment">// idea: make a bitset for each boundary.  Its fixed size,
-// and can be copied.  Also no fear in adding duplicates
+<span class="kw">fn </span>grapheme_is_digit(c: <span class="kw-2">&amp;</span>str) -&gt; bool {
+    c.chars().all(|c| c.is_ascii_digit())
+}
 
-// gross
-</span><span class="kw">pub fn </span>split&lt;<span class="lifetime">&#39;a</span>, T: <span class="question-mark">?</span>Sized&gt;(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T, boundaries: <span class="kw-2">&amp;</span>[Boundary]) -&gt; Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;
+<span class="kw">fn </span>grapheme_is_uppercase(c: <span class="kw-2">&amp;</span>str) -&gt; bool {
+    c.to_uppercase() != c.to_lowercase() &amp;&amp; c == c.to_uppercase()
+}
+
+<span class="kw">fn </span>grapheme_is_lowercase(c: <span class="kw-2">&amp;</span>str) -&gt; bool {
+    c.to_uppercase() != c.to_lowercase() &amp;&amp; c == c.to_lowercase()
+}
+
+<span class="kw">pub fn </span>split&lt;T&gt;(s: T, boundaries: <span class="kw-2">&amp;</span>[Boundary]) -&gt; Vec&lt;String&gt;
 <span class="kw">where
     </span>T: AsRef&lt;str&gt;,
 {
-    <span class="kw">let </span>s = s.as_ref();
+    <span class="kw">use </span>std::iter::once;
+    <span class="comment">// create split_points function that counts off by graphemes into list
+    
+    </span><span class="kw">let </span>s = s.as_ref();
 
-    <span class="kw">let </span>single_splits = s
-        .chars()
-        .enumerate()
-        .filter(|(<span class="kw">_</span>, c)| boundaries.iter().any(|b| b.detect_one(<span class="kw-2">*</span>c)))
-        .map(|(i, <span class="kw">_</span>)| i + <span class="number">1</span>)
-        .collect();
+    <span class="comment">// Some&lt;bool&gt; means the following
+    // None: no split
+    // Some(false): split between characters
+    // Some(true): split consuming characters
 
-    <span class="kw">let </span>words = replace_at_indicies(s, single_splits);
+    </span><span class="kw">let </span>left_iter = s.graphemes(<span class="bool-val">true</span>);
+    <span class="kw">let </span>mid_iter = s.graphemes(<span class="bool-val">true</span>).skip(<span class="number">1</span>);
+    <span class="kw">let </span>right_iter = s.graphemes(<span class="bool-val">true</span>).skip(<span class="number">2</span>);
 
-    <span class="kw">let </span>final_words = words.iter().flat_map(|<span class="kw-2">&amp;</span>w| {
-        <span class="kw">let </span>left_iter = w.chars();
-        <span class="kw">let </span>mid_iter = w.chars().skip(<span class="number">1</span>);
-        <span class="kw">let </span>right_iter = w.chars().skip(<span class="number">2</span>);
+    <span class="kw">let </span>singles = left_iter.clone();
+    <span class="kw">let </span>doubles = left_iter.clone().zip(mid_iter.clone());
+    <span class="kw">let </span>triples = left_iter.zip(mid_iter).zip(right_iter);
 
-        <span class="kw">let </span>three_iter = left_iter.clone().zip(mid_iter.clone()).zip(right_iter);
-        <span class="kw">let </span>two_iter = left_iter.clone().zip(mid_iter);
+    <span class="kw">let </span>singles = singles
+        .map(|c| boundaries.iter().any(|b| b.detect_one(c)))
+        .map(|split| <span class="kw">if </span>split {<span class="prelude-val">Some</span>(<span class="bool-val">true</span>)} <span class="kw">else </span>{<span class="prelude-val">None</span>});
+    <span class="kw">let </span>doubles = doubles
+        .map(|(c,d)| boundaries.iter().any(|b| b.detect_two(c, d)))
+        .map(|split| <span class="kw">if </span>split {<span class="prelude-val">Some</span>(<span class="bool-val">false</span>)} <span class="kw">else </span>{<span class="prelude-val">None</span>});
+    <span class="kw">let </span>triples = triples
+        .map(|((c,d),e)| boundaries.iter().any(|b| b.detect_three(c, d, e)))
+        .map(|split| <span class="kw">if </span>split {<span class="prelude-val">Some</span>(<span class="bool-val">false</span>)} <span class="kw">else </span>{<span class="prelude-val">None</span>});
 
-        <span class="kw">let </span><span class="kw-2">mut </span>splits: Vec&lt;usize&gt; = three_iter
-            .enumerate()
-            .filter(|(<span class="kw">_</span>, ((c, d), e))| boundaries.iter().any(|b| b.detect_three(<span class="kw-2">*</span>c, <span class="kw-2">*</span>d, <span class="kw-2">*</span>e)))
-            .map(|(i, <span class="kw">_</span>)| i + <span class="number">1</span>)
-            .chain(
-                two_iter
-                    .enumerate()
-                    .filter(|(<span class="kw">_</span>, (c, d))| boundaries.iter().any(|b| b.detect_two(<span class="kw-2">*</span>c, <span class="kw-2">*</span>d)))
-                    .map(|(i, <span class="kw">_</span>)| i + <span class="number">1</span>),
-            )
-            .collect();
-        splits.sort_unstable();
+    <span class="kw">let </span>split_points = singles
+        .zip(once(<span class="prelude-val">None</span>).chain(doubles))
+        .zip(once(<span class="prelude-val">None</span>).chain(triples).chain(once(<span class="prelude-val">None</span>)))
+        .map(|((s, d), t)| s.or(d).or(t));
 
-        split_on_indicies(w, splits)
-    });
-
-    final_words.rev().filter(|s| !s.is_empty()).collect()
-}
-
-<span class="kw">pub fn </span>replace_at_indicies(s: <span class="kw-2">&amp;</span>str, splits: Vec&lt;usize&gt;) -&gt; Vec&lt;<span class="kw-2">&amp;</span>str&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>words = Vec::new();
-
-    <span class="kw">let </span><span class="kw-2">mut </span>first = s;
-    <span class="kw">let </span><span class="kw-2">mut </span>second;
-    <span class="kw">for </span><span class="kw-2">&amp;</span>x <span class="kw">in </span>splits.iter().rev() {
-        <span class="kw">let </span>pair = first.split_at(x);
-        first = <span class="kw-2">&amp;</span>pair.<span class="number">0</span>[..(pair.<span class="number">0</span>.len() - <span class="number">1</span>)];
-        second = pair.<span class="number">1</span>;
-        words.push(second);
+    <span class="kw">let </span><span class="kw-2">mut </span>word = String::new();
+    <span class="kw">for </span>(c, split) <span class="kw">in </span>s.graphemes(<span class="bool-val">true</span>).zip(split_points) {
+        <span class="kw">match </span>split {
+            <span class="comment">// no split here
+            </span><span class="prelude-val">None </span>=&gt; word.push_str(c),
+            <span class="comment">// split here, consume letter
+            </span><span class="prelude-val">Some</span>(<span class="bool-val">true</span>) =&gt; words.push(std::mem::take(<span class="kw-2">&amp;mut </span>word)),
+            <span class="comment">// split here, keep letter
+            </span><span class="prelude-val">Some</span>(<span class="bool-val">false</span>) =&gt; {
+                words.push(std::mem::take(<span class="kw-2">&amp;mut </span>word));
+                word.push_str(c);
+            }
+        }
     }
-    words.push(first);
+    words.push(word);
 
-    words
-}
+    <span class="comment">/*
+    let mut words = Vec::new();
+    let mut left_idx = 0;
+    let mut total_chars = 0;
+    let mut skip = 0;
+    let mut cur = GraphemeCursor::new(left_idx, s.len(), true);
 
-<span class="kw">pub fn </span>split_on_indicies(s: <span class="kw-2">&amp;</span>str, splits: Vec&lt;usize&gt;) -&gt; Vec&lt;<span class="kw-2">&amp;</span>str&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>words = Vec::new();
-
-    <span class="kw">let </span><span class="kw-2">mut </span>first = s;
-    <span class="kw">let </span><span class="kw-2">mut </span>second;
-    <span class="kw">for </span><span class="kw-2">&amp;</span>x <span class="kw">in </span>splits.iter().rev() {
-        <span class="kw">let </span>pair = first.split_at(x);
-        first = pair.<span class="number">0</span>;
-        second = pair.<span class="number">1</span>;
-        words.push(second);
+    for (right_idx, split) in split_points.enumerate() {
+        match split {
+            // no split here
+            None =&gt; {},
+            // split here, consume letter
+            Some(true) =&gt; {
+                let mut right_bound = left_bound;
+                for _ in 0..total_chars {
+                    right_bound = cur.next_boundary(s, skip).unwrap().unwrap();
+                }
+                words.push(&amp;s[left_bound..right_bound])
+            }
+            // split here, keep letter
+            Some(false) =&gt; {
+            }
+            // dont push an empty string, do nothing
+            _ =&gt; {}
+        }
     }
-    words.push(first);
+    */
 
-    words
+    </span>words.into_iter().filter(|s| !s.is_empty()).collect()
 }
 
 <span class="attr">#[cfg(test)]
@@ -848,6 +898,10 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>boundaries_found_in_string() {
         <span class="kw">use </span>Boundary::<span class="kw-2">*</span>;
+        <span class="macro">assert_eq!</span>(
+            <span class="macro">vec!</span>[UpperLower],
+            Boundary::list_from(<span class="string">&quot;.Aaaa&quot;</span>)
+        );
         <span class="macro">assert_eq!</span>(
             <span class="macro">vec!</span>[LowerUpper, UpperLower, LowerDigit],
             Boundary::list_from(<span class="string">&quot;a8.Aa.aA&quot;</span>)

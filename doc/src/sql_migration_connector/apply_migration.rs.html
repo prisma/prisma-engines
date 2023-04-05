@@ -187,8 +187,9 @@
 <a href="#187" id="187">187</a>
 <a href="#188" id="188">188</a>
 <a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
-    pair::Pair,
+    migration_pair::MigrationPair,
     sql_migration::{SqlMigration, SqlMigrationStep},
     SqlFlavour, SqlMigrationConnector,
 };
@@ -205,7 +206,7 @@
     <span class="macro">tracing::debug!</span>(<span class="string">&quot;{} steps to execute&quot;</span>, migration.steps.len());
 
     <span class="kw">for </span>step <span class="kw">in </span><span class="kw-2">&amp;</span>migration.steps {
-        <span class="kw">for </span>sql_string <span class="kw">in </span>render_raw_sql(step, flavour, Pair::new(<span class="kw-2">&amp;</span>migration.before, <span class="kw-2">&amp;</span>migration.after)) {
+        <span class="kw">for </span>sql_string <span class="kw">in </span>render_raw_sql(step, flavour, MigrationPair::new(<span class="kw-2">&amp;</span>migration.before, <span class="kw-2">&amp;</span>migration.after)) {
             <span class="macro">assert!</span>(!sql_string.is_empty());
             <span class="kw">let </span>span = <span class="macro">tracing::info_span!</span>(<span class="string">&quot;migration_step&quot;</span>, <span class="question-mark">?</span>step);
             flavour.raw_cmd(<span class="kw-2">&amp;</span>sql_string).instrument(span).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -259,7 +260,8 @@
     }
 
     <span class="kw">for </span>step <span class="kw">in </span><span class="kw-2">&amp;</span>migration.steps {
-        <span class="kw">let </span>statements: Vec&lt;String&gt; = render_raw_sql(step, flavour, Pair::new(<span class="kw-2">&amp;</span>migration.before, <span class="kw-2">&amp;</span>migration.after));
+        <span class="kw">let </span>statements: Vec&lt;String&gt; =
+            render_raw_sql(step, flavour, MigrationPair::new(<span class="kw-2">&amp;</span>migration.before, <span class="kw-2">&amp;</span>migration.after));
 
         <span class="kw">if </span>!statements.is_empty() {
             <span class="kw">if </span>is_first_step {
@@ -308,7 +310,7 @@
 <span class="kw">fn </span>render_raw_sql(
     step: <span class="kw-2">&amp;</span>SqlMigrationStep,
     renderer: <span class="kw-2">&amp;</span>(<span class="kw">dyn </span>SqlFlavour + Send + Sync),
-    schemas: Pair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;,
+    schemas: MigrationPair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;,
 ) -&gt; Vec&lt;String&gt; {
     <span class="kw">match </span>step {
         SqlMigrationStep::AlterSequence(sequence_ids, changes) =&gt; {
@@ -369,7 +371,7 @@
             renderer.render_create_extension(create_extension, schemas.next)
         }
         SqlMigrationStep::AlterExtension(alter_extension) =&gt; {
-            renderer.render_alter_extension(alter_extension, Pair::new(schemas.previous, schemas.next))
+            renderer.render_alter_extension(alter_extension, MigrationPair::new(schemas.previous, schemas.next))
         }
         SqlMigrationStep::DropExtension(drop_extension) =&gt; {
             renderer.render_drop_extension(drop_extension, schemas.previous)

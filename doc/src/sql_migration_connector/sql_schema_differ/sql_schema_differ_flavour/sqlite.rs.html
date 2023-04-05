@@ -65,7 +65,7 @@
 <a href="#65" id="65">65</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::SqlSchemaDifferFlavour;
 <span class="kw">use crate</span>::{
-    flavour::SqliteFlavour, pair::Pair, sql_schema_differ::column::ColumnTypeChange,
+    flavour::SqliteFlavour, migration_pair::MigrationPair, sql_schema_differ::column::ColumnTypeChange,
     sql_schema_differ::differ_database::DifferDatabase,
 };
 <span class="kw">use </span>sql_schema_describer::{walkers::TableColumnWalker, ColumnTypeFamily};
@@ -83,11 +83,11 @@
         <span class="bool-val">false
     </span>}
 
-    <span class="kw">fn </span>column_autoincrement_changed(<span class="kw-2">&amp;</span><span class="self">self</span>, _columns: Pair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; bool {
+    <span class="kw">fn </span>column_autoincrement_changed(<span class="kw-2">&amp;</span><span class="self">self</span>, _columns: MigrationPair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; bool {
         <span class="bool-val">false
     </span>}
 
-    <span class="kw">fn </span>column_type_change(<span class="kw-2">&amp;</span><span class="self">self</span>, differ: Pair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt; {
+    <span class="kw">fn </span>column_type_change(<span class="kw-2">&amp;</span><span class="self">self</span>, differ: MigrationPair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt; {
         <span class="kw">match </span>(differ.previous.column_type_family(), differ.next.column_type_family()) {
             (a, b) <span class="kw">if </span>a == b =&gt; <span class="prelude-val">None</span>,
             (<span class="kw">_</span>, ColumnTypeFamily::String) =&gt; <span class="prelude-val">Some</span>(ColumnTypeChange::SafeCast),

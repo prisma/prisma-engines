@@ -222,13 +222,6 @@
 <a href="#222" id="222">222</a>
 <a href="#223" id="223">223</a>
 <a href="#224" id="224">224</a>
-<a href="#225" id="225">225</a>
-<a href="#226" id="226">226</a>
-<a href="#227" id="227">227</a>
-<a href="#228" id="228">228</a>
-<a href="#229" id="229">229</a>
-<a href="#230" id="230">230</a>
-<a href="#231" id="231">231</a>
 </pre><pre class="rust"><code><span class="doccomment">//! The MongoDB migration connector.
 //!
 //! It is intentionally structured after sql-migration-connector and implements the same
@@ -240,9 +233,11 @@
 <span class="kw">mod </span>migration;
 <span class="kw">mod </span>migration_persistence;
 <span class="kw">mod </span>migration_step_applier;
+<span class="kw">mod </span>sampler;
 <span class="kw">mod </span>schema_calculator;
+<span class="kw">mod </span>warnings;
 
-<span class="kw">use </span>client_wrapper::Client;
+<span class="kw">use </span>client_wrapper::{mongo_error_to_connector_error, Client};
 <span class="kw">use </span>enumflags2::BitFlags;
 <span class="kw">use </span>migration::MongoDbMigration;
 <span class="kw">use </span>migration_connector::{migrations_directory::MigrationDirectory, <span class="kw-2">*</span>};
@@ -399,21 +394,12 @@
         ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>IntrospectionContext,
     ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;IntrospectionResult&gt;&gt; {
         Box::pin(<span class="kw">async move </span>{
-            <span class="kw">let </span>url: String = ctx
-                .datasource()
-                .load_direct_url(|v| std::env::var(v).ok())
-                .map_err(|err| {
-                    migration_connector::ConnectorError::new_schema_parser_error(
-                        err.to_pretty_string(<span class="string">&quot;schema.prisma&quot;</span>, ctx.schema_string()),
-                    )
-                })<span class="question-mark">?</span>;
-            <span class="kw">let </span>connector = mongodb_introspection_connector::MongoDbIntrospectionConnector::new(<span class="kw-2">&amp;</span>url)
+            <span class="kw">let </span>client = <span class="self">self</span>.client().<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">let </span>schema = client.describe().<span class="kw">await</span><span class="question-mark">?</span>;
+
+            sampler::sample(client.database(), schema, ctx)
                 .<span class="kw">await
-                </span>.map_err(|err| ConnectorError::from_source(err, <span class="string">&quot;Introspection error&quot;</span>))<span class="question-mark">?</span>;
-            connector
-                .introspect(ctx)
-                .<span class="kw">await
-                </span>.map_err(|err| ConnectorError::from_source(err, <span class="string">&quot;Introspection error&quot;</span>))
+                </span>.map_err(mongo_error_to_connector_error)
         })
     }
 

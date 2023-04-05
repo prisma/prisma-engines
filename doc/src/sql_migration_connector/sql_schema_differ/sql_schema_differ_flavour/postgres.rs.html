@@ -711,7 +711,7 @@
 <span class="kw">use crate</span>::{
     database_schema::SqlDatabaseSchema,
     flavour::PostgresFlavour,
-    pair::Pair,
+    migration_pair::MigrationPair,
     sql_migration::{
         AlterEnum, AlterExtension, CreateExtension, DropExtension, ExtensionChange, SequenceChange, SequenceChanges,
         SqlMigrationStep,
@@ -753,7 +753,7 @@
         <span class="bool-val">true
     </span>}
 
-    <span class="kw">fn </span>column_autoincrement_changed(<span class="kw-2">&amp;</span><span class="self">self</span>, columns: Pair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; bool {
+    <span class="kw">fn </span>column_autoincrement_changed(<span class="kw-2">&amp;</span><span class="self">self</span>, columns: MigrationPair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; bool {
         <span class="kw">if </span><span class="self">self</span>.is_cockroachdb() {
             <span class="kw">return </span><span class="bool-val">false</span>;
         }
@@ -761,7 +761,7 @@
         columns.previous.is_autoincrement() != columns.next.is_autoincrement()
     }
 
-    <span class="kw">fn </span>column_type_change(<span class="kw-2">&amp;</span><span class="self">self</span>, columns: Pair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt; {
+    <span class="kw">fn </span>column_type_change(<span class="kw-2">&amp;</span><span class="self">self</span>, columns: MigrationPair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt; {
         <span class="comment">// Handle the enum cases first.
         </span><span class="kw">match </span>columns
             .map(|col| col.column_type_family_as_enum().map(|e| (e.name(), e.namespace())))
@@ -811,7 +811,7 @@
             <span class="kw">return</span>;
         }
 
-        <span class="kw">let </span>schemas: Pair&lt;(<span class="kw-2">&amp;</span>SqlDatabaseSchema, <span class="kw-2">&amp;</span>PostgresSchemaExt)&gt; = db
+        <span class="kw">let </span>schemas: MigrationPair&lt;(<span class="kw-2">&amp;</span>SqlDatabaseSchema, <span class="kw-2">&amp;</span>PostgresSchemaExt)&gt; = db
             .schemas
             .map(|schema| (schema, schema.describer_schema.downcast_connector_data()));
 
@@ -896,7 +896,7 @@
         <span class="bool-val">true
     </span>}
 
-    <span class="kw">fn </span>index_should_be_renamed(<span class="kw-2">&amp;</span><span class="self">self</span>, pair: Pair&lt;IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; bool {
+    <span class="kw">fn </span>index_should_be_renamed(<span class="kw-2">&amp;</span><span class="self">self</span>, pair: MigrationPair&lt;IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; bool {
         <span class="comment">// Implements correct comparison for truncated index names.
         </span><span class="kw">let </span>(previous_name, next_name) = pair.map(|idx| idx.name()).into_tuple();
 
@@ -972,7 +972,7 @@
             }
 
             steps.push(SqlMigrationStep::AlterExtension(AlterExtension {
-                ids: Pair::new(ext.previous.id, ext.next.id),
+                ids: MigrationPair::new(ext.previous.id, ext.next.id),
                 changes,
             }));
         }
@@ -983,13 +983,13 @@
     }
 
     <span class="kw">fn </span>define_extensions(<span class="kw-2">&amp;</span><span class="self">self</span>, db: <span class="kw-2">&amp;mut </span>DifferDatabase&lt;<span class="lifetime">&#39;_</span>&gt;) {
-        <span class="kw">let </span>schemas: Pair&lt;(<span class="kw-2">&amp;</span>SqlDatabaseSchema, <span class="kw-2">&amp;</span>PostgresSchemaExt)&gt; = db
+        <span class="kw">let </span>schemas: MigrationPair&lt;(<span class="kw-2">&amp;</span>SqlDatabaseSchema, <span class="kw-2">&amp;</span>PostgresSchemaExt)&gt; = db
             .schemas
             .map(|schema| (schema, schema.describer_schema.downcast_connector_data()));
 
         <span class="kw">for </span>extension <span class="kw">in </span>schemas.previous.<span class="number">1</span>.extension_walkers() {
             db.extensions
-                .insert(extension.name(), Pair::new(<span class="prelude-val">Some</span>(extension.id), <span class="prelude-val">None</span>));
+                .insert(extension.name(), MigrationPair::new(<span class="prelude-val">Some</span>(extension.id), <span class="prelude-val">None</span>));
         }
 
         <span class="kw">for </span>extension <span class="kw">in </span>schemas.next.<span class="number">1</span>.extension_walkers() {
@@ -999,7 +999,7 @@
     }
 }
 
-<span class="kw">fn </span>cockroach_column_type_change(columns: Pair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt; {
+<span class="kw">fn </span>cockroach_column_type_change(columns: MigrationPair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt; {
     <span class="kw">use </span>ColumnTypeChange::<span class="kw-2">*</span>;
 
     <span class="kw">let </span>previous_type: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>CockroachType&gt; = columns.previous.column_native_type();
@@ -1029,7 +1029,7 @@
 </span><span class="kw">fn </span>cockroach_native_type_change_riskyness(
     previous: CockroachType,
     next: CockroachType,
-    columns: Pair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+    columns: MigrationPair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
 ) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt; {
     <span class="kw">let </span>covered_by_index = columns
         .map(|col| col.is_part_of_secondary_index() || col.is_part_of_primary_key())
@@ -1053,7 +1053,7 @@
     }
 }
 
-<span class="kw">fn </span>postgres_column_type_change(columns: Pair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt; {
+<span class="kw">fn </span>postgres_column_type_change(columns: MigrationPair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt; {
     <span class="kw">use </span>ColumnTypeChange::<span class="kw-2">*</span>;
     <span class="kw">let </span>previous_type: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>PostgresType&gt; = columns.previous.column_native_type();
     <span class="kw">let </span>next_type: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>PostgresType&gt; = columns.next.column_native_type();

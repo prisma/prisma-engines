@@ -152,7 +152,7 @@
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::DestructiveChangeCheckerFlavour;
 <span class="kw">use crate</span>::{
     flavour::{PostgresFlavour, SqlFlavour},
-    pair::Pair,
+    migration_pair::MigrationPair,
     sql_destructive_change_checker::{
         check::{Column, Table},
         destructive_check_plan::DestructiveCheckPlan,
@@ -169,7 +169,7 @@
     <span class="kw">fn </span>check_alter_column(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         alter_column: <span class="kw-2">&amp;</span>AlterColumn,
-        columns: <span class="kw-2">&amp;</span>Pair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+        columns: <span class="kw-2">&amp;</span>MigrationPair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
         plan: <span class="kw-2">&amp;mut </span>DestructiveCheckPlan,
         step_index: usize,
     ) {
@@ -235,7 +235,7 @@
 
     <span class="kw">fn </span>check_drop_and_recreate_column(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        columns: <span class="kw-2">&amp;</span>Pair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+        columns: <span class="kw-2">&amp;</span>MigrationPair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
         changes: <span class="kw-2">&amp;</span>ColumnChanges,
         plan: <span class="kw-2">&amp;mut </span>DestructiveCheckPlan,
         step_index: usize,

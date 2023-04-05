@@ -399,6 +399,11 @@
 <a href="#399" id="399">399</a>
 <a href="#400" id="400">400</a>
 <a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
 </pre><pre class="rust"><code><span class="doccomment">//! The SQL migration connector.
 
 </span><span class="attr">#![deny(rust_2018_idioms, unsafe_code, missing_docs)]
@@ -406,23 +411,30 @@
 
 </span><span class="kw">mod </span>apply_migration;
 <span class="kw">mod </span>database_schema;
+<span class="kw">mod </span>datamodel_calculator;
 <span class="kw">mod </span>error;
 <span class="kw">mod </span>flavour;
-<span class="kw">mod </span>pair;
+<span class="kw">mod </span>introspection_helpers;
+<span class="kw">mod </span>introspection_map;
+<span class="kw">mod </span>introspection_pair;
+<span class="kw">mod </span>migration_pair;
+<span class="kw">mod </span>rendering;
+<span class="kw">mod </span>sanitize_datamodel_names;
 <span class="kw">mod </span>sql_destructive_change_checker;
 <span class="kw">mod </span>sql_migration;
 <span class="kw">mod </span>sql_migration_persistence;
 <span class="kw">mod </span>sql_renderer;
 <span class="kw">mod </span>sql_schema_calculator;
 <span class="kw">mod </span>sql_schema_differ;
+<span class="kw">mod </span>version_checker;
+<span class="kw">mod </span>warnings;
 
 <span class="kw">use </span>database_schema::SqlDatabaseSchema;
 <span class="kw">use </span>enumflags2::BitFlags;
 <span class="kw">use </span>flavour::{MssqlFlavour, MysqlFlavour, PostgresFlavour, SqlFlavour, SqliteFlavour};
 <span class="kw">use </span>migration_connector::{migrations_directory::MigrationDirectory, <span class="kw-2">*</span>};
-<span class="kw">use </span>pair::Pair;
+<span class="kw">use </span>migration_pair::MigrationPair;
 <span class="kw">use </span>psl::ValidatedSchema;
-<span class="kw">use </span>sql_introspection_connector::datamodel_calculator;
 <span class="kw">use </span>sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
 <span class="kw">use </span>std::sync::Arc;
@@ -620,7 +632,7 @@
     </span><span class="kw">fn </span>diff(<span class="kw-2">&amp;</span><span class="self">self</span>, from: DatabaseSchema, to: DatabaseSchema) -&gt; Migration {
         <span class="kw">let </span>previous = SqlDatabaseSchema::from_erased(from);
         <span class="kw">let </span>next = SqlDatabaseSchema::from_erased(to);
-        <span class="kw">let </span>steps = sql_schema_differ::calculate_steps(Pair::new(<span class="kw-2">&amp;</span>previous, <span class="kw-2">&amp;</span>next), <span class="self">self</span>.flavour.as_ref());
+        <span class="kw">let </span>steps = sql_schema_differ::calculate_steps(MigrationPair::new(<span class="kw-2">&amp;</span>previous, <span class="kw-2">&amp;</span>next), <span class="self">self</span>.flavour.as_ref());
         <span class="macro">tracing::debug!</span>(<span class="question-mark">?</span>steps, <span class="string">&quot;Inferred migration steps.&quot;</span>);
 
         Migration::new(SqlMigration {
@@ -647,9 +659,7 @@
             <span class="kw">let </span>namespaces = Namespaces::from_vec(<span class="kw-2">&amp;mut </span>namespace_names);
             <span class="kw">let </span>sql_schema = <span class="self">self</span>.flavour.introspect(namespaces, ctx).<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="kw">let </span>search_path = <span class="self">self</span>.flavour.search_path();
-
-            <span class="kw">let </span>datamodel = datamodel_calculator::calculate(<span class="kw-2">&amp;</span>sql_schema, ctx, search_path)
-                .map_err(|err| ConnectorError::from_source(err, <span class="string">&quot;Introspection error&quot;</span>))<span class="question-mark">?</span>;
+            <span class="kw">let </span>datamodel = datamodel_calculator::calculate(<span class="kw-2">&amp;</span>sql_schema, ctx, search_path);
 
             <span class="prelude-val">Ok</span>(datamodel)
         })
@@ -764,7 +774,7 @@
 
     steps.extend(drop_views);
 
-    <span class="kw">let </span>diffables: Pair&lt;SqlDatabaseSchema&gt; = Pair::new(source_schema, target_schema).map(From::from);
+    <span class="kw">let </span>diffables: MigrationPair&lt;SqlDatabaseSchema&gt; = MigrationPair::new(source_schema, target_schema).map(From::from);
     steps.extend(sql_schema_differ::calculate_steps(diffables.as_ref(), flavour));
     <span class="kw">let </span>(source_schema, target_schema) = diffables.map(|s| s.describer_schema).into_tuple();
 

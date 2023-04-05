@@ -1153,7 +1153,7 @@
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::SqlSchemaDifferFlavour;
 <span class="kw">use crate</span>::{
     flavour::MssqlFlavour,
-    pair::Pair,
+    migration_pair::MigrationPair,
     sql_migration::SqlMigrationStep,
     sql_schema_differ::{column::ColumnTypeChange, differ_database::DifferDatabase, table::TableDiffer, ColumnChanges},
 };
@@ -1205,7 +1205,7 @@
             .collect();
     }
 
-    <span class="kw">fn </span>column_type_change(<span class="kw-2">&amp;</span><span class="self">self</span>, differ: Pair&lt;sql::TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt; {
+    <span class="kw">fn </span>column_type_change(<span class="kw-2">&amp;</span><span class="self">self</span>, differ: MigrationPair&lt;sql::TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt; {
         <span class="kw">let </span>previous_family = differ.previous.column_type_family();
         <span class="kw">let </span>next_family = differ.next.column_type_family();
         <span class="kw">let </span>previous_type: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>MsSqlType&gt; = differ.previous.column_native_type();
@@ -1217,7 +1217,7 @@
         }
     }
 
-    <span class="kw">fn </span>primary_key_changed(<span class="kw-2">&amp;</span><span class="self">self</span>, tables: Pair&lt;sql::TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; bool {
+    <span class="kw">fn </span>primary_key_changed(<span class="kw-2">&amp;</span><span class="self">self</span>, tables: MigrationPair&lt;sql::TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; bool {
         <span class="kw">let </span>pk_clusterings = tables.map(|t| {
             <span class="kw">let </span>ext: <span class="kw-2">&amp;</span>MssqlSchemaExt = t.schema.downcast_connector_data();
             t.primary_key().map(|pk| ext.index_is_clustered(pk.id)).unwrap_or(<span class="bool-val">false</span>)
@@ -1228,7 +1228,7 @@
     <span class="kw">fn </span>push_index_changes_for_column_changes(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         table: <span class="kw-2">&amp;</span>TableDiffer&lt;<span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span>&gt;,
-        column_id: Pair&lt;TableColumnId&gt;,
+        column_id: MigrationPair&lt;TableColumnId&gt;,
         column_changes: ColumnChanges,
         steps: <span class="kw-2">&amp;mut </span>Vec&lt;SqlMigrationStep&gt;,
     ) {

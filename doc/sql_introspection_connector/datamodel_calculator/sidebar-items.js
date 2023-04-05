@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":[["calculate","Calculate a data model from a database schema."]]};

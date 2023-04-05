@@ -52,7 +52,7 @@ not provided as a variant of <code>Case</code>.</p>
 words will be mutated before joining and will maintain whatever case they were in the
 original string.</p>
 </div><span id="structfield.delim" class="structfield small-section-header"><a href="#structfield.delim" class="anchor field">§</a><code>delim: <a class="struct" href="https://doc.rust-lang.org/1.68.0/alloc/string/struct.String.html" title="struct alloc::string::String">String</a></code></span><div class="docblock"><p>The string used to join mutated words together.</p>
-</div><h2 id="implementations" class="small-section-header">Implementations<a href="#implementations" class="anchor">§</a></h2><div id="implementations-list"><details class="toggle implementors-toggle" open><summary><section id="impl-Converter" class="impl has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#80-277">source</a><a href="#impl-Converter" class="anchor">§</a><h3 class="code-header">impl <a class="struct" href="struct.Converter.html" title="struct convert_case::Converter">Converter</a></h3></section></summary><div class="impl-items"><details class="toggle method-toggle" open><summary><section id="method.new" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#90-92">source</a><h4 class="code-header">pub fn <a href="#method.new" class="fn">new</a>() -&gt; Self</h4></section></summary><div class="docblock"><p>Creates a new <code>Converter</code> with default fields.  This is the same as <code>Default::default()</code>.
+</div><h2 id="implementations" class="small-section-header">Implementations<a href="#implementations" class="anchor">§</a></h2><div id="implementations-list"><details class="toggle implementors-toggle" open><summary><section id="impl-Converter" class="impl has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#80-278">source</a><a href="#impl-Converter" class="anchor">§</a><h3 class="code-header">impl <a class="struct" href="struct.Converter.html" title="struct convert_case::Converter">Converter</a></h3></section></summary><div class="impl-items"><details class="toggle method-toggle" open><summary><section id="method.new" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#90-92">source</a><h4 class="code-header">pub fn <a href="#method.new" class="fn">new</a>() -&gt; Self</h4></section></summary><div class="docblock"><p>Creates a new <code>Converter</code> with default fields.  This is the same as <code>Default::default()</code>.
 The <code>Converter</code> will use <code>Boundary::defaults()</code> for boundaries, no pattern, and an empty
 string as a delimeter.</p>
 
@@ -60,21 +60,21 @@ string as a delimeter.</p>
 
 <span class="kw">let </span>conv = Converter::new();
 <span class="macro">assert_eq!</span>(<span class="string">&quot;DeathPerennialQUEST&quot;</span>, conv.convert(<span class="string">&quot;Death-Perennial QUEST&quot;</span>))</code></pre></div>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.convert" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#102-112">source</a><h4 class="code-header">pub fn <a href="#method.convert" class="fn">convert</a>&lt;T&gt;(&amp;self, s: T) -&gt; <a class="struct" href="https://doc.rust-lang.org/1.68.0/alloc/string/struct.String.html" title="struct alloc::string::String">String</a><span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: <a class="trait" href="https://doc.rust-lang.org/1.68.0/core/convert/trait.AsRef.html" title="trait core::convert::AsRef">AsRef</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/1.68.0/std/primitive.str.html">str</a>&gt;,</span></h4></section></summary><div class="docblock"><p>Converts a string.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.convert" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#102-113">source</a><h4 class="code-header">pub fn <a href="#method.convert" class="fn">convert</a>&lt;T&gt;(&amp;self, s: T) -&gt; <a class="struct" href="https://doc.rust-lang.org/1.68.0/alloc/string/struct.String.html" title="struct alloc::string::String">String</a><span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: <a class="trait" href="https://doc.rust-lang.org/1.68.0/core/convert/trait.AsRef.html" title="trait core::convert::AsRef">AsRef</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/1.68.0/std/primitive.str.html">str</a>&gt;,</span></h4></section></summary><div class="docblock"><p>Converts a string.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>convert_case::{Case, Converter};
 
 <span class="kw">let </span>conv = Converter::new()
     .to_case(Case::Camel);
 <span class="macro">assert_eq!</span>(<span class="string">&quot;xmlHttpRequest&quot;</span>, conv.convert(<span class="string">&quot;XML_HTTP_Request&quot;</span>))</code></pre></div>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.to_case" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#122-126">source</a><h4 class="code-header">pub fn <a href="#method.to_case" class="fn">to_case</a>(self, case: <a class="enum" href="enum.Case.html" title="enum convert_case::Case">Case</a>) -&gt; Self</h4></section></summary><div class="docblock"><p>Set the pattern and delimiter to those associated with the given case.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.to_case" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#123-127">source</a><h4 class="code-header">pub fn <a href="#method.to_case" class="fn">to_case</a>(self, case: <a class="enum" href="enum.Case.html" title="enum convert_case::Case">Case</a>) -&gt; Self</h4></section></summary><div class="docblock"><p>Set the pattern and delimiter to those associated with the given case.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>convert_case::{Case, Converter};
 
 <span class="kw">let </span>conv = Converter::new()
     .to_case(Case::Pascal);
 <span class="macro">assert_eq!</span>(<span class="string">&quot;VariableName&quot;</span>, conv.convert(<span class="string">&quot;variable name&quot;</span>))</code></pre></div>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.from_case" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#138-141">source</a><h4 class="code-header">pub fn <a href="#method.from_case" class="fn">from_case</a>(self, case: <a class="enum" href="enum.Case.html" title="enum convert_case::Case">Case</a>) -&gt; Self</h4></section></summary><div class="docblock"><p>Sets the boundaries to those associated with the provided case.  This is used
+</div></details><details class="toggle method-toggle" open><summary><section id="method.from_case" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#139-142">source</a><h4 class="code-header">pub fn <a href="#method.from_case" class="fn">from_case</a>(self, case: <a class="enum" href="enum.Case.html" title="enum convert_case::Case">Case</a>) -&gt; Self</h4></section></summary><div class="docblock"><p>Sets the boundaries to those associated with the provided case.  This is used
 by the <code>from_case</code> function in the <code>Casing</code> trait.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>convert_case::{Case, Converter};
@@ -83,7 +83,7 @@ by the <code>from_case</code> function in the <code>Casing</code> trait.</p>
     .from_case(Case::Snake)
     .to_case(Case::Title);
 <span class="macro">assert_eq!</span>(<span class="string">&quot;Dot Productvalue&quot;</span>, conv.convert(<span class="string">&quot;dot_productValue&quot;</span>))</code></pre></div>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.set_boundaries" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#152-155">source</a><h4 class="code-header">pub fn <a href="#method.set_boundaries" class="fn">set_boundaries</a>(self, bs: &amp;[<a class="enum" href="enum.Boundary.html" title="enum convert_case::Boundary">Boundary</a>]) -&gt; Self</h4></section></summary><div class="docblock"><p>Sets the boundaries to those provided.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.set_boundaries" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#153-156">source</a><h4 class="code-header">pub fn <a href="#method.set_boundaries" class="fn">set_boundaries</a>(self, bs: &amp;[<a class="enum" href="enum.Boundary.html" title="enum convert_case::Boundary">Boundary</a>]) -&gt; Self</h4></section></summary><div class="docblock"><p>Sets the boundaries to those provided.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>convert_case::{Boundary, Case, Converter};
 
@@ -91,7 +91,7 @@ by the <code>from_case</code> function in the <code>Casing</code> trait.</p>
     .set_boundaries(<span class="kw-2">&amp;</span>[Boundary::Underscore, Boundary::LowerUpper])
     .to_case(Case::Lower);
 <span class="macro">assert_eq!</span>(<span class="string">&quot;panic attack dream theater&quot;</span>, conv.convert(<span class="string">&quot;panicAttack_dreamTheater&quot;</span>))</code></pre></div>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.add_boundary" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#167-170">source</a><h4 class="code-header">pub fn <a href="#method.add_boundary" class="fn">add_boundary</a>(self, b: <a class="enum" href="enum.Boundary.html" title="enum convert_case::Boundary">Boundary</a>) -&gt; Self</h4></section></summary><div class="docblock"><p>Adds a boundary to the list of boundaries.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.add_boundary" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#168-171">source</a><h4 class="code-header">pub fn <a href="#method.add_boundary" class="fn">add_boundary</a>(self, b: <a class="enum" href="enum.Boundary.html" title="enum convert_case::Boundary">Boundary</a>) -&gt; Self</h4></section></summary><div class="docblock"><p>Adds a boundary to the list of boundaries.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>convert_case::{Boundary, Case, Converter};
 
@@ -100,7 +100,7 @@ by the <code>from_case</code> function in the <code>Casing</code> trait.</p>
     .add_boundary(Boundary::Hyphen)
     .to_case(Case::Snake);
 <span class="macro">assert_eq!</span>(<span class="string">&quot;my_biography_video_1&quot;</span>, conv.convert(<span class="string">&quot;My Biography - Video 1&quot;</span>))</code></pre></div>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.add_boundaries" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#182-185">source</a><h4 class="code-header">pub fn <a href="#method.add_boundaries" class="fn">add_boundaries</a>(self, bs: &amp;[<a class="enum" href="enum.Boundary.html" title="enum convert_case::Boundary">Boundary</a>]) -&gt; Self</h4></section></summary><div class="docblock"><p>Adds a vector of boundaries to the list of boundaries.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.add_boundaries" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#183-186">source</a><h4 class="code-header">pub fn <a href="#method.add_boundaries" class="fn">add_boundaries</a>(self, bs: &amp;[<a class="enum" href="enum.Boundary.html" title="enum convert_case::Boundary">Boundary</a>]) -&gt; Self</h4></section></summary><div class="docblock"><p>Adds a vector of boundaries to the list of boundaries.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>convert_case::{Boundary, Case, Converter};
 
@@ -109,7 +109,7 @@ by the <code>from_case</code> function in the <code>Casing</code> trait.</p>
     .to_case(Case::Title)
     .add_boundaries(<span class="kw-2">&amp;</span>[Boundary::Underscore, Boundary::LowerUpper]);
 <span class="macro">assert_eq!</span>(<span class="string">&quot;2020 10 First Day&quot;</span>, conv.convert(<span class="string">&quot;2020-10_firstDay&quot;</span>));</code></pre></div>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.remove_boundary" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#196-199">source</a><h4 class="code-header">pub fn <a href="#method.remove_boundary" class="fn">remove_boundary</a>(self, b: <a class="enum" href="enum.Boundary.html" title="enum convert_case::Boundary">Boundary</a>) -&gt; Self</h4></section></summary><div class="docblock"><p>Removes a boundary from the list of boundaries if it exists.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.remove_boundary" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#197-200">source</a><h4 class="code-header">pub fn <a href="#method.remove_boundary" class="fn">remove_boundary</a>(self, b: <a class="enum" href="enum.Boundary.html" title="enum convert_case::Boundary">Boundary</a>) -&gt; Self</h4></section></summary><div class="docblock"><p>Removes a boundary from the list of boundaries if it exists.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>convert_case::{Boundary, Case, Converter};
 
@@ -117,7 +117,7 @@ by the <code>from_case</code> function in the <code>Casing</code> trait.</p>
     .remove_boundary(Boundary::Acronym)
     .to_case(Case::Kebab);
 <span class="macro">assert_eq!</span>(<span class="string">&quot;httprequest-parser&quot;</span>, conv.convert(<span class="string">&quot;HTTPRequest_parser&quot;</span>));</code></pre></div>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.remove_boundaries" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#210-215">source</a><h4 class="code-header">pub fn <a href="#method.remove_boundaries" class="fn">remove_boundaries</a>(self, bs: &amp;[<a class="enum" href="enum.Boundary.html" title="enum convert_case::Boundary">Boundary</a>]) -&gt; Self</h4></section></summary><div class="docblock"><p>Removes all the provided boundaries from the list of boundaries if it exists.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.remove_boundaries" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#211-216">source</a><h4 class="code-header">pub fn <a href="#method.remove_boundaries" class="fn">remove_boundaries</a>(self, bs: &amp;[<a class="enum" href="enum.Boundary.html" title="enum convert_case::Boundary">Boundary</a>]) -&gt; Self</h4></section></summary><div class="docblock"><p>Removes all the provided boundaries from the list of boundaries if it exists.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>convert_case::{Boundary, Case, Converter};
 
@@ -125,7 +125,7 @@ by the <code>from_case</code> function in the <code>Casing</code> trait.</p>
     .remove_boundaries(<span class="kw-2">&amp;</span>Boundary::digits())
     .to_case(Case::Snake);
 <span class="macro">assert_eq!</span>(<span class="string">&quot;c04_s03_path_finding.pdf&quot;</span>, conv.convert(<span class="string">&quot;C04 S03 Path Finding.pdf&quot;</span>));</code></pre></div>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.set_delim" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#226-232">source</a><h4 class="code-header">pub fn <a href="#method.set_delim" class="fn">set_delim</a>&lt;T&gt;(self, d: T) -&gt; Self<span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: <a class="trait" href="https://doc.rust-lang.org/1.68.0/alloc/string/trait.ToString.html" title="trait alloc::string::ToString">ToString</a>,</span></h4></section></summary><div class="docblock"><p>Sets the delimeter.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.set_delim" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#227-233">source</a><h4 class="code-header">pub fn <a href="#method.set_delim" class="fn">set_delim</a>&lt;T&gt;(self, d: T) -&gt; Self<span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: <a class="trait" href="https://doc.rust-lang.org/1.68.0/alloc/string/trait.ToString.html" title="trait alloc::string::ToString">ToString</a>,</span></h4></section></summary><div class="docblock"><p>Sets the delimeter.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>convert_case::{Case, Converter};
 
@@ -133,7 +133,7 @@ by the <code>from_case</code> function in the <code>Casing</code> trait.</p>
     .to_case(Case::Snake)
     .set_delim(<span class="string">&quot;.&quot;</span>);
 <span class="macro">assert_eq!</span>(<span class="string">&quot;lower.with.dots&quot;</span>, conv.convert(<span class="string">&quot;LowerWithDots&quot;</span>));</code></pre></div>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.remove_delim" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#243-246">source</a><h4 class="code-header">pub fn <a href="#method.remove_delim" class="fn">remove_delim</a>(self) -&gt; Self</h4></section></summary><div class="docblock"><p>Sets the delimeter to an empty string.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.remove_delim" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#244-247">source</a><h4 class="code-header">pub fn <a href="#method.remove_delim" class="fn">remove_delim</a>(self) -&gt; Self</h4></section></summary><div class="docblock"><p>Sets the delimeter to an empty string.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>convert_case::{Case, Converter};
 
@@ -141,7 +141,7 @@ by the <code>from_case</code> function in the <code>Casing</code> trait.</p>
     .to_case(Case::Snake)
     .remove_delim();
 <span class="macro">assert_eq!</span>(<span class="string">&quot;nodelimshere&quot;</span>, conv.convert(<span class="string">&quot;No Delims Here&quot;</span>));</code></pre></div>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.set_pattern" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#257-260">source</a><h4 class="code-header">pub fn <a href="#method.set_pattern" class="fn">set_pattern</a>(self, p: <a class="enum" href="enum.Pattern.html" title="enum convert_case::Pattern">Pattern</a>) -&gt; Self</h4></section></summary><div class="docblock"><p>Sets the pattern.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.set_pattern" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#258-261">source</a><h4 class="code-header">pub fn <a href="#method.set_pattern" class="fn">set_pattern</a>(self, p: <a class="enum" href="enum.Pattern.html" title="enum convert_case::Pattern">Pattern</a>) -&gt; Self</h4></section></summary><div class="docblock"><p>Sets the pattern.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>convert_case::{Case, Converter, Pattern};
 
@@ -149,7 +149,7 @@ by the <code>from_case</code> function in the <code>Casing</code> trait.</p>
     .set_delim(<span class="string">&quot;_&quot;</span>)
     .set_pattern(Pattern::Sentence);
 <span class="macro">assert_eq!</span>(<span class="string">&quot;Bjarne_case&quot;</span>, conv.convert(<span class="string">&quot;BJARNE CASE&quot;</span>));</code></pre></div>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.remove_pattern" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#273-276">source</a><h4 class="code-header">pub fn <a href="#method.remove_pattern" class="fn">remove_pattern</a>(self) -&gt; Self</h4></section></summary><div class="docblock"><p>Sets the pattern field to <code>None</code>.  Where there is no pattern, a character’s case is never
+</div></details><details class="toggle method-toggle" open><summary><section id="method.remove_pattern" class="method has-srclink"><a class="srclink rightside" href="../src/convert_case/converter.rs.html#274-277">source</a><h4 class="code-header">pub fn <a href="#method.remove_pattern" class="fn">remove_pattern</a>(self) -&gt; Self</h4></section></summary><div class="docblock"><p>Sets the pattern field to <code>None</code>.  Where there is no pattern, a character’s case is never
 mutated and will be maintained at the end of conversion.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>convert_case::{Case, Converter};

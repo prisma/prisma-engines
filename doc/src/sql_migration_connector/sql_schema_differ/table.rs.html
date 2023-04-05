@@ -196,19 +196,19 @@
 <a href="#196" id="196">196</a>
 <a href="#197" id="197">197</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{differ_database::DifferDatabase, foreign_keys_match};
-<span class="kw">use crate</span>::{flavour::SqlFlavour, pair::Pair};
+<span class="kw">use crate</span>::{flavour::SqlFlavour, migration_pair::MigrationPair};
 <span class="kw">use </span>sql_schema_describer::{
     walkers::{ForeignKeyWalker, IndexWalker, TableColumnWalker, TableWalker},
     TableId,
 };
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TableDiffer&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) tables: Pair&lt;TableWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) tables: MigrationPair&lt;TableWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) db: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>DifferDatabase&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;schema</span>, <span class="lifetime">&#39;b</span>&gt; TableDiffer&lt;<span class="lifetime">&#39;schema</span>, <span class="lifetime">&#39;b</span>&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>column_pairs(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = Pair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;schema</span>&gt;&gt;&gt; + <span class="lifetime">&#39;_ </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>column_pairs(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = MigrationPair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;schema</span>&gt;&gt;&gt; + <span class="lifetime">&#39;_ </span>{
         <span class="self">self</span>.db
             .column_pairs(<span class="self">self</span>.tables.map(|t| t.id))
             .map(<span class="kw">move </span>|colids| <span class="self">self</span>.db.schemas.walk(colids))
@@ -235,7 +235,7 @@
         <span class="self">self</span>.next_foreign_keys().filter(<span class="kw">move </span>|next_fk| {
             !<span class="self">self
                 </span>.previous_foreign_keys()
-                .any(|previous_fk| <span class="kw">super</span>::foreign_keys_match(Pair::new(<span class="kw-2">&amp;</span>previous_fk, next_fk), <span class="self">self</span>.db))
+                .any(|previous_fk| <span class="kw">super</span>::foreign_keys_match(MigrationPair::new(<span class="kw-2">&amp;</span>previous_fk, next_fk), <span class="self">self</span>.db))
         })
     }
 
@@ -243,7 +243,7 @@
         <span class="self">self</span>.previous_foreign_keys().filter(<span class="kw">move </span>|previous_fk| {
             !<span class="self">self
                 </span>.next_foreign_keys()
-                .any(|next_fk| <span class="kw">super</span>::foreign_keys_match(Pair::new(previous_fk, <span class="kw-2">&amp;</span>next_fk), <span class="self">self</span>.db))
+                .any(|next_fk| <span class="kw">super</span>::foreign_keys_match(MigrationPair::new(previous_fk, <span class="kw-2">&amp;</span>next_fk), <span class="self">self</span>.db))
         })
     }
 
@@ -263,15 +263,15 @@
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>foreign_key_pairs(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = Pair&lt;ForeignKeyWalker&lt;<span class="lifetime">&#39;schema</span>&gt;&gt;&gt; + <span class="lifetime">&#39;_ </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>foreign_key_pairs(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = MigrationPair&lt;ForeignKeyWalker&lt;<span class="lifetime">&#39;schema</span>&gt;&gt;&gt; + <span class="lifetime">&#39;_ </span>{
         <span class="self">self</span>.previous_foreign_keys().filter_map(<span class="kw">move </span>|previous_fk| {
             <span class="self">self</span>.next_foreign_keys()
-                .find(<span class="kw">move </span>|next_fk| foreign_keys_match(Pair::new(<span class="kw-2">&amp;</span>previous_fk, next_fk), <span class="self">self</span>.db))
-                .map(<span class="kw">move </span>|next_fk| Pair::new(previous_fk, next_fk))
+                .find(<span class="kw">move </span>|next_fk| foreign_keys_match(MigrationPair::new(<span class="kw-2">&amp;</span>previous_fk, next_fk), <span class="self">self</span>.db))
+                .map(<span class="kw">move </span>|next_fk| MigrationPair::new(previous_fk, next_fk))
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>index_pairs&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = Pair&lt;IndexWalker&lt;<span class="lifetime">&#39;schema</span>&gt;&gt;&gt; + <span class="lifetime">&#39;a </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>index_pairs&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = MigrationPair&lt;IndexWalker&lt;<span class="lifetime">&#39;schema</span>&gt;&gt;&gt; + <span class="lifetime">&#39;a </span>{
         <span class="kw">let </span>singular_indexes = <span class="self">self</span>.previous_indexes().filter(<span class="kw">move </span>|left| {
             <span class="comment">// Renaming an index in a situation where we have multiple indexes
             // with the same columns, but a different name, is highly unstable.
@@ -291,7 +291,7 @@
         singular_indexes.filter_map(<span class="kw">move </span>|previous_index| {
             <span class="self">self</span>.next_indexes()
                 .find(|next_index| indexes_match(previous_index, <span class="kw-2">*</span>next_index, <span class="self">self</span>.db.flavour))
-                .map(|renamed_index| Pair::new(previous_index, renamed_index))
+                .map(|renamed_index| MigrationPair::new(previous_index, renamed_index))
         })
     }
 
@@ -371,7 +371,7 @@
         <span class="self">self</span>.tables.next
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>table_ids(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Pair&lt;TableId&gt; {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>table_ids(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MigrationPair&lt;TableId&gt; {
         <span class="self">self</span>.tables.map(|t| t.id)
     }
 }

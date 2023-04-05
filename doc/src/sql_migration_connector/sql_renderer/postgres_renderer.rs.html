@@ -1126,10 +1126,14 @@
 <a href="#1126" id="1126">1126</a>
 <a href="#1127" id="1127">1127</a>
 <a href="#1128" id="1128">1128</a>
+<a href="#1129" id="1129">1129</a>
+<a href="#1130" id="1130">1130</a>
+<a href="#1131" id="1131">1131</a>
+<a href="#1132" id="1132">1132</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{common::<span class="kw-2">*</span>, SqlRenderer};
 <span class="kw">use crate</span>::{
     flavour::PostgresFlavour,
-    pair::Pair,
+    migration_pair::MigrationPair,
     sql_migration::{
         AlterColumn, AlterEnum, AlterExtension, AlterTable, CreateExtension, DropExtension, ExtensionChange,
         RedefineTable, SequenceChange, SequenceChanges, TableChange,
@@ -1170,11 +1174,11 @@
     <span class="comment">// TODO(MultiSchema): We only do alter_sequence on CockroachDB.
     </span><span class="kw">fn </span>render_alter_sequence(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        sequence_idx: Pair&lt;u32&gt;,
+        sequence_idx: MigrationPair&lt;u32&gt;,
         changes: SequenceChanges,
-        schemas: Pair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;,
+        schemas: MigrationPair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;,
     ) -&gt; Vec&lt;String&gt; {
-        <span class="kw">let </span>exts: Pair&lt;<span class="kw-2">&amp;</span>PostgresSchemaExt&gt; = schemas.map(|schema| schema.downcast_connector_data());
+        <span class="kw">let </span>exts: MigrationPair&lt;<span class="kw-2">&amp;</span>PostgresSchemaExt&gt; = schemas.map(|schema| schema.downcast_connector_data());
         <span class="kw">let </span>(prev_seq, next_seq) = exts
             .zip(sequence_idx)
             .map(|(ext, idx)| <span class="kw-2">&amp;</span>ext.sequences[idx <span class="kw">as </span>usize])
@@ -1250,8 +1254,8 @@
         })
     }
 
-    <span class="kw">fn </span>render_alter_extension(<span class="kw-2">&amp;</span><span class="self">self</span>, alter: <span class="kw-2">&amp;</span>AlterExtension, schemas: Pair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;) -&gt; Vec&lt;String&gt; {
-        <span class="kw">let </span>exts: Pair&lt;<span class="kw-2">&amp;</span>PostgresSchemaExt&gt; = schemas.map(|schema| schema.downcast_connector_data());
+    <span class="kw">fn </span>render_alter_extension(<span class="kw-2">&amp;</span><span class="self">self</span>, alter: <span class="kw-2">&amp;</span>AlterExtension, schemas: MigrationPair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;) -&gt; Vec&lt;String&gt; {
+        <span class="kw">let </span>exts: MigrationPair&lt;<span class="kw-2">&amp;</span>PostgresSchemaExt&gt; = schemas.map(|schema| schema.downcast_connector_data());
         <span class="kw">let </span>extensions = exts.zip(alter.ids).map(|(ext, id)| ext.get_extension(id));
 
         alter
@@ -1307,7 +1311,7 @@
         .to_string()
     }
 
-    <span class="kw">fn </span>render_alter_enum(<span class="kw-2">&amp;</span><span class="self">self</span>, alter_enum: <span class="kw-2">&amp;</span>AlterEnum, schemas: Pair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;) -&gt; Vec&lt;String&gt; {
+    <span class="kw">fn </span>render_alter_enum(<span class="kw-2">&amp;</span><span class="self">self</span>, alter_enum: <span class="kw-2">&amp;</span>AlterEnum, schemas: MigrationPair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;) -&gt; Vec&lt;String&gt; {
         <span class="comment">// ALTER TYPE is much more limited on postgres than on cockroachdb.
         //
         // On Postgres:
@@ -1323,7 +1327,7 @@
         }
     }
 
-    <span class="kw">fn </span>render_alter_primary_key(<span class="kw-2">&amp;</span><span class="self">self</span>, tables: Pair&lt;TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; Vec&lt;String&gt; {
+    <span class="kw">fn </span>render_alter_primary_key(<span class="kw-2">&amp;</span><span class="self">self</span>, tables: MigrationPair&lt;TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; Vec&lt;String&gt; {
         render_step(<span class="kw-2">&amp;mut </span>|step| {
             step.render_statement(<span class="kw-2">&amp;mut </span>|stmt| {
                 stmt.push_str(<span class="string">&quot;ALTER TABLE &quot;</span>);
@@ -1341,7 +1345,7 @@
         })
     }
 
-    <span class="kw">fn </span>render_rename_index(<span class="kw-2">&amp;</span><span class="self">self</span>, indexes: Pair&lt;IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; Vec&lt;String&gt; {
+    <span class="kw">fn </span>render_rename_index(<span class="kw-2">&amp;</span><span class="self">self</span>, indexes: MigrationPair&lt;IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; Vec&lt;String&gt; {
         render_step(<span class="kw-2">&amp;mut </span>|step| {
             step.render_statement(<span class="kw-2">&amp;mut </span>|stmt| {
                 <span class="kw">let </span>previous_table = indexes.previous.table();
@@ -1356,7 +1360,7 @@
         })
     }
 
-    <span class="kw">fn </span>render_alter_table(<span class="kw-2">&amp;</span><span class="self">self</span>, alter_table: <span class="kw-2">&amp;</span>AlterTable, schemas: Pair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;) -&gt; Vec&lt;String&gt; {
+    <span class="kw">fn </span>render_alter_table(<span class="kw-2">&amp;</span><span class="self">self</span>, alter_table: <span class="kw-2">&amp;</span>AlterTable, schemas: MigrationPair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;) -&gt; Vec&lt;String&gt; {
         <span class="kw">let </span>AlterTable { changes, table_ids } = alter_table;
         <span class="kw">let </span><span class="kw-2">mut </span>lines = Vec::new();
         <span class="kw">let </span><span class="kw-2">mut </span>before_statements = Vec::new();
@@ -1582,7 +1586,7 @@
         .to_string()
     }
 
-    <span class="kw">fn </span>render_redefine_tables(<span class="kw-2">&amp;</span><span class="self">self</span>, tables: <span class="kw-2">&amp;</span>[RedefineTable], schemas: Pair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;) -&gt; Vec&lt;String&gt; {
+    <span class="kw">fn </span>render_redefine_tables(<span class="kw-2">&amp;</span><span class="self">self</span>, tables: <span class="kw-2">&amp;</span>[RedefineTable], schemas: MigrationPair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;) -&gt; Vec&lt;String&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>result = Vec::new();
 
         <span class="kw">for </span>redefine_table <span class="kw">in </span>tables {
@@ -1648,7 +1652,7 @@
         <span class="macro">unreachable!</span>(<span class="string">&quot;render_drop_user_defined_type on PostgreSQL&quot;</span>)
     }
 
-    <span class="kw">fn </span>render_rename_foreign_key(<span class="kw-2">&amp;</span><span class="self">self</span>, fks: Pair&lt;ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; String {
+    <span class="kw">fn </span>render_rename_foreign_key(<span class="kw-2">&amp;</span><span class="self">self</span>, fks: MigrationPair&lt;ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; String {
         <span class="macro">format!</span>(
             <span class="string">r#&quot;ALTER TABLE {table} RENAME CONSTRAINT {previous} TO {next}&quot;#</span>,
             table = QuotedWithPrefix::pg_from_table_walker(fks.previous.table()),
@@ -1807,7 +1811,7 @@
 }
 
 <span class="kw">fn </span>render_alter_column(
-    columns: Pair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+    columns: MigrationPair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
     column_changes: <span class="kw-2">&amp;</span>ColumnChanges,
     before_statements: <span class="kw-2">&amp;mut </span>Vec&lt;String&gt;,
     clauses: <span class="kw-2">&amp;mut </span>Vec&lt;String&gt;,
@@ -1879,7 +1883,7 @@
 }
 
 <span class="kw">fn </span>expand_alter_column(
-    columns: Pair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+    columns: MigrationPair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
     column_changes: <span class="kw-2">&amp;</span>ColumnChanges,
 ) -&gt; Vec&lt;PostgresAlterColumn&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>changes = Vec::new();
@@ -2000,7 +2004,7 @@
 
 <span class="kw">fn </span>render_postgres_alter_enum(
     alter_enum: <span class="kw-2">&amp;</span>AlterEnum,
-    schemas: Pair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;,
+    schemas: MigrationPair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;,
     flavour: <span class="kw-2">&amp;</span>PostgresFlavour,
 ) -&gt; Vec&lt;String&gt; {
     <span class="kw">if </span>alter_enum.dropped_variants.is_empty() {
@@ -2130,7 +2134,7 @@
         <span class="kw">for </span>(columns, next_default) <span class="kw">in </span>alter_enum
             .previous_usages_as_default
             .iter()
-            .filter_map(|(prev, next)| next.map(|next| schemas.walk(Pair::new(<span class="kw-2">*</span>prev, next))))
+            .filter_map(|(prev, next)| next.map(|next| schemas.walk(MigrationPair::new(<span class="kw-2">*</span>prev, next))))
             .filter_map(|columns| columns.next.default().map(|next_default| (columns, next_default)))
         {
             <span class="kw">let </span>table_name = columns.previous.table().name();
@@ -2154,7 +2158,11 @@
     stmts
 }
 
-<span class="kw">fn </span>render_cockroach_alter_enum(alter_enum: <span class="kw-2">&amp;</span>AlterEnum, schemas: Pair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;, renderer: <span class="kw-2">&amp;mut </span>StepRenderer) {
+<span class="kw">fn </span>render_cockroach_alter_enum(
+    alter_enum: <span class="kw-2">&amp;</span>AlterEnum,
+    schemas: MigrationPair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;,
+    renderer: <span class="kw-2">&amp;mut </span>StepRenderer,
+) {
     <span class="kw">let </span>enums = schemas.walk(alter_enum.id);
     <span class="kw">let </span><span class="kw-2">mut </span>prefix = String::new();
     prefix.push_str(<span class="string">&quot;ALTER TYPE &quot;</span>);

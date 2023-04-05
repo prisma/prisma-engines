@@ -214,12 +214,12 @@
 <a href="#214" id="214">214</a>
 <a href="#215" id="215">215</a>
 <a href="#216" id="216">216</a>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{flavour::SqlFlavour, pair::Pair};
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{flavour::SqlFlavour, migration_pair::MigrationPair};
 <span class="kw">use </span>enumflags2::BitFlags;
 
 <span class="kw">use </span>sql_schema_describer::{walkers::TableColumnWalker, DefaultKind, PrismaValue};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>all_changes(cols: Pair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;, flavour: <span class="kw-2">&amp;</span><span class="kw">dyn </span>SqlFlavour) -&gt; ColumnChanges {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>all_changes(cols: MigrationPair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;, flavour: <span class="kw-2">&amp;</span><span class="kw">dyn </span>SqlFlavour) -&gt; ColumnChanges {
     <span class="kw">let </span><span class="kw-2">mut </span>changes = BitFlags::empty();
     <span class="kw">let </span>type_change = flavour.column_type_change(cols);
 
@@ -245,7 +245,7 @@
 <span class="doccomment">/// There are workarounds to cope with current migration and introspection limitations.
 ///
 /// - We bail on a number of cases that are too complex to deal with right now or underspecified.
-</span><span class="kw">fn </span>defaults_match(cols: Pair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;, flavour: <span class="kw-2">&amp;</span><span class="kw">dyn </span>SqlFlavour) -&gt; bool {
+</span><span class="kw">fn </span>defaults_match(cols: MigrationPair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;, flavour: <span class="kw-2">&amp;</span><span class="kw">dyn </span>SqlFlavour) -&gt; bool {
     <span class="comment">// JSON defaults on MySQL should be ignored.
     </span><span class="kw">if </span>flavour.should_ignore_json_defaults()
         &amp;&amp; (cols.previous.column_type_family().is_json() || cols.next.column_type_family().is_json())

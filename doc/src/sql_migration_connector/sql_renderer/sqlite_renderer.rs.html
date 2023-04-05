@@ -350,7 +350,7 @@
 </pre><pre class="rust"><code><span class="kw">use super</span>::{common::<span class="kw-2">*</span>, SqlRenderer};
 <span class="kw">use crate</span>::{
     flavour::SqliteFlavour,
-    pair::Pair,
+    migration_pair::MigrationPair,
     sql_migration::{AlterEnum, AlterTable, RedefineTable, TableChange},
 };
 <span class="kw">use </span>indoc::formatdoc;
@@ -365,7 +365,7 @@
         Quoted::Double(name)
     }
 
-    <span class="kw">fn </span>render_alter_enum(<span class="kw-2">&amp;</span><span class="self">self</span>, _alter_enum: <span class="kw-2">&amp;</span>AlterEnum, _schemas: Pair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;) -&gt; Vec&lt;String&gt; {
+    <span class="kw">fn </span>render_alter_enum(<span class="kw-2">&amp;</span><span class="self">self</span>, _alter_enum: <span class="kw-2">&amp;</span>AlterEnum, _schemas: MigrationPair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;) -&gt; Vec&lt;String&gt; {
         <span class="macro">unreachable!</span>(<span class="string">&quot;render_alter_enum on sqlite&quot;</span>)
     }
 
@@ -409,7 +409,7 @@
         <span class="macro">unreachable!</span>(<span class="string">&quot;AddForeignKey on SQLite&quot;</span>)
     }
 
-    <span class="kw">fn </span>render_alter_table(<span class="kw-2">&amp;</span><span class="self">self</span>, alter_table: <span class="kw-2">&amp;</span>AlterTable, schemas: Pair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;) -&gt; Vec&lt;String&gt; {
+    <span class="kw">fn </span>render_alter_table(<span class="kw-2">&amp;</span><span class="self">self</span>, alter_table: <span class="kw-2">&amp;</span>AlterTable, schemas: MigrationPair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;) -&gt; Vec&lt;String&gt; {
         <span class="kw">let </span>AlterTable { changes, table_ids } = alter_table;
         <span class="kw">let </span>tables = schemas.walk(<span class="kw-2">*</span>table_ids);
         <span class="kw">let </span><span class="kw-2">mut </span>statements = Vec::new();
@@ -505,7 +505,7 @@
         <span class="macro">format!</span>(<span class="string">&quot;DROP INDEX {}&quot;</span>, <span class="self">self</span>.quote(index.name()))
     }
 
-    <span class="kw">fn </span>render_drop_and_recreate_index(<span class="kw-2">&amp;</span><span class="self">self</span>, indexes: Pair&lt;IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; Vec&lt;String&gt; {
+    <span class="kw">fn </span>render_drop_and_recreate_index(<span class="kw-2">&amp;</span><span class="self">self</span>, indexes: MigrationPair&lt;IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; Vec&lt;String&gt; {
         <span class="macro">vec!</span>[
             <span class="self">self</span>.render_drop_index(indexes.previous),
             <span class="self">self</span>.render_create_index(indexes.next),
@@ -531,7 +531,7 @@
         })
     }
 
-    <span class="kw">fn </span>render_redefine_tables(<span class="kw-2">&amp;</span><span class="self">self</span>, tables: <span class="kw-2">&amp;</span>[RedefineTable], schemas: Pair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;) -&gt; Vec&lt;String&gt; {
+    <span class="kw">fn </span>render_redefine_tables(<span class="kw-2">&amp;</span><span class="self">self</span>, tables: <span class="kw-2">&amp;</span>[RedefineTable], schemas: MigrationPair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;) -&gt; Vec&lt;String&gt; {
         <span class="comment">// Based on &#39;Making Other Kinds Of Table Schema Changes&#39; from https://www.sqlite.org/lang_altertable.html
         </span><span class="kw">let </span><span class="kw-2">mut </span>result = <span class="macro">vec!</span>[<span class="string">&quot;PRAGMA foreign_keys=OFF&quot;</span>.to_string()];
 
@@ -577,7 +577,7 @@
         <span class="macro">unreachable!</span>(<span class="string">&quot;render_drop_user_defined_type on SQLite&quot;</span>)
     }
 
-    <span class="kw">fn </span>render_rename_foreign_key(<span class="kw-2">&amp;</span><span class="self">self</span>, _fks: Pair&lt;ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; String {
+    <span class="kw">fn </span>render_rename_foreign_key(<span class="kw-2">&amp;</span><span class="self">self</span>, _fks: MigrationPair&lt;ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; String {
         <span class="macro">unreachable!</span>(<span class="string">&quot;render RenameForeignKey on SQLite&quot;</span>)
     }
 }
@@ -613,7 +613,7 @@
 </span><span class="kw">fn </span>copy_current_table_into_new_table(
     steps: <span class="kw-2">&amp;mut </span>Vec&lt;String&gt;,
     redefine_table: <span class="kw-2">&amp;</span>RedefineTable,
-    tables: Pair&lt;TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+    tables: MigrationPair&lt;TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
     temporary_table_name: <span class="kw-2">&amp;</span>str,
 ) {
     <span class="kw">if </span>redefine_table.column_pairs.is_empty() {

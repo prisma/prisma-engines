@@ -163,7 +163,7 @@
 <a href="#163" id="163">163</a>
 <a href="#164" id="164">164</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{differ_database::DifferDatabase, ColumnTypeChange};
-<span class="kw">use crate</span>::{pair::Pair, sql_migration::SqlMigrationStep, sql_schema_differ};
+<span class="kw">use crate</span>::{migration_pair::MigrationPair, sql_migration::SqlMigrationStep, sql_schema_differ};
 <span class="kw">use </span>sql_schema_describer::{
     walkers::{IndexWalker, TableColumnWalker, TableWalker},
     TableColumnId,
@@ -201,12 +201,12 @@
     </span><span class="kw">fn </span>can_rename_foreign_key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
 
     <span class="doccomment">/// This method must return whether a column became or ceased to be autoincrementing.
-    </span><span class="kw">fn </span>column_autoincrement_changed(<span class="kw-2">&amp;</span><span class="self">self</span>, columns: Pair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; bool {
+    </span><span class="kw">fn </span>column_autoincrement_changed(<span class="kw-2">&amp;</span><span class="self">self</span>, columns: MigrationPair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; bool {
         columns.previous.is_autoincrement() != columns.next.is_autoincrement()
     }
 
     <span class="doccomment">/// Return whether a column&#39;s type needs to be migrated, and how.
-    </span><span class="kw">fn </span>column_type_change(<span class="kw-2">&amp;</span><span class="self">self</span>, differ: Pair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt;;
+    </span><span class="kw">fn </span>column_type_change(<span class="kw-2">&amp;</span><span class="self">self</span>, differ: MigrationPair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt;;
 
     <span class="doccomment">/// Push enum-related steps.
     </span><span class="kw">fn </span>push_enum_steps(<span class="kw-2">&amp;</span><span class="self">self</span>, _steps: <span class="kw-2">&amp;mut </span>Vec&lt;SqlMigrationStep&gt;, _db: <span class="kw-2">&amp;</span>DifferDatabase&lt;<span class="lifetime">&#39;_</span>&gt;) {}
@@ -231,7 +231,7 @@
     </span>}
 
     <span class="doccomment">/// Return whether an index should be renamed by the migration.
-    </span><span class="kw">fn </span>index_should_be_renamed(<span class="kw-2">&amp;</span><span class="self">self</span>, indexes: Pair&lt;IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; bool {
+    </span><span class="kw">fn </span>index_should_be_renamed(<span class="kw-2">&amp;</span><span class="self">self</span>, indexes: MigrationPair&lt;IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; bool {
         indexes.previous.name() != indexes.next.name()
     }
 
@@ -240,7 +240,7 @@
     </span>}
 
     <span class="doccomment">/// Did something connector-specific change in the primary key definition?
-    </span><span class="kw">fn </span>primary_key_changed(<span class="kw-2">&amp;</span><span class="self">self</span>, _tables: Pair&lt;TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; bool {
+    </span><span class="kw">fn </span>primary_key_changed(<span class="kw-2">&amp;</span><span class="self">self</span>, _tables: MigrationPair&lt;TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; bool {
         <span class="bool-val">false
     </span>}
 
@@ -248,7 +248,7 @@
     </span><span class="kw">fn </span>push_index_changes_for_column_changes(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         _table: <span class="kw-2">&amp;</span>sql_schema_differ::TableDiffer&lt;<span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span>&gt;,
-        _column_index: Pair&lt;TableColumnId&gt;,
+        _column_index: MigrationPair&lt;TableColumnId&gt;,
         _column_changes: sql_schema_differ::ColumnChanges,
         _steps: <span class="kw-2">&amp;mut </span>Vec&lt;SqlMigrationStep&gt;,
     ) {
@@ -303,7 +303,7 @@
         string.as_bytes() == bytes
     }
 
-    <span class="kw">fn </span>table_names_match(<span class="kw-2">&amp;</span><span class="self">self</span>, names: Pair&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; bool {
+    <span class="kw">fn </span>table_names_match(<span class="kw-2">&amp;</span><span class="self">self</span>, names: MigrationPair&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; bool {
         names.previous == names.next
     }
 

@@ -538,6 +538,9 @@
 <a href="#538" id="538">538</a>
 <a href="#539" id="539">539</a>
 <a href="#540" id="540">540</a>
+<a href="#541" id="541">541</a>
+<a href="#542" id="542">542</a>
+<a href="#543" id="543">543</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>column;
 <span class="kw">mod </span>differ_database;
 <span class="kw">mod </span>enums;
@@ -551,7 +554,7 @@
 <span class="kw">use </span><span class="self">self</span>::differ_database::DifferDatabase;
 <span class="kw">use crate</span>::{
     database_schema::SqlDatabaseSchema,
-    pair::Pair,
+    migration_pair::MigrationPair,
     sql_migration::{<span class="self">self</span>, AlterColumn, AlterTable, RedefineTable, SqlMigrationStep, TableChange},
     SqlFlavour,
 };
@@ -560,7 +563,10 @@
 <span class="kw">use </span>std::{borrow::Cow, collections::HashSet};
 <span class="kw">use </span>table::TableDiffer;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>calculate_steps(schemas: Pair&lt;<span class="kw-2">&amp;</span>SqlDatabaseSchema&gt;, flavour: <span class="kw-2">&amp;</span><span class="kw">dyn </span>SqlFlavour) -&gt; Vec&lt;SqlMigrationStep&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>calculate_steps(
+    schemas: MigrationPair&lt;<span class="kw-2">&amp;</span>SqlDatabaseSchema&gt;,
+    flavour: <span class="kw-2">&amp;</span><span class="kw">dyn </span>SqlFlavour,
+) -&gt; Vec&lt;SqlMigrationStep&gt; {
     <span class="kw">let </span>db = DifferDatabase::new(schemas, flavour);
     <span class="kw">let </span><span class="kw-2">mut </span>steps: Vec&lt;SqlMigrationStep&gt; = Vec::new();
 
@@ -656,7 +662,7 @@
             .index_pairs()
             .filter(|pair| db.flavour.index_should_be_renamed(<span class="kw-2">*</span>pair))
         {
-            <span class="kw">let </span>index: Pair&lt;IndexId&gt; = i.map(|i| i.id);
+            <span class="kw">let </span>index: MigrationPair&lt;IndexId&gt; = i.map(|i| i.id);
 
             <span class="kw">let </span>step = <span class="kw">if </span>db.flavour.can_rename_index() {
                 SqlMigrationStep::RenameIndex { index }
@@ -730,7 +736,7 @@
                 <span class="kw">return </span><span class="prelude-val">None</span>;
             }
 
-            <span class="kw">let </span>column_id = Pair::new(column_differ.previous.id, column_differ.next.id);
+            <span class="kw">let </span>column_id = MigrationPair::new(column_differ.previous.id, column_differ.next.id);
 
             <span class="kw">match </span>changes.type_change {
                 <span class="prelude-val">Some</span>(ColumnTypeChange::NotCastable) =&gt; <span class="prelude-val">Some</span>(TableChange::DropAndRecreateColumn { column_id, changes }),
@@ -972,7 +978,7 @@
 
 <span class="doccomment">/// Compare two foreign keys and return whether they should be considered
 /// equivalent for schema diffing purposes.
-</span><span class="kw">fn </span>foreign_keys_match(fks: Pair&lt;<span class="kw-2">&amp;</span>ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;, db: <span class="kw-2">&amp;</span>DifferDatabase&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+</span><span class="kw">fn </span>foreign_keys_match(fks: MigrationPair&lt;<span class="kw-2">&amp;</span>ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;, db: <span class="kw-2">&amp;</span>DifferDatabase&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
     <span class="kw">let </span>references_same_table = db.flavour.table_names_match(fks.map(|fk| fk.referenced_table().name()));
 
     <span class="kw">let </span>references_same_column_count = fks.previous.referenced_columns().len() == fks.next.referenced_columns().len();
@@ -1006,7 +1012,7 @@
 }
 
 <span class="kw">fn </span>push_foreign_key_pair_changes(
-    fk: Pair&lt;ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+    fk: MigrationPair&lt;ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
     steps: <span class="kw-2">&amp;mut </span>Vec&lt;SqlMigrationStep&gt;,
     db: <span class="kw-2">&amp;</span>DifferDatabase&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) {

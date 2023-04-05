@@ -682,7 +682,7 @@
 <a href="#682" id="682">682</a>
 <a href="#683" id="683">683</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
-    pair::Pair,
+    migration_pair::MigrationPair,
     sql_renderer::IteratorJoin,
     sql_schema_differ::{ColumnChange, ColumnChanges},
 };
@@ -703,8 +703,8 @@
 }
 
 <span class="kw">impl </span>SqlMigration {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>schemas(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Pair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt; {
-        Pair::new(<span class="kw-2">&amp;</span><span class="self">self</span>.before, <span class="kw-2">&amp;</span><span class="self">self</span>.after)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>schemas(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MigrationPair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt; {
+        MigrationPair::new(<span class="kw-2">&amp;</span><span class="self">self</span>.before, <span class="kw-2">&amp;</span><span class="self">self</span>.after)
     }
 
     <span class="doccomment">/// Exposed for tests.
@@ -1095,7 +1095,7 @@
     }
 }
 
-<span class="kw">fn </span>render_column_changes(columns: Pair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;, changes: <span class="kw-2">&amp;</span>ColumnChanges, sink: <span class="kw-2">&amp;mut </span>String) {
+<span class="kw">fn </span>render_column_changes(columns: MigrationPair&lt;TableColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;, changes: <span class="kw-2">&amp;</span>ColumnChanges, sink: <span class="kw-2">&amp;mut </span>String) {
     <span class="kw">let </span>readable_changes = changes
         .iter()
         .map(|change| <span class="kw">match </span>change {
@@ -1135,7 +1135,7 @@
     DropExtension(DropExtension),
     CreateExtension(CreateExtension),
     AlterExtension(AlterExtension),
-    AlterSequence(Pair&lt;u32&gt;, SequenceChanges),
+    AlterSequence(MigrationPair&lt;u32&gt;, SequenceChanges),
     DropView(DropView),
     DropUserDefinedType(DropUserDefinedType),
     CreateEnum(sql_schema_describer::EnumId),
@@ -1147,7 +1147,7 @@
         index_id: IndexId,
     },
     AlterTable(AlterTable),
-    AlterPrimaryKey(Pair&lt;TableId&gt;),
+    AlterPrimaryKey(MigrationPair&lt;TableId&gt;),
     <span class="comment">// Order matters: we must drop tables before we create indexes,
     // because on Postgres and SQLite, we may create indexes whose names
     // clash with the names of indexes on the dropped tables.
@@ -1173,7 +1173,7 @@
         from_drop_and_recreate: bool,
     },
     RenameForeignKey {
-        foreign_key_id: Pair&lt;ForeignKeyId&gt;,
+        foreign_key_id: MigrationPair&lt;ForeignKeyId&gt;,
     },
     <span class="comment">// Order matters: this needs to come after create_indexes, because the foreign keys can depend on unique
     // indexes created there.
@@ -1181,10 +1181,10 @@
         foreign_key_id: ForeignKeyId,
     },
     RenameIndex {
-        index: Pair&lt;IndexId&gt;,
+        index: MigrationPair&lt;IndexId&gt;,
     },
     RedefineIndex {
-        index: Pair&lt;IndexId&gt;,
+        index: MigrationPair&lt;IndexId&gt;,
     },
 }
 
@@ -1219,7 +1219,7 @@
 
 <span class="attr">#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>AlterExtension {
-    <span class="kw">pub </span>ids: Pair&lt;postgres::ExtensionId&gt;,
+    <span class="kw">pub </span>ids: MigrationPair&lt;postgres::ExtensionId&gt;,
     <span class="kw">pub </span>changes: Vec&lt;ExtensionChange&gt;,
 }
 
@@ -1241,7 +1241,7 @@
 
 <span class="attr">#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>AlterTable {
-    <span class="kw">pub </span>table_ids: Pair&lt;TableId&gt;,
+    <span class="kw">pub </span>table_ids: MigrationPair&lt;TableId&gt;,
     <span class="kw">pub </span>changes: Vec&lt;TableChange&gt;,
 }
 
@@ -1256,7 +1256,7 @@
         column_id: TableColumnId,
     },
     DropAndRecreateColumn {
-        column_id: Pair&lt;TableColumnId&gt;,
+        column_id: MigrationPair&lt;TableColumnId&gt;,
         <span class="doccomment">/// The change mask for the column.
         </span>changes: ColumnChanges,
     },
@@ -1289,7 +1289,7 @@
 
 <span class="attr">#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>AlterColumn {
-    <span class="kw">pub </span>column_id: Pair&lt;TableColumnId&gt;,
+    <span class="kw">pub </span>column_id: MigrationPair&lt;TableColumnId&gt;,
     <span class="kw">pub </span>changes: ColumnChanges,
     <span class="kw">pub </span>type_change: <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt;,
 }
@@ -1303,7 +1303,7 @@
 
 <span class="attr">#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>AlterEnum {
-    <span class="kw">pub </span>id: Pair&lt;EnumId&gt;,
+    <span class="kw">pub </span>id: MigrationPair&lt;EnumId&gt;,
     <span class="kw">pub </span>created_variants: Vec&lt;String&gt;,
     <span class="kw">pub </span>dropped_variants: Vec&lt;String&gt;,
     <span class="doccomment">/// This should be intepreted as prev_colidx, Option&lt;next_colidx&gt;) The second item in the tuple
@@ -1325,8 +1325,8 @@
     <span class="kw">pub </span>added_columns_with_virtual_defaults: Vec&lt;TableColumnId&gt;,
     <span class="kw">pub </span>dropped_columns: Vec&lt;TableColumnId&gt;,
     <span class="kw">pub </span>dropped_primary_key: bool,
-    <span class="kw">pub </span>column_pairs: Vec&lt;(Pair&lt;TableColumnId&gt;, ColumnChanges, <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt;)&gt;,
-    <span class="kw">pub </span>table_ids: Pair&lt;TableId&gt;,
+    <span class="kw">pub </span>column_pairs: Vec&lt;(MigrationPair&lt;TableColumnId&gt;, ColumnChanges, <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt;)&gt;,
+    <span class="kw">pub </span>table_ids: MigrationPair&lt;TableId&gt;,
 }
 
 <span class="attr">#[derive(Clone, Copy, Debug, PartialEq, Eq)]
