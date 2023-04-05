@@ -1,10 +1,7 @@
 use crate::CoreError;
-use connector::{Connection, ConnectionLike, Transaction};
+use connector::Transaction;
 use std::fmt::Display;
-use tokio::{
-    task::JoinHandle,
-    time::{Duration, Instant},
-};
+use tokio::time::{Duration, Instant};
 
 mod actor_manager;
 mod actors;
@@ -72,31 +69,31 @@ where
 
 impl Display for TxId {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0)
+        Display::fmt(&self.0, f)
     }
 }
 
-pub enum CachedTx {
-    Open(OpenTx),
+pub enum CachedTx<'a> {
+    Open(Box<dyn Transaction + 'a>),
     Committed,
     RolledBack,
     Expired,
 }
 
-impl Display for CachedTx {
+impl Display for CachedTx<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            CachedTx::Open(_) => write!(f, "Open"),
-            CachedTx::Committed => write!(f, "Committed"),
-            CachedTx::RolledBack => write!(f, "Rolled back"),
-            CachedTx::Expired => write!(f, "Expired"),
+            CachedTx::Open(_) => f.write_str("Open"),
+            CachedTx::Committed => f.write_str("Committed"),
+            CachedTx::RolledBack => f.write_str("Rolled back"),
+            CachedTx::Expired => f.write_str("Expired"),
         }
     }
 }
 
-impl CachedTx {
+impl<'a> CachedTx<'a> {
     /// Requires this cached TX to be `Open`, else an error will be raised that it is no longer valid.
-    pub fn as_open(&mut self) -> crate::Result<&mut OpenTx> {
+    pub(crate) fn as_open(&mut self) -> crate::Result<&mut Box<dyn Transaction + 'a>> {
         if let Self::Open(ref mut otx) = self {
             Ok(otx)
         } else {
@@ -105,7 +102,7 @@ impl CachedTx {
         }
     }
 
-    pub fn to_closed(&self, start_time: Instant, timeout: Duration) -> Option<ClosedTx> {
+    pub(crate) fn to_closed(&self, start_time: Instant, timeout: Duration) -> Option<ClosedTx> {
         match self {
             CachedTx::Open(_) => None,
             CachedTx::Committed => Some(ClosedTx::Committed),
@@ -115,39 +112,7 @@ impl CachedTx {
     }
 }
 
-pub struct OpenTx {
-    pub conn: Box<dyn Connection>,
-    pub tx: Box<dyn Transaction + 'static>,
-    pub expiration_timer: Option<JoinHandle<()>>,
-}
-
-impl OpenTx {
-    pub async fn start(mut conn: Box<dyn Connection>, isolation_level: Option<String>) -> crate::Result<Self> {
-        // Forces static lifetime for the transaction, disabling the lifetime checks for `tx`.
-        // Why is this okay? We store the connection the tx depends on with its lifetime next to
-        // the tx in the struct. Neither the connection nor the tx are moved out of this struct.
-        // The `OpenTx` struct is dropped as a unit.
-        let transaction: Box<dyn Transaction + '_> = conn.start_transaction(isolation_level).await?;
-        let tx = unsafe {
-            let tx: Box<dyn Transaction + 'static> = std::mem::transmute(transaction);
-            tx
-        };
-
-        let c_tx = OpenTx {
-            conn,
-            tx,
-            expiration_timer: None,
-        };
-
-        Ok(c_tx)
-    }
-
-    pub fn as_connection_like(&mut self) -> &mut dyn ConnectionLike {
-        self.tx.as_mut().as_connection_like()
-    }
-}
-
-pub enum ClosedTx {
+pub(crate) enum ClosedTx {
     Committed,
     RolledBack,
     Expired { start_time: Instant, timeout: Duration },
