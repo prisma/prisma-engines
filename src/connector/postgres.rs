@@ -15,7 +15,7 @@ use percent_encoding::percent_decode;
 use postgres_native_tls::MakeTlsConnector;
 use std::{
     borrow::{Borrow, Cow},
-    fmt::Debug,
+    fmt::{Debug, Display},
     fs,
     future::Future,
     sync::atomic::{AtomicBool, Ordering},
@@ -489,7 +489,7 @@ impl PostgresUrl {
         }
 
         if let Some(schema) = &self.query_params.schema {
-            config.search_path(schema.clone());
+            config.search_path(SearchPath(schema.as_str()).to_string());
         }
 
         config.ssl_mode(self.query_params.ssl_mode);
@@ -628,6 +628,19 @@ impl PostgreSql {
         } else {
             Ok(())
         }
+    }
+}
+
+// A SearchPath option (Display-impl) for connection initialization.
+struct SearchPath<'a>(&'a str);
+
+impl Display for SearchPath<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("\"")?;
+        f.write_str(self.0)?;
+        f.write_str("\"")?;
+
+        Ok(())
     }
 }
 
@@ -891,7 +904,7 @@ mod tests {
         let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
         let row = result_set.first().unwrap();
 
-        assert_eq!(Some("musti-test"), row[0].as_str());
+        assert_eq!(Some("\"musti-test\""), row[0].as_str());
     }
 
     #[tokio::test]
