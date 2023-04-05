@@ -7,7 +7,7 @@ edition = "2021"
 psl.workspace = true
 quaint.workspace = true
 mongodb-client = { path = "../../../libs/mongodb-client" }
-migration-core = { path = "../../../migration-engine/core" }
+schema-core = { path = "../../../schema-engine/core" }
 test-setup = { path = "../../../libs/test-setup" }
 
 parking_lot = { version = "0.12", features = ["send_guard"] }

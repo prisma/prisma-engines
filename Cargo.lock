@@ -1551,31 +1551,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "introspection-engine-tests"
-version = "0.1.0"
-dependencies = [
- "barrel",
- "connection-string",
- "enumflags2",
- "expect-test",
- "indoc",
- "migration-connector",
- "pretty_assertions",
- "psl",
- "quaint",
- "serde_json",
- "sql-migration-connector",
- "sql-schema-describer",
- "test-macros",
- "test-setup",
- "tokio",
- "tracing",
- "tracing-futures",
- "url",
- "user-facing-errors",
-]
-
-[[package]]
 name = "io-lifetimes"
 version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2005,103 +1980,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "migration-connector"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "enumflags2",
- "psl",
- "quaint",
- "serde",
- "serde_json",
- "sha2 0.9.9",
- "tracing",
- "tracing-error",
- "user-facing-errors",
-]
-
-[[package]]
-name = "migration-core"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "chrono",
- "enumflags2",
- "json-rpc-api-build",
- "jsonrpc-core",
- "migration-connector",
- "mongodb-migration-connector",
- "psl",
- "serde",
- "serde_json",
- "sql-migration-connector",
- "tokio",
- "tracing",
- "tracing-futures",
- "tracing-subscriber",
- "url",
- "user-facing-errors",
-]
-
-[[package]]
-name = "migration-engine-cli"
-version = "0.1.0"
-dependencies = [
- "backtrace",
- "base64 0.13.1",
- "connection-string",
- "expect-test",
- "indoc",
- "json-rpc-stdio",
- "migration-connector",
- "migration-core",
- "quaint",
- "serde_json",
- "structopt",
- "tempfile",
- "test-macros",
- "test-setup",
- "tokio",
- "tracing",
- "tracing-error",
- "tracing-subscriber",
- "url",
- "user-facing-errors",
-]
-
-[[package]]
-name = "migration-engine-tests"
-version = "0.1.0"
-dependencies = [
- "bigdecimal",
- "chrono",
- "colored",
- "connection-string",
- "enumflags2",
- "expect-test",
- "indoc",
- "jsonrpc-core",
- "migration-core",
- "once_cell",
- "pretty_assertions",
- "prisma-value",
- "psl",
- "quaint",
- "serde",
- "serde_json",
- "sql-migration-connector",
- "sql-schema-describer",
- "tempfile",
- "test-macros",
- "test-setup",
- "tokio",
- "tracing",
- "tracing-futures",
- "url",
- "user-facing-errors",
-]
-
-[[package]]
 name = "minimal-lexical"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2203,33 +2081,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "mongodb-migration-connector"
-version = "0.1.0"
-dependencies = [
- "convert_case",
- "datamodel-renderer",
- "dissimilar",
- "enumflags2",
- "expect-test",
- "futures",
- "indoc",
- "migration-connector",
- "mongodb",
- "mongodb-client",
- "mongodb-schema-describer",
- "names",
- "once_cell",
- "psl",
- "regex",
- "serde",
- "serde_json",
- "tokio",
- "tracing",
- "url",
- "user-facing-errors",
-]
-
-[[package]]
 name = "mongodb-query-connector"
 version = "0.1.0"
 dependencies = [
@@ -2259,6 +2110,33 @@ dependencies = [
  "tracing-futures",
  "user-facing-errors",
  "uuid 1.1.2",
+]
+
+[[package]]
+name = "mongodb-schema-connector"
+version = "0.1.0"
+dependencies = [
+ "convert_case",
+ "datamodel-renderer",
+ "dissimilar",
+ "enumflags2",
+ "expect-test",
+ "futures",
+ "indoc",
+ "mongodb",
+ "mongodb-client",
+ "mongodb-schema-describer",
+ "names",
+ "once_cell",
+ "psl",
+ "regex",
+ "schema-connector",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tracing",
+ "url",
+ "user-facing-errors",
 ]
 
 [[package]]
@@ -3195,13 +3073,13 @@ version = "0.1.0"
 dependencies = [
  "connection-string",
  "enumflags2",
- "migration-core",
  "mongodb",
  "mongodb-client",
  "once_cell",
  "parking_lot 0.12.1",
  "psl",
  "quaint",
+ "schema-core",
  "tempfile",
  "test-setup",
  "url",
@@ -3877,6 +3755,71 @@ dependencies = [
 ]
 
 [[package]]
+name = "schema-connector"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "enumflags2",
+ "psl",
+ "quaint",
+ "serde",
+ "serde_json",
+ "sha2 0.9.9",
+ "tracing",
+ "tracing-error",
+ "user-facing-errors",
+]
+
+[[package]]
+name = "schema-core"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "enumflags2",
+ "json-rpc-api-build",
+ "jsonrpc-core",
+ "mongodb-schema-connector",
+ "psl",
+ "schema-connector",
+ "serde",
+ "serde_json",
+ "sql-schema-connector",
+ "tokio",
+ "tracing",
+ "tracing-futures",
+ "tracing-subscriber",
+ "url",
+ "user-facing-errors",
+]
+
+[[package]]
+name = "schema-engine-cli"
+version = "0.1.0"
+dependencies = [
+ "backtrace",
+ "base64 0.13.1",
+ "connection-string",
+ "expect-test",
+ "indoc",
+ "json-rpc-stdio",
+ "quaint",
+ "schema-connector",
+ "schema-core",
+ "serde_json",
+ "structopt",
+ "tempfile",
+ "test-macros",
+ "test-setup",
+ "tokio",
+ "tracing",
+ "tracing-error",
+ "tracing-subscriber",
+ "url",
+ "user-facing-errors",
+]
+
+[[package]]
 name = "scopeguard"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4170,33 +4113,60 @@ dependencies = [
 ]
 
 [[package]]
-name = "sql-migration-connector"
+name = "sql-introspection-tests"
 version = "0.1.0"
 dependencies = [
- "chrono",
+ "barrel",
  "connection-string",
- "datamodel-renderer",
- "either",
  "enumflags2",
+ "expect-test",
  "indoc",
- "migration-connector",
- "once_cell",
- "prisma-value",
+ "pretty_assertions",
  "psl",
  "quaint",
- "regex",
- "serde",
+ "schema-connector",
  "serde_json",
- "sql-ddl",
+ "sql-schema-connector",
  "sql-schema-describer",
- "sqlformat",
- "sqlparser",
+ "test-macros",
+ "test-setup",
  "tokio",
  "tracing",
  "tracing-futures",
  "url",
  "user-facing-errors",
- "uuid 1.1.2",
+]
+
+[[package]]
+name = "sql-migration-tests"
+version = "0.1.0"
+dependencies = [
+ "bigdecimal",
+ "chrono",
+ "colored",
+ "connection-string",
+ "enumflags2",
+ "expect-test",
+ "indoc",
+ "jsonrpc-core",
+ "once_cell",
+ "pretty_assertions",
+ "prisma-value",
+ "psl",
+ "quaint",
+ "schema-core",
+ "serde",
+ "serde_json",
+ "sql-schema-connector",
+ "sql-schema-describer",
+ "tempfile",
+ "test-macros",
+ "test-setup",
+ "tokio",
+ "tracing",
+ "tracing-futures",
+ "url",
+ "user-facing-errors",
 ]
 
 [[package]]
@@ -4225,6 +4195,36 @@ dependencies = [
  "tracing",
  "tracing-futures",
  "tracing-opentelemetry",
+ "user-facing-errors",
+ "uuid 1.1.2",
+]
+
+[[package]]
+name = "sql-schema-connector"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "connection-string",
+ "datamodel-renderer",
+ "either",
+ "enumflags2",
+ "indoc",
+ "once_cell",
+ "prisma-value",
+ "psl",
+ "quaint",
+ "regex",
+ "schema-connector",
+ "serde",
+ "serde_json",
+ "sql-ddl",
+ "sql-schema-describer",
+ "sqlformat",
+ "sqlparser",
+ "tokio",
+ "tracing",
+ "tracing-futures",
+ "url",
  "user-facing-errors",
  "uuid 1.1.2",
 ]
@@ -4407,9 +4407,9 @@ dependencies = [
  "colored",
  "dmmf",
  "enumflags2",
- "migration-connector",
- "migration-core",
  "psl",
+ "schema-connector",
+ "schema-core",
  "serde_json",
  "structopt",
  "tokio",

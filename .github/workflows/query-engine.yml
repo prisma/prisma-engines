@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   rust-vitess-tests:
-    name: "Rust test suite: ${{ matrix.database.name }} (${{ matrix.engine_protocol }}) on Linux"
+    name: "Test ${{ matrix.database.name }} (${{ matrix.engine_protocol }}) on Linux"
 
     strategy:
       fail-fast: false

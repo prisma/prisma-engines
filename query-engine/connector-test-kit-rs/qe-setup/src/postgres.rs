@@ -1,5 +1,5 @@
-use migration_core::migration_connector::{ConnectorError, ConnectorResult};
 use quaint::{prelude::*, single::Quaint};
+use schema_core::schema_connector::{ConnectorError, ConnectorResult};
 use std::collections::HashMap;
 use url::Url;
 

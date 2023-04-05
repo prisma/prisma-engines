@@ -1,5 +1,5 @@
-use migration_core::migration_connector::{ConnectorError, ConnectorResult};
 use psl::parser_database::SourceFile;
+use schema_core::schema_connector::{ConnectorError, ConnectorResult};
 use std::sync::Arc;
 use url::Url;
 
