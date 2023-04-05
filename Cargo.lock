@@ -2935,7 +2935,7 @@ dependencies = [
 [[package]]
 name = "postgres-native-tls"
 version = "0.5.0"
-source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#74f0847e9a8ac350c48dd65c4c33e9be5fcf6010"
+source = "git+https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#00d4815e58859261bdfca71c75be7dc657303f7d"
 dependencies = [
  "native-tls",
  "tokio",
@@ -2946,7 +2946,7 @@ dependencies = [
 [[package]]
 name = "postgres-protocol"
 version = "0.6.4"
-source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#74f0847e9a8ac350c48dd65c4c33e9be5fcf6010"
+source = "git+https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#00d4815e58859261bdfca71c75be7dc657303f7d"
 dependencies = [
  "base64 0.13.1",
  "byteorder",
@@ -2963,7 +2963,7 @@ dependencies = [
 [[package]]
 name = "postgres-types"
 version = "0.2.4"
-source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#74f0847e9a8ac350c48dd65c4c33e9be5fcf6010"
+source = "git+https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#00d4815e58859261bdfca71c75be7dc657303f7d"
 dependencies = [
  "bit-vec",
  "bytes",
@@ -3210,7 +3210,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#53c756a67a0ff3f1b6023c64bec9dc9280bdc1cd"
+source = "git+https://github.com/prisma/quaint#9e99a0690784132b89f062c1dc4e8818f4bb0d2d"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -4626,7 +4626,7 @@ dependencies = [
 [[package]]
 name = "tokio-postgres"
 version = "0.7.7"
-source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#74f0847e9a8ac350c48dd65c4c33e9be5fcf6010"
+source = "git+https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#00d4815e58859261bdfca71c75be7dc657303f7d"
 dependencies = [
  "async-trait",
  "byteorder",
