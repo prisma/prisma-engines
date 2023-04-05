@@ -21,6 +21,14 @@ tracing = "0.1"
 url = "2"
 connection-string = "0.1"
 
+mongodb-query-connector = { path = "../connectors/mongodb-query-connector", optional = true }
+sql-query-connector = { path = "../connectors/sql-query-connector", optional = true }
+
 [dev-dependencies]
 insta = "1.7.1"
 schema-builder = { path = "../schema-builder" }
+
+[features]
+default = ["mongodb", "sql"]
+mongodb = ["mongodb-query-connector"]
+sql = ["sql-query-connector"]

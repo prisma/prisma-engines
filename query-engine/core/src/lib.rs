@@ -18,6 +18,7 @@ pub use self::{
     query_document::*,
     telemetry::*,
 };
+pub use connector::{error::ConnectorError, Connector};
 
 mod error;
 mod interactive_transactions;

@@ -5,7 +5,7 @@ version = "0.1.0"
 
 [features]
 default = ["sql", "mongodb"]
-mongodb = ["mongodb-connector", "query-core/mongodb"]
+mongodb = ["mongodb-connector"]
 sql = ["sql-connector"]
 vendored-openssl = ["quaint/vendored-openssl"]
 
