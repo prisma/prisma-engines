@@ -201,7 +201,7 @@
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::execute_operation::{execute_many_operations, execute_many_self_contained, execute_single_self_contained};
 <span class="kw">use </span><span class="kw">super</span>::request_context;
 <span class="kw">use crate</span>::{
-    protocol::EngineProtocol, BatchDocumentTransaction, CoreError, OpenTx, Operation, QueryExecutor, ResponseData,
+    protocol::EngineProtocol, BatchDocumentTransaction, CoreError, Operation, QueryExecutor, ResponseData,
     TransactionActorManager, TransactionError, TransactionManager, TransactionOptions, TxId,
 };
 
@@ -370,17 +370,17 @@
             .<span class="kw">await</span>;
 
             <span class="kw">let </span>conn = conn.map_err(|<span class="kw">_</span>| TransactionError::AcquisitionTimeout)<span class="question-mark">??</span>;
-            <span class="kw">let </span>c_tx = OpenTx::start(conn, isolation_level).<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="self">self</span>.itx_manager
                 .create_tx(
                     query_schema.clone(),
                     id.clone(),
-                    c_tx,
+                    conn,
+                    isolation_level,
                     Duration::from_millis(valid_for_millis),
                     engine_protocol,
                 )
-                .<span class="kw">await</span>;
+                .<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="macro">debug!</span>(<span class="string">&quot;[{}] Started.&quot;</span>, id);
             <span class="prelude-val">Ok</span>(id)

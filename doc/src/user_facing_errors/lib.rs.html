@@ -216,18 +216,16 @@
 <a href="#216" id="216">216</a>
 <a href="#217" id="217">217</a>
 <a href="#218" id="218">218</a>
-<a href="#219" id="219">219</a>
 </pre><pre class="rust"><code><span class="attr">#![deny(unsafe_code, warnings, rust_2018_idioms)]
 #![allow(clippy::derive_partial_eq_without_eq)]
 
 </span><span class="kw">mod </span>panic_hook;
 
 <span class="kw">pub mod </span>common;
-<span class="kw">pub mod </span>introspection_engine;
-<span class="kw">pub mod </span>migration_engine;
 <span class="attr">#[cfg(feature = <span class="string">&quot;sql&quot;</span>)]
 </span><span class="kw">pub mod </span>quaint;
 <span class="kw">pub mod </span>query_engine;
+<span class="kw">pub mod </span>schema_engine;
 
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>std::borrow::Cow;

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":[["SqlMigrationConnector","The top-level SQL migration connector."]]};

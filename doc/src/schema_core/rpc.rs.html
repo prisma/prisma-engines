@@ -1,0 +1,134 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `schema-engine/core/src/rpc.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rpc.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-93196c7a1c3542a8.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../schema_core/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<a href="#2" id="2">2</a>
+<a href="#3" id="3">3</a>
+<a href="#4" id="4">4</a>
+<a href="#5" id="5">5</a>
+<a href="#6" id="6">6</a>
+<a href="#7" id="7">7</a>
+<a href="#8" id="8">8</a>
+<a href="#9" id="9">9</a>
+<a href="#10" id="10">10</a>
+<a href="#11" id="11">11</a>
+<a href="#12" id="12">12</a>
+<a href="#13" id="13">13</a>
+<a href="#14" id="14">14</a>
+<a href="#15" id="15">15</a>
+<a href="#16" id="16">16</a>
+<a href="#17" id="17">17</a>
+<a href="#18" id="18">18</a>
+<a href="#19" id="19">19</a>
+<a href="#20" id="20">20</a>
+<a href="#21" id="21">21</a>
+<a href="#22" id="22">22</a>
+<a href="#23" id="23">23</a>
+<a href="#24" id="24">24</a>
+<a href="#25" id="25">25</a>
+<a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
+<a href="#38" id="38">38</a>
+<a href="#39" id="39">39</a>
+<a href="#40" id="40">40</a>
+<a href="#41" id="41">41</a>
+<a href="#42" id="42">42</a>
+<a href="#43" id="43">43</a>
+<a href="#44" id="44">44</a>
+<a href="#45" id="45">45</a>
+<a href="#46" id="46">46</a>
+<a href="#47" id="47">47</a>
+<a href="#48" id="48">48</a>
+<a href="#49" id="49">49</a>
+<a href="#50" id="50">50</a>
+<a href="#51" id="51">51</a>
+<a href="#52" id="52">52</a>
+<a href="#53" id="53">53</a>
+<a href="#54" id="54">54</a>
+<a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{json_rpc::method_names::<span class="kw-2">*</span>, CoreError, CoreResult, GenericApi};
+<span class="kw">use </span>jsonrpc_core::{types::error::Error <span class="kw">as </span>JsonRpcError, IoHandler, Params};
+<span class="kw">use </span>std::sync::Arc;
+
+<span class="doccomment">/// Initialize a JSON-RPC ready migration engine API.
+</span><span class="kw">pub fn </span>rpc_api(prisma_schema: <span class="prelude-ty">Option</span>&lt;String&gt;, host: Arc&lt;<span class="kw">dyn </span>schema_connector::ConnectorHost&gt;) -&gt; IoHandler {
+    <span class="kw">let </span><span class="kw-2">mut </span>io_handler = IoHandler::default();
+    <span class="kw">let </span>api = Arc::new(<span class="kw">crate</span>::state::EngineState::new(prisma_schema, <span class="prelude-val">Some</span>(host)));
+
+    <span class="kw">for </span>cmd <span class="kw">in </span>METHOD_NAMES {
+        <span class="kw">let </span>api = api.clone();
+        io_handler.add_method(cmd, <span class="kw">move </span>|params: Params| {
+            Box::pin(run_command(api.clone(), cmd, params))
+        });
+    }
+
+    io_handler
+}
+
+<span class="attr">#[allow(clippy::redundant_allocation)]
+</span><span class="kw">async fn </span>run_command(
+    executor: Arc&lt;<span class="kw">dyn </span>GenericApi&gt;,
+    cmd: <span class="kw-2">&amp;</span>str,
+    params: Params,
+) -&gt; <span class="prelude-ty">Result</span>&lt;serde_json::Value, JsonRpcError&gt; {
+    <span class="macro">tracing::debug!</span>(<span class="question-mark">?</span>cmd, <span class="string">&quot;running the command&quot;</span>);
+    <span class="kw">match </span>cmd {
+        APPLY_MIGRATIONS =&gt; render(executor.apply_migrations(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        CREATE_DATABASE =&gt; render(executor.create_database(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        CREATE_MIGRATION =&gt; render(executor.create_migration(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        DB_EXECUTE =&gt; render(executor.db_execute(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        DEV_DIAGNOSTIC =&gt; render(executor.dev_diagnostic(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        DIFF =&gt; render(executor.diff(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        DEBUG_PANIC =&gt; render(executor.debug_panic().<span class="kw">await</span>),
+        DIAGNOSE_MIGRATION_HISTORY =&gt; render(executor.diagnose_migration_history(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        ENSURE_CONNECTION_VALIDITY =&gt; render(executor.ensure_connection_validity(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        EVALUATE_DATA_LOSS =&gt; render(executor.evaluate_data_loss(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        GET_DATABASE_VERSION =&gt; render(executor.version().<span class="kw">await</span>),
+        INTROSPECT =&gt; render(executor.introspect(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        LIST_MIGRATION_DIRECTORIES =&gt; render(executor.list_migration_directories(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        MARK_MIGRATION_APPLIED =&gt; render(executor.mark_migration_applied(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        MARK_MIGRATION_ROLLED_BACK =&gt; render(executor.mark_migration_rolled_back(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        <span class="comment">// TODO(MultiSchema): we probably need to grab the namespaces from the params
+        </span>RESET =&gt; render(executor.reset().<span class="kw">await</span>),
+        SCHEMA_PUSH =&gt; render(executor.schema_push(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        other =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Unknown command {}&quot;</span>, other),
+    }
+}
+
+<span class="kw">fn </span>render(result: CoreResult&lt;<span class="kw">impl </span>serde::Serialize&gt;) -&gt; jsonrpc_core::Result&lt;jsonrpc_core::Value&gt; {
+    result
+        .map(|response| serde_json::to_value(response).expect(<span class="string">&quot;Rendering of RPC response failed&quot;</span>))
+        .map_err(render_jsonrpc_error)
+}
+
+<span class="kw">fn </span>render_jsonrpc_error(crate_error: CoreError) -&gt; JsonRpcError {
+    serde_json::to_value(<span class="kw-2">&amp;</span>crate_error.to_user_facing())
+        .map(|data| JsonRpcError {
+            <span class="comment">// We separate the JSON-RPC error code (defined by the JSON-RPC spec) from the
+            // prisma error code, which is located in `data`.
+            </span>code: jsonrpc_core::types::error::ErrorCode::ServerError(<span class="number">4466</span>),
+            message: <span class="string">&quot;An error happened. Check the data field for details.&quot;</span>.to_string(),
+            data: <span class="prelude-val">Some</span>(data),
+        })
+        .unwrap()
+}
+</code></pre></div>
+</section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="schema_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>

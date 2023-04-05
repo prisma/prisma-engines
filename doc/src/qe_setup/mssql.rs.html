@@ -45,8 +45,8 @@
 <a href="#45" id="45">45</a>
 <a href="#46" id="46">46</a>
 </pre><pre class="rust"><code><span class="kw">use </span>connection_string::JdbcString;
-<span class="kw">use </span>migration_core::migration_connector::{ConnectorError, ConnectorResult};
 <span class="kw">use </span>quaint::{prelude::<span class="kw-2">*</span>, single::Quaint};
+<span class="kw">use </span>schema_core::schema_connector::{ConnectorError, ConnectorResult};
 <span class="kw">use </span>std::str::FromStr;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>mssql_setup(url: String, prisma_schema: <span class="kw-2">&amp;</span>str, db_schemas: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; ConnectorResult&lt;()&gt; {
@@ -67,7 +67,7 @@
         conn.raw_cmd(<span class="kw-2">&amp;</span>sql).<span class="kw">await</span>.unwrap();
         conn.raw_cmd(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;USE [{db_name}];&quot;</span>)).<span class="kw">await</span>.unwrap();
     } <span class="kw">else </span>{
-        <span class="kw">let </span>api = migration_core::migration_api(<span class="prelude-val">Some</span>(prisma_schema.to_owned()), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>api = schema_core::schema_api(<span class="prelude-val">Some</span>(prisma_schema.to_owned()), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
         api.reset().<span class="kw">await</span>.ok();
         <span class="comment">// Without these, our poor connection gets deadlocks if other schemas
         // are modified while we introspect.

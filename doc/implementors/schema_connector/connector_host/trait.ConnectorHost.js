@@ -1,0 +1,6 @@
+(function() {var implementors = {
+"migration_engine":[["impl <a class=\"trait\" href=\"schema_connector/connector_host/trait.ConnectorHost.html\" title=\"trait schema_connector::connector_host::ConnectorHost\">ConnectorHost</a> for <a class=\"struct\" href=\"migration_engine/struct.JsonRpcHost.html\" title=\"struct migration_engine::JsonRpcHost\">JsonRpcHost</a>"]],
+"schema_connector":[],
+"sql_migration_tests":[["impl <a class=\"trait\" href=\"schema_connector/connector_host/trait.ConnectorHost.html\" title=\"trait schema_connector::connector_host::ConnectorHost\">ConnectorHost</a> for <a class=\"struct\" href=\"sql_migration_tests/test_api/struct.TestConnectorHost.html\" title=\"struct sql_migration_tests::test_api::TestConnectorHost\">TestConnectorHost</a>"]],
+"test_cli":[["impl <a class=\"trait\" href=\"schema_connector/connector_host/trait.ConnectorHost.html\" title=\"trait schema_connector::connector_host::ConnectorHost\">ConnectorHost</a> for <a class=\"struct\" href=\"test_cli/struct.DiffHost.html\" title=\"struct test_cli::DiffHost\">DiffHost</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

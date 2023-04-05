@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["MongoDbSchemaConnector","The top-level MongoDB migration connector."]]};

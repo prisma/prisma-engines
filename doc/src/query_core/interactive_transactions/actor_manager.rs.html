@@ -154,7 +154,13 @@
 <a href="#154" id="154">154</a>
 <a href="#155" id="155">155</a>
 <a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{protocol::EngineProtocol, ClosedTx, Operation, ResponseData};
+<span class="kw">use </span>connector::Connection;
 <span class="kw">use </span>lru::LruCache;
 <span class="kw">use </span>once_cell::sync::Lazy;
 <span class="kw">use </span>schema::QuerySchemaRef;
@@ -168,7 +174,7 @@
     time::Duration,
 };
 
-<span class="kw">use super</span>::{spawn_client_list_clear_actor, spawn_itx_actor, ITXClient, OpenTx, TransactionError, TxId};
+<span class="kw">use super</span>::{spawn_client_list_clear_actor, spawn_itx_actor, ITXClient, TransactionError, TxId};
 
 <span class="kw">pub static </span>CLOSED_TX_CACHE_SIZE: Lazy&lt;usize&gt; = Lazy::new(|| <span class="kw">match </span>std::env::var(<span class="string">&quot;CLOSED_TX_CACHE_SIZE&quot;</span>) {
     <span class="prelude-val">Ok</span>(size) =&gt; size.parse().unwrap_or(<span class="number">100</span>),
@@ -179,10 +185,10 @@
 
 <span class="kw">pub struct </span>TransactionActorManager {
     <span class="doccomment">/// Map of active ITx clients
-    </span><span class="kw">pub </span>clients: Arc&lt;RwLock&lt;HashMap&lt;TxId, ITXClient&gt;&gt;&gt;,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) clients: Arc&lt;RwLock&lt;HashMap&lt;TxId, ITXClient&gt;&gt;&gt;,
     <span class="doccomment">/// Cache of closed transactions. We keep the last N closed transactions in memory to
     /// return better error messages if operations are performed on closed transactions.
-    </span><span class="kw">pub </span>closed_txs: Arc&lt;RwLock&lt;LruCache&lt;TxId, <span class="prelude-ty">Option</span>&lt;ClosedTx&gt;&gt;&gt;&gt;,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) closed_txs: Arc&lt;RwLock&lt;LruCache&lt;TxId, <span class="prelude-ty">Option</span>&lt;ClosedTx&gt;&gt;&gt;&gt;,
     <span class="doccomment">/// Channel used to signal an ITx is closed and can be moved to the list of closed transactions.
     </span>send_done: Sender&lt;(TxId, <span class="prelude-ty">Option</span>&lt;ClosedTx&gt;)&gt;,
     <span class="doccomment">/// Handle to the task in charge of clearing actors.
@@ -219,25 +225,29 @@
         }
     }
 
-    <span class="kw">pub async fn </span>create_tx(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>create_tx(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         query_schema: QuerySchemaRef,
         tx_id: TxId,
-        value: OpenTx,
+        conn: Box&lt;<span class="kw">dyn </span>Connection + Send + Sync&gt;,
+        isolation_level: <span class="prelude-ty">Option</span>&lt;String&gt;,
         timeout: Duration,
         engine_protocol: EngineProtocol,
-    ) {
+    ) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
         <span class="kw">let </span>client = spawn_itx_actor(
             query_schema.clone(),
             tx_id.clone(),
-            value,
+            conn,
+            isolation_level,
             timeout,
             CHANNEL_SIZE,
             <span class="self">self</span>.send_done.clone(),
             engine_protocol,
-        );
+        )
+        .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="self">self</span>.clients.write().<span class="kw">await</span>.insert(tx_id, client);
+        <span class="prelude-val">Ok</span>(())
     }
 
     <span class="kw">async fn </span>get_client(<span class="kw-2">&amp;</span><span class="self">self</span>, tx_id: <span class="kw-2">&amp;</span>TxId, from_operation: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;ITXClient&gt; {

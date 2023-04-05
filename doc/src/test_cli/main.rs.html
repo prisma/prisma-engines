@@ -463,8 +463,8 @@
 
 <span class="kw">use </span>anyhow::Context;
 <span class="kw">use </span>colored::Colorize;
-<span class="kw">use </span>migration_connector::BoxFuture;
-<span class="kw">use </span>migration_core::json_rpc::types::<span class="kw-2">*</span>;
+<span class="kw">use </span>schema_connector::BoxFuture;
+<span class="kw">use </span>schema_core::json_rpc::types::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::{fmt, fs::File, io::Read, str::FromStr, sync::Arc};
 <span class="kw">use </span>structopt::<span class="kw-2">*</span>;
 
@@ -663,7 +663,7 @@
                 <span class="macro">unreachable!</span>()
             };
 
-            <span class="kw">let </span>api = migration_core::migration_api(<span class="prelude-val">Some</span>(schema.clone()), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>api = schema_core::schema_api(<span class="prelude-val">Some</span>(schema.clone()), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
 
             <span class="kw">let </span>params = IntrospectParams {
                 schema,
@@ -690,13 +690,13 @@
         }
         Command::ResetDatabase(cmd) =&gt; {
             <span class="kw">let </span>schema = read_datamodel_from_file(<span class="kw-2">&amp;</span>cmd.schema_path).context(<span class="string">&quot;Error reading the schema from file&quot;</span>)<span class="question-mark">?</span>;
-            <span class="kw">let </span>api = migration_core::migration_api(<span class="prelude-val">Some</span>(schema), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>api = schema_core::schema_api(<span class="prelude-val">Some</span>(schema), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
 
             api.reset().<span class="kw">await</span><span class="question-mark">?</span>;
         }
         Command::CreateDatabase(cmd) =&gt; {
             <span class="kw">let </span>schema = read_datamodel_from_file(<span class="kw-2">&amp;</span>cmd.schema_path).context(<span class="string">&quot;Error reading the schema from file&quot;</span>)<span class="question-mark">?</span>;
-            <span class="kw">let </span>api = migration_core::migration_api(<span class="prelude-val">Some</span>(schema.clone()), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>api = schema_core::schema_api(<span class="prelude-val">Some</span>(schema.clone()), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
 
             api.create_database(CreateDatabaseParams {
                 datasource: DatasourceParam::SchemaString(SchemaContainer { schema }),
@@ -707,7 +707,7 @@
             <span class="kw">let </span>prisma_schema =
                 read_datamodel_from_file(<span class="kw-2">&amp;</span>cmd.schema_path).context(<span class="string">&quot;Error reading the schema from file&quot;</span>)<span class="question-mark">?</span>;
 
-            <span class="kw">let </span>api = migration_core::migration_api(<span class="prelude-val">Some</span>(prisma_schema.clone()), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>api = schema_core::schema_api(<span class="prelude-val">Some</span>(prisma_schema.clone()), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
 
             <span class="kw">let </span>input = CreateMigrationInput {
                 migrations_directory_path: cmd.migrations_path,
@@ -722,7 +722,7 @@
             <span class="kw">let </span>prisma_schema =
                 read_datamodel_from_file(<span class="kw-2">&amp;</span>cmd.schema_path).context(<span class="string">&quot;Error reading the schema from file&quot;</span>)<span class="question-mark">?</span>;
 
-            <span class="kw">let </span>api = migration_core::migration_api(<span class="prelude-val">Some</span>(prisma_schema), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>api = schema_core::schema_api(<span class="prelude-val">Some</span>(prisma_schema), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
             api.apply_migrations(cmd.into()).<span class="kw">await</span><span class="question-mark">?</span>;
         }
     }
@@ -771,7 +771,7 @@
         <span class="kw">if let </span><span class="prelude-val">Some</span>(url) = cmd.url.as_ref() {
             <span class="kw">let </span>skeleton = minimal_schema_from_url(url)<span class="question-mark">?</span>;
 
-            <span class="kw">let </span>api = migration_core::migration_api(<span class="prelude-val">Some</span>(skeleton.clone()), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>api = schema_core::schema_api(<span class="prelude-val">Some</span>(skeleton.clone()), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
 
             <span class="kw">let </span>params = IntrospectParams {
                 schema: skeleton,
@@ -810,7 +810,7 @@
 
 <span class="kw">async fn </span>schema_push(cmd: <span class="kw-2">&amp;</span>SchemaPush) -&gt; anyhow::Result&lt;()&gt; {
     <span class="kw">let </span>schema = read_datamodel_from_file(<span class="kw-2">&amp;</span>cmd.schema_path).context(<span class="string">&quot;Error reading the schema from file&quot;</span>)<span class="question-mark">?</span>;
-    <span class="kw">let </span>api = migration_core::migration_api(<span class="prelude-val">Some</span>(schema.clone()), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>api = schema_core::schema_api(<span class="prelude-val">Some</span>(schema.clone()), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
 
     <span class="kw">let </span>response = api
         .schema_push(SchemaPushInput {
@@ -861,17 +861,17 @@
 
 <span class="kw">struct </span>DiffHost;
 
-<span class="kw">impl </span>migration_connector::ConnectorHost <span class="kw">for </span>DiffHost {
-    <span class="kw">fn </span>print(<span class="kw-2">&amp;</span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>str) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, migration_core::CoreResult&lt;()&gt;&gt; {
+<span class="kw">impl </span>schema_connector::ConnectorHost <span class="kw">for </span>DiffHost {
+    <span class="kw">fn </span>print(<span class="kw-2">&amp;</span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>str) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, schema_core::CoreResult&lt;()&gt;&gt; {
         <span class="macro">print!</span>(<span class="string">&quot;{s}&quot;</span>);
         Box::pin(std::future::ready(<span class="prelude-val">Ok</span>(())))
     }
 }
 
 <span class="kw">async fn </span>migrate_diff(cmd: <span class="kw-2">&amp;</span>MigrateDiff) -&gt; anyhow::Result&lt;()&gt; {
-    <span class="kw">use </span>migration_core::json_rpc::types::<span class="kw-2">*</span>;
+    <span class="kw">use </span>schema_core::json_rpc::types::<span class="kw-2">*</span>;
 
-    <span class="kw">let </span>api = migration_core::migration_api(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(Arc::new(DiffHost)))<span class="question-mark">?</span>;
+    <span class="kw">let </span>api = schema_core::schema_api(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(Arc::new(DiffHost)))<span class="question-mark">?</span>;
     <span class="kw">let </span>to = <span class="kw">if let </span><span class="prelude-val">Some</span>(to_schema_datamodel) = <span class="kw-2">&amp;</span>cmd.to_schema_datamodel {
         DiffTarget::SchemaDatamodel(SchemaContainer {
             schema: to_schema_datamodel.clone(),
@@ -910,7 +910,7 @@
         .with_writer(std::io::stderr)
         .finish()
         .with(ErrorLayer::default())
-        .with(migration_core::TimingsLayer::default());
+        .with(schema_core::TimingsLayer::default());
 
     tracing::subscriber::set_global_default(subscriber)
         .map_err(|err| <span class="macro">eprintln!</span>(<span class="string">&quot;Error initializing the global logger: {err}&quot;</span>))

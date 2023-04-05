@@ -375,11 +375,31 @@
 <a href="#375" id="375">375</a>
 <a href="#376" id="376">376</a>
 <a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{CachedTx, TransactionError, TxOpRequest, TxOpRequestMsg, TxOpResponse};
 <span class="kw">use crate</span>::{
     execute_many_operations, execute_single_operation, protocol::EngineProtocol,
-    telemetry::helpers::set_span_link_from_traceparent, ClosedTx, OpenTx, Operation, ResponseData, TxId,
+    telemetry::helpers::set_span_link_from_traceparent, ClosedTx, Operation, ResponseData, TxId,
 };
+<span class="kw">use </span>connector::Connection;
 <span class="kw">use </span>schema::QuerySchemaRef;
 <span class="kw">use </span>std::{collections::HashMap, sync::Arc};
 <span class="kw">use </span>tokio::{
@@ -400,18 +420,18 @@
     Finished,
 }
 
-<span class="kw">pub struct </span>ITXServer {
+<span class="kw">pub struct </span>ITXServer&lt;<span class="lifetime">&#39;a</span>&gt; {
     id: TxId,
-    <span class="kw">pub </span>cached_tx: CachedTx,
+    <span class="kw">pub </span>cached_tx: CachedTx&lt;<span class="lifetime">&#39;a</span>&gt;,
     <span class="kw">pub </span>timeout: Duration,
     receive: Receiver&lt;TxOpRequest&gt;,
     query_schema: QuerySchemaRef,
 }
 
-<span class="kw">impl </span>ITXServer {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ITXServer&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub fn </span>new(
         id: TxId,
-        tx: CachedTx,
+        tx: CachedTx&lt;<span class="lifetime">&#39;a</span>&gt;,
         timeout: Duration,
         receive: Receiver&lt;TxOpRequest&gt;,
         query_schema: QuerySchemaRef,
@@ -492,7 +512,7 @@
         <span class="kw">if let </span>CachedTx::Open(<span class="kw">_</span>) = <span class="self">self</span>.cached_tx {
             <span class="kw">let </span>open_tx = <span class="self">self</span>.cached_tx.as_open()<span class="question-mark">?</span>;
             <span class="macro">trace!</span>(<span class="string">&quot;[{}] committing.&quot;</span>, <span class="self">self</span>.id.to_string());
-            open_tx.tx.commit().<span class="kw">await</span><span class="question-mark">?</span>;
+            open_tx.commit().<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="self">self</span>.cached_tx = CachedTx::Committed;
         }
 
@@ -503,7 +523,7 @@
         <span class="macro">debug!</span>(<span class="string">&quot;[{}] rolling back, was timed out = {was_timeout}&quot;</span>, <span class="self">self</span>.name());
         <span class="kw">if let </span>CachedTx::Open(<span class="kw">_</span>) = <span class="self">self</span>.cached_tx {
             <span class="kw">let </span>open_tx = <span class="self">self</span>.cached_tx.as_open()<span class="question-mark">?</span>;
-            open_tx.tx.rollback().<span class="kw">await</span><span class="question-mark">?</span>;
+            open_tx.rollback().<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="kw">if </span>was_timeout {
                 <span class="macro">trace!</span>(<span class="string">&quot;[{}] Expired Rolling back&quot;</span>, <span class="self">self</span>.id.to_string());
                 <span class="self">self</span>.cached_tx = CachedTx::Expired;
@@ -620,37 +640,53 @@
     }
 }
 
-<span class="kw">pub fn </span>spawn_itx_actor(
+<span class="attr">#[allow(clippy::too_many_arguments)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>spawn_itx_actor(
     query_schema: QuerySchemaRef,
     tx_id: TxId,
-    value: OpenTx,
+    <span class="kw-2">mut </span>conn: Box&lt;<span class="kw">dyn </span>Connection + Send + Sync&gt;,
+    isolation_level: <span class="prelude-ty">Option</span>&lt;String&gt;,
     timeout: Duration,
     channel_size: usize,
     send_done: Sender&lt;(TxId, <span class="prelude-ty">Option</span>&lt;ClosedTx&gt;)&gt;,
     engine_protocol: EngineProtocol,
-) -&gt; ITXClient {
-    <span class="kw">let </span>(tx_to_server, rx_from_client) = channel::&lt;TxOpRequest&gt;(channel_size);
+) -&gt; <span class="kw">crate</span>::Result&lt;ITXClient&gt; {
+    <span class="kw">let </span>span = Span::current();
+    <span class="kw">let </span>tx_id_str = tx_id.to_string();
+    span.record(<span class="string">&quot;itx_id&quot;</span>, tx_id_str.as_str());
+    <span class="kw">let </span>dispatcher = <span class="kw">crate</span>::get_current_dispatcher();
 
+    <span class="kw">let </span>(tx_to_server, rx_from_client) = channel::&lt;TxOpRequest&gt;(channel_size);
     <span class="kw">let </span>client = ITXClient {
         send: tx_to_server,
         tx_id: tx_id.clone(),
     };
-
-    <span class="kw">let </span><span class="kw-2">mut </span>server = ITXServer::new(
-        tx_id.clone(),
-        CachedTx::Open(value),
-        timeout,
-        rx_from_client,
-        query_schema,
-    );
-    <span class="kw">let </span>dispatcher = <span class="kw">crate</span>::get_current_dispatcher();
-    <span class="kw">let </span>span = Span::current();
-
-    <span class="kw">let </span>tx_id_str = tx_id.to_string();
-    span.record(<span class="string">&quot;itx_id&quot;</span>, tx_id_str.as_str());
+    <span class="kw">let </span>(open_transaction_send, open_transaction_rcv) = oneshot::channel();
 
     tokio::task::spawn(
         <span class="kw">crate</span>::executor::with_request_context(engine_protocol, <span class="kw">async move </span>{
+            <span class="comment">// We match on the result in order to send the error to the parent task and abort this
+            // task, on error. This is a separate task (actor), not a function where we can just bubble up the
+            // result.
+            </span><span class="kw">let </span>c_tx = <span class="kw">match </span>conn.start_transaction(isolation_level).<span class="kw">await </span>{
+                <span class="prelude-val">Ok</span>(c_tx) =&gt; {
+                    open_transaction_send.send(<span class="prelude-val">Ok</span>(())).unwrap();
+                    c_tx
+                }
+                <span class="prelude-val">Err</span>(err) =&gt; {
+                    open_transaction_send.send(<span class="prelude-val">Err</span>(err)).unwrap();
+                    <span class="kw">return</span>;
+                }
+            };
+
+            <span class="kw">let </span><span class="kw-2">mut </span>server = ITXServer::new(
+                tx_id.clone(),
+                CachedTx::Open(c_tx),
+                timeout,
+                rx_from_client,
+                query_schema,
+            );
+
             <span class="kw">let </span>start_time = Instant::now();
             <span class="kw">let </span>sleep = time::sleep(timeout);
             <span class="macro">tokio::pin!</span>(sleep);
@@ -689,7 +725,9 @@
         .with_subscriber(dispatcher),
     );
 
-    client
+    open_transaction_rcv.<span class="kw">await</span>.unwrap()<span class="question-mark">?</span>;
+
+    <span class="prelude-val">Ok</span>(client)
 }
 
 <span class="doccomment">/// Spawn the client list clear actor
@@ -733,7 +771,7 @@
         }
    ```
 */
-</span><span class="kw">pub fn </span>spawn_client_list_clear_actor(
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>spawn_client_list_clear_actor(
     clients: Arc&lt;RwLock&lt;HashMap&lt;TxId, ITXClient&gt;&gt;&gt;,
     closed_txs: Arc&lt;RwLock&lt;lru::LruCache&lt;TxId, <span class="prelude-ty">Option</span>&lt;ClosedTx&gt;&gt;&gt;&gt;,
     <span class="kw-2">mut </span>rx: Receiver&lt;(TxId, <span class="prelude-ty">Option</span>&lt;ClosedTx&gt;)&gt;,

@@ -117,48 +117,10 @@
 <a href="#117" id="117">117</a>
 <a href="#118" id="118">118</a>
 <a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-<a href="#121" id="121">121</a>
-<a href="#122" id="122">122</a>
-<a href="#123" id="123">123</a>
-<a href="#124" id="124">124</a>
-<a href="#125" id="125">125</a>
-<a href="#126" id="126">126</a>
-<a href="#127" id="127">127</a>
-<a href="#128" id="128">128</a>
-<a href="#129" id="129">129</a>
-<a href="#130" id="130">130</a>
-<a href="#131" id="131">131</a>
-<a href="#132" id="132">132</a>
-<a href="#133" id="133">133</a>
-<a href="#134" id="134">134</a>
-<a href="#135" id="135">135</a>
-<a href="#136" id="136">136</a>
-<a href="#137" id="137">137</a>
-<a href="#138" id="138">138</a>
-<a href="#139" id="139">139</a>
-<a href="#140" id="140">140</a>
-<a href="#141" id="141">141</a>
-<a href="#142" id="142">142</a>
-<a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
-<a href="#149" id="149">149</a>
-<a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
-<a href="#152" id="152">152</a>
-<a href="#153" id="153">153</a>
-<a href="#154" id="154">154</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::CoreError;
-<span class="kw">use </span>connector::{Connection, ConnectionLike, Transaction};
+<span class="kw">use </span>connector::Transaction;
 <span class="kw">use </span>std::fmt::Display;
-<span class="kw">use </span>tokio::{
-    task::JoinHandle,
-    time::{Duration, Instant},
-};
+<span class="kw">use </span>tokio::time::{Duration, Instant};
 
 <span class="kw">mod </span>actor_manager;
 <span class="kw">mod </span>actors;
@@ -226,31 +188,31 @@
 
 <span class="kw">impl </span>Display <span class="kw">for </span>TxId {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+        Display::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, f)
     }
 }
 
-<span class="kw">pub enum </span>CachedTx {
-    Open(OpenTx),
+<span class="kw">pub enum </span>CachedTx&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Open(Box&lt;<span class="kw">dyn </span>Transaction + <span class="lifetime">&#39;a</span>&gt;),
     Committed,
     RolledBack,
     Expired,
 }
 
-<span class="kw">impl </span>Display <span class="kw">for </span>CachedTx {
+<span class="kw">impl </span>Display <span class="kw">for </span>CachedTx&lt;<span class="lifetime">&#39;_</span>&gt; {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
-            CachedTx::Open(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Open&quot;</span>),
-            CachedTx::Committed =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Committed&quot;</span>),
-            CachedTx::RolledBack =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Rolled back&quot;</span>),
-            CachedTx::Expired =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Expired&quot;</span>),
+            CachedTx::Open(<span class="kw">_</span>) =&gt; f.write_str(<span class="string">&quot;Open&quot;</span>),
+            CachedTx::Committed =&gt; f.write_str(<span class="string">&quot;Committed&quot;</span>),
+            CachedTx::RolledBack =&gt; f.write_str(<span class="string">&quot;Rolled back&quot;</span>),
+            CachedTx::Expired =&gt; f.write_str(<span class="string">&quot;Expired&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl </span>CachedTx {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; CachedTx&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="doccomment">/// Requires this cached TX to be `Open`, else an error will be raised that it is no longer valid.
-    </span><span class="kw">pub fn </span>as_open(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;<span class="kw-2">&amp;mut </span>OpenTx&gt; {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>as_open(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;<span class="kw-2">&amp;mut </span>Box&lt;<span class="kw">dyn </span>Transaction + <span class="lifetime">&#39;a</span>&gt;&gt; {
         <span class="kw">if let </span><span class="self">Self</span>::Open(<span class="kw-2">ref mut </span>otx) = <span class="self">self </span>{
             <span class="prelude-val">Ok</span>(otx)
         } <span class="kw">else </span>{
@@ -259,7 +221,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>to_closed(<span class="kw-2">&amp;</span><span class="self">self</span>, start_time: Instant, timeout: Duration) -&gt; <span class="prelude-ty">Option</span>&lt;ClosedTx&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>to_closed(<span class="kw-2">&amp;</span><span class="self">self</span>, start_time: Instant, timeout: Duration) -&gt; <span class="prelude-ty">Option</span>&lt;ClosedTx&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             CachedTx::Open(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
             CachedTx::Committed =&gt; <span class="prelude-val">Some</span>(ClosedTx::Committed),
@@ -269,39 +231,7 @@
     }
 }
 
-<span class="kw">pub struct </span>OpenTx {
-    <span class="kw">pub </span>conn: Box&lt;<span class="kw">dyn </span>Connection&gt;,
-    <span class="kw">pub </span>tx: Box&lt;<span class="kw">dyn </span>Transaction + <span class="lifetime">&#39;static</span>&gt;,
-    <span class="kw">pub </span>expiration_timer: <span class="prelude-ty">Option</span>&lt;JoinHandle&lt;()&gt;&gt;,
-}
-
-<span class="kw">impl </span>OpenTx {
-    <span class="kw">pub async fn </span>start(<span class="kw-2">mut </span>conn: Box&lt;<span class="kw">dyn </span>Connection&gt;, isolation_level: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
-        <span class="comment">// Forces static lifetime for the transaction, disabling the lifetime checks for `tx`.
-        // Why is this okay? We store the connection the tx depends on with its lifetime next to
-        // the tx in the struct. Neither the connection nor the tx are moved out of this struct.
-        // The `OpenTx` struct is dropped as a unit.
-        </span><span class="kw">let </span>transaction: Box&lt;<span class="kw">dyn </span>Transaction + <span class="lifetime">&#39;_</span>&gt; = conn.start_transaction(isolation_level).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let </span>tx = <span class="kw">unsafe </span>{
-            <span class="kw">let </span>tx: Box&lt;<span class="kw">dyn </span>Transaction + <span class="lifetime">&#39;static</span>&gt; = std::mem::transmute(transaction);
-            tx
-        };
-
-        <span class="kw">let </span>c_tx = OpenTx {
-            conn,
-            tx,
-            expiration_timer: <span class="prelude-val">None</span>,
-        };
-
-        <span class="prelude-val">Ok</span>(c_tx)
-    }
-
-    <span class="kw">pub fn </span>as_connection_like(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>ConnectionLike {
-        <span class="self">self</span>.tx.as_mut().as_connection_like()
-    }
-}
-
-<span class="kw">pub enum </span>ClosedTx {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>ClosedTx {
     Committed,
     RolledBack,
     Expired { start_time: Instant, timeout: Duration },

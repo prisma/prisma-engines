@@ -145,15 +145,15 @@
 <span class="kw">mod </span>mysql;
 <span class="kw">mod </span>postgres;
 
-<span class="kw">pub use </span>migration_core::migration_connector::ConnectorError;
+<span class="kw">pub use </span>schema_core::schema_connector::ConnectorError;
 
 <span class="kw">use </span><span class="self">self</span>::{cockroachdb::<span class="kw-2">*</span>, mongodb::<span class="kw-2">*</span>, mssql::<span class="kw-2">*</span>, mysql::<span class="kw-2">*</span>, postgres::<span class="kw-2">*</span>};
 <span class="kw">use </span>enumflags2::BitFlags;
-<span class="kw">use </span>migration_core::{
-    json_rpc::types::<span class="kw-2">*</span>,
-    migration_connector::{BoxFuture, ConnectorResult},
-};
 <span class="kw">use </span>psl::{builtin_connectors::<span class="kw-2">*</span>, Datasource};
+<span class="kw">use </span>schema_core::{
+    json_rpc::types::<span class="kw-2">*</span>,
+    schema_connector::{BoxFuture, ConnectorResult},
+};
 <span class="kw">use </span>std::{env, sync::Arc};
 
 <span class="kw">fn </span>parse_configuration(datamodel: <span class="kw-2">&amp;</span>str) -&gt; ConnectorResult&lt;(Datasource, String, BitFlags&lt;psl::PreviewFeature&gt;)&gt; {
@@ -232,7 +232,7 @@
     printed: parking_lot::Mutex&lt;Vec&lt;String&gt;&gt;,
 }
 
-<span class="kw">impl </span>migration_core::migration_connector::ConnectorHost <span class="kw">for </span>LoggingHost {
+<span class="kw">impl </span>schema_core::schema_connector::ConnectorHost <span class="kw">for </span>LoggingHost {
     <span class="kw">fn </span>print(<span class="kw-2">&amp;</span><span class="self">self</span>, text: <span class="kw-2">&amp;</span>str) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;()&gt;&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>msgs = <span class="self">self</span>.printed.lock();
         msgs.push(text.to_owned());
@@ -243,7 +243,7 @@
 <span class="kw">async fn </span>diff_and_apply(schema: <span class="kw-2">&amp;</span>str) {
     <span class="kw">let </span>tmpdir = tempfile::tempdir().unwrap();
     <span class="kw">let </span>host = Arc::new(LoggingHost::default());
-    <span class="kw">let </span>api = migration_core::migration_api(<span class="prelude-val">Some</span>(schema.to_owned()), <span class="prelude-val">Some</span>(host.clone())).unwrap();
+    <span class="kw">let </span>api = schema_core::schema_api(<span class="prelude-val">Some</span>(schema.to_owned()), <span class="prelude-val">Some</span>(host.clone())).unwrap();
     <span class="kw">let </span>schema_file_path = tmpdir.path().join(<span class="string">&quot;schema.prisma&quot;</span>);
     std::fs::write(<span class="kw-2">&amp;</span>schema_file_path, schema).unwrap();
 
