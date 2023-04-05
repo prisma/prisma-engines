@@ -148,18 +148,18 @@ optional = true
 
 [dependencies.tokio-postgres]
 features = ["with-uuid-1", "with-chrono-0_4", "with-serde_json-1", "with-bit-vec-0_6"]
-git = "https://github.com/pimeys/rust-postgres"
+git = "https://github.com/prisma/rust-postgres"
 branch = "pgbouncer-mode"
 optional = true
 
 [dependencies.postgres-types]
 features = ["with-uuid-1", "with-chrono-0_4", "with-serde_json-1", "with-bit-vec-0_6"]
-git = "https://github.com/pimeys/rust-postgres"
+git = "https://github.com/prisma/rust-postgres"
 branch = "pgbouncer-mode"
 optional = true
 
 [dependencies.postgres-native-tls]
-git = "https://github.com/pimeys/rust-postgres"
+git = "https://github.com/prisma/rust-postgres"
 branch = "pgbouncer-mode"
 optional = true
 
