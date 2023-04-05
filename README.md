@@ -71,8 +71,10 @@ compiled binaries inside the repository root in the `target/debug` (without
 | Prisma Component     | Path to Binary                                   |
 | -------------------- | ------------------------------------------------ |
 | Query Engine         | `./target/[debug\|release]/query-engine`         |
-| Schema Engine     | `./target/[debug\|release]/schema-engine`     |
+| Schema Engine        | `./target/[debug\|release]/migration-engine`(*)  |
 | Prisma Format        | `./target/[debug\|release]/prisma-fmt`           |
+
+(*) Will be renamed to schema-engine in Prisma 5.
 
 ## Prisma Schema Language
 
@@ -151,17 +153,14 @@ The *Schema Engine* does a couple of things:
 - creates new migrations by comparing the prisma file with the current state of
     the database, in order to bring the database in sync with the prisma file
 - run these migrations and keeps track of which migrations have been executed
-- introspect a database schema as a PSL file
+- (re-)generate a prisma schema file starting from a live database
 
 The engine uses:
 - the prisma files, as the source of truth
 - the database it connects to, for diffing and running migrations, as well as
-    keeping track of migrations in the `_prisma_migrations` table
+  keeping track of migrations in the `_prisma_migrations` table
 - the `prisma/migrations` directory which acts as a database of existing
-    migrations
-
-For more information about the migrations engine, check the [crate
-README](./migration-engine/README.md).
+  migrations
 
 ## Prisma format
 
