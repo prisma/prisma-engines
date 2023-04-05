@@ -18,7 +18,11 @@ use psl::{
 };
 use quaint::{connector::ResultRow, prelude::Queryable, Value::Array};
 use regex::Regex;
-use std::{any::type_name, collections::BTreeMap, convert::TryInto};
+use std::{
+    any::type_name,
+    collections::{BTreeMap, HashMap},
+    convert::TryInto,
+};
 use tracing::trace;
 
 /// A PostgreSQL sequence.
@@ -119,10 +123,17 @@ impl Debug for SqlSchemaDescriber<'_> {
     }
 }
 
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum IndexNullPosition {
+    First,
+    Last,
+}
+
 #[derive(Default, Debug)]
 pub struct PostgresSchemaExt {
     pub opclasses: Vec<(IndexColumnId, SQLOperatorClass)>,
     pub indexes: Vec<(IndexId, SqlIndexAlgorithm)>,
+    pub index_null_position: HashMap<IndexColumnId, IndexNullPosition>,
     /// The schema's sequences.
     pub sequences: Vec<Sequence>,
     /// The extensions included in the schema(s).
@@ -174,6 +185,25 @@ impl PostgresSchemaExt {
 
     pub fn clear_extensions(&mut self) {
         self.extensions.clear();
+    }
+
+    pub fn non_default_null_position(&self, column: IndexColumnWalker<'_>) -> bool {
+        let position = self.index_null_position.get(&column.id);
+
+        let position = match position {
+            Some(position) => *position,
+            _ => return false,
+        };
+
+        let sort_order = match column.sort_order() {
+            Some(order) => order,
+            _ => return false,
+        };
+
+        match sort_order {
+            SQLSortOrder::Asc => position == IndexNullPosition::First,
+            SQLSortOrder::Desc => position == IndexNullPosition::Last,
+        }
     }
 }
 
@@ -1182,6 +1212,18 @@ impl<'a> SqlSchemaDescriber<'a> {
             });
 
             pg_ext.indexes.push((index_id, algorithm));
+
+            if algorithm == SqlIndexAlgorithm::BTree && !is_primary_key {
+                let nulls_first = row.get_expect_bool("nulls_first");
+
+                let position = if nulls_first {
+                    IndexNullPosition::First
+                } else {
+                    IndexNullPosition::Last
+                };
+
+                pg_ext.index_null_position.insert(index_field_id, position);
+            }
 
             if let Some(opclass) = operator_class {
                 pg_ext.opclasses.push((index_field_id, opclass));
