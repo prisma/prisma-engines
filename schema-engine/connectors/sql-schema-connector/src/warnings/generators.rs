@@ -316,6 +316,7 @@ pub(crate) struct TopLevelItem {
 
 /// An indexed column that triggered a warning.
 #[derive(Serialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub(crate) struct IndexedColumn {
     /// The name of the index
     pub(crate) index_name: String,

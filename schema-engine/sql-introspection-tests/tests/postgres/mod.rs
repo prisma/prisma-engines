@@ -209,12 +209,12 @@ async fn index_sort_order_stopgap(api: &mut TestApi) -> TestResult {
             "message": "These index columns are having a non-default null sort order, which is not yet fully supported. Read more: https://pris.ly/d/non-default-index-null-ordering",
             "affected": [
               {
-                "index_name": "idx_a",
-                "column_name": "a"
+                "indexName": "idx_a",
+                "columnName": "a"
               },
               {
-                "index_name": "idx_b",
-                "column_name": "b"
+                "indexName": "idx_b",
+                "columnName": "b"
               }
             ]
           }
