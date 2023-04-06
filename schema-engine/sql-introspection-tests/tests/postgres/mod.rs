@@ -224,3 +224,87 @@ async fn index_sort_order_stopgap(api: &mut TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(tags(Postgres))]
+async fn index_sort_order_stopgap_control(api: &mut TestApi) -> TestResult {
+
+    let schema = indoc! {r#"
+CREATE TABLE "Post" (
+    "id" text NOT NULL,
+    "createdAt" timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" timestamp(3) NOT NULL DEFAULT '1970-01-01 00:00:00'::timestamp without time zone,
+    "published" boolean NOT NULL DEFAULT false,
+    "title" text NOT NULL,
+    "content" text,
+    "authorId" text,
+    "jsonData" jsonb,
+    "coinflips" _bool,
+    PRIMARY KEY ("id")
+);
+DROP TABLE IF EXISTS "User" CASCADE;
+CREATE TABLE "User" (
+    "id" text,
+    "email" text NOT NULL,
+    "name" text,
+    PRIMARY KEY ("id")
+);
+CREATE UNIQUE INDEX "User.email" ON "User"("email");
+ALTER TABLE "Post"
+ADD FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DELETE
+SET NULL ON UPDATE CASCADE;
+INSERT INTO "User" (email, id, name)
+VALUES (
+        'a@a.de',
+        '576eddf9-2434-421f-9a86-58bede16fd95',
+        'Alice'
+    );
+    "#};
+
+    api.raw_cmd(schema).await;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model foo {
+          id Int @id
+          a  Int
+          b  Int @unique(map: "idx_b", sort: Desc)
+          c  Int
+          d  Int @unique(map: "idx_d")
+
+          @@index([a], map: "idx_a")
+          @@index([c(sort: Desc)], map: "idx_c")
+        }
+    "#]];
+
+    api.expect_datamodel(&expectation).await;
+
+    let expectation = expect![[r#"
+        [
+          {
+            "code": 29,
+            "message": "These index columns are having a non-default null sort order, which is not yet fully supported. Read more: https://pris.ly/d/non-default-index-null-ordering",
+            "affected": [
+              {
+                "indexName": "idx_a",
+                "columnName": "a"
+              },
+              {
+                "indexName": "idx_b",
+                "columnName": "b"
+              }
+            ]
+          }
+        ]"#]];
+
+    api.expect_warnings(&expectation).await;
+
+    Ok(())
+}
