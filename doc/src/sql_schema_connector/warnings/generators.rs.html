@@ -545,6 +545,7 @@
 <a href="#545" id="545">545</a>
 <a href="#546" id="546">546</a>
 <a href="#547" id="547">547</a>
+<a href="#548" id="548">548</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Warnings generator for Introspection
 
 </span><span class="kw">use </span>schema_connector::Warning;
@@ -863,6 +864,7 @@
 
 <span class="doccomment">/// An indexed column that triggered a warning.
 </span><span class="attr">#[derive(Serialize, Debug, Clone)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>IndexedColumn {
     <span class="doccomment">/// The name of the index
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) index_name: String,
