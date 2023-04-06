@@ -3,7 +3,8 @@ SELECT
   namespace.nspname as namespace,
   false as is_partition,
   false as has_subclass,
-  false as has_row_level_security
+  false as has_row_level_security,
+  reloptions
 FROM pg_class AS tbl
 INNER JOIN pg_namespace AS namespace ON namespace.oid = tbl.relnamespace
 WHERE

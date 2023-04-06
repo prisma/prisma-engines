@@ -134,6 +134,7 @@ pub struct PostgresSchemaExt {
     pub opclasses: Vec<(IndexColumnId, SQLOperatorClass)>,
     pub indexes: Vec<(IndexId, SqlIndexAlgorithm)>,
     pub index_null_position: HashMap<IndexColumnId, IndexNullPosition>,
+    pub table_options: Vec<BTreeMap<String, String>>,
     /// The schema's sequences.
     pub sequences: Vec<Sequence>,
     /// The extensions included in the schema(s).
@@ -203,6 +204,18 @@ impl PostgresSchemaExt {
         match sort_order {
             SQLSortOrder::Asc => position == IndexNullPosition::First,
             SQLSortOrder::Desc => position == IndexNullPosition::Last,
+        }
+    }
+
+    pub fn uses_row_level_ttl(&self, id: TableId) -> bool {
+        let options = match self.table_options.get(id.0 as usize) {
+            Some(options) => options,
+            None => return false,
+        };
+
+        match options.get("ttl") {
+            Some(val) => val.as_str() == "'on'",
+            None => false,
         }
     }
 }
@@ -477,10 +490,11 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
     // either updating or removing it.
     async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
         let mut sql_schema = SqlSchema::default();
+        let mut pg_ext = PostgresSchemaExt::default();
 
         self.get_namespaces(&mut sql_schema, &[schema]).await?;
 
-        let table_count = self.get_table_names(&mut sql_schema).await?.len();
+        let table_count = self.get_table_names(&mut sql_schema, &mut pg_ext).await?.len();
         let size_in_bytes = self.get_size(schema).await?;
 
         Ok(SqlMetadata {
@@ -496,7 +510,7 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
         self.get_namespaces(&mut sql_schema, schemas).await?;
 
         //TODO(matthias) can we get rid of the table names map and instead just use tablewalker_ns everywhere like in get_columns?
-        let table_names = self.get_table_names(&mut sql_schema).await?;
+        let table_names = self.get_table_names(&mut sql_schema, &mut pg_ext).await?;
 
         // order matters
         self.get_views(&mut sql_schema).await?;
@@ -645,6 +659,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     async fn get_table_names(
         &self,
         sql_schema: &mut SqlSchema,
+        pg_ext: &mut PostgresSchemaExt,
     ) -> DescriberResult<IndexMap<(String, String), TableId>> {
         let sql = if self.circumstances.contains(Circumstances::CanPartitionTables) {
             include_str!("postgres/tables_query.sql")
@@ -662,25 +677,44 @@ impl<'a> SqlSchemaDescriber<'a> {
             )
             .await?;
 
-        let names = rows.into_iter().map(|row| {
-            (
+        let mut names = Vec::with_capacity(rows.len());
+
+        for row in rows.into_iter() {
+            let options: BTreeMap<String, String> = row
+                .get_string_array("reloptions")
+                .unwrap_or_default()
+                .into_iter()
+                .filter_map(|s| {
+                    let mut splitted = s.split('=');
+                    let key = splitted.next()?.to_string();
+                    let value = splitted.next()?.to_string();
+
+                    Some((key, value))
+                })
+                .collect();
+
+            names.push((
                 row.get_expect_string("table_name"),
                 row.get_expect_string("namespace"),
                 row.get_expect_bool("is_partition"),
                 row.get_expect_bool("has_subclass"),
                 row.get_expect_bool("has_row_level_security"),
-            )
-        });
+            ));
+
+            pg_ext.table_options.push(options);
+        }
 
         let mut map = IndexMap::default();
 
         for (table_name, namespace, is_partition, has_subclass, has_row_level_security) in names {
             let cloned_name = table_name.clone();
+
             let partition = if is_partition {
                 BitFlags::from_flag(TableProperties::IsPartition)
             } else {
                 BitFlags::empty()
             };
+
             let subclass = if has_subclass {
                 BitFlags::from_flag(TableProperties::HasSubclass)
             } else {
@@ -697,6 +731,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 sql_schema.get_namespace_id(&namespace).unwrap(),
                 partition | subclass | row_level_security,
             );
+
             map.insert((namespace, cloned_name), id);
         }
 

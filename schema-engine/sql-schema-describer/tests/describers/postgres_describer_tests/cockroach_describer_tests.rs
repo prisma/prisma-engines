@@ -521,6 +521,7 @@ fn cockroachdb_22_2_sequences_must_work(api: TestApi) {
             opclasses: [],
             indexes: [],
             index_null_position: {},
+            table_options: [],
             sequences: [
                 Sequence {
                     namespace_id: NamespaceId(

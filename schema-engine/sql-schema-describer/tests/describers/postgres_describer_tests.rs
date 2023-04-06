@@ -978,6 +978,9 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                 ),
             ],
             index_null_position: {},
+            table_options: [
+                {},
+            ],
             sequences: [
                 Sequence {
                     namespace_id: NamespaceId(
@@ -1149,6 +1152,7 @@ fn postgres_sequences_must_work(api: TestApi) {
             opclasses: [],
             indexes: [],
             index_null_position: {},
+            table_options: [],
             sequences: [
                 Sequence {
                     namespace_id: NamespaceId(
@@ -1735,6 +1739,7 @@ fn extensions_are_described_correctly(api: TestApi) {
             opclasses: [],
             indexes: [],
             index_null_position: {},
+            table_options: [],
             sequences: [],
             extensions: [
                 DatabaseExtension {

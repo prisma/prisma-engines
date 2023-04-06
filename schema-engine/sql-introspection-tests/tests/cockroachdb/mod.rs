@@ -328,3 +328,52 @@ async fn string_col_with_length(api: &mut TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(tags(CockroachDb))]
+async fn row_level_ttl_stopgap(api: &mut TestApi) -> TestResult {
+    // https://www.notion.so/prismaio/Row-level-TTL-CockroachDB-87c673e7a14a419aa91ebcd5d16d227b
+
+    let schema = indoc! {r#"
+        CREATE TABLE "ttl_test" (
+            id SERIAL PRIMARY KEY,
+            inserted_at TIMESTAMP default current_timestamp()
+        ) WITH (ttl_expire_after = '3 months');
+    "#};
+
+    api.raw_cmd(schema).await;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "cockroachdb"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model ttl_test {
+          id          BigInt    @id @default(autoincrement())
+          inserted_at DateTime? @default(now()) @db.Timestamp(6)
+        }
+    "#]];
+
+    api.expect_datamodel(&expectation).await;
+
+    let expectation = expect![[r#"
+        [
+          {
+            "code": 31,
+            "message": "These models are using a row level TTL setting defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/row-level-ttl",
+            "affected": [
+              {
+                "model": "ttl_test"
+              }
+            ]
+          }
+        ]"#]];
+
+    api.expect_warnings(&expectation).await;
+
+    Ok(())
+}
