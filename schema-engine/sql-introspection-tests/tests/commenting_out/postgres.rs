@@ -334,10 +334,7 @@ async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &mut Te
 
 // Postgres9 does not support partition tables, and Postgres10 does not support primary keys on
 // partition tables.
-#[test_connector(
-    tags(Postgres11, Postgres12, Postgres13, Postgres14, Postgres15),
-    exclude(CockroachDb)
-)]
+#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres9))]
 async fn partition_table_gets_comment(api: &mut TestApi) -> TestResult {
     api.raw_cmd(
         r#"
