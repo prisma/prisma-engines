@@ -293,9 +293,9 @@ VALUES (
           Post  Post[]
         }
     "#]];
-    */
 
     api.expect_datamodel(&expectation).await;
+    */
 
     let expectation = expect![[r#"
         foo"#]];
