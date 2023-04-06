@@ -27,7 +27,11 @@ SELECT
     CASE rawindex.indoption & 1
         WHEN 1 THEN 'DESC'
         ELSE 'ASC' END
-        AS column_order
+        AS column_order,
+    CASE rawindex.indoption & 2
+        WHEN 2 THEN true
+        ELSE false END
+        AS nulls_first
 FROM
     rawindex
     INNER JOIN pg_class AS tableinfo ON tableinfo.oid = rawindex.indrelid

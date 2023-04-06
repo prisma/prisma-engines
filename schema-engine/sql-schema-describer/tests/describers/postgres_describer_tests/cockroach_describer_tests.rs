@@ -520,6 +520,7 @@ fn cockroachdb_22_2_sequences_must_work(api: TestApi) {
         PostgresSchemaExt {
             opclasses: [],
             indexes: [],
+            index_null_position: {},
             sequences: [
                 Sequence {
                     namespace_id: NamespaceId(
