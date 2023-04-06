@@ -298,7 +298,7 @@ VALUES (
     */
 
     let expectation = expect![[r#"
-        "#]];
+        []"#]];
 
     api.expect_warnings(&expectation).await;
 
