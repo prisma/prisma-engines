@@ -1,4 +1,4 @@
-//! A container to manage 0 or more migration connectors, based on request contents.
+//! A container to manage 0 or more schema connectors, based on request contents.
 //!
 //! Why this rather than using connectors directly? We must be able to use the migration engine
 //! without a valid schema or database connection for commands like createDatabase and diff.
@@ -83,7 +83,7 @@ impl EngineState {
                 response_sender
                     .send(output)
                     .map_err(|_| ())
-                    .expect("failed to send back response in migration-engine state");
+                    .expect("failed to send back response in schema-engine state");
             })
         });
 
@@ -121,7 +121,7 @@ impl EngineState {
                 response_sender
                     .send(output)
                     .map_err(|_| ())
-                    .expect("failed to send back response in migration-engine state");
+                    .expect("failed to send back response in schema-engine state");
             })
         });
 

@@ -259,7 +259,7 @@ qe-dev-mongo_4_4: start-mongodb_4_4
 
 use-local-migration-engine:
 	cargo build --release
-	cp target/release/migration-engine $(PRISMA2_BINARY_PATH)/
+	cp target/release/schema-engine $(PRISMA2_BINARY_PATH)/
 
 use-local-query-engine:
 	cargo build --release

@@ -1,4 +1,4 @@
-# migration-engine/json-rpc-api-build
+# schema-engine/json-rpc-api-build
 
 The build script implementation for generating documentation and types from the
 migration engine JSON-RPC API reference.

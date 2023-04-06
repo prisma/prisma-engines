@@ -12,12 +12,12 @@ use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Tags, 
 use url::Url;
 use user_facing_errors::{common::DatabaseDoesNotExist, UserFacingError};
 
-fn migration_engine_bin_path() -> &'static str {
-    env!("CARGO_BIN_EXE_migration-engine")
+fn schema_engine_bin_path() -> &'static str {
+    env!("CARGO_BIN_EXE_schema-engine")
 }
 
 fn run(args: &[&str]) -> Output {
-    Command::new(migration_engine_bin_path())
+    Command::new(schema_engine_bin_path())
         .arg("cli")
         .args(args)
         .env("RUST_LOG", "INFO")
@@ -312,7 +312,7 @@ fn basic_jsonrpc_roundtrip_works(_api: TestApi) {
     fs::create_dir_all(&tmpdir).unwrap();
     fs::write(&tmpfile, datamodel).unwrap();
 
-    let mut command = Command::new(migration_engine_bin_path());
+    let mut command = Command::new(schema_engine_bin_path());
     command.arg("--datamodel").arg(&tmpfile).env("RUST_LOG", "info");
 
     with_child_process(command, |process| {
@@ -347,7 +347,7 @@ fn introspect_sqlite_empty_database() {
 
     fs::File::create(tmpdir.path().join("dev.db")).unwrap();
 
-    let mut command = Command::new(migration_engine_bin_path());
+    let mut command = Command::new(schema_engine_bin_path());
     command.env(
         "TEST_DATABASE_URL",
         format!("file:{}/dev.db", tmpdir.path().to_string_lossy()),
@@ -394,7 +394,7 @@ fn introspect_sqlite_invalid_empty_database() {
 
     fs::File::create(tmpdir.path().join("dev.db")).unwrap();
 
-    let mut command = Command::new(migration_engine_bin_path());
+    let mut command = Command::new(schema_engine_bin_path());
     command.env(
         "TEST_DATABASE_URL",
         format!("file:{}/dev.db", tmpdir.path().to_string_lossy()),
@@ -449,7 +449,7 @@ fn execute_postgres(api: TestApi) {
     let schema_path = tmpdir.path().join("prisma.schema");
     fs::write(&schema_path, schema).unwrap();
 
-    let command = Command::new(migration_engine_bin_path());
+    let command = Command::new(schema_engine_bin_path());
 
     with_child_process(command, |process| {
         let stdin = process.stdin.as_mut().unwrap();
@@ -512,7 +512,7 @@ fn introspect_postgres(api: TestApi) {
     let schema_path = tmpdir.path().join("prisma.schema");
     fs::write(&schema_path, schema).unwrap();
 
-    let command = Command::new(migration_engine_bin_path());
+    let command = Command::new(schema_engine_bin_path());
 
     with_child_process(command, |process| {
         let stdin = process.stdin.as_mut().unwrap();
@@ -599,7 +599,7 @@ fn introspect_e2e() {
     "#;
     fs::File::create(tmpdir.path().join("dev.db")).unwrap();
 
-    let mut command = Command::new(migration_engine_bin_path());
+    let mut command = Command::new(schema_engine_bin_path());
 
     command.env(
         "TEST_DATABASE_URL",
