@@ -486,11 +486,7 @@ impl PostgresUrl {
 
         if let Some(connect_timeout) = self.query_params.connect_timeout {
             config.connect_timeout(connect_timeout);
-        }
-
-        if let Some(schema) = &self.query_params.schema {
-            config.search_path(SearchPath(schema.as_str()).to_string());
-        }
+        };
 
         config.ssl_mode(self.query_params.ssl_mode);
 
@@ -550,6 +546,20 @@ impl PostgreSql {
                 tracing::error!("Error in PostgreSQL connection: {:?}", e);
             }
         }));
+
+        // SET NAMES sets the client text encoding. It needs to be explicitly set for automatic
+        // conversion to and from UTF-8 to happen server-side.
+        //
+        // Relevant docs: https://www.postgresql.org/docs/current/multibyte.html
+        let session_variables = format!(
+            r##"
+            {set_search_path}
+            SET NAMES 'UTF8';
+            "##,
+            set_search_path = SetSearchPath(url.query_params.schema.as_deref())
+        );
+
+        client.simple_query(session_variables.as_str()).await?;
 
         Ok(Self {
             client: PostgresClient(client),
@@ -631,14 +641,16 @@ impl PostgreSql {
     }
 }
 
-// A SearchPath option (Display-impl) for connection initialization.
-struct SearchPath<'a>(&'a str);
+// A SetSearchPath statement (Display-impl) for connection initialization.
+struct SetSearchPath<'a>(Option<&'a str>);
 
-impl Display for SearchPath<'_> {
+impl Display for SetSearchPath<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str("\"")?;
-        f.write_str(self.0)?;
-        f.write_str("\"")?;
+        if let Some(schema) = self.0 {
+            f.write_str("SET search_path = \"")?;
+            f.write_str(schema)?;
+            f.write_str("\";\n")?;
+        }
 
         Ok(())
     }
