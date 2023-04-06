@@ -7,13 +7,51 @@
 <a href="#7" id="7">7</a>
 <a href="#8" id="8">8</a>
 <a href="#9" id="9">9</a>
-</pre><pre class="rust"><code><span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
+<a href="#10" id="10">10</a>
+<a href="#11" id="11">11</a>
+<a href="#12" id="12">12</a>
+<a href="#13" id="13">13</a>
+<a href="#14" id="14">14</a>
+<a href="#15" id="15">15</a>
+<a href="#16" id="16">16</a>
+<a href="#17" id="17">17</a>
+<a href="#18" id="18">18</a>
+<a href="#19" id="19">19</a>
+<a href="#20" id="20">20</a>
+<a href="#21" id="21">21</a>
+<a href="#22" id="22">22</a>
+<a href="#23" id="23">23</a>
+<a href="#24" id="24">24</a>
+<a href="#25" id="25">25</a>
+<a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
+</pre><pre class="rust"><code><span class="kw">use </span>sql::postgres::PostgresSchemaExt;
+<span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
+
+<span class="kw">use crate</span>::{
+    datamodel_calculator::DatamodelCalculatorContext,
+    warnings::generators::{IndexedColumn, Warnings},
+};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>PostgresIntrospectionFlavour;
 
 <span class="kw">impl </span><span class="kw">super</span>::IntrospectionFlavour <span class="kw">for </span>PostgresIntrospectionFlavour {
     <span class="kw">fn </span>keep_previous_scalar_field_arity(<span class="kw-2">&amp;</span><span class="self">self</span>, next: sql::ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
         next.is_in_view() &amp;&amp; next.column_type().arity.is_nullable()
+    }
+
+    <span class="kw">fn </span>generate_warnings(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>DatamodelCalculatorContext&lt;<span class="lifetime">&#39;_</span>&gt;, warnings: <span class="kw-2">&amp;mut </span>Warnings) {
+        <span class="kw">let </span>pg_ext: <span class="kw-2">&amp;</span>PostgresSchemaExt = ctx.sql_schema.downcast_connector_data();
+
+        <span class="kw">for </span>index <span class="kw">in </span>ctx.sql_schema.table_walkers().flat_map(|t| t.indexes()) {
+            <span class="kw">for </span>column <span class="kw">in </span>index.columns().filter(|c| pg_ext.non_default_null_position(<span class="kw-2">*</span>c)) {
+                warnings.non_default_index_null_sort_order.push(IndexedColumn {
+                    index_name: index.name().to_string(),
+                    column_name: column.name().to_string(),
+                });
+            }
+        }
     }
 }
 </code></pre></div>

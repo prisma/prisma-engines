@@ -1473,6 +1473,48 @@
 <a href="#1473" id="1473">1473</a>
 <a href="#1474" id="1474">1474</a>
 <a href="#1475" id="1475">1475</a>
+<a href="#1476" id="1476">1476</a>
+<a href="#1477" id="1477">1477</a>
+<a href="#1478" id="1478">1478</a>
+<a href="#1479" id="1479">1479</a>
+<a href="#1480" id="1480">1480</a>
+<a href="#1481" id="1481">1481</a>
+<a href="#1482" id="1482">1482</a>
+<a href="#1483" id="1483">1483</a>
+<a href="#1484" id="1484">1484</a>
+<a href="#1485" id="1485">1485</a>
+<a href="#1486" id="1486">1486</a>
+<a href="#1487" id="1487">1487</a>
+<a href="#1488" id="1488">1488</a>
+<a href="#1489" id="1489">1489</a>
+<a href="#1490" id="1490">1490</a>
+<a href="#1491" id="1491">1491</a>
+<a href="#1492" id="1492">1492</a>
+<a href="#1493" id="1493">1493</a>
+<a href="#1494" id="1494">1494</a>
+<a href="#1495" id="1495">1495</a>
+<a href="#1496" id="1496">1496</a>
+<a href="#1497" id="1497">1497</a>
+<a href="#1498" id="1498">1498</a>
+<a href="#1499" id="1499">1499</a>
+<a href="#1500" id="1500">1500</a>
+<a href="#1501" id="1501">1501</a>
+<a href="#1502" id="1502">1502</a>
+<a href="#1503" id="1503">1503</a>
+<a href="#1504" id="1504">1504</a>
+<a href="#1505" id="1505">1505</a>
+<a href="#1506" id="1506">1506</a>
+<a href="#1507" id="1507">1507</a>
+<a href="#1508" id="1508">1508</a>
+<a href="#1509" id="1509">1509</a>
+<a href="#1510" id="1510">1510</a>
+<a href="#1511" id="1511">1511</a>
+<a href="#1512" id="1512">1512</a>
+<a href="#1513" id="1513">1513</a>
+<a href="#1514" id="1514">1514</a>
+<a href="#1515" id="1515">1515</a>
+<a href="#1516" id="1516">1516</a>
+<a href="#1517" id="1517">1517</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.
 
 </span><span class="kw">mod </span>default;
@@ -1493,7 +1535,11 @@
 };
 <span class="kw">use </span>quaint::{connector::ResultRow, prelude::Queryable, Value::Array};
 <span class="kw">use </span>regex::Regex;
-<span class="kw">use </span>std::{any::type_name, collections::BTreeMap, convert::TryInto};
+<span class="kw">use </span>std::{
+    any::type_name,
+    collections::{BTreeMap, HashMap},
+    convert::TryInto,
+};
 <span class="kw">use </span>tracing::trace;
 
 <span class="doccomment">/// A PostgreSQL sequence.
@@ -1594,10 +1640,17 @@
     }
 }
 
+<span class="attr">#[derive(Clone, Copy, Debug, PartialEq)]
+</span><span class="kw">pub enum </span>IndexNullPosition {
+    First,
+    Last,
+}
+
 <span class="attr">#[derive(Default, Debug)]
 </span><span class="kw">pub struct </span>PostgresSchemaExt {
     <span class="kw">pub </span>opclasses: Vec&lt;(IndexColumnId, SQLOperatorClass)&gt;,
     <span class="kw">pub </span>indexes: Vec&lt;(IndexId, SqlIndexAlgorithm)&gt;,
+    <span class="kw">pub </span>index_null_position: HashMap&lt;IndexColumnId, IndexNullPosition&gt;,
     <span class="doccomment">/// The schema&#39;s sequences.
     </span><span class="kw">pub </span>sequences: Vec&lt;Sequence&gt;,
     <span class="doccomment">/// The extensions included in the schema(s).
@@ -1649,6 +1702,25 @@
 
     <span class="kw">pub fn </span>clear_extensions(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="self">self</span>.extensions.clear();
+    }
+
+    <span class="kw">pub fn </span>non_default_null_position(<span class="kw-2">&amp;</span><span class="self">self</span>, column: IndexColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+        <span class="kw">let </span>position = <span class="self">self</span>.index_null_position.get(<span class="kw-2">&amp;</span>column.id);
+
+        <span class="kw">let </span>position = <span class="kw">match </span>position {
+            <span class="prelude-val">Some</span>(position) =&gt; <span class="kw-2">*</span>position,
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="bool-val">false</span>,
+        };
+
+        <span class="kw">let </span>sort_order = <span class="kw">match </span>column.sort_order() {
+            <span class="prelude-val">Some</span>(order) =&gt; order,
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="bool-val">false</span>,
+        };
+
+        <span class="kw">match </span>sort_order {
+            SQLSortOrder::Asc =&gt; position == IndexNullPosition::First,
+            SQLSortOrder::Desc =&gt; position == IndexNullPosition::Last,
+        }
     }
 }
 
@@ -2657,6 +2729,18 @@
             });
 
             pg_ext.indexes.push((index_id, algorithm));
+
+            <span class="kw">if </span>algorithm == SqlIndexAlgorithm::BTree &amp;&amp; !is_primary_key {
+                <span class="kw">let </span>nulls_first = row.get_expect_bool(<span class="string">&quot;nulls_first&quot;</span>);
+
+                <span class="kw">let </span>position = <span class="kw">if </span>nulls_first {
+                    IndexNullPosition::First
+                } <span class="kw">else </span>{
+                    IndexNullPosition::Last
+                };
+
+                pg_ext.index_null_position.insert(index_field_id, position);
+            }
 
             <span class="kw">if let </span><span class="prelude-val">Some</span>(opclass) = operator_class {
                 pg_ext.opclasses.push((index_field_id, opclass));

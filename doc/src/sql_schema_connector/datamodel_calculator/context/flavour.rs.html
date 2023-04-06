@@ -27,6 +27,12 @@
 <a href="#27" id="27">27</a>
 <a href="#28" id="28">28</a>
 <a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>mysql;
 <span class="kw">mod </span>postgresql;
 <span class="kw">mod </span>sqlite;
@@ -38,6 +44,10 @@
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">use </span>postgresql::PostgresIntrospectionFlavour;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">use </span>sqlite::SqliteIntrospectionFlavour;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">use </span>sqlserver::SqlServerIntrospectionFlavour;
+
+<span class="kw">use </span><span class="kw">crate</span>::warnings::generators::Warnings;
+
+<span class="kw">use </span><span class="kw">super</span>::DatamodelCalculatorContext;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>IntrospectionFlavour {
     <span class="doccomment">/// For columns in PostgreSQL or SQLite views, if changed in PSL,
@@ -55,6 +65,8 @@
 
         sqlformat::format(definition, <span class="kw-2">&amp;</span>Default::default(), opts)
     }
+
+    <span class="kw">fn </span>generate_warnings(<span class="kw-2">&amp;</span><span class="self">self</span>, _ctx: <span class="kw-2">&amp;</span>DatamodelCalculatorContext&lt;<span class="lifetime">&#39;_</span>&gt;, _warnings: <span class="kw-2">&amp;mut </span>Warnings) {}
 }
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="sql_schema_connector" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>

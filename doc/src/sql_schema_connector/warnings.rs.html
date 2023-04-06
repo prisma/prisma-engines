@@ -32,18 +32,22 @@
 <a href="#32" id="32">32</a>
 <a href="#33" id="33">33</a>
 <a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Definition of warnings, which are displayed to the user during `db
 //! pull`.
 
 </span><span class="kw">mod </span>r#enum;
-<span class="kw">mod </span>generators;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>generators;
 <span class="kw">mod </span>model;
 <span class="kw">mod </span>view;
 
 <span class="kw">use </span><span class="kw">crate</span>::datamodel_calculator::DatamodelCalculatorContext;
-<span class="kw">use </span>generators::Warnings;
+<span class="kw">use </span><span class="kw">crate</span>::Warning;
 <span class="kw">use </span>psl::PreviewFeature;
-<span class="kw">use </span>schema_connector::Warning;
+
+<span class="kw">use </span><span class="self">self</span>::generators::Warnings;
 
 <span class="doccomment">/// Analyzes the described database schema, triggering
 /// warnings to the user if necessary.
@@ -63,6 +67,8 @@
             view::generate_warnings(view, <span class="kw-2">&amp;mut </span>warnings);
         }
     }
+
+    ctx.flavour.generate_warnings(ctx, <span class="kw-2">&amp;mut </span>warnings);
 
     warnings.finalize()
 }
