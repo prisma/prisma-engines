@@ -227,7 +227,6 @@ async fn index_sort_order_stopgap(api: &mut TestApi) -> TestResult {
 
 #[test_connector(tags(Postgres))]
 async fn index_sort_order_stopgap_control(api: &mut TestApi) -> TestResult {
-
     let schema = indoc! {r#"
 CREATE TABLE "Post" (
     "id" text NOT NULL,
