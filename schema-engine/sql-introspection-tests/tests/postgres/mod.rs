@@ -261,6 +261,8 @@ VALUES (
 
     api.raw_cmd(schema).await;
 
+    /*
+    this actually returns differnet things for Postgres and Cockroach, this here is the Postgres one
     let expectation = expect![[r#"
         generator client {
           provider = "prisma-client-js"
@@ -271,37 +273,32 @@ VALUES (
           url      = "env(TEST_DATABASE_URL)"
         }
 
-        model foo {
-          id Int @id
-          a  Int
-          b  Int @unique(map: "idx_b", sort: Desc)
-          c  Int
-          d  Int @unique(map: "idx_d")
+        model Post {
+          id        String    @id
+          createdAt DateTime  @default(now())
+          updatedAt DateTime  @default(dbgenerated("'1970-01-01 00:00:00'::timestamp without time zone"))
+          published Boolean   @default(false)
+          title     String
+          content   String?
+          authorId  String?
+          jsonData  Json?
+          coinflips Boolean[]
+          User      User?     @relation(fields: [authorId], references: [id])
+        }
 
-          @@index([a], map: "idx_a")
-          @@index([c(sort: Desc)], map: "idx_c")
+        model User {
+          id    String  @id
+          email String  @unique(map: "User.email")
+          name  String?
+          Post  Post[]
         }
     "#]];
+    */
 
     api.expect_datamodel(&expectation).await;
 
     let expectation = expect![[r#"
-        [
-          {
-            "code": 29,
-            "message": "These index columns are having a non-default null sort order, which is not yet fully supported. Read more: https://pris.ly/d/non-default-index-null-ordering",
-            "affected": [
-              {
-                "indexName": "idx_a",
-                "columnName": "a"
-              },
-              {
-                "indexName": "idx_b",
-                "columnName": "b"
-              }
-            ]
-          }
-        ]"#]];
+        foo"#]];
 
     api.expect_warnings(&expectation).await;
 
