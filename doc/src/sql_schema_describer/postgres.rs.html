@@ -1515,6 +1515,7 @@
 <a href="#1515" id="1515">1515</a>
 <a href="#1516" id="1516">1516</a>
 <a href="#1517" id="1517">1517</a>
+<a href="#1518" id="1518">1518</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.
 
 </span><span class="kw">mod </span>default;
@@ -2730,7 +2731,8 @@
 
             pg_ext.indexes.push((index_id, algorithm));
 
-            <span class="kw">if </span>algorithm == SqlIndexAlgorithm::BTree &amp;&amp; !is_primary_key {
+            <span class="comment">// only enable nulls first/last on Postgres
+            </span><span class="kw">if </span>!<span class="self">self</span>.is_cockroach() &amp;&amp; algorithm == SqlIndexAlgorithm::BTree &amp;&amp; !is_primary_key {
                 <span class="kw">let </span>nulls_first = row.get_expect_bool(<span class="string">&quot;nulls_first&quot;</span>);
 
                 <span class="kw">let </span>position = <span class="kw">if </span>nulls_first {
