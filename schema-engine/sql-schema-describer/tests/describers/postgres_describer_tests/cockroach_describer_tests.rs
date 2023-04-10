@@ -386,6 +386,8 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
                     length: None,
                 },
             ],
+            check_constraints: [],
+            exclusion_constraints: [],
             views: [],
             view_columns: [],
             procedures: [],
