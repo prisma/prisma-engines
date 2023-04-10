@@ -1213,7 +1213,8 @@ impl<'a> SqlSchemaDescriber<'a> {
 
             pg_ext.indexes.push((index_id, algorithm));
 
-            if algorithm == SqlIndexAlgorithm::BTree && !is_primary_key {
+            // only enable nulls first/last on Postgres
+            if !self.is_cockroach() && algorithm == SqlIndexAlgorithm::BTree && !is_primary_key {
                 let nulls_first = row.get_expect_bool("nulls_first");
 
                 let position = if nulls_first {
