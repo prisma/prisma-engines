@@ -135,6 +135,16 @@ impl SqlSchema {
         self.connector_data.data = Some(data);
     }
 
+    /// Get check constraints.
+    pub fn check_constraints(&self) -> &[CheckConstraint] {
+        &self.check_constraints
+    }
+
+    /// Get exclusion constraints.
+    pub fn exclusion_constraints(&self) -> &[ExclusionConstraint] {
+        &self.exclusion_constraints
+    }
+
     /// Get a view.
     pub fn get_view(&self, name: &str) -> Option<&View> {
         self.views.iter().find(|v| v.name == name)

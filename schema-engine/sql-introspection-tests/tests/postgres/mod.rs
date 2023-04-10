@@ -258,7 +258,19 @@ async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
 
     api.expect_datamodel(&expectation).await;
 
-    let expectation = expect!["[]"];
+    let expectation = expect![[r#"
+        [
+          {
+            "code": 31,
+            "message": "These tables have check constraints, which are not yet fully supported. Read more: https://pris.ly/d/postgres-check-constraints",
+            "affected": [
+              {
+                "name": "products_price_check",
+                "definition": "CHECK ((price > (0)::numeric))"
+              }
+            ]
+          }
+        ]"#]];
 
     api.expect_warnings(&expectation).await;
 
@@ -266,7 +278,7 @@ async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn check_exclusion_constraints_stopgap(api: &mut TestApi) -> TestResult {
+async fn exclusion_constraints_stopgap(api: &mut TestApi) -> TestResult {
     // https://www.notion.so/prismaio/PostgreSQL-Exclusion-Constraints-fb2ecc44f773463f908d3d0e2d737271
 
     let schema = indoc! {r#"
@@ -307,7 +319,19 @@ async fn check_exclusion_constraints_stopgap(api: &mut TestApi) -> TestResult {
 
     api.expect_datamodel(&expectation).await;
 
-    let expectation = expect!["[]"];
+    let expectation = expect![[r#"
+        [
+          {
+            "code": 32,
+            "message": "These tables have exclusion constraints, which are not yet fully supported. Read more: https://pris.ly/d/postgres-exclusion-constraints",
+            "affected": [
+              {
+                "name": "room_reservation_room_id_tstzrange_excl",
+                "definition": "EXCLUDE USING gist (room_id WITH =, tstzrange(reserved_at, reserved_until) WITH &&) WHERE ((NOT canceled))"
+              }
+            ]
+          }
+        ]"#]];
 
     api.expect_warnings(&expectation).await;
 

@@ -209,6 +209,7 @@ impl Warnings {
         );
 
         maybe_warn(&self.check_constraints, check_constraints_found, &mut self.warnings);
+
         maybe_warn(
             &self.exclusion_constraints,
             exclusion_constraints_found,
@@ -340,9 +341,9 @@ pub(crate) struct IndexedColumn {
 #[serde(rename_all = "camelCase")]
 pub(crate) struct CheckConstraint {
     /// The name of the namespace
-    pub(crate) namespace: String,
+    // pub(crate) namespace: String,
     /// The name of the table
-    pub(crate) table: String,
+    // pub(crate) table: String,
     /// The name of the constraint
     pub(crate) name: String,
     /// The definition of the constraint
@@ -354,9 +355,9 @@ pub(crate) struct CheckConstraint {
 #[serde(rename_all = "camelCase")]
 pub(crate) struct ExclusionConstraint {
     /// The name of the namespace
-    pub(crate) namespace: String,
+    /// pub(crate) namespace: String,
     /// The name of the table
-    pub(crate) table: String,
+    /// pub(crate) table: String,
     /// The name of the constraint
     pub(crate) name: String,
     /// The definition of the constraint
