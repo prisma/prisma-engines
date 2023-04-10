@@ -24,5 +24,7 @@ impl super::IntrospectionFlavour for PostgresIntrospectionFlavour {
                 });
             }
         }
+
+        // TODO: trigger a warning in case of check constraints or exclude constraints
     }
 }

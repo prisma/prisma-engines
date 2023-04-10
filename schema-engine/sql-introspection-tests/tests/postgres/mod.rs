@@ -224,3 +224,92 @@ async fn index_sort_order_stopgap(api: &mut TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
+    // https://www.notion.so/prismaio/Indexes-Constraints-Check-constraints-PostgreSQL-cde0bee25f6343d8bbd0f7e84932e808
+
+    let schema = indoc! {r#"
+      CREATE TABLE products (
+          product_id serial PRIMARY KEY,
+          name text,
+          price numeric CHECK (price > 0)
+      );
+    "#};
+
+    api.raw_cmd(schema).await;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model products {
+          product_id Int      @id @default(autoincrement())
+          name       String?
+          price      Decimal? @db.Decimal
+        }
+    "#]];
+
+    api.expect_datamodel(&expectation).await;
+
+    let expectation = expect!["[]"];
+
+    api.expect_warnings(&expectation).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn check_exclusion_constraints_stopgap(api: &mut TestApi) -> TestResult {
+    // https://www.notion.so/prismaio/PostgreSQL-Exclusion-Constraints-fb2ecc44f773463f908d3d0e2d737271
+
+    let schema = indoc! {r#"
+      CREATE EXTENSION btree_gist;
+
+      CREATE TABLE room_reservation (
+          room_reservation_id serial PRIMARY KEY,
+          room_id integer NOT NULL, -- this could e.g. be a foreign key to a `room` table
+          reserved_at timestamptz NOT NULL,
+          reserved_until timestamptz NOT NULL,
+          canceled boolean DEFAULT false,
+          EXCLUDE USING gist (
+              room_id WITH =, tstzrange(reserved_at, reserved_until) WITH &&
+          ) WHERE (NOT canceled)
+      );
+    "#};
+
+    api.raw_cmd(schema).await;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model room_reservation {
+          room_reservation_id Int      @id @default(autoincrement())
+          room_id             Int
+          reserved_at         DateTime @db.Timestamptz(6)
+          reserved_until      DateTime @db.Timestamptz(6)
+          canceled            Boolean? @default(false)
+        }
+    "#]];
+
+    api.expect_datamodel(&expectation).await;
+
+    let expectation = expect!["[]"];
+
+    api.expect_warnings(&expectation).await;
+
+    Ok(())
+}

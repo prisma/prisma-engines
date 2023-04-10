@@ -55,6 +55,10 @@ pub(crate) struct Warnings {
     pub(crate) inherited_tables: Vec<Model>,
     /// Warn about non-default NULLS FIRST/NULLS LAST in indices.
     pub(crate) non_default_index_null_sort_order: Vec<IndexedColumn>,
+    /// Warn about check constraints.
+    pub(crate) check_constraints: Vec<CheckConstraint>,
+    /// Warn about exclusion constraints.
+    pub(crate) exclusion_constraints: Vec<ExclusionConstraint>,
 }
 
 impl Warnings {
@@ -204,6 +208,13 @@ impl Warnings {
             &mut self.warnings,
         );
 
+        maybe_warn(&self.check_constraints, check_constraints_found, &mut self.warnings);
+        maybe_warn(
+            &self.exclusion_constraints,
+            exclusion_constraints_found,
+            &mut self.warnings,
+        );
+
         self.warnings
     }
 }
@@ -322,6 +333,34 @@ pub(crate) struct IndexedColumn {
     pub(crate) index_name: String,
     /// The name of the column
     pub(crate) column_name: String,
+}
+
+/// A check constraint that triggered a warning.
+#[derive(Serialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct CheckConstraint {
+    /// The name of the namespace
+    pub(crate) namespace: String,
+    /// The name of the table
+    pub(crate) table: String,
+    /// The name of the constraint
+    pub(crate) name: String,
+    /// The definition of the constraint
+    pub(crate) definition: String,
+}
+
+/// An exclusion constraint that triggered a warning.
+#[derive(Serialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct ExclusionConstraint {
+    /// The name of the namespace
+    pub(crate) namespace: String,
+    /// The name of the table
+    pub(crate) table: String,
+    /// The name of the constraint
+    pub(crate) name: String,
+    /// The definition of the constraint
+    pub(crate) definition: String,
 }
 
 pub(super) fn warning_models_without_identifier(affected: &[Model]) -> Warning {
@@ -542,6 +581,26 @@ pub(crate) fn non_default_index_null_sort_order(affected: &[IndexedColumn]) -> W
 
     Warning {
         code: 29,
+        message: message.into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+pub(crate) fn check_constraints_found(affected: &[CheckConstraint]) -> Warning {
+    let message = "These tables have check constraints, which are not yet fully supported. Read more: https://pris.ly/d/postgres-check-constraints";
+
+    Warning {
+        code: 31,
+        message: message.into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+pub(crate) fn exclusion_constraints_found(affected: &[ExclusionConstraint]) -> Warning {
+    let message = "These tables have exclusion constraints, which are not yet fully supported. Read more: https://pris.ly/d/postgres-exclusion-constraints";
+
+    Warning {
+        code: 32,
         message: message.into(),
         affected: serde_json::to_value(affected).unwrap(),
     }
