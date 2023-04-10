@@ -40,12 +40,6 @@ impl<'a> TableWalker<'a> {
         range.map(move |idx| self.walk(IndexId(idx as u32)))
     }
 
-    /// Traverse the table's check constraints.
-    /// pub fn check_constraints(self) -> ???
-
-    /// Traverse the table's exclusion constraints.
-    /// pub fn exclusion_constraints(self) -> ???
-
     /// Traverse the foreign keys on the table.
     pub fn foreign_keys(self) -> impl ExactSizeIterator<Item = ForeignKeyWalker<'a>> {
         self.foreign_keys_range()
