@@ -2,14 +2,15 @@
 //! pull`.
 
 mod r#enum;
-mod generators;
+pub(crate) mod generators;
 mod model;
 mod view;
 
 use crate::datamodel_calculator::DatamodelCalculatorContext;
-use generators::Warnings;
+use crate::Warning;
 use psl::PreviewFeature;
-use schema_connector::Warning;
+
+use self::generators::Warnings;
 
 /// Analyzes the described database schema, triggering
 /// warnings to the user if necessary.
@@ -29,6 +30,8 @@ pub(crate) fn generate(ctx: &DatamodelCalculatorContext<'_>) -> Vec<Warning> {
             view::generate_warnings(view, &mut warnings);
         }
     }
+
+    ctx.flavour.generate_warnings(ctx, &mut warnings);
 
     warnings.finalize()
 }

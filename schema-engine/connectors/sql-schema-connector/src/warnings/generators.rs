@@ -1,3 +1,5 @@
+//! Warnings generator for Introspection
+
 use schema_connector::Warning;
 use serde::Serialize;
 
@@ -5,69 +7,73 @@ use serde::Serialize;
 /// over directly creating warnings from the code, to prevent spamming
 /// the user.
 #[derive(Debug, Default)]
-pub(super) struct Warnings {
+pub(crate) struct Warnings {
     /// Store final warnings to this vector.
     warnings: Vec<Warning>,
     /// Fields that are using Prisma 1 UUID defaults.
-    pub(super) prisma_1_uuid_defaults: Vec<ModelAndField>,
+    pub(crate) prisma_1_uuid_defaults: Vec<ModelAndField>,
     /// Fields that are using Prisma 1 CUID defaults.
-    pub(super) prisma_1_cuid_defaults: Vec<ModelAndField>,
+    pub(crate) prisma_1_cuid_defaults: Vec<ModelAndField>,
     /// Fields having an empty name.
-    pub(super) fields_with_empty_names_in_model: Vec<ModelAndField>,
+    pub(crate) fields_with_empty_names_in_model: Vec<ModelAndField>,
     /// Fields having an empty name.
-    pub(super) fields_with_empty_names_in_view: Vec<ViewAndField>,
+    pub(crate) fields_with_empty_names_in_view: Vec<ViewAndField>,
     /// Field names in models we remapped during introspection.
-    pub(super) remapped_fields_in_model: Vec<ModelAndField>,
+    pub(crate) remapped_fields_in_model: Vec<ModelAndField>,
     /// Field names in views we remapped during introspection.
-    pub(super) remapped_fields_in_view: Vec<ViewAndField>,
+    pub(crate) remapped_fields_in_view: Vec<ViewAndField>,
     /// Enum values that are empty strings.
-    pub(super) enum_values_with_empty_names: Vec<EnumAndValue>,
+    pub(crate) enum_values_with_empty_names: Vec<EnumAndValue>,
     /// Models that have no fields.
-    pub(super) models_without_columns: Vec<Model>,
+    pub(crate) models_without_columns: Vec<Model>,
     /// Models missing a id or unique constraint.
-    pub(super) models_without_identifiers: Vec<Model>,
+    pub(crate) models_without_identifiers: Vec<Model>,
     /// Views missing a id or unique constraint.
-    pub(super) views_without_identifiers: Vec<View>,
+    pub(crate) views_without_identifiers: Vec<View>,
     /// If the id attribute has a name taken from a previous model.
-    pub(super) reintrospected_id_names_in_model: Vec<Model>,
+    pub(crate) reintrospected_id_names_in_model: Vec<Model>,
     /// If the id attribute has a name taken from a previous view.
-    pub(super) reintrospected_id_names_in_view: Vec<View>,
+    pub(crate) reintrospected_id_names_in_view: Vec<View>,
     /// The field in model has a type we do not currently support in Prisma.
-    pub(super) unsupported_types_in_model: Vec<ModelAndFieldAndType>,
+    pub(crate) unsupported_types_in_model: Vec<ModelAndFieldAndType>,
     /// The field in view has a type we do not currently support in Prisma.
-    pub(super) unsupported_types_in_view: Vec<ViewAndFieldAndType>,
+    pub(crate) unsupported_types_in_view: Vec<ViewAndFieldAndType>,
     /// The name of the model is taken from a previous data model.
-    pub(super) remapped_models: Vec<Model>,
+    pub(crate) remapped_models: Vec<Model>,
     /// The name of the model is taken from a previous data model.
-    pub(super) remapped_views: Vec<View>,
+    pub(crate) remapped_views: Vec<View>,
     /// The name of the enum variant is taken from a previous data model.
-    pub(super) remapped_values: Vec<EnumAndValue>,
+    pub(crate) remapped_values: Vec<EnumAndValue>,
     /// The relation is copied from a previous data model, only if
     /// `relationMode` is `prisma`.
-    pub(super) reintrospected_relations: Vec<Model>,
+    pub(crate) reintrospected_relations: Vec<Model>,
     /// The name of these models or enums was a dupe in the PSL.
-    pub(super) duplicate_names: Vec<TopLevelItem>,
+    pub(crate) duplicate_names: Vec<TopLevelItem>,
     /// Warn about using partition tables, which only have introspection support.
-    pub(super) partition_tables: Vec<Model>,
+    pub(crate) partition_tables: Vec<Model>,
     /// Warn about using inherited tables, which only have introspection support.
-    pub(super) inherited_tables: Vec<Model>,
+    pub(crate) inherited_tables: Vec<Model>,
+    /// Warn about non-default NULLS FIRST/NULLS LAST in indices.
+    pub(crate) non_default_index_null_sort_order: Vec<IndexedColumn>,
 }
 
 impl Warnings {
-    pub(super) fn new() -> Self {
+    /// Generate a new empty warnings structure.
+    pub(crate) fn new() -> Self {
         Self {
             warnings: Vec::new(),
             ..Default::default()
         }
     }
 
-    pub(super) fn push(&mut self, warning: Warning) {
+    /// Push a warning to the collection.
+    pub(crate) fn push(&mut self, warning: Warning) {
         self.warnings.push(warning);
     }
 
     /// Generate warnings from all indicators. Must be called after
     /// introspection.
-    pub(super) fn finalize(mut self) -> Vec<Warning> {
+    pub(crate) fn finalize(mut self) -> Vec<Warning> {
         fn maybe_warn<T>(elems: &[T], warning: impl Fn(&[T]) -> Warning, warnings: &mut Vec<Warning>) {
             if !elems.is_empty() {
                 warnings.push(warning(elems))
@@ -192,80 +198,130 @@ impl Warnings {
 
         maybe_warn(&self.inherited_tables, inherited_tables_found, &mut self.warnings);
 
+        maybe_warn(
+            &self.non_default_index_null_sort_order,
+            non_default_index_null_sort_order,
+            &mut self.warnings,
+        );
+
         self.warnings
     }
 }
 
+/// A model that triggered a warning.
 #[derive(Serialize, Debug, Clone)]
-pub(super) struct Model {
-    pub(super) model: String,
+pub(crate) struct Model {
+    /// The name of the model
+    pub(crate) model: String,
 }
 
+/// A view that triggered a warning.
 #[derive(Serialize, Debug, Clone)]
-pub(super) struct View {
-    pub(super) view: String,
+pub(crate) struct View {
+    /// The name of the view
+    pub(crate) view: String,
 }
 
+/// An enum that triggered a warning.
 #[derive(Serialize, Debug, Clone)]
-pub(super) struct Enum {
-    pub(super) enm: String,
+pub(crate) struct Enum {
+    /// The name of the enum
+    pub(crate) enm: String,
 }
 
 impl Enum {
-    pub(super) fn new(name: &str) -> Self {
+    /// Create a new enum with given name.
+    pub(crate) fn new(name: &str) -> Self {
         Enum { enm: name.to_owned() }
     }
 }
 
+/// A field in a model that triggered a warning.
 #[derive(Serialize, Debug, Clone)]
-pub(super) struct ModelAndField {
-    pub(super) model: String,
-    pub(super) field: String,
+pub(crate) struct ModelAndField {
+    /// The name of the model
+    pub(crate) model: String,
+    /// The name of the field
+    pub(crate) field: String,
 }
 
+/// A field in a view that triggered a warning.
 #[derive(Serialize, Debug, Clone)]
-pub(super) struct ViewAndField {
-    pub(super) view: String,
-    pub(super) field: String,
+pub(crate) struct ViewAndField {
+    /// The name of the view
+    pub(crate) view: String,
+    /// The name of the field
+    pub(crate) field: String,
 }
 
+/// An index in a model that triggered a warning.
 #[derive(Serialize, Debug, Clone)]
-pub(super) struct ModelAndIndex {
-    pub(super) model: String,
-    pub(super) index_db_name: String,
+pub(crate) struct ModelAndIndex {
+    /// The name of the model
+    pub(crate) model: String,
+    /// The name of the index
+    pub(crate) index_db_name: String,
 }
 
+/// A field type in a model that triggered a warning.
 #[derive(Serialize, Debug)]
-pub(super) struct ModelAndFieldAndType {
-    pub(super) model: String,
-    pub(super) field: String,
-    pub(super) tpe: String,
+pub(crate) struct ModelAndFieldAndType {
+    /// The name of the model
+    pub(crate) model: String,
+    /// The name of the field
+    pub(crate) field: String,
+    /// The name of the type
+    pub(crate) tpe: String,
 }
 
+/// A field type in a view that triggered a warning.
 #[derive(Serialize, Debug)]
-pub(super) struct ViewAndFieldAndType {
-    pub(super) view: String,
-    pub(super) field: String,
-    pub(super) tpe: String,
+pub(crate) struct ViewAndFieldAndType {
+    /// The name of the view
+    pub(crate) view: String,
+    /// The name of the field
+    pub(crate) field: String,
+    /// The name of the type
+    pub(crate) tpe: String,
 }
 
+/// An enum value that triggered a warning.
 #[derive(Serialize, Debug, Clone)]
-pub(super) struct EnumAndValue {
-    pub(super) enm: String,
-    pub(super) value: String,
+pub(crate) struct EnumAndValue {
+    /// The name of the enum
+    pub(crate) enm: String,
+    /// The enum value
+    pub(crate) value: String,
 }
 
+/// An top level type that triggered a warning.
 #[derive(Serialize, Debug, Clone, Copy)]
-pub(super) enum TopLevelType {
+pub(crate) enum TopLevelType {
+    /// A model.
     Model,
+    /// An enum.
     Enum,
+    /// A view.
     View,
 }
 
+/// An top level item that triggered a warning.
 #[derive(Serialize, Debug, Clone)]
-pub(super) struct TopLevelItem {
-    pub(super) r#type: TopLevelType,
-    pub(super) name: String,
+pub(crate) struct TopLevelItem {
+    /// The name of the top-level type
+    pub(crate) r#type: TopLevelType,
+    /// The name of the object
+    pub(crate) name: String,
+}
+
+/// An indexed column that triggered a warning.
+#[derive(Serialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct IndexedColumn {
+    /// The name of the index
+    pub(crate) index_name: String,
+    /// The name of the column
+    pub(crate) column_name: String,
 }
 
 pub(super) fn warning_models_without_identifier(affected: &[Model]) -> Warning {
@@ -338,7 +394,8 @@ pub(super) fn warning_enriched_with_map_on_field_in_models(affected: &[ModelAndF
     }
 }
 
-pub(super) fn warning_enriched_with_map_on_enum(affected: &[Enum]) -> Warning {
+/// A model was given a `@@map` attribute during introspection.
+pub(crate) fn warning_enriched_with_map_on_enum(affected: &[Enum]) -> Warning {
     Warning {
         code: 9,
         message: "These enums were enriched with `@@map` information taken from the previous Prisma schema.".into(),
@@ -475,6 +532,16 @@ pub(super) fn inherited_tables_found(affected: &[Model]) -> Warning {
 
     Warning {
         code: 28,
+        message: message.into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+pub(crate) fn non_default_index_null_sort_order(affected: &[IndexedColumn]) -> Warning {
+    let message = "These index columns are having a non-default null sort order, which is not yet fully supported. Read more: https://pris.ly/d/non-default-index-null-ordering";
+
+    Warning {
+        code: 29,
         message: message.into(),
         affected: serde_json::to_value(affected).unwrap(),
     }

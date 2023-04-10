@@ -977,6 +977,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     BTree,
                 ),
             ],
+            index_null_position: {},
             sequences: [
                 Sequence {
                     namespace_id: NamespaceId(
@@ -1147,6 +1148,7 @@ fn postgres_sequences_must_work(api: TestApi) {
         PostgresSchemaExt {
             opclasses: [],
             indexes: [],
+            index_null_position: {},
             sequences: [
                 Sequence {
                     namespace_id: NamespaceId(
@@ -1732,6 +1734,7 @@ fn extensions_are_described_correctly(api: TestApi) {
         PostgresSchemaExt {
             opclasses: [],
             indexes: [],
+            index_null_position: {},
             sequences: [],
             extensions: [
                 DatabaseExtension {

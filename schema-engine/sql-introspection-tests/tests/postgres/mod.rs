@@ -154,3 +154,73 @@ async fn scalar_list_defaults_work(api: &mut TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn index_sort_order_stopgap(api: &mut TestApi) -> TestResult {
+    // https://www.notion.so/prismaio/Index-sort-order-Nulls-first-last-PostgreSQL-cf8265dff0f34dd195732735a4ce9648
+
+    let schema = indoc! {r#"
+        CREATE TABLE foo (
+            id INT PRIMARY KEY,
+            a INT NOT NULL,
+            b INT NOT NULL,
+            c INT NOT NULL,
+            d INT NOT NULL
+        );
+
+        CREATE INDEX idx_a ON foo(a ASC NULLS FIRST);
+        CREATE UNIQUE INDEX idx_b ON foo(b DESC NULLS LAST);
+
+        -- these two are default orders, no warnings
+        CREATE INDEX idx_c ON foo(c DESC NULLS FIRST);
+        CREATE UNIQUE INDEX idx_d ON foo(d ASC NULLS LAST);
+    "#};
+
+    api.raw_cmd(schema).await;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model foo {
+          id Int @id
+          a  Int
+          b  Int @unique(map: "idx_b", sort: Desc)
+          c  Int
+          d  Int @unique(map: "idx_d")
+
+          @@index([a], map: "idx_a")
+          @@index([c(sort: Desc)], map: "idx_c")
+        }
+    "#]];
+
+    api.expect_datamodel(&expectation).await;
+
+    let expectation = expect![[r#"
+        [
+          {
+            "code": 29,
+            "message": "These index columns are having a non-default null sort order, which is not yet fully supported. Read more: https://pris.ly/d/non-default-index-null-ordering",
+            "affected": [
+              {
+                "indexName": "idx_a",
+                "columnName": "a"
+              },
+              {
+                "indexName": "idx_b",
+                "columnName": "b"
+              }
+            ]
+          }
+        ]"#]];
+
+    api.expect_warnings(&expectation).await;
+
+    Ok(())
+}

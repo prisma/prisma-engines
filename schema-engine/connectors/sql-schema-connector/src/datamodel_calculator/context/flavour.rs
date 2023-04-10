@@ -10,6 +10,10 @@ pub(super) use postgresql::PostgresIntrospectionFlavour;
 pub(super) use sqlite::SqliteIntrospectionFlavour;
 pub(super) use sqlserver::SqlServerIntrospectionFlavour;
 
+use crate::warnings::generators::Warnings;
+
+use super::DatamodelCalculatorContext;
+
 pub(crate) trait IntrospectionFlavour {
     /// For columns in PostgreSQL or SQLite views, if changed in PSL,
     /// we use the changed arity instead of the always optional value from the
@@ -26,4 +30,6 @@ pub(crate) trait IntrospectionFlavour {
 
         sqlformat::format(definition, &Default::default(), opts)
     }
+
+    fn generate_warnings(&self, _ctx: &DatamodelCalculatorContext<'_>, _warnings: &mut Warnings) {}
 }
