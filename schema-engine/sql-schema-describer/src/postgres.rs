@@ -101,6 +101,27 @@ impl fmt::Display for SqlIndexAlgorithm {
     }
 }
 
+#[derive(PartialEq, Debug, Clone, Copy)]
+pub enum SqlConstraint {
+    Check,
+    Exclude,
+}
+
+impl AsRef<str> for SqlConstraint {
+    fn as_ref(&self) -> &str {
+        match self {
+            Self::Check => "CHECK",
+            Self::Exclude => "EXCLUDE",
+        }
+    }
+}
+
+impl fmt::Display for SqlConstraint {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_ref())
+    }
+}
+
 #[enumflags2::bitflags]
 #[derive(Clone, Copy, Debug)]
 #[repr(u8)]
@@ -504,6 +525,7 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
         self.get_columns(&mut sql_schema).await?;
         self.get_foreign_keys(&table_names, &mut sql_schema).await?;
         self.get_indices(&table_names, &mut pg_ext, &mut sql_schema).await?;
+        self.get_constraints(&table_names, &mut sql_schema).await?;
 
         self.get_procedures(&mut sql_schema).await?;
         self.get_extensions(&mut pg_ext).await?;
@@ -1110,6 +1132,60 @@ impl<'a> SqlSchemaDescriber<'a> {
 
             if let Some((_, fkid)) = current_fk {
                 sql_schema.push_foreign_key_column(fkid, [column_id, referenced_column_id]);
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Return the constraints that are not primary keys, foreign keys, or unique keys.
+    /// Namely, this returns CHECK and EXCLUDE constraints.
+    async fn get_constraints(
+        &self,
+        table_ids: &IndexMap<(String, String), TableId>,
+        sql_schema: &mut SqlSchema,
+    ) -> DescriberResult<()> {
+        let namespaces = &sql_schema.namespaces;
+        let sql = include_str!("postgres/constraints_query.sql");
+        let rows = self
+            .conn
+            .query_raw(
+                sql,
+                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
+            )
+            .await?;
+
+        for row in rows {
+            let namespace = row.get_expect_string("namespace");
+            let namespace_id = sql_schema.get_namespace_id(&namespace).unwrap();
+            let table_name = row.get_expect_string("table_name");
+            let table_id = table_ids.get(&(namespace, table_name)).unwrap();
+            let constraint_name = row.get_expect_string("constraint_name");
+            let constraint_type = row.get_expect_char("constraint_type");
+            let constraint_definition = row.get_expect_string("constraint_definition");
+
+            match constraint_type {
+                'c' => {
+                    let check_constraint = CheckConstraint {
+                        name: constraint_name,
+                        namespace_id,
+                        table_id: *table_id,
+                        definition: constraint_definition,
+                    };
+
+                    sql_schema.push_check_constraint(check_constraint);
+                }
+                'x' => {
+                    let exclusion_constraint = ExclusionConstraint {
+                        name: constraint_name,
+                        namespace_id,
+                        table_id: *table_id,
+                        definition: constraint_definition,
+                    };
+
+                    sql_schema.push_exclusion_constraint(exclusion_constraint);
+                }
+                _ => (),
             }
         }
 

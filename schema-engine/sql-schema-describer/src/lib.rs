@@ -79,6 +79,10 @@ pub struct SqlSchema {
     indexes: Vec<Index>,
     /// All columns of indexes.
     index_columns: Vec<IndexColumn>,
+    /// Check constraints for every table.
+    check_constraints: Vec<CheckConstraint>,
+    /// Exclusion constraints for every table.
+    exclusion_constraints: Vec<ExclusionConstraint>,
     /// The schema's views,
     views: Vec<View>,
     /// The schema's columns that are in views.
@@ -327,6 +331,14 @@ impl SqlSchema {
             constrained_column,
             referenced_column,
         });
+    }
+
+    pub fn push_check_constraint(&mut self, check_constraint: CheckConstraint) {
+        self.check_constraints.push(check_constraint);
+    }
+
+    pub fn push_exclusion_constraint(&mut self, exclusion_constraint: ExclusionConstraint) {
+        self.exclusion_constraints.push(exclusion_constraint);
     }
 
     pub fn push_namespace(&mut self, name: String) -> NamespaceId {
@@ -763,6 +775,30 @@ struct Enum {
 struct EnumVariant {
     enum_id: EnumId,
     variant_name: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct CheckConstraint {
+    /// Namespace of the constraint
+    namespace_id: NamespaceId,
+    /// Table of the constraint
+    table_id: TableId,
+    /// Name of the constraint.
+    pub name: String,
+    /// The SQL definition of the constraint.
+    pub definition: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ExclusionConstraint {
+    /// Namespace of the constraint
+    namespace_id: NamespaceId,
+    /// Table of the constraint
+    table_id: TableId,
+    /// Name of the constraint.
+    pub name: String,
+    /// The SQL definition of the constraint.
+    pub definition: String,
 }
 
 /// An SQL view.
