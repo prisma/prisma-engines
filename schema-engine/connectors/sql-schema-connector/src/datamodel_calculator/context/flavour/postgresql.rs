@@ -25,8 +25,6 @@ impl super::IntrospectionFlavour for PostgresIntrospectionFlavour {
             }
         }
 
-        dbg!("check_constraints: {}", &ctx.sql_schema.check_constraints());
-
         for check_constraint in ctx.sql_schema.check_constraints() {
             let check_constraint = CheckConstraint {
                 name: check_constraint.name.clone(),
