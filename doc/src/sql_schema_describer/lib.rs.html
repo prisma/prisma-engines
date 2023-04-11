@@ -900,6 +900,7 @@
 <a href="#900" id="900">900</a>
 <a href="#901" id="901">901</a>
 <a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Database description. This crate is used heavily in the schema engine.
 
 </span><span class="attr">#![deny(rust_2018_idioms, unsafe_code)]
@@ -1376,6 +1377,7 @@
 </span><span class="kw">pub enum </span>TableProperties {
     IsPartition,
     HasSubclass,
+    HasRowLevelSecurity,
 }
 
 <span class="doccomment">/// A table found in a schema.

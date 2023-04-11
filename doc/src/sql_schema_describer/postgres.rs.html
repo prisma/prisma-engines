@@ -1516,6 +1516,12 @@
 <a href="#1516" id="1516">1516</a>
 <a href="#1517" id="1517">1517</a>
 <a href="#1518" id="1518">1518</a>
+<a href="#1519" id="1519">1519</a>
+<a href="#1520" id="1520">1520</a>
+<a href="#1521" id="1521">1521</a>
+<a href="#1522" id="1522">1522</a>
+<a href="#1523" id="1523">1523</a>
+<a href="#1524" id="1524">1524</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.
 
 </span><span class="kw">mod </span>default;
@@ -2186,12 +2192,13 @@
                 row.get_expect_string(<span class="string">&quot;namespace&quot;</span>),
                 row.get_expect_bool(<span class="string">&quot;is_partition&quot;</span>),
                 row.get_expect_bool(<span class="string">&quot;has_subclass&quot;</span>),
+                row.get_expect_bool(<span class="string">&quot;has_row_level_security&quot;</span>),
             )
         });
 
         <span class="kw">let </span><span class="kw-2">mut </span>map = IndexMap::default();
 
-        <span class="kw">for </span>(table_name, namespace, is_partition, has_subclass) <span class="kw">in </span>names {
+        <span class="kw">for </span>(table_name, namespace, is_partition, has_subclass, has_row_level_security) <span class="kw">in </span>names {
             <span class="kw">let </span>cloned_name = table_name.clone();
             <span class="kw">let </span>partition = <span class="kw">if </span>is_partition {
                 BitFlags::from_flag(TableProperties::IsPartition)
@@ -2203,11 +2210,16 @@
             } <span class="kw">else </span>{
                 BitFlags::empty()
             };
+            <span class="kw">let </span>row_level_security = <span class="kw">if </span>has_row_level_security {
+                BitFlags::from_flag(TableProperties::HasRowLevelSecurity)
+            } <span class="kw">else </span>{
+                BitFlags::empty()
+            };
 
             <span class="kw">let </span>id = sql_schema.push_table_with_properties(
                 table_name,
                 sql_schema.get_namespace_id(<span class="kw-2">&amp;</span>namespace).unwrap(),
-                partition | subclass,
+                partition | subclass | row_level_security,
             );
             map.insert((namespace, cloned_name), id);
         }

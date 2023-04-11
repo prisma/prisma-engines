@@ -223,6 +223,11 @@
 <a href="#223" id="223">223</a>
 <a href="#224" id="224">224</a>
 <a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
 </pre><pre class="rust"><code><span class="kw">use </span>psl::{
     datamodel_connector::walker_ext_traits::IndexWalkerExt,
     parser_database::walkers,
@@ -265,6 +270,11 @@
     <span class="doccomment">/// Whether the model has subclass tables or not.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_subclass(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.next.has_subclass()
+    }
+
+    <span class="doccomment">/// Whether the model has row level security enabled.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_row_level_security(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.next.has_row_level_security()
     }
 
     <span class="doccomment">/// Name of the model in the PSL. The value can be sanitized if it
