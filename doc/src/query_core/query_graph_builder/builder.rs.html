@@ -116,6 +116,12 @@
 <a href="#116" id="116">116</a>
 <a href="#117" id="117">117</a>
 <a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
 </pre><pre class="rust"><code><span class="kw">use </span>once_cell::sync::Lazy;
 <span class="kw">use </span>std::{fmt, fs::File, io::Write};
 
@@ -146,15 +152,19 @@
     </span><span class="kw">pub fn </span>build(<span class="self">self</span>, operation: Operation) -&gt; QueryGraphBuilderResult&lt;(QueryGraph, IrSerializer)&gt; {
         <span class="kw">let </span>_span = <span class="macro">info_span!</span>(<span class="string">&quot;prisma:engine:build_graph&quot;</span>);
         <span class="kw">match </span>operation {
-            Operation::Read(selection) =&gt; <span class="self">self</span>.build_internal(selection, <span class="self">self</span>.query_schema.query()),
-            Operation::Write(selection) =&gt; <span class="self">self</span>.build_internal(selection, <span class="self">self</span>.query_schema.mutation()),
+            Operation::Read(selection) =&gt; {
+                <span class="self">self</span>.build_internal(selection, (<span class="self">self</span>.query_schema.query, <span class="self">self</span>.query_schema.query()))
+            }
+            Operation::Write(selection) =&gt; {
+                <span class="self">self</span>.build_internal(selection, (<span class="self">self</span>.query_schema.mutation, <span class="self">self</span>.query_schema.mutation()))
+            }
         }
     }
 
     <span class="kw">fn </span>build_internal(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         selection: Selection,
-        root_object: <span class="kw-2">&amp;</span>ObjectType, <span class="comment">// Either the query or mutation object.
+        root_object: (OutputObjectTypeId, <span class="kw-2">&amp;</span>ObjectType), <span class="comment">// Either the query or mutation object.
     </span>) -&gt; QueryGraphBuilderResult&lt;(QueryGraph, IrSerializer)&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>selections = <span class="macro">vec!</span>[selection];
         <span class="kw">let </span><span class="kw-2">mut </span>parsed_object = QueryDocumentParser::new(<span class="kw">crate</span>::executor::get_request_now()).parse(
@@ -165,15 +175,16 @@
 
         <span class="comment">// Because we&#39;re processing root objects, there can only be one query / mutation.
         </span><span class="kw">let </span>field_pair = parsed_object.fields.pop().unwrap();
-        <span class="kw">let </span>serializer = <span class="self">Self</span>::derive_serializer(<span class="kw-2">&amp;</span>selections.pop().unwrap(), <span class="kw-2">&amp;</span>field_pair.schema_field);
+        <span class="kw">let </span>serializer = <span class="self">Self</span>::derive_serializer(<span class="kw-2">&amp;</span>selections.pop().unwrap(), field_pair.schema_field);
+        <span class="kw">let </span>schema_field = <span class="kw-2">&amp;</span><span class="self">self</span>.query_schema.db[field_pair.schema_field.<span class="number">0</span>].get_fields()[field_pair.schema_field.<span class="number">1</span>];
 
-        <span class="kw">if </span>field_pair.schema_field.query_info.is_some() {
+        <span class="kw">if </span>schema_field.query_info.is_some() {
             <span class="kw">let </span>graph = <span class="self">self</span>.dispatch_build(field_pair)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>((graph, serializer))
         } <span class="kw">else </span>{
             <span class="prelude-val">Err</span>(QueryGraphBuilderError::SchemaError(<span class="macro">format!</span>(
                 <span class="string">&quot;Expected query information to be attached on schema object &#39;{}&#39;, field &#39;{}&#39;.&quot;</span>,
-                root_object.identifier.name(),
+                root_object.<span class="number">1</span>.identifier.name(),
                 field_pair.parsed_field.name
             )))
         }
@@ -181,7 +192,8 @@
 
     <span class="attr">#[rustfmt::skip]
     </span><span class="kw">fn </span>dispatch_build(<span class="kw-2">&amp;</span><span class="self">self</span>, field_pair: FieldPair) -&gt; QueryGraphBuilderResult&lt;QueryGraph&gt; {
-        <span class="kw">let </span>query_info = field_pair.schema_field.query_info.as_ref().unwrap();
+        <span class="kw">let </span>schema_field = <span class="kw-2">&amp;</span><span class="self">self</span>.query_schema.db[field_pair.schema_field.<span class="number">0</span>].get_fields()[field_pair.schema_field.<span class="number">1</span>];
+        <span class="kw">let </span>query_info = schema_field.query_info.as_ref().unwrap();
         <span class="kw">let </span>parsed_field = field_pair.parsed_field;
         <span class="kw">let </span>connector_ctx = <span class="self">self</span>.query_schema.context();
 
@@ -224,13 +236,13 @@
         <span class="prelude-val">Ok</span>(graph)
     }
 
-    <span class="kw">fn </span>derive_serializer(selection: <span class="kw-2">&amp;</span>Selection, field: <span class="kw-2">&amp;</span>OutputFieldRef) -&gt; IrSerializer {
+    <span class="kw">fn </span>derive_serializer(selection: <span class="kw-2">&amp;</span>Selection, field: (OutputObjectTypeId, usize)) -&gt; IrSerializer {
         IrSerializer {
             key: selection
                 .alias()
                 .clone()
                 .unwrap_or_else(|| selection.name().to_string()),
-            output_field: field.clone(),
+            output_field: field,
         }
     }
 }

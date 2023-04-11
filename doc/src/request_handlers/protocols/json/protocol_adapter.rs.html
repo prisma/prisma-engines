@@ -1406,7 +1406,7 @@
 <span class="kw">use </span>prisma_models::{decode_bytes, parse_datetime, prelude::ParentContainer, Field};
 <span class="kw">use </span>query_core::{
     constants::custom_types,
-    schema::{ObjectType, OutputFieldRef, QuerySchema, QuerySchemaRef},
+    schema::{ObjectType, OutputField, QuerySchema, QuerySchemaRef},
     ArgumentValue, Operation, Selection,
 };
 <span class="kw">use </span>serde_json::Value <span class="kw">as </span>JsonValue;
@@ -1439,7 +1439,7 @@
     }
 
     <span class="kw">fn </span>convert_selection(
-        field: <span class="kw-2">&amp;</span>OutputFieldRef,
+        field: <span class="kw-2">&amp;</span>OutputField,
         container: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ParentContainer&gt;,
         query: FieldQuery,
         query_schema: <span class="kw-2">&amp;</span>QuerySchemaRef,
@@ -1465,13 +1465,13 @@
             <span class="kw">match </span>selected {
                 <span class="comment">// $scalars: true
                 </span><span class="kw">crate</span>::SelectionSetValue::Shorthand(<span class="bool-val">true</span>) <span class="kw">if </span>SelectionSet::is_all_scalars(<span class="kw-2">&amp;</span>selection_name) =&gt; {
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>(schema_object) = field.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db) {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, schema_object)) = field.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db) {
                         <span class="self">Self</span>::default_scalar_selection(schema_object, <span class="kw-2">&amp;mut </span>selection);
                     }
                 }
                 <span class="comment">// $composites: true
                 </span><span class="kw">crate</span>::SelectionSetValue::Shorthand(<span class="bool-val">true</span>) <span class="kw">if </span>SelectionSet::is_all_composites(<span class="kw-2">&amp;</span>selection_name) =&gt; {
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>(schema_object) = field.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db) {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, schema_object)) = field.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db) {
                         <span class="kw">if let </span><span class="prelude-val">Some</span>(container) = container {
                             <span class="self">Self</span>::default_composite_selection(
                                 <span class="kw-2">&amp;mut </span>selection,
@@ -1497,8 +1497,8 @@
                 </span><span class="kw">crate</span>::SelectionSetValue::Shorthand(<span class="bool-val">false</span>) =&gt; (),
                 <span class="comment">// &lt;field_name&gt;: { selection: { ... }, arguments: { ... } }
                 </span><span class="kw">crate</span>::SelectionSetValue::Nested(nested_query) =&gt; {
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>(schema_object) = field.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db) {
-                        <span class="kw">let </span>schema_field = schema_object.find_field(<span class="kw-2">&amp;</span>selection_name).ok_or_else(|| {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, schema_object)) = field.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db) {
+                        <span class="kw">let </span>(<span class="kw">_</span>, schema_field) = schema_object.find_field(<span class="kw-2">&amp;</span>selection_name).ok_or_else(|| {
                             HandlerError::query_conversion(<span class="macro">format!</span>(
                                 <span class="string">&quot;Unknown nested field &#39;{}&#39; for operation {} does not match any query.&quot;</span>,
                                 selection_name, <span class="kw-2">&amp;</span>field.name
@@ -1520,7 +1520,7 @@
                         }
 
                         selection.push_nested_selection(<span class="self">Self</span>::convert_selection(
-                            <span class="kw-2">&amp;</span>schema_field,
+                            schema_field,
                             nested_container.as_ref(),
                             nested_query,
                             query_schema,
@@ -1673,13 +1673,13 @@
                 <span class="kw">for </span>cf <span class="kw">in </span>model.fields().composite() {
                     <span class="kw">let </span>schema_field = schema_object.find_field(cf.name());
 
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>(schema_field) = schema_field {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, schema_field)) = schema_field {
                         <span class="kw">let </span><span class="kw-2">mut </span>nested_selection = Selection::with_name(cf.name());
 
                         <span class="self">Self</span>::default_composite_selection(
                             <span class="kw-2">&amp;mut </span>nested_selection,
                             <span class="kw-2">&amp;</span>ParentContainer::from(cf.typ()),
-                            schema_field.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db).unwrap(),
+                            schema_field.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db).unwrap().<span class="number">1</span>,
                             walked_types,
                             query_schema,
                         )<span class="question-mark">?</span>;
@@ -1700,7 +1700,7 @@
                 <span class="kw">for </span>f <span class="kw">in </span>ct.fields() {
                     <span class="kw">let </span>schema_field = schema_object.find_field(f.name());
 
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>(schema_field) = schema_field {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, schema_field)) = schema_field {
                         <span class="kw">match </span>f {
                             Field::Scalar(s) =&gt; {
                                 selection.push_nested_selection(Selection::with_name(s.name().to_owned()))
@@ -1711,7 +1711,7 @@
                                 <span class="self">Self</span>::default_composite_selection(
                                     <span class="kw-2">&amp;mut </span>nested_selection,
                                     <span class="kw-2">&amp;</span>ParentContainer::from(cf.typ()),
-                                    schema_field.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db).unwrap(),
+                                    schema_field.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db).unwrap().<span class="number">1</span>,
                                     walked_types,
                                     query_schema,
                                 )<span class="question-mark">?</span>;
@@ -1732,7 +1732,7 @@
         query_schema: <span class="kw-2">&amp;</span>QuerySchemaRef,
         model_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
         action: <span class="kw">crate</span>::Action,
-    ) -&gt; <span class="kw">crate</span>::Result&lt;(OperationType, <span class="kw-2">&amp;</span>OutputFieldRef)&gt; {
+    ) -&gt; <span class="kw">crate</span>::Result&lt;(OperationType, <span class="kw-2">&amp;</span>OutputField)&gt; {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(field) = query_schema.find_query_field_by_model_and_action(model_name.as_deref(), action.value()) {
             <span class="kw">return </span><span class="prelude-val">Ok</span>((OperationType::Read, field));
         };

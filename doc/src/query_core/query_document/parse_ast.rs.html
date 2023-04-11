@@ -142,15 +142,13 @@
 <a href="#142" id="142">142</a>
 <a href="#143" id="143">143</a>
 <a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Parsed query document tree. Naming is WIP.
 //! Structures represent parsed and validated parts of the query document, used by the query builders.
-</span><span class="kw">use </span>indexmap::IndexMap;
+</span><span class="kw">use </span><span class="kw">crate</span>::QueryParserResult;
+<span class="kw">use </span>indexmap::IndexMap;
 <span class="kw">use </span>prisma_models::{OrderBy, PrismaValue, ScalarFieldRef};
-<span class="kw">use </span>schema::{ObjectTag, OutputFieldRef};
+<span class="kw">use </span>schema::{ObjectTag, OutputFieldId};
 <span class="kw">use </span>std::ops::{Deref, DerefMut};
-
-<span class="kw">use </span><span class="kw">crate</span>::QueryParserResult;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>ParsedInputList = Vec&lt;ParsedInputValue&gt;;
 
@@ -231,7 +229,7 @@
     </span><span class="kw">pub </span>parsed_field: ParsedField,
 
     <span class="doccomment">/// The schema field that the parsed field corresponds to.
-    </span><span class="kw">pub </span>schema_field: OutputFieldRef,
+    </span><span class="kw">pub </span>schema_field: OutputFieldId,
 }
 
 <span class="attr">#[derive(Debug, Clone)]

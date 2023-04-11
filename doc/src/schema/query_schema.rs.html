@@ -318,7 +318,11 @@
 <a href="#318" id="318">318</a>
 <a href="#319" id="319">319</a>
 <a href="#320" id="320">320</a>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{EnumType, IdentifierType, ObjectType, OutputFieldRef, OutputObjectTypeId, QuerySchemaDatabase};
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{EnumType, IdentifierType, ObjectType, OutputField, OutputObjectTypeId, QuerySchemaDatabase};
 <span class="kw">use </span>prisma_models::{InternalDataModelRef, ModelRef};
 <span class="kw">use </span>psl::{
     datamodel_connector::{ConnectorCapability, RelationMode},
@@ -349,10 +353,10 @@
     </span><span class="kw">pub </span>db: QuerySchemaDatabase,
 
     <span class="comment">// Indexes query fields by their own query info for easier access.
-    </span>query_map: HashMap&lt;QueryInfo, OutputFieldRef&gt;,
+    </span>query_map: HashMap&lt;QueryInfo, usize&gt;,
 
     <span class="comment">// Indexes mutation fields by their own query info for easier access.
-    </span>mutation_map: HashMap&lt;QueryInfo, OutputFieldRef&gt;,
+    </span>mutation_map: HashMap&lt;QueryInfo, usize&gt;,
 }
 
 <span class="doccomment">/// Connector meta information, to be used in query execution if necessary.
@@ -393,18 +397,18 @@
     ) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>features = internal_data_model.schema.configuration.preview_features();
         <span class="kw">let </span>relation_mode = internal_data_model.schema.relation_mode();
-        <span class="kw">let </span><span class="kw-2">mut </span>query_map: HashMap&lt;QueryInfo, OutputFieldRef&gt; = HashMap::new();
-        <span class="kw">let </span><span class="kw-2">mut </span>mutation_map: HashMap&lt;QueryInfo, OutputFieldRef&gt; = HashMap::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>query_map: HashMap&lt;QueryInfo, usize&gt; = HashMap::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>mutation_map: HashMap&lt;QueryInfo, usize&gt; = HashMap::new();
 
-        <span class="kw">for </span>field <span class="kw">in </span>db[query].get_fields() {
+        <span class="kw">for </span>(field_idx, field) <span class="kw">in </span>db[query].get_fields().iter().enumerate() {
             <span class="kw">if let </span><span class="prelude-val">Some</span>(query_info) = field.query_info() {
-                query_map.insert(query_info.to_owned(), field.clone());
+                query_map.insert(query_info.to_owned(), field_idx);
             }
         }
 
-        <span class="kw">for </span>field <span class="kw">in </span>db[mutation].get_fields() {
+        <span class="kw">for </span>(field_idx, field) <span class="kw">in </span>db[mutation].get_fields().iter().enumerate() {
             <span class="kw">if let </span><span class="prelude-val">Some</span>(query_info) = field.query_info() {
-                mutation_map.insert(query_info.to_owned(), field.clone());
+                mutation_map.insert(query_info.to_owned(), field_idx);
             }
         }
 
@@ -419,42 +423,46 @@
         }
     }
 
-    <span class="kw">pub fn </span>find_mutation_field&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: T) -&gt; <span class="prelude-ty">Option</span>&lt;OutputFieldRef&gt;
+    <span class="kw">pub fn </span>find_mutation_field&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: T) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>OutputField&gt;
     <span class="kw">where
         </span>T: Into&lt;String&gt;,
     {
         <span class="kw">let </span>name = name.into();
-        <span class="self">self</span>.mutation().get_fields().iter().find(|f| f.name == name).cloned()
+        <span class="self">self</span>.mutation().get_fields().iter().find(|f| f.name == name)
     }
 
-    <span class="kw">pub fn </span>find_query_field&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: T) -&gt; <span class="prelude-ty">Option</span>&lt;OutputFieldRef&gt;
+    <span class="kw">pub fn </span>find_query_field&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: T) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>OutputField&gt;
     <span class="kw">where
         </span>T: Into&lt;String&gt;,
     {
         <span class="kw">let </span>name = name.into();
-        <span class="self">self</span>.query().get_fields().iter().find(|f| f.name == name).cloned()
+        <span class="self">self</span>.query().get_fields().iter().find(|f| f.name == name)
     }
 
     <span class="kw">pub fn </span>find_query_field_by_model_and_action(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         model_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
         tag: QueryTag,
-    ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>OutputFieldRef&gt; {
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>OutputField&gt; {
         <span class="kw">let </span>model = model_name.and_then(|name| <span class="self">self</span>.internal_data_model.find_model(name).ok());
         <span class="kw">let </span>query_info = QueryInfo { model, tag };
 
-        <span class="self">self</span>.query_map.get(<span class="kw-2">&amp;</span>query_info)
+        <span class="self">self</span>.query_map
+            .get(<span class="kw-2">&amp;</span>query_info)
+            .map(|idx| <span class="kw-2">&amp;</span><span class="self">self</span>.query().get_fields()[<span class="kw-2">*</span>idx])
     }
 
     <span class="kw">pub fn </span>find_mutation_field_by_model_and_action(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         model_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
         tag: QueryTag,
-    ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>OutputFieldRef&gt; {
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>OutputField&gt; {
         <span class="kw">let </span>model = model_name.and_then(|name| <span class="self">self</span>.internal_data_model.find_model(name).ok());
         <span class="kw">let </span>query_info = QueryInfo { model, tag };
 
-        <span class="self">self</span>.mutation_map.get(<span class="kw-2">&amp;</span>query_info)
+        <span class="self">self</span>.mutation_map
+            .get(<span class="kw-2">&amp;</span>query_info)
+            .map(|idx| <span class="kw-2">&amp;</span><span class="self">self</span>.mutation().get_fields()[<span class="kw-2">*</span>idx])
     }
 
     <span class="kw">pub fn </span>mutation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ObjectType {

@@ -237,19 +237,19 @@
 <span class="kw">use </span>fmt::Debug;
 <span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>prisma_models::{ast::ModelId, ModelRef};
-<span class="kw">use </span>std::{fmt, sync::Arc};
+<span class="kw">use </span>std::fmt;
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub enum </span>OutputType {
     Enum(EnumTypeId),
-    List(OutputTypeRef),
+    List(Box&lt;OutputType&gt;),
     Object(OutputObjectTypeId),
     Scalar(ScalarType),
 }
 
 <span class="kw">impl </span>OutputType {
     <span class="kw">pub fn </span>list(containing: OutputType) -&gt; OutputType {
-        OutputType::List(Arc::new(containing))
+        OutputType::List(Box::new(containing))
     }
 
     <span class="kw">pub fn </span>object(containing: OutputObjectTypeId) -&gt; OutputType {
@@ -306,11 +306,11 @@
 
     <span class="doccomment">/// Attempts to recurse through the type until an object type is found.
     /// Returns Some(ObjectTypeStrongRef) if ab object type is found, None otherwise.
-    </span><span class="kw">pub fn </span>as_object_type&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, db: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchemaDatabase) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ObjectType&gt; {
+    </span><span class="kw">pub fn </span>as_object_type&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, db: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchemaDatabase) -&gt; <span class="prelude-ty">Option</span>&lt;(OutputObjectTypeId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ObjectType)&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             OutputType::Enum(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
             OutputType::List(inner) =&gt; inner.as_object_type(db),
-            OutputType::Object(obj) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>db[<span class="kw-2">*</span>obj]),
+            OutputType::Object(obj) =&gt; <span class="prelude-val">Some</span>((<span class="kw-2">*</span>obj, <span class="kw-2">&amp;</span>db[<span class="kw-2">*</span>obj])),
             OutputType::Scalar(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
@@ -348,7 +348,7 @@
 
 <span class="kw">pub struct </span>ObjectType {
     <span class="kw">pub </span>identifier: Identifier,
-    fields: OnceCell&lt;Vec&lt;OutputFieldRef&gt;&gt;,
+    fields: OnceCell&lt;Vec&lt;OutputField&gt;&gt;,
 
     <span class="comment">// Object types can directly map to models.
     </span>model: <span class="prelude-ty">Option</span>&lt;ModelId&gt;,
@@ -378,19 +378,19 @@
     }
 
     <span class="kw">pub fn </span>add_field(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: OutputField) {
-        <span class="self">self</span>.fields.get_mut().unwrap().push(Arc::new(field));
+        <span class="self">self</span>.fields.get_mut().unwrap().push(field)
     }
 
-    <span class="kw">pub fn </span>get_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[OutputFieldRef] {
+    <span class="kw">pub fn </span>get_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[OutputField] {
         <span class="self">self</span>.fields.get().unwrap()
     }
 
     <span class="kw">pub fn </span>set_fields(<span class="kw-2">&amp;</span><span class="self">self</span>, fields: Vec&lt;OutputField&gt;) {
-        <span class="self">self</span>.fields.set(fields.into_iter().map(Arc::new).collect()).unwrap();
+        <span class="self">self</span>.fields.set(fields).unwrap();
     }
 
-    <span class="kw">pub fn </span>find_field(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;OutputFieldRef&gt; {
-        <span class="self">self</span>.get_fields().iter().find(|f| f.name == name).cloned()
+    <span class="kw">pub fn </span>find_field&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;(usize, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>OutputField)&gt; {
+        <span class="self">self</span>.get_fields().iter().enumerate().find(|(<span class="kw">_</span>, f)| f.name == name)
     }
 
     <span class="doccomment">/// True if fields are empty, false otherwise.
@@ -402,7 +402,7 @@
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>OutputField {
     <span class="kw">pub </span>name: String,
-    <span class="kw">pub </span>field_type: OutputTypeRef,
+    <span class="kw">pub </span>field_type: OutputType,
     <span class="kw">pub </span>deprecation: <span class="prelude-ty">Option</span>&lt;Deprecation&gt;,
 
     <span class="doccomment">/// Arguments are input fields, but positioned in context of an output field
@@ -465,7 +465,7 @@
     // is an object and that object is backed by a model, meaning that it is not an scalar list
     </span><span class="kw">pub fn </span>maps_to_relation(<span class="kw-2">&amp;</span><span class="self">self</span>, query_schema: <span class="kw-2">&amp;</span>QuerySchema) -&gt; bool {
         <span class="kw">let </span>o = <span class="self">self</span>.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db);
-        o.is_some() &amp;&amp; o.unwrap().model.is_some()
+        o.is_some() &amp;&amp; o.unwrap().<span class="number">1</span>.model.is_some()
     }
 }
 </code></pre></div>

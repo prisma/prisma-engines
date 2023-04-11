@@ -227,12 +227,6 @@
 <a href="#227" id="227">227</a>
 <a href="#228" id="228">228</a>
 <a href="#229" id="229">229</a>
-<a href="#230" id="230">230</a>
-<a href="#231" id="231">231</a>
-<a href="#232" id="232">232</a>
-<a href="#233" id="233">233</a>
-<a href="#234" id="234">234</a>
-<a href="#235" id="235">235</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::mutations::{create_many, create_one};
 <span class="kw">use </span>input_types::fields::{arguments, input_fields};
@@ -241,28 +235,22 @@
 
 <span class="doccomment">/// Builds the root `Mutation` type.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build(ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; OutputObjectTypeId {
-    <span class="kw">let </span><span class="kw-2">mut </span>fields: Vec&lt;OutputField&gt; = ctx
-        .internal_data_model
-        .models()
-        .flat_map(|model| {
-            <span class="kw">let </span><span class="kw-2">mut </span>vec = <span class="macro">vec!</span>[];
+    <span class="kw">let </span><span class="kw-2">mut </span>fields = Vec::with_capacity(ctx.internal_data_model.schema.db.models_count());
 
-            <span class="kw">if </span>model.supports_create_operation() {
-                vec.push(create_one(ctx, <span class="kw-2">&amp;</span>model));
+    <span class="kw">for </span>model <span class="kw">in </span>ctx.internal_data_model.models() {
+        <span class="kw">if </span>model.supports_create_operation() {
+            fields.push(create_one(ctx, <span class="kw-2">&amp;</span>model));
 
-                append_opt(<span class="kw-2">&amp;mut </span>vec, upsert_item_field(ctx, <span class="kw-2">&amp;</span>model));
-                append_opt(<span class="kw-2">&amp;mut </span>vec, create_many(ctx, <span class="kw-2">&amp;</span>model));
-            }
+            append_opt(<span class="kw-2">&amp;mut </span>fields, upsert_item_field(ctx, <span class="kw-2">&amp;</span>model));
+            append_opt(<span class="kw-2">&amp;mut </span>fields, create_many(ctx, <span class="kw-2">&amp;</span>model));
+        }
 
-            append_opt(<span class="kw-2">&amp;mut </span>vec, delete_item_field(ctx, <span class="kw-2">&amp;</span>model));
-            append_opt(<span class="kw-2">&amp;mut </span>vec, update_item_field(ctx, <span class="kw-2">&amp;</span>model));
+        append_opt(<span class="kw-2">&amp;mut </span>fields, delete_item_field(ctx, <span class="kw-2">&amp;</span>model));
+        append_opt(<span class="kw-2">&amp;mut </span>fields, update_item_field(ctx, <span class="kw-2">&amp;</span>model));
 
-            vec.push(update_many_field(ctx, <span class="kw-2">&amp;</span>model));
-            vec.push(delete_many_field(ctx, <span class="kw-2">&amp;</span>model));
-
-            vec
-        })
-        .collect();
+        fields.push(update_many_field(ctx, <span class="kw-2">&amp;</span>model));
+        fields.push(delete_many_field(ctx, <span class="kw-2">&amp;</span>model));
+    }
 
     create_nested_inputs(ctx);
 

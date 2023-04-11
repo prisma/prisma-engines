@@ -327,10 +327,10 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>OutputFieldRef {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>OutputField {
     <span class="attr">#[allow(clippy::wrong_self_convention)]
-    </span><span class="kw">fn </span>into_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
-        GqlRenderer::Field(GqlFieldRenderer::Output(Arc::clone(<span class="self">self</span>)))
+    </span><span class="kw">fn </span>into_renderer(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
+        GqlRenderer::Field(GqlFieldRenderer::Output(<span class="self">self</span>))
     }
 }
 

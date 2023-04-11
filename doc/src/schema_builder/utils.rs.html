@@ -86,11 +86,9 @@
 <a href="#86" id="86">86</a>
 <a href="#87" id="87">87</a>
 <a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>prisma_models::{ast, dml, walkers};
-<span class="kw">use </span>std::sync::Arc;
 
 <span class="doccomment">/// Object type convenience wrapper function.
 </span><span class="kw">pub fn </span>object_type(ident: Identifier, fields: Vec&lt;OutputField&gt;, model: <span class="prelude-ty">Option</span>&lt;ast::ModelId&gt;) -&gt; ObjectType {
@@ -131,7 +129,7 @@
     OutputField {
         name: name.into(),
         arguments,
-        field_type: Arc::new(field_type),
+        field_type,
         query_info,
         is_nullable: <span class="bool-val">false</span>,
         deprecation: <span class="prelude-val">None</span>,
@@ -157,7 +155,7 @@
 }
 
 <span class="doccomment">/// Appends an option of type T to a vector over T if the option is Some.
-</span><span class="kw">pub fn </span>append_opt&lt;T&gt;(vec: <span class="kw-2">&amp;mut </span>Vec&lt;T&gt;, opt: <span class="prelude-ty">Option</span>&lt;T&gt;) {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>append_opt&lt;T&gt;(vec: <span class="kw-2">&amp;mut </span>Vec&lt;T&gt;, opt: <span class="prelude-ty">Option</span>&lt;T&gt;) {
     vec.extend(opt.into_iter())
 }
 

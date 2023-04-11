@@ -267,12 +267,13 @@
 <a href="#267" id="267">267</a>
 <a href="#268" id="268">268</a>
 <a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
 </pre><pre class="rust"><code><span class="kw">use </span>indexmap::IndexMap;
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>prisma_models::PrismaValue;
 <span class="kw">use </span>query_core::{
     constants::custom_types,
-    schema::{InputField, InputObjectType, InputType, OutputFieldRef, QuerySchema, QuerySchemaRef},
+    schema::{InputField, InputObjectType, InputType, OutputField, QuerySchema, QuerySchemaRef},
     schema_builder::constants::{<span class="self">self</span>, json_null},
     ArgumentValue, ArgumentValueObject, Selection,
 };
@@ -298,7 +299,7 @@
         <span class="kw">let </span>output = JsonSingleQuery {
             model_name,
             action: Action::new(query_tag),
-            query: graphql_selection_to_json_field_query(selection, <span class="kw-2">&amp;</span>schema_field, query_schema.as_ref()),
+            query: graphql_selection_to_json_field_query(selection, schema_field, query_schema.as_ref()),
         };
 
         <span class="prelude-val">Ok</span>(output)
@@ -307,7 +308,7 @@
 
 <span class="kw">fn </span>graphql_selection_to_json_field_query(
     <span class="kw-2">mut </span>selection: Selection,
-    schema_field: <span class="kw-2">&amp;</span>OutputFieldRef,
+    schema_field: <span class="kw-2">&amp;</span>OutputField,
     query_schema: <span class="kw-2">&amp;</span>QuerySchema,
 ) -&gt; FieldQuery {
     FieldQuery {
@@ -397,7 +398,7 @@
 
 <span class="kw">fn </span>graphql_selection_to_json_selection(
     selection: Selection,
-    schema_field: <span class="kw-2">&amp;</span>OutputFieldRef,
+    schema_field: <span class="kw-2">&amp;</span>OutputField,
     query_schema: <span class="kw-2">&amp;</span>QuerySchema,
 ) -&gt; SelectionSet {
     <span class="kw">let </span><span class="kw-2">mut </span>res: IndexMap&lt;String, SelectionSetValue&gt; = IndexMap::new();
@@ -410,16 +411,17 @@
         <span class="kw">if </span>no_args &amp;&amp; no_nested_selection {
             res.insert(selection_name, SelectionSetValue::Shorthand(<span class="bool-val">true</span>));
         } <span class="kw">else </span>{
-            <span class="kw">let </span>nested_field = schema_field
+            <span class="kw">let </span>(<span class="kw">_</span>, nested_field) = schema_field
                 .field_type
                 .as_object_type(<span class="kw-2">&amp;</span>query_schema.db)
                 .unwrap()
-                .find_field(<span class="kw-2">&amp;</span>selection_name)
+                .<span class="number">1
+                </span>.find_field(<span class="kw-2">&amp;</span>selection_name)
                 .unwrap();
 
             <span class="kw">let </span>nested = SelectionSetValue::Nested(graphql_selection_to_json_field_query(
                 nested_selection,
-                <span class="kw-2">&amp;</span>nested_field,
+                nested_field,
                 query_schema,
             ));
 

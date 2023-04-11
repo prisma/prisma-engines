@@ -91,14 +91,14 @@
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>GqlFieldRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
     Input(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>InputField),
-    Output(OutputFieldRef),
+    Output(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>OutputField),
 }
 
 <span class="kw">impl </span>Renderer <span class="kw">for </span>GqlFieldRenderer&lt;<span class="lifetime">&#39;_</span>&gt; {
     <span class="kw">fn </span>render(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
         <span class="kw">match </span><span class="self">self </span>{
             GqlFieldRenderer::Input(input) =&gt; <span class="self">self</span>.render_input_field(input, ctx),
-            GqlFieldRenderer::Output(output) =&gt; <span class="self">self</span>.render_output_field(Arc::clone(output), ctx),
+            GqlFieldRenderer::Output(output) =&gt; <span class="self">self</span>.render_output_field(output, ctx),
         }
     }
 }
@@ -113,7 +113,7 @@
         <span class="macro">format!</span>(<span class="string">&quot;{}: {}{}&quot;</span>, input_field.name, rendered_type, required)
     }
 
-    <span class="kw">fn </span>render_output_field(<span class="kw-2">&amp;</span><span class="self">self</span>, field: OutputFieldRef, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
+    <span class="kw">fn </span>render_output_field(<span class="kw-2">&amp;</span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>OutputField, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
         <span class="kw">let </span>rendered_args = <span class="self">self</span>.render_arguments(<span class="kw-2">&amp;</span>field.arguments, ctx);
         <span class="kw">let </span>rendered_args = <span class="kw">if </span>rendered_args.is_empty() {
             <span class="string">&quot;&quot;</span>.into()

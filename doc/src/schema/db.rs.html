@@ -70,6 +70,8 @@
 <a href="#70" id="70">70</a>
 <a href="#71" id="71">71</a>
 <a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{EnumType, InputObjectType, InputType, ObjectType};
 <span class="kw">use </span>std::ops;
 
@@ -118,6 +120,8 @@
 
 <span class="attr">#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 </span><span class="kw">pub struct </span>EnumTypeId(usize);
+
+<span class="kw">pub type </span>OutputFieldId = (OutputObjectTypeId, usize);
 
 <span class="kw">impl </span>ops::Index&lt;InputObjectTypeId&gt; <span class="kw">for </span>QuerySchemaDatabase {
     <span class="kw">type </span>Output = InputObjectType;

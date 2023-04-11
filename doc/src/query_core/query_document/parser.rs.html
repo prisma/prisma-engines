@@ -982,7 +982,6 @@
 <a href="#982" id="982">982</a>
 <a href="#983" id="983">983</a>
 <a href="#984" id="984">984</a>
-<a href="#985" id="985">985</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{executor::get_engine_protocol, schema::<span class="kw-2">*</span>};
 <span class="kw">use </span>bigdecimal::{BigDecimal, ToPrimitive};
@@ -991,7 +990,7 @@
 <span class="kw">use </span>indexmap::IndexSet;
 <span class="kw">use </span>prisma_models::dml::{<span class="self">self</span>, ValueGeneratorFn};
 <span class="kw">use </span>prisma_value::PrismaValue;
-<span class="kw">use </span>std::{borrow::Borrow, convert::TryFrom, str::FromStr, sync::Arc, vec};
+<span class="kw">use </span>std::{convert::TryFrom, str::FromStr};
 <span class="kw">use </span>user_facing_errors::query_engine::validation::ValidationError;
 <span class="kw">use </span>uuid::Uuid;
 
@@ -1009,7 +1008,7 @@
     </span><span class="kw">pub fn </span>parse(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         selections: <span class="kw-2">&amp;</span>[Selection],
-        schema_object: <span class="kw-2">&amp;</span>ObjectType,
+        schema_object: (OutputObjectTypeId, <span class="kw-2">&amp;</span>ObjectType),
         query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     ) -&gt; QueryParserResult&lt;ParsedObject&gt; {
         <span class="self">self</span>.parse_object(
@@ -1031,7 +1030,7 @@
         selection_path: Path,
         argument_path: Path,
         selections: <span class="kw-2">&amp;</span>[Selection],
-        schema_object: <span class="kw-2">&amp;</span>ObjectType,
+        (object_id, schema_object): (OutputObjectTypeId, <span class="kw-2">&amp;</span>ObjectType),
         query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     ) -&gt; QueryParserResult&lt;ParsedObject&gt; {
         <span class="kw">if </span>selections.is_empty() {
@@ -1046,11 +1045,11 @@
             .map(|selection| {
                 <span class="kw">let </span>field_name = selection.name();
                 <span class="kw">match </span>schema_object.find_field(field_name) {
-                    <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>field) =&gt; <span class="self">self</span>.parse_field(
+                    <span class="prelude-val">Some</span>((field_idx, field)) =&gt; <span class="self">self</span>.parse_field(
                         selection_path.clone(),
                         argument_path.clone(),
                         selection,
-                        field,
+                        ((object_id, field_idx), field),
                         query_schema,
                     ),
                     <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(ValidationError::unknown_selection_field(
@@ -1069,7 +1068,7 @@
         selection_path: Path,
         argument_path: Path,
         selection: <span class="kw-2">&amp;</span>Selection,
-        schema_field: <span class="kw-2">&amp;</span>OutputFieldRef,
+        (field_id, schema_field): (OutputFieldId, <span class="kw-2">&amp;</span>OutputField),
         query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     ) -&gt; QueryParserResult&lt;FieldPair&gt; {
         <span class="kw">let </span>selection_path = selection_path.add(schema_field.name.clone());
@@ -1105,7 +1104,6 @@
                     <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
                 };
 
-                <span class="kw">let </span>schema_field = Arc::clone(schema_field);
                 <span class="kw">let </span>parsed_field = ParsedField {
                     name: selection.name().to_string(),
                     alias: selection.alias().clone(),
@@ -1115,7 +1113,7 @@
 
                 <span class="prelude-val">Ok</span>(FieldPair {
                     parsed_field,
-                    schema_field,
+                    schema_field: field_id,
                 })
             }
         })
@@ -1126,7 +1124,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         selection_path: Path,
         argument_path: Path,
-        schema_field: <span class="kw-2">&amp;</span>OutputFieldRef,
+        schema_field: <span class="kw-2">&amp;</span>OutputField,
         given_arguments: <span class="kw-2">&amp;</span>[(String, ArgumentValue)],
         query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     ) -&gt; QueryParserResult&lt;Vec&lt;ParsedArgument&gt;&gt; {
@@ -1618,7 +1616,7 @@
             ))
         };
 
-        <span class="kw">match </span>typ.borrow() {
+        <span class="kw">match </span>typ {
             EnumType::Database(db) =&gt; <span class="kw">match </span>db.map_input_value(<span class="kw-2">&amp;</span>raw) {
                 <span class="prelude-val">Some</span>(value) =&gt; <span class="prelude-val">Ok</span>(ParsedInputValue::Single(value)),
                 <span class="prelude-val">None </span>=&gt; err(<span class="kw-2">&amp;</span>db.identifier().name()),
@@ -1807,7 +1805,7 @@
             .iter()
             .map(|field| {
                 <span class="kw">let </span>name = field.name.to_owned();
-                <span class="kw">let </span>type_name = to_simplified_output_type_name(field.field_type.as_ref(), query_schema);
+                <span class="kw">let </span>type_name = to_simplified_output_type_name(<span class="kw-2">&amp;</span>field.field_type, query_schema);
                 <span class="kw">let </span>is_relation = field.maps_to_relation(query_schema);
 
                 validation::OutputTypeDescriptionField::new(name, type_name, is_relation)
