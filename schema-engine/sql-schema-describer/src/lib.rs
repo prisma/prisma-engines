@@ -496,6 +496,7 @@ impl SqlSchema {
 pub enum TableProperties {
     IsPartition,
     HasSubclass,
+    HasRowLevelSecurity,
 }
 
 /// A table found in a schema.

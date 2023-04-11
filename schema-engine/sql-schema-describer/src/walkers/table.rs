@@ -110,6 +110,11 @@ impl<'a> TableWalker<'a> {
         self.table().properties.contains(TableProperties::HasSubclass)
     }
 
+    /// Does the table have row level security enabled?
+    pub fn has_row_level_security(self) -> bool {
+        self.table().properties.contains(TableProperties::HasRowLevelSecurity)
+    }
+
     /// Reference to the underlying `Table` struct.
     fn table(self) -> &'a Table {
         &self.schema.tables[self.id.0 as usize]

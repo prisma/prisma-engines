@@ -55,6 +55,8 @@ pub(crate) struct Warnings {
     pub(crate) inherited_tables: Vec<Model>,
     /// Warn about non-default NULLS FIRST/NULLS LAST in indices.
     pub(crate) non_default_index_null_sort_order: Vec<IndexedColumn>,
+    /// Warn about using row level security, which is currently unsupported.
+    pub(crate) row_level_security_tables: Vec<Model>,
     /// Warn about check constraints.
     pub(crate) check_constraints: Vec<CheckConstraint>,
     /// Warn about exclusion constraints.
@@ -201,6 +203,12 @@ impl Warnings {
         maybe_warn(&self.partition_tables, partition_tables_found, &mut self.warnings);
 
         maybe_warn(&self.inherited_tables, inherited_tables_found, &mut self.warnings);
+
+        maybe_warn(
+            &self.row_level_security_tables,
+            row_level_security_tables_found,
+            &mut self.warnings,
+        );
 
         maybe_warn(
             &self.non_default_index_null_sort_order,
@@ -582,6 +590,16 @@ pub(crate) fn non_default_index_null_sort_order(affected: &[IndexedColumn]) -> W
 
     Warning {
         code: 29,
+        message: message.into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+pub(crate) fn row_level_security_tables_found(affected: &[Model]) -> Warning {
+    let message = "These tables contain row level security, which is not yet fully supported.";
+
+    Warning {
+        code: 30,
         message: message.into(),
         affected: serde_json::to_value(affected).unwrap(),
     }
