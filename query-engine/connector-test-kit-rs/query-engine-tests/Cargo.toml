@@ -25,3 +25,7 @@ futures = "0.3"
 
 [dev-dependencies]
 insta = "1.7.1"
+query-engine = { path = "../../query-engine"}
+query-engine-metrics = { path = "../../metrics"}
+assert_cmd = "2.0"
+reqwest = "0.11"

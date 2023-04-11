@@ -22,6 +22,7 @@ pub(crate) type Executor = Box<dyn QueryExecutor + Send + Sync>;
 
 /// Direct engine runner.
 pub struct Runner {
+    prisma_dml: String,
     executor: Executor,
     query_schema: QuerySchemaRef,
     connector_tag: ConnectorTag,
@@ -33,6 +34,10 @@ pub struct Runner {
 }
 
 impl Runner {
+    pub fn prisma_dml(&self) -> &str {
+        &self.prisma_dml
+    }
+
     pub async fn load(
         datamodel: String,
         connector_tag: ConnectorTag,
@@ -40,7 +45,7 @@ impl Runner {
         log_capture: TestLogCapture,
     ) -> TestResult<Self> {
         let protocol = EngineProtocol::from(&ENGINE_PROTOCOL.to_string());
-        let schema = psl::parse_schema(datamodel).unwrap();
+        let schema = psl::parse_schema(datamodel.clone()).unwrap();
         let data_source = schema.configuration.datasources.first().unwrap();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
         let executor = load_executor(data_source, schema.configuration.preview_features(), &url).await?;
@@ -49,6 +54,7 @@ impl Runner {
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(internal_data_model, true));
 
         Ok(Self {
+            prisma_dml: datamodel,
             executor,
             query_schema,
             connector_tag,
