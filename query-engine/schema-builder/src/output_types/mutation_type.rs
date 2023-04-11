@@ -6,28 +6,22 @@ use psl::datamodel_connector::ConnectorCapability;
 
 /// Builds the root `Mutation` type.
 pub(crate) fn build(ctx: &mut BuilderContext<'_>) -> OutputObjectTypeId {
-    let mut fields: Vec<OutputField> = ctx
-        .internal_data_model
-        .models()
-        .flat_map(|model| {
-            let mut vec = vec![];
+    let mut fields = Vec::with_capacity(ctx.internal_data_model.schema.db.models_count());
 
-            if model.supports_create_operation() {
-                vec.push(create_one(ctx, &model));
+    for model in ctx.internal_data_model.models() {
+        if model.supports_create_operation() {
+            fields.push(create_one(ctx, &model));
 
-                append_opt(&mut vec, upsert_item_field(ctx, &model));
-                append_opt(&mut vec, create_many(ctx, &model));
-            }
+            append_opt(&mut fields, upsert_item_field(ctx, &model));
+            append_opt(&mut fields, create_many(ctx, &model));
+        }
 
-            append_opt(&mut vec, delete_item_field(ctx, &model));
-            append_opt(&mut vec, update_item_field(ctx, &model));
+        append_opt(&mut fields, delete_item_field(ctx, &model));
+        append_opt(&mut fields, update_item_field(ctx, &model));
 
-            vec.push(update_many_field(ctx, &model));
-            vec.push(delete_many_field(ctx, &model));
-
-            vec
-        })
-        .collect();
+        fields.push(update_many_field(ctx, &model));
+        fields.push(delete_many_field(ctx, &model));
+    }
 
     create_nested_inputs(ctx);
 
