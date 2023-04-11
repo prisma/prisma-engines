@@ -42,6 +42,11 @@ impl<'a> ModelPair<'a> {
         self.next.has_subclass()
     }
 
+    /// Whether the model has row level security enabled.
+    pub(crate) fn has_row_level_security(self) -> bool {
+        self.next.has_row_level_security()
+    }
+
     /// Name of the model in the PSL. The value can be sanitized if it
     /// contains characters that are not allowed in the PSL
     /// definition.

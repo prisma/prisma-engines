@@ -468,3 +468,50 @@ ALTER TABLE blocks_p2_0 ADD CONSTRAINT b2_unique UNIQUE (id);
     api.expect_datamodel(&expected).await;
     Ok(())
 }
+
+// Postgres9 does not support row level security
+#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres9))]
+async fn row_level_security_warning(api: &mut TestApi) -> TestResult {
+    api.raw_cmd(
+        r#"
+-- Create a test table
+CREATE TABLE foo (
+    id SERIAL PRIMARY KEY,
+    -- We use this row to security
+    owner VARCHAR(30) NOT NULL
+);
+
+ALTER TABLE foo ENABLE ROW LEVEL SECURITY; "#,
+    )
+    .await;
+
+    let expected = json!([{
+        "code": 30,
+        "message": "These tables contain row level security, which is not yet fully supported.",
+        "affected": [
+            {
+                "model": "foo"
+            }
+        ]
+    }]);
+
+    assert_eq_json!(expected, api.introspection_warnings().await?);
+
+    let expected = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model foo {
+          id    Int    @id @default(autoincrement())
+          owner String @db.VarChar(30)
+        }
+    "#]];
+    api.expect_datamodel(&expected).await;
+    Ok(())
+}
