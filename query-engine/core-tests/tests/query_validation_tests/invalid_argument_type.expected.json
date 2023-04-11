@@ -5,7 +5,7 @@
     "kind": "Union",
     "errors": [
       {
-        "kind": "InvalidArgumentType",
+        "kind": "asdf",
         "argumentPath": [
           "where",
           "id"
