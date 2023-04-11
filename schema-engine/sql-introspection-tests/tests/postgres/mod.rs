@@ -262,7 +262,7 @@ async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
         [
           {
             "code": 31,
-            "message": "These tables have check constraints, which are not yet fully supported. Read more: https://pris.ly/d/postgres-check-constraints",
+            "message": "These are check constraints, which are not yet fully supported. Read more: https://pris.ly/d/postgres-check-constraints",
             "affected": [
               {
                 "name": "products_price_check",
@@ -323,7 +323,7 @@ async fn exclusion_constraints_stopgap(api: &mut TestApi) -> TestResult {
         [
           {
             "code": 32,
-            "message": "These tables have exclusion constraints, which are not yet fully supported. Read more: https://pris.ly/d/postgres-exclusion-constraints",
+            "message": "These are exclusion constraints, which are not yet fully supported. Read more: https://pris.ly/d/postgres-exclusion-constraints",
             "affected": [
               {
                 "name": "room_reservation_room_id_tstzrange_excl",

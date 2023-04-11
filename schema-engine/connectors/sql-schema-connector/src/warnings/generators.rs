@@ -606,7 +606,7 @@ pub(crate) fn row_level_security_tables_found(affected: &[Model]) -> Warning {
 }
 
 pub(crate) fn check_constraints_found(affected: &[CheckConstraint]) -> Warning {
-    let message = "These tables have check constraints, which are not yet fully supported. Read more: https://pris.ly/d/postgres-check-constraints";
+    let message = "These are check constraints, which are not yet fully supported. Read more: https://pris.ly/d/postgres-check-constraints";
 
     Warning {
         code: 31,
@@ -616,7 +616,7 @@ pub(crate) fn check_constraints_found(affected: &[CheckConstraint]) -> Warning {
 }
 
 pub(crate) fn exclusion_constraints_found(affected: &[ExclusionConstraint]) -> Warning {
-    let message = "These tables have exclusion constraints, which are not yet fully supported. Read more: https://pris.ly/d/postgres-exclusion-constraints";
+    let message = "These are exclusion constraints, which are not yet fully supported. Read more: https://pris.ly/d/postgres-exclusion-constraints";
 
     Warning {
         code: 32,
