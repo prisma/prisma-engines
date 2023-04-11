@@ -32,6 +32,12 @@ pub(super) fn generate_warnings(model: ModelPair<'_>, warnings: &mut Warnings) {
         });
     }
 
+    if model.has_row_level_security() {
+        warnings.row_level_security_tables.push(generators::Model {
+            model: model.name().to_string(),
+        });
+    }
+
     if model.uses_duplicate_name() {
         warnings.duplicate_names.push(generators::TopLevelItem {
             r#type: generators::TopLevelType::Model,
