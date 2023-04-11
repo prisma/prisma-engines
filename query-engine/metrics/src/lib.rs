@@ -30,10 +30,11 @@ mod formatters;
 mod recorder;
 mod registry;
 
+use once_cell::sync::Lazy;
 use recorder::*;
 pub use registry::MetricRegistry;
 use serde::Deserialize;
-use std::sync::Once;
+use std::{collections::HashMap, sync::Once};
 
 pub extern crate metrics;
 pub use metrics::{
@@ -41,6 +42,14 @@ pub use metrics::{
     increment_counter, increment_gauge,
 };
 
+// Internal metrics name emitted by the connector pool implementation
+pub const MOBC_POOL_CONNECTIONS_OPENED_TOTAL: &str = "mobc_pool_connections_opened_total";
+pub const MOBC_POOL_CONNECTIONS_CLOSED_TOTAL: &str = "mobc_pool_connections_closed_total";
+pub const MOBC_POOL_CONNECTIONS_OPEN: &str = "mobc_pool_connections_open";
+pub const MOBC_POOL_CONNECTIONS_BUSY: &str = "mobc_pool_connections_busy";
+pub const MOBC_POOL_CONNECTIONS_IDLE: &str = "mobc_pool_connections_idle";
+
+// External metrics names that we expose.
 pub const PRISMA_CLIENT_QUERIES_TOTAL: &str = "prisma_client_queries_total";
 pub const PRISMA_CLIENT_QUERIES_HISTOGRAM_MS: &str = "prisma_client_queries_duration_histogram_ms";
 pub const PRISMA_POOL_CONNECTIONS_OPENED_TOTAL: &str = "prisma_pool_connections_opened_total";
@@ -54,25 +63,38 @@ pub const PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS: &str = "prisma_dataso
 pub const PRISMA_DATASOURCE_QUERIES_TOTAL: &str = "prisma_datasource_queries_total";
 pub const PRISMA_CLIENT_QUERIES_ACTIVE: &str = "prisma_client_queries_active";
 
-// At the moment the histogram is only used for timings. So the bounds are hard coded here
-// The buckets are for ms
-pub(crate) const HISTOGRAM_BOUNDS: [f64; 10] = [0.0, 1.0, 5.0, 10.0, 50.0, 100.0, 500.0, 1000.0, 5000.0, 50000.0];
-// We need a list of acceptable metrics we want to expose, we don't want to accidentally expose metrics
-// that a different library have or unintended information
+// We need a list of acceptable metrics, we don't want to accidentally process metrics emitted by a
+// third party library
 const ACCEPT_LIST: &[&str] = &[
+    MOBC_POOL_CONNECTIONS_OPENED_TOTAL,
+    MOBC_POOL_CONNECTIONS_CLOSED_TOTAL,
+    MOBC_POOL_CONNECTIONS_OPEN,
+    MOBC_POOL_CONNECTIONS_BUSY,
+    MOBC_POOL_CONNECTIONS_IDLE,
     PRISMA_CLIENT_QUERIES_HISTOGRAM_MS,
     PRISMA_CLIENT_QUERIES_TOTAL,
-    PRISMA_POOL_CONNECTIONS_OPENED_TOTAL,
-    PRISMA_POOL_CONNECTIONS_CLOSED_TOTAL,
-    PRISMA_POOL_CONNECTIONS_OPEN,
-    PRISMA_POOL_CONNECTIONS_BUSY,
-    PRISMA_POOL_CONNECTIONS_IDLE,
     PRISMA_CLIENT_QUERIES_WAIT,
     PRISMA_CLIENT_QUERIES_WAIT_HISTOGRAM_MS,
     PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS,
     PRISMA_DATASOURCE_QUERIES_TOTAL,
     PRISMA_CLIENT_QUERIES_ACTIVE,
 ];
+
+// Some of the metrics we receive have their internal names, and we need to expose them under a different
+// name, this map translates from the internal names used by mobc to the external names we want to expose
+static METRIC_RENAMES: Lazy<HashMap<&str, &str>> = Lazy::new(|| {
+    HashMap::from([
+        (MOBC_POOL_CONNECTIONS_OPENED_TOTAL, PRISMA_POOL_CONNECTIONS_OPENED_TOTAL),
+        (MOBC_POOL_CONNECTIONS_CLOSED_TOTAL, PRISMA_POOL_CONNECTIONS_CLOSED_TOTAL),
+        (MOBC_POOL_CONNECTIONS_OPEN, PRISMA_POOL_CONNECTIONS_OPEN),
+        (MOBC_POOL_CONNECTIONS_BUSY, PRISMA_POOL_CONNECTIONS_BUSY),
+        (MOBC_POOL_CONNECTIONS_IDLE, PRISMA_POOL_CONNECTIONS_BUSY),
+    ])
+});
+
+// At the moment the histogram is only used for timings. So the bounds are hard coded here
+// The buckets are for ms
+pub(crate) const HISTOGRAM_BOUNDS: [f64; 10] = [0.0, 1.0, 5.0, 10.0, 50.0, 100.0, 500.0, 1000.0, 5000.0, 50000.0];
 
 #[derive(PartialEq, Eq, Debug, Deserialize)]
 pub enum MetricFormat {
