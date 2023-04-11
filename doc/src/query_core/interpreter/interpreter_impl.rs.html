@@ -307,7 +307,6 @@
 <a href="#307" id="307">307</a>
 <a href="#308" id="308">308</a>
 <a href="#309" id="309">309</a>
-<a href="#310" id="310">310</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{
     expression::<span class="kw-2">*</span>,
     query_interpreters::{read, write},
@@ -315,7 +314,6 @@
 };
 <span class="kw">use crate</span>::{Query, QueryResult};
 <span class="kw">use </span>connector::ConnectionLike;
-<span class="kw">use </span>crossbeam_queue::SegQueue;
 <span class="kw">use </span>futures::future::BoxFuture;
 <span class="kw">use </span>prisma_models::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::{collections::HashMap, fmt};
@@ -450,9 +448,9 @@
     }
 }
 
-<span class="kw">pub struct </span>QueryInterpreter&lt;<span class="lifetime">&#39;conn</span>&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>QueryInterpreter&lt;<span class="lifetime">&#39;conn</span>&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn </span><span class="kw-2">mut </span><span class="kw">dyn </span>ConnectionLike,
-    log: SegQueue&lt;String&gt;,
+    log: Vec&lt;String&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;conn</span>&gt; fmt::Debug <span class="kw">for </span>QueryInterpreter&lt;<span class="lifetime">&#39;conn</span>&gt; {
@@ -466,8 +464,8 @@
         tracing::level_filters::STATIC_MAX_LEVEL == tracing::level_filters::LevelFilter::TRACE
     }
 
-    <span class="kw">pub fn </span>new(conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn </span><span class="kw-2">mut </span><span class="kw">dyn </span>ConnectionLike) -&gt; QueryInterpreter&lt;<span class="lifetime">&#39;_</span>&gt; {
-        <span class="kw">let </span>log = SegQueue::new();
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn </span><span class="kw-2">mut </span><span class="kw">dyn </span>ConnectionLike) -&gt; QueryInterpreter&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>log = Vec::new();
 
         <span class="kw">if </span><span class="self">Self</span>::log_enabled() {
             log.push(<span class="string">&quot;\n&quot;</span>.to_string());
@@ -597,17 +595,17 @@
         }
     }
 
-    <span class="kw">pub fn </span>log_output(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>log_output(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="kw">let </span><span class="kw-2">mut </span>output = String::with_capacity(<span class="self">self</span>.log.len() * <span class="number">30</span>);
 
-        <span class="kw">while let </span><span class="prelude-val">Some</span>(s) = <span class="self">self</span>.log.pop() {
-            output.push_str(<span class="kw-2">&amp;</span>s);
+        <span class="kw">for </span>s <span class="kw">in </span><span class="self">self</span>.log.iter().rev() {
+            output.push_str(s)
         }
 
         output
     }
 
-    <span class="kw">fn </span>log_line&lt;F, S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, level: usize, f: F)
+    <span class="kw">fn </span>log_line&lt;F, S&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, level: usize, f: F)
     <span class="kw">where
         </span>S: AsRef&lt;str&gt;,
         F: FnOnce() -&gt; S,

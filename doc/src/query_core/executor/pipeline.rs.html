@@ -43,14 +43,14 @@
 <span class="kw">use </span>tracing::Instrument;
 
 <span class="attr">#[derive(Debug)]
-</span><span class="kw">pub struct </span>QueryPipeline&lt;<span class="lifetime">&#39;conn</span>&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>QueryPipeline&lt;<span class="lifetime">&#39;conn</span>&gt; {
     graph: QueryGraph,
     interpreter: QueryInterpreter&lt;<span class="lifetime">&#39;conn</span>&gt;,
     serializer: IrSerializer,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;conn</span>&gt; QueryPipeline&lt;<span class="lifetime">&#39;conn</span>&gt; {
-    <span class="kw">pub fn </span>new(graph: QueryGraph, interpreter: QueryInterpreter&lt;<span class="lifetime">&#39;conn</span>&gt;, serializer: IrSerializer) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(graph: QueryGraph, interpreter: QueryInterpreter&lt;<span class="lifetime">&#39;conn</span>&gt;, serializer: IrSerializer) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             graph,
             interpreter,
@@ -58,7 +58,7 @@
         }
     }
 
-    <span class="kw">pub async fn </span>execute(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>execute(
         <span class="kw-2">mut </span><span class="self">self</span>,
         query_schema: <span class="kw-2">&amp;</span>QuerySchema,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
