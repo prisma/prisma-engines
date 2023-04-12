@@ -2,7 +2,7 @@ use super::{
     type_renderer::{render_input_types, render_output_type},
     DmmfInputField, DmmfOutputField, RenderContext,
 };
-use schema::{InputField, InputType, OutputFieldRef, ScalarType};
+use schema::{InputField, InputType, OutputField, ScalarType};
 
 pub(super) fn render_input_field(input_field: &InputField, ctx: &mut RenderContext) -> DmmfInputField {
     let type_references = render_input_types(input_field.field_types(ctx.query_schema), ctx);
@@ -22,7 +22,7 @@ pub(super) fn render_input_field(input_field: &InputField, ctx: &mut RenderConte
     field
 }
 
-pub(super) fn render_output_field(field: &OutputFieldRef, ctx: &mut RenderContext) -> DmmfOutputField {
+pub(super) fn render_output_field(field: &OutputField, ctx: &mut RenderContext) -> DmmfOutputField {
     let rendered_inputs = field.arguments.iter().map(|arg| render_input_field(arg, ctx)).collect();
     let output_type = render_output_type(&field.field_type, ctx);
 

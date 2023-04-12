@@ -149,10 +149,10 @@ impl<'a> IntoRenderer<'a> for InputField {
     }
 }
 
-impl<'a> IntoRenderer<'a> for OutputFieldRef {
+impl<'a> IntoRenderer<'a> for OutputField {
     #[allow(clippy::wrong_self_convention)]
-    fn into_renderer(&self) -> GqlRenderer<'a> {
-        GqlRenderer::Field(GqlFieldRenderer::Output(Arc::clone(self)))
+    fn into_renderer(&'a self) -> GqlRenderer<'a> {
+        GqlRenderer::Field(GqlFieldRenderer::Output(self))
     }
 }
 
