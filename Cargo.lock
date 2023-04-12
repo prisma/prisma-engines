@@ -3169,7 +3169,6 @@ dependencies = [
  "bigdecimal",
  "chrono",
  "crossbeam-channel",
- "crossbeam-queue",
  "cuid",
  "enumflags2",
  "futures",

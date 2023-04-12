@@ -333,7 +333,7 @@ async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &mut Te
 }
 
 // Postgres9 does not support partition tables, and Postgres10 does not support primary keys on
-// partition tables.
+// partition tables without an workaround (see the following tests for details).
 #[test_connector(
     tags(Postgres11, Postgres12, Postgres13, Postgres14, Postgres15),
     exclude(CockroachDb)
@@ -395,6 +395,74 @@ ALTER TABLE blocks
           other_blocks    blocks[] @relation("blocksToblocks")
 
           @@id([account, id])
+        }
+    "#]];
+    api.expect_datamodel(&expected).await;
+    Ok(())
+}
+
+// There is no way to make this work on Postgres10 currently. We can define UNIQUE or PK
+// constraints on each of the parttions, but we are not allowed to define one on the main table.
+// Our introspection currently only reads the propertieds/index properties for the main table, so
+// these models will always be ignored.
+#[test_connector(tags(Postgres), exclude(Postgres9, CockroachDb))]
+async fn partition_table_gets_postgres10(api: &mut TestApi) -> TestResult {
+    api.raw_cmd(
+        r#"
+CREATE TABLE IF NOT EXISTS blocks
+(
+    id int NOT NULL
+) PARTITION BY RANGE (id);
+
+CREATE TABLE blocks_p1_0 PARTITION OF blocks
+    FOR VALUES FROM (0) TO (1000);
+
+CREATE TABLE blocks_p2_0 PARTITION OF blocks
+    FOR VALUES FROM (1001) TO (2000);
+
+ALTER TABLE blocks_p1_0 ADD CONSTRAINT b1_unique UNIQUE (id);
+ALTER TABLE blocks_p2_0 ADD CONSTRAINT b2_unique UNIQUE (id);
+    "#,
+    )
+    .await;
+
+    let expected = json!([{
+        "code": 1,
+        "message": "The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.",
+        "affected": [
+            {
+                "model": "blocks"
+            }
+        ]
+    }, {
+        "code": 27,
+        "message": "These tables are partition tables, which are not yet fully supported.",
+        "affected": [
+            {
+                "model": "blocks"
+            }
+        ]
+
+    }]);
+
+    assert_eq_json!(expected, api.introspection_warnings().await?);
+
+    let expected = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        /// This table is a partition table and requires additional setup for migrations. Visit https://pris.ly/d/partition-tables for more info.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        model blocks {
+          id Int
+
+          @@ignore
         }
     "#]];
     api.expect_datamodel(&expected).await;
