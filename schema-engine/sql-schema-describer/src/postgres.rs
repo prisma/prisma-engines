@@ -1168,6 +1168,16 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         let mut constraints_map: IndexMap<(String, String), BitFlags<TableProperties, u8>> = IndexMap::default();
 
+        let upsert_bitflag = |constraints_map: &mut IndexMap<(String, String), BitFlags<TableProperties, u8>>,
+                              constraint_key: (String, String),
+                              flag: BitFlags<TableProperties, u8>| {
+            if let Some(previous_flag) = constraints_map.remove(&constraint_key) {
+                constraints_map.insert(constraint_key, previous_flag | flag);
+            } else {
+                constraints_map.insert(constraint_key, flag);
+            }
+        };
+
         for row in rows {
             let namespace = row.get_expect_string("namespace");
             // let namespace_id = sql_schema.get_namespace_id(&namespace).unwrap();
@@ -1187,7 +1197,8 @@ impl<'a> SqlSchemaDescriber<'a> {
                     };
                     sql_schema.push_check_constraint(check_constraint);
 
-                    constraints_map.insert(
+                    upsert_bitflag(
+                        &mut constraints_map,
                         constraint_key,
                         BitFlags::from_flag(TableProperties::HasCheckConstraints),
                     );
@@ -1199,7 +1210,8 @@ impl<'a> SqlSchemaDescriber<'a> {
                     };
                     sql_schema.push_exclusion_constraint(exclusion_constraint);
 
-                    constraints_map.insert(
+                    upsert_bitflag(
+                        &mut constraints_map,
                         constraint_key,
                         BitFlags::from_flag(TableProperties::HasExclusionConstraints),
                     );
