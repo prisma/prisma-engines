@@ -3,14 +3,14 @@ use schema::QuerySchema;
 use tracing::Instrument;
 
 #[derive(Debug)]
-pub struct QueryPipeline<'conn> {
+pub(crate) struct QueryPipeline<'conn> {
     graph: QueryGraph,
     interpreter: QueryInterpreter<'conn>,
     serializer: IrSerializer,
 }
 
 impl<'conn> QueryPipeline<'conn> {
-    pub fn new(graph: QueryGraph, interpreter: QueryInterpreter<'conn>, serializer: IrSerializer) -> Self {
+    pub(crate) fn new(graph: QueryGraph, interpreter: QueryInterpreter<'conn>, serializer: IrSerializer) -> Self {
         Self {
             graph,
             interpreter,
@@ -18,7 +18,7 @@ impl<'conn> QueryPipeline<'conn> {
         }
     }
 
-    pub async fn execute(
+    pub(crate) async fn execute(
         mut self,
         query_schema: &QuerySchema,
         trace_id: Option<String>,

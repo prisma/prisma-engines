@@ -1,4 +1,4 @@
-use crate::{EnumType, IdentifierType, ObjectType, OutputFieldRef, OutputObjectTypeId, QuerySchemaDatabase};
+use crate::{EnumType, IdentifierType, ObjectType, OutputField, OutputObjectTypeId, QuerySchemaDatabase};
 use prisma_models::{InternalDataModelRef, ModelRef};
 use psl::{
     datamodel_connector::{ConnectorCapability, RelationMode},
@@ -29,10 +29,10 @@ pub struct QuerySchema {
     pub db: QuerySchemaDatabase,
 
     // Indexes query fields by their own query info for easier access.
-    query_map: HashMap<QueryInfo, OutputFieldRef>,
+    query_map: HashMap<QueryInfo, usize>,
 
     // Indexes mutation fields by their own query info for easier access.
-    mutation_map: HashMap<QueryInfo, OutputFieldRef>,
+    mutation_map: HashMap<QueryInfo, usize>,
 }
 
 /// Connector meta information, to be used in query execution if necessary.
@@ -73,18 +73,18 @@ impl QuerySchema {
     ) -> Self {
         let features = internal_data_model.schema.configuration.preview_features();
         let relation_mode = internal_data_model.schema.relation_mode();
-        let mut query_map: HashMap<QueryInfo, OutputFieldRef> = HashMap::new();
-        let mut mutation_map: HashMap<QueryInfo, OutputFieldRef> = HashMap::new();
+        let mut query_map: HashMap<QueryInfo, usize> = HashMap::new();
+        let mut mutation_map: HashMap<QueryInfo, usize> = HashMap::new();
 
-        for field in db[query].get_fields() {
+        for (field_idx, field) in db[query].get_fields().iter().enumerate() {
             if let Some(query_info) = field.query_info() {
-                query_map.insert(query_info.to_owned(), field.clone());
+                query_map.insert(query_info.to_owned(), field_idx);
             }
         }
 
-        for field in db[mutation].get_fields() {
+        for (field_idx, field) in db[mutation].get_fields().iter().enumerate() {
             if let Some(query_info) = field.query_info() {
-                mutation_map.insert(query_info.to_owned(), field.clone());
+                mutation_map.insert(query_info.to_owned(), field_idx);
             }
         }
 
@@ -99,42 +99,46 @@ impl QuerySchema {
         }
     }
 
-    pub fn find_mutation_field<T>(&self, name: T) -> Option<OutputFieldRef>
+    pub fn find_mutation_field<T>(&self, name: T) -> Option<&OutputField>
     where
         T: Into<String>,
     {
         let name = name.into();
-        self.mutation().get_fields().iter().find(|f| f.name == name).cloned()
+        self.mutation().get_fields().iter().find(|f| f.name == name)
     }
 
-    pub fn find_query_field<T>(&self, name: T) -> Option<OutputFieldRef>
+    pub fn find_query_field<T>(&self, name: T) -> Option<&OutputField>
     where
         T: Into<String>,
     {
         let name = name.into();
-        self.query().get_fields().iter().find(|f| f.name == name).cloned()
+        self.query().get_fields().iter().find(|f| f.name == name)
     }
 
     pub fn find_query_field_by_model_and_action(
         &self,
         model_name: Option<&str>,
         tag: QueryTag,
-    ) -> Option<&OutputFieldRef> {
+    ) -> Option<&OutputField> {
         let model = model_name.and_then(|name| self.internal_data_model.find_model(name).ok());
         let query_info = QueryInfo { model, tag };
 
-        self.query_map.get(&query_info)
+        self.query_map
+            .get(&query_info)
+            .map(|idx| &self.query().get_fields()[*idx])
     }
 
     pub fn find_mutation_field_by_model_and_action(
         &self,
         model_name: Option<&str>,
         tag: QueryTag,
-    ) -> Option<&OutputFieldRef> {
+    ) -> Option<&OutputField> {
         let model = model_name.and_then(|name| self.internal_data_model.find_model(name).ok());
         let query_info = QueryInfo { model, tag };
 
-        self.mutation_map.get(&query_info)
+        self.mutation_map
+            .get(&query_info)
+            .map(|idx| &self.mutation().get_fields()[*idx])
     }
 
     pub fn mutation(&self) -> &ObjectType {

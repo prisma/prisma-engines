@@ -1,7 +1,6 @@
 use super::*;
 use once_cell::sync::OnceCell;
 use prisma_models::{ast, dml, walkers};
-use std::sync::Arc;
 
 /// Object type convenience wrapper function.
 pub fn object_type(ident: Identifier, fields: Vec<OutputField>, model: Option<ast::ModelId>) -> ObjectType {
@@ -42,7 +41,7 @@ where
     OutputField {
         name: name.into(),
         arguments,
-        field_type: Arc::new(field_type),
+        field_type,
         query_info,
         is_nullable: false,
         deprecation: None,
@@ -68,7 +67,7 @@ where
 }
 
 /// Appends an option of type T to a vector over T if the option is Some.
-pub fn append_opt<T>(vec: &mut Vec<T>, opt: Option<T>) {
+pub(crate) fn append_opt<T>(vec: &mut Vec<T>, opt: Option<T>) {
     vec.extend(opt.into_iter())
 }
 
