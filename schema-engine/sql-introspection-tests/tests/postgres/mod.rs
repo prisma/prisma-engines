@@ -225,115 +225,250 @@ async fn index_sort_order_stopgap(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
+mod check_constraints {
     // https://www.notion.so/prismaio/Indexes-Constraints-Check-constraints-PostgreSQL-cde0bee25f6343d8bbd0f7e84932e808
 
-    let schema = indoc! {r#"
-      CREATE TABLE products (
-          product_id serial PRIMARY KEY,
-          name text,
-          price numeric CHECK (price > 0)
-      );
-    "#};
+    use super::*;
 
-    api.raw_cmd(schema).await;
+    #[test_connector(tags(Postgres), exclude(CockroachDb))]
+    async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
+        let raw_sql = indoc! {r#"
+        CREATE TABLE products (
+            product_id serial PRIMARY KEY,
+            name text,
+            price numeric CHECK (price > 0)
+        );
+      "#};
 
-    let expectation = expect![[r#"
-        generator client {
-          provider = "prisma-client-js"
-        }
+        api.raw_cmd(raw_sql).await;
 
-        datasource db {
-          provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
-        }
-
-        model products {
-          product_id Int      @id @default(autoincrement())
-          name       String?
-          price      Decimal? @db.Decimal
-        }
-    "#]];
-
-    api.expect_datamodel(&expectation).await;
-
-    let expectation = expect![[r#"
-        [
-          {
-            "code": 31,
-            "message": "These are check constraints, which are not yet fully supported. Read more: https://pris.ly/d/postgres-check-constraints",
-            "affected": [
-              {
-                "name": "products_price_check",
-                "definition": "CHECK ((price > (0)::numeric))"
-              }
-            ]
+        let schema = expect![[r#"
+          generator client {
+            provider = "prisma-client-js"
           }
-        ]"#]];
+  
+          datasource db {
+            provider = "postgresql"
+            url      = "env(TEST_DATABASE_URL)"
+          }
+  
+          model products {
+            product_id Int      @id @default(autoincrement())
+            name       String?
+            price      Decimal? @db.Decimal
+          }
+      "#]];
 
-    api.expect_warnings(&expectation).await;
+        api.expect_datamodel(&schema).await;
 
-    Ok(())
+        // ensure the introspected schema is valid
+        psl::parse_schema(schema.data()).unwrap();
+
+        let expectation = expect![[r#"
+            [
+              {
+                "code": 31,
+                "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints",
+                "affected": [
+                  {
+                    "name": "products_price_check",
+                    "definition": "CHECK ((price > (0)::numeric))"
+                  }
+                ]
+              }
+            ]"#]];
+
+        api.expect_warnings(&expectation).await;
+
+        Ok(())
+    }
 }
 
-#[test_connector(tags(Postgres), exclude(CockroachDb))]
-async fn exclusion_constraints_stopgap(api: &mut TestApi) -> TestResult {
+mod exclusion_constraints {
     // https://www.notion.so/prismaio/PostgreSQL-Exclusion-Constraints-fb2ecc44f773463f908d3d0e2d737271
 
-    let schema = indoc! {r#"
-      CREATE EXTENSION btree_gist;
+    use super::*;
 
-      CREATE TABLE room_reservation (
-          room_reservation_id serial PRIMARY KEY,
-          room_id integer NOT NULL, -- this could e.g. be a foreign key to a `room` table
-          reserved_at timestamptz NOT NULL,
-          reserved_until timestamptz NOT NULL,
-          canceled boolean DEFAULT false,
-          EXCLUDE USING gist (
-              room_id WITH =, tstzrange(reserved_at, reserved_until) WITH &&
-          ) WHERE (NOT canceled)
-      );
-    "#};
+    #[test_connector(tags(Postgres), exclude(CockroachDb))]
+    async fn exclusion_constraints_stopgap(api: &mut TestApi) -> TestResult {
+        let raw_sql = indoc! {r#"
+        CREATE EXTENSION btree_gist;
+  
+        CREATE TABLE room_reservation (
+            room_reservation_id serial PRIMARY KEY,
+            room_id integer NOT NULL, -- this could e.g. be a foreign key to a `room` table
+            reserved_at timestamptz NOT NULL,
+            reserved_until timestamptz NOT NULL,
+            canceled boolean DEFAULT false,
+            EXCLUDE USING gist (
+                room_id WITH =, tstzrange(reserved_at, reserved_until) WITH &&
+            ) WHERE (NOT canceled)
+        );
+      "#};
 
-    api.raw_cmd(schema).await;
+        api.raw_cmd(raw_sql).await;
 
-    let expectation = expect![[r#"
-        generator client {
-          provider = "prisma-client-js"
-        }
-
-        datasource db {
-          provider = "postgresql"
-          url      = "env(TEST_DATABASE_URL)"
-        }
-
-        model room_reservation {
-          room_reservation_id Int      @id @default(autoincrement())
-          room_id             Int
-          reserved_at         DateTime @db.Timestamptz(6)
-          reserved_until      DateTime @db.Timestamptz(6)
-          canceled            Boolean? @default(false)
-        }
-    "#]];
-
-    api.expect_datamodel(&expectation).await;
-
-    let expectation = expect![[r#"
-        [
-          {
-            "code": 32,
-            "message": "These are exclusion constraints, which are not yet fully supported. Read more: https://pris.ly/d/postgres-exclusion-constraints",
-            "affected": [
-              {
-                "name": "room_reservation_room_id_tstzrange_excl",
-                "definition": "EXCLUDE USING gist (room_id WITH =, tstzrange(reserved_at, reserved_until) WITH &&) WHERE ((NOT canceled))"
-              }
-            ]
+        let schema = expect![[r#"
+          generator client {
+            provider = "prisma-client-js"
           }
-        ]"#]];
+  
+          datasource db {
+            provider = "postgresql"
+            url      = "env(TEST_DATABASE_URL)"
+          }
+  
+          model room_reservation {
+            room_reservation_id Int      @id @default(autoincrement())
+            room_id             Int
+            reserved_at         DateTime @db.Timestamptz(6)
+            reserved_until      DateTime @db.Timestamptz(6)
+            canceled            Boolean? @default(false)
+          }
+      "#]];
 
-    api.expect_warnings(&expectation).await;
+        api.expect_datamodel(&schema).await;
 
-    Ok(())
+        // ensure the introspected schema is valid
+        psl::parse_schema(schema.data()).unwrap();
+
+        let expectation = expect![[r#"
+            [
+              {
+                "code": 32,
+                "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints",
+                "affected": [
+                  {
+                    "name": "room_reservation_room_id_tstzrange_excl",
+                    "definition": "EXCLUDE USING gist (room_id WITH =, tstzrange(reserved_at, reserved_until) WITH &&) WHERE ((NOT canceled))"
+                  }
+                ]
+              }
+            ]"#]];
+
+        api.expect_warnings(&expectation).await;
+
+        Ok(())
+    }
+
+    #[test_connector(tags(Postgres), exclude(CockroachDb))]
+    async fn exclusion_constraints_without_where_stopgap(api: &mut TestApi) -> TestResult {
+        let raw_sql = indoc! {r#"
+        CREATE EXTENSION btree_gist;
+  
+        CREATE TABLE room_reservation (
+            room_reservation_id serial PRIMARY KEY,
+            room_id integer NOT NULL, -- this could e.g. be a foreign key to a `room` table
+            reserved_at timestamptz NOT NULL,
+            reserved_until timestamptz NOT NULL,
+            EXCLUDE USING gist (
+                room_id WITH =, tstzrange(reserved_at, reserved_until) WITH &&
+            )
+        );
+      "#};
+
+        api.raw_cmd(raw_sql).await;
+
+        let schema = expect![[r#"
+            generator client {
+              provider = "prisma-client-js"
+            }
+
+            datasource db {
+              provider = "postgresql"
+              url      = "env(TEST_DATABASE_URL)"
+            }
+
+            model room_reservation {
+              room_reservation_id Int      @id @default(autoincrement())
+              room_id             Int
+              reserved_at         DateTime @db.Timestamptz(6)
+              reserved_until      DateTime @db.Timestamptz(6)
+            }
+        "#]];
+
+        api.expect_datamodel(&schema).await;
+
+        // ensure the introspected schema is valid
+        psl::parse_schema(schema.data()).unwrap();
+
+        let expectation = expect![[r#"
+            [
+              {
+                "code": 32,
+                "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints",
+                "affected": [
+                  {
+                    "name": "room_reservation_room_id_tstzrange_excl",
+                    "definition": "EXCLUDE USING gist (room_id WITH =, tstzrange(reserved_at, reserved_until) WITH &&)"
+                  }
+                ]
+              }
+            ]"#]];
+
+        api.expect_warnings(&expectation).await;
+
+        Ok(())
+    }
+
+    #[test_connector(tags(Postgres), exclude(CockroachDb))]
+    async fn exclusion_constraints_without_where_and_expressions_stopgap(api: &mut TestApi) -> TestResult {
+        let raw_sql = indoc! {r#"
+          CREATE EXTENSION btree_gist;
+    
+          CREATE TABLE room_reservation (
+              room_reservation_id serial PRIMARY KEY,
+              room_id integer NOT NULL, -- this could e.g. be a foreign key to a `room` table
+              EXCLUDE USING gist (
+                  room_id WITH =
+              )
+          );
+        "#};
+
+        api.raw_cmd(raw_sql).await;
+
+        // TODO: the @@index line shouldn't be here.
+        // See: https://github.com/prisma/prisma/issues/17515
+        let schema = expect![[r#"
+            generator client {
+              provider = "prisma-client-js"
+            }
+
+            datasource db {
+              provider = "postgresql"
+              url      = "env(TEST_DATABASE_URL)"
+            }
+
+            model room_reservation {
+              room_reservation_id Int @id @default(autoincrement())
+              room_id             Int
+
+              @@index([room_id], map: "room_reservation_room_id_excl", type: Gist)
+            }
+        "#]];
+
+        api.expect_datamodel(&schema).await;
+
+        // TODO: re-enable after fixing https://github.com/prisma/prisma/issues/17515
+        // ensure the introspected schema is valid
+        // psl::parse_schema(schema.data()).unwrap();
+
+        let expectation = expect![[r#"
+            [
+              {
+                "code": 32,
+                "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints",
+                "affected": [
+                  {
+                    "name": "room_reservation_room_id_excl",
+                    "definition": "EXCLUDE USING gist (room_id WITH =)"
+                  }
+                ]
+              }
+            ]"#]];
+
+        api.expect_warnings(&expectation).await;
+
+        Ok(())
+    }
 }
