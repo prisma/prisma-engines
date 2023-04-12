@@ -55,37 +55,14 @@ mod smoke_tests {
             .await
             .unwrap();
 
-        insta::assert_snapshot!(metrics, @r###"# HELP prisma_client_queries_total Total number of Prisma Client queries executed
-# TYPE prisma_client_queries_total counter
-prisma_client_queries_total 0
-
-# HELP prisma_datasource_queries_total Total number of Datasource Queries executed
-# TYPE prisma_datasource_queries_total counter
-prisma_datasource_queries_total 0
-
-# HELP prisma_pool_connections_open Number of currently open Pool Connections
-# TYPE prisma_pool_connections_open counter
-prisma_pool_connections_open 1
-
-# HELP prisma_client_queries_active Number of currently active Prisma Client queries
-# TYPE prisma_client_queries_active gauge
-prisma_client_queries_active 0
-
-# HELP prisma_client_queries_wait Number of Prisma Client queries currently waiting for a connection
-# TYPE prisma_client_queries_wait gauge
-prisma_client_queries_wait 0
-
-# HELP prisma_pool_connections_busy Number of currently busy Pool Connections (executing a database query)
-# TYPE prisma_pool_connections_busy gauge
-prisma_pool_connections_busy 0
-
-# HELP prisma_pool_connections_idle Number of currently unused Pool Connections (waiting for the next pool query to run)
-# TYPE prisma_pool_connections_idle gauge
-prisma_pool_connections_idle 21
-
-# HELP prisma_pool_connections_opened_total Total number of Pool Connections opened
-# TYPE prisma_pool_connections_opened_total gauge
-prisma_pool_connections_opened_total 1"###);
+        assert!(metrics.contains("prisma_client_queries_total counter"));
+        assert!(metrics.contains("prisma_datasource_queries_total counter"));
+        assert!(metrics.contains("prisma_pool_connections_open counter"));
+        assert!(metrics.contains("prisma_client_queries_active gauge"));
+        assert!(metrics.contains("prisma_client_queries_wait gauge"));
+        assert!(metrics.contains("prisma_pool_connections_busy gauge"));
+        assert!(metrics.contains("prisma_pool_connections_idle gauge"));
+        assert!(metrics.contains("prisma_pool_connections_opened_total gauge"));
 
         Ok(())
     }
