@@ -605,8 +605,9 @@ pub(crate) fn row_level_security_tables_found(affected: &[Model]) -> Warning {
     }
 }
 
+// TODO: add a comment at the top of the table informing that check constraints are not represented in PSL
 pub(crate) fn check_constraints_found(affected: &[CheckConstraint]) -> Warning {
-    let message = "These are check constraints, which are not yet fully supported. Read more: https://pris.ly/d/postgres-check-constraints";
+    let message = "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints";
 
     Warning {
         code: 31,
@@ -615,8 +616,9 @@ pub(crate) fn check_constraints_found(affected: &[CheckConstraint]) -> Warning {
     }
 }
 
+// TODO: add a comment at the top of the table informing that check constraints are not represented in PSL
 pub(crate) fn exclusion_constraints_found(affected: &[ExclusionConstraint]) -> Warning {
-    let message = "These are exclusion constraints, which are not yet fully supported. Read more: https://pris.ly/d/postgres-exclusion-constraints";
+    let message = "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints";
 
     Warning {
         code: 32,
