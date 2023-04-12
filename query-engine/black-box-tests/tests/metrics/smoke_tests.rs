@@ -44,11 +44,7 @@ mod smoke_tests {
         // wait for the query-engine to start
         std::thread::sleep(std::time::Duration::from_secs(1));
 
-        let http = reqwest::Client::new();
-
-        let metrics = http
-            .get("http://0.0.0.0:57582/metrics")
-            .send()
+        let metrics = reqwest::get("http://0.0.0.0:57582/metrics")
             .await
             .unwrap()
             .text()
