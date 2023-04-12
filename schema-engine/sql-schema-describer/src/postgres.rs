@@ -487,6 +487,42 @@ impl AsRef<str> for SQLOperatorClassKind {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+struct CheckConstraintFromQuery {
+    namespace: String,
+    table_name: String,
+    constraint_name: String,
+    constraint_definition: String,
+    is_deferrable: bool,
+    is_deferred: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct ExclusionConstraintFromQuery {
+    namespace: String,
+    table_name: String,
+    constraint_name: String,
+    constraint_definition: String,
+    is_deferrable: bool,
+    is_deferred: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct ForeignKeyConstraintFromQuery {
+    con_id: String,
+    child_column: String,
+    parent_table: String,
+    parent_column: String,
+    confdeltype: String,
+    confupdtype: String,
+    referenced_schema_name: String,
+    constraint_name: String,
+    child: String,
+    parent: String,
+    table_name: String,
+    namespace: String,
+}
+
 #[async_trait::async_trait]
 impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
     async fn list_databases(&self) -> DescriberResult<Vec<String>> {
@@ -1168,6 +1204,17 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         let mut constraints_map: IndexMap<(String, String), BitFlags<TableProperties, u8>> = IndexMap::default();
 
+        let json_row = rows.into_single().expect("Query should always return 1 row");
+
+        let check_constraints_json_array = json_row.get_expect_string("check");
+        let exclusion_constraints_json_array = json_row.get_expect_string("exclusion");
+        let _foreign_key_constraints_json_array = json_row.get_expect_string("foreign_key");
+
+        let check_constraints: Vec<CheckConstraintFromQuery> =
+            serde_json::from_str(&check_constraints_json_array).unwrap();
+        let exclusion_constraints: Vec<ExclusionConstraintFromQuery> =
+            serde_json::from_str(&exclusion_constraints_json_array).unwrap();
+
         let upsert_bitflag = |constraints_map: &mut IndexMap<(String, String), BitFlags<TableProperties, u8>>,
                               constraint_key: (String, String),
                               flag: BitFlags<TableProperties, u8>| {
@@ -1178,46 +1225,30 @@ impl<'a> SqlSchemaDescriber<'a> {
             }
         };
 
-        for row in rows {
-            let namespace = row.get_expect_string("namespace");
-            // let namespace_id = sql_schema.get_namespace_id(&namespace).unwrap();
-            let table_name = row.get_expect_string("table_name");
-            // let table_id = table_ids.get(&(namespace, table_name)).unwrap();
-            let constraint_name = row.get_expect_string("constraint_name");
-            let constraint_type = row.get_expect_char("constraint_type");
-            let constraint_definition = row.get_expect_string("constraint_definition");
+        for row in check_constraints {
+            let constraint_key = (row.namespace, row.table_name);
 
-            let constraint_key = (namespace, table_name);
+            let check_constraint = CheckConstraint {
+                name: row.constraint_name,
+                definition: row.constraint_definition,
+            };
+            sql_schema.push_check_constraint(check_constraint);
 
-            match constraint_type {
-                'c' => {
-                    let check_constraint = CheckConstraint {
-                        name: constraint_name,
-                        definition: constraint_definition,
-                    };
-                    sql_schema.push_check_constraint(check_constraint);
+            let flag = BitFlags::from_flag(TableProperties::HasCheckConstraints);
+            upsert_bitflag(&mut constraints_map, constraint_key, flag);
+        }
 
-                    upsert_bitflag(
-                        &mut constraints_map,
-                        constraint_key,
-                        BitFlags::from_flag(TableProperties::HasCheckConstraints),
-                    );
-                }
-                'x' => {
-                    let exclusion_constraint = ExclusionConstraint {
-                        name: constraint_name,
-                        definition: constraint_definition,
-                    };
-                    sql_schema.push_exclusion_constraint(exclusion_constraint);
+        for row in exclusion_constraints {
+            let constraint_key = (row.namespace, row.table_name);
 
-                    upsert_bitflag(
-                        &mut constraints_map,
-                        constraint_key,
-                        BitFlags::from_flag(TableProperties::HasExclusionConstraints),
-                    );
-                }
-                _ => (),
-            }
+            let exclusion_constraint = ExclusionConstraint {
+                name: row.constraint_name,
+                definition: row.constraint_definition,
+            };
+            sql_schema.push_exclusion_constraint(exclusion_constraint);
+
+            let flag = BitFlags::from_flag(TableProperties::HasExclusionConstraints);
+            upsert_bitflag(&mut constraints_map, constraint_key, flag);
         }
 
         Ok(constraints_map)
