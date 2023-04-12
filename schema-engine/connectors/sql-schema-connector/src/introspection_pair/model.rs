@@ -47,6 +47,16 @@ impl<'a> ModelPair<'a> {
         self.next.has_row_level_security()
     }
 
+    /// Whether the model has check constraints.
+    pub(crate) fn has_check_constraints(self) -> bool {
+        self.next.has_check_constraints()
+    }
+
+    /// Whether the model has exclusion constraints.
+    pub(crate) fn has_exclusion_constraints(self) -> bool {
+        self.next.has_exclusion_constraints()
+    }
+
     /// Name of the model in the PSL. The value can be sanitized if it
     /// contains characters that are not allowed in the PSL
     /// definition.

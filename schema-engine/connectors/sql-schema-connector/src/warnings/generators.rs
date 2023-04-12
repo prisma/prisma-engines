@@ -57,6 +57,10 @@ pub(crate) struct Warnings {
     pub(crate) non_default_index_null_sort_order: Vec<IndexedColumn>,
     /// Warn about using row level security, which is currently unsupported.
     pub(crate) row_level_security_tables: Vec<Model>,
+    /// Warn about check constraints.
+    pub(crate) check_constraints: Vec<CheckConstraint>,
+    /// Warn about exclusion constraints.
+    pub(crate) exclusion_constraints: Vec<ExclusionConstraint>,
 }
 
 impl Warnings {
@@ -212,6 +216,14 @@ impl Warnings {
             &mut self.warnings,
         );
 
+        maybe_warn(&self.check_constraints, check_constraints_found, &mut self.warnings);
+
+        maybe_warn(
+            &self.exclusion_constraints,
+            exclusion_constraints_found,
+            &mut self.warnings,
+        );
+
         self.warnings
     }
 }
@@ -330,6 +342,34 @@ pub(crate) struct IndexedColumn {
     pub(crate) index_name: String,
     /// The name of the column
     pub(crate) column_name: String,
+}
+
+/// A check constraint that triggered a warning.
+#[derive(Serialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct CheckConstraint {
+    /// The name of the namespace
+    // pub(crate) namespace: String,
+    /// The name of the table
+    // pub(crate) table: String,
+    /// The name of the constraint
+    pub(crate) name: String,
+    /// The definition of the constraint
+    pub(crate) definition: String,
+}
+
+/// An exclusion constraint that triggered a warning.
+#[derive(Serialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct ExclusionConstraint {
+    /// The name of the namespace
+    /// pub(crate) namespace: String,
+    /// The name of the table
+    /// pub(crate) table: String,
+    /// The name of the constraint
+    pub(crate) name: String,
+    /// The definition of the constraint
+    pub(crate) definition: String,
 }
 
 pub(super) fn warning_models_without_identifier(affected: &[Model]) -> Warning {
@@ -555,11 +595,33 @@ pub(crate) fn non_default_index_null_sort_order(affected: &[IndexedColumn]) -> W
     }
 }
 
-pub(super) fn row_level_security_tables_found(affected: &[Model]) -> Warning {
+pub(crate) fn row_level_security_tables_found(affected: &[Model]) -> Warning {
     let message = "These tables contain row level security, which is not yet fully supported.";
 
     Warning {
         code: 30,
+        message: message.into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+// TODO: add a comment at the top of the table informing that check constraints are not represented in PSL
+pub(crate) fn check_constraints_found(affected: &[CheckConstraint]) -> Warning {
+    let message = "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints";
+
+    Warning {
+        code: 31,
+        message: message.into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+// TODO: add a comment at the top of the table informing that check constraints are not represented in PSL
+pub(crate) fn exclusion_constraints_found(affected: &[ExclusionConstraint]) -> Warning {
+    let message = "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints";
+
+    Warning {
+        code: 32,
         message: message.into(),
         affected: serde_json::to_value(affected).unwrap(),
     }

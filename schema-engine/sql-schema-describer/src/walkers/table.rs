@@ -115,6 +115,18 @@ impl<'a> TableWalker<'a> {
         self.table().properties.contains(TableProperties::HasRowLevelSecurity)
     }
 
+    /// Does the table have check constraints?
+    pub fn has_check_constraints(self) -> bool {
+        self.table().properties.contains(TableProperties::HasCheckConstraints)
+    }
+
+    /// Does the table have exclusion constraints?
+    pub fn has_exclusion_constraints(self) -> bool {
+        self.table()
+            .properties
+            .contains(TableProperties::HasExclusionConstraints)
+    }
+
     /// Reference to the underlying `Table` struct.
     fn table(self) -> &'a Table {
         &self.schema.tables[self.id.0 as usize]

@@ -101,6 +101,27 @@ impl fmt::Display for SqlIndexAlgorithm {
     }
 }
 
+#[derive(PartialEq, Debug, Clone, Copy)]
+pub enum SqlConstraint {
+    Check,
+    Exclude,
+}
+
+impl AsRef<str> for SqlConstraint {
+    fn as_ref(&self) -> &str {
+        match self {
+            Self::Check => "CHECK",
+            Self::Exclude => "EXCLUDE",
+        }
+    }
+}
+
+impl fmt::Display for SqlConstraint {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_ref())
+    }
+}
+
 #[enumflags2::bitflags]
 #[derive(Clone, Copy, Debug)]
 #[repr(u8)]
@@ -466,6 +487,42 @@ impl AsRef<str> for SQLOperatorClassKind {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+struct CheckConstraintFromQuery {
+    namespace: String,
+    table_name: String,
+    constraint_name: String,
+    constraint_definition: String,
+    is_deferrable: bool,
+    is_deferred: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct ExclusionConstraintFromQuery {
+    namespace: String,
+    table_name: String,
+    constraint_name: String,
+    constraint_definition: String,
+    is_deferrable: bool,
+    is_deferred: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct ForeignKeyConstraintFromQuery {
+    con_id: String,
+    child_column: String,
+    parent_table: String,
+    parent_column: String,
+    confdeltype: String,
+    confupdtype: String,
+    referenced_schema_name: String,
+    constraint_name: String,
+    child: String,
+    parent: String,
+    table_name: String,
+    namespace: String,
+}
+
 #[async_trait::async_trait]
 impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
     async fn list_databases(&self) -> DescriberResult<Vec<String>> {
@@ -672,10 +729,14 @@ impl<'a> SqlSchemaDescriber<'a> {
             )
         });
 
+        let mut constraints_map = self.get_constraints(sql_schema).await?;
+
         let mut map = IndexMap::default();
 
         for (table_name, namespace, is_partition, has_subclass, has_row_level_security) in names {
-            let cloned_name = table_name.clone();
+            let table_name_cloned = table_name.clone();
+            let namespace_cloned = namespace.clone();
+
             let partition = if is_partition {
                 BitFlags::from_flag(TableProperties::IsPartition)
             } else {
@@ -692,12 +753,15 @@ impl<'a> SqlSchemaDescriber<'a> {
                 BitFlags::empty()
             };
 
+            let constraints_key = (namespace_cloned, table_name_cloned);
+            let unsupported_constraint = constraints_map.remove(&constraints_key).unwrap_or(BitFlags::empty());
+
             let id = sql_schema.push_table_with_properties(
                 table_name,
                 sql_schema.get_namespace_id(&namespace).unwrap(),
-                partition | subclass | row_level_security,
+                partition | subclass | row_level_security | unsupported_constraint,
             );
-            map.insert((namespace, cloned_name), id);
+            map.insert(constraints_key, id);
         }
 
         Ok(map)
@@ -1120,6 +1184,74 @@ impl<'a> SqlSchemaDescriber<'a> {
         }
 
         Ok(())
+    }
+
+    /// Return the constraints that are not primary keys, foreign keys, or unique keys.
+    /// Namely, this returns CHECK and EXCLUDE constraints.
+    async fn get_constraints(
+        &self,
+        sql_schema: &mut SqlSchema,
+    ) -> DescriberResult<IndexMap<(String, String), BitFlags<TableProperties, u8>>> {
+        let namespaces = &sql_schema.namespaces;
+        let sql = include_str!("postgres/constraints_query.sql");
+        let rows = self
+            .conn
+            .query_raw(
+                sql,
+                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
+            )
+            .await?;
+
+        let mut constraints_map: IndexMap<(String, String), BitFlags<TableProperties, u8>> = IndexMap::default();
+
+        let json_row = rows.into_single().expect("Query should always return 1 row");
+
+        let check_constraints_json_array = json_row.get_expect_string("check");
+        let exclusion_constraints_json_array = json_row.get_expect_string("exclusion");
+        let _foreign_key_constraints_json_array = json_row.get_expect_string("foreign_key");
+
+        let check_constraints: Vec<CheckConstraintFromQuery> =
+            serde_json::from_str(&check_constraints_json_array).unwrap();
+        let exclusion_constraints: Vec<ExclusionConstraintFromQuery> =
+            serde_json::from_str(&exclusion_constraints_json_array).unwrap();
+
+        let upsert_bitflag = |constraints_map: &mut IndexMap<(String, String), BitFlags<TableProperties, u8>>,
+                              constraint_key: (String, String),
+                              flag: BitFlags<TableProperties, u8>| {
+            if let Some(previous_flag) = constraints_map.remove(&constraint_key) {
+                constraints_map.insert(constraint_key, previous_flag | flag);
+            } else {
+                constraints_map.insert(constraint_key, flag);
+            }
+        };
+
+        for row in check_constraints {
+            let constraint_key = (row.namespace, row.table_name);
+
+            let check_constraint = CheckConstraint {
+                name: row.constraint_name,
+                definition: row.constraint_definition,
+            };
+            sql_schema.push_check_constraint(check_constraint);
+
+            let flag = BitFlags::from_flag(TableProperties::HasCheckConstraints);
+            upsert_bitflag(&mut constraints_map, constraint_key, flag);
+        }
+
+        for row in exclusion_constraints {
+            let constraint_key = (row.namespace, row.table_name);
+
+            let exclusion_constraint = ExclusionConstraint {
+                name: row.constraint_name,
+                definition: row.constraint_definition,
+            };
+            sql_schema.push_exclusion_constraint(exclusion_constraint);
+
+            let flag = BitFlags::from_flag(TableProperties::HasExclusionConstraints);
+            upsert_bitflag(&mut constraints_map, constraint_key, flag);
+        }
+
+        Ok(constraints_map)
     }
 
     async fn get_indices(

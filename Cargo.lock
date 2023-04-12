@@ -4246,6 +4246,7 @@ dependencies = [
  "quaint",
  "regex",
  "serde",
+ "serde_json",
  "test-macros",
  "test-setup",
  "tokio",
