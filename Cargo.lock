@@ -279,6 +279,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "black-box-tests"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "assert_cmd",
+ "indoc",
+ "insta",
+ "query-engine-tests",
+ "query-tests-setup",
+ "reqwest",
+ "serde_json",
+ "tokio",
+ "user-facing-errors",
+]
+
+[[package]]
 name = "block-buffer"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3419,7 +3435,6 @@ name = "query-engine-tests"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "assert_cmd",
  "base64 0.13.1",
  "chrono",
  "colored",
@@ -3429,11 +3444,9 @@ dependencies = [
  "once_cell",
  "prisma-value",
  "psl",
- "query-engine",
  "query-engine-metrics",
  "query-test-macros",
  "query-tests-setup",
- "reqwest",
  "serde_json",
  "tokio",
  "tracing",

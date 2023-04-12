@@ -51,6 +51,11 @@ test-qe-st:
 test-qe-verbose-st:
 	cargo test --package query-engine-tests -- --nocapture --test-threads 1
 
+# Black-box tests, exercising the query engine HTTP apis (metrics, tracing, etc)
+test-qe-black-box:
+	cargo test --package black-box-tests -- --test-threads 1
+
+
 ###########################
 # Database setup commands #
 ###########################

@@ -1,7 +1,7 @@
 use query_engine_tests::*;
 
 /// Asserts common basics for composite type writes.
-#[test_suite(schema(schema), only(Postgres))]
+#[test_suite(schema(schema))]
 mod black_box_endpoint_polling {
     fn schema() -> String {
         let schema = indoc! {

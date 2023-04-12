@@ -1,6 +1,5 @@
 #![allow(clippy::module_inception, clippy::too_many_arguments)]
 
-mod metrics;
 mod new;
 mod queries;
 mod raw;
