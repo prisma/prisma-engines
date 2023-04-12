@@ -525,7 +525,6 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
         self.get_columns(&mut sql_schema).await?;
         self.get_foreign_keys(&table_names, &mut sql_schema).await?;
         self.get_indices(&table_names, &mut pg_ext, &mut sql_schema).await?;
-        self.get_constraints(&table_names, &mut sql_schema).await?;
 
         self.get_procedures(&mut sql_schema).await?;
         self.get_extensions(&mut pg_ext).await?;
@@ -694,10 +693,14 @@ impl<'a> SqlSchemaDescriber<'a> {
             )
         });
 
+        let mut constraints_map = self.get_constraints(sql_schema).await?;
+
         let mut map = IndexMap::default();
 
         for (table_name, namespace, is_partition, has_subclass, has_row_level_security) in names {
-            let cloned_name = table_name.clone();
+            let table_name_cloned = table_name.clone();
+            let namespace_cloned = namespace.clone();
+
             let partition = if is_partition {
                 BitFlags::from_flag(TableProperties::IsPartition)
             } else {
@@ -714,12 +717,15 @@ impl<'a> SqlSchemaDescriber<'a> {
                 BitFlags::empty()
             };
 
+            let constraints_key = (namespace_cloned, table_name_cloned);
+            let unsupported_constraint = constraints_map.remove(&constraints_key).unwrap_or(BitFlags::empty());
+
             let id = sql_schema.push_table_with_properties(
                 table_name,
                 sql_schema.get_namespace_id(&namespace).unwrap(),
-                partition | subclass | row_level_security,
+                partition | subclass | row_level_security | unsupported_constraint,
             );
-            map.insert((namespace, cloned_name), id);
+            map.insert(constraints_key, id);
         }
 
         Ok(map)
@@ -1148,9 +1154,8 @@ impl<'a> SqlSchemaDescriber<'a> {
     /// Namely, this returns CHECK and EXCLUDE constraints.
     async fn get_constraints(
         &self,
-        table_ids: &IndexMap<(String, String), TableId>,
         sql_schema: &mut SqlSchema,
-    ) -> DescriberResult<()> {
+    ) -> DescriberResult<IndexMap<(String, String), BitFlags<TableProperties, u8>>> {
         let namespaces = &sql_schema.namespaces;
         let sql = include_str!("postgres/constraints_query.sql");
         let rows = self
@@ -1161,41 +1166,49 @@ impl<'a> SqlSchemaDescriber<'a> {
             )
             .await?;
 
+        let mut constraints_map: IndexMap<(String, String), BitFlags<TableProperties, u8>> = IndexMap::default();
+
         for row in rows {
             let namespace = row.get_expect_string("namespace");
-            let namespace_id = sql_schema.get_namespace_id(&namespace).unwrap();
+            // let namespace_id = sql_schema.get_namespace_id(&namespace).unwrap();
             let table_name = row.get_expect_string("table_name");
-            let table_id = table_ids.get(&(namespace, table_name)).unwrap();
+            // let table_id = table_ids.get(&(namespace, table_name)).unwrap();
             let constraint_name = row.get_expect_string("constraint_name");
             let constraint_type = row.get_expect_char("constraint_type");
             let constraint_definition = row.get_expect_string("constraint_definition");
+
+            let constraint_key = (namespace, table_name);
 
             match constraint_type {
                 'c' => {
                     let check_constraint = CheckConstraint {
                         name: constraint_name,
-                        namespace_id,
-                        table_id: *table_id,
                         definition: constraint_definition,
                     };
-
                     sql_schema.push_check_constraint(check_constraint);
+
+                    constraints_map.insert(
+                        constraint_key,
+                        BitFlags::from_flag(TableProperties::HasCheckConstraints),
+                    );
                 }
                 'x' => {
                     let exclusion_constraint = ExclusionConstraint {
                         name: constraint_name,
-                        namespace_id,
-                        table_id: *table_id,
                         definition: constraint_definition,
                     };
-
                     sql_schema.push_exclusion_constraint(exclusion_constraint);
+
+                    constraints_map.insert(
+                        constraint_key,
+                        BitFlags::from_flag(TableProperties::HasExclusionConstraints),
+                    );
                 }
                 _ => (),
             }
         }
 
-        Ok(())
+        Ok(constraints_map)
     }
 
     async fn get_indices(

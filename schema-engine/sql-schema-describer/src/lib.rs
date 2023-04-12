@@ -497,6 +497,8 @@ pub enum TableProperties {
     IsPartition,
     HasSubclass,
     HasRowLevelSecurity,
+    HasCheckConstraints,
+    HasExclusionConstraints,
 }
 
 /// A table found in a schema.
@@ -790,10 +792,6 @@ struct EnumVariant {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CheckConstraint {
-    /// Namespace of the constraint
-    namespace_id: NamespaceId,
-    /// Table of the constraint
-    table_id: TableId,
     /// Name of the constraint.
     pub name: String,
     /// The SQL definition of the constraint.
@@ -802,10 +800,6 @@ pub struct CheckConstraint {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ExclusionConstraint {
-    /// Namespace of the constraint
-    namespace_id: NamespaceId,
-    /// Table of the constraint
-    table_id: TableId,
     /// Name of the constraint.
     pub name: String,
     /// The SQL definition of the constraint.

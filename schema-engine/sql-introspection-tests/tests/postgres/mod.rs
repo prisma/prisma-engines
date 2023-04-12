@@ -243,21 +243,22 @@ mod check_constraints {
         api.raw_cmd(raw_sql).await;
 
         let schema = expect![[r#"
-          generator client {
-            provider = "prisma-client-js"
-          }
-  
-          datasource db {
-            provider = "postgresql"
-            url      = "env(TEST_DATABASE_URL)"
-          }
-  
-          model products {
-            product_id Int      @id @default(autoincrement())
-            name       String?
-            price      Decimal? @db.Decimal
-          }
-      "#]];
+            generator client {
+              provider = "prisma-client-js"
+            }
+
+            datasource db {
+              provider = "postgresql"
+              url      = "env(TEST_DATABASE_URL)"
+            }
+
+            /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.
+            model products {
+              product_id Int      @id @default(autoincrement())
+              name       String?
+              price      Decimal? @db.Decimal
+            }
+        "#]];
 
         api.expect_datamodel(&schema).await;
 
@@ -309,23 +310,24 @@ mod exclusion_constraints {
         api.raw_cmd(raw_sql).await;
 
         let schema = expect![[r#"
-          generator client {
-            provider = "prisma-client-js"
-          }
-  
-          datasource db {
-            provider = "postgresql"
-            url      = "env(TEST_DATABASE_URL)"
-          }
-  
-          model room_reservation {
-            room_reservation_id Int      @id @default(autoincrement())
-            room_id             Int
-            reserved_at         DateTime @db.Timestamptz(6)
-            reserved_until      DateTime @db.Timestamptz(6)
-            canceled            Boolean? @default(false)
-          }
-      "#]];
+            generator client {
+              provider = "prisma-client-js"
+            }
+
+            datasource db {
+              provider = "postgresql"
+              url      = "env(TEST_DATABASE_URL)"
+            }
+
+            /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-exclusion-constraints for more info.
+            model room_reservation {
+              room_reservation_id Int      @id @default(autoincrement())
+              room_id             Int
+              reserved_at         DateTime @db.Timestamptz(6)
+              reserved_until      DateTime @db.Timestamptz(6)
+              canceled            Boolean? @default(false)
+            }
+        "#]];
 
         api.expect_datamodel(&schema).await;
 
@@ -379,6 +381,7 @@ mod exclusion_constraints {
               url      = "env(TEST_DATABASE_URL)"
             }
 
+            /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-exclusion-constraints for more info.
             model room_reservation {
               room_reservation_id Int      @id @default(autoincrement())
               room_id             Int
@@ -439,6 +442,7 @@ mod exclusion_constraints {
               url      = "env(TEST_DATABASE_URL)"
             }
 
+            /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-exclusion-constraints for more info.
             model room_reservation {
               room_reservation_id Int @id @default(autoincrement())
               room_id             Int
