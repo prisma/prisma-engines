@@ -2,7 +2,7 @@ use query_engine_tests::*;
 
 /// Asserts common basics for composite type writes.
 #[test_suite(schema(schema))]
-mod black_box_endpoint_polling {
+mod smoke_tests {
     fn schema() -> String {
         let schema = indoc! {
             r#"model Person {
@@ -14,7 +14,7 @@ mod black_box_endpoint_polling {
     }
 
     #[connector_test]
-    async fn test_metrics(r: Runner) -> TestResult<()> {
+    async fn expected_metrics_rendered(r: Runner) -> TestResult<()> {
         // spwan a query-engine with metrics enabled that is configured to use the same
         // DML as the one used by the test suite as provided by the schema function above.
         let path = assert_cmd::cargo::cargo_bin("query-engine");
