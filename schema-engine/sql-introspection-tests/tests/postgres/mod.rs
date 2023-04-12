@@ -510,8 +510,6 @@ mod exclusion_constraints {
 
         api.raw_cmd(raw_sql).await;
 
-        // TODO: the @@index line shouldn't be here.
-        // See: https://github.com/prisma/prisma/issues/17515
         let schema = expect![[r#"
             generator client {
               provider = "prisma-client-js"
@@ -526,16 +524,13 @@ mod exclusion_constraints {
             model room_reservation {
               room_reservation_id Int @id @default(autoincrement())
               room_id             Int
-
-              @@index([room_id], map: "room_reservation_room_id_excl", type: Gist)
             }
         "#]];
 
         api.expect_datamodel(&schema).await;
 
-        // TODO: re-enable after fixing https://github.com/prisma/prisma/issues/17515
         // ensure the introspected schema is valid
-        // psl::parse_schema(schema.data()).unwrap();
+        psl::parse_schema(schema.data()).unwrap();
 
         let expectation = expect![[r#"
             [
