@@ -1557,6 +1557,71 @@
 <a href="#1557" id="1557">1557</a>
 <a href="#1558" id="1558">1558</a>
 <a href="#1559" id="1559">1559</a>
+<a href="#1560" id="1560">1560</a>
+<a href="#1561" id="1561">1561</a>
+<a href="#1562" id="1562">1562</a>
+<a href="#1563" id="1563">1563</a>
+<a href="#1564" id="1564">1564</a>
+<a href="#1565" id="1565">1565</a>
+<a href="#1566" id="1566">1566</a>
+<a href="#1567" id="1567">1567</a>
+<a href="#1568" id="1568">1568</a>
+<a href="#1569" id="1569">1569</a>
+<a href="#1570" id="1570">1570</a>
+<a href="#1571" id="1571">1571</a>
+<a href="#1572" id="1572">1572</a>
+<a href="#1573" id="1573">1573</a>
+<a href="#1574" id="1574">1574</a>
+<a href="#1575" id="1575">1575</a>
+<a href="#1576" id="1576">1576</a>
+<a href="#1577" id="1577">1577</a>
+<a href="#1578" id="1578">1578</a>
+<a href="#1579" id="1579">1579</a>
+<a href="#1580" id="1580">1580</a>
+<a href="#1581" id="1581">1581</a>
+<a href="#1582" id="1582">1582</a>
+<a href="#1583" id="1583">1583</a>
+<a href="#1584" id="1584">1584</a>
+<a href="#1585" id="1585">1585</a>
+<a href="#1586" id="1586">1586</a>
+<a href="#1587" id="1587">1587</a>
+<a href="#1588" id="1588">1588</a>
+<a href="#1589" id="1589">1589</a>
+<a href="#1590" id="1590">1590</a>
+<a href="#1591" id="1591">1591</a>
+<a href="#1592" id="1592">1592</a>
+<a href="#1593" id="1593">1593</a>
+<a href="#1594" id="1594">1594</a>
+<a href="#1595" id="1595">1595</a>
+<a href="#1596" id="1596">1596</a>
+<a href="#1597" id="1597">1597</a>
+<a href="#1598" id="1598">1598</a>
+<a href="#1599" id="1599">1599</a>
+<a href="#1600" id="1600">1600</a>
+<a href="#1601" id="1601">1601</a>
+<a href="#1602" id="1602">1602</a>
+<a href="#1603" id="1603">1603</a>
+<a href="#1604" id="1604">1604</a>
+<a href="#1605" id="1605">1605</a>
+<a href="#1606" id="1606">1606</a>
+<a href="#1607" id="1607">1607</a>
+<a href="#1608" id="1608">1608</a>
+<a href="#1609" id="1609">1609</a>
+<a href="#1610" id="1610">1610</a>
+<a href="#1611" id="1611">1611</a>
+<a href="#1612" id="1612">1612</a>
+<a href="#1613" id="1613">1613</a>
+<a href="#1614" id="1614">1614</a>
+<a href="#1615" id="1615">1615</a>
+<a href="#1616" id="1616">1616</a>
+<a href="#1617" id="1617">1617</a>
+<a href="#1618" id="1618">1618</a>
+<a href="#1619" id="1619">1619</a>
+<a href="#1620" id="1620">1620</a>
+<a href="#1621" id="1621">1621</a>
+<a href="#1622" id="1622">1622</a>
+<a href="#1623" id="1623">1623</a>
+<a href="#1624" id="1624">1624</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.
 
 </span><span class="kw">mod </span>default;
@@ -1688,11 +1753,26 @@
     Last,
 }
 
+<span class="attr">#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+</span><span class="kw">pub enum </span>Constraint {
+    Index(IndexId),
+    ForeignKey(ForeignKeyId),
+}
+
+<span class="attr">#[enumflags2::bitflags]
+#[derive(Clone, Copy, Debug)]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>ConstraintOption {
+    Deferred,
+    Deferrable,
+}
+
 <span class="attr">#[derive(Default, Debug)]
 </span><span class="kw">pub struct </span>PostgresSchemaExt {
     <span class="kw">pub </span>opclasses: Vec&lt;(IndexColumnId, SQLOperatorClass)&gt;,
     <span class="kw">pub </span>indexes: Vec&lt;(IndexId, SqlIndexAlgorithm)&gt;,
     <span class="kw">pub </span>index_null_position: HashMap&lt;IndexColumnId, IndexNullPosition&gt;,
+    <span class="kw">pub </span>constraint_options: HashMap&lt;Constraint, BitFlags&lt;ConstraintOption&gt;&gt;,
     <span class="kw">pub </span>table_options: Vec&lt;BTreeMap&lt;String, String&gt;&gt;,
     <span class="doccomment">/// The schema&#39;s sequences.
     </span><span class="kw">pub </span>sequences: Vec&lt;Sequence&gt;,
@@ -1774,6 +1854,20 @@
 
         <span class="kw">match </span>options.get(<span class="string">&quot;ttl&quot;</span>) {
             <span class="prelude-val">Some</span>(val) =&gt; val.as_str() == <span class="string">&quot;&#39;on&#39;&quot;</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,
+        }
+    }
+
+    <span class="kw">pub fn </span>non_default_foreign_key_constraint_deferring(<span class="kw-2">&amp;</span><span class="self">self</span>, id: ForeignKeyId) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.constraint_options.get(<span class="kw-2">&amp;</span>Constraint::ForeignKey(id)) {
+            <span class="prelude-val">Some</span>(opts) =&gt; opts.contains(ConstraintOption::Deferrable) || opts.contains(ConstraintOption::Deferred),
+            <span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,
+        }
+    }
+
+    <span class="kw">pub fn </span>non_default_index_constraint_deferring(<span class="kw-2">&amp;</span><span class="self">self</span>, id: IndexId) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.constraint_options.get(<span class="kw-2">&amp;</span>Constraint::Index(id)) {
+            <span class="prelude-val">Some</span>(opts) =&gt; opts.contains(ConstraintOption::Deferrable) || opts.contains(ConstraintOption::Deferred),
             <span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,
         }
     }
@@ -2075,7 +2169,8 @@
         </span><span class="self">self</span>.get_views(<span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.get_enums(<span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.get_columns(<span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="self">self</span>.get_foreign_keys(<span class="kw-2">&amp;</span>table_names, <span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.get_foreign_keys(<span class="kw-2">&amp;</span>table_names, <span class="kw-2">&amp;mut </span>pg_ext, <span class="kw-2">&amp;mut </span>sql_schema)
+            .<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.get_indices(<span class="kw-2">&amp;</span>table_names, <span class="kw-2">&amp;mut </span>pg_ext, <span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="self">self</span>.get_procedures(<span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -2557,6 +2652,7 @@
     </span><span class="kw">async fn </span>get_foreign_keys(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         table_ids: <span class="kw-2">&amp;</span>IndexMap&lt;(String, String), TableId&gt;,
+        pg_ext: <span class="kw-2">&amp;mut </span>PostgresSchemaExt,
         sql_schema: <span class="kw-2">&amp;mut </span>SqlSchema,
     ) -&gt; DescriberResult&lt;()&gt; {
         <span class="kw">let </span>namespaces = <span class="kw-2">&amp;</span>sql_schema.namespaces;
@@ -2575,7 +2671,9 @@
                 child,
                 parent,
                 table_name, 
-                namespace
+                namespace,
+                condeferrable,
+                condeferred
             FROM (SELECT 
                         ns.nspname AS &quot;namespace&quot;,
                         unnest(con1.conkey)                AS &quot;parent&quot;,
@@ -2588,7 +2686,9 @@
                         con1.conrelid,
                         con1.conname,
                         con1.confdeltype,
-                        con1.confupdtype
+                        con1.confupdtype,
+                        con1.condeferrable                  AS condeferrable,
+                        con1.condeferred                    AS condeferred
                 FROM pg_class cl
                         join pg_constraint con1 on con1.conrelid = cl.oid
                         join pg_namespace ns on cl.relnamespace = ns.oid
@@ -2704,6 +2804,20 @@
                         [on_delete_action, on_update_action],
                     );
 
+                    <span class="kw">let </span><span class="kw-2">mut </span>constraint_options = BitFlags::empty();
+
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="bool-val">true</span>) = row.get_bool(<span class="string">&quot;condeferrable&quot;</span>) {
+                        constraint_options |= ConstraintOption::Deferrable;
+                    }
+
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="bool-val">true</span>) = row.get_bool(<span class="string">&quot;condeferred&quot;</span>) {
+                        constraint_options |= ConstraintOption::Deferred;
+                    }
+
+                    pg_ext
+                        .constraint_options
+                        .insert(Constraint::ForeignKey(fkid), constraint_options);
+
                     current_fk = <span class="prelude-val">Some</span>((id, fkid));
                 }
             }
@@ -2788,6 +2902,22 @@
                 } <span class="kw">else </span>{
                     sql_schema.push_index(table_id, index_name)
                 };
+
+                <span class="kw">if </span>is_primary_key || is_unique {
+                    <span class="kw">let </span><span class="kw-2">mut </span>constraint_options = BitFlags::empty();
+
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="bool-val">true</span>) = row.get_bool(<span class="string">&quot;condeferrable&quot;</span>) {
+                        constraint_options |= ConstraintOption::Deferrable;
+                    }
+
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="bool-val">true</span>) = row.get_bool(<span class="string">&quot;condeferred&quot;</span>) {
+                        constraint_options |= ConstraintOption::Deferred;
+                    }
+
+                    pg_ext
+                        .constraint_options
+                        .insert(Constraint::Index(index_id), constraint_options);
+                }
 
                 current_index = <span class="prelude-val">Some</span>(index_id);
             }

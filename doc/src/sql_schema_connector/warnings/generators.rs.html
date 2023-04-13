@@ -578,6 +578,29 @@
 <a href="#578" id="578">578</a>
 <a href="#579" id="579">579</a>
 <a href="#580" id="580">580</a>
+<a href="#581" id="581">581</a>
+<a href="#582" id="582">582</a>
+<a href="#583" id="583">583</a>
+<a href="#584" id="584">584</a>
+<a href="#585" id="585">585</a>
+<a href="#586" id="586">586</a>
+<a href="#587" id="587">587</a>
+<a href="#588" id="588">588</a>
+<a href="#589" id="589">589</a>
+<a href="#590" id="590">590</a>
+<a href="#591" id="591">591</a>
+<a href="#592" id="592">592</a>
+<a href="#593" id="593">593</a>
+<a href="#594" id="594">594</a>
+<a href="#595" id="595">595</a>
+<a href="#596" id="596">596</a>
+<a href="#597" id="597">597</a>
+<a href="#598" id="598">598</a>
+<a href="#599" id="599">599</a>
+<a href="#600" id="600">600</a>
+<a href="#601" id="601">601</a>
+<a href="#602" id="602">602</a>
+<a href="#603" id="603">603</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Warnings generator for Introspection
 
 </span><span class="kw">use </span>schema_connector::Warning;
@@ -639,6 +662,8 @@
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) row_level_security_tables: Vec&lt;Model&gt;,
     <span class="doccomment">/// Warn about row level TTL
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) row_level_ttl: Vec&lt;Model&gt;,
+    <span class="doccomment">/// Warn about non-default unique deferring setup
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) non_default_deferring: Vec&lt;ModelAndConstraint&gt;,
 }
 
 <span class="kw">impl </span>Warnings {
@@ -796,6 +821,8 @@
 
         maybe_warn(<span class="kw-2">&amp;</span><span class="self">self</span>.row_level_ttl, row_level_ttl_in_tables, <span class="kw-2">&amp;mut </span><span class="self">self</span>.warnings);
 
+        maybe_warn(<span class="kw-2">&amp;</span><span class="self">self</span>.non_default_deferring, non_default_deferring, <span class="kw-2">&amp;mut </span><span class="self">self</span>.warnings);
+
         <span class="self">self</span>.warnings
     }
 }
@@ -853,6 +880,15 @@
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) model: String,
     <span class="doccomment">/// The name of the index
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) index_db_name: String,
+}
+
+<span class="doccomment">/// A constraint in a model that triggered a warning.
+</span><span class="attr">#[derive(Serialize, Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ModelAndConstraint {
+    <span class="doccomment">/// The name of the model
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) model: String,
+    <span class="doccomment">/// The name of the constraint
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) constraint: String,
 }
 
 <span class="doccomment">/// A field type in a model that triggered a warning.
@@ -1154,6 +1190,16 @@
 
     Warning {
         code: <span class="number">31</span>,
+        message: message.into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>non_default_deferring(affected: <span class="kw-2">&amp;</span>[ModelAndConstraint]) -&gt; Warning {
+    <span class="kw">let </span>message = <span class="string">&quot;These primary key, foreign key or unique constraints are using non-default deferring in the database, which is not yet fully supported. Read more: https://pris.ly/d/constraint-deferring&quot;</span>;
+
+    Warning {
+        code: <span class="number">35</span>,
         message: message.into(),
         affected: serde_json::to_value(affected).unwrap(),
     }
