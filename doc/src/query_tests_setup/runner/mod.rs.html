@@ -276,6 +276,10 @@
 <a href="#276" id="276">276</a>
 <a href="#277" id="277">277</a>
 <a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>json_adapter;
 
 <span class="kw">use </span>std::{env, sync::Arc};
@@ -311,6 +315,10 @@
 }
 
 <span class="kw">impl </span>Runner {
+    <span class="kw">pub fn </span>prisma_dml(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.query_schema.internal_data_model.schema.db.source()
+    }
+
     <span class="kw">pub async fn </span>load(
         datamodel: String,
         connector_tag: ConnectorTag,
@@ -318,7 +326,7 @@
         log_capture: TestLogCapture,
     ) -&gt; TestResult&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>protocol = EngineProtocol::from(<span class="kw-2">&amp;</span>ENGINE_PROTOCOL.to_string());
-        <span class="kw">let </span>schema = psl::parse_schema(datamodel).unwrap();
+        <span class="kw">let </span>schema = psl::parse_schema(datamodel.clone()).unwrap();
         <span class="kw">let </span>data_source = schema.configuration.datasources.first().unwrap();
         <span class="kw">let </span>url = data_source.load_url(|key| env::var(key).ok()).unwrap();
         <span class="kw">let </span>executor = load_executor(data_source, schema.configuration.preview_features(), <span class="kw-2">&amp;</span>url).<span class="kw">await</span><span class="question-mark">?</span>;
