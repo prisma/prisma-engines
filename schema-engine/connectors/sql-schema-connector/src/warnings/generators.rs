@@ -279,12 +279,12 @@ pub(crate) struct ModelAndIndex {
     pub(crate) index_db_name: String,
 }
 
-/// An constraint in a model that triggered a warning.
+/// A constraint in a model that triggered a warning.
 #[derive(Serialize, Debug, Clone)]
 pub(crate) struct ModelAndConstraint {
     /// The name of the model
     pub(crate) model: String,
-    /// The name of the index
+    /// The name of the constraint
     pub(crate) constraint: String,
 }
 
