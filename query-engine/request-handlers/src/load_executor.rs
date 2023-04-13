@@ -13,7 +13,7 @@ pub async fn load(
     source: &Datasource,
     features: PreviewFeatures,
     url: &str,
-) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync>> {
+) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync + 'static>> {
     match source.active_provider {
         p if SQLITE.is_provider(p) => sqlite(source, url, features).await,
         p if MYSQL.is_provider(p) => mysql(source, url, features).await,
