@@ -57,6 +57,8 @@ pub(crate) struct Warnings {
     pub(crate) non_default_index_null_sort_order: Vec<IndexedColumn>,
     /// Warn about using row level security, which is currently unsupported.
     pub(crate) row_level_security_tables: Vec<Model>,
+    /// Warn about row level TTL
+    pub(crate) row_level_ttl: Vec<Model>,
 }
 
 impl Warnings {
@@ -211,6 +213,8 @@ impl Warnings {
             non_default_index_null_sort_order,
             &mut self.warnings,
         );
+
+        maybe_warn(&self.row_level_ttl, row_level_ttl_in_tables, &mut self.warnings);
 
         self.warnings
     }
@@ -560,6 +564,16 @@ pub(super) fn row_level_security_tables_found(affected: &[Model]) -> Warning {
 
     Warning {
         code: 30,
+        message: message.into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+pub(crate) fn row_level_ttl_in_tables(affected: &[Model]) -> Warning {
+    let message = "These models are using a row level TTL setting defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/row-level-ttl";
+
+    Warning {
+        code: 31,
         message: message.into(),
         affected: serde_json::to_value(affected).unwrap(),
     }
