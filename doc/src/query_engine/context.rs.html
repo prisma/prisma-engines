@@ -130,10 +130,6 @@
 <a href="#130" id="130">130</a>
 <a href="#131" id="131">131</a>
 <a href="#132" id="132">132</a>
-<a href="#133" id="133">133</a>
-<a href="#134" id="134">134</a>
-<a href="#135" id="135">135</a>
-<a href="#136" id="136">136</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::features::{EnabledFeatures, Feature};
 <span class="kw">use crate</span>::{logger::Logger, opt::PrismaOpt};
 <span class="kw">use crate</span>::{PrismaError, PrismaResult};
@@ -173,45 +169,36 @@
         enabled_features: EnabledFeatures,
         metrics: <span class="prelude-ty">Option</span>&lt;MetricRegistry&gt;,
     ) -&gt; PrismaResult&lt;PrismaContext&gt; {
-        <span class="kw">let </span>arced_schema = Arc::new(schema);
-        <span class="kw">let </span>arced_schema_2 = Arc::clone(<span class="kw-2">&amp;</span>arced_schema);
+        <span class="kw">let </span>config = <span class="kw-2">&amp;</span>schema.configuration;
+        <span class="comment">// We only support one data source at the moment, so take the first one (default not exposed yet).
+        </span><span class="kw">let </span>data_source = config
+            .datasources
+            .first()
+            .ok_or_else(|| PrismaError::ConfigurationError(<span class="string">&quot;No valid data source found&quot;</span>.into()))<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>query_schema_fut = tokio::runtime::Handle::current().spawn_blocking(<span class="kw">move </span>|| {
-            <span class="comment">// Build internal data model
-            </span><span class="kw">let </span>internal_data_model = prisma_models::convert(arced_schema);
+        <span class="kw">let </span>url = data_source.load_url(|key| env::var(key).ok())<span class="question-mark">?</span>;
 
-            <span class="comment">// Construct query schema
-            </span>Arc::new(schema_builder::build(
-                internal_data_model,
-                enabled_features.contains(Feature::RawQueries),
-            ))
-        });
-        <span class="kw">let </span>executor_fut = tokio::spawn(<span class="kw">async move </span>{
-            <span class="kw">let </span>config = <span class="kw-2">&amp;</span>arced_schema_2.configuration;
-            <span class="kw">let </span>preview_features = config.preview_features();
+        <span class="comment">// Load executor
+        </span><span class="kw">let </span>executor = load_executor(data_source, config.preview_features(), <span class="kw-2">&amp;</span>url).<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="comment">// We only support one data source at the moment, so take the first one (default not exposed yet).
-            </span><span class="kw">let </span>data_source = config
-                .datasources
-                .first()
-                .ok_or_else(|| PrismaError::ConfigurationError(<span class="string">&quot;No valid data source found&quot;</span>.into()))<span class="question-mark">?</span>;
+        <span class="comment">// Build internal data model
+        </span><span class="kw">let </span>internal_data_model = prisma_models::convert(Arc::new(schema));
 
-            <span class="kw">let </span>url = data_source.load_url(|key| env::var(key).ok())<span class="question-mark">?</span>;
-            <span class="comment">// Load executor
-            </span><span class="kw">let </span>executor = load_executor(data_source, preview_features, <span class="kw-2">&amp;</span>url).<span class="kw">await</span><span class="question-mark">?</span>;
-            executor.primary_connector().get_connection().<span class="kw">await</span><span class="question-mark">?</span>;
-            PrismaResult::&lt;<span class="kw">_</span>&gt;::Ok(executor)
-        });
-
-        <span class="kw">let </span>(query_schema, executor) = <span class="macro">tokio::join!</span>(query_schema_fut, executor_fut);
+        <span class="comment">// Construct query schema
+        </span><span class="kw">let </span>query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
+            internal_data_model,
+            enabled_features.contains(Feature::RawQueries),
+        ));
 
         <span class="kw">let </span>context = <span class="self">Self </span>{
-            query_schema: query_schema.unwrap(),
-            executor: executor.unwrap()<span class="question-mark">?</span>,
+            query_schema,
+            executor,
             metrics: metrics.unwrap_or_default(),
             engine_protocol: protocol,
             enabled_features,
         };
+
+        context.verify_connection().<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(context)
     }
@@ -230,6 +217,11 @@
 
     <span class="kw">pub fn </span>engine_protocol(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; EngineProtocol {
         <span class="self">self</span>.engine_protocol
+    }
+
+    <span class="kw">async fn </span>verify_connection(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; PrismaResult&lt;()&gt; {
+        <span class="self">self</span>.executor.primary_connector().get_connection().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(())
     }
 }
 

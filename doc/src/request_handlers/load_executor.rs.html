@@ -119,7 +119,7 @@
     source: <span class="kw-2">&amp;</span>Datasource,
     features: PreviewFeatures,
     url: <span class="kw-2">&amp;</span>str,
-) -&gt; query_core::Result&lt;Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync + <span class="lifetime">&#39;static</span>&gt;&gt; {
+) -&gt; query_core::Result&lt;Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync&gt;&gt; {
     <span class="kw">match </span>source.active_provider {
         p <span class="kw">if </span>SQLITE.is_provider(p) =&gt; sqlite(source, url, features).<span class="kw">await</span>,
         p <span class="kw">if </span>MYSQL.is_provider(p) =&gt; mysql(source, url, features).<span class="kw">await</span>,
