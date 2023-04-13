@@ -978,6 +978,15 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                 ),
             ],
             index_null_position: {},
+            constraint_options: {
+                Index(
+                    IndexId(
+                        0,
+                    ),
+                ): BitFlags<ConstraintOption> {
+                    bits: 0b0,
+                },
+            },
             table_options: [
                 {},
             ],
@@ -1152,6 +1161,7 @@ fn postgres_sequences_must_work(api: TestApi) {
             opclasses: [],
             indexes: [],
             index_null_position: {},
+            constraint_options: {},
             table_options: [],
             sequences: [
                 Sequence {
@@ -1739,6 +1749,7 @@ fn extensions_are_described_correctly(api: TestApi) {
             opclasses: [],
             indexes: [],
             index_null_position: {},
+            constraint_options: {},
             table_options: [],
             sequences: [],
             extensions: [

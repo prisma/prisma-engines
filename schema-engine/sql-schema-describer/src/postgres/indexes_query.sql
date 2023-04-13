@@ -31,7 +31,9 @@ SELECT
     CASE rawindex.indoption & 2
         WHEN 2 THEN true
         ELSE false END
-        AS nulls_first
+        AS nulls_first,
+    pc.condeferrable AS condeferrable,
+    pc.condeferred AS condeferred
 FROM
     rawindex
     INNER JOIN pg_class AS tableinfo ON tableinfo.oid = rawindex.indrelid
@@ -42,5 +44,6 @@ FROM
     INNER JOIN pg_am AS indexaccess ON indexaccess.oid = indexinfo.relam
     LEFT JOIN pg_opclass AS opclass -- left join because crdb has no opclasses
         ON opclass.oid = rawindex.indclass
+    LEFT JOIN pg_constraint pc ON rawindex.indexrelid = pc.conindid AND pc.contype <> 'f'
 WHERE schemainfo.nspname = ANY ( $1 )
 ORDER BY namespace, table_name, index_name, column_index;

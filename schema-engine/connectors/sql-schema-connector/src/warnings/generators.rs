@@ -59,6 +59,8 @@ pub(crate) struct Warnings {
     pub(crate) row_level_security_tables: Vec<Model>,
     /// Warn about row level TTL
     pub(crate) row_level_ttl: Vec<Model>,
+    /// Warn about non-default unique deferring setup
+    pub(crate) non_default_deferring: Vec<ModelAndConstraint>,
 }
 
 impl Warnings {
@@ -216,6 +218,8 @@ impl Warnings {
 
         maybe_warn(&self.row_level_ttl, row_level_ttl_in_tables, &mut self.warnings);
 
+        maybe_warn(&self.non_default_deferring, non_default_deferring, &mut self.warnings);
+
         self.warnings
     }
 }
@@ -273,6 +277,15 @@ pub(crate) struct ModelAndIndex {
     pub(crate) model: String,
     /// The name of the index
     pub(crate) index_db_name: String,
+}
+
+/// A constraint in a model that triggered a warning.
+#[derive(Serialize, Debug, Clone)]
+pub(crate) struct ModelAndConstraint {
+    /// The name of the model
+    pub(crate) model: String,
+    /// The name of the constraint
+    pub(crate) constraint: String,
 }
 
 /// A field type in a model that triggered a warning.
@@ -574,6 +587,16 @@ pub(crate) fn row_level_ttl_in_tables(affected: &[Model]) -> Warning {
 
     Warning {
         code: 31,
+        message: message.into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+pub(crate) fn non_default_deferring(affected: &[ModelAndConstraint]) -> Warning {
+    let message = "These primary key, foreign key or unique constraints are using non-default deferring in the database, which is not yet fully supported. Read more: https://pris.ly/d/constraint-deferring";
+
+    Warning {
+        code: 35,
         message: message.into(),
         affected: serde_json::to_value(affected).unwrap(),
     }

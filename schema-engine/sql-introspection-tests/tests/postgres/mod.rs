@@ -224,3 +224,88 @@ async fn index_sort_order_stopgap(api: &mut TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn deferrable_stopgap(api: &mut TestApi) -> TestResult {
+    // https://www.notion.so/prismaio/Indexes-Constraints-Deferred-unique-constraints-PostgreSQL-c302af689bb94a669d645a7aa91765ce
+
+    let schema = indoc! {r#"
+        CREATE TABLE a (
+            id INT,
+            foo INT,
+            bar INT
+        );
+
+        CREATE TABLE b (
+            id INT PRIMARY KEY
+        );
+
+        ALTER TABLE a
+            ADD CONSTRAINT a_b_fk
+            FOREIGN KEY (foo) REFERENCES b(id)
+            DEFERRABLE INITIALLY DEFERRED;
+
+        ALTER TABLE a
+            ADD CONSTRAINT foo_key
+            UNIQUE(foo)
+            DEFERRABLE INITIALLY IMMEDIATE;
+
+        ALTER TABLE a
+            ADD CONSTRAINT foo_pkey
+            PRIMARY KEY (id)
+            DEFERRABLE INITIALLY DEFERRED;
+    "#};
+
+    api.raw_cmd(schema).await;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model a {
+          id  Int  @id(map: "foo_pkey")
+          foo Int? @unique(map: "foo_key")
+          bar Int?
+          b   b?   @relation(fields: [foo], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "a_b_fk")
+        }
+
+        model b {
+          id Int @id
+          a  a?
+        }
+    "#]];
+
+    api.expect_datamodel(&expectation).await;
+
+    let expectation = expect![[r#"
+        [
+          {
+            "code": 35,
+            "message": "These primary key, foreign key or unique constraints are using non-default deferring in the database, which is not yet fully supported. Read more: https://pris.ly/d/constraint-deferring",
+            "affected": [
+              {
+                "model": "a",
+                "constraint": "foo_key"
+              },
+              {
+                "model": "a",
+                "constraint": "foo_pkey"
+              },
+              {
+                "model": "a",
+                "constraint": "a_b_fk"
+              }
+            ]
+          }
+        ]"#]];
+
+    api.expect_warnings(&expectation).await;
+
+    Ok(())
+}
