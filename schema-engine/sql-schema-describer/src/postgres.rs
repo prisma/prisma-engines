@@ -129,11 +129,26 @@ pub enum IndexNullPosition {
     Last,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum Constraint {
+    Index(IndexId),
+    ForeignKey(ForeignKeyId),
+}
+
+#[enumflags2::bitflags]
+#[derive(Clone, Copy, Debug)]
+#[repr(u8)]
+pub enum ConstraintOption {
+    Deferred,
+    Deferrable,
+}
+
 #[derive(Default, Debug)]
 pub struct PostgresSchemaExt {
     pub opclasses: Vec<(IndexColumnId, SQLOperatorClass)>,
     pub indexes: Vec<(IndexId, SqlIndexAlgorithm)>,
     pub index_null_position: HashMap<IndexColumnId, IndexNullPosition>,
+    pub constraint_options: HashMap<Constraint, BitFlags<ConstraintOption>>,
     pub table_options: Vec<BTreeMap<String, String>>,
     /// The schema's sequences.
     pub sequences: Vec<Sequence>,
@@ -215,6 +230,20 @@ impl PostgresSchemaExt {
 
         match options.get("ttl") {
             Some(val) => val.as_str() == "'on'",
+            None => false,
+        }
+    }
+
+    pub fn non_default_foreign_key_constraint_deferring(&self, id: ForeignKeyId) -> bool {
+        match self.constraint_options.get(&Constraint::ForeignKey(id)) {
+            Some(opts) => opts.contains(ConstraintOption::Deferrable) || opts.contains(ConstraintOption::Deferred),
+            None => false,
+        }
+    }
+
+    pub fn non_default_index_constraint_deferring(&self, id: IndexId) -> bool {
+        match self.constraint_options.get(&Constraint::Index(id)) {
+            Some(opts) => opts.contains(ConstraintOption::Deferrable) || opts.contains(ConstraintOption::Deferred),
             None => false,
         }
     }
@@ -516,7 +545,8 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
         self.get_views(&mut sql_schema).await?;
         self.get_enums(&mut sql_schema).await?;
         self.get_columns(&mut sql_schema).await?;
-        self.get_foreign_keys(&table_names, &mut sql_schema).await?;
+        self.get_foreign_keys(&table_names, &mut pg_ext, &mut sql_schema)
+            .await?;
         self.get_indices(&table_names, &mut pg_ext, &mut sql_schema).await?;
 
         self.get_procedures(&mut sql_schema).await?;
@@ -998,6 +1028,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     async fn get_foreign_keys(
         &self,
         table_ids: &IndexMap<(String, String), TableId>,
+        pg_ext: &mut PostgresSchemaExt,
         sql_schema: &mut SqlSchema,
     ) -> DescriberResult<()> {
         let namespaces = &sql_schema.namespaces;
@@ -1016,7 +1047,9 @@ impl<'a> SqlSchemaDescriber<'a> {
                 child,
                 parent,
                 table_name, 
-                namespace
+                namespace,
+                condeferrable,
+                condeferred
             FROM (SELECT 
                         ns.nspname AS "namespace",
                         unnest(con1.conkey)                AS "parent",
@@ -1029,7 +1062,9 @@ impl<'a> SqlSchemaDescriber<'a> {
                         con1.conrelid,
                         con1.conname,
                         con1.confdeltype,
-                        con1.confupdtype
+                        con1.confupdtype,
+                        con1.condeferrable                  AS condeferrable,
+                        con1.condeferred                    AS condeferred
                 FROM pg_class cl
                         join pg_constraint con1 on con1.conrelid = cl.oid
                         join pg_namespace ns on cl.relnamespace = ns.oid
@@ -1145,6 +1180,20 @@ impl<'a> SqlSchemaDescriber<'a> {
                         [on_delete_action, on_update_action],
                     );
 
+                    let mut constraint_options = BitFlags::empty();
+
+                    if let Some(true) = row.get_bool("condeferrable") {
+                        constraint_options |= ConstraintOption::Deferrable;
+                    }
+
+                    if let Some(true) = row.get_bool("condeferred") {
+                        constraint_options |= ConstraintOption::Deferred;
+                    }
+
+                    pg_ext
+                        .constraint_options
+                        .insert(Constraint::ForeignKey(fkid), constraint_options);
+
                     current_fk = Some((id, fkid));
                 }
             }
@@ -1229,6 +1278,22 @@ impl<'a> SqlSchemaDescriber<'a> {
                 } else {
                     sql_schema.push_index(table_id, index_name)
                 };
+
+                if is_primary_key || is_unique {
+                    let mut constraint_options = BitFlags::empty();
+
+                    if let Some(true) = row.get_bool("condeferrable") {
+                        constraint_options |= ConstraintOption::Deferrable;
+                    }
+
+                    if let Some(true) = row.get_bool("condeferred") {
+                        constraint_options |= ConstraintOption::Deferred;
+                    }
+
+                    pg_ext
+                        .constraint_options
+                        .insert(Constraint::Index(index_id), constraint_options);
+                }
 
                 current_index = Some(index_id);
             }

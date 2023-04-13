@@ -3,7 +3,7 @@ use sql_schema_describer as sql;
 
 use crate::{
     datamodel_calculator::DatamodelCalculatorContext,
-    warnings::generators::{IndexedColumn, Model, Warnings},
+    warnings::generators::{IndexedColumn, Model, ModelAndConstraint, Warnings},
 };
 
 pub(crate) struct PostgresIntrospectionFlavour;
@@ -24,12 +24,29 @@ impl super::IntrospectionFlavour for PostgresIntrospectionFlavour {
                         column_name: column.name().to_string(),
                     });
                 }
+
+                if pg_ext.non_default_index_constraint_deferring(index.id) {
+                    warnings.non_default_deferring.push(ModelAndConstraint {
+                        model: ctx.table_prisma_name(table.id).prisma_name().to_string(),
+                        constraint: index.name().to_string(),
+                    });
+                }
+            }
+
+            for fk in table.foreign_keys() {
+                if pg_ext.non_default_foreign_key_constraint_deferring(fk.id) {
+                    warnings.non_default_deferring.push(ModelAndConstraint {
+                        model: ctx.table_prisma_name(table.id).prisma_name().to_string(),
+                        // unwrap: postgres fks always have a name
+                        constraint: fk.constraint_name().unwrap().to_string(),
+                    });
+                }
             }
 
             if pg_ext.uses_row_level_ttl(table.id) && ctx.is_cockroach() {
                 warnings.row_level_ttl.push(Model {
                     model: ctx.table_prisma_name(table.id).prisma_name().to_string(),
-                })
+                });
             }
         }
     }
