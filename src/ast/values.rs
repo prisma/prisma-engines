@@ -658,6 +658,23 @@ impl<'a> Value<'a> {
             _ => None,
         }
     }
+
+    /// Returns a cloned Vec<T> if the value is an array of T, otherwise `None`.
+    pub fn to_vec<T>(&self) -> Option<Vec<T>>
+    where
+        T: TryFrom<Value<'a>>,
+    {
+        match self {
+            Value::Array(Some(vec)) => {
+                let rslt: Result<Vec<_>, _> = vec.clone().into_iter().map(T::try_from).collect();
+                match rslt {
+                    Err(_) => None,
+                    Ok(values) => Some(values),
+                }
+            }
+            _ => None,
+        }
+    }
 }
 
 value!(val: i64, Int64, val);
