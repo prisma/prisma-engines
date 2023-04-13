@@ -236,6 +236,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 namespace_id: NamespaceId(0),
                 name: row.get_expect_string("view_name"),
                 definition: row.get_string("view_sql"),
+                description: None,
             })
         }
 
@@ -303,9 +304,10 @@ impl<'a> SqlSchemaDescriber<'a> {
                     name,
                     Default::default(),
                     Into::into(TableProperties::IsPartition),
+                    None,
                 )
             } else {
-                sql_schema.push_table(name, Default::default())
+                sql_schema.push_table(name, Default::default(), None)
             };
             map.insert(cloned_name, id);
         }
@@ -534,6 +536,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 name,
                 tpe,
                 auto_increment,
+                description: None,
             };
 
             match container_id {
@@ -645,7 +648,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             "longtext" => (ColumnTypeFamily::String, Some(MySqlType::LongText)),
             "enum" => {
                 let enum_name = format!("{table}_{column_name}");
-                let enum_id = sql_schema.push_enum(Default::default(), enum_name);
+                let enum_id = sql_schema.push_enum(Default::default(), enum_name, None);
                 push_enum_variants(full_data_type, enum_id, sql_schema);
                 (ColumnTypeFamily::Enum(enum_id), None)
             }

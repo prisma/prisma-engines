@@ -139,6 +139,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
             ],
             enums: [],
@@ -159,6 +160,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -176,6 +178,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -193,6 +196,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -210,6 +214,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -227,6 +232,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -244,6 +250,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -261,6 +268,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -278,6 +286,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -295,6 +304,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -312,6 +322,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -329,6 +340,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -346,6 +358,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -363,6 +376,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -380,6 +394,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -397,6 +412,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -414,6 +430,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -431,6 +448,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -448,6 +466,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -465,6 +484,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -482,6 +502,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -499,6 +520,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -516,6 +538,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -533,6 +556,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -550,6 +574,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -567,6 +592,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -584,6 +610,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -601,6 +628,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -618,6 +646,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -635,6 +664,7 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
             ],
@@ -819,6 +849,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
                 Table {
                     namespace_id: NamespaceId(
@@ -828,6 +859,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
             ],
             enums: [],
@@ -848,6 +880,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -865,6 +898,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -882,6 +916,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -899,6 +934,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
             ],
@@ -996,6 +1032,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
                 Table {
                     namespace_id: NamespaceId(
@@ -1005,6 +1042,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
                 Table {
                     namespace_id: NamespaceId(
@@ -1014,6 +1052,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
                 Table {
                     namespace_id: NamespaceId(
@@ -1023,6 +1062,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
                 Table {
                     namespace_id: NamespaceId(
@@ -1032,6 +1072,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
             ],
             enums: [],
@@ -1052,6 +1093,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1069,6 +1111,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1086,6 +1129,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: true,
+                        description: None,
                     },
                 ),
                 (
@@ -1103,6 +1147,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: true,
+                        description: None,
                     },
                 ),
                 (
@@ -1120,6 +1165,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1137,6 +1183,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: true,
+                        description: None,
                     },
                 ),
                 (
@@ -1154,6 +1201,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1171,6 +1219,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: true,
+                        description: None,
                     },
                 ),
                 (
@@ -1188,6 +1237,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
             ],

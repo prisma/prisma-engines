@@ -51,6 +51,13 @@ pub(super) fn generate_warnings(model: ModelPair<'_>, warnings: &mut Warnings) {
         });
     }
 
+    if model.description().is_some() {
+        warnings.commented_objects.push(generators::Object {
+            r#type: "model",
+            name: model.name().to_string(),
+        })
+    }
+
     for field in model.scalar_fields() {
         if let Some(DefaultKind::Prisma1Uuid) = field.default().kind() {
             let warn = generators::ModelAndField {
@@ -96,6 +103,13 @@ pub(super) fn generate_warnings(model: ModelPair<'_>, warnings: &mut Warnings) {
             };
 
             warnings.fields_with_empty_names_in_model.push(mf);
+        }
+
+        if field.description().is_some() {
+            warnings.commented_objects.push(generators::Object {
+                r#type: "field",
+                name: format!("{}.{}", model.name(), field.name()),
+            })
         }
     }
 

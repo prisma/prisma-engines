@@ -111,6 +111,11 @@ impl<'a> ColumnWalker<'a> {
         self.id.is_right()
     }
 
+    /// Description (comment) of the column.
+    pub fn description(self) -> Option<&'a str> {
+        self.get().description.as_deref()
+    }
+
     fn get(self) -> &'a Column {
         match self.id {
             Either::Left(table_column_id) => &self.schema.table_columns[table_column_id.0 as usize].1,

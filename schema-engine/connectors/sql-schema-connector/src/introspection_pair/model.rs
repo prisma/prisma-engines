@@ -227,4 +227,9 @@ impl<'a> ModelPair<'a> {
                 (!pair.defined_in_a_field()).then_some(pair)
             })
     }
+
+    /// The COMMENT of the model.
+    pub(crate) fn description(self) -> Option<&'a str> {
+        self.next.description()
+    }
 }

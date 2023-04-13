@@ -205,6 +205,11 @@ impl<'a> ScalarFieldPair<'a> {
         IntrospectionPair::new(self.context, previous, self.next)
     }
 
+    /// The COMMENT of the enum.
+    pub(crate) fn description(self) -> Option<&'a str> {
+        self.next.description()
+    }
+
     fn column_type_family(self) -> &'a sql::ColumnTypeFamily {
         self.next.column_type_family()
     }

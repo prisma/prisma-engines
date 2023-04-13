@@ -378,3 +378,62 @@ async fn row_level_ttl_stopgap(api: &mut TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(tags(CockroachDb), preview_features("views"))]
+async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
+    // https://www.notion.so/prismaio/Comments-ac89f872098e463183fd668a643f3ab8
+    // Only comments on tables and columns are supported.
+
+    let schema = indoc! {r#"
+        CREATE TABLE a (
+            id INT PRIMARY KEY,
+            val VARCHAR(20)
+        );
+
+        COMMENT ON TABLE a IS 'push';
+        COMMENT ON COLUMN a.val IS 'meow';
+    "#};
+
+    api.raw_cmd(schema).await;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["views"]
+        }
+
+        datasource db {
+          provider = "cockroachdb"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        model a {
+          id  Int     @id
+          val String? @db.String(20)
+        }
+    "#]];
+
+    api.expect_datamodel(&expectation).await;
+
+    let expectation = expect![[r#"
+        [
+          {
+            "code": 36,
+            "message": "These objects have comments defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/database-comments",
+            "affected": [
+              {
+                "type": "model",
+                "name": "a"
+              },
+              {
+                "type": "field",
+                "name": "a.val"
+              }
+            ]
+          }
+        ]"#]];
+
+    api.expect_warnings(&expectation).await;
+
+    Ok(())
+}

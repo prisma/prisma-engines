@@ -61,6 +61,8 @@ pub(crate) struct Warnings {
     pub(crate) row_level_ttl: Vec<Model>,
     /// Warn about non-default unique deferring setup
     pub(crate) non_default_deferring: Vec<ModelAndConstraint>,
+    /// Warn about comments
+    pub(crate) commented_objects: Vec<Object>,
 }
 
 impl Warnings {
@@ -217,8 +219,8 @@ impl Warnings {
         );
 
         maybe_warn(&self.row_level_ttl, row_level_ttl_in_tables, &mut self.warnings);
-
         maybe_warn(&self.non_default_deferring, non_default_deferring, &mut self.warnings);
+        maybe_warn(&self.commented_objects, commented_objects, &mut self.warnings);
 
         self.warnings
     }
@@ -336,6 +338,12 @@ pub(crate) struct TopLevelItem {
     /// The name of the top-level type
     pub(crate) r#type: TopLevelType,
     /// The name of the object
+    pub(crate) name: String,
+}
+
+#[derive(Serialize, Debug, Clone)]
+pub(crate) struct Object {
+    pub(crate) r#type: &'static str,
     pub(crate) name: String,
 }
 
@@ -597,6 +605,16 @@ pub(crate) fn non_default_deferring(affected: &[ModelAndConstraint]) -> Warning 
 
     Warning {
         code: 35,
+        message: message.into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+pub(crate) fn commented_objects(affected: &[Object]) -> Warning {
+    let message = "These objects have comments defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/database-comments";
+
+    Warning {
+        code: 36,
         message: message.into(),
         affected: serde_json::to_value(affected).unwrap(),
     }
