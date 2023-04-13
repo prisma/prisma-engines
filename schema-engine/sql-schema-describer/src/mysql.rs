@@ -277,7 +277,8 @@ impl<'a> SqlSchemaDescriber<'a> {
         let sql = r#"
             SELECT DISTINCT
               BINARY table_info.table_name AS table_name,
-              table_info.create_options AS create_options
+              table_info.create_options AS create_options,
+              IF(table_info.table_comment = '', NULL, table_info.table_comment) AS table_comment
             FROM information_schema.tables AS table_info
             JOIN information_schema.columns AS column_info
                 ON BINARY column_info.table_name = BINARY table_info.table_name
@@ -292,22 +293,23 @@ impl<'a> SqlSchemaDescriber<'a> {
             (
                 row.get_expect_string("table_name"),
                 row.get_expect_string("create_options") == "partitioned",
+                row.get_string("table_comment"),
             )
         });
 
         let mut map = IndexMap::default();
 
-        for (name, is_partition) in names {
+        for (name, is_partition, description) in names {
             let cloned_name = name.clone();
             let id = if is_partition {
                 sql_schema.push_table_with_properties(
                     name,
                     Default::default(),
                     Into::into(TableProperties::IsPartition),
-                    None,
+                    description,
                 )
             } else {
-                sql_schema.push_table(name, Default::default(), None)
+                sql_schema.push_table(name, Default::default(), description)
             };
             map.insert(cloned_name, id);
         }
@@ -363,7 +365,8 @@ impl<'a> SqlSchemaDescriber<'a> {
                 column_default column_default,
                 is_nullable is_nullable,
                 extra extra,
-                table_name table_name
+                table_name table_name,
+                IF(column_comment = '', NULL, column_comment) AS column_comment
             FROM information_schema.columns
             WHERE table_schema = ?
             ORDER BY ordinal_position
@@ -532,11 +535,13 @@ impl<'a> SqlSchemaDescriber<'a> {
                 }
             }
 
+            let description = col.get_string("table_comment");
+
             let col = Column {
                 name,
                 tpe,
                 auto_increment,
-                description: None,
+                description,
             };
 
             match container_id {
