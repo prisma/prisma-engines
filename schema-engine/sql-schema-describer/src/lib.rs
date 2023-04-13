@@ -263,6 +263,16 @@ impl SqlSchema {
         id
     }
 
+    pub fn push_mysql_multi_value_index(&mut self, table_id: TableId, index_name: String) -> IndexId {
+        let id = IndexId(self.indexes.len() as u32);
+        self.indexes.push(Index {
+            table_id,
+            index_name,
+            tpe: IndexType::MySQLMultiValueIndex,
+        });
+        id
+    }
+
     /// Add table default value to the schema.
     pub fn push_table_default_value(&mut self, column_id: TableColumnId, value: DefaultValue) -> TableDefaultValueId {
         let id = TableDefaultValueId(self.table_default_values.len() as u32);
@@ -518,6 +528,8 @@ pub enum IndexType {
     Fulltext,
     /// The table's primary key
     PrimaryKey,
+    /// MySQL multi value index
+    MySQLMultiValueIndex,
 }
 
 /// The sort order of an index.

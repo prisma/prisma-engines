@@ -142,6 +142,8 @@ async fn push_indexes(
         let column_name = if let Some(name) = row.get_string("column_name") {
             name
         } else {
+            sql_schema.push_mysql_multi_value_index(table_id, index_name);
+
             // filter out indexes on expressions
             // if the sequence is 1 and we have an expression,
             // we never create an index to the collection and can

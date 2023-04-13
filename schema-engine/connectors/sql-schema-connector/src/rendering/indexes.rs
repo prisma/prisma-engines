@@ -34,6 +34,8 @@ pub(super) fn render(index: IndexPair<'_>) -> renderer::IndexDefinition<'_> {
         sql::IndexType::Normal => renderer::IndexDefinition::index(fields),
         // we filter these out in the pair
         sql::IndexType::PrimaryKey => unreachable!(),
+        // we don't render these yet
+        sql::IndexType::MySQLMultiValueIndex => unreachable!(),
     };
 
     if let Some(name) = index.name() {

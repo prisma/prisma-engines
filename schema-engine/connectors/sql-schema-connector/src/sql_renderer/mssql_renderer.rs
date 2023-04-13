@@ -145,7 +145,9 @@ impl SqlRenderer for MssqlFlavour {
             sql::IndexType::Normal => {
                 format!("CREATE {clustering}INDEX {index_name} ON {table_reference}({columns})",)
             }
-            sql::IndexType::Fulltext | sql::IndexType::PrimaryKey => unreachable!(),
+            sql::IndexType::Fulltext | sql::IndexType::PrimaryKey | sql::IndexType::MySQLMultiValueIndex => {
+                unreachable!()
+            }
         }
     }
 

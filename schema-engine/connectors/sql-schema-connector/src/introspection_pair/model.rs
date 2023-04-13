@@ -248,6 +248,7 @@ impl<'a> ModelPair<'a> {
             .indexes()
             .filter(|i| !(i.is_unique() && i.columns().len() == 1))
             .filter(|i| !i.is_primary_key())
+            .filter(|i| !i.is_mysql_multi_value_index())
             .map(move |next| {
                 let previous = self.previous.and_then(|prev| {
                     prev.indexes().find(|idx| {

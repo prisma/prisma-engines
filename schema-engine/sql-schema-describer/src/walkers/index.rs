@@ -39,6 +39,11 @@ impl<'a> IndexWalker<'a> {
         matches!(self.get().tpe, IndexType::Unique)
     }
 
+    /// Is this index the primary key of the table?
+    pub fn is_mysql_multi_value_index(self) -> bool {
+        matches!(self.get().tpe, IndexType::MySQLMultiValueIndex)
+    }
+
     /// The name of the index.
     pub fn name(self) -> &'a str {
         &self.get().index_name
