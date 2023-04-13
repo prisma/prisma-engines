@@ -24,7 +24,7 @@ pub fn uuid_to_bin() -> Expression<'static> {
 }
 
 /// Generates an optimized swapped UUID in MySQL 8
-/// see https://dev.mysql.com/doc/refman/8.0/en/miscellaneous-functions.html#function_uuid-to-bin
+/// see `<https://dev.mysql.com/doc/refman/8.0/en/miscellaneous-functions.html#function_uuid-to-bin>`
 /// ```rust
 /// # use quaint::{ast::*, visitor::{Visitor, Mysql}};
 /// # fn main() -> Result<(), quaint::error::Error> {

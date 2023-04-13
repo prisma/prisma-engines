@@ -641,7 +641,7 @@ impl<'a> Value<'a> {
         }
     }
 
-    /// Returns a Vec<T> if the value is an array of T, otherwise `None`.
+    /// Returns a `Vec<T>` if the value is an array of `T`, otherwise `None`.
     pub fn into_vec<T>(self) -> Option<Vec<T>>
     where
         // Implement From<Value>
@@ -688,21 +688,16 @@ value!(val: f64, Double, val);
 value!(val: f32, Float, val);
 
 #[cfg(feature = "chrono")]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "chrono")))]
 value!(val: DateTime<Utc>, DateTime, val);
 #[cfg(feature = "chrono")]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "chrono")))]
 value!(val: chrono::NaiveTime, Time, val);
 #[cfg(feature = "chrono")]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "chrono")))]
 value!(val: chrono::NaiveDate, Date, val);
 #[cfg(feature = "bigdecimal")]
 value!(val: BigDecimal, Numeric, val);
 #[cfg(feature = "json")]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "json")))]
 value!(val: JsonValue, Json, val);
 #[cfg(feature = "uuid")]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "uuid")))]
 value!(val: Uuid, Uuid, val);
 
 impl<'a> TryFrom<Value<'a>> for i64 {

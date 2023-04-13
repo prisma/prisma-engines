@@ -47,7 +47,13 @@ Quaint is an abstraction over certain SQL databases. It provides:
 For type-safe database abstraction, [Diesel](https://diesel.rs/) is an excellent
 choice.
 
-### Testing:
+### Building
+
+```sh
+ > cargo build --features all
+ ```
+
+### Testing
 
 - See `.envrc` for connection params. Override variables if different. MySQL,
   PostgreSQL and SQL Server needs to be running for tests to succeed.
@@ -65,6 +71,16 @@ value. They'll be logged at the `INFO` level and are visible when having a
 logger in scope.
 
 The `FMT_SQL` environment variable can be used to log _formatted_ SQL queries. Beware, the `fmt-sql` feature must be enabled too.
+
+### Generating docs
+
+This requires the rust nightly channel:
+
+```sh
+> cargo +nightly rustdoc --all-features
+```
+
+Documentation index would be created at `$CARGO_TARGET_DIR/doc/quaint/index.html`
 
 ## Security
 
