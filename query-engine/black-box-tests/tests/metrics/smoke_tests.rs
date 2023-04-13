@@ -1,3 +1,4 @@
+use crate::helpers::*;
 use query_engine_tests::*;
 
 /// Asserts common basics for composite type writes.
@@ -15,51 +16,26 @@ mod smoke_tests {
 
     #[connector_test]
     async fn expected_metrics_rendered(r: Runner) -> TestResult<()> {
-        // spwan a query-engine with metrics enabled that is configured to use the same
-        // DML as the one used by the test suite as provided by the schema function above.
-        let path = assert_cmd::cargo::cargo_bin("query-engine");
-        let mut query_engine = std::process::Command::new(path)
-            .arg("--enable-metrics")
-            .arg("--port")
-            .arg("57582")
-            .arg("-g")
-            .stdout(std::process::Stdio::null())
-            .stderr(std::process::Stdio::null())
-            .env("PRISMA_DML", r.prisma_dml())
-            .spawn()
-            .expect("Cannot spawn query-engine");
+        let mut qe_cmd = query_engine_cmd(r.prisma_dml(), "57582");
+        qe_cmd.arg("--enable-metrics");
 
-        // the Cleaner is to make sure the query-engine is killed when the test is done
-        // in case of any panic
-        struct Cleaner<'a> {
-            p: &'a mut std::process::Child,
-        }
-        impl<'a> Drop for Cleaner<'a> {
-            fn drop(&mut self) {
-                self.p.kill().expect("Failed to kill query-engine");
-            }
-        }
-        let _cleaner = Cleaner { p: &mut query_engine };
+        with_child_process(&mut qe_cmd, async move {
+            let metrics = reqwest::get("http://0.0.0.0:57582/metrics")
+                .await
+                .unwrap()
+                .text()
+                .await
+                .unwrap();
 
-        // wait for the query-engine to start
-        std::thread::sleep(std::time::Duration::from_secs(1));
-
-        let metrics = reqwest::get("http://0.0.0.0:57582/metrics")
-            .await
-            .unwrap()
-            .text()
-            .await
-            .unwrap();
-
-        assert!(metrics.contains("prisma_client_queries_total counter"));
-        assert!(metrics.contains("prisma_datasource_queries_total counter"));
-        assert!(metrics.contains("prisma_pool_connections_open counter"));
-        assert!(metrics.contains("prisma_client_queries_active gauge"));
-        assert!(metrics.contains("prisma_client_queries_wait gauge"));
-        assert!(metrics.contains("prisma_pool_connections_busy gauge"));
-        assert!(metrics.contains("prisma_pool_connections_idle gauge"));
-        assert!(metrics.contains("prisma_pool_connections_opened_total gauge"));
-
-        Ok(())
+            assert!(metrics.contains("prisma_client_queries_total counter"));
+            assert!(metrics.contains("prisma_datasource_queries_total counter"));
+            assert!(metrics.contains("prisma_pool_connections_open counter"));
+            assert!(metrics.contains("prisma_client_queries_active gauge"));
+            assert!(metrics.contains("prisma_client_queries_wait gauge"));
+            assert!(metrics.contains("prisma_pool_connections_busy gauge"));
+            assert!(metrics.contains("prisma_pool_connections_idle gauge"));
+            assert!(metrics.contains("prisma_pool_connections_opened_total gauge"));
+        })
+        .await
     }
 }

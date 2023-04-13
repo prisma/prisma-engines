@@ -42,7 +42,8 @@ pub use metrics::{
     increment_counter, increment_gauge,
 };
 
-// Internal metrics name emitted by the connector pool implementation
+// Dependency metrics names emitted by the connector pool implementation (mobc) that will be renamed
+// using the `METRIC_RENAMES` map.
 pub const MOBC_POOL_CONNECTIONS_OPENED_TOTAL: &str = "mobc_pool_connections_opened_total";
 pub const MOBC_POOL_CONNECTIONS_CLOSED_TOTAL: &str = "mobc_pool_connections_closed_total";
 pub const MOBC_POOL_CONNECTIONS_OPEN: &str = "mobc_pool_connections_open";

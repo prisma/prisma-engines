@@ -22,7 +22,6 @@ pub(crate) type Executor = Box<dyn QueryExecutor + Send + Sync>;
 
 /// Direct engine runner.
 pub struct Runner {
-    prisma_dml: String,
     executor: Executor,
     query_schema: QuerySchemaRef,
     connector_tag: ConnectorTag,
@@ -35,7 +34,7 @@ pub struct Runner {
 
 impl Runner {
     pub fn prisma_dml(&self) -> &str {
-        &self.prisma_dml
+        self.query_schema.internal_data_model.schema.db.source()
     }
 
     pub async fn load(
@@ -54,7 +53,6 @@ impl Runner {
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(internal_data_model, true));
 
         Ok(Self {
-            prisma_dml: datamodel,
             executor,
             query_schema,
             connector_tag,
