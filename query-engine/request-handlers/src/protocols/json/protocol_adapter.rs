@@ -251,40 +251,37 @@ impl JsonProtocolAdapter {
         query_schema: &QuerySchemaRef,
         all_scalars_set: bool,
     ) -> crate::Result<Selection> {
-        if let Some((_, parent_object)) = parent_field.field_type.as_object_type(&query_schema.db) {
-            let (_, nested_field) = parent_object.find_field(nested_field_name).ok_or_else(|| {
-                HandlerError::query_conversion(format!(
-                    "Unknown nested field '{}' for type {}",
-                    nested_field_name,
-                    &parent_object.identifier.name()
-                ))
-            })?;
+        let nested_object_type = parent_field
+            .field_type
+            .as_object_type(&query_schema.db)
+            .and_then(|(_, parent_object)| parent_object.find_field(nested_field_name))
+            .and_then(|(_, nested_field)| nested_field.field_type.as_object_type(&query_schema.db))
+            .map(|(_, nested_object)| nested_object);
 
-            if let Some((_, field_object)) = nested_field.field_type.as_object_type(&query_schema.db) {
-                // case for a relation - we select all nested scalar fields and composite fields
-                let mut nested_selection = Selection::new(nested_field_name, None, vec![], vec![]);
-                let nested_container = container
-                    .and_then(|c| c.find_field(nested_field_name))
-                    .map(|f| f.nested_container());
+        if let Some(nested_object_type) = nested_object_type {
+            // case for a relation - we select all nested scalar fields and composite fields
+            let mut nested_selection = Selection::new(nested_field_name, None, vec![], vec![]);
+            let nested_container = container
+                .and_then(|c| c.find_field(nested_field_name))
+                .map(|f| f.nested_container());
 
-                Self::default_scalar_and_composite_selection(
-                    &mut nested_selection,
-                    field_object,
-                    nested_container.as_ref(),
-                    query_schema,
-                )?;
+            Self::default_scalar_and_composite_selection(
+                &mut nested_selection,
+                nested_object_type,
+                nested_container.as_ref(),
+                query_schema,
+            )?;
 
-                return Ok(nested_selection);
-            }
+            return Ok(nested_selection);
         }
 
+        // case for a scalar - just picking the specified field without any nested selections
         if all_scalars_set {
             return Err(HandlerError::query_conversion(format!(
                 "Cannot select both '$scalars: true' and a specific scalar field '{nested_field_name}'.",
             )));
         }
 
-        // case for a scalar - just picking the specified field without any nested selections
         Ok(Selection::with_name(nested_field_name))
     }
 
