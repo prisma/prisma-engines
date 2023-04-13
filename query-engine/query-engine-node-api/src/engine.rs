@@ -1,5 +1,7 @@
 use crate::{engine::executor::TransactionOptions, error::ApiError, log_callback::LogCallback, logger::Logger};
 use futures::FutureExt;
+use napi::{Env, JsFunction, JsUnknown};
+use napi_derive::napi;
 use psl::PreviewFeature;
 use query_core::{
     executor, protocol::EngineProtocol, schema::QuerySchema, schema_builder, telemetry, QueryExecutor, TxId,
@@ -19,9 +21,6 @@ use tokio::sync::RwLock;
 use tracing::{field, instrument::WithSubscriber, Instrument, Span};
 use tracing_subscriber::filter::LevelFilter;
 use user_facing_errors::Error;
-
-use napi::{Env, JsFunction, JsUnknown};
-use napi_derive::napi;
 
 /// The main query engine used by JS
 #[napi]
@@ -227,35 +226,51 @@ impl QueryEngine {
 
             let mut inner = self.inner.write().await;
             let builder = inner.as_builder()?;
+            let arced_schema = Arc::clone(&builder.schema);
+            let arced_schema_2 = Arc::clone(&builder.schema);
 
-            let engine = async move {
-                // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
+            let url = {
                 let data_source = builder
                     .schema
                     .configuration
                     .datasources
                     .first()
                     .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
-
-                let preview_features = builder.schema.configuration.preview_features();
-                let url = data_source
+                data_source
                     .load_url_with_config_dir(&builder.config_dir, |key| builder.env.get(key).map(ToString::to_string))
-                    .map_err(|err| crate::error::ApiError::Conversion(err, builder.schema.db.source().to_owned()))?;
+                    .map_err(|err| crate::error::ApiError::Conversion(err, builder.schema.db.source().to_owned()))?
+            };
 
-                let executor = load_executor(data_source, preview_features, &url).await?;
-                let connector = executor.primary_connector();
-                connector.get_connection().await?;
+            let engine = async move {
+                let executor_fut = tokio::spawn(async move {
+                    // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
+                    let data_source = arced_schema
+                        .configuration
+                        .datasources
+                        .first()
+                        .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
 
-                // Build internal data model
-                let internal_data_model = prisma_models::convert(Arc::clone(&builder.schema));
+                    let preview_features = arced_schema.configuration.preview_features();
 
-                let enable_raw_queries = true;
-                let query_schema = schema_builder::build(internal_data_model, enable_raw_queries);
+                    let executor = load_executor(data_source, preview_features, &url).await?;
+                    let connector = executor.primary_connector();
+                    connector.get_connection().await?;
+                    crate::Result::<_>::Ok(executor)
+                });
+
+                let query_schema_fut = tokio::runtime::Handle::current().spawn_blocking(move || {
+                    // Build internal data model
+                    let internal_data_model = prisma_models::convert(arced_schema_2);
+
+                    let enable_raw_queries = true;
+                    schema_builder::build(internal_data_model, enable_raw_queries)
+                });
+                let (query_schema, executor) = tokio::join!(query_schema_fut, executor_fut);
 
                 Ok(ConnectedEngine {
                     schema: builder.schema.clone(),
-                    query_schema: Arc::new(query_schema),
-                    executor,
+                    query_schema: Arc::new(query_schema.unwrap()),
+                    executor: executor.unwrap()?,
                     config_dir: builder.config_dir.clone(),
                     env: builder.env.clone(),
                     metrics: self.logger.metrics(),
