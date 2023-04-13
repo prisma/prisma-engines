@@ -1522,6 +1522,41 @@
 <a href="#1522" id="1522">1522</a>
 <a href="#1523" id="1523">1523</a>
 <a href="#1524" id="1524">1524</a>
+<a href="#1525" id="1525">1525</a>
+<a href="#1526" id="1526">1526</a>
+<a href="#1527" id="1527">1527</a>
+<a href="#1528" id="1528">1528</a>
+<a href="#1529" id="1529">1529</a>
+<a href="#1530" id="1530">1530</a>
+<a href="#1531" id="1531">1531</a>
+<a href="#1532" id="1532">1532</a>
+<a href="#1533" id="1533">1533</a>
+<a href="#1534" id="1534">1534</a>
+<a href="#1535" id="1535">1535</a>
+<a href="#1536" id="1536">1536</a>
+<a href="#1537" id="1537">1537</a>
+<a href="#1538" id="1538">1538</a>
+<a href="#1539" id="1539">1539</a>
+<a href="#1540" id="1540">1540</a>
+<a href="#1541" id="1541">1541</a>
+<a href="#1542" id="1542">1542</a>
+<a href="#1543" id="1543">1543</a>
+<a href="#1544" id="1544">1544</a>
+<a href="#1545" id="1545">1545</a>
+<a href="#1546" id="1546">1546</a>
+<a href="#1547" id="1547">1547</a>
+<a href="#1548" id="1548">1548</a>
+<a href="#1549" id="1549">1549</a>
+<a href="#1550" id="1550">1550</a>
+<a href="#1551" id="1551">1551</a>
+<a href="#1552" id="1552">1552</a>
+<a href="#1553" id="1553">1553</a>
+<a href="#1554" id="1554">1554</a>
+<a href="#1555" id="1555">1555</a>
+<a href="#1556" id="1556">1556</a>
+<a href="#1557" id="1557">1557</a>
+<a href="#1558" id="1558">1558</a>
+<a href="#1559" id="1559">1559</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.
 
 </span><span class="kw">mod </span>default;
@@ -1658,6 +1693,7 @@
     <span class="kw">pub </span>opclasses: Vec&lt;(IndexColumnId, SQLOperatorClass)&gt;,
     <span class="kw">pub </span>indexes: Vec&lt;(IndexId, SqlIndexAlgorithm)&gt;,
     <span class="kw">pub </span>index_null_position: HashMap&lt;IndexColumnId, IndexNullPosition&gt;,
+    <span class="kw">pub </span>table_options: Vec&lt;BTreeMap&lt;String, String&gt;&gt;,
     <span class="doccomment">/// The schema&#39;s sequences.
     </span><span class="kw">pub </span>sequences: Vec&lt;Sequence&gt;,
     <span class="doccomment">/// The extensions included in the schema(s).
@@ -1727,6 +1763,18 @@
         <span class="kw">match </span>sort_order {
             SQLSortOrder::Asc =&gt; position == IndexNullPosition::First,
             SQLSortOrder::Desc =&gt; position == IndexNullPosition::Last,
+        }
+    }
+
+    <span class="kw">pub fn </span>uses_row_level_ttl(<span class="kw-2">&amp;</span><span class="self">self</span>, id: TableId) -&gt; bool {
+        <span class="kw">let </span>options = <span class="kw">match </span><span class="self">self</span>.table_options.get(id.<span class="number">0 </span><span class="kw">as </span>usize) {
+            <span class="prelude-val">Some</span>(options) =&gt; options,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="bool-val">false</span>,
+        };
+
+        <span class="kw">match </span>options.get(<span class="string">&quot;ttl&quot;</span>) {
+            <span class="prelude-val">Some</span>(val) =&gt; val.as_str() == <span class="string">&quot;&#39;on&#39;&quot;</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 }
@@ -2001,10 +2049,11 @@
     // either updating or removing it.
     </span><span class="kw">async fn </span>get_metadata(<span class="kw-2">&amp;</span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span>str) -&gt; DescriberResult&lt;SqlMetadata&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>sql_schema = SqlSchema::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>pg_ext = PostgresSchemaExt::default();
 
         <span class="self">self</span>.get_namespaces(<span class="kw-2">&amp;mut </span>sql_schema, <span class="kw-2">&amp;</span>[schema]).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let </span>table_count = <span class="self">self</span>.get_table_names(<span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>.len();
+        <span class="kw">let </span>table_count = <span class="self">self</span>.get_table_names(<span class="kw-2">&amp;mut </span>sql_schema, <span class="kw-2">&amp;mut </span>pg_ext).<span class="kw">await</span><span class="question-mark">?</span>.len();
         <span class="kw">let </span>size_in_bytes = <span class="self">self</span>.get_size(schema).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(SqlMetadata {
@@ -2020,7 +2069,7 @@
         <span class="self">self</span>.get_namespaces(<span class="kw-2">&amp;mut </span>sql_schema, schemas).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="comment">//TODO(matthias) can we get rid of the table names map and instead just use tablewalker_ns everywhere like in get_columns?
-        </span><span class="kw">let </span>table_names = <span class="self">self</span>.get_table_names(<span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
+        </span><span class="kw">let </span>table_names = <span class="self">self</span>.get_table_names(<span class="kw-2">&amp;mut </span>sql_schema, <span class="kw-2">&amp;mut </span>pg_ext).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="comment">// order matters
         </span><span class="self">self</span>.get_views(<span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -2169,6 +2218,7 @@
     <span class="kw">async fn </span>get_table_names(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         sql_schema: <span class="kw-2">&amp;mut </span>SqlSchema,
+        pg_ext: <span class="kw-2">&amp;mut </span>PostgresSchemaExt,
     ) -&gt; DescriberResult&lt;IndexMap&lt;(String, String), TableId&gt;&gt; {
         <span class="kw">let </span>sql = <span class="kw">if </span><span class="self">self</span>.circumstances.contains(Circumstances::CanPartitionTables) {
             <span class="macro">include_str!</span>(<span class="string">&quot;postgres/tables_query.sql&quot;</span>)
@@ -2186,25 +2236,44 @@
             )
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let </span>names = rows.into_iter().map(|row| {
-            (
+        <span class="kw">let </span><span class="kw-2">mut </span>names = Vec::with_capacity(rows.len());
+
+        <span class="kw">for </span>row <span class="kw">in </span>rows.into_iter() {
+            <span class="kw">let </span>options: BTreeMap&lt;String, String&gt; = row
+                .get_string_array(<span class="string">&quot;reloptions&quot;</span>)
+                .unwrap_or_default()
+                .into_iter()
+                .filter_map(|s| {
+                    <span class="kw">let </span><span class="kw-2">mut </span>splitted = s.split(<span class="string">&#39;=&#39;</span>);
+                    <span class="kw">let </span>key = splitted.next()<span class="question-mark">?</span>.to_string();
+                    <span class="kw">let </span>value = splitted.next()<span class="question-mark">?</span>.to_string();
+
+                    <span class="prelude-val">Some</span>((key, value))
+                })
+                .collect();
+
+            names.push((
                 row.get_expect_string(<span class="string">&quot;table_name&quot;</span>),
                 row.get_expect_string(<span class="string">&quot;namespace&quot;</span>),
                 row.get_expect_bool(<span class="string">&quot;is_partition&quot;</span>),
                 row.get_expect_bool(<span class="string">&quot;has_subclass&quot;</span>),
                 row.get_expect_bool(<span class="string">&quot;has_row_level_security&quot;</span>),
-            )
-        });
+            ));
+
+            pg_ext.table_options.push(options);
+        }
 
         <span class="kw">let </span><span class="kw-2">mut </span>map = IndexMap::default();
 
         <span class="kw">for </span>(table_name, namespace, is_partition, has_subclass, has_row_level_security) <span class="kw">in </span>names {
             <span class="kw">let </span>cloned_name = table_name.clone();
+
             <span class="kw">let </span>partition = <span class="kw">if </span>is_partition {
                 BitFlags::from_flag(TableProperties::IsPartition)
             } <span class="kw">else </span>{
                 BitFlags::empty()
             };
+
             <span class="kw">let </span>subclass = <span class="kw">if </span>has_subclass {
                 BitFlags::from_flag(TableProperties::HasSubclass)
             } <span class="kw">else </span>{
@@ -2221,6 +2290,7 @@
                 sql_schema.get_namespace_id(<span class="kw-2">&amp;</span>namespace).unwrap(),
                 partition | subclass | row_level_security,
             );
+
             map.insert((namespace, cloned_name), id);
         }
 
