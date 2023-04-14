@@ -8,6 +8,7 @@ use opentelemetry::{global, propagation::Extractor};
 use query_core::helpers::*;
 use query_core::telemetry::capturing::TxTraceExt;
 use query_core::{telemetry, ExtendedTransactionUserFacingError, TransactionOptions, TxId};
+use query_engine_metrics::MetricFormat;
 use request_handlers::{dmmf, render_graphql_schema, RequestBody, RequestHandler};
 use serde_json::json;
 use std::collections::HashMap;
@@ -228,7 +229,16 @@ fn playground_handler() -> Response<Body> {
 }
 
 async fn metrics_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
-    let requested_json = req.uri().query().map(|q| q.contains("format=json")).unwrap_or_default();
+    let format = if let Some(query) = req.uri().query() {
+        if query.contains("format=json") {
+            MetricFormat::Json
+        } else {
+            MetricFormat::Prometheus
+        }
+    } else {
+        MetricFormat::Prometheus
+    };
+
     let body_start = req.into_body();
     // block and buffer request until the request has completed
     let full_body = hyper::body::to_bytes(body_start).await?;
@@ -238,25 +248,27 @@ async fn metrics_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
         Err(_e) => HashMap::new(),
     };
 
-    let response = if requested_json {
+    if format == MetricFormat::Json {
         let metrics = cx.metrics.to_json(global_labels);
 
-        Response::builder()
+        let res = Response::builder()
             .status(StatusCode::OK)
             .header(CONTENT_TYPE, "application/json")
             .body(Body::from(metrics.to_string()))
-            .unwrap()
-    } else {
-        let metrics = cx.metrics.to_prometheus(global_labels);
+            .unwrap();
 
-        Response::builder()
-            .status(StatusCode::OK)
-            .header(CONTENT_TYPE, "text/plain; version=0.0.4")
-            .body(Body::from(metrics))
-            .unwrap()
-    };
+        return Ok(res);
+    }
 
-    Ok(response)
+    let metrics = cx.metrics.to_prometheus(global_labels);
+
+    let res = Response::builder()
+        .status(StatusCode::OK)
+        .header(CONTENT_TYPE, "text/plain; version=0.0.4")
+        .body(Body::from(metrics))
+        .unwrap();
+
+    Ok(res)
 }
 
 /// Sadly the routing doesn't make it obvious what the transaction routes are:

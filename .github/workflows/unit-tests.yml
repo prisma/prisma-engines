@@ -34,7 +34,6 @@ jobs:
       - run: |
             cargo test --workspace \
                   --exclude=query-engine \
-                  --exclude=black-box-tests \
                   --exclude=query-engine-tests \
                   --exclude=sql-migration-tests \
                   --exclude=schema-engine-cli \

@@ -17,7 +17,6 @@ members = [
   "query-engine/connector-test-kit-rs/query-tests-setup",
   "query-engine/core",
   "query-engine/core-tests",
-  "query-engine/black-box-tests",
   "query-engine/dmmf",
   "query-engine/metrics",
   "query-engine/prisma-models",
@@ -40,7 +39,6 @@ tokio = { version = "1.25", features = ["rt-multi-thread", "macros", "sync", "io
 user-facing-errors = { path = "./libs/user-facing-errors" }
 uuid = { version = "1", features = ["serde"] }
 indoc = "2.0.1"
-connection-string = "0.2"
 
 [workspace.dependencies.quaint]
 git = "https://github.com/prisma/quaint"
