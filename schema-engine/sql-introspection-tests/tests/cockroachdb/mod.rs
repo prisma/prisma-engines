@@ -332,6 +332,7 @@ async fn string_col_with_length(api: &mut TestApi) -> TestResult {
 #[test_connector(tags(CockroachDb))]
 async fn row_level_ttl_stopgap(api: &mut TestApi) -> TestResult {
     // https://www.notion.so/prismaio/Row-level-TTL-CockroachDB-87c673e7a14a419aa91ebcd5d16d227b
+    //
 
     let schema = indoc! {r#"
         CREATE TABLE "ttl_test" (
