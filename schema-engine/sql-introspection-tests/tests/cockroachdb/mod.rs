@@ -377,6 +377,24 @@ async fn row_level_ttl_stopgap(api: &mut TestApi) -> TestResult {
 
     api.expect_warnings(&expectation).await;
 
+    let input = indoc! {r#"
+        /// This model is using a row level TTL in the database, and requires an additional setup in migrations. Read more: https://pris.ly/d/row-level-ttl
+        model ttl_test {
+          id          BigInt    @id @default(autoincrement())
+          inserted_at DateTime? @default(now()) @db.Timestamp(6)
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        /// This model is using a row level TTL in the database, and requires an additional setup in migrations. Read more: https://pris.ly/d/row-level-ttl
+        model ttl_test {
+          id          BigInt    @id @default(autoincrement())
+          inserted_at DateTime? @default(now()) @db.Timestamp(6)
+        }
+    "#]];
+
+    api.expect_re_introspected_datamodel(input, expectation).await;
+
     Ok(())
 }
 

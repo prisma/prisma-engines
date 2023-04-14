@@ -175,12 +175,13 @@ impl<'a> ModelPair<'a> {
     /// deferring.
     pub(crate) fn adds_non_default_deferring(self) -> bool {
         let from_index = self.all_indexes().any(|i| i.adds_a_non_default_deferring());
+
         let from_fk = self
             .relation_fields()
             .filter(|rf| rf.fields().is_some())
             .any(|rf| rf.adds_non_default_deferring());
 
-        from_index || from_fk
+        self.previous.is_none() && (from_index || from_fk)
     }
 
     /// A model must have either a primary key, or at least one unique
