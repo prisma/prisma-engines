@@ -205,7 +205,7 @@ impl<'a> ScalarFieldPair<'a> {
         IntrospectionPair::new(self.context, previous, self.next)
     }
 
-    /// The COMMENT of the enum.
+    /// The COMMENT of the field.
     pub(crate) fn description(self) -> Option<&'a str> {
         self.next.description()
     }
