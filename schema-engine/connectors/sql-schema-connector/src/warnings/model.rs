@@ -52,7 +52,7 @@ pub(super) fn generate_warnings(model: ModelPair<'_>, warnings: &mut Warnings) {
     }
 
     if model.description().is_some() {
-        warnings.commented_objects.push(generators::Object {
+        warnings.objects_with_comments.push(generators::Object {
             r#type: "model",
             name: model.name().to_string(),
         })
@@ -106,7 +106,7 @@ pub(super) fn generate_warnings(model: ModelPair<'_>, warnings: &mut Warnings) {
         }
 
         if field.description().is_some() {
-            warnings.commented_objects.push(generators::Object {
+            warnings.objects_with_comments.push(generators::Object {
                 r#type: "field",
                 name: format!("{}.{}", model.name(), field.name()),
             })

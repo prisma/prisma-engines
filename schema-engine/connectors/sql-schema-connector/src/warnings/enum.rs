@@ -17,7 +17,7 @@ pub(super) fn generate_warnings(r#enum: EnumPair<'_>, warnings: &mut Warnings) {
     }
 
     if r#enum.description().is_some() {
-        warnings.commented_objects.push(generators::Object {
+        warnings.objects_with_comments.push(generators::Object {
             r#type: "enum",
             name: r#enum.name().to_string(),
         });
