@@ -487,7 +487,7 @@ ALTER TABLE foo ENABLE ROW LEVEL SECURITY; "#,
 
     let expected = json!([{
         "code": 30,
-        "message": "These tables contain row level security, which is not yet fully supported.",
+        "message": "These tables contain row level security, which is not yet fully supported. Read more: https://pris.ly/d/row-level-security",
         "affected": [
             {
                 "model": "foo"
@@ -507,6 +507,7 @@ ALTER TABLE foo ENABLE ROW LEVEL SECURITY; "#,
           url      = "env(TEST_DATABASE_URL)"
         }
 
+        /// This model contains row level security and requires additional setup for migrations. Visit https://prisl.y/d/row-level-security for more info.
         model foo {
           id    Int    @id @default(autoincrement())
           owner String @db.VarChar(30)

@@ -47,6 +47,11 @@ impl<'a> ModelPair<'a> {
         self.next.has_row_level_security()
     }
 
+    /// True, if we add a new model with row level security enabled.
+    pub(crate) fn adds_row_level_security(self) -> bool {
+        self.previous.is_none() && self.has_row_level_security()
+    }
+
     /// Name of the model in the PSL. The value can be sanitized if it
     /// contains characters that are not allowed in the PSL
     /// definition.
@@ -151,7 +156,7 @@ impl<'a> ModelPair<'a> {
 
     /// True, if we _add_ a new constraint with a non-default
     /// deferring.
-    pub(crate) fn uses_non_default_deferring(self) -> bool {
+    pub(crate) fn adds_non_default_deferring(self) -> bool {
         let from_index = self.all_indexes().any(|i| i.adds_a_non_default_deferring());
         let from_fk = self
             .relation_fields()

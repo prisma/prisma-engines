@@ -97,10 +97,16 @@ fn render_model(model: ModelPair<'_>, sql_family: SqlFamily) -> renderer::Model<
         rendered.documentation(docs);
     }
 
-    if model.uses_non_default_deferring() {
+    if model.adds_non_default_deferring() {
         let docs = "This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.";
 
         rendered.documentation(docs);
+    }
+
+    if model.adds_row_level_security() {
+        let docs= "This model contains row level security and requires additional setup for migrations. Visit https://prisl.y/d/row-level-security for more info.";
+
+        rendered.documentation(docs)
     }
 
     for field in model.scalar_fields() {
