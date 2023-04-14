@@ -268,6 +268,22 @@
 <a href="#268" id="268">268</a>
 <a href="#269" id="269">269</a>
 <a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
 </pre><pre class="rust"><code><span class="kw">use </span>indexmap::IndexMap;
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>prisma_models::PrismaValue;
@@ -407,9 +423,25 @@
         <span class="kw">let </span>no_args = nested_selection.arguments().is_empty();
         <span class="kw">let </span>no_nested_selection = nested_selection.nested_selections().is_empty();
         <span class="kw">let </span>selection_name = nested_selection.name().to_owned();
+        <span class="kw">let </span>can_have_nested_selection = schema_field
+            .field_type
+            .as_object_type(<span class="kw-2">&amp;</span>query_schema.db)
+            .and_then(|(<span class="kw">_</span>, object)| object.find_field(<span class="kw-2">&amp;</span>selection_name))
+            .and_then(|(<span class="kw">_</span>, field)| field.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db))
+            .is_some();
 
         <span class="kw">if </span>no_args &amp;&amp; no_nested_selection {
-            res.insert(selection_name, SelectionSetValue::Shorthand(<span class="bool-val">true</span>));
+            <span class="kw">if </span>can_have_nested_selection {
+                res.insert(
+                    selection_name,
+                    SelectionSetValue::Nested(FieldQuery {
+                        arguments: <span class="prelude-val">None</span>,
+                        selection: SelectionSet::new(IndexMap::new()),
+                    }),
+                );
+            } <span class="kw">else </span>{
+                res.insert(selection_name, SelectionSetValue::Shorthand(<span class="bool-val">true</span>));
+            }
         } <span class="kw">else </span>{
             <span class="kw">let </span>(<span class="kw">_</span>, nested_field) = schema_field
                 .field_type

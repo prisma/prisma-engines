@@ -554,6 +554,16 @@
 <a href="#554" id="554">554</a>
 <a href="#555" id="555">555</a>
 <a href="#556" id="556">556</a>
+<a href="#557" id="557">557</a>
+<a href="#558" id="558">558</a>
+<a href="#559" id="559">559</a>
+<a href="#560" id="560">560</a>
+<a href="#561" id="561">561</a>
+<a href="#562" id="562">562</a>
+<a href="#563" id="563">563</a>
+<a href="#564" id="564">564</a>
+<a href="#565" id="565">565</a>
+<a href="#566" id="566">566</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::context::PrismaContext;
 <span class="kw">use </span><span class="kw">crate</span>::features::Feature;
 <span class="kw">use crate</span>::{opt::PrismaOpt, PrismaResult};
@@ -754,10 +764,20 @@
 
                 <span class="prelude-val">Ok</span>(res)
             }
-            <span class="prelude-val">Err</span>(_e) =&gt; {
+            <span class="prelude-val">Err</span>(e) =&gt; {
+                <span class="kw">let </span>ufe: user_facing_errors::Error = request_handlers::HandlerError::query_conversion(<span class="macro">format!</span>(
+                    <span class="string">&quot;Error parsing {:?} query. {}&quot;</span>,
+                    cx.engine_protocol(),
+                    e
+                ))
+                .into();
+
+                <span class="kw">let </span>result_bytes = serde_json::to_vec(<span class="kw-2">&amp;</span>ufe).unwrap();
+
                 <span class="kw">let </span>res = Response::builder()
-                    .status(StatusCode::BAD_REQUEST)
-                    .body(Body::empty())
+                    .status(StatusCode::UNPROCESSABLE_ENTITY) <span class="comment">// 422
+                    </span>.header(CONTENT_TYPE, <span class="string">&quot;application/json&quot;</span>)
+                    .body(Body::from(result_bytes))
                     .unwrap();
 
                 <span class="prelude-val">Ok</span>(res)
