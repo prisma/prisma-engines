@@ -37,9 +37,19 @@ impl<'a> ModelPair<'a> {
         self.next.is_partition()
     }
 
+    /// True, if we add a new model with a partition.
+    pub(crate) fn new_with_partition(self) -> bool {
+        self.previous.is_none() && self.is_partition()
+    }
+
     /// Whether the model has subclass tables or not.
     pub(crate) fn has_subclass(self) -> bool {
         self.next.has_subclass()
+    }
+
+    /// True, if we add a new model with a subclass.
+    pub(crate) fn new_with_subclass(self) -> bool {
+        self.previous.is_none() && self.has_subclass()
     }
 
     /// Whether the model has row level security enabled.
