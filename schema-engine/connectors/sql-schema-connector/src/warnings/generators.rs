@@ -581,7 +581,7 @@ pub(crate) fn non_default_index_null_sort_order(affected: &[IndexedColumn]) -> W
 }
 
 pub(super) fn row_level_security_tables_found(affected: &[Model]) -> Warning {
-    let message = "These tables contain row level security, which is not yet fully supported.";
+    let message = "These tables contain row level security, which is not yet fully supported. Read more: https://pris.ly/d/row-level-security";
 
     Warning {
         code: 30,

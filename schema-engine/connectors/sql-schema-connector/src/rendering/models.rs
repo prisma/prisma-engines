@@ -46,13 +46,13 @@ fn render_model(model: ModelPair<'_>, sql_family: SqlFamily) -> renderer::Model<
         }
     }
 
-    if model.is_partition() {
+    if model.new_with_partition() {
         let docs = "This table is a partition table and requires additional setup for migrations. Visit https://pris.ly/d/partition-tables for more info.";
 
         rendered.documentation(docs);
     }
 
-    if model.has_subclass() {
+    if model.new_with_subclass() {
         let docs = "This table has subclasses and requires additional setup for migrations. Visit https://pris.ly/d/table-inheritance for more info.";
 
         rendered.documentation(docs);
@@ -88,6 +88,30 @@ fn render_model(model: ModelPair<'_>, sql_family: SqlFamily) -> renderer::Model<
 
     if model.adds_a_description() {
         let docs = "This model is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments";
+        rendered.documentation(docs);
+    }
+
+    if model.adds_a_row_level_ttl() {
+        let docs = "This model is using a row level TTL in the database, and requires an additional setup in migrations. Read more: https://pris.ly/d/row-level-ttl";
+
+        rendered.documentation(docs);
+    }
+
+    if model.adds_non_default_deferring() {
+        let docs = "This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.";
+
+        rendered.documentation(docs);
+    }
+
+    if model.adds_row_level_security() {
+        let docs= "This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.";
+
+        rendered.documentation(docs);
+    }
+
+    if model.adds_non_default_null_position() {
+        let docs = "This model contains an index with non-default null sort order and requires additional setup for migrations. Visit https://pris.ly/d/default-index-null-ordering for more info.";
+
         rendered.documentation(docs);
     }
 
