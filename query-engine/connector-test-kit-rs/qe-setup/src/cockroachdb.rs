@@ -1,11 +1,13 @@
 use once_cell::sync::OnceCell;
-use quaint::{prelude::*, single::Quaint};
+use quaint::{connector::PostgresFlavour, prelude::*, single::Quaint};
 use schema_core::schema_connector::{ConnectorError, ConnectorResult};
 use url::Url;
 
 pub(crate) async fn cockroach_setup(url: String, prisma_schema: &str) -> ConnectorResult<()> {
     let mut url = Url::parse(&url).map_err(ConnectorError::url_parse_error)?;
-    let quaint_url = quaint::connector::PostgresUrl::new(url.clone()).unwrap();
+    let mut quaint_url = quaint::connector::PostgresUrl::new(url.clone()).unwrap();
+    quaint_url.set_flavour(PostgresFlavour::Cockroach);
+
     let db_name = quaint_url.dbname();
     let conn = create_admin_conn(&mut url).await?;
 
