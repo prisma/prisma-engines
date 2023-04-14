@@ -293,7 +293,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             (
                 row.get_expect_string("table_name"),
                 row.get_expect_string("create_options") == "partitioned",
-                row.get_string("table_comment").filter(|c| c != ""),
+                row.get_string("table_comment").filter(|c| !c.is_empty()),
             )
         });
 

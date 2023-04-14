@@ -184,7 +184,7 @@ async fn a_table_with_only_an_unsupported_id(api: &mut TestApi) -> TestResult {
     "#};
 
     let result = api.introspect().await?;
-    api.assert_eq_datamodels(&dm, &result);
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
