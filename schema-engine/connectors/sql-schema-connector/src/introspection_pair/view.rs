@@ -179,4 +179,10 @@ impl<'a> ViewPair<'a> {
     pub(crate) fn description(self) -> Option<&'a str> {
         self.next.description()
     }
+
+    /// True if we introspect the view for the first time, and it has a comment
+    /// in the database.
+    pub(crate) fn adds_a_description(self) -> bool {
+        self.previous.is_none() && self.description().is_some()
+    }
 }

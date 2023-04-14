@@ -46,6 +46,11 @@ fn render_enum(r#enum: EnumPair<'_>) -> renderer::Enum<'_> {
         rendered_enum.documentation(docs);
     }
 
+    if r#enum.adds_a_description() {
+        let docs = "This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments";
+        rendered_enum.documentation(docs);
+    }
+
     for variant in r#enum.variants() {
         let mut rendered_variant = renderer::EnumVariant::new(variant.name());
 

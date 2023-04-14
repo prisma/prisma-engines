@@ -407,8 +407,10 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
           url      = "env(TEST_DATABASE_URL)"
         }
 
+        /// This model is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
         model a {
           id  Int     @id
+          /// This field is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
           val String? @db.String(20)
         }
     "#]];

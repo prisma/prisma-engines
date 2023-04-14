@@ -232,4 +232,9 @@ impl<'a> ModelPair<'a> {
     pub(crate) fn description(self) -> Option<&'a str> {
         self.next.description()
     }
+
+    /// True if we have a new model and it has a comment.
+    pub(crate) fn adds_a_description(self) -> bool {
+        self.previous.is_none() && self.description().is_some()
+    }
 }
