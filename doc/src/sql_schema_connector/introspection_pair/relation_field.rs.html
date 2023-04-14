@@ -387,6 +387,21 @@
 <a href="#387" id="387">387</a>
 <a href="#388" id="388">388</a>
 <a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{datamodel_calculator::DatamodelCalculatorContext, introspection_pair::ModelPair};
 <span class="kw">use </span>psl::{
     datamodel_connector::constraint_names::ConstraintNames,
@@ -742,6 +757,21 @@
             RelationType::Inline(field) =&gt; !forward_relation_field_is_unique(field.next),
             RelationType::Emulated(field) =&gt; field.previous.ast_field().arity.is_list(),
             RelationType::Many2Many(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+        }
+    }
+
+    <span class="doccomment">/// True, if we add a new constraint with non-default deferring.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>adds_non_default_deferring(<span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.relation_type {
+            RelationType::Inline(field) =&gt; {
+                field.previous.is_none()
+                    &amp;&amp; <span class="self">self
+                        </span>.context
+                        .flavour
+                        .uses_non_default_foreign_key_deferring(<span class="self">self</span>.context, field.next)
+            }
+            RelationType::Many2Many(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+            RelationType::Emulated(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
         }
     }
 

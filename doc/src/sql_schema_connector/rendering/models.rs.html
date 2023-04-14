@@ -112,6 +112,30 @@
 <a href="#112" id="112">112</a>
 <a href="#113" id="113">113</a>
 <a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Rendering of model blocks.
 
 </span><span class="kw">use super</span>::{id, indexes, relation_field, scalar_field};
@@ -160,13 +184,13 @@
         }
     }
 
-    <span class="kw">if </span>model.is_partition() {
+    <span class="kw">if </span>model.new_with_partition() {
         <span class="kw">let </span>docs = <span class="string">&quot;This table is a partition table and requires additional setup for migrations. Visit https://pris.ly/d/partition-tables for more info.&quot;</span>;
 
         rendered.documentation(docs);
     }
 
-    <span class="kw">if </span>model.has_subclass() {
+    <span class="kw">if </span>model.new_with_subclass() {
         <span class="kw">let </span>docs = <span class="string">&quot;This table has subclasses and requires additional setup for migrations. Visit https://pris.ly/d/table-inheritance for more info.&quot;</span>;
 
         rendered.documentation(docs);
@@ -202,6 +226,30 @@
 
     <span class="kw">if </span>model.adds_a_description() {
         <span class="kw">let </span>docs = <span class="string">&quot;This model is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments&quot;</span>;
+        rendered.documentation(docs);
+    }
+
+    <span class="kw">if </span>model.adds_a_row_level_ttl() {
+        <span class="kw">let </span>docs = <span class="string">&quot;This model is using a row level TTL in the database, and requires an additional setup in migrations. Read more: https://pris.ly/d/row-level-ttl&quot;</span>;
+
+        rendered.documentation(docs);
+    }
+
+    <span class="kw">if </span>model.adds_non_default_deferring() {
+        <span class="kw">let </span>docs = <span class="string">&quot;This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.&quot;</span>;
+
+        rendered.documentation(docs);
+    }
+
+    <span class="kw">if </span>model.adds_row_level_security() {
+        <span class="kw">let </span>docs= <span class="string">&quot;This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.&quot;</span>;
+
+        rendered.documentation(docs);
+    }
+
+    <span class="kw">if </span>model.adds_non_default_null_position() {
+        <span class="kw">let </span>docs = <span class="string">&quot;This model contains an index with non-default null sort order and requires additional setup for migrations. Visit https://pris.ly/d/default-index-null-ordering for more info.&quot;</span>;
+
         rendered.documentation(docs);
     }
 

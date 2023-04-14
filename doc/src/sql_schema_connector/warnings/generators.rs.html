@@ -1202,7 +1202,7 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>row_level_security_tables_found(affected: <span class="kw-2">&amp;</span>[Model]) -&gt; Warning {
-    <span class="kw">let </span>message = <span class="string">&quot;These tables contain row level security, which is not yet fully supported.&quot;</span>;
+    <span class="kw">let </span>message = <span class="string">&quot;These tables contain row level security, which is not yet fully supported. Read more: https://pris.ly/d/row-level-security&quot;</span>;
 
     Warning {
         code: <span class="number">30</span>,

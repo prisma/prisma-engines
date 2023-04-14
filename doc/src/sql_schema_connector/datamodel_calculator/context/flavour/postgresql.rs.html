@@ -51,7 +51,37 @@
 <a href="#51" id="51">51</a>
 <a href="#52" id="52">52</a>
 <a href="#53" id="53">53</a>
-</pre><pre class="rust"><code><span class="kw">use </span>sql::postgres::PostgresSchemaExt;
+<a href="#54" id="54">54</a>
+<a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+</pre><pre class="rust"><code><span class="kw">use </span>sql::{postgres::PostgresSchemaExt, ForeignKeyWalker, IndexWalker, TableWalker};
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
 
 <span class="kw">use crate</span>::{
@@ -67,18 +97,16 @@
     }
 
     <span class="kw">fn </span>generate_warnings(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>DatamodelCalculatorContext&lt;<span class="lifetime">&#39;_</span>&gt;, warnings: <span class="kw-2">&amp;mut </span>Warnings) {
-        <span class="kw">let </span>pg_ext: <span class="kw-2">&amp;</span>PostgresSchemaExt = ctx.sql_schema.downcast_connector_data();
-
         <span class="kw">for </span>table <span class="kw">in </span>ctx.sql_schema.table_walkers() {
             <span class="kw">for </span>index <span class="kw">in </span>table.indexes() {
-                <span class="kw">for </span>column <span class="kw">in </span>index.columns().filter(|c| pg_ext.non_default_null_position(<span class="kw-2">*</span>c)) {
+                <span class="kw">for </span>column <span class="kw">in </span>index.columns().filter(|c| <span class="self">self</span>.uses_non_default_null_position(ctx, <span class="kw-2">*</span>c)) {
                     warnings.non_default_index_null_sort_order.push(IndexedColumn {
                         index_name: index.name().to_string(),
                         column_name: column.name().to_string(),
                     });
                 }
 
-                <span class="kw">if </span>pg_ext.non_default_index_constraint_deferring(index.id) {
+                <span class="kw">if </span><span class="self">self</span>.uses_non_default_index_deferring(ctx, index) {
                     warnings.non_default_deferring.push(ModelAndConstraint {
                         model: ctx.table_prisma_name(table.id).prisma_name().to_string(),
                         constraint: index.name().to_string(),
@@ -87,7 +115,7 @@
             }
 
             <span class="kw">for </span>fk <span class="kw">in </span>table.foreign_keys() {
-                <span class="kw">if </span>pg_ext.non_default_foreign_key_constraint_deferring(fk.id) {
+                <span class="kw">if </span><span class="self">self</span>.uses_non_default_foreign_key_deferring(ctx, fk) {
                     warnings.non_default_deferring.push(ModelAndConstraint {
                         model: ctx.table_prisma_name(table.id).prisma_name().to_string(),
                         <span class="comment">// unwrap: postgres fks always have a name
@@ -96,12 +124,44 @@
                 }
             }
 
-            <span class="kw">if </span>pg_ext.uses_row_level_ttl(table.id) &amp;&amp; ctx.is_cockroach() {
+            <span class="kw">if </span><span class="self">self</span>.uses_row_level_ttl(ctx, table) {
                 warnings.row_level_ttl.push(Model {
                     model: ctx.table_prisma_name(table.id).prisma_name().to_string(),
                 });
             }
         }
+    }
+
+    <span class="kw">fn </span>uses_row_level_ttl(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>DatamodelCalculatorContext&lt;<span class="lifetime">&#39;_</span>&gt;, table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+        <span class="kw">let </span>pg_ext: <span class="kw-2">&amp;</span>PostgresSchemaExt = ctx.sql_schema.downcast_connector_data();
+
+        ctx.is_cockroach() &amp;&amp; pg_ext.uses_row_level_ttl(table.id)
+    }
+
+    <span class="kw">fn </span>uses_non_default_index_deferring(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>DatamodelCalculatorContext&lt;<span class="lifetime">&#39;_</span>&gt;, index: IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+        <span class="kw">let </span>pg_ext: <span class="kw-2">&amp;</span>PostgresSchemaExt = ctx.sql_schema.downcast_connector_data();
+
+        pg_ext.non_default_index_constraint_deferring(index.id)
+    }
+
+    <span class="kw">fn </span>uses_non_default_foreign_key_deferring(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        ctx: <span class="kw-2">&amp;</span>DatamodelCalculatorContext&lt;<span class="lifetime">&#39;_</span>&gt;,
+        foreign_key: ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; bool {
+        <span class="kw">let </span>pg_ext: <span class="kw-2">&amp;</span>PostgresSchemaExt = ctx.sql_schema.downcast_connector_data();
+
+        pg_ext.non_default_foreign_key_constraint_deferring(foreign_key.id)
+    }
+
+    <span class="kw">fn </span>uses_non_default_null_position(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        ctx: <span class="kw-2">&amp;</span>DatamodelCalculatorContext&lt;<span class="lifetime">&#39;_</span>&gt;,
+        column: sql::IndexColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; bool {
+        <span class="kw">let </span>pg_ext: <span class="kw-2">&amp;</span>PostgresSchemaExt = ctx.sql_schema.downcast_connector_data();
+
+        pg_ext.non_default_null_position(column)
     }
 }
 </code></pre></div>
