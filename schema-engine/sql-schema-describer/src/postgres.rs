@@ -798,7 +798,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             FROM pg_catalog.pg_views views
             INNER JOIN pg_catalog.pg_namespace ns ON views.schemaname = ns.nspname
             INNER JOIN pg_catalog.pg_class class ON class.relnamespace = ns.oid AND class.relname = views.viewname
-            LEFT JOIN pg_catalog.pg_description description ON description.objoid = class.oid
+            LEFT JOIN pg_catalog.pg_description description ON description.objoid = class.oid AND description.objsubid = 0
             WHERE schemaname = ANY ( $1 )
         "#};
 

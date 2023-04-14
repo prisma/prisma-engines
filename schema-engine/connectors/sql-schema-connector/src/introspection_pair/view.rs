@@ -174,4 +174,9 @@ impl<'a> ViewPair<'a> {
             .definition()
             .map(|s| self.context.flavour.format_view_definition(s))
     }
+
+    /// The COMMENT of the view.
+    pub(crate) fn description(self) -> Option<&'a str> {
+        self.next.description()
+    }
 }

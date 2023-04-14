@@ -328,6 +328,7 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
         COMMENT ON COLUMN a.val IS 'meow';
         COMMENT ON VIEW b IS 'purr';
         COMMENT ON TYPE c IS 'hiss';
+        COMMENT ON COLUMN b.val IS 'miu';
     "#};
 
     api.raw_cmd(schema).await;
@@ -389,6 +390,14 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
               {
                 "type": "field",
                 "name": "a.val"
+              },
+              {
+                "type": "view",
+                "name": "b"
+              },
+              {
+                "type": "field",
+                "name": "b.val"
               }
             ]
           }
