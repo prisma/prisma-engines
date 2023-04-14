@@ -66,6 +66,11 @@
 <a href="#66" id="66">66</a>
 <a href="#67" id="67">67</a>
 <a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Rendering of enumerators.
 
 </span><span class="kw">use crate</span>::{
@@ -111,6 +116,11 @@
     }
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(docs) = r#enum.documentation() {
+        rendered_enum.documentation(docs);
+    }
+
+    <span class="kw">if </span>r#enum.adds_a_description() {
+        <span class="kw">let </span>docs = <span class="string">&quot;This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments&quot;</span>;
         rendered_enum.documentation(docs);
     }
 

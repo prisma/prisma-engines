@@ -37,6 +37,11 @@
 <a href="#37" id="37">37</a>
 <a href="#38" id="38">38</a>
 <a href="#39" id="39">39</a>
+<a href="#40" id="40">40</a>
+<a href="#41" id="41">41</a>
+<a href="#42" id="42">42</a>
+<a href="#43" id="43">43</a>
+<a href="#44" id="44">44</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::ops::Range;
 
 <span class="kw">use crate</span>::{View, ViewColumnId, ViewColumnWalker, ViewId, Walker};
@@ -66,6 +71,11 @@
     <span class="doccomment">/// Traverse the view&#39;s columns.
     </span><span class="kw">pub fn </span>columns(<span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = ViewColumnWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
         <span class="self">self</span>.columns_range().map(<span class="kw">move </span>|idx| <span class="self">self</span>.walk(ViewColumnId(idx <span class="kw">as </span>u32)))
+    }
+
+    <span class="doccomment">/// Description (comment) of the view.
+    </span><span class="kw">pub fn </span>description(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        <span class="self">self</span>.get().description.as_deref()
     }
 
     <span class="kw">fn </span>columns_range(<span class="self">self</span>) -&gt; Range&lt;usize&gt; {

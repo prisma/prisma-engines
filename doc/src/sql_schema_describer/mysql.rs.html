@@ -857,6 +857,14 @@
 <a href="#857" id="857">857</a>
 <a href="#858" id="858">858</a>
 <a href="#859" id="859">859</a>
+<a href="#860" id="860">860</a>
+<a href="#861" id="861">861</a>
+<a href="#862" id="862">862</a>
+<a href="#863" id="863">863</a>
+<a href="#864" id="864">864</a>
+<a href="#865" id="865">865</a>
+<a href="#866" id="866">866</a>
+<a href="#867" id="867">867</a>
 </pre><pre class="rust"><code><span class="doccomment">//! MySQL schema description.
 
 </span><span class="kw">use crate</span>::{getters::Getter, parsers::Parser, <span class="kw-2">*</span>};
@@ -1095,6 +1103,7 @@
                 namespace_id: NamespaceId(<span class="number">0</span>),
                 name: row.get_expect_string(<span class="string">&quot;view_name&quot;</span>),
                 definition: row.get_string(<span class="string">&quot;view_sql&quot;</span>),
+                description: <span class="prelude-val">None</span>,
             })
         }
 
@@ -1135,7 +1144,8 @@
         </span><span class="kw">let </span>sql = <span class="string">r#&quot;
             SELECT DISTINCT
               BINARY table_info.table_name AS table_name,
-              table_info.create_options AS create_options
+              table_info.create_options AS create_options,
+              table_info.table_comment AS table_comment
             FROM information_schema.tables AS table_info
             JOIN information_schema.columns AS column_info
                 ON BINARY column_info.table_name = BINARY table_info.table_name
@@ -1150,21 +1160,23 @@
             (
                 row.get_expect_string(<span class="string">&quot;table_name&quot;</span>),
                 row.get_expect_string(<span class="string">&quot;create_options&quot;</span>) == <span class="string">&quot;partitioned&quot;</span>,
+                row.get_string(<span class="string">&quot;table_comment&quot;</span>).filter(|c| !c.is_empty()),
             )
         });
 
         <span class="kw">let </span><span class="kw-2">mut </span>map = IndexMap::default();
 
-        <span class="kw">for </span>(name, is_partition) <span class="kw">in </span>names {
+        <span class="kw">for </span>(name, is_partition, description) <span class="kw">in </span>names {
             <span class="kw">let </span>cloned_name = name.clone();
             <span class="kw">let </span>id = <span class="kw">if </span>is_partition {
                 sql_schema.push_table_with_properties(
                     name,
                     Default::default(),
                     Into::into(TableProperties::IsPartition),
+                    description,
                 )
             } <span class="kw">else </span>{
-                sql_schema.push_table(name, Default::default())
+                sql_schema.push_table(name, Default::default(), description)
             };
             map.insert(cloned_name, id);
         }
@@ -1220,7 +1232,8 @@
                 column_default column_default,
                 is_nullable is_nullable,
                 extra extra,
-                table_name table_name
+                table_name table_name,
+                IF(column_comment = &#39;&#39;, NULL, column_comment) AS column_comment
             FROM information_schema.columns
             WHERE table_schema = ?
             ORDER BY ordinal_position
@@ -1389,10 +1402,13 @@
                 }
             }
 
+            <span class="kw">let </span>description = col.get_string(<span class="string">&quot;column_comment&quot;</span>);
+
             <span class="kw">let </span>col = Column {
                 name,
                 tpe,
                 auto_increment,
+                description,
             };
 
             <span class="kw">match </span>container_id {
@@ -1504,7 +1520,7 @@
             <span class="string">&quot;longtext&quot; </span>=&gt; (ColumnTypeFamily::String, <span class="prelude-val">Some</span>(MySqlType::LongText)),
             <span class="string">&quot;enum&quot; </span>=&gt; {
                 <span class="kw">let </span>enum_name = <span class="macro">format!</span>(<span class="string">&quot;{table}_{column_name}&quot;</span>);
-                <span class="kw">let </span>enum_id = sql_schema.push_enum(Default::default(), enum_name);
+                <span class="kw">let </span>enum_id = sql_schema.push_enum(Default::default(), enum_name, <span class="prelude-val">None</span>);
                 push_enum_variants(full_data_type, enum_id, sql_schema);
                 (ColumnTypeFamily::Enum(enum_id), <span class="prelude-val">None</span>)
             }

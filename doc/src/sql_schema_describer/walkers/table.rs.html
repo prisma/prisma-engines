@@ -120,6 +120,11 @@
 <a href="#120" id="120">120</a>
 <a href="#121" id="121">121</a>
 <a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::ops::Range;
 
 <span class="kw">use crate</span>::{
@@ -235,6 +240,11 @@
     <span class="doccomment">/// Does the table have row level security enabled?
     </span><span class="kw">pub fn </span>has_row_level_security(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.table().properties.contains(TableProperties::HasRowLevelSecurity)
+    }
+
+    <span class="doccomment">/// Description (comment) of the table.
+    </span><span class="kw">pub fn </span>description(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        <span class="self">self</span>.table().description.as_deref()
     }
 
     <span class="doccomment">/// Reference to the underlying `Table` struct.

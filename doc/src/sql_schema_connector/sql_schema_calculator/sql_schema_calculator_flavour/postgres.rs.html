@@ -410,10 +410,10 @@
                 .schema()
                 .and_then(|(name, <span class="kw">_</span>)| ctx.schemas.get(name).cloned())
                 .unwrap_or_default();
-            <span class="kw">let </span>sql_enum_id = ctx
-                .schema
-                .describer_schema
-                .push_enum(sql_namespace_id, prisma_enum.database_name().to_owned());
+            <span class="kw">let </span>sql_enum_id =
+                ctx.schema
+                    .describer_schema
+                    .push_enum(sql_namespace_id, prisma_enum.database_name().to_owned(), <span class="prelude-val">None</span>);
             ctx.enum_ids.insert(prisma_enum.id, sql_enum_id);
 
             <span class="kw">for </span>value <span class="kw">in </span>prisma_enum.values() {

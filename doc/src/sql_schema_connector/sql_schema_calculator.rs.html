@@ -603,6 +603,14 @@
 <a href="#603" id="603">603</a>
 <a href="#604" id="604">604</a>
 <a href="#605" id="605">605</a>
+<a href="#606" id="606">606</a>
+<a href="#607" id="607">607</a>
+<a href="#608" id="608">608</a>
+<a href="#609" id="609">609</a>
+<a href="#610" id="610">610</a>
+<a href="#611" id="611">611</a>
+<a href="#612" id="612">612</a>
+<a href="#613" id="613">613</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>sql_schema_calculator_flavour;
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">use </span>sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
@@ -665,7 +673,7 @@
         <span class="kw">let </span>table_id = ctx
             .schema
             .describer_schema
-            .push_table(model.database_name().to_owned(), namespace_id);
+            .push_table(model.database_name().to_owned(), namespace_id, <span class="prelude-val">None</span>);
         ctx.model_id_to_table_id.insert(model.model_id(), table_id);
 
         <span class="kw">for </span>field <span class="kw">in </span>model.scalar_fields() {
@@ -824,7 +832,10 @@
         };
 
         <span class="kw">let </span>namespace_id = ctx.walk(model_a_table_id).namespace_id(); <span class="comment">// we put the join table in the schema of table A.
-        </span><span class="kw">let </span>table_id = ctx.schema.describer_schema.push_table(table_name.clone(), namespace_id);
+        </span><span class="kw">let </span>table_id = ctx
+            .schema
+            .describer_schema
+            .push_table(table_name.clone(), namespace_id, <span class="prelude-val">None</span>);
         <span class="kw">let </span>column_a_type = ctx
             .walk(model_a_table_id)
             .primary_key_columns()
@@ -850,6 +861,7 @@
                 name: model_a_column.into(),
                 tpe: column_a_type,
                 auto_increment: <span class="bool-val">false</span>,
+                description: <span class="prelude-val">None</span>,
             },
         );
         <span class="kw">let </span>column_b_id = ctx.schema.describer_schema.push_table_column(
@@ -858,6 +870,7 @@
                 name: model_b_column.into(),
                 tpe: column_b_type,
                 auto_increment: <span class="bool-val">false</span>,
+                description: <span class="prelude-val">None</span>,
             },
         );
 
@@ -1003,6 +1016,7 @@
             column_arity(field.ast_field().arity),
         ),
         auto_increment: <span class="bool-val">false</span>,
+        description: <span class="prelude-val">None</span>,
     };
 
     ctx.schema.describer_schema.push_table_column(table_id, column);
@@ -1037,6 +1051,7 @@
             field.ast_field().field_type.as_unsupported().unwrap().<span class="number">0</span>.to_owned(),
         ),
         auto_increment: <span class="bool-val">false</span>,
+        description: <span class="prelude-val">None</span>,
     };
 
     ctx.schema.describer_schema.push_table_column(table_id, column);
@@ -1122,6 +1137,7 @@
             native_type: <span class="prelude-val">Some</span>(native_type),
         },
         auto_increment: field.is_autoincrement() || ctx.flavour.field_is_implicit_autoincrement_primary_key(field),
+        description: <span class="prelude-val">None</span>,
     };
 
     <span class="kw">let </span>column_id = ctx.schema.describer_schema.push_table_column(table_id, column);

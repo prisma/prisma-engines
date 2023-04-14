@@ -209,6 +209,16 @@
 <a href="#209" id="209">209</a>
 <a href="#210" id="210">210</a>
 <a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::sanitize_datamodel_names;
 <span class="kw">use </span>either::Either;
 <span class="kw">use </span>psl::{
@@ -414,6 +424,16 @@
     </span><span class="kw">pub fn </span>default(<span class="self">self</span>) -&gt; DefaultValuePair&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="kw">let </span>previous = <span class="self">self</span>.previous.and_then(|prev| prev.default_value());
         IntrospectionPair::new(<span class="self">self</span>.context, previous, <span class="self">self</span>.next)
+    }
+
+    <span class="doccomment">/// The COMMENT of the field.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>description(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        <span class="self">self</span>.next.description()
+    }
+
+    <span class="doccomment">/// True if we have a new field and it has a comment.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>adds_a_description(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.previous.is_none() &amp;&amp; <span class="self">self</span>.description().is_some()
     }
 
     <span class="kw">fn </span>column_type_family(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>sql::ColumnTypeFamily {

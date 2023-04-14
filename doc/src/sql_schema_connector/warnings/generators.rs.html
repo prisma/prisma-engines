@@ -601,6 +601,24 @@
 <a href="#601" id="601">601</a>
 <a href="#602" id="602">602</a>
 <a href="#603" id="603">603</a>
+<a href="#604" id="604">604</a>
+<a href="#605" id="605">605</a>
+<a href="#606" id="606">606</a>
+<a href="#607" id="607">607</a>
+<a href="#608" id="608">608</a>
+<a href="#609" id="609">609</a>
+<a href="#610" id="610">610</a>
+<a href="#611" id="611">611</a>
+<a href="#612" id="612">612</a>
+<a href="#613" id="613">613</a>
+<a href="#614" id="614">614</a>
+<a href="#615" id="615">615</a>
+<a href="#616" id="616">616</a>
+<a href="#617" id="617">617</a>
+<a href="#618" id="618">618</a>
+<a href="#619" id="619">619</a>
+<a href="#620" id="620">620</a>
+<a href="#621" id="621">621</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Warnings generator for Introspection
 
 </span><span class="kw">use </span>schema_connector::Warning;
@@ -664,6 +682,8 @@
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) row_level_ttl: Vec&lt;Model&gt;,
     <span class="doccomment">/// Warn about non-default unique deferring setup
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) non_default_deferring: Vec&lt;ModelAndConstraint&gt;,
+    <span class="doccomment">/// Warn about comments
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) objects_with_comments: Vec&lt;Object&gt;,
 }
 
 <span class="kw">impl </span>Warnings {
@@ -820,8 +840,8 @@
         );
 
         maybe_warn(<span class="kw-2">&amp;</span><span class="self">self</span>.row_level_ttl, row_level_ttl_in_tables, <span class="kw-2">&amp;mut </span><span class="self">self</span>.warnings);
-
         maybe_warn(<span class="kw-2">&amp;</span><span class="self">self</span>.non_default_deferring, non_default_deferring, <span class="kw-2">&amp;mut </span><span class="self">self</span>.warnings);
+        maybe_warn(<span class="kw-2">&amp;</span><span class="self">self</span>.objects_with_comments, commented_objects, <span class="kw-2">&amp;mut </span><span class="self">self</span>.warnings);
 
         <span class="self">self</span>.warnings
     }
@@ -940,6 +960,12 @@
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) r#type: TopLevelType,
     <span class="doccomment">/// The name of the object
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) name: String,
+}
+
+<span class="attr">#[derive(Serialize, Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Object {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) r#type: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) name: String,
 }
 
 <span class="doccomment">/// An indexed column that triggered a warning.
@@ -1200,6 +1226,16 @@
 
     Warning {
         code: <span class="number">35</span>,
+        message: message.into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>commented_objects(affected: <span class="kw-2">&amp;</span>[Object]) -&gt; Warning {
+    <span class="kw">let </span>message = <span class="string">&quot;These objects have comments defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/database-comments&quot;</span>;
+
+    Warning {
+        code: <span class="number">36</span>,
         message: message.into(),
         affected: serde_json::to_value(affected).unwrap(),
     }

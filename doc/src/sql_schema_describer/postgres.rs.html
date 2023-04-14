@@ -1622,6 +1622,26 @@
 <a href="#1622" id="1622">1622</a>
 <a href="#1623" id="1623">1623</a>
 <a href="#1624" id="1624">1624</a>
+<a href="#1625" id="1625">1625</a>
+<a href="#1626" id="1626">1626</a>
+<a href="#1627" id="1627">1627</a>
+<a href="#1628" id="1628">1628</a>
+<a href="#1629" id="1629">1629</a>
+<a href="#1630" id="1630">1630</a>
+<a href="#1631" id="1631">1631</a>
+<a href="#1632" id="1632">1632</a>
+<a href="#1633" id="1633">1633</a>
+<a href="#1634" id="1634">1634</a>
+<a href="#1635" id="1635">1635</a>
+<a href="#1636" id="1636">1636</a>
+<a href="#1637" id="1637">1637</a>
+<a href="#1638" id="1638">1638</a>
+<a href="#1639" id="1639">1639</a>
+<a href="#1640" id="1640">1640</a>
+<a href="#1641" id="1641">1641</a>
+<a href="#1642" id="1642">1642</a>
+<a href="#1643" id="1643">1643</a>
+<a href="#1644" id="1644">1644</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.
 
 </span><span class="kw">mod </span>default;
@@ -2353,6 +2373,7 @@
                 row.get_expect_bool(<span class="string">&quot;is_partition&quot;</span>),
                 row.get_expect_bool(<span class="string">&quot;has_subclass&quot;</span>),
                 row.get_expect_bool(<span class="string">&quot;has_row_level_security&quot;</span>),
+                row.get_string(<span class="string">&quot;description&quot;</span>),
             ));
 
             pg_ext.table_options.push(options);
@@ -2360,7 +2381,7 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>map = IndexMap::default();
 
-        <span class="kw">for </span>(table_name, namespace, is_partition, has_subclass, has_row_level_security) <span class="kw">in </span>names {
+        <span class="kw">for </span>(table_name, namespace, is_partition, has_subclass, has_row_level_security, description) <span class="kw">in </span>names {
             <span class="kw">let </span>cloned_name = table_name.clone();
 
             <span class="kw">let </span>partition = <span class="kw">if </span>is_partition {
@@ -2384,6 +2405,7 @@
                 table_name,
                 sql_schema.get_namespace_id(<span class="kw-2">&amp;</span>namespace).unwrap(),
                 partition | subclass | row_level_security,
+                description,
             );
 
             map.insert((namespace, cloned_name), id);
@@ -2412,8 +2434,15 @@
     <span class="kw">async fn </span>get_views(<span class="kw-2">&amp;</span><span class="self">self</span>, sql_schema: <span class="kw-2">&amp;mut </span>SqlSchema) -&gt; DescriberResult&lt;()&gt; {
         <span class="kw">let </span>namespaces = <span class="kw-2">&amp;</span>sql_schema.namespaces;
         <span class="kw">let </span>sql = <span class="macro">indoc! </span>{<span class="string">r#&quot;
-            SELECT viewname AS view_name, definition AS view_sql, schemaname as namespace
-            FROM pg_catalog.pg_views
+            SELECT
+                views.viewname AS view_name,
+                views.definition AS view_sql,
+                views.schemaname AS namespace,
+                description.description AS description
+            FROM pg_catalog.pg_views views
+            INNER JOIN pg_catalog.pg_namespace ns ON views.schemaname = ns.nspname
+            INNER JOIN pg_catalog.pg_class class ON class.relnamespace = ns.oid AND class.relname = views.viewname
+            LEFT JOIN pg_catalog.pg_description description ON description.objoid = class.oid AND description.objsubid = 0
             WHERE schemaname = ANY ( $1 )
         &quot;#</span>};
 
@@ -2424,19 +2453,18 @@
                 <span class="kw-2">&amp;</span>[Array(<span class="prelude-val">Some</span>(namespaces.iter().map(|v| v.as_str().into()).collect()))],
             )
             .<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let </span><span class="kw-2">mut </span>views = Vec::with_capacity(result_set.len());
 
         <span class="kw">for </span>row <span class="kw">in </span>result_set.into_iter() {
-            views.push(View {
-                namespace_id: sql_schema
-                    .get_namespace_id(<span class="kw-2">&amp;</span>row.get_expect_string(<span class="string">&quot;namespace&quot;</span>))
-                    .unwrap(),
-                name: row.get_expect_string(<span class="string">&quot;view_name&quot;</span>),
-                definition: row.get_string(<span class="string">&quot;view_sql&quot;</span>),
-            })
-        }
+            <span class="kw">let </span>name = row.get_expect_string(<span class="string">&quot;view_name&quot;</span>);
+            <span class="kw">let </span>definition = row.get_string(<span class="string">&quot;view_sql&quot;</span>);
+            <span class="kw">let </span>description = row.get_string(<span class="string">&quot;description&quot;</span>);
 
-        sql_schema.views = views;
+            <span class="kw">let </span>namespace_id = sql_schema
+                .get_namespace_id(<span class="kw-2">&amp;</span>row.get_expect_string(<span class="string">&quot;namespace&quot;</span>))
+                .unwrap();
+
+            sql_schema.push_view(name, namespace_id, definition, description);
+        }
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -2469,7 +2497,8 @@
                 pg_get_expr(attdef.adbin, attdef.adrelid) AS column_default,
                 info.is_nullable,
                 info.is_identity,
-                info.character_maximum_length
+                info.character_maximum_length,
+                description.description
             FROM information_schema.columns info
             JOIN pg_attribute att ON att.attname = info.column_name
             JOIN (
@@ -2481,6 +2510,7 @@
                   AND relname = info.table_name
                   AND namespace = info.table_schema
             LEFT OUTER JOIN pg_attrdef attdef ON attdef.adrelid = att.attrelid AND attdef.adnum = att.attnum AND table_schema = namespace
+            LEFT OUTER JOIN pg_description description ON description.objoid = att.attrelid AND description.objsubid = ordinal_position
             WHERE table_schema = ANY ( $1 ) {is_visible_clause}
             ORDER BY namespace, table_name, ordinal_position;
         &quot;#
@@ -2531,6 +2561,8 @@
                 .and_then(|raw_default_value| raw_default_value.to_string())
                 .and_then(|raw_default_value| get_default_value(<span class="kw-2">&amp;</span>raw_default_value, <span class="kw-2">&amp;</span>tpe));
 
+            <span class="kw">let </span>description = col.get_string(<span class="string">&quot;description&quot;</span>);
+
             <span class="kw">let </span>auto_increment = is_identity
                 || <span class="macro">matches!</span>(default.as_ref().map(|d| <span class="kw-2">&amp;</span>d.kind), <span class="prelude-val">Some</span>(DefaultKind::Sequence(<span class="kw">_</span>)))
                 || (<span class="self">self</span>.is_cockroach()
@@ -2552,6 +2584,7 @@
                 name,
                 tpe,
                 auto_increment,
+                description,
             };
 
             <span class="kw">match </span>container_id {
@@ -3029,10 +3062,11 @@
         <span class="kw">let </span>namespaces = <span class="kw-2">&amp;</span>sql_schema.namespaces;
 
         <span class="kw">let </span>sql = <span class="string">&quot;
-            SELECT t.typname as name, e.enumlabel as value, n.nspname as namespace
+            SELECT t.typname as name, e.enumlabel as value, n.nspname as namespace, d.description
             FROM pg_type t
             JOIN pg_enum e ON t.oid = e.enumtypid
             JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
+            LEFT OUTER JOIN pg_description d ON d.objoid = t.oid
             WHERE n.nspname = ANY ( $1 )
             ORDER BY e.enumsortorder&quot;</span>;
 
@@ -3043,19 +3077,25 @@
                 <span class="kw-2">&amp;</span>[Array(<span class="prelude-val">Some</span>(namespaces.iter().map(|v| v.as_str().into()).collect()))],
             )
             .<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let </span><span class="kw-2">mut </span>enum_values: BTreeMap&lt;(NamespaceId, String), Vec&lt;String&gt;&gt; = BTreeMap::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>enum_values: BTreeMap&lt;(NamespaceId, String, <span class="prelude-ty">Option</span>&lt;String&gt;), Vec&lt;String&gt;&gt; = BTreeMap::new();
 
         <span class="kw">for </span>row <span class="kw">in </span>rows.into_iter() {
             <span class="kw">let </span>name = row.get_expect_string(<span class="string">&quot;name&quot;</span>);
             <span class="kw">let </span>value = row.get_expect_string(<span class="string">&quot;value&quot;</span>);
             <span class="kw">let </span>namespace = row.get_expect_string(<span class="string">&quot;namespace&quot;</span>);
+            <span class="kw">let </span>description = row.get_string(<span class="string">&quot;description&quot;</span>);
             <span class="kw">let </span>namespace_id = sql_schema.get_namespace_id(<span class="kw-2">&amp;</span>namespace).unwrap();
-            <span class="kw">let </span>values = enum_values.entry((namespace_id, name)).or_insert_with(Vec::new);
+
+            <span class="kw">let </span>values = enum_values
+                .entry((namespace_id, name, description))
+                .or_insert_with(Vec::new);
+
             values.push(value);
         }
 
-        <span class="kw">for </span>((namespace_id, enum_name), variants) <span class="kw">in </span>enum_values {
-            <span class="kw">let </span>enum_id = sql_schema.push_enum(namespace_id, enum_name);
+        <span class="kw">for </span>((namespace_id, enum_name, description), variants) <span class="kw">in </span>enum_values {
+            <span class="kw">let </span>enum_id = sql_schema.push_enum(namespace_id, enum_name, description);
+
             <span class="kw">for </span>variant <span class="kw">in </span>variants {
                 sql_schema.push_enum_variant(enum_id, variant);
             }

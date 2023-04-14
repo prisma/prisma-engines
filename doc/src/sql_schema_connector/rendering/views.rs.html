@@ -93,6 +93,11 @@
 <a href="#93" id="93">93</a>
 <a href="#94" id="94">94</a>
 <a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     datamodel_calculator::DatamodelCalculatorContext, introspection_helpers <span class="kw">as </span>helpers, introspection_pair::ViewPair,
 };
@@ -171,6 +176,11 @@
 
     <span class="kw">if </span>!view.has_usable_identifier() &amp;&amp; !view.ignored_in_psl() {
         <span class="kw">let </span>docs = <span class="string">&quot;The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.&quot;</span>;
+        rendered.documentation(docs);
+    }
+
+    <span class="kw">if </span>view.adds_a_description() {
+        <span class="kw">let </span>docs = <span class="string">&quot;This view is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments&quot;</span>;
         rendered.documentation(docs);
     }
 

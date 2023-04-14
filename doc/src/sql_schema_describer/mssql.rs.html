@@ -883,6 +883,8 @@
 <a href="#883" id="883">883</a>
 <a href="#884" id="884">884</a>
 <a href="#885" id="885">885</a>
+<a href="#886" id="886">886</a>
+<a href="#887" id="887">887</a>
 </pre><pre class="rust"><code><span class="doccomment">//! SQL server schema description.
 
 </span><span class="kw">use crate</span>::{
@@ -1111,7 +1113,7 @@
             };
 
             <span class="kw">let </span>cloned_name = table_name.clone();
-            <span class="kw">let </span>id = sql_schema.push_table(table_name, namespace_id);
+            <span class="kw">let </span>id = sql_schema.push_table(table_name, namespace_id, <span class="prelude-val">None</span>);
             map.insert((namespace, cloned_name), id);
         }
 
@@ -1280,6 +1282,7 @@
                 name,
                 tpe,
                 auto_increment,
+                description: <span class="prelude-val">None</span>,
             };
 
             <span class="kw">match </span>container_id {
@@ -1463,6 +1466,7 @@
                 namespace_id,
                 name: row.get_expect_string(<span class="string">&quot;view_name&quot;</span>),
                 definition: row.get_string(<span class="string">&quot;view_sql&quot;</span>),
+                description: <span class="prelude-val">None</span>,
             })
         }
 

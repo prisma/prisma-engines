@@ -42,7 +42,7 @@
                 model_name = field.model().database_name(),
                 field_name = field.database_name()
             );
-            <span class="kw">let </span>sql_enum_id = ctx.schema.describer_schema.push_enum(Default::default(), name);
+            <span class="kw">let </span>sql_enum_id = ctx.schema.describer_schema.push_enum(Default::default(), name, <span class="prelude-val">None</span>);
             ctx.enum_ids.insert(enum_tpe.id, sql_enum_id);
             <span class="kw">for </span>variant <span class="kw">in </span>enum_tpe.values().map(|v| v.database_name().to_owned()) {
                 ctx.schema.describer_schema.push_enum_variant(sql_enum_id, variant);

@@ -118,6 +118,11 @@
 <a href="#118" id="118">118</a>
 <a href="#119" id="119">119</a>
 <a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>index_column;
 <span class="kw">mod </span>table_column;
 <span class="kw">mod </span>view_column;
@@ -229,6 +234,11 @@
     <span class="doccomment">/// True if the column is defined in a view.
     </span><span class="kw">pub fn </span>is_in_view(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.id.is_right()
+    }
+
+    <span class="doccomment">/// Description (comment) of the column.
+    </span><span class="kw">pub fn </span>description(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        <span class="self">self</span>.get().description.as_deref()
     }
 
     <span class="kw">fn </span>get(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Column {

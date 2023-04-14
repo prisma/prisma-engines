@@ -614,6 +614,7 @@
 <a href="#614" id="614">614</a>
 <a href="#615" id="615">615</a>
 <a href="#616" id="616">616</a>
+<a href="#617" id="617">617</a>
 </pre><pre class="rust"><code><span class="doccomment">//! SQLite description.
 
 </span><span class="kw">use crate</span>::{
@@ -787,11 +788,11 @@
 
             <span class="kw">match </span>r#type.as_str() {
                 <span class="string">&quot;table&quot; </span>=&gt; {
-                    <span class="kw">let </span>id = schema.push_table(name, Default::default());
+                    <span class="kw">let </span>id = schema.push_table(name, Default::default(), <span class="prelude-val">None</span>);
                     map.insert(cloned_name, Either::Left(id));
                 }
                 <span class="string">&quot;view&quot; </span>=&gt; {
-                    <span class="kw">let </span>id = schema.push_view(name, Default::default(), definition);
+                    <span class="kw">let </span>id = schema.push_view(name, Default::default(), definition, <span class="prelude-val">None</span>);
                     map.insert(cloned_name, Either::Right(id));
                 }
                 <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
@@ -1016,6 +1017,7 @@
             name: row.get_expect_string(<span class="string">&quot;name&quot;</span>),
             tpe,
             auto_increment: <span class="bool-val">false</span>,
+            description: <span class="prelude-val">None</span>,
         };
 
         <span class="kw">match </span>container_id {
