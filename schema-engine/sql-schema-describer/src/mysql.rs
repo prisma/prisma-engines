@@ -278,7 +278,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             SELECT DISTINCT
               BINARY table_info.table_name AS table_name,
               table_info.create_options AS create_options,
-              IF(table_info.table_comment = '', NULL, table_info.table_comment) AS table_comment
+              table_info.table_comment AS table_comment
             FROM information_schema.tables AS table_info
             JOIN information_schema.columns AS column_info
                 ON BINARY column_info.table_name = BINARY table_info.table_name
@@ -293,7 +293,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             (
                 row.get_expect_string("table_name"),
                 row.get_expect_string("create_options") == "partitioned",
-                row.get_string("table_comment"),
+                row.get_string("table_comment").filter(|c| c != ""),
             )
         });
 
@@ -535,7 +535,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 }
             }
 
-            let description = col.get_string("table_comment");
+            let description = col.get_string("column_comment");
 
             let col = Column {
                 name,

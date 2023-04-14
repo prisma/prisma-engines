@@ -849,6 +849,10 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
               {
                 "type": "model",
                 "name": "a"
+              },
+              {
+                "type": "field",
+                "name": "a.a"
               }
             ]
           }
