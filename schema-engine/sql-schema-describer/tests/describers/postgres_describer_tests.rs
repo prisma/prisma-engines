@@ -142,6 +142,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
             ],
             enums: [],
@@ -162,6 +163,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -179,6 +181,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -196,6 +199,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -213,6 +217,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -230,6 +235,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -247,6 +253,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -264,6 +271,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -281,6 +289,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -298,6 +307,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -315,6 +325,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: true,
+                        description: None,
                     },
                 ),
                 (
@@ -332,6 +343,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -349,6 +361,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -366,6 +379,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -383,6 +397,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -400,6 +415,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -417,6 +433,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -434,6 +451,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -451,6 +469,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -468,6 +487,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -485,6 +505,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -502,6 +523,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -519,6 +541,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -536,6 +559,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -553,6 +577,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -570,6 +595,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -587,6 +613,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -604,6 +631,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -621,6 +649,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -638,6 +667,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: true,
+                        description: None,
                     },
                 ),
                 (
@@ -655,6 +685,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: true,
+                        description: None,
                     },
                 ),
                 (
@@ -672,6 +703,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: true,
+                        description: None,
                     },
                 ),
                 (
@@ -689,6 +721,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -706,6 +739,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -723,6 +757,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -740,6 +775,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -757,6 +793,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -774,6 +811,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -791,6 +829,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -808,6 +847,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -825,6 +865,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -842,6 +883,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -859,6 +901,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -876,6 +919,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
             ],
@@ -1270,6 +1314,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
             ],
             enums: [],
@@ -1290,6 +1335,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1307,6 +1353,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1324,6 +1371,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1341,6 +1389,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
             ],
@@ -1445,6 +1494,7 @@ fn seemingly_escaped_backslashes_in_string_literals_must_not_be_unescaped(api: T
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
             ],
             enums: [],
@@ -1465,6 +1515,7 @@ fn seemingly_escaped_backslashes_in_string_literals_must_not_be_unescaped(api: T
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
             ],
@@ -1802,6 +1853,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
                 Table {
                     namespace_id: NamespaceId(
@@ -1811,6 +1863,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
             ],
             enums: [],
@@ -1831,6 +1884,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: true,
+                        description: None,
                     },
                 ),
                 (
@@ -1848,6 +1902,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1865,6 +1920,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: true,
+                        description: None,
                     },
                 ),
                 (
@@ -1882,6 +1938,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
             ],
@@ -2026,6 +2083,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
                 Table {
                     namespace_id: NamespaceId(
@@ -2035,6 +2093,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
                 Table {
                     namespace_id: NamespaceId(
@@ -2044,6 +2103,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
                 Table {
                     namespace_id: NamespaceId(
@@ -2053,6 +2113,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
                 Table {
                     namespace_id: NamespaceId(
@@ -2062,6 +2123,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
             ],
             enums: [],
@@ -2082,6 +2144,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2099,6 +2162,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: true,
+                        description: None,
                     },
                 ),
                 (
@@ -2116,6 +2180,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: true,
+                        description: None,
                     },
                 ),
                 (
@@ -2133,6 +2198,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2150,6 +2216,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: true,
+                        description: None,
                     },
                 ),
                 (
@@ -2167,6 +2234,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: true,
+                        description: None,
                     },
                 ),
                 (
@@ -2184,6 +2252,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2201,6 +2270,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: true,
+                        description: None,
                     },
                 ),
                 (
@@ -2218,6 +2288,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
             ],

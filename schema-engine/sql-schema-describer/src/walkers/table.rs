@@ -115,6 +115,11 @@ impl<'a> TableWalker<'a> {
         self.table().properties.contains(TableProperties::HasRowLevelSecurity)
     }
 
+    /// Description (comment) of the table.
+    pub fn description(self) -> Option<&'a str> {
+        self.table().description.as_deref()
+    }
+
     /// Reference to the underlying `Table` struct.
     fn table(self) -> &'a Table {
         &self.schema.tables[self.id.0 as usize]

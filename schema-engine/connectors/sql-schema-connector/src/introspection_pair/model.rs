@@ -227,4 +227,14 @@ impl<'a> ModelPair<'a> {
                 (!pair.defined_in_a_field()).then_some(pair)
             })
     }
+
+    /// The COMMENT of the model.
+    pub(crate) fn description(self) -> Option<&'a str> {
+        self.next.description()
+    }
+
+    /// True if we have a new model and it has a comment.
+    pub(crate) fn adds_a_description(self) -> bool {
+        self.previous.is_none() && self.description().is_some()
+    }
 }

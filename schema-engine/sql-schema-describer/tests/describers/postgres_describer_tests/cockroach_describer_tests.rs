@@ -240,6 +240,7 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
             ],
             enums: [],
@@ -260,6 +261,7 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -277,6 +279,7 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -294,6 +297,7 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
             ],

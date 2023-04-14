@@ -309,3 +309,106 @@ async fn deferrable_stopgap(api: &mut TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("views"))]
+async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
+    // https://www.notion.so/prismaio/Comments-ac89f872098e463183fd668a643f3ab8
+
+    let schema = indoc! {r#"
+        CREATE TABLE a (
+            id INT PRIMARY KEY,
+            val VARCHAR(20)
+        );
+
+        CREATE VIEW b AS SELECT val FROM a;
+
+        CREATE TYPE c AS ENUM ('a', 'b');
+
+        COMMENT ON TABLE a IS 'push';
+        COMMENT ON COLUMN a.val IS 'meow';
+        COMMENT ON VIEW b IS 'purr';
+        COMMENT ON TYPE c IS 'hiss';
+        COMMENT ON COLUMN b.val IS 'miu';
+    "#};
+
+    api.raw_cmd(schema).await;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["views"]
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        /// This model is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+        model a {
+          id  Int     @id
+          /// This field is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+          val String? @db.VarChar(20)
+        }
+
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// This view is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+        view b {
+          /// This field is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+          val String? @db.VarChar(20)
+
+          @@ignore
+        }
+
+        /// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+        enum c {
+          a
+          b
+        }
+    "#]];
+
+    api.expect_datamodel(&expectation).await;
+
+    let expectation = expect![[r#"
+        [
+          {
+            "code": 24,
+            "message": "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers",
+            "affected": [
+              {
+                "view": "b"
+              }
+            ]
+          },
+          {
+            "code": 36,
+            "message": "These objects have comments defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/database-comments",
+            "affected": [
+              {
+                "type": "enum",
+                "name": "c"
+              },
+              {
+                "type": "model",
+                "name": "a"
+              },
+              {
+                "type": "field",
+                "name": "a.val"
+              },
+              {
+                "type": "view",
+                "name": "b"
+              },
+              {
+                "type": "field",
+                "name": "b.val"
+              }
+            ]
+          }
+        ]"#]];
+
+    api.expect_warnings(&expectation).await;
+
+    Ok(())
+}

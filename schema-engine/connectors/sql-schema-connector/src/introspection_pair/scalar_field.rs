@@ -205,6 +205,16 @@ impl<'a> ScalarFieldPair<'a> {
         IntrospectionPair::new(self.context, previous, self.next)
     }
 
+    /// The COMMENT of the field.
+    pub(crate) fn description(self) -> Option<&'a str> {
+        self.next.description()
+    }
+
+    /// True if we have a new field and it has a comment.
+    pub(crate) fn adds_a_description(self) -> bool {
+        self.previous.is_none() && self.description().is_some()
+    }
+
     fn column_type_family(self) -> &'a sql::ColumnTypeFamily {
         self.next.column_type_family()
     }
