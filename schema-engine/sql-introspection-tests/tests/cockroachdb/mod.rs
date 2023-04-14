@@ -353,6 +353,7 @@ async fn row_level_ttl_stopgap(api: &mut TestApi) -> TestResult {
           url      = "env(TEST_DATABASE_URL)"
         }
 
+        /// This model is using a row level TTL in the database, and requires an additional setup in migrations. Read more: https://pris.ly/d/row-level-ttl
         model ttl_test {
           id          BigInt    @id @default(autoincrement())
           inserted_at DateTime? @default(now()) @db.Timestamp(6)

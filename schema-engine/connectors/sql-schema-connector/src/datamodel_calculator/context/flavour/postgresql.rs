@@ -1,4 +1,4 @@
-use sql::postgres::PostgresSchemaExt;
+use sql::{postgres::PostgresSchemaExt, TableWalker};
 use sql_schema_describer as sql;
 
 use crate::{
@@ -43,11 +43,17 @@ impl super::IntrospectionFlavour for PostgresIntrospectionFlavour {
                 }
             }
 
-            if pg_ext.uses_row_level_ttl(table.id) && ctx.is_cockroach() {
+            if self.uses_row_level_ttl(ctx, table) {
                 warnings.row_level_ttl.push(Model {
                     model: ctx.table_prisma_name(table.id).prisma_name().to_string(),
                 });
             }
         }
+    }
+
+    fn uses_row_level_ttl(&self, ctx: &DatamodelCalculatorContext<'_>, table: TableWalker<'_>) -> bool {
+        let pg_ext: &PostgresSchemaExt = ctx.sql_schema.downcast_connector_data();
+
+        ctx.is_cockroach() && pg_ext.uses_row_level_ttl(table.id)
     }
 }

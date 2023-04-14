@@ -3,6 +3,7 @@ mod postgresql;
 mod sqlite;
 mod sqlserver;
 
+use sql::TableWalker;
 use sql_schema_describer as sql;
 
 pub(super) use mysql::MysqlIntrospectionFlavour;
@@ -32,4 +33,8 @@ pub(crate) trait IntrospectionFlavour {
     }
 
     fn generate_warnings(&self, _ctx: &DatamodelCalculatorContext<'_>, _warnings: &mut Warnings) {}
+
+    fn uses_row_level_ttl(&self, _ctx: &DatamodelCalculatorContext<'_>, _table: TableWalker<'_>) -> bool {
+        false
+    }
 }

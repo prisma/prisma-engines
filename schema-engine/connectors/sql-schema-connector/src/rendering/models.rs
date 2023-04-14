@@ -91,6 +91,12 @@ fn render_model(model: ModelPair<'_>, sql_family: SqlFamily) -> renderer::Model<
         rendered.documentation(docs);
     }
 
+    if model.adds_a_row_level_ttl() {
+        let docs = "This model is using a row level TTL in the database, and requires an additional setup in migrations. Read more: https://pris.ly/d/row-level-ttl";
+
+        rendered.documentation(docs);
+    }
+
     for field in model.scalar_fields() {
         rendered.push_field(scalar_field::render(field));
     }

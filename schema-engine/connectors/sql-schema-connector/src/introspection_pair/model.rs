@@ -144,6 +144,11 @@ impl<'a> ModelPair<'a> {
         self.previous.filter(|m| m.mapped_name().is_some()).is_some()
     }
 
+    /// True, if we have a new model that uses row level TTL.
+    pub(crate) fn adds_a_row_level_ttl(self) -> bool {
+        self.previous.is_none() && self.context.flavour.uses_row_level_ttl(self.context, self.next)
+    }
+
     /// A model must have either a primary key, or at least one unique
     /// index defined that consists of columns that are all supported by
     /// prisma and not null.
