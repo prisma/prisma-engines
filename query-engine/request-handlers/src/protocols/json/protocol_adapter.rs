@@ -83,13 +83,13 @@ impl JsonProtocolAdapter {
                 }
                 // <field_name>: true
                 crate::SelectionSetValue::Shorthand(true) => {
-                    if all_scalars_set {
-                        return Err(HandlerError::query_conversion(format!(
-                            "Cannot select both '$scalars: true' and a specific scalar field '{selection_name}'.",
-                        )));
-                    }
-
-                    selection.push_nested_selection(Selection::with_name(selection_name));
+                    selection.push_nested_selection(Self::create_shorthand_selection(
+                        field,
+                        &selection_name,
+                        container,
+                        query_schema,
+                        all_scalars_set,
+                    )?);
                 }
                 // <field_name>: false
                 crate::SelectionSetValue::Shorthand(false) => (),
@@ -105,11 +105,7 @@ impl JsonProtocolAdapter {
 
                         let field = container.and_then(|container| container.find_field(&schema_field.name));
                         let is_composite_field = field.as_ref().map(|f| f.is_composite()).unwrap_or(false);
-                        let nested_container = field.map(|f| match f {
-                            Field::Relation(rf) => ParentContainer::from(rf.related_model()),
-                            Field::Scalar(sf) => sf.container(),
-                            Field::Composite(cf) => ParentContainer::from(cf.typ()),
-                        });
+                        let nested_container = field.map(|f| f.related_container());
 
                         if is_composite_field && all_composites_set {
                             return Err(HandlerError::query_conversion(format!(
@@ -248,6 +244,47 @@ impl JsonProtocolAdapter {
         }
     }
 
+    fn create_shorthand_selection(
+        parent_field: &OutputField,
+        nested_field_name: &str,
+        container: Option<&ParentContainer>,
+        query_schema: &QuerySchemaRef,
+        all_scalars_set: bool,
+    ) -> crate::Result<Selection> {
+        let nested_object_type = parent_field
+            .field_type
+            .as_object_type(&query_schema.db)
+            .and_then(|(_, parent_object)| parent_object.find_field(nested_field_name))
+            .and_then(|(_, nested_field)| nested_field.field_type.as_object_type(&query_schema.db))
+            .map(|(_, nested_object)| nested_object);
+
+        if let Some(nested_object_type) = nested_object_type {
+            // case for a relation - we select all nested scalar fields and composite fields
+            let mut nested_selection = Selection::new(nested_field_name, None, vec![], vec![]);
+            let nested_container = container
+                .and_then(|c| c.find_field(nested_field_name))
+                .map(|f| f.related_container());
+
+            Self::default_scalar_and_composite_selection(
+                &mut nested_selection,
+                nested_object_type,
+                nested_container.as_ref(),
+                query_schema,
+            )?;
+
+            return Ok(nested_selection);
+        }
+
+        // case for a scalar - just picking the specified field without any nested selections
+        if all_scalars_set {
+            return Err(HandlerError::query_conversion(format!(
+                "Cannot select both '$scalars: true' and a specific scalar field '{nested_field_name}'.",
+            )));
+        }
+
+        Ok(Selection::with_name(nested_field_name))
+    }
+
     fn default_scalar_selection(schema_object: &ObjectType, selection: &mut Selection) {
         for scalar in schema_object.get_fields().iter().filter(|f| {
             f.field_type.is_scalar()
@@ -321,6 +358,26 @@ impl JsonProtocolAdapter {
                     }
                 }
             }
+        }
+
+        Ok(())
+    }
+
+    fn default_scalar_and_composite_selection(
+        selection: &mut Selection,
+        schema_object: &ObjectType,
+        container: Option<&ParentContainer>,
+        query_schema: &QuerySchema,
+    ) -> crate::Result<()> {
+        Self::default_scalar_selection(schema_object, selection);
+        if let Some(container) = container {
+            Self::default_composite_selection(
+                selection,
+                container,
+                schema_object,
+                &mut HashSet::<String>::new(),
+                query_schema,
+            )?;
         }
 
         Ok(())
@@ -550,6 +607,102 @@ mod tests {
                         alias: None,
                         arguments: [],
                         nested_selections: [],
+                    },
+                ],
+            },
+        )
+        "###);
+    }
+
+    #[test]
+    pub fn relation_shorthand() {
+        let query: JsonSingleQuery = serde_json::from_str(
+            r#"{
+            "modelName": "Post",
+            "action": "findFirst",
+            "query": {
+                "selection": {
+                    "user": true
+                }
+            }
+        }"#,
+        )
+        .unwrap();
+        let operation = JsonProtocolAdapter::convert_single(query, &schema()).unwrap();
+        assert_debug_snapshot!(operation, @r###"
+        Read(
+            Selection {
+                name: "findFirstPost",
+                alias: None,
+                arguments: [],
+                nested_selections: [
+                    Selection {
+                        name: "user",
+                        alias: None,
+                        arguments: [],
+                        nested_selections: [
+                            Selection {
+                                name: "id",
+                                alias: None,
+                                arguments: [],
+                                nested_selections: [],
+                            },
+                            Selection {
+                                name: "name",
+                                alias: None,
+                                arguments: [],
+                                nested_selections: [],
+                            },
+                            Selection {
+                                name: "email",
+                                alias: None,
+                                arguments: [],
+                                nested_selections: [],
+                            },
+                            Selection {
+                                name: "role",
+                                alias: None,
+                                arguments: [],
+                                nested_selections: [],
+                            },
+                            Selection {
+                                name: "roles",
+                                alias: None,
+                                arguments: [],
+                                nested_selections: [],
+                            },
+                            Selection {
+                                name: "tags",
+                                alias: None,
+                                arguments: [],
+                                nested_selections: [],
+                            },
+                            Selection {
+                                name: "address",
+                                alias: None,
+                                arguments: [],
+                                nested_selections: [
+                                    Selection {
+                                        name: "number",
+                                        alias: None,
+                                        arguments: [],
+                                        nested_selections: [],
+                                    },
+                                    Selection {
+                                        name: "street",
+                                        alias: None,
+                                        arguments: [],
+                                        nested_selections: [],
+                                    },
+                                    Selection {
+                                        name: "zipCode",
+                                        alias: None,
+                                        arguments: [],
+                                        nested_selections: [],
+                                    },
+                                ],
+                            },
+                        ],
                     },
                 ],
             },

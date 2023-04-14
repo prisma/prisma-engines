@@ -6,7 +6,7 @@ pub use composite::*;
 pub use relation::*;
 pub use scalar::*;
 
-use crate::{ast, ModelRef};
+use crate::{ast, parent_container::ParentContainer, ModelRef};
 use psl::parser_database::{walkers, ScalarType};
 use std::{borrow::Cow, hash::Hash};
 
@@ -121,6 +121,14 @@ impl Field {
             Some(v)
         } else {
             None
+        }
+    }
+
+    pub fn related_container(&self) -> ParentContainer {
+        match self {
+            Field::Relation(rf) => ParentContainer::from(rf.related_model()),
+            Field::Scalar(sf) => sf.container(),
+            Field::Composite(cf) => ParentContainer::from(cf.typ()),
         }
     }
 }

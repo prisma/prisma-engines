@@ -137,9 +137,25 @@ fn graphql_selection_to_json_selection(
         let no_args = nested_selection.arguments().is_empty();
         let no_nested_selection = nested_selection.nested_selections().is_empty();
         let selection_name = nested_selection.name().to_owned();
+        let can_have_nested_selection = schema_field
+            .field_type
+            .as_object_type(&query_schema.db)
+            .and_then(|(_, object)| object.find_field(&selection_name))
+            .and_then(|(_, field)| field.field_type.as_object_type(&query_schema.db))
+            .is_some();
 
         if no_args && no_nested_selection {
-            res.insert(selection_name, SelectionSetValue::Shorthand(true));
+            if can_have_nested_selection {
+                res.insert(
+                    selection_name,
+                    SelectionSetValue::Nested(FieldQuery {
+                        arguments: None,
+                        selection: SelectionSet::new(IndexMap::new()),
+                    }),
+                );
+            } else {
+                res.insert(selection_name, SelectionSetValue::Shorthand(true));
+            }
         } else {
             let (_, nested_field) = schema_field
                 .field_type
