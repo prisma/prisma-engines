@@ -162,16 +162,12 @@ impl<'a> IndexPair<'a> {
 
     /// True, if we add a new index that has non-default deferring.
     pub(crate) fn adds_a_non_default_deferring(self) -> bool {
-        if self.previous.is_none() {
-            return false;
-        }
-
-        if let Some(index) = self.next {
-            self.context
+        match (self.previous, self.next) {
+            (None, Some(next)) => self
+                .context
                 .flavour
-                .uses_non_default_index_deferring(self.context, index)
-        } else {
-            false
+                .uses_non_default_index_deferring(self.context, next),
+            _ => false,
         }
     }
 
