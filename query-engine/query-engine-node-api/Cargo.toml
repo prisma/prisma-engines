@@ -26,7 +26,7 @@ napi = { version = "2.12.4", default-features = false, features = ["napi8", "tok
 napi-derive = "2.12.3"
 
 thiserror = "1"
-connection-string = { workspace = true } 
+connection-string = "0.1"
 url = "2"
 serde_json.workspace = true
 serde.workspace = true

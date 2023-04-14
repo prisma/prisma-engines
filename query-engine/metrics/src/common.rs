@@ -62,13 +62,8 @@ impl Metric {
 
         labels_map.extend(global_labels);
 
-        let mut key = name.as_str();
-        if let Some(rename) = crate::METRIC_RENAMES.get(key) {
-            key = rename;
-        }
-
         Self {
-            key: key.to_string(),
+            key: name.as_str().to_string(),
             value,
             description,
             labels: labels_map,

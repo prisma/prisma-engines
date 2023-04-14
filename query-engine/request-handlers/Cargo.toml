@@ -19,7 +19,7 @@ bigdecimal = "0.3"
 thiserror = "1"
 tracing = "0.1"
 url = "2"
-connection-string = { workspace = true } 
+connection-string = "0.1"
 
 mongodb-query-connector = { path = "../connectors/mongodb-query-connector", optional = true }
 sql-query-connector = { path = "../connectors/sql-query-connector", optional = true }

@@ -33,10 +33,6 @@ pub struct Runner {
 }
 
 impl Runner {
-    pub fn prisma_dml(&self) -> &str {
-        self.query_schema.internal_data_model.schema.db.source()
-    }
-
     pub async fn load(
         datamodel: String,
         connector_tag: ConnectorTag,
@@ -44,7 +40,7 @@ impl Runner {
         log_capture: TestLogCapture,
     ) -> TestResult<Self> {
         let protocol = EngineProtocol::from(&ENGINE_PROTOCOL.to_string());
-        let schema = psl::parse_schema(datamodel.clone()).unwrap();
+        let schema = psl::parse_schema(datamodel).unwrap();
         let data_source = schema.configuration.datasources.first().unwrap();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
         let executor = load_executor(data_source, schema.configuration.preview_features(), &url).await?;

@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  rust-query-engine-tests:
+  rust-vitess-tests:
     name: "Test ${{ matrix.database.name }} (${{ matrix.engine_protocol }}) on Linux"
 
     strategy:
