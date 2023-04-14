@@ -75,7 +75,7 @@ impl JsonProtocolAdapter {
                                 &mut selection,
                                 container,
                                 schema_object,
-                                &mut HashSet::<String>::new(),
+                                &mut HashSet::<(String, String)>::new(),
                                 query_schema,
                             )?;
                         }
@@ -300,7 +300,7 @@ impl JsonProtocolAdapter {
         selection: &mut Selection,
         container: &ParentContainer,
         schema_object: &ObjectType,
-        walked_types: &mut HashSet<String>,
+        walked_fields: &mut HashSet<(String, String)>,
         query_schema: &QuerySchema,
     ) -> crate::Result<()> {
         match container {
@@ -315,7 +315,7 @@ impl JsonProtocolAdapter {
                             &mut nested_selection,
                             &ParentContainer::from(cf.typ()),
                             schema_field.field_type.as_object_type(&query_schema.db).unwrap().1,
-                            walked_types,
+                            walked_fields,
                             query_schema,
                         )?;
 
@@ -324,16 +324,10 @@ impl JsonProtocolAdapter {
                 }
             }
             ParentContainer::CompositeType(ct) => {
-                if walked_types.contains(ct.name()) {
-                    return Err(HandlerError::query_conversion(
-                        "$composites: true does not support recursive composite types.",
-                    ));
-                }
-
-                walked_types.insert(ct.name().to_owned());
-
                 for f in ct.fields() {
-                    let schema_field = schema_object.find_field(f.name());
+                    let field_name = f.name().to_owned();
+
+                    let schema_field = schema_object.find_field(&field_name);
 
                     if let Some((_, schema_field)) = schema_field {
                         match f {
@@ -341,13 +335,21 @@ impl JsonProtocolAdapter {
                                 selection.push_nested_selection(Selection::with_name(s.name().to_owned()))
                             }
                             Field::Composite(cf) => {
+                                let walked_model_field = (ct.name().to_owned(), field_name);
+                                if walked_fields.contains(&walked_model_field) {
+                                    return Err(HandlerError::query_conversion(
+                                        "$composites: true does not support recursive composite types.",
+                                    ));
+                                }
+
+                                walked_fields.insert(walked_model_field);
                                 let mut nested_selection = Selection::with_name(cf.name().to_owned());
 
                                 Self::default_composite_selection(
                                     &mut nested_selection,
                                     &ParentContainer::from(cf.typ()),
                                     schema_field.field_type.as_object_type(&query_schema.db).unwrap().1,
-                                    walked_types,
+                                    walked_fields,
                                     query_schema,
                                 )?;
 
@@ -375,7 +377,7 @@ impl JsonProtocolAdapter {
                 selection,
                 container,
                 schema_object,
-                &mut HashSet::<String>::new(),
+                &mut HashSet::<(String, String)>::new(),
                 query_schema,
             )?;
         }
@@ -1548,6 +1550,177 @@ mod tests {
         Err(
             Configuration(
                 "Cannot select both '$composites: true' and a specific composite field 'upvotes'.",
+            ),
+        )
+        "###);
+    }
+
+    fn recursive_composite_schema() -> schema::QuerySchemaRef {
+        let schema_str = r#"
+          generator client {
+            provider        = "prisma-client-js"
+          }
+          
+          datasource db {
+            provider = "mongodb"
+            url      = "mongodb://"
+          }
+          
+          model List {
+            id String @id @default(auto()) @map("_id") @db.ObjectId
+            head ListNode?
+          }
+          
+          type ListNode  {
+            value Int
+            next ListNode? 
+          }        
+        "#;
+        let mut schema = psl::validate(schema_str.into());
+
+        schema.diagnostics.to_result().unwrap();
+
+        let internal_data_model = prisma_models::convert(Arc::new(schema));
+
+        Arc::new(schema_builder::build(internal_data_model, true))
+    }
+
+    #[test]
+    pub fn recursive_composites() {
+        let query: JsonSingleQuery = serde_json::from_str(
+            r#"{
+                "modelName": "List",
+                "action": "createOne",
+                "query": {
+                  "selection": {
+                    "$composites": true
+                  }
+                }
+              }"#,
+        )
+        .unwrap();
+
+        let operation = JsonProtocolAdapter::convert_single(query, &recursive_composite_schema());
+
+        assert_debug_snapshot!(operation, @r###"
+        Err(
+            Configuration(
+                "$composites: true does not support recursive composite types.",
+            ),
+        )
+        "###);
+    }
+
+    fn sibling_composite_schema() -> schema::QuerySchemaRef {
+        let schema_str = r#"
+          generator client {
+            provider        = "prisma-client-js"
+          }
+          
+          datasource db {
+            provider = "mongodb"
+            url      = "mongodb://"
+          }
+          
+          model User {
+            id String @id @default(auto()) @map("_id") @db.ObjectId
+          
+            billingAddress Address
+            shippingAddress Address
+          }
+          
+          type Address {
+            number Int
+            street String
+            zipCode Int
+          }        
+        "#;
+        let mut schema = psl::validate(schema_str.into());
+
+        schema.diagnostics.to_result().unwrap();
+
+        let internal_data_model = prisma_models::convert(Arc::new(schema));
+
+        Arc::new(schema_builder::build(internal_data_model, true))
+    }
+
+    #[test]
+    pub fn sibling_composites() {
+        let query: JsonSingleQuery = serde_json::from_str(
+            r#"{
+                "modelName": "User",
+                "action": "createOne",
+                "query": {
+                  "selection": {
+                    "$composites": true
+                  }
+                }
+              }"#,
+        )
+        .unwrap();
+
+        let operation = JsonProtocolAdapter::convert_single(query, &sibling_composite_schema());
+
+        assert_debug_snapshot!(operation, @r###"
+        Ok(
+            Write(
+                Selection {
+                    name: "createOneUser",
+                    alias: None,
+                    arguments: [],
+                    nested_selections: [
+                        Selection {
+                            name: "billingAddress",
+                            alias: None,
+                            arguments: [],
+                            nested_selections: [
+                                Selection {
+                                    name: "number",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [],
+                                },
+                                Selection {
+                                    name: "street",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [],
+                                },
+                                Selection {
+                                    name: "zipCode",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [],
+                                },
+                            ],
+                        },
+                        Selection {
+                            name: "shippingAddress",
+                            alias: None,
+                            arguments: [],
+                            nested_selections: [
+                                Selection {
+                                    name: "number",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [],
+                                },
+                                Selection {
+                                    name: "street",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [],
+                                },
+                                Selection {
+                                    name: "zipCode",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [],
+                                },
+                            ],
+                        },
+                    ],
+                },
             ),
         )
         "###);
