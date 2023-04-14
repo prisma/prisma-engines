@@ -268,6 +268,7 @@ async fn deferrable_stopgap(api: &mut TestApi) -> TestResult {
           url      = "env(TEST_DATABASE_URL)"
         }
 
+        /// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
         model a {
           id  Int  @id(map: "foo_pkey")
           foo Int? @unique(map: "foo_key")

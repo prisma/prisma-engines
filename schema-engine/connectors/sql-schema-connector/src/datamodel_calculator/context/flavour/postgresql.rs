@@ -1,4 +1,4 @@
-use sql::{postgres::PostgresSchemaExt, TableWalker};
+use sql::{postgres::PostgresSchemaExt, ForeignKeyWalker, IndexWalker, TableWalker};
 use sql_schema_describer as sql;
 
 use crate::{
@@ -25,7 +25,7 @@ impl super::IntrospectionFlavour for PostgresIntrospectionFlavour {
                     });
                 }
 
-                if pg_ext.non_default_index_constraint_deferring(index.id) {
+                if self.uses_non_default_index_deferring(ctx, index) {
                     warnings.non_default_deferring.push(ModelAndConstraint {
                         model: ctx.table_prisma_name(table.id).prisma_name().to_string(),
                         constraint: index.name().to_string(),
@@ -34,7 +34,7 @@ impl super::IntrospectionFlavour for PostgresIntrospectionFlavour {
             }
 
             for fk in table.foreign_keys() {
-                if pg_ext.non_default_foreign_key_constraint_deferring(fk.id) {
+                if self.uses_non_default_foreign_key_deferring(ctx, fk) {
                     warnings.non_default_deferring.push(ModelAndConstraint {
                         model: ctx.table_prisma_name(table.id).prisma_name().to_string(),
                         // unwrap: postgres fks always have a name
@@ -55,5 +55,21 @@ impl super::IntrospectionFlavour for PostgresIntrospectionFlavour {
         let pg_ext: &PostgresSchemaExt = ctx.sql_schema.downcast_connector_data();
 
         ctx.is_cockroach() && pg_ext.uses_row_level_ttl(table.id)
+    }
+
+    fn uses_non_default_index_deferring(&self, ctx: &DatamodelCalculatorContext<'_>, index: IndexWalker<'_>) -> bool {
+        let pg_ext: &PostgresSchemaExt = ctx.sql_schema.downcast_connector_data();
+
+        pg_ext.non_default_index_constraint_deferring(index.id)
+    }
+
+    fn uses_non_default_foreign_key_deferring(
+        &self,
+        ctx: &DatamodelCalculatorContext<'_>,
+        foreign_key: ForeignKeyWalker<'_>,
+    ) -> bool {
+        let pg_ext: &PostgresSchemaExt = ctx.sql_schema.downcast_connector_data();
+
+        pg_ext.non_default_foreign_key_constraint_deferring(foreign_key.id)
     }
 }

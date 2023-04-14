@@ -160,6 +160,21 @@ impl<'a> IndexPair<'a> {
         self.defined_in_a_field().then(|| self.fields().next().unwrap())
     }
 
+    /// True, if we add a new index that has non-default deferring.
+    pub(crate) fn adds_a_non_default_deferring(self) -> bool {
+        if self.previous.is_none() {
+            return false;
+        }
+
+        if let Some(index) = self.next {
+            self.context
+                .flavour
+                .uses_non_default_index_deferring(self.context, index)
+        } else {
+            false
+        }
+    }
+
     fn defined_in_a_field(self) -> bool {
         if !matches!(self.index_type(), sql::IndexType::Unique) {
             return false;

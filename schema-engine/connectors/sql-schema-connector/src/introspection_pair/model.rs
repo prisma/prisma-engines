@@ -149,6 +149,18 @@ impl<'a> ModelPair<'a> {
         self.previous.is_none() && self.context.flavour.uses_row_level_ttl(self.context, self.next)
     }
 
+    /// True, if we _add_ a new constraint with a non-default
+    /// deferring.
+    pub(crate) fn uses_non_default_deferring(self) -> bool {
+        let from_index = self.all_indexes().any(|i| i.adds_a_non_default_deferring());
+        let from_fk = self
+            .relation_fields()
+            .filter(|rf| rf.fields().is_some())
+            .any(|rf| rf.adds_non_default_deferring());
+
+        from_index || from_fk
+    }
+
     /// A model must have either a primary key, or at least one unique
     /// index defined that consists of columns that are all supported by
     /// prisma and not null.
@@ -241,5 +253,26 @@ impl<'a> ModelPair<'a> {
     /// True if we have a new model and it has a comment.
     pub(crate) fn adds_a_description(self) -> bool {
         self.previous.is_none() && self.description().is_some()
+    }
+
+    fn all_indexes(self) -> impl ExactSizeIterator<Item = IndexPair<'a>> {
+        self.next.indexes().map(move |next| {
+            let previous = self.previous.and_then(|prev| {
+                prev.indexes().find(|idx| {
+                    // Upgrade logic. Prior to Prisma 3, PSL index attributes had a `name` argument but no `map`
+                    // argument. If we infer that an index in the database was produced using that logic, we
+                    // match up the existing index.
+                    if idx.mapped_name().is_none() && idx.name() == Some(next.name()) {
+                        return true;
+                    }
+
+                    // Compare the constraint name (implicit or mapped name) from the Prisma schema with the
+                    // constraint name from the database.
+                    idx.constraint_name(self.context.active_connector()) == next.name()
+                })
+            });
+
+            IntrospectionPair::new(self.context, previous, Some(next))
+        })
     }
 }
