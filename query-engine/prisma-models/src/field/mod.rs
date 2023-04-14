@@ -124,7 +124,7 @@ impl Field {
         }
     }
 
-    pub fn nested_container(&self) -> ParentContainer {
+    pub fn related_container(&self) -> ParentContainer {
         match self {
             Field::Relation(rf) => ParentContainer::from(rf.related_model()),
             Field::Scalar(sf) => sf.container(),

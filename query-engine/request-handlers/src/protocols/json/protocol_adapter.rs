@@ -105,7 +105,7 @@ impl JsonProtocolAdapter {
 
                         let field = container.and_then(|container| container.find_field(&schema_field.name));
                         let is_composite_field = field.as_ref().map(|f| f.is_composite()).unwrap_or(false);
-                        let nested_container = field.map(|f| f.nested_container());
+                        let nested_container = field.map(|f| f.related_container());
 
                         if is_composite_field && all_composites_set {
                             return Err(HandlerError::query_conversion(format!(
@@ -263,7 +263,7 @@ impl JsonProtocolAdapter {
             let mut nested_selection = Selection::new(nested_field_name, None, vec![], vec![]);
             let nested_container = container
                 .and_then(|c| c.find_field(nested_field_name))
-                .map(|f| f.nested_container());
+                .map(|f| f.related_container());
 
             Self::default_scalar_and_composite_selection(
                 &mut nested_selection,
