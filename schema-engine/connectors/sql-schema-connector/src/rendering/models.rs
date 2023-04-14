@@ -104,9 +104,15 @@ fn render_model(model: ModelPair<'_>, sql_family: SqlFamily) -> renderer::Model<
     }
 
     if model.adds_row_level_security() {
-        let docs= "This model contains row level security and requires additional setup for migrations. Visit https://prisl.y/d/row-level-security for more info.";
+        let docs= "This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.";
 
-        rendered.documentation(docs)
+        rendered.documentation(docs);
+    }
+
+    if model.adds_non_default_null_position() {
+        let docs = "This model contains an index with non-default null sort order and requires additional setup for migrations. Visit https://pris.ly/d/default-index-null-ordering for more info.";
+
+        rendered.documentation(docs);
     }
 
     for field in model.scalar_fields() {

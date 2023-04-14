@@ -46,6 +46,18 @@ impl<'a> IndexFieldPair<'a> {
         self.next.and_then(|next| next.length())
     }
 
+    /// True, if we _add_ an index with non-default null position.
+    pub(crate) fn adds_non_default_null_position(self) -> bool {
+        if self.previous.is_some() {
+            return false;
+        }
+
+        match self.next {
+            Some(next) => self.context.flavour.uses_non_default_null_position(self.context, next),
+            None => false,
+        }
+    }
+
     /// A PostgreSQL specific operator class for the indexed column.
     pub(crate) fn opclass(self) -> Option<IndexOps<'a>> {
         if !self.context.sql_family.is_postgres() {

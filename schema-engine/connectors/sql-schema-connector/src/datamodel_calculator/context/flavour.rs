@@ -3,7 +3,7 @@ mod postgresql;
 mod sqlite;
 mod sqlserver;
 
-use sql::{ForeignKeyWalker, IndexWalker, TableWalker};
+use sql::{ForeignKeyWalker, IndexColumnWalker, IndexWalker, TableWalker};
 use sql_schema_describer as sql;
 
 pub(super) use mysql::MysqlIntrospectionFlavour;
@@ -46,6 +46,14 @@ pub(crate) trait IntrospectionFlavour {
         &self,
         _ctx: &DatamodelCalculatorContext<'_>,
         _foreign_key: ForeignKeyWalker<'_>,
+    ) -> bool {
+        false
+    }
+
+    fn uses_non_default_null_position(
+        &self,
+        _ctx: &DatamodelCalculatorContext<'_>,
+        _column: IndexColumnWalker<'_>,
     ) -> bool {
         false
     }

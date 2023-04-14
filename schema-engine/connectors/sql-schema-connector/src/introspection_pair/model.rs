@@ -52,6 +52,13 @@ impl<'a> ModelPair<'a> {
         self.previous.is_none() && self.has_row_level_security()
     }
 
+    /// True, if we add an index with non-default null position.
+    pub(crate) fn adds_non_default_null_position(self) -> bool {
+        self.all_indexes()
+            .flat_map(|i| i.fields())
+            .any(|f| f.adds_non_default_null_position())
+    }
+
     /// Name of the model in the PSL. The value can be sanitized if it
     /// contains characters that are not allowed in the PSL
     /// definition.

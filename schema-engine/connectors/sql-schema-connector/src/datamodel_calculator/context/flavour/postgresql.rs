@@ -14,11 +14,9 @@ impl super::IntrospectionFlavour for PostgresIntrospectionFlavour {
     }
 
     fn generate_warnings(&self, ctx: &DatamodelCalculatorContext<'_>, warnings: &mut Warnings) {
-        let pg_ext: &PostgresSchemaExt = ctx.sql_schema.downcast_connector_data();
-
         for table in ctx.sql_schema.table_walkers() {
             for index in table.indexes() {
-                for column in index.columns().filter(|c| pg_ext.non_default_null_position(*c)) {
+                for column in index.columns().filter(|c| self.uses_non_default_null_position(ctx, *c)) {
                     warnings.non_default_index_null_sort_order.push(IndexedColumn {
                         index_name: index.name().to_string(),
                         column_name: column.name().to_string(),
@@ -71,5 +69,15 @@ impl super::IntrospectionFlavour for PostgresIntrospectionFlavour {
         let pg_ext: &PostgresSchemaExt = ctx.sql_schema.downcast_connector_data();
 
         pg_ext.non_default_foreign_key_constraint_deferring(foreign_key.id)
+    }
+
+    fn uses_non_default_null_position(
+        &self,
+        ctx: &DatamodelCalculatorContext<'_>,
+        column: sql::IndexColumnWalker<'_>,
+    ) -> bool {
+        let pg_ext: &PostgresSchemaExt = ctx.sql_schema.downcast_connector_data();
+
+        pg_ext.non_default_null_position(column)
     }
 }

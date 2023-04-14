@@ -188,6 +188,7 @@ async fn index_sort_order_stopgap(api: &mut TestApi) -> TestResult {
           url      = "env(TEST_DATABASE_URL)"
         }
 
+        /// This model contains an index with non-default null sort order and requires additional setup for migrations. Visit https://pris.ly/d/default-index-null-ordering for more info.
         model foo {
           id Int @id
           a  Int
