@@ -31,7 +31,7 @@ jobs:
             url: "mongodb://prisma:prisma@localhost:27017/?authSource=admin&retryWrites=true"
           - name: "mongodb5"
             url: "mongodb://prisma:prisma@localhost:27018/?authSource=admin&retryWrites=true"
-    runs-on: buildjet-16vcpu-ubuntu-2004
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
@@ -105,7 +105,7 @@ jobs:
             is_vitess: true
             single_threaded: true
 
-    runs-on: buildjet-16vcpu-ubuntu-2004
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
