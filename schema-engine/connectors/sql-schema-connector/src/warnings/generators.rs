@@ -57,19 +57,16 @@ pub(crate) struct Warnings {
     pub(crate) non_default_index_null_sort_order: Vec<IndexedColumn>,
     /// Warn about using row level security, which is currently unsupported.
     pub(crate) row_level_security_tables: Vec<Model>,
-<<<<<<< HEAD
     /// Warn about check constraints.
     pub(crate) check_constraints: Vec<CheckConstraint>,
     /// Warn about exclusion constraints.
     pub(crate) exclusion_constraints: Vec<ExclusionConstraint>,
-=======
     /// Warn about row level TTL
     pub(crate) row_level_ttl: Vec<Model>,
     /// Warn about non-default unique deferring setup
     pub(crate) non_default_deferring: Vec<ModelAndConstraint>,
     /// Warn about comments
     pub(crate) objects_with_comments: Vec<Object>,
->>>>>>> main
 }
 
 impl Warnings {
@@ -225,7 +222,6 @@ impl Warnings {
             &mut self.warnings,
         );
 
-<<<<<<< HEAD
         maybe_warn(&self.check_constraints, check_constraints_found, &mut self.warnings);
 
         maybe_warn(
@@ -233,11 +229,10 @@ impl Warnings {
             exclusion_constraints_found,
             &mut self.warnings,
         );
-=======
+
         maybe_warn(&self.row_level_ttl, row_level_ttl_in_tables, &mut self.warnings);
         maybe_warn(&self.non_default_deferring, non_default_deferring, &mut self.warnings);
         maybe_warn(&self.objects_with_comments, commented_objects, &mut self.warnings);
->>>>>>> main
 
         self.warnings
     }
@@ -634,7 +629,6 @@ pub(super) fn row_level_security_tables_found(affected: &[Model]) -> Warning {
         affected: serde_json::to_value(affected).unwrap(),
     }
 }
-
 
 pub(crate) fn row_level_ttl_in_tables(affected: &[Model]) -> Warning {
     let message = "These models are using a row level TTL setting defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/row-level-ttl";
