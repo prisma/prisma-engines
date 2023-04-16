@@ -60,6 +60,11 @@ pub(crate) fn render(field: ScalarFieldPair<'_>) -> renderer::Field<'_> {
         rendered.commented_out();
     }
 
+    if field.adds_a_description() {
+        let docs = "This field is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments";
+        rendered.documentation(docs);
+    }
+
     rendered
 }
 

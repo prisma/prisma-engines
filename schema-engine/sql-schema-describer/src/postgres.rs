@@ -150,11 +150,27 @@ pub enum IndexNullPosition {
     Last,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum Constraint {
+    Index(IndexId),
+    ForeignKey(ForeignKeyId),
+}
+
+#[enumflags2::bitflags]
+#[derive(Clone, Copy, Debug)]
+#[repr(u8)]
+pub enum ConstraintOption {
+    Deferred,
+    Deferrable,
+}
+
 #[derive(Default, Debug)]
 pub struct PostgresSchemaExt {
     pub opclasses: Vec<(IndexColumnId, SQLOperatorClass)>,
     pub indexes: Vec<(IndexId, SqlIndexAlgorithm)>,
     pub index_null_position: HashMap<IndexColumnId, IndexNullPosition>,
+    pub constraint_options: HashMap<Constraint, BitFlags<ConstraintOption>>,
+    pub table_options: Vec<BTreeMap<String, String>>,
     /// The schema's sequences.
     pub sequences: Vec<Sequence>,
     /// The extensions included in the schema(s).
@@ -224,6 +240,32 @@ impl PostgresSchemaExt {
         match sort_order {
             SQLSortOrder::Asc => position == IndexNullPosition::First,
             SQLSortOrder::Desc => position == IndexNullPosition::Last,
+        }
+    }
+
+    pub fn uses_row_level_ttl(&self, id: TableId) -> bool {
+        let options = match self.table_options.get(id.0 as usize) {
+            Some(options) => options,
+            None => return false,
+        };
+
+        match options.get("ttl") {
+            Some(val) => val.as_str() == "'on'",
+            None => false,
+        }
+    }
+
+    pub fn non_default_foreign_key_constraint_deferring(&self, id: ForeignKeyId) -> bool {
+        match self.constraint_options.get(&Constraint::ForeignKey(id)) {
+            Some(opts) => opts.contains(ConstraintOption::Deferrable) || opts.contains(ConstraintOption::Deferred),
+            None => false,
+        }
+    }
+
+    pub fn non_default_index_constraint_deferring(&self, id: IndexId) -> bool {
+        match self.constraint_options.get(&Constraint::Index(id)) {
+            Some(opts) => opts.contains(ConstraintOption::Deferrable) || opts.contains(ConstraintOption::Deferred),
+            None => false,
         }
     }
 }
@@ -498,10 +540,11 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
     // either updating or removing it.
     async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
         let mut sql_schema = SqlSchema::default();
+        let mut pg_ext = PostgresSchemaExt::default();
 
         self.get_namespaces(&mut sql_schema, &[schema]).await?;
 
-        let table_count = self.get_table_names(&mut sql_schema).await?.len();
+        let table_count = self.get_table_names(&mut sql_schema, &mut pg_ext).await?.len();
         let size_in_bytes = self.get_size(schema).await?;
 
         Ok(SqlMetadata {
@@ -517,13 +560,14 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
         self.get_namespaces(&mut sql_schema, schemas).await?;
 
         //TODO(matthias) can we get rid of the table names map and instead just use tablewalker_ns everywhere like in get_columns?
-        let table_names = self.get_table_names(&mut sql_schema).await?;
+        let table_names = self.get_table_names(&mut sql_schema, &mut pg_ext).await?;
 
         // order matters
         self.get_views(&mut sql_schema).await?;
         self.get_enums(&mut sql_schema).await?;
         self.get_columns(&mut sql_schema).await?;
-        self.get_foreign_keys(&table_names, &mut sql_schema).await?;
+        self.get_foreign_keys(&table_names, &mut pg_ext, &mut sql_schema)
+            .await?;
         self.get_indices(&table_names, &mut pg_ext, &mut sql_schema).await?;
 
         self.get_procedures(&mut sql_schema).await?;
@@ -666,6 +710,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     async fn get_table_names(
         &self,
         sql_schema: &mut SqlSchema,
+        pg_ext: &mut PostgresSchemaExt,
     ) -> DescriberResult<IndexMap<(String, String), TableId>> {
         let sql = if self.circumstances.contains(Circumstances::CanPartitionTables) {
             include_str!("postgres/tables_query.sql")
@@ -683,29 +728,47 @@ impl<'a> SqlSchemaDescriber<'a> {
             )
             .await?;
 
-        let names = rows.into_iter().map(|row| {
-            (
+        let mut names = Vec::with_capacity(rows.len());
+
+        for row in rows.into_iter() {
+            let options: BTreeMap<String, String> = row
+                .get_string_array("reloptions")
+                .unwrap_or_default()
+                .into_iter()
+                .filter_map(|s| {
+                    let mut splitted = s.split('=');
+                    let key = splitted.next()?.to_string();
+                    let value = splitted.next()?.to_string();
+
+                    Some((key, value))
+                })
+                .collect();
+
+            names.push((
                 row.get_expect_string("table_name"),
                 row.get_expect_string("namespace"),
                 row.get_expect_bool("is_partition"),
                 row.get_expect_bool("has_subclass"),
                 row.get_expect_bool("has_row_level_security"),
-            )
-        });
+                row.get_string("description"),
+            ));
+
+            pg_ext.table_options.push(options);
+        }
 
         let mut constraints_map = self.get_constraints(sql_schema).await?;
 
         let mut map = IndexMap::default();
 
-        for (table_name, namespace, is_partition, has_subclass, has_row_level_security) in names {
-            let table_name_cloned = table_name.clone();
-            let namespace_cloned = namespace.clone();
+        for (table_name, namespace, is_partition, has_subclass, has_row_level_security, description) in names {
+            let cloned_name = table_name.clone();
 
             let partition = if is_partition {
                 BitFlags::from_flag(TableProperties::IsPartition)
             } else {
                 BitFlags::empty()
             };
+
             let subclass = if has_subclass {
                 BitFlags::from_flag(TableProperties::HasSubclass)
             } else {
@@ -717,13 +780,14 @@ impl<'a> SqlSchemaDescriber<'a> {
                 BitFlags::empty()
             };
 
-            let constraints_key = (namespace_cloned, table_name_cloned);
+            let constraints_key = (namespace.clone(), cloned_name);
             let unsupported_constraint = constraints_map.remove(&constraints_key).unwrap_or(BitFlags::empty());
 
             let id = sql_schema.push_table_with_properties(
                 table_name,
                 sql_schema.get_namespace_id(&namespace).unwrap(),
                 partition | subclass | row_level_security | unsupported_constraint,
+                description,
             );
             map.insert(constraints_key, id);
         }
@@ -751,8 +815,15 @@ impl<'a> SqlSchemaDescriber<'a> {
     async fn get_views(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
         let namespaces = &sql_schema.namespaces;
         let sql = indoc! {r#"
-            SELECT viewname AS view_name, definition AS view_sql, schemaname as namespace
-            FROM pg_catalog.pg_views
+            SELECT
+                views.viewname AS view_name,
+                views.definition AS view_sql,
+                views.schemaname AS namespace,
+                description.description AS description
+            FROM pg_catalog.pg_views views
+            INNER JOIN pg_catalog.pg_namespace ns ON views.schemaname = ns.nspname
+            INNER JOIN pg_catalog.pg_class class ON class.relnamespace = ns.oid AND class.relname = views.viewname
+            LEFT JOIN pg_catalog.pg_description description ON description.objoid = class.oid AND description.objsubid = 0
             WHERE schemaname = ANY ( $1 )
         "#};
 
@@ -763,19 +834,18 @@ impl<'a> SqlSchemaDescriber<'a> {
                 &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
             )
             .await?;
-        let mut views = Vec::with_capacity(result_set.len());
 
         for row in result_set.into_iter() {
-            views.push(View {
-                namespace_id: sql_schema
-                    .get_namespace_id(&row.get_expect_string("namespace"))
-                    .unwrap(),
-                name: row.get_expect_string("view_name"),
-                definition: row.get_string("view_sql"),
-            })
-        }
+            let name = row.get_expect_string("view_name");
+            let definition = row.get_string("view_sql");
+            let description = row.get_string("description");
 
-        sql_schema.views = views;
+            let namespace_id = sql_schema
+                .get_namespace_id(&row.get_expect_string("namespace"))
+                .unwrap();
+
+            sql_schema.push_view(name, namespace_id, definition, description);
+        }
 
         Ok(())
     }
@@ -808,7 +878,8 @@ impl<'a> SqlSchemaDescriber<'a> {
                 pg_get_expr(attdef.adbin, attdef.adrelid) AS column_default,
                 info.is_nullable,
                 info.is_identity,
-                info.character_maximum_length
+                info.character_maximum_length,
+                description.description
             FROM information_schema.columns info
             JOIN pg_attribute att ON att.attname = info.column_name
             JOIN (
@@ -820,6 +891,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                   AND relname = info.table_name
                   AND namespace = info.table_schema
             LEFT OUTER JOIN pg_attrdef attdef ON attdef.adrelid = att.attrelid AND attdef.adnum = att.attnum AND table_schema = namespace
+            LEFT OUTER JOIN pg_description description ON description.objoid = att.attrelid AND description.objsubid = ordinal_position
             WHERE table_schema = ANY ( $1 ) {is_visible_clause}
             ORDER BY namespace, table_name, ordinal_position;
         "#
@@ -870,6 +942,8 @@ impl<'a> SqlSchemaDescriber<'a> {
                 .and_then(|raw_default_value| raw_default_value.to_string())
                 .and_then(|raw_default_value| get_default_value(&raw_default_value, &tpe));
 
+            let description = col.get_string("description");
+
             let auto_increment = is_identity
                 || matches!(default.as_ref().map(|d| &d.kind), Some(DefaultKind::Sequence(_)))
                 || (self.is_cockroach()
@@ -891,6 +965,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 name,
                 tpe,
                 auto_increment,
+                description,
             };
 
             match container_id {
@@ -991,6 +1066,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     async fn get_foreign_keys(
         &self,
         table_ids: &IndexMap<(String, String), TableId>,
+        pg_ext: &mut PostgresSchemaExt,
         sql_schema: &mut SqlSchema,
     ) -> DescriberResult<()> {
         let namespaces = &sql_schema.namespaces;
@@ -1009,7 +1085,9 @@ impl<'a> SqlSchemaDescriber<'a> {
                 child,
                 parent,
                 table_name, 
-                namespace
+                namespace,
+                condeferrable,
+                condeferred
             FROM (SELECT 
                         ns.nspname AS "namespace",
                         unnest(con1.conkey)                AS "parent",
@@ -1022,7 +1100,9 @@ impl<'a> SqlSchemaDescriber<'a> {
                         con1.conrelid,
                         con1.conname,
                         con1.confdeltype,
-                        con1.confupdtype
+                        con1.confupdtype,
+                        con1.condeferrable                  AS condeferrable,
+                        con1.condeferred                    AS condeferred
                 FROM pg_class cl
                         join pg_constraint con1 on con1.conrelid = cl.oid
                         join pg_namespace ns on cl.relnamespace = ns.oid
@@ -1137,6 +1217,20 @@ impl<'a> SqlSchemaDescriber<'a> {
                         [table_id, referenced_table_id],
                         [on_delete_action, on_update_action],
                     );
+
+                    let mut constraint_options = BitFlags::empty();
+
+                    if let Some(true) = row.get_bool("condeferrable") {
+                        constraint_options |= ConstraintOption::Deferrable;
+                    }
+
+                    if let Some(true) = row.get_bool("condeferred") {
+                        constraint_options |= ConstraintOption::Deferred;
+                    }
+
+                    pg_ext
+                        .constraint_options
+                        .insert(Constraint::ForeignKey(fkid), constraint_options);
 
                     current_fk = Some((id, fkid));
                 }
@@ -1296,6 +1390,22 @@ impl<'a> SqlSchemaDescriber<'a> {
                     sql_schema.push_index(table_id, index_name)
                 };
 
+                if is_primary_key || is_unique {
+                    let mut constraint_options = BitFlags::empty();
+
+                    if let Some(true) = row.get_bool("condeferrable") {
+                        constraint_options |= ConstraintOption::Deferrable;
+                    }
+
+                    if let Some(true) = row.get_bool("condeferred") {
+                        constraint_options |= ConstraintOption::Deferred;
+                    }
+
+                    pg_ext
+                        .constraint_options
+                        .insert(Constraint::Index(index_id), constraint_options);
+                }
+
                 current_index = Some(index_id);
             }
 
@@ -1406,10 +1516,11 @@ impl<'a> SqlSchemaDescriber<'a> {
         let namespaces = &sql_schema.namespaces;
 
         let sql = "
-            SELECT t.typname as name, e.enumlabel as value, n.nspname as namespace
+            SELECT t.typname as name, e.enumlabel as value, n.nspname as namespace, d.description
             FROM pg_type t
             JOIN pg_enum e ON t.oid = e.enumtypid
             JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
+            LEFT OUTER JOIN pg_description d ON d.objoid = t.oid
             WHERE n.nspname = ANY ( $1 )
             ORDER BY e.enumsortorder";
 
@@ -1420,19 +1531,25 @@ impl<'a> SqlSchemaDescriber<'a> {
                 &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
             )
             .await?;
-        let mut enum_values: BTreeMap<(NamespaceId, String), Vec<String>> = BTreeMap::new();
+        let mut enum_values: BTreeMap<(NamespaceId, String, Option<String>), Vec<String>> = BTreeMap::new();
 
         for row in rows.into_iter() {
             let name = row.get_expect_string("name");
             let value = row.get_expect_string("value");
             let namespace = row.get_expect_string("namespace");
+            let description = row.get_string("description");
             let namespace_id = sql_schema.get_namespace_id(&namespace).unwrap();
-            let values = enum_values.entry((namespace_id, name)).or_insert_with(Vec::new);
+
+            let values = enum_values
+                .entry((namespace_id, name, description))
+                .or_insert_with(Vec::new);
+
             values.push(value);
         }
 
-        for ((namespace_id, enum_name), variants) in enum_values {
-            let enum_id = sql_schema.push_enum(namespace_id, enum_name);
+        for ((namespace_id, enum_name, description), variants) in enum_values {
+            let enum_id = sql_schema.push_enum(namespace_id, enum_name, description);
+
             for variant in variants {
                 sql_schema.push_enum_variant(enum_id, variant);
             }

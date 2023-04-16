@@ -99,6 +99,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
             ],
             enums: [
@@ -107,6 +108,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                         0,
                     ),
                     name: "User_enum_col",
+                    description: None,
                 },
             ],
             enum_variants: [
@@ -139,6 +141,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: true,
+                        description: None,
                     },
                 ),
                 (
@@ -156,6 +159,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -173,6 +177,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -190,6 +195,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -207,6 +213,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -224,6 +231,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -241,6 +249,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -258,6 +267,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -275,6 +285,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -292,6 +303,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -309,6 +321,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -326,6 +339,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -343,6 +357,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -360,6 +375,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -377,6 +393,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -394,6 +411,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -411,6 +429,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -428,6 +447,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -445,6 +465,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -462,6 +483,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -479,6 +501,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -496,6 +519,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -515,6 +539,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -530,6 +555,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -547,6 +573,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -564,6 +591,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -581,6 +609,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -598,6 +627,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -615,6 +645,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -632,6 +663,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -649,6 +681,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -666,6 +699,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -683,6 +717,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -700,6 +735,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -717,6 +753,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -734,6 +771,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -751,6 +789,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -768,6 +807,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -785,6 +825,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
             ],
@@ -895,6 +936,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
             ],
             enums: [
@@ -903,6 +945,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                         0,
                     ),
                     name: "User_enum_col",
+                    description: None,
                 },
             ],
             enum_variants: [
@@ -935,6 +978,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: true,
+                        description: None,
                     },
                 ),
                 (
@@ -952,6 +996,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -969,6 +1014,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -986,6 +1032,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1003,6 +1050,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1020,6 +1068,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1037,6 +1086,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1054,6 +1104,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1071,6 +1122,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1088,6 +1140,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1105,6 +1158,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1122,6 +1176,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1139,6 +1194,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1156,6 +1212,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1173,6 +1230,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1190,6 +1248,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1207,6 +1266,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1224,6 +1284,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1241,6 +1302,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1258,6 +1320,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1275,6 +1338,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1292,6 +1356,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1311,6 +1376,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1326,6 +1392,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1343,6 +1410,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1360,6 +1428,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1377,6 +1446,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1394,6 +1464,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1411,6 +1482,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1428,6 +1500,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1445,6 +1518,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1462,6 +1536,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1479,6 +1554,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1496,6 +1572,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1513,6 +1590,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1530,6 +1608,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1547,6 +1626,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1564,6 +1644,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1581,6 +1662,7 @@ fn all_mariadb_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
             ],
@@ -1684,6 +1766,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
             ],
             enums: [
@@ -1692,6 +1775,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                         0,
                     ),
                     name: "User_enum_col",
+                    description: None,
                 },
             ],
             enum_variants: [
@@ -1724,6 +1808,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: true,
+                        description: None,
                     },
                 ),
                 (
@@ -1741,6 +1826,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1758,6 +1844,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1775,6 +1862,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1792,6 +1880,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1809,6 +1898,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1826,6 +1916,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1843,6 +1934,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1860,6 +1952,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1877,6 +1970,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1894,6 +1988,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1911,6 +2006,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1928,6 +2024,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1945,6 +2042,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1962,6 +2060,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1979,6 +2078,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -1996,6 +2096,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2013,6 +2114,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2030,6 +2132,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2047,6 +2150,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2064,6 +2168,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2081,6 +2186,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2100,6 +2206,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2115,6 +2222,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2132,6 +2240,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2149,6 +2258,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2166,6 +2276,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2183,6 +2294,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2200,6 +2312,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2217,6 +2330,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2234,6 +2348,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2251,6 +2366,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2268,6 +2384,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2285,6 +2402,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2302,6 +2420,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2319,6 +2438,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2336,6 +2456,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2353,6 +2474,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2370,6 +2492,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
             ],
@@ -2537,6 +2660,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
                 Table {
                     namespace_id: NamespaceId(
@@ -2546,6 +2670,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
             ],
             enums: [],
@@ -2566,6 +2691,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2583,6 +2709,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2600,6 +2727,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
             ],
@@ -2727,6 +2855,7 @@ fn introspected_default_strings_should_be_unescaped(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
             ],
             enums: [],
@@ -2747,6 +2876,7 @@ fn introspected_default_strings_should_be_unescaped(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
             ],
@@ -2804,6 +2934,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
             ],
             enums: [],
@@ -2824,6 +2955,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2841,6 +2973,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
             ],
@@ -2911,6 +3044,7 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
             ],
             enums: [],
@@ -2931,6 +3065,7 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
             ],
@@ -2999,6 +3134,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
             ],
             enums: [
@@ -3007,6 +3143,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                         0,
                     ),
                     name: "game_enum_col",
+                    description: None,
                 },
             ],
             enum_variants: [
@@ -3033,6 +3170,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -3050,6 +3188,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -3067,6 +3206,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -3084,6 +3224,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -3101,6 +3242,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -3118,6 +3260,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -3135,6 +3278,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -3152,6 +3296,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -3169,6 +3314,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -3186,6 +3332,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                             ),
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -3205,6 +3352,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -3220,6 +3368,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
             ],

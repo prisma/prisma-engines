@@ -136,7 +136,7 @@ source .test_database_urls/mysql_5_6
     tok(conn.raw_cmd(&text)).unwrap();
 
     let params = ConnectorParams {
-        connection_string: database_url.to_owned(),
+        connection_string: database_url,
         preview_features,
         shadow_database_connection_string: None,
     };

@@ -7,7 +7,9 @@ pub trait Getter {
     fn get_expect_char(&self, name: &str) -> char;
     fn get_expect_i64(&self, name: &str) -> i64;
     fn get_expect_bool(&self, name: &str) -> bool;
+    fn get_expect_string_array(&self, name: &str) -> Vec<String>;
 
+    fn get_string_array(&self, name: &str) -> Option<Vec<String>>;
     fn get_char(&self, name: &str) -> Option<char>;
     fn get_string(&self, name: &str) -> Option<String>;
     fn get_bool(&self, name: &str) -> Option<bool>;
@@ -45,6 +47,18 @@ impl Getter for ResultRow {
         self.get_bool(name)
             .ok_or_else(|| format!("Getting {} from Resultrow {:?} as bool failed", name, &self))
             .unwrap()
+    }
+
+    #[track_caller]
+    fn get_expect_string_array(&self, name: &str) -> Vec<String> {
+        self.get(name)
+            .and_then(|x| x.to_vec::<String>())
+            .ok_or_else(|| format!("Getting {name} from ResultRow {self:?} as Vec<String> failed"))
+            .unwrap()
+    }
+
+    fn get_string_array(&self, name: &str) -> Option<Vec<String>> {
+        self.get(name).and_then(|x| x.to_vec::<String>())
     }
 
     fn get_char(&self, name: &str) -> Option<char> {

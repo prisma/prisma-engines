@@ -356,6 +356,21 @@ impl<'a> RelationFieldPair<'a> {
         }
     }
 
+    /// True, if we add a new constraint with non-default deferring.
+    pub(crate) fn adds_non_default_deferring(self) -> bool {
+        match self.relation_type {
+            RelationType::Inline(field) => {
+                field.previous.is_none()
+                    && self
+                        .context
+                        .flavour
+                        .uses_non_default_foreign_key_deferring(self.context, field.next)
+            }
+            RelationType::Many2Many(_) => false,
+            RelationType::Emulated(_) => false,
+        }
+    }
+
     /// If the relation is completely taken from the PSL.
     pub(crate) fn reintrospected_relation(self) -> bool {
         matches!(self.relation_type, RelationType::Emulated(_))

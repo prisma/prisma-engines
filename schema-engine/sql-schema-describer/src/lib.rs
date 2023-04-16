@@ -234,12 +234,15 @@ impl SqlSchema {
     }
 
     /// Add an enum to the schema.
-    pub fn push_enum(&mut self, namespace_id: NamespaceId, enum_name: String) -> EnumId {
+    pub fn push_enum(&mut self, namespace_id: NamespaceId, enum_name: String, description: Option<String>) -> EnumId {
         let id = EnumId(self.enums.len() as u32);
+
         self.enums.push(Enum {
             namespace_id,
             name: enum_name,
+            description,
         });
+
         id
     }
 
@@ -357,23 +360,35 @@ impl SqlSchema {
         id
     }
 
-    pub fn push_table(&mut self, name: String, namespace_id: NamespaceId) -> TableId {
+    pub fn push_table(&mut self, name: String, namespace_id: NamespaceId, description: Option<String>) -> TableId {
         let id = TableId(self.tables.len() as u32);
+
         self.tables.push(Table {
             namespace_id,
             name,
             properties: TableProperties::empty(),
+            description,
         });
+
         id
     }
 
-    pub fn push_view(&mut self, name: String, namespace_id: NamespaceId, definition: Option<String>) -> ViewId {
+    pub fn push_view(
+        &mut self,
+        name: String,
+        namespace_id: NamespaceId,
+        definition: Option<String>,
+        description: Option<String>,
+    ) -> ViewId {
         let id = ViewId(self.views.len() as u32);
+
         self.views.push(View {
             namespace_id,
             name,
             definition,
+            description,
         });
+
         id
     }
 
@@ -382,13 +397,17 @@ impl SqlSchema {
         name: String,
         namespace_id: NamespaceId,
         properties: BitFlags<TableProperties>,
+        description: Option<String>,
     ) -> TableId {
         let id = TableId(self.tables.len() as u32);
+
         self.tables.push(Table {
             namespace_id,
             name,
             properties,
+            description,
         });
+
         id
     }
 
@@ -507,6 +526,7 @@ pub struct Table {
     namespace_id: NamespaceId,
     name: String,
     properties: BitFlags<TableProperties>,
+    description: Option<String>,
 }
 
 /// The type of an index.
@@ -596,6 +616,8 @@ pub struct Column {
     pub tpe: ColumnType,
     /// Is the column auto-incrementing?
     pub auto_increment: bool,
+    /// The comment in the database
+    pub description: Option<String>,
 }
 
 /// The type of a column.
@@ -782,6 +804,7 @@ struct Enum {
     /// The namespace the enum type belongs to, if applicable.
     namespace_id: NamespaceId,
     name: String,
+    description: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -815,6 +838,8 @@ pub struct View {
     pub name: String,
     /// The SQL definition of the view.
     pub definition: Option<String>,
+    /// The comment in the database
+    pub description: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]

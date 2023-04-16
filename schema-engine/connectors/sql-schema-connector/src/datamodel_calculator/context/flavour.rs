@@ -3,6 +3,7 @@ mod postgresql;
 mod sqlite;
 mod sqlserver;
 
+use sql::{ForeignKeyWalker, IndexColumnWalker, IndexWalker, TableWalker};
 use sql_schema_describer as sql;
 
 pub(super) use mysql::MysqlIntrospectionFlavour;
@@ -32,4 +33,28 @@ pub(crate) trait IntrospectionFlavour {
     }
 
     fn generate_warnings(&self, _ctx: &DatamodelCalculatorContext<'_>, _warnings: &mut Warnings) {}
+
+    fn uses_row_level_ttl(&self, _ctx: &DatamodelCalculatorContext<'_>, _table: TableWalker<'_>) -> bool {
+        false
+    }
+
+    fn uses_non_default_index_deferring(&self, _ctx: &DatamodelCalculatorContext<'_>, _index: IndexWalker<'_>) -> bool {
+        false
+    }
+
+    fn uses_non_default_foreign_key_deferring(
+        &self,
+        _ctx: &DatamodelCalculatorContext<'_>,
+        _foreign_key: ForeignKeyWalker<'_>,
+    ) -> bool {
+        false
+    }
+
+    fn uses_non_default_null_position(
+        &self,
+        _ctx: &DatamodelCalculatorContext<'_>,
+        _column: IndexColumnWalker<'_>,
+    ) -> bool {
+        false
+    }
 }

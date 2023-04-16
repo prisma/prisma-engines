@@ -29,6 +29,13 @@ pub(super) fn generate_warnings(view: ViewPair<'_>, warnings: &mut Warnings) {
         });
     }
 
+    if view.description().is_some() {
+        warnings.objects_with_comments.push(generators::Object {
+            r#type: "view",
+            name: view.name().to_string(),
+        })
+    }
+
     for field in view.scalar_fields() {
         if field.remapped_name_from_psl() {
             let mf = generators::ViewAndField {
@@ -56,6 +63,13 @@ pub(super) fn generate_warnings(view: ViewPair<'_>, warnings: &mut Warnings) {
             };
 
             warnings.fields_with_empty_names_in_view.push(mf);
+        }
+
+        if field.description().is_some() {
+            warnings.objects_with_comments.push(generators::Object {
+                r#type: "field",
+                name: format!("{}.{}", view.name(), field.name()),
+            })
         }
     }
 

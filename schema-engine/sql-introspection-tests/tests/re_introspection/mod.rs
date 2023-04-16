@@ -463,7 +463,7 @@ async fn manually_remapped_enum_value_name(api: &mut TestApi) -> TestResult {
         }
     "#};
 
-    let result = api.re_introspect(&input_dm).await?;
+    let result = api.re_introspect(input_dm).await?;
     api.assert_eq_datamodels(final_dm, &result);
 
     let expected = json!([{
@@ -530,7 +530,7 @@ async fn manually_re_mapped_enum_name(api: &mut TestApi) -> TestResult {
         }
     "#};
 
-    let result = api.re_introspect(&input_dm).await?;
+    let result = api.re_introspect(input_dm).await?;
     api.assert_eq_datamodels(final_dm, &result);
 
     let expected = json!([{
@@ -591,7 +591,7 @@ async fn manually_re_mapped_invalid_enum_values(api: &mut TestApi) -> TestResult
         }
     "#;
 
-    let result = api.re_introspect(&input_dm).await?;
+    let result = api.re_introspect(input_dm).await?;
     api.assert_eq_datamodels(final_dm, &result);
 
     let expected = json!([{
@@ -822,7 +822,7 @@ async fn custom_model_order(api: &mut TestApi) -> TestResult {
         }
     "#};
 
-    let result = api.re_introspect(&input_dm).await?;
+    let result = api.re_introspect(input_dm).await?;
     api.assert_eq_datamodels(final_dm, &result);
 
     Ok(())
@@ -901,7 +901,7 @@ async fn custom_enum_order(api: &mut TestApi) -> TestResult {
         }
     "#};
 
-    let result = api.re_introspect(&input_dm).await?;
+    let result = api.re_introspect(input_dm).await?;
     api.assert_eq_datamodels(final_dm, &result);
 
     Ok(())
@@ -1033,7 +1033,7 @@ async fn virtual_cuid_default(api: &mut TestApi) {
         }
     "#};
 
-    let result = api.re_introspect(&input_dm).await.unwrap();
+    let result = api.re_introspect(input_dm).await.unwrap();
     api.assert_eq_datamodels(final_dm, &result);
 }
 
@@ -1083,7 +1083,7 @@ async fn virtual_cuid_default_cockroach(api: &mut TestApi) {
         }
     "#};
 
-    let result = api.re_introspect(&input_dm).await.unwrap();
+    let result = api.re_introspect(input_dm).await.unwrap();
     api.assert_eq_datamodels(final_dm, &result);
 }
 
@@ -1321,7 +1321,7 @@ async fn re_introspecting_mysql_enum_names(api: &mut TestApi) -> TestResult {
             }
         "#;
 
-    let result = api.re_introspect(&input_dm).await.unwrap();
+    let result = api.re_introspect(input_dm).await.unwrap();
     api.assert_eq_datamodels(final_dm, &result);
 
     assert_eq_json!(
@@ -1496,7 +1496,7 @@ async fn re_introspecting_ignore(api: &mut TestApi) -> TestResult {
         }
     "#};
 
-    let result = api.re_introspect(&input_dm).await.unwrap();
+    let result = api.re_introspect(input_dm).await.unwrap();
     api.assert_eq_datamodels(final_dm, &result);
 
     Ok(())
@@ -1594,7 +1594,7 @@ async fn re_introspecting_custom_compound_unique_upgrade(api: &mut TestApi) -> T
          }
      "#};
 
-    let result = api.re_introspect(&input_dm).await?;
+    let result = api.re_introspect(input_dm).await?;
     api.assert_eq_datamodels(final_dm, &result);
 
     Ok(())

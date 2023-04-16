@@ -35,6 +35,11 @@ impl<'a> EnumWalker<'a> {
         super::range_for_key(&self.schema.enum_variants, self.id, |variant| variant.enum_id)
             .map(move |idx| self.schema.enum_variants[idx].variant_name.as_str())
     }
+
+    /// Description (comment) of the enum.
+    pub fn description(self) -> Option<&'a str> {
+        self.get().description.as_deref()
+    }
 }
 
 impl<'a> EnumVariantWalker<'a> {

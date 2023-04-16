@@ -29,6 +29,11 @@ impl<'a> ViewWalker<'a> {
         self.columns_range().map(move |idx| self.walk(ViewColumnId(idx as u32)))
     }
 
+    /// Description (comment) of the view.
+    pub fn description(self) -> Option<&'a str> {
+        self.get().description.as_deref()
+    }
+
     fn columns_range(self) -> Range<usize> {
         super::range_for_key(&self.schema.view_columns, self.id, |(tid, _)| *tid)
     }

@@ -57,10 +57,19 @@ pub(crate) struct Warnings {
     pub(crate) non_default_index_null_sort_order: Vec<IndexedColumn>,
     /// Warn about using row level security, which is currently unsupported.
     pub(crate) row_level_security_tables: Vec<Model>,
+<<<<<<< HEAD
     /// Warn about check constraints.
     pub(crate) check_constraints: Vec<CheckConstraint>,
     /// Warn about exclusion constraints.
     pub(crate) exclusion_constraints: Vec<ExclusionConstraint>,
+=======
+    /// Warn about row level TTL
+    pub(crate) row_level_ttl: Vec<Model>,
+    /// Warn about non-default unique deferring setup
+    pub(crate) non_default_deferring: Vec<ModelAndConstraint>,
+    /// Warn about comments
+    pub(crate) objects_with_comments: Vec<Object>,
+>>>>>>> main
 }
 
 impl Warnings {
@@ -216,6 +225,7 @@ impl Warnings {
             &mut self.warnings,
         );
 
+<<<<<<< HEAD
         maybe_warn(&self.check_constraints, check_constraints_found, &mut self.warnings);
 
         maybe_warn(
@@ -223,6 +233,11 @@ impl Warnings {
             exclusion_constraints_found,
             &mut self.warnings,
         );
+=======
+        maybe_warn(&self.row_level_ttl, row_level_ttl_in_tables, &mut self.warnings);
+        maybe_warn(&self.non_default_deferring, non_default_deferring, &mut self.warnings);
+        maybe_warn(&self.objects_with_comments, commented_objects, &mut self.warnings);
+>>>>>>> main
 
         self.warnings
     }
@@ -283,6 +298,15 @@ pub(crate) struct ModelAndIndex {
     pub(crate) index_db_name: String,
 }
 
+/// A constraint in a model that triggered a warning.
+#[derive(Serialize, Debug, Clone)]
+pub(crate) struct ModelAndConstraint {
+    /// The name of the model
+    pub(crate) model: String,
+    /// The name of the constraint
+    pub(crate) constraint: String,
+}
+
 /// A field type in a model that triggered a warning.
 #[derive(Serialize, Debug)]
 pub(crate) struct ModelAndFieldAndType {
@@ -331,6 +355,12 @@ pub(crate) struct TopLevelItem {
     /// The name of the top-level type
     pub(crate) r#type: TopLevelType,
     /// The name of the object
+    pub(crate) name: String,
+}
+
+#[derive(Serialize, Debug, Clone)]
+pub(crate) struct Object {
+    pub(crate) r#type: &'static str,
     pub(crate) name: String,
 }
 
@@ -595,8 +625,8 @@ pub(crate) fn non_default_index_null_sort_order(affected: &[IndexedColumn]) -> W
     }
 }
 
-pub(crate) fn row_level_security_tables_found(affected: &[Model]) -> Warning {
-    let message = "These tables contain row level security, which is not yet fully supported.";
+pub(super) fn row_level_security_tables_found(affected: &[Model]) -> Warning {
+    let message = "These tables contain row level security, which is not yet fully supported. Read more: https://pris.ly/d/row-level-security";
 
     Warning {
         code: 30,
@@ -605,9 +635,9 @@ pub(crate) fn row_level_security_tables_found(affected: &[Model]) -> Warning {
     }
 }
 
-// TODO: add a comment at the top of the table informing that check constraints are not represented in PSL
-pub(crate) fn check_constraints_found(affected: &[CheckConstraint]) -> Warning {
-    let message = "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints";
+
+pub(crate) fn row_level_ttl_in_tables(affected: &[Model]) -> Warning {
+    let message = "These models are using a row level TTL setting defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/row-level-ttl";
 
     Warning {
         code: 31,
@@ -616,12 +646,41 @@ pub(crate) fn check_constraints_found(affected: &[CheckConstraint]) -> Warning {
     }
 }
 
-// TODO: add a comment at the top of the table informing that check constraints are not represented in PSL
+pub(crate) fn check_constraints_found(affected: &[CheckConstraint]) -> Warning {
+    let message = "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints";
+
+    Warning {
+        code: 33,
+        message: message.into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
 pub(crate) fn exclusion_constraints_found(affected: &[ExclusionConstraint]) -> Warning {
     let message = "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints";
 
     Warning {
-        code: 32,
+        code: 34,
+        message: message.into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+pub(crate) fn non_default_deferring(affected: &[ModelAndConstraint]) -> Warning {
+    let message = "These primary key, foreign key or unique constraints are using non-default deferring in the database, which is not yet fully supported. Read more: https://pris.ly/d/constraint-deferring";
+
+    Warning {
+        code: 35,
+        message: message.into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+pub(crate) fn commented_objects(affected: &[Object]) -> Warning {
+    let message = "These objects have comments defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/database-comments";
+
+    Warning {
+        code: 36,
         message: message.into(),
         affected: serde_json::to_value(affected).unwrap(),
     }
