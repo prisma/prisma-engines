@@ -101,27 +101,6 @@ impl fmt::Display for SqlIndexAlgorithm {
     }
 }
 
-#[derive(PartialEq, Debug, Clone, Copy)]
-pub enum SqlConstraint {
-    Check,
-    Exclude,
-}
-
-impl AsRef<str> for SqlConstraint {
-    fn as_ref(&self) -> &str {
-        match self {
-            Self::Check => "CHECK",
-            Self::Exclude => "EXCLUDE",
-        }
-    }
-}
-
-impl fmt::Display for SqlConstraint {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(self.as_ref())
-    }
-}
-
 #[enumflags2::bitflags]
 #[derive(Clone, Copy, Debug)]
 #[repr(u8)]
