@@ -3,7 +3,7 @@ use sql_schema_describer as sql;
 
 use crate::{
     datamodel_calculator::DatamodelCalculatorContext,
-    warnings::generators::{CheckConstraint, ExclusionConstraint, IndexedColumn, ModelAndConstraint, Warnings},
+    warnings::generators::{CheckConstraint, ExclusionConstraint, IndexedColumn, Model, ModelAndConstraint, Warnings},
 };
 
 pub(crate) struct PostgresIntrospectionFlavour;

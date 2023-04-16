@@ -59,12 +59,12 @@ impl<'a> ModelPair<'a> {
 
     /// Whether the model has check constraints.
     pub(crate) fn has_check_constraints(self) -> bool {
-        self.next.has_check_constraints()
+        self.previous.is_none() && self.next.has_check_constraints()
     }
 
     /// Whether the model has exclusion constraints.
     pub(crate) fn has_exclusion_constraints(self) -> bool {
-        self.next.has_exclusion_constraints()
+        self.previous.is_none() && self.next.has_exclusion_constraints()
     }
 
     /// True, if we add a new model with row level security enabled.

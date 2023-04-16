@@ -578,30 +578,58 @@ mod constraints {
         psl::parse_schema(schema.data()).unwrap();
 
         let expectation = expect![[r#"
-        [
-          {
-            "code": 31,
-            "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints",
-            "affected": [
+            [
               {
-                "name": "room_reservation_price_check",
-                "definition": "CHECK ((price > (0)::numeric))"
-              }
-            ]
-          },
-          {
-            "code": 32,
-            "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints",
-            "affected": [
+                "code": 33,
+                "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints",
+                "affected": [
+                  {
+                    "name": "room_reservation_price_check",
+                    "definition": "CHECK ((price > (0)::numeric))"
+                  }
+                ]
+              },
               {
-                "name": "room_reservation_room_id_tstzrange_excl",
-                "definition": "EXCLUDE USING gist (room_id WITH =, tstzrange(reserved_at, reserved_until) WITH &&) WHERE ((NOT canceled))"
+                "code": 34,
+                "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints",
+                "affected": [
+                  {
+                    "name": "room_reservation_room_id_tstzrange_excl",
+                    "definition": "EXCLUDE USING gist (room_id WITH =, tstzrange(reserved_at, reserved_until) WITH &&) WHERE ((NOT canceled))"
+                  }
+                ]
               }
-            ]
-          }
-        ]"#]];
+            ]"#]];
 
         api.expect_warnings(&expectation).await;
+
+        let input = indoc! { r#"
+          /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.
+          /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-exclusion-constraints for more info.
+          model room_reservation {
+            room_reservation_id Int      @id @default(autoincrement())
+            room_id             Int
+            reserved_at         DateTime @db.Timestamptz(6)
+            reserved_until      DateTime @db.Timestamptz(6)
+            canceled            Boolean? @default(false)
+            price               Decimal? @db.Decimal
+          }
+          "#
+        };
+
+        let expectation = expect![[r#"
+            /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.
+            /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-exclusion-constraints for more info.
+            model room_reservation {
+              room_reservation_id Int      @id @default(autoincrement())
+              room_id             Int
+              reserved_at         DateTime @db.Timestamptz(6)
+              reserved_until      DateTime @db.Timestamptz(6)
+              canceled            Boolean? @default(false)
+              price               Decimal? @db.Decimal
+            }
+        "#]];
+        api.expect_re_introspected_datamodel(input, expectation).await;
 
         Ok(())
     }
@@ -650,7 +678,7 @@ mod check_constraints {
         let expectation = expect![[r#"
             [
               {
-                "code": 31,
+                "code": 33,
                 "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints",
                 "affected": [
                   {
@@ -662,6 +690,26 @@ mod check_constraints {
             ]"#]];
 
         api.expect_warnings(&expectation).await;
+
+        let input = indoc! { r#"
+          /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.
+          model products {
+            product_id Int      @id @default(autoincrement())
+            name       String?
+            price      Decimal? @db.Decimal
+          }
+        "#
+        };
+
+        let expectation = expect![[r#"
+            /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.
+            model products {
+              product_id Int      @id @default(autoincrement())
+              name       String?
+              price      Decimal? @db.Decimal
+            }
+        "#]];
+        api.expect_re_introspected_datamodel(input, expectation).await;
 
         Ok(())
     }
@@ -719,7 +767,7 @@ mod exclusion_constraints {
         let expectation = expect![[r#"
             [
               {
-                "code": 32,
+                "code": 34,
                 "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints",
                 "affected": [
                   {
@@ -731,6 +779,30 @@ mod exclusion_constraints {
             ]"#]];
 
         api.expect_warnings(&expectation).await;
+
+        let input = indoc! { r#"
+          /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-exclusion-constraints for more info.
+          model room_reservation {
+            room_reservation_id Int      @id @default(autoincrement())
+            room_id             Int
+            reserved_at         DateTime @db.Timestamptz(6)
+            reserved_until      DateTime @db.Timestamptz(6)
+            canceled            Boolean? @default(false)
+          }
+        "#
+        };
+
+        let expectation = expect![[r#"
+            /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-exclusion-constraints for more info.
+            model room_reservation {
+              room_reservation_id Int      @id @default(autoincrement())
+              room_id             Int
+              reserved_at         DateTime @db.Timestamptz(6)
+              reserved_until      DateTime @db.Timestamptz(6)
+              canceled            Boolean? @default(false)
+            }
+        "#]];
+        api.expect_re_introspected_datamodel(input, expectation).await;
 
         Ok(())
     }
@@ -780,7 +852,7 @@ mod exclusion_constraints {
         let expectation = expect![[r#"
             [
               {
-                "code": 32,
+                "code": 34,
                 "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints",
                 "affected": [
                   {
@@ -792,6 +864,28 @@ mod exclusion_constraints {
             ]"#]];
 
         api.expect_warnings(&expectation).await;
+
+        let input = indoc! { r#"
+          /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-exclusion-constraints for more info.
+          model room_reservation {
+            room_reservation_id Int      @id @default(autoincrement())
+            room_id             Int
+            reserved_at         DateTime @db.Timestamptz(6)
+            reserved_until      DateTime @db.Timestamptz(6)
+          }
+        "#
+        };
+
+        let expectation = expect![[r#"
+            /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-exclusion-constraints for more info.
+            model room_reservation {
+              room_reservation_id Int      @id @default(autoincrement())
+              room_id             Int
+              reserved_at         DateTime @db.Timestamptz(6)
+              reserved_until      DateTime @db.Timestamptz(6)
+            }
+        "#]];
+        api.expect_re_introspected_datamodel(input, expectation).await;
 
         Ok(())
     }
@@ -837,7 +931,7 @@ mod exclusion_constraints {
         let expectation = expect![[r#"
             [
               {
-                "code": 32,
+                "code": 34,
                 "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints",
                 "affected": [
                   {
@@ -849,6 +943,24 @@ mod exclusion_constraints {
             ]"#]];
 
         api.expect_warnings(&expectation).await;
+
+        let input = indoc! { r#"
+          /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-exclusion-constraints for more info.
+          model room_reservation {
+            room_reservation_id Int @id @default(autoincrement())
+            room_id             Int
+          }
+        "#
+        };
+
+        let expectation = expect![[r#"
+            /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-exclusion-constraints for more info.
+            model room_reservation {
+              room_reservation_id Int @id @default(autoincrement())
+              room_id             Int
+            }
+        "#]];
+        api.expect_re_introspected_datamodel(input, expectation).await;
 
         Ok(())
     }
