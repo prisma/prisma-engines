@@ -1253,20 +1253,17 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         for row in rows {
             let namespace = row.get_expect_string("namespace");
-            // let namespace_id = sql_schema.get_namespace_id(&namespace).unwrap();
             let table_name = row.get_expect_string("table_name");
-            // let table_id = table_ids.get(&(namespace, table_name)).unwrap();
             let constraint_name = row.get_expect_string("constraint_name");
             let constraint_type = row.get_expect_char("constraint_type");
-            let constraint_definition = row.get_expect_string("constraint_definition");
 
-            let constraint_key = (namespace, table_name);
+            let constraint_key = (namespace, table_name.clone());
 
             match constraint_type {
                 'c' => {
-                    let check_constraint = CheckConstraint {
-                        name: constraint_name,
-                        definition: constraint_definition,
+                    let check_constraint = ModelAndConstraint {
+                        model: table_name,
+                        constraint: constraint_name,
                     };
                     sql_schema.push_check_constraint(check_constraint);
 
@@ -1277,9 +1274,9 @@ impl<'a> SqlSchemaDescriber<'a> {
                     );
                 }
                 'x' => {
-                    let exclusion_constraint = ExclusionConstraint {
-                        name: constraint_name,
-                        definition: constraint_definition,
+                    let exclusion_constraint = ModelAndConstraint {
+                        model: table_name,
+                        constraint: constraint_name,
                     };
                     sql_schema.push_exclusion_constraint(exclusion_constraint);
 

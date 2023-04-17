@@ -80,9 +80,9 @@ pub struct SqlSchema {
     /// All columns of indexes.
     index_columns: Vec<IndexColumn>,
     /// Check constraints for every table.
-    check_constraints: Vec<CheckConstraint>,
+    check_constraints: Vec<ModelAndConstraint>,
     /// Exclusion constraints for every table.
-    exclusion_constraints: Vec<ExclusionConstraint>,
+    exclusion_constraints: Vec<ModelAndConstraint>,
     /// The schema's views,
     views: Vec<View>,
     /// The schema's columns that are in views.
@@ -136,12 +136,12 @@ impl SqlSchema {
     }
 
     /// Get check constraints.
-    pub fn check_constraints(&self) -> &[CheckConstraint] {
+    pub fn check_constraints(&self) -> &[ModelAndConstraint] {
         &self.check_constraints
     }
 
     /// Get exclusion constraints.
-    pub fn exclusion_constraints(&self) -> &[ExclusionConstraint] {
+    pub fn exclusion_constraints(&self) -> &[ModelAndConstraint] {
         &self.exclusion_constraints
     }
 
@@ -346,11 +346,11 @@ impl SqlSchema {
         });
     }
 
-    pub fn push_check_constraint(&mut self, check_constraint: CheckConstraint) {
+    pub fn push_check_constraint(&mut self, check_constraint: ModelAndConstraint) {
         self.check_constraints.push(check_constraint);
     }
 
-    pub fn push_exclusion_constraint(&mut self, exclusion_constraint: ExclusionConstraint) {
+    pub fn push_exclusion_constraint(&mut self, exclusion_constraint: ModelAndConstraint) {
         self.exclusion_constraints.push(exclusion_constraint);
     }
 
@@ -813,12 +813,12 @@ struct EnumVariant {
     variant_name: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct CheckConstraint {
-    /// Name of the constraint.
-    pub name: String,
-    /// The SQL definition of the constraint.
-    pub definition: String,
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ModelAndConstraint {
+    /// The name of the model
+    pub model: String,
+    /// The name of the constraint
+    pub constraint: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

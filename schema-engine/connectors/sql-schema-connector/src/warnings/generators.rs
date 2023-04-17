@@ -58,9 +58,9 @@ pub(crate) struct Warnings {
     /// Warn about using row level security, which is currently unsupported.
     pub(crate) row_level_security_tables: Vec<Model>,
     /// Warn about check constraints.
-    pub(crate) check_constraints: Vec<CheckConstraint>,
+    pub(crate) check_constraints: Vec<ModelAndConstraint>,
     /// Warn about exclusion constraints.
-    pub(crate) exclusion_constraints: Vec<ExclusionConstraint>,
+    pub(crate) exclusion_constraints: Vec<ModelAndConstraint>,
     /// Warn about row level TTL
     pub(crate) row_level_ttl: Vec<Model>,
     /// Warn about non-default unique deferring setup
@@ -369,34 +369,6 @@ pub(crate) struct IndexedColumn {
     pub(crate) column_name: String,
 }
 
-/// A check constraint that triggered a warning.
-#[derive(Serialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct CheckConstraint {
-    /// The name of the namespace
-    // pub(crate) namespace: String,
-    /// The name of the table
-    // pub(crate) table: String,
-    /// The name of the constraint
-    pub(crate) name: String,
-    /// The definition of the constraint
-    pub(crate) definition: String,
-}
-
-/// An exclusion constraint that triggered a warning.
-#[derive(Serialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct ExclusionConstraint {
-    /// The name of the namespace
-    /// pub(crate) namespace: String,
-    /// The name of the table
-    /// pub(crate) table: String,
-    /// The name of the constraint
-    pub(crate) name: String,
-    /// The definition of the constraint
-    pub(crate) definition: String,
-}
-
 pub(super) fn warning_models_without_identifier(affected: &[Model]) -> Warning {
     Warning {
         code: 1,
@@ -640,7 +612,7 @@ pub(crate) fn row_level_ttl_in_tables(affected: &[Model]) -> Warning {
     }
 }
 
-pub(crate) fn check_constraints_found(affected: &[CheckConstraint]) -> Warning {
+pub(crate) fn check_constraints_found(affected: &[ModelAndConstraint]) -> Warning {
     let message = "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints";
 
     Warning {
@@ -650,7 +622,7 @@ pub(crate) fn check_constraints_found(affected: &[CheckConstraint]) -> Warning {
     }
 }
 
-pub(crate) fn exclusion_constraints_found(affected: &[ExclusionConstraint]) -> Warning {
+pub(crate) fn exclusion_constraints_found(affected: &[ModelAndConstraint]) -> Warning {
     let message = "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints";
 
     Warning {

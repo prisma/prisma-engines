@@ -584,8 +584,8 @@ mod constraints {
                 "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints",
                 "affected": [
                   {
-                    "name": "room_reservation_price_check",
-                    "definition": "CHECK ((price > (0)::numeric))"
+                    "model": "room_reservation",
+                    "constraint": "room_reservation_price_check"
                   }
                 ]
               },
@@ -594,8 +594,8 @@ mod constraints {
                 "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints",
                 "affected": [
                   {
-                    "name": "room_reservation_room_id_tstzrange_excl",
-                    "definition": "EXCLUDE USING gist (room_id WITH =, tstzrange(reserved_at, reserved_until) WITH &&) WHERE ((NOT canceled))"
+                    "model": "room_reservation",
+                    "constraint": "room_reservation_room_id_tstzrange_excl"
                   }
                 ]
               }
@@ -682,8 +682,8 @@ mod check_constraints {
                 "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints",
                 "affected": [
                   {
-                    "name": "products_price_check",
-                    "definition": "CHECK ((price > (0)::numeric))"
+                    "model": "products",
+                    "constraint": "products_price_check"
                   }
                 ]
               }
@@ -771,8 +771,8 @@ mod exclusion_constraints {
                 "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints",
                 "affected": [
                   {
-                    "name": "room_reservation_room_id_tstzrange_excl",
-                    "definition": "EXCLUDE USING gist (room_id WITH =, tstzrange(reserved_at, reserved_until) WITH &&) WHERE ((NOT canceled))"
+                    "model": "room_reservation",
+                    "constraint": "room_reservation_room_id_tstzrange_excl"
                   }
                 ]
               }
@@ -856,8 +856,8 @@ mod exclusion_constraints {
                 "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints",
                 "affected": [
                   {
-                    "name": "room_reservation_room_id_tstzrange_excl",
-                    "definition": "EXCLUDE USING gist (room_id WITH =, tstzrange(reserved_at, reserved_until) WITH &&)"
+                    "model": "room_reservation",
+                    "constraint": "room_reservation_room_id_tstzrange_excl"
                   }
                 ]
               }
@@ -935,8 +935,8 @@ mod exclusion_constraints {
                 "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints",
                 "affected": [
                   {
-                    "name": "room_reservation_room_id_excl",
-                    "definition": "EXCLUDE USING gist (room_id WITH =)"
+                    "model": "room_reservation",
+                    "constraint": "room_reservation_room_id_excl"
                   }
                 ]
               }
