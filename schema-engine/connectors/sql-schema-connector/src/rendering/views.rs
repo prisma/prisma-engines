@@ -80,7 +80,7 @@ fn render_view(view: ViewPair<'_>) -> renderer::View<'_> {
     }
 
     if view.adds_a_description() {
-        let docs = "This view is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments";
+        let docs = "This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments";
         rendered.documentation(docs);
     }
 
