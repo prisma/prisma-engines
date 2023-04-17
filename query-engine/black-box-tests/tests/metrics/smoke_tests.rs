@@ -18,6 +18,7 @@ mod smoke_tests {
     async fn expected_metrics_rendered(r: Runner) -> TestResult<()> {
         let mut qe_cmd = query_engine_cmd(r.prisma_dml(), "57582");
         qe_cmd.arg("--enable-metrics");
+        qe_cmd.env("PRISMA_ENGINE_PROTOCOL", "json");
 
         with_child_process(&mut qe_cmd, async move {
             let client = reqwest::Client::new();
@@ -27,9 +28,15 @@ mod smoke_tests {
                 .body(
                     r###"
                     {
-                    "operationName": null,
-                    "variables": {},
-                    "query": "{\n  findManyPerson {\n    id\n  }\n}\n"
+                        "action": "findMany",
+                        "modelName": "Person",
+                        "query": {
+                            "arguments": {
+                            },
+                            "selection": {
+                                "$scalars": true
+                            }
+                        }
                     }
                     "###,
                 )
