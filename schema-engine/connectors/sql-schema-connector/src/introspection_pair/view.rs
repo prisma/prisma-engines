@@ -174,4 +174,16 @@ impl<'a> ViewPair<'a> {
             .definition()
             .map(|s| self.context.flavour.format_view_definition(s))
     }
+
+    /// The COMMENT of the view.
+    pub(crate) fn description(self) -> Option<&'a str> {
+        self.next.description()
+    }
+
+    /// True if we introspect the view for the first time, and it has a comment
+    /// in the database.
+    pub(crate) fn adds_a_description(self) -> bool {
+        self.previous.is_none()
+            && (self.description().is_some() || self.scalar_fields().any(|sf| sf.adds_a_description()))
+    }
 }

@@ -184,7 +184,7 @@ async fn a_table_with_only_an_unsupported_id(api: &mut TestApi) -> TestResult {
     "#};
 
     let result = api.introspect().await?;
-    api.assert_eq_datamodels(&dm, &result);
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
@@ -487,7 +487,7 @@ ALTER TABLE foo ENABLE ROW LEVEL SECURITY; "#,
 
     let expected = json!([{
         "code": 30,
-        "message": "These tables contain row level security, which is not yet fully supported.",
+        "message": "These tables contain row level security, which is not yet fully supported. Read more: https://pris.ly/d/row-level-security",
         "affected": [
             {
                 "model": "foo"
@@ -507,6 +507,7 @@ ALTER TABLE foo ENABLE ROW LEVEL SECURITY; "#,
           url      = "env(TEST_DATABASE_URL)"
         }
 
+        /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
         model foo {
           id    Int    @id @default(autoincrement())
           owner String @db.VarChar(30)

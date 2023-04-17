@@ -171,11 +171,11 @@ impl<'a> SqlSchemaDescriber<'a> {
 
             match r#type.as_str() {
                 "table" => {
-                    let id = schema.push_table(name, Default::default());
+                    let id = schema.push_table(name, Default::default(), None);
                     map.insert(cloned_name, Either::Left(id));
                 }
                 "view" => {
-                    let id = schema.push_view(name, Default::default(), definition);
+                    let id = schema.push_view(name, Default::default(), definition, None);
                     map.insert(cloned_name, Either::Right(id));
                 }
                 _ => unreachable!(),
@@ -400,6 +400,7 @@ async fn push_columns(
             name: row.get_expect_string("name"),
             tpe,
             auto_increment: false,
+            description: None,
         };
 
         match container_id {

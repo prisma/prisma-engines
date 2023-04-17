@@ -197,10 +197,20 @@ async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
 
                 Ok(res)
             }
-            Err(_e) => {
+            Err(e) => {
+                let ufe: user_facing_errors::Error = request_handlers::HandlerError::query_conversion(format!(
+                    "Error parsing {:?} query. {}",
+                    cx.engine_protocol(),
+                    e
+                ))
+                .into();
+
+                let result_bytes = serde_json::to_vec(&ufe).unwrap();
+
                 let res = Response::builder()
-                    .status(StatusCode::BAD_REQUEST)
-                    .body(Body::empty())
+                    .status(StatusCode::UNPROCESSABLE_ENTITY) // 422
+                    .header(CONTENT_TYPE, "application/json")
+                    .body(Body::from(result_bytes))
                     .unwrap();
 
                 Ok(res)

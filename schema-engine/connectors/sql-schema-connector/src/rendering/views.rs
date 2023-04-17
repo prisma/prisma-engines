@@ -79,6 +79,11 @@ fn render_view(view: ViewPair<'_>) -> renderer::View<'_> {
         rendered.documentation(docs);
     }
 
+    if view.adds_a_description() {
+        let docs = "This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments";
+        rendered.documentation(docs);
+    }
+
     for field in view.scalar_fields() {
         rendered.push_field(scalar_field::render(field));
     }

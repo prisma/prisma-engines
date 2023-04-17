@@ -13,7 +13,14 @@ pub(super) fn generate_warnings(r#enum: EnumPair<'_>, warnings: &mut Warnings) {
         warnings.duplicate_names.push(generators::TopLevelItem {
             r#type: generators::TopLevelType::Enum,
             name: r#enum.name().to_string(),
-        })
+        });
+    }
+
+    if r#enum.description().is_some() {
+        warnings.objects_with_comments.push(generators::Object {
+            r#type: "enum",
+            name: r#enum.name().to_string(),
+        });
     }
 
     for variant in r#enum.variants() {

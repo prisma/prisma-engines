@@ -37,14 +37,36 @@ impl<'a> ModelPair<'a> {
         self.next.is_partition()
     }
 
+    /// True, if we add a new model with a partition.
+    pub(crate) fn new_with_partition(self) -> bool {
+        self.previous.is_none() && self.is_partition()
+    }
+
     /// Whether the model has subclass tables or not.
     pub(crate) fn has_subclass(self) -> bool {
         self.next.has_subclass()
     }
 
+    /// True, if we add a new model with a subclass.
+    pub(crate) fn new_with_subclass(self) -> bool {
+        self.previous.is_none() && self.has_subclass()
+    }
+
     /// Whether the model has row level security enabled.
     pub(crate) fn has_row_level_security(self) -> bool {
         self.next.has_row_level_security()
+    }
+
+    /// True, if we add a new model with row level security enabled.
+    pub(crate) fn adds_row_level_security(self) -> bool {
+        self.previous.is_none() && self.has_row_level_security()
+    }
+
+    /// True, if we add an index with non-default null position.
+    pub(crate) fn adds_non_default_null_position(self) -> bool {
+        self.all_indexes()
+            .flat_map(|i| i.fields())
+            .any(|f| f.adds_non_default_null_position())
     }
 
     /// Name of the model in the PSL. The value can be sanitized if it
@@ -144,6 +166,24 @@ impl<'a> ModelPair<'a> {
         self.previous.filter(|m| m.mapped_name().is_some()).is_some()
     }
 
+    /// True, if we have a new model that uses row level TTL.
+    pub(crate) fn adds_a_row_level_ttl(self) -> bool {
+        self.previous.is_none() && self.context.flavour.uses_row_level_ttl(self.context, self.next)
+    }
+
+    /// True, if we _add_ a new constraint with a non-default
+    /// deferring.
+    pub(crate) fn adds_non_default_deferring(self) -> bool {
+        let from_index = self.all_indexes().any(|i| i.adds_a_non_default_deferring());
+
+        let from_fk = self
+            .relation_fields()
+            .filter(|rf| rf.fields().is_some())
+            .any(|rf| rf.adds_non_default_deferring());
+
+        self.previous.is_none() && (from_index || from_fk)
+    }
+
     /// A model must have either a primary key, or at least one unique
     /// index defined that consists of columns that are all supported by
     /// prisma and not null.
@@ -226,5 +266,37 @@ impl<'a> ModelPair<'a> {
 
                 (!pair.defined_in_a_field()).then_some(pair)
             })
+    }
+
+    /// The COMMENT of the model.
+    pub(crate) fn description(self) -> Option<&'a str> {
+        self.next.description()
+    }
+
+    /// True if we have a new model and it has a comment.
+    pub(crate) fn adds_a_description(self) -> bool {
+        self.previous.is_none()
+            && (self.description().is_some() || self.scalar_fields().any(|sf| sf.adds_a_description()))
+    }
+
+    fn all_indexes(self) -> impl ExactSizeIterator<Item = IndexPair<'a>> {
+        self.next.indexes().map(move |next| {
+            let previous = self.previous.and_then(|prev| {
+                prev.indexes().find(|idx| {
+                    // Upgrade logic. Prior to Prisma 3, PSL index attributes had a `name` argument but no `map`
+                    // argument. If we infer that an index in the database was produced using that logic, we
+                    // match up the existing index.
+                    if idx.mapped_name().is_none() && idx.name() == Some(next.name()) {
+                        return true;
+                    }
+
+                    // Compare the constraint name (implicit or mapped name) from the Prisma schema with the
+                    // constraint name from the database.
+                    idx.constraint_name(self.context.active_connector()) == next.name()
+                })
+            });
+
+            IntrospectionPair::new(self.context, previous, Some(next))
+        })
     }
 }

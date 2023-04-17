@@ -47,7 +47,7 @@ async fn a_table_with_enums(api: &mut TestApi) -> TestResult {
 
     for _ in 0..4 {
         let result = api.introspect().await?;
-        api.assert_eq_datamodels(&dm, &result);
+        api.assert_eq_datamodels(dm, &result);
     }
 
     Ok(())

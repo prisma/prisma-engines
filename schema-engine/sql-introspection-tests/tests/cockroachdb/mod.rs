@@ -353,6 +353,7 @@ async fn row_level_ttl_stopgap(api: &mut TestApi) -> TestResult {
           url      = "env(TEST_DATABASE_URL)"
         }
 
+        /// This model is using a row level TTL in the database, and requires an additional setup in migrations. Read more: https://pris.ly/d/row-level-ttl
         model ttl_test {
           id          BigInt    @id @default(autoincrement())
           inserted_at DateTime? @default(now()) @db.Timestamp(6)
@@ -369,6 +370,84 @@ async fn row_level_ttl_stopgap(api: &mut TestApi) -> TestResult {
             "affected": [
               {
                 "model": "ttl_test"
+              }
+            ]
+          }
+        ]"#]];
+
+    api.expect_warnings(&expectation).await;
+
+    let input = indoc! {r#"
+        /// This model is using a row level TTL in the database, and requires an additional setup in migrations. Read more: https://pris.ly/d/row-level-ttl
+        model ttl_test {
+          id          BigInt    @id @default(autoincrement())
+          inserted_at DateTime? @default(now()) @db.Timestamp(6)
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        /// This model is using a row level TTL in the database, and requires an additional setup in migrations. Read more: https://pris.ly/d/row-level-ttl
+        model ttl_test {
+          id          BigInt    @id @default(autoincrement())
+          inserted_at DateTime? @default(now()) @db.Timestamp(6)
+        }
+    "#]];
+
+    api.expect_re_introspected_datamodel(input, expectation).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(CockroachDb), preview_features("views"))]
+async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
+    // https://www.notion.so/prismaio/Comments-ac89f872098e463183fd668a643f3ab8
+    // Only comments on tables and columns are supported.
+
+    let schema = indoc! {r#"
+        CREATE TABLE a (
+            id INT PRIMARY KEY,
+            val VARCHAR(20)
+        );
+
+        COMMENT ON TABLE a IS 'push';
+        COMMENT ON COLUMN a.val IS 'meow';
+    "#};
+
+    api.raw_cmd(schema).await;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["views"]
+        }
+
+        datasource db {
+          provider = "cockroachdb"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+        model a {
+          id  Int     @id
+          val String? @db.String(20)
+        }
+    "#]];
+
+    api.expect_datamodel(&expectation).await;
+
+    let expectation = expect![[r#"
+        [
+          {
+            "code": 36,
+            "message": "These objects have comments defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/database-comments",
+            "affected": [
+              {
+                "type": "model",
+                "name": "a"
+              },
+              {
+                "type": "field",
+                "name": "a.val"
               }
             ]
           }

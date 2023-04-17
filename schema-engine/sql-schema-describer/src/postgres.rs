@@ -729,6 +729,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 row.get_expect_bool("is_partition"),
                 row.get_expect_bool("has_subclass"),
                 row.get_expect_bool("has_row_level_security"),
+                row.get_string("description"),
             ));
 
             pg_ext.table_options.push(options);
@@ -736,7 +737,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         let mut map = IndexMap::default();
 
-        for (table_name, namespace, is_partition, has_subclass, has_row_level_security) in names {
+        for (table_name, namespace, is_partition, has_subclass, has_row_level_security, description) in names {
             let cloned_name = table_name.clone();
 
             let partition = if is_partition {
@@ -760,6 +761,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 table_name,
                 sql_schema.get_namespace_id(&namespace).unwrap(),
                 partition | subclass | row_level_security,
+                description,
             );
 
             map.insert((namespace, cloned_name), id);
@@ -788,8 +790,15 @@ impl<'a> SqlSchemaDescriber<'a> {
     async fn get_views(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
         let namespaces = &sql_schema.namespaces;
         let sql = indoc! {r#"
-            SELECT viewname AS view_name, definition AS view_sql, schemaname as namespace
-            FROM pg_catalog.pg_views
+            SELECT
+                views.viewname AS view_name,
+                views.definition AS view_sql,
+                views.schemaname AS namespace,
+                description.description AS description
+            FROM pg_catalog.pg_views views
+            INNER JOIN pg_catalog.pg_namespace ns ON views.schemaname = ns.nspname
+            INNER JOIN pg_catalog.pg_class class ON class.relnamespace = ns.oid AND class.relname = views.viewname
+            LEFT JOIN pg_catalog.pg_description description ON description.objoid = class.oid AND description.objsubid = 0
             WHERE schemaname = ANY ( $1 )
         "#};
 
@@ -800,19 +809,18 @@ impl<'a> SqlSchemaDescriber<'a> {
                 &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
             )
             .await?;
-        let mut views = Vec::with_capacity(result_set.len());
 
         for row in result_set.into_iter() {
-            views.push(View {
-                namespace_id: sql_schema
-                    .get_namespace_id(&row.get_expect_string("namespace"))
-                    .unwrap(),
-                name: row.get_expect_string("view_name"),
-                definition: row.get_string("view_sql"),
-            })
-        }
+            let name = row.get_expect_string("view_name");
+            let definition = row.get_string("view_sql");
+            let description = row.get_string("description");
 
-        sql_schema.views = views;
+            let namespace_id = sql_schema
+                .get_namespace_id(&row.get_expect_string("namespace"))
+                .unwrap();
+
+            sql_schema.push_view(name, namespace_id, definition, description);
+        }
 
         Ok(())
     }
@@ -845,7 +853,8 @@ impl<'a> SqlSchemaDescriber<'a> {
                 pg_get_expr(attdef.adbin, attdef.adrelid) AS column_default,
                 info.is_nullable,
                 info.is_identity,
-                info.character_maximum_length
+                info.character_maximum_length,
+                description.description
             FROM information_schema.columns info
             JOIN pg_attribute att ON att.attname = info.column_name
             JOIN (
@@ -857,6 +866,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                   AND relname = info.table_name
                   AND namespace = info.table_schema
             LEFT OUTER JOIN pg_attrdef attdef ON attdef.adrelid = att.attrelid AND attdef.adnum = att.attnum AND table_schema = namespace
+            LEFT OUTER JOIN pg_description description ON description.objoid = att.attrelid AND description.objsubid = ordinal_position
             WHERE table_schema = ANY ( $1 ) {is_visible_clause}
             ORDER BY namespace, table_name, ordinal_position;
         "#
@@ -907,6 +917,8 @@ impl<'a> SqlSchemaDescriber<'a> {
                 .and_then(|raw_default_value| raw_default_value.to_string())
                 .and_then(|raw_default_value| get_default_value(&raw_default_value, &tpe));
 
+            let description = col.get_string("description");
+
             let auto_increment = is_identity
                 || matches!(default.as_ref().map(|d| &d.kind), Some(DefaultKind::Sequence(_)))
                 || (self.is_cockroach()
@@ -928,6 +940,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 name,
                 tpe,
                 auto_increment,
+                description,
             };
 
             match container_id {
@@ -1405,10 +1418,11 @@ impl<'a> SqlSchemaDescriber<'a> {
         let namespaces = &sql_schema.namespaces;
 
         let sql = "
-            SELECT t.typname as name, e.enumlabel as value, n.nspname as namespace
+            SELECT t.typname as name, e.enumlabel as value, n.nspname as namespace, d.description
             FROM pg_type t
             JOIN pg_enum e ON t.oid = e.enumtypid
             JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
+            LEFT OUTER JOIN pg_description d ON d.objoid = t.oid
             WHERE n.nspname = ANY ( $1 )
             ORDER BY e.enumsortorder";
 
@@ -1419,19 +1433,25 @@ impl<'a> SqlSchemaDescriber<'a> {
                 &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
             )
             .await?;
-        let mut enum_values: BTreeMap<(NamespaceId, String), Vec<String>> = BTreeMap::new();
+        let mut enum_values: BTreeMap<(NamespaceId, String, Option<String>), Vec<String>> = BTreeMap::new();
 
         for row in rows.into_iter() {
             let name = row.get_expect_string("name");
             let value = row.get_expect_string("value");
             let namespace = row.get_expect_string("namespace");
+            let description = row.get_string("description");
             let namespace_id = sql_schema.get_namespace_id(&namespace).unwrap();
-            let values = enum_values.entry((namespace_id, name)).or_insert_with(Vec::new);
+
+            let values = enum_values
+                .entry((namespace_id, name, description))
+                .or_insert_with(Vec::new);
+
             values.push(value);
         }
 
-        for ((namespace_id, enum_name), variants) in enum_values {
-            let enum_id = sql_schema.push_enum(namespace_id, enum_name);
+        for ((namespace_id, enum_name, description), variants) in enum_values {
+            let enum_id = sql_schema.push_enum(namespace_id, enum_name, description);
+
             for variant in variants {
                 sql_schema.push_enum_variant(enum_id, variant);
             }

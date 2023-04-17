@@ -16,7 +16,7 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
                 model_name = field.model().database_name(),
                 field_name = field.database_name()
             );
-            let sql_enum_id = ctx.schema.describer_schema.push_enum(Default::default(), name);
+            let sql_enum_id = ctx.schema.describer_schema.push_enum(Default::default(), name, None);
             ctx.enum_ids.insert(enum_tpe.id, sql_enum_id);
             for variant in enum_tpe.values().map(|v| v.database_name().to_owned()) {
                 ctx.schema.describer_schema.push_enum_variant(sql_enum_id, variant);

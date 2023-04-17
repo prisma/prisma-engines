@@ -62,6 +62,16 @@ impl<'a> EnumPair<'a> {
         self.previous.is_none() && !self.context.name_is_unique(self.next.name())
     }
 
+    /// The COMMENT of the enum.
+    pub(crate) fn description(self) -> Option<&'a str> {
+        self.next.description()
+    }
+
+    /// True if we have a new enum and it has a comment.
+    pub(crate) fn adds_a_description(self) -> bool {
+        self.previous.is_none() && self.description().is_some()
+    }
+
     /// Iterates all of the variants that are part of the enum.
     pub(crate) fn variants(self) -> impl ExactSizeIterator<Item = EnumVariantPair<'a>> + 'a {
         self.next.variants().map(move |next| {

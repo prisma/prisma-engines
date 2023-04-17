@@ -61,6 +61,8 @@ pub(crate) struct Warnings {
     pub(crate) row_level_ttl: Vec<Model>,
     /// Warn about non-default unique deferring setup
     pub(crate) non_default_deferring: Vec<ModelAndConstraint>,
+    /// Warn about comments
+    pub(crate) objects_with_comments: Vec<Object>,
 }
 
 impl Warnings {
@@ -217,8 +219,8 @@ impl Warnings {
         );
 
         maybe_warn(&self.row_level_ttl, row_level_ttl_in_tables, &mut self.warnings);
-
         maybe_warn(&self.non_default_deferring, non_default_deferring, &mut self.warnings);
+        maybe_warn(&self.objects_with_comments, commented_objects, &mut self.warnings);
 
         self.warnings
     }
@@ -336,6 +338,12 @@ pub(crate) struct TopLevelItem {
     /// The name of the top-level type
     pub(crate) r#type: TopLevelType,
     /// The name of the object
+    pub(crate) name: String,
+}
+
+#[derive(Serialize, Debug, Clone)]
+pub(crate) struct Object {
+    pub(crate) r#type: &'static str,
     pub(crate) name: String,
 }
 
@@ -573,7 +581,7 @@ pub(crate) fn non_default_index_null_sort_order(affected: &[IndexedColumn]) -> W
 }
 
 pub(super) fn row_level_security_tables_found(affected: &[Model]) -> Warning {
-    let message = "These tables contain row level security, which is not yet fully supported.";
+    let message = "These tables contain row level security, which is not yet fully supported. Read more: https://pris.ly/d/row-level-security";
 
     Warning {
         code: 30,
@@ -597,6 +605,16 @@ pub(crate) fn non_default_deferring(affected: &[ModelAndConstraint]) -> Warning 
 
     Warning {
         code: 35,
+        message: message.into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+pub(crate) fn commented_objects(affected: &[Object]) -> Warning {
+    let message = "These objects have comments defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/database-comments";
+
+    Warning {
+        code: 36,
         message: message.into(),
         affected: serde_json::to_value(affected).unwrap(),
     }

@@ -16,10 +16,10 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
                 .schema()
                 .and_then(|(name, _)| ctx.schemas.get(name).cloned())
                 .unwrap_or_default();
-            let sql_enum_id = ctx
-                .schema
-                .describer_schema
-                .push_enum(sql_namespace_id, prisma_enum.database_name().to_owned());
+            let sql_enum_id =
+                ctx.schema
+                    .describer_schema
+                    .push_enum(sql_namespace_id, prisma_enum.database_name().to_owned(), None);
             ctx.enum_ids.insert(prisma_enum.id, sql_enum_id);
 
             for value in prisma_enum.values() {
