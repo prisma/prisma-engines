@@ -218,21 +218,6 @@
 <a href="#218" id="218">218</a>
 <a href="#219" id="219">219</a>
 <a href="#220" id="220">220</a>
-<a href="#221" id="221">221</a>
-<a href="#222" id="222">222</a>
-<a href="#223" id="223">223</a>
-<a href="#224" id="224">224</a>
-<a href="#225" id="225">225</a>
-<a href="#226" id="226">226</a>
-<a href="#227" id="227">227</a>
-<a href="#228" id="228">228</a>
-<a href="#229" id="229">229</a>
-<a href="#230" id="230">230</a>
-<a href="#231" id="231">231</a>
-<a href="#232" id="232">232</a>
-<a href="#233" id="233">233</a>
-<a href="#234" id="234">234</a>
-<a href="#235" id="235">235</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>fmt::Debug;
 <span class="kw">use </span>once_cell::sync::OnceCell;
@@ -403,7 +388,6 @@
 </span><span class="kw">pub struct </span>OutputField {
     <span class="kw">pub </span>name: String,
     <span class="kw">pub </span>field_type: OutputType,
-    <span class="kw">pub </span>deprecation: <span class="prelude-ty">Option</span>&lt;Deprecation&gt;,
 
     <span class="doccomment">/// Arguments are input fields, but positioned in context of an output field
     /// instead of being attached to an input object.
@@ -430,20 +414,6 @@
             <span class="self">self
         </span>}
     }
-
-    <span class="kw">pub fn </span>deprecate&lt;T, S&gt;(<span class="kw-2">mut </span><span class="self">self</span>, reason: T, since_version: S, planned_removal_version: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="self">Self
-    </span><span class="kw">where
-        </span>T: Into&lt;String&gt;,
-        S: Into&lt;String&gt;,
-    {
-        <span class="self">self</span>.deprecation = <span class="prelude-val">Some</span>(Deprecation {
-            reason: reason.into(),
-            since_version: since_version.into(),
-            planned_removal_version,
-        });
-
-        <span class="self">self
-    </span>}
 
     <span class="kw">pub fn </span>model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ModelRef&gt; {
         <span class="self">self</span>.query_info.as_ref().and_then(|info| info.model.as_ref())

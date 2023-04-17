@@ -36,8 +36,6 @@
 <a href="#36" id="36">36</a>
 <a href="#37" id="37">37</a>
 <a href="#38" id="38">38</a>
-<a href="#39" id="39">39</a>
-<a href="#40" id="40">40</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{
     type_renderer::{render_input_types, render_output_type},
     DmmfInputField, DmmfOutputField, RenderContext,
@@ -51,15 +49,13 @@
         .iter()
         .any(|typ| <span class="macro">matches!</span>(typ, InputType::Scalar(ScalarType::Null)));
 
-    <span class="kw">let </span>field = DmmfInputField {
+    DmmfInputField {
         name: input_field.name.clone(),
         input_types: type_references,
         is_required: input_field.is_required,
         is_nullable: nullable,
-        deprecation: input_field.deprecation.as_ref().map(Into::into),
-    };
-
-    field
+        deprecation: <span class="prelude-val">None</span>,
+    }
 }
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render_output_field(field: <span class="kw-2">&amp;</span>OutputField, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; DmmfOutputField {
@@ -71,7 +67,7 @@
         args: rendered_inputs,
         output_type,
         is_nullable: field.is_nullable,
-        deprecation: field.deprecation.as_ref().map(Into::into),
+        deprecation: <span class="prelude-val">None</span>,
     };
 
     ctx.add_mapping(field.name.clone(), field.query_info.as_ref());

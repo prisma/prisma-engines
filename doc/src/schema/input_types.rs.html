@@ -328,22 +328,6 @@
 <a href="#328" id="328">328</a>
 <a href="#329" id="329">329</a>
 <a href="#330" id="330">330</a>
-<a href="#331" id="331">331</a>
-<a href="#332" id="332">332</a>
-<a href="#333" id="333">333</a>
-<a href="#334" id="334">334</a>
-<a href="#335" id="335">335</a>
-<a href="#336" id="336">336</a>
-<a href="#337" id="337">337</a>
-<a href="#338" id="338">338</a>
-<a href="#339" id="339">339</a>
-<a href="#340" id="340">340</a>
-<a href="#341" id="341">341</a>
-<a href="#342" id="342">342</a>
-<a href="#343" id="343">343</a>
-<a href="#344" id="344">344</a>
-<a href="#345" id="345">345</a>
-<a href="#346" id="346">346</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>fmt::Debug;
 <span class="kw">use </span>once_cell::sync::OnceCell;
@@ -457,7 +441,6 @@
 </span><span class="kw">pub struct </span>InputField {
     <span class="kw">pub </span>name: String,
     <span class="kw">pub </span>default_value: <span class="prelude-ty">Option</span>&lt;dml::DefaultKind&gt;,
-    <span class="kw">pub </span>deprecation: <span class="prelude-ty">Option</span>&lt;Deprecation&gt;,
 
     <span class="doccomment">/// Possible field types, represented as a union of input types, but only one can be provided at any time.
     /// Slice expressed as (start, len).
@@ -473,7 +456,6 @@
         InputField {
             name,
             default_value,
-            deprecation: <span class="prelude-val">None</span>,
             field_types: <span class="prelude-val">None</span>,
             is_required,
         }
@@ -535,20 +517,6 @@
     <span class="doccomment">/// Adds possible input type to this input field&#39;s type union.
     </span><span class="kw">pub fn </span>add_type(<span class="kw-2">mut </span><span class="self">self</span>, typ: InputType, db: <span class="kw-2">&amp;mut </span>QuerySchemaDatabase) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.push_type(typ, db);
-        <span class="self">self
-    </span>}
-
-    <span class="kw">pub fn </span>deprecate&lt;T, S&gt;(<span class="kw-2">mut </span><span class="self">self</span>, reason: T, since_version: S, planned_removal_version: <span class="prelude-ty">Option</span>&lt;S&gt;) -&gt; <span class="self">Self
-    </span><span class="kw">where
-        </span>T: Into&lt;String&gt;,
-        S: Into&lt;String&gt;,
-    {
-        <span class="self">self</span>.deprecation = <span class="prelude-val">Some</span>(Deprecation {
-            reason: reason.into(),
-            since_version: since_version.into(),
-            planned_removal_version: planned_removal_version.map(Into::into),
-        });
-
         <span class="self">self
     </span>}
 }
