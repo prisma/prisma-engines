@@ -14,7 +14,7 @@ tokio.workspace = true
 anyhow = "1.0"
 async-trait = "0.1"
 base64 = "0.12"
-connection-string = { workspace = true }
+connection-string.workspace = true
 connector = { path = "../connectors/query-connector", package = "query-connector" }
 enumflags2 = { version = "0.7"}
 psl.workspace = true
