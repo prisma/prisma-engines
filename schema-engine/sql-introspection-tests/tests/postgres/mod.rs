@@ -408,14 +408,14 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
           url      = "env(TEST_DATABASE_URL)"
         }
 
-        /// This model or some of its fields is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+        /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
         model a {
           id  Int     @id
           val String? @db.VarChar(20)
         }
 
         /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-        /// This view or some of its fields is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+        /// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
         view b {
           val String? @db.VarChar(20)
 

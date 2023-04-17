@@ -87,7 +87,7 @@ fn render_model(model: ModelPair<'_>, sql_family: SqlFamily) -> renderer::Model<
     }
 
     if model.adds_a_description() {
-        let docs = "This model or some of its fields is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments";
+        let docs = "This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments";
         rendered.documentation(docs);
     }
 
