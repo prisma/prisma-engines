@@ -20,7 +20,28 @@ mod smoke_tests {
         qe_cmd.arg("--enable-metrics");
 
         with_child_process(&mut qe_cmd, async move {
-            let metrics = reqwest::get("http://0.0.0.0:57582/metrics")
+            let client = reqwest::Client::new();
+
+            let res = client
+                .post("http://0.0.0.0:57582/")
+                .body(
+                    r###"
+                    {
+                    "operationName": null,
+                    "variables": {},
+                    "query": "{\n  findManyPerson {\n    id\n  }\n}\n"
+                    }
+                    "###,
+                )
+                .send()
+                .await
+                .unwrap();
+
+            assert_eq!(res.status(), 200);
+
+            let metrics = client
+                .get("http://0.0.0.0:57582/metrics")
+                .send()
                 .await
                 .unwrap()
                 .text()
@@ -35,6 +56,7 @@ mod smoke_tests {
             assert!(metrics.contains("prisma_pool_connections_busy gauge"));
             assert!(metrics.contains("prisma_pool_connections_idle gauge"));
             assert!(metrics.contains("prisma_pool_connections_opened_total gauge"));
+            assert!(metrics.contains("prisma_datasource_queries_duration_histogram_ms_bucket"));
         })
         .await
     }

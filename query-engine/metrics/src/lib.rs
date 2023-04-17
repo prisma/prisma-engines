@@ -49,6 +49,8 @@ pub const MOBC_POOL_CONNECTIONS_CLOSED_TOTAL: &str = "mobc_pool_connections_clos
 pub const MOBC_POOL_CONNECTIONS_OPEN: &str = "mobc_pool_connections_open";
 pub const MOBC_POOL_CONNECTIONS_BUSY: &str = "mobc_pool_connections_busy";
 pub const MOBC_POOL_CONNECTIONS_IDLE: &str = "mobc_pool_connections_idle";
+pub const MOBC_POOL_WAIT_COUNT: &str = "mobc_client_queries_wait";
+pub const MOBC_POOL_WAIT_DURATION: &str = "mobc_client_queries_wait_histogram_ms";
 
 // External metrics names that we expose.
 pub const PRISMA_CLIENT_QUERIES_TOTAL: &str = "prisma_client_queries_total";
@@ -72,10 +74,10 @@ const ACCEPT_LIST: &[&str] = &[
     MOBC_POOL_CONNECTIONS_OPEN,
     MOBC_POOL_CONNECTIONS_BUSY,
     MOBC_POOL_CONNECTIONS_IDLE,
+    MOBC_POOL_WAIT_COUNT,
+    MOBC_POOL_WAIT_DURATION,
     PRISMA_CLIENT_QUERIES_HISTOGRAM_MS,
     PRISMA_CLIENT_QUERIES_TOTAL,
-    PRISMA_CLIENT_QUERIES_WAIT,
-    PRISMA_CLIENT_QUERIES_WAIT_HISTOGRAM_MS,
     PRISMA_DATASOURCE_QUERIES_DURATION_HISTOGRAM_MS,
     PRISMA_DATASOURCE_QUERIES_TOTAL,
     PRISMA_CLIENT_QUERIES_ACTIVE,
@@ -90,6 +92,8 @@ static METRIC_RENAMES: Lazy<HashMap<&str, &str>> = Lazy::new(|| {
         (MOBC_POOL_CONNECTIONS_OPEN, PRISMA_POOL_CONNECTIONS_OPEN),
         (MOBC_POOL_CONNECTIONS_BUSY, PRISMA_POOL_CONNECTIONS_BUSY),
         (MOBC_POOL_CONNECTIONS_IDLE, PRISMA_POOL_CONNECTIONS_IDLE),
+        (MOBC_POOL_WAIT_COUNT, PRISMA_CLIENT_QUERIES_WAIT),
+        (MOBC_POOL_WAIT_DURATION, PRISMA_CLIENT_QUERIES_WAIT_HISTOGRAM_MS),
     ])
 });
 
