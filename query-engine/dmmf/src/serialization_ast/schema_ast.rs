@@ -1,5 +1,4 @@
 use indexmap::IndexMap;
-use schema::Deprecation;
 use serde::Serialize;
 
 #[derive(Debug, Serialize, Default)]
@@ -113,14 +112,4 @@ pub struct DmmfDeprecation {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub planned_removal_version: Option<String>,
-}
-
-impl From<&Deprecation> for DmmfDeprecation {
-    fn from(deprecation: &Deprecation) -> Self {
-        Self {
-            since_version: deprecation.since_version.clone(),
-            planned_removal_version: deprecation.planned_removal_version.clone(),
-            reason: deprecation.reason.clone(),
-        }
-    }
 }

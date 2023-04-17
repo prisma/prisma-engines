@@ -111,7 +111,6 @@ impl InputObjectType {
 pub struct InputField {
     pub name: String,
     pub default_value: Option<dml::DefaultKind>,
-    pub deprecation: Option<Deprecation>,
 
     /// Possible field types, represented as a union of input types, but only one can be provided at any time.
     /// Slice expressed as (start, len).
@@ -127,7 +126,6 @@ impl InputField {
         InputField {
             name,
             default_value,
-            deprecation: None,
             field_types: None,
             is_required,
         }
@@ -189,20 +187,6 @@ impl InputField {
     /// Adds possible input type to this input field's type union.
     pub fn add_type(mut self, typ: InputType, db: &mut QuerySchemaDatabase) -> Self {
         self.push_type(typ, db);
-        self
-    }
-
-    pub fn deprecate<T, S>(mut self, reason: T, since_version: S, planned_removal_version: Option<S>) -> Self
-    where
-        T: Into<String>,
-        S: Into<String>,
-    {
-        self.deprecation = Some(Deprecation {
-            reason: reason.into(),
-            since_version: since_version.into(),
-            planned_removal_version: planned_removal_version.map(Into::into),
-        });
-
         self
     }
 }

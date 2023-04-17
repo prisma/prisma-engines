@@ -44,7 +44,6 @@ where
         field_type,
         query_info,
         is_nullable: false,
-        deprecation: None,
     }
 }
 

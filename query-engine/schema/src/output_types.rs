@@ -168,7 +168,6 @@ impl ObjectType {
 pub struct OutputField {
     pub name: String,
     pub field_type: OutputType,
-    pub deprecation: Option<Deprecation>,
 
     /// Arguments are input fields, but positioned in context of an output field
     /// instead of being attached to an input object.
@@ -194,20 +193,6 @@ impl OutputField {
         } else {
             self
         }
-    }
-
-    pub fn deprecate<T, S>(mut self, reason: T, since_version: S, planned_removal_version: Option<String>) -> Self
-    where
-        T: Into<String>,
-        S: Into<String>,
-    {
-        self.deprecation = Some(Deprecation {
-            reason: reason.into(),
-            since_version: since_version.into(),
-            planned_removal_version,
-        });
-
-        self
     }
 
     pub fn model(&self) -> Option<&ModelRef> {
