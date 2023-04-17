@@ -762,6 +762,10 @@ impl<'a> SqlSchemaDescriber<'a> {
             let constraints_key = (namespace.clone(), cloned_name);
             let unsupported_constraint = constraints_map.remove(&constraints_key).unwrap_or(BitFlags::empty());
 
+            // TODO: we could build this without check and exclusion constraints.
+            // We could then mutate the tables by id to add these constraints as "properties".
+            // This would allow "get_constraints" to avoid using BTreeMaps in favor of mutating
+            // the map in place.
             let id = sql_schema.push_table_with_properties(
                 table_name,
                 sql_schema.get_namespace_id(&namespace).unwrap(),
