@@ -186,6 +186,7 @@
 <a href="#186" id="186">186</a>
 <a href="#187" id="187">187</a>
 <a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="kw">use </span>psl::{
@@ -371,7 +372,8 @@
     <span class="doccomment">/// True if we introspect the view for the first time, and it has a comment
     /// in the database.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>adds_a_description(<span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.previous.is_none() &amp;&amp; <span class="self">self</span>.description().is_some()
+        <span class="self">self</span>.previous.is_none()
+            &amp;&amp; (<span class="self">self</span>.description().is_some() || <span class="self">self</span>.scalar_fields().any(|sf| sf.adds_a_description()))
     }
 }
 </code></pre></div>

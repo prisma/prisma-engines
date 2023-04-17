@@ -299,6 +299,7 @@
 <a href="#299" id="299">299</a>
 <a href="#300" id="300">300</a>
 <a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
 </pre><pre class="rust"><code><span class="kw">use </span>psl::{
     datamodel_connector::walker_ext_traits::IndexWalkerExt,
     parser_database::walkers,
@@ -576,7 +577,8 @@
 
     <span class="doccomment">/// True if we have a new model and it has a comment.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>adds_a_description(<span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.previous.is_none() &amp;&amp; <span class="self">self</span>.description().is_some()
+        <span class="self">self</span>.previous.is_none()
+            &amp;&amp; (<span class="self">self</span>.description().is_some() || <span class="self">self</span>.scalar_fields().any(|sf| sf.adds_a_description()))
     }
 
     <span class="kw">fn </span>all_indexes(<span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = IndexPair&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
