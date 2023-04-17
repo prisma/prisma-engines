@@ -14,6 +14,8 @@ impl super::IntrospectionFlavour for PostgresIntrospectionFlavour {
     }
 
     fn generate_warnings(&self, ctx: &DatamodelCalculatorContext<'_>, warnings: &mut Warnings) {
+        let pg_ext: &PostgresSchemaExt = ctx.sql_schema.downcast_connector_data();
+
         for table in ctx.sql_schema.table_walkers() {
             for index in table.indexes() {
                 for column in index.columns().filter(|c| self.uses_non_default_null_position(ctx, *c)) {
@@ -46,22 +48,15 @@ impl super::IntrospectionFlavour for PostgresIntrospectionFlavour {
                     model: ctx.table_prisma_name(table.id).prisma_name().to_string(),
                 });
             }
-        }
 
-        for check_constraint in ctx.sql_schema.check_constraints() {
-            let check_constraint = ModelAndConstraint {
-                constraint: check_constraint.constraint.clone(),
-                model: check_constraint.model.clone(),
-            };
-            warnings.check_constraints.push(check_constraint);
-        }
+            for constraint in pg_ext.exclude_constraints(table.id) {
+                let exclusion_constraint = ModelAndConstraint {
+                    model: ctx.table_prisma_name(table.id).prisma_name().to_string(),
+                    constraint: constraint.to_string(),
+                };
 
-        for exclusion_constraint in ctx.sql_schema.exclusion_constraints() {
-            let exclusion_constraint = ModelAndConstraint {
-                constraint: exclusion_constraint.constraint.clone(),
-                model: exclusion_constraint.model.clone(),
-            };
-            warnings.exclusion_constraints.push(exclusion_constraint);
+                warnings.exclusion_constraints.push(exclusion_constraint);
+            }
         }
     }
 
@@ -95,5 +90,10 @@ impl super::IntrospectionFlavour for PostgresIntrospectionFlavour {
         let pg_ext: &PostgresSchemaExt = ctx.sql_schema.downcast_connector_data();
 
         pg_ext.non_default_null_position(column)
+    }
+
+    fn uses_exclude_constraint(&self, ctx: &DatamodelCalculatorContext<'_>, table: TableWalker<'_>) -> bool {
+        let pg_ext: &PostgresSchemaExt = ctx.sql_schema.downcast_connector_data();
+        pg_ext.uses_exclude_constraint(table.id)
     }
 }

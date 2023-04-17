@@ -80,9 +80,7 @@ pub struct SqlSchema {
     /// All columns of indexes.
     index_columns: Vec<IndexColumn>,
     /// Check constraints for every table.
-    check_constraints: Vec<ModelAndConstraint>,
-    /// Exclusion constraints for every table.
-    exclusion_constraints: Vec<ModelAndConstraint>,
+    check_constraints: Vec<(TableId, String)>,
     /// The schema's views,
     views: Vec<View>,
     /// The schema's columns that are in views.
@@ -133,16 +131,6 @@ impl SqlSchema {
     /// Insert connector-specific data into the schema. This will replace existing connector data.
     pub fn set_connector_data(&mut self, data: Box<dyn Any + Send + Sync>) {
         self.connector_data.data = Some(data);
-    }
-
-    /// Get check constraints.
-    pub fn check_constraints(&self) -> &[ModelAndConstraint] {
-        &self.check_constraints
-    }
-
-    /// Get exclusion constraints.
-    pub fn exclusion_constraints(&self) -> &[ModelAndConstraint] {
-        &self.exclusion_constraints
     }
 
     /// Get a view.
@@ -344,14 +332,6 @@ impl SqlSchema {
             constrained_column,
             referenced_column,
         });
-    }
-
-    pub fn push_check_constraint(&mut self, check_constraint: ModelAndConstraint) {
-        self.check_constraints.push(check_constraint);
-    }
-
-    pub fn push_exclusion_constraint(&mut self, exclusion_constraint: ModelAndConstraint) {
-        self.exclusion_constraints.push(exclusion_constraint);
     }
 
     pub fn push_namespace(&mut self, name: String) -> NamespaceId {
@@ -811,22 +791,6 @@ struct Enum {
 struct EnumVariant {
     enum_id: EnumId,
     variant_name: String,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct ModelAndConstraint {
-    /// The name of the model
-    pub model: String,
-    /// The name of the constraint
-    pub constraint: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct ExclusionConstraint {
-    /// Name of the constraint.
-    pub name: String,
-    /// The SQL definition of the constraint.
-    pub definition: String,
 }
 
 /// An SQL view.

@@ -58,6 +58,13 @@ pub(super) fn generate_warnings(model: ModelPair<'_>, warnings: &mut Warnings) {
         })
     }
 
+    for constraint in model.check_constraints() {
+        warnings.check_constraints.push(generators::ModelAndConstraint {
+            model: model.name().to_string(),
+            constraint: constraint.to_string(),
+        })
+    }
+
     for field in model.scalar_fields() {
         if let Some(DefaultKind::Prisma1Uuid) = field.default().kind() {
             let warn = generators::ModelAndField {

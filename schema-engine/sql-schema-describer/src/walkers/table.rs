@@ -117,14 +117,20 @@ impl<'a> TableWalker<'a> {
 
     /// Does the table have check constraints?
     pub fn has_check_constraints(self) -> bool {
-        self.table().properties.contains(TableProperties::HasCheckConstraints)
+        self.schema
+            .check_constraints
+            .binary_search_by_key(&self.id, |(id, _)| *id)
+            .is_ok()
     }
 
-    /// Does the table have exclusion constraints?
-    pub fn has_exclusion_constraints(self) -> bool {
-        self.table()
-            .properties
-            .contains(TableProperties::HasExclusionConstraints)
+    /// The check constraint names for the table.
+    pub fn check_constraints(self) -> impl ExactSizeIterator<Item = &'a str> {
+        let low = self.schema.check_constraints.partition_point(|(id, _)| *id < self.id);
+        let high = self.schema.check_constraints[low..].partition_point(|(id, _)| *id <= self.id);
+
+        self.schema.check_constraints[low..high]
+            .iter()
+            .map(|(_, name)| name.as_str())
     }
 
     /// Description (comment) of the table.

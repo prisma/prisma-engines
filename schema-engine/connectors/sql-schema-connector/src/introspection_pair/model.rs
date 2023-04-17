@@ -58,13 +58,18 @@ impl<'a> ModelPair<'a> {
     }
 
     /// Whether the model has check constraints.
-    pub(crate) fn has_check_constraints(self) -> bool {
+    pub(crate) fn adds_check_constraints(self) -> bool {
         self.previous.is_none() && self.next.has_check_constraints()
     }
 
+    /// The names of check constraints for this model.
+    pub(crate) fn check_constraints(self) -> impl Iterator<Item = &'a str> {
+        self.next.check_constraints()
+    }
+
     /// Whether the model has exclusion constraints.
-    pub(crate) fn has_exclusion_constraints(self) -> bool {
-        self.previous.is_none() && self.next.has_exclusion_constraints()
+    pub(crate) fn adds_exclusion_constraints(self) -> bool {
+        self.previous.is_none() && self.context.flavour.uses_exclude_constraint(self.context, self.next)
     }
 
     /// True, if we add a new model with row level security enabled.
