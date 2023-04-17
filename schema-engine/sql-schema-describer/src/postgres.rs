@@ -150,6 +150,7 @@ pub struct PostgresSchemaExt {
     pub index_null_position: HashMap<IndexColumnId, IndexNullPosition>,
     pub constraint_options: HashMap<Constraint, BitFlags<ConstraintOption>>,
     pub table_options: Vec<BTreeMap<String, String>>,
+    pub exclude_constraints: Vec<(TableId, String)>,
     /// The schema's sequences.
     pub sequences: Vec<Sequence>,
     /// The extensions included in the schema(s).
@@ -246,6 +247,21 @@ impl PostgresSchemaExt {
             Some(opts) => opts.contains(ConstraintOption::Deferrable) || opts.contains(ConstraintOption::Deferred),
             None => false,
         }
+    }
+
+    pub fn exclude_constraints(&self, table_id: TableId) -> impl ExactSizeIterator<Item = &str> {
+        let low = self.exclude_constraints.partition_point(|(id, _)| *id < table_id);
+        let high = self.exclude_constraints[low..].partition_point(|(id, _)| *id <= table_id);
+
+        self.exclude_constraints[low..high]
+            .iter()
+            .map(|(_, name)| name.as_str())
+    }
+
+    pub fn uses_exclude_constraint(&self, id: TableId) -> bool {
+        self.exclude_constraints
+            .binary_search_by_key(&id, |(id, _)| *id)
+            .is_ok()
     }
 }
 
@@ -542,6 +558,7 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
         let table_names = self.get_table_names(&mut sql_schema, &mut pg_ext).await?;
 
         // order matters
+        self.get_constraints(&table_names, &mut sql_schema, &mut pg_ext).await?;
         self.get_views(&mut sql_schema).await?;
         self.get_enums(&mut sql_schema).await?;
         self.get_columns(&mut sql_schema).await?;
@@ -735,8 +752,6 @@ impl<'a> SqlSchemaDescriber<'a> {
             pg_ext.table_options.push(options);
         }
 
-        let mut constraints_map = self.get_constraints(sql_schema).await?;
-
         let mut map = IndexMap::default();
 
         for (table_name, namespace, is_partition, has_subclass, has_row_level_security, description) in names {
@@ -760,7 +775,6 @@ impl<'a> SqlSchemaDescriber<'a> {
             };
 
             let constraints_key = (namespace.clone(), cloned_name);
-            let unsupported_constraint = constraints_map.remove(&constraints_key).unwrap_or(BitFlags::empty());
 
             // TODO: we could build this without check and exclusion constraints.
             // We could then mutate the tables by id to add these constraints as "properties".
@@ -769,9 +783,10 @@ impl<'a> SqlSchemaDescriber<'a> {
             let id = sql_schema.push_table_with_properties(
                 table_name,
                 sql_schema.get_namespace_id(&namespace).unwrap(),
-                partition | subclass | row_level_security | unsupported_constraint,
+                partition | subclass | row_level_security,
                 description,
             );
+
             map.insert(constraints_key, id);
         }
 
@@ -1231,10 +1246,13 @@ impl<'a> SqlSchemaDescriber<'a> {
     /// Namely, this returns CHECK and EXCLUDE constraints.
     async fn get_constraints(
         &self,
+        table_names: &IndexMap<(String, String), TableId>,
         sql_schema: &mut SqlSchema,
-    ) -> DescriberResult<BTreeMap<(String, String), BitFlags<TableProperties, u8>>> {
+        pg_ext: &mut PostgresSchemaExt,
+    ) -> DescriberResult<()> {
         let namespaces = &sql_schema.namespaces;
         let sql = include_str!("postgres/constraints_query.sql");
+
         let rows = self
             .conn
             .query_raw(
@@ -1243,48 +1261,32 @@ impl<'a> SqlSchemaDescriber<'a> {
             )
             .await?;
 
-        let mut constraints_map: BTreeMap<(String, String), BitFlags<TableProperties, u8>> = BTreeMap::default();
-
         for row in rows {
             let namespace = row.get_expect_string("namespace");
             let table_name = row.get_expect_string("table_name");
             let constraint_name = row.get_expect_string("constraint_name");
             let constraint_type = row.get_expect_char("constraint_type");
 
-            let constraint_key = (namespace, table_name.clone());
+            let table_id = match table_names.get(&(namespace, table_name)) {
+                Some(id) => *id,
+                None => continue,
+            };
 
             match constraint_type {
                 'c' => {
-                    let check_constraint = ModelAndConstraint {
-                        model: table_name,
-                        constraint: constraint_name,
-                    };
-                    sql_schema.push_check_constraint(check_constraint);
-
-                    let flag = BitFlags::from_flag(TableProperties::HasCheckConstraints);
-                    constraints_map
-                        .entry(constraint_key)
-                        .and_modify(|previous_flag| *previous_flag |= flag)
-                        .or_insert(flag);
+                    sql_schema.check_constraints.push((table_id, constraint_name));
                 }
                 'x' => {
-                    let exclusion_constraint = ModelAndConstraint {
-                        model: table_name,
-                        constraint: constraint_name,
-                    };
-                    sql_schema.push_exclusion_constraint(exclusion_constraint);
-
-                    let flag = BitFlags::from_flag(TableProperties::HasExclusionConstraints);
-                    constraints_map
-                        .entry(constraint_key)
-                        .and_modify(|previous_flag| *previous_flag |= flag)
-                        .or_insert(flag);
+                    pg_ext.exclude_constraints.push((table_id, constraint_name));
                 }
                 _ => (),
             }
         }
 
-        Ok(constraints_map)
+        sql_schema.check_constraints.sort_by_key(|(id, _)| *id);
+        pg_ext.exclude_constraints.sort_by_key(|(id, _)| *id);
+
+        Ok(())
     }
 
     async fn get_indices(

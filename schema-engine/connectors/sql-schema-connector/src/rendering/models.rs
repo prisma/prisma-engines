@@ -58,13 +58,13 @@ fn render_model(model: ModelPair<'_>, sql_family: SqlFamily) -> renderer::Model<
         rendered.documentation(docs);
     }
 
-    if model.has_check_constraints() {
+    if model.adds_check_constraints() {
         let docs = "This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.";
 
         rendered.documentation(docs);
     }
 
-    if model.has_exclusion_constraints() {
+    if model.adds_exclusion_constraints() {
         let docs = "This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-exclusion-constraints for more info.";
 
         rendered.documentation(docs);
