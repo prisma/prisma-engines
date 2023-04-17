@@ -1228,7 +1228,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     async fn get_constraints(
         &self,
         sql_schema: &mut SqlSchema,
-    ) -> DescriberResult<IndexMap<(String, String), BitFlags<TableProperties, u8>>> {
+    ) -> DescriberResult<BTreeMap<(String, String), BitFlags<TableProperties, u8>>> {
         let namespaces = &sql_schema.namespaces;
         let sql = include_str!("postgres/constraints_query.sql");
         let rows = self
@@ -1239,17 +1239,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             )
             .await?;
 
-        let mut constraints_map: IndexMap<(String, String), BitFlags<TableProperties, u8>> = IndexMap::default();
-
-        let upsert_bitflag = |constraints_map: &mut IndexMap<(String, String), BitFlags<TableProperties, u8>>,
-                              constraint_key: (String, String),
-                              flag: BitFlags<TableProperties, u8>| {
-            if let Some(previous_flag) = constraints_map.remove(&constraint_key) {
-                constraints_map.insert(constraint_key, previous_flag | flag);
-            } else {
-                constraints_map.insert(constraint_key, flag);
-            }
-        };
+        let mut constraints_map: BTreeMap<(String, String), BitFlags<TableProperties, u8>> = BTreeMap::default();
 
         for row in rows {
             let namespace = row.get_expect_string("namespace");
@@ -1267,11 +1257,11 @@ impl<'a> SqlSchemaDescriber<'a> {
                     };
                     sql_schema.push_check_constraint(check_constraint);
 
-                    upsert_bitflag(
-                        &mut constraints_map,
-                        constraint_key,
-                        BitFlags::from_flag(TableProperties::HasCheckConstraints),
-                    );
+                    let flag = BitFlags::from_flag(TableProperties::HasCheckConstraints);
+                    constraints_map
+                        .entry(constraint_key)
+                        .and_modify(|previous_flag| *previous_flag |= flag)
+                        .or_insert(flag);
                 }
                 'x' => {
                     let exclusion_constraint = ModelAndConstraint {
@@ -1280,11 +1270,11 @@ impl<'a> SqlSchemaDescriber<'a> {
                     };
                     sql_schema.push_exclusion_constraint(exclusion_constraint);
 
-                    upsert_bitflag(
-                        &mut constraints_map,
-                        constraint_key,
-                        BitFlags::from_flag(TableProperties::HasExclusionConstraints),
-                    );
+                    let flag = BitFlags::from_flag(TableProperties::HasExclusionConstraints);
+                    constraints_map
+                        .entry(constraint_key)
+                        .and_modify(|previous_flag| *previous_flag |= flag)
+                        .or_insert(flag);
                 }
                 _ => (),
             }
