@@ -1,6 +1,6 @@
 use super::*;
 use once_cell::sync::OnceCell;
-use prisma_models::{ast, dml, walkers};
+use prisma_models::{ast, walkers, DefaultKind};
 
 /// Object type convenience wrapper function.
 pub fn object_type(ident: Identifier, fields: Vec<OutputField>, model: Option<ast::ModelId>) -> ObjectType {
@@ -52,7 +52,7 @@ pub(crate) fn input_field<T, S>(
     ctx: &mut BuilderContext<'_>,
     name: T,
     field_types: S,
-    default_value: Option<dml::DefaultKind>,
+    default_value: Option<DefaultKind>,
 ) -> InputField
 where
     T: Into<String>,

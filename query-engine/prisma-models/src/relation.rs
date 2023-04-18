@@ -1,8 +1,6 @@
-use crate::prelude::*;
-use dml::ReferentialAction;
 use psl::{
     datamodel_connector::walker_ext_traits::*,
-    parser_database::{walkers, RelationId},
+    parser_database::{walkers, ReferentialAction, RelationId},
 };
 
 pub type Relation = crate::Zipper<RelationId>;

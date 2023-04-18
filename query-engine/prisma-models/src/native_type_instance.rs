@@ -1,4 +1,4 @@
-use psl_core::datamodel_connector::{Connector, NativeTypeInstance as PslNativeTypeInstance};
+use psl::datamodel_connector::{Connector, NativeTypeInstance as PslNativeTypeInstance};
 
 /// Represents an instance of a native type declared in the Prisma schema.
 #[derive(Clone)]

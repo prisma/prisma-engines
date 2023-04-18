@@ -1,6 +1,6 @@
 use super::{field_ref_type::WithFieldRefInputExt, objects::*, *};
 use constants::{aggregations, filters};
-use prisma_models::{dml, CompositeFieldRef, PrismaValue};
+use prisma_models::{CompositeFieldRef, DefaultKind, NativeTypeInstance, PrismaValue};
 use psl::datamodel_connector::ConnectorCapability;
 
 /// Builds filter types for the given model field.
@@ -232,7 +232,7 @@ fn scalar_list_filter_type(ctx: &mut BuilderContext<'_>, sf: &ScalarFieldRef) ->
 fn full_scalar_filter_type(
     ctx: &mut BuilderContext<'_>,
     typ: &TypeIdentifier,
-    native_type: Option<&dml::NativeTypeInstance>,
+    native_type: Option<&NativeTypeInstance>,
     list: bool,
     nullable: bool,
     nested: bool,
@@ -516,7 +516,7 @@ fn query_mode_field(ctx: &mut BuilderContext<'_>, nested: bool) -> impl Iterator
             ctx,
             filters::MODE,
             InputType::enum_type(enum_type),
-            Some(dml::DefaultKind::Single(PrismaValue::Enum(filters::DEFAULT.to_owned()))),
+            Some(DefaultKind::Single(PrismaValue::Enum(filters::DEFAULT.to_owned()))),
         )
         .optional();
 
@@ -550,7 +550,7 @@ fn map_avg_type_ident(typ: TypeIdentifier) -> TypeIdentifier {
 fn not_filter_field(
     ctx: &mut BuilderContext<'_>,
     typ: &TypeIdentifier,
-    native_type: Option<&dml::NativeTypeInstance>,
+    native_type: Option<&NativeTypeInstance>,
     mapped_scalar_type: InputType,
     is_nullable: bool,
     include_aggregates: bool,
