@@ -496,8 +496,6 @@ pub enum TableProperties {
     IsPartition,
     HasSubclass,
     HasRowLevelSecurity,
-    HasCheckConstraints,
-    HasExclusionConstraints,
 }
 
 /// A table found in a schema.
