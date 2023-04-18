@@ -323,7 +323,7 @@ dependencies = [
 name = "builtin-psl-connectors"
 version = "0.1.0"
 dependencies = [
- "connection-string 0.2.0",
+ "connection-string",
  "either",
  "enumflags2",
  "indoc",
@@ -519,15 +519,6 @@ dependencies = [
  "either",
  "memchr",
  "unreachable",
-]
-
-[[package]]
-name = "connection-string"
-version = "0.1.13"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b97faeec45f49581c458f8bf81992c5e3ec17d82cda99f59d3cea14eff62698d"
-dependencies = [
- "wasm-bindgen",
 ]
 
 [[package]]
@@ -3144,7 +3135,7 @@ dependencies = [
 name = "qe-setup"
 version = "0.1.0"
 dependencies = [
- "connection-string 0.2.0",
+ "connection-string",
  "enumflags2",
  "mongodb",
  "mongodb-client",
@@ -3170,7 +3161,7 @@ dependencies = [
  "byteorder",
  "bytes",
  "chrono",
- "connection-string 0.2.0",
+ "connection-string",
  "either",
  "futures",
  "hex",
@@ -3241,7 +3232,7 @@ dependencies = [
  "base64 0.12.3",
  "bigdecimal",
  "chrono",
- "connection-string 0.2.0",
+ "connection-string",
  "crossbeam-channel",
  "cuid",
  "enumflags2",
@@ -3278,7 +3269,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "base64 0.12.3",
- "connection-string 0.2.0",
+ "connection-string",
  "enumflags2",
  "graphql-parser",
  "hyper",
@@ -3331,7 +3322,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "connection-string 0.2.0",
+ "connection-string",
  "futures",
  "napi",
  "napi-build",
@@ -3603,7 +3594,7 @@ name = "request-handlers"
 version = "0.1.0"
 dependencies = [
  "bigdecimal",
- "connection-string 0.2.0",
+ "connection-string",
  "dmmf",
  "futures",
  "graphql-parser",
@@ -3909,7 +3900,7 @@ version = "0.1.0"
 dependencies = [
  "backtrace",
  "base64 0.13.1",
- "connection-string 0.2.0",
+ "connection-string",
  "expect-test",
  "indoc",
  "json-rpc-stdio",
@@ -4245,7 +4236,7 @@ name = "sql-introspection-tests"
 version = "0.1.0"
 dependencies = [
  "barrel",
- "connection-string 0.2.0",
+ "connection-string",
  "enumflags2",
  "expect-test",
  "indoc",
@@ -4272,7 +4263,7 @@ dependencies = [
  "bigdecimal",
  "chrono",
  "colored",
- "connection-string 0.2.0",
+ "connection-string",
  "enumflags2",
  "expect-test",
  "indoc",
@@ -4332,7 +4323,7 @@ name = "sql-schema-connector"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "connection-string 0.2.0",
+ "connection-string",
  "datamodel-renderer",
  "either",
  "enumflags2",
@@ -4570,7 +4561,7 @@ dependencies = [
 name = "test-setup"
 version = "0.1.0"
 dependencies = [
- "connection-string 0.2.0",
+ "connection-string",
  "dissimilar",
  "enumflags2",
  "once_cell",
@@ -4628,9 +4619,9 @@ dependencies = [
 
 [[package]]
 name = "tiberius"
-version = "0.11.6"
+version = "0.11.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3cff04849bffc92a61210e3fea7a1e83faf3666cf55b26edc4d7656ea879293b"
+checksum = "66303a42b7c5daffb95c10cd8f3007a9c29b3e90128cf42b3738f58102aa2516"
 dependencies = [
  "async-native-tls",
  "async-trait",
@@ -4639,7 +4630,7 @@ dependencies = [
  "byteorder",
  "bytes",
  "chrono",
- "connection-string 0.1.13",
+ "connection-string",
  "encoding",
  "enumflags2",
  "futures",
