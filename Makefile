@@ -26,6 +26,9 @@ bootstrap-darwin:
 build:
 	cargo build
 
+build-qe:
+	cargo build --package query-engine
+
 # Emulate pedantic CI compilation.
 pedantic:
 	RUSTFLAGS="-D warnings" cargo fmt -- --check && RUSTFLAGS="-D warnings" cargo clippy --all-targets
@@ -50,6 +53,11 @@ test-qe-st:
 # Single threaded thread execution, verbose.
 test-qe-verbose-st:
 	cargo test --package query-engine-tests -- --nocapture --test-threads 1
+
+# Black-box tests, exercising the query engine HTTP apis (metrics, tracing, etc)
+test-qe-black-box: build-qe
+	cargo test --package black-box-tests -- --test-threads 1
+
 
 ###########################
 # Database setup commands #
