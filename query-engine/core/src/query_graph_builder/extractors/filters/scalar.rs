@@ -98,7 +98,8 @@ impl<'a> ScalarFilterParser<'a> {
                         PrismaValue::Null => field.equals(value),
                         PrismaValue::List(values) => field.is_in(values),
 
-                        _ => unreachable!(), // Validation guarantees this.
+                        val if self.reverse() => field.not_in(vec![val]),
+                        val => field.is_in(vec![val]),
                     },
                     ConditionValue::FieldRef(field_ref) if self.reverse() => field.not_in(field_ref),
                     ConditionValue::FieldRef(field_ref) => field.is_in(field_ref),
@@ -119,7 +120,8 @@ impl<'a> ScalarFilterParser<'a> {
                         PrismaValue::Null => field.not_equals(value),
                         PrismaValue::List(values) => field.not_in(values),
 
-                        _ => unreachable!(), // Validation guarantees this.
+                        val if self.reverse() => field.is_in(vec![val]),
+                        val => field.not_in(vec![val]),
                     },
                     ConditionValue::FieldRef(field_ref) if self.reverse() => field.is_in(field_ref),
                     ConditionValue::FieldRef(field_ref) => field.not_in(field_ref),
