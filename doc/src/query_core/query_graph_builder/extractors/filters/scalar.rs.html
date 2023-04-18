@@ -583,6 +583,8 @@
 <a href="#583" id="583">583</a>
 <a href="#584" id="584">584</a>
 <a href="#585" id="585">585</a>
+<a href="#586" id="586">586</a>
+<a href="#587" id="587">587</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult};
 <span class="kw">use </span>connector::{
     ConditionListValue, ConditionValue, Filter, JsonCompare, JsonFilterPath, JsonTargetType, ScalarCompare,
@@ -683,8 +685,9 @@
                         PrismaValue::Null =&gt; field.equals(value),
                         PrismaValue::List(values) =&gt; field.is_in(values),
 
-                        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(), <span class="comment">// Validation guarantees this.
-                    </span>},
+                        val <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; field.not_in(<span class="macro">vec!</span>[val]),
+                        val =&gt; field.is_in(<span class="macro">vec!</span>[val]),
+                    },
                     ConditionValue::FieldRef(field_ref) <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; field.not_in(field_ref),
                     ConditionValue::FieldRef(field_ref) =&gt; field.is_in(field_ref),
                 };
@@ -704,8 +707,9 @@
                         </span>PrismaValue::Null =&gt; field.not_equals(value),
                         PrismaValue::List(values) =&gt; field.not_in(values),
 
-                        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(), <span class="comment">// Validation guarantees this.
-                    </span>},
+                        val <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; field.is_in(<span class="macro">vec!</span>[val]),
+                        val =&gt; field.not_in(<span class="macro">vec!</span>[val]),
+                    },
                     ConditionValue::FieldRef(field_ref) <span class="kw">if </span><span class="self">self</span>.reverse() =&gt; field.is_in(field_ref),
                     ConditionValue::FieldRef(field_ref) =&gt; field.not_in(field_ref),
                 };

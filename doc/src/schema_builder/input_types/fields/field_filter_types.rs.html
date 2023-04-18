@@ -593,6 +593,9 @@
 <a href="#593" id="593">593</a>
 <a href="#594" id="594">594</a>
 <a href="#595" id="595">595</a>
+<a href="#596" id="596">596</a>
+<a href="#597" id="597">597</a>
+<a href="#598" id="598">598</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{field_ref_type::WithFieldRefInputExt, objects::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
 <span class="kw">use </span>constants::{aggregations, filters};
 <span class="kw">use </span>prisma_models::{dml, CompositeFieldRef, PrismaValue};
@@ -1006,13 +1009,16 @@
     mapped_type: InputType,
     nullable: bool,
 ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = InputField&gt; {
-    <span class="kw">let </span>input_type = InputType::list(mapped_type);
+    <span class="kw">let </span>input_type = InputType::list(mapped_type.clone());
 
-    <span class="kw">let </span>field_types: Vec&lt;InputType&gt; = <span class="kw">if </span>ctx.has_capability(ConnectorCapability::ScalarLists) {
+    <span class="kw">let </span><span class="kw-2">mut </span>field_types: Vec&lt;InputType&gt; = <span class="kw">if </span>ctx.has_capability(ConnectorCapability::ScalarLists) {
         input_type.with_field_ref_input(ctx)
     } <span class="kw">else </span>{
         <span class="macro">vec!</span>[input_type]
     };
+
+    <span class="comment">// Allow for scalar shorthand too: { in: 2 } &lt;=&gt; { in: [2] }
+    </span>field_types.push(mapped_type);
 
     <span class="macro">vec!</span>[
         input_field(ctx, filters::IN, field_types.clone(), <span class="prelude-val">None</span>)
