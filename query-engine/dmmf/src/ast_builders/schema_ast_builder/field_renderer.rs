@@ -11,15 +11,13 @@ pub(super) fn render_input_field(input_field: &InputField, ctx: &mut RenderConte
         .iter()
         .any(|typ| matches!(typ, InputType::Scalar(ScalarType::Null)));
 
-    let field = DmmfInputField {
+    DmmfInputField {
         name: input_field.name.clone(),
         input_types: type_references,
         is_required: input_field.is_required,
         is_nullable: nullable,
-        deprecation: input_field.deprecation.as_ref().map(Into::into),
-    };
-
-    field
+        deprecation: None,
+    }
 }
 
 pub(super) fn render_output_field(field: &OutputField, ctx: &mut RenderContext) -> DmmfOutputField {
@@ -31,7 +29,7 @@ pub(super) fn render_output_field(field: &OutputField, ctx: &mut RenderContext) 
         args: rendered_inputs,
         output_type,
         is_nullable: field.is_nullable,
-        deprecation: field.deprecation.as_ref().map(Into::into),
+        deprecation: None,
     };
 
     ctx.add_mapping(field.name.clone(), field.query_info.as_ref());
