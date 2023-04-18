@@ -411,13 +411,16 @@ fn inclusion_filters(
     mapped_type: InputType,
     nullable: bool,
 ) -> impl Iterator<Item = InputField> {
-    let input_type = InputType::list(mapped_type);
+    let input_type = InputType::list(mapped_type.clone());
 
-    let field_types: Vec<InputType> = if ctx.has_capability(ConnectorCapability::ScalarLists) {
+    let mut field_types: Vec<InputType> = if ctx.has_capability(ConnectorCapability::ScalarLists) {
         input_type.with_field_ref_input(ctx)
     } else {
         vec![input_type]
     };
+
+    // Allow for scalar shorthand too: { in: 2 } <=> { in: [2] }
+    field_types.push(mapped_type);
 
     vec![
         input_field(ctx, filters::IN, field_types.clone(), None)
