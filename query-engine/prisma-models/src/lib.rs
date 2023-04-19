@@ -1,5 +1,6 @@
 mod composite_type;
 mod convert;
+mod default_value;
 mod error;
 mod field;
 mod field_selection;
@@ -7,6 +8,7 @@ mod fields;
 mod internal_data_model;
 mod internal_enum;
 mod model;
+mod native_type_instance;
 mod order_by;
 mod parent_container;
 mod prisma_value_ext;
@@ -17,10 +19,10 @@ mod selection_result;
 mod zipper;
 
 pub mod prelude;
-pub use self::zipper::*;
+
+pub use self::{default_value::*, native_type_instance::*, zipper::*};
 pub use composite_type::*;
 pub use convert::convert;
-pub use dml;
 pub use error::*;
 pub use field::*;
 pub use field_selection::*;
@@ -36,6 +38,10 @@ pub use selection_result::*;
 
 // Re-exports
 pub use prisma_value::*;
-pub use psl::{self, parser_database::walkers, schema_ast::ast};
+pub use psl::{
+    self,
+    parser_database::walkers,
+    schema_ast::ast::{self, FieldArity},
+};
 
 pub type Result<T> = std::result::Result<T, DomainError>;

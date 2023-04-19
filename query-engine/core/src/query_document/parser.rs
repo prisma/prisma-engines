@@ -4,7 +4,7 @@ use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
 use core::fmt;
 use indexmap::IndexSet;
-use prisma_models::dml::{self, ValueGeneratorFn};
+use prisma_models::{DefaultKind, ValueGeneratorFn};
 use prisma_value::PrismaValue;
 use std::{convert::TryFrom, str::FromStr};
 use user_facing_errors::query_engine::validation::ValidationError;
@@ -677,9 +677,7 @@ impl QueryDocumentParser {
                 match &field.default_value {
                     Some(default_value) => {
                         let default_pv = match &default_value {
-                            dml::DefaultKind::Expression(ref expr)
-                                if matches!(expr.generator(), ValueGeneratorFn::Now) =>
-                            {
+                            DefaultKind::Expression(ref expr) if matches!(expr.generator(), ValueGeneratorFn::Now) => {
                                 self.default_now.clone()
                             }
                             _ => default_value.get()?,
