@@ -1,5 +1,4 @@
 use super::*;
-use crate::utils::quote_connector;
 use darling::FromMeta;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
@@ -20,11 +19,9 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
 
     let excluded_features = args.exclude_features.features();
     let db_schemas = args.db_schemas.schemas();
-    let connectors = args.connectors_to_test();
+    let only = &args.only;
+    let exclude = &args.exclude;
     let handler = args.schema.unwrap().handler_path;
-
-    // Renders the connectors as list to use in the code.
-    let connectors = connectors.into_iter().map(quote_connector);
 
     let mut test_function = parse_macro_input!(input as ItemFn);
 
@@ -71,9 +68,9 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
         #[test]
         fn #test_fn_ident() {
             query_tests_setup::run_connector_test(
-                #test_name,
                 #test_database_name,
-                &[#(#connectors,)*],
+                &[#only],
+                &[#exclude],
                 &[#(ConnectorCapability::#capabilities),*],
                 &[#(#excluded_features),*],
                 #handler,
