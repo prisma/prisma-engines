@@ -57,4 +57,8 @@ pub(crate) trait IntrospectionFlavour {
     ) -> bool {
         false
     }
+
+    fn uses_exclude_constraint(&self, _ctx: &DatamodelCalculatorContext<'_>, _table: TableWalker<'_>) -> bool {
+        false
+    }
 }

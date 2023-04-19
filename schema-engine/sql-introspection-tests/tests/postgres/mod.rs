@@ -1,4 +1,5 @@
 mod brin;
+mod constraints;
 mod extensions;
 mod gin;
 mod gist;

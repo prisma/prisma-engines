@@ -57,6 +57,10 @@ pub(crate) struct Warnings {
     pub(crate) non_default_index_null_sort_order: Vec<IndexedColumn>,
     /// Warn about using row level security, which is currently unsupported.
     pub(crate) row_level_security_tables: Vec<Model>,
+    /// Warn about check constraints.
+    pub(crate) check_constraints: Vec<ModelAndConstraint>,
+    /// Warn about exclusion constraints.
+    pub(crate) exclusion_constraints: Vec<ModelAndConstraint>,
     /// Warn about row level TTL
     pub(crate) row_level_ttl: Vec<Model>,
     /// Warn about non-default unique deferring setup
@@ -215,6 +219,14 @@ impl Warnings {
         maybe_warn(
             &self.non_default_index_null_sort_order,
             non_default_index_null_sort_order,
+            &mut self.warnings,
+        );
+
+        maybe_warn(&self.check_constraints, check_constraints_found, &mut self.warnings);
+
+        maybe_warn(
+            &self.exclusion_constraints,
+            exclusion_constraints_found,
             &mut self.warnings,
         );
 
@@ -595,6 +607,26 @@ pub(crate) fn row_level_ttl_in_tables(affected: &[Model]) -> Warning {
 
     Warning {
         code: 31,
+        message: message.into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+pub(crate) fn check_constraints_found(affected: &[ModelAndConstraint]) -> Warning {
+    let message = "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints";
+
+    Warning {
+        code: 33,
+        message: message.into(),
+        affected: serde_json::to_value(affected).unwrap(),
+    }
+}
+
+pub(crate) fn exclusion_constraints_found(affected: &[ModelAndConstraint]) -> Warning {
+    let message = "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints";
+
+    Warning {
+        code: 34,
         message: message.into(),
         affected: serde_json::to_value(affected).unwrap(),
     }

@@ -995,6 +995,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     length: None,
                 },
             ],
+            check_constraints: [],
             views: [],
             view_columns: [],
             procedures: [],
@@ -1034,6 +1035,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
             table_options: [
                 {},
             ],
+            exclude_constraints: [],
             sequences: [
                 Sequence {
                     namespace_id: NamespaceId(
@@ -1207,6 +1209,7 @@ fn postgres_sequences_must_work(api: TestApi) {
             index_null_position: {},
             constraint_options: {},
             table_options: [],
+            exclude_constraints: [],
             sequences: [
                 Sequence {
                     namespace_id: NamespaceId(
@@ -1460,6 +1463,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                     length: None,
                 },
             ],
+            check_constraints: [],
             views: [],
             view_columns: [],
             procedures: [],
@@ -1539,6 +1543,7 @@ fn seemingly_escaped_backslashes_in_string_literals_must_not_be_unescaped(api: T
             foreign_key_columns: [],
             indexes: [],
             index_columns: [],
+            check_constraints: [],
             views: [],
             view_columns: [],
             procedures: [],
@@ -1802,6 +1807,7 @@ fn extensions_are_described_correctly(api: TestApi) {
             index_null_position: {},
             constraint_options: {},
             table_options: [],
+            exclude_constraints: [],
             sequences: [],
             extensions: [
                 DatabaseExtension {
@@ -2037,6 +2043,7 @@ fn multiple_schemas_with_same_table_names_are_described(api: TestApi) {
                     length: None,
                 },
             ],
+            check_constraints: [],
             views: [],
             view_columns: [],
             procedures: [],
@@ -2525,6 +2532,7 @@ fn multiple_schemas_with_same_foreign_key_are_described(api: TestApi) {
                     length: None,
                 },
             ],
+            check_constraints: [],
             views: [],
             view_columns: [],
             procedures: [],

@@ -79,6 +79,8 @@ pub struct SqlSchema {
     indexes: Vec<Index>,
     /// All columns of indexes.
     index_columns: Vec<IndexColumn>,
+    /// Check constraints for every table.
+    check_constraints: Vec<(TableId, String)>,
     /// The schema's views,
     views: Vec<View>,
     /// The schema's columns that are in views.
