@@ -66,7 +66,6 @@ impl Actor {
         let tag = ConnectorTag::try_from(("sqlserver", None))?;
 
         let datamodel = render_test_datamodel(
-            &CONFIG,
             "sql_server_deadlocks_test",
             SCHEMA.to_owned(),
             &[],

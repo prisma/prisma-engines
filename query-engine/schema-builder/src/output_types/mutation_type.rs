@@ -1,7 +1,7 @@
 use super::*;
 use crate::mutations::{create_many, create_one};
 use input_types::fields::{arguments, input_fields};
-use prisma_models::{dml, PrismaValue};
+use prisma_models::{DefaultKind, PrismaValue};
 use psl::datamodel_connector::ConnectorCapability;
 
 /// Builds the root `Mutation` type.
@@ -98,7 +98,7 @@ fn create_execute_raw_field(ctx: &mut BuilderContext<'_>) -> OutputField {
                 ctx,
                 "parameters",
                 InputType::json_list(),
-                Some(dml::DefaultKind::Single(PrismaValue::String("[]".into()))),
+                Some(DefaultKind::Single(PrismaValue::String("[]".into()))),
             )
             .optional(),
         ],
@@ -119,7 +119,7 @@ fn create_query_raw_field(ctx: &mut BuilderContext<'_>) -> OutputField {
                 ctx,
                 "parameters",
                 InputType::json_list(),
-                Some(dml::DefaultKind::Single(PrismaValue::String("[]".into()))),
+                Some(DefaultKind::Single(PrismaValue::String("[]".into()))),
             )
             .optional(),
         ],

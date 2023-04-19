@@ -1,7 +1,7 @@
 use super::*;
 use fmt::Debug;
 use once_cell::sync::OnceCell;
-use prisma_models::{dml, prelude::ParentContainer};
+use prisma_models::{prelude::ParentContainer, DefaultKind};
 use std::{boxed::Box, fmt};
 
 #[derive(PartialEq)]
@@ -110,7 +110,7 @@ impl InputObjectType {
 #[derive(Debug, PartialEq)]
 pub struct InputField {
     pub name: String,
-    pub default_value: Option<dml::DefaultKind>,
+    pub default_value: Option<DefaultKind>,
 
     /// Possible field types, represented as a union of input types, but only one can be provided at any time.
     /// Slice expressed as (start, len).
@@ -122,7 +122,7 @@ pub struct InputField {
 }
 
 impl InputField {
-    pub fn new(name: String, default_value: Option<dml::DefaultKind>, is_required: bool) -> InputField {
+    pub fn new(name: String, default_value: Option<DefaultKind>, is_required: bool) -> InputField {
         InputField {
             name,
             default_value,
