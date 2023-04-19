@@ -153,7 +153,7 @@ mod manager;
 pub use manager::*;
 
 use crate::{
-    connector::ConnectionInfo,
+    connector::{ConnectionInfo, PostgresFlavour},
     error::{Error, ErrorKind},
 };
 use mobc::Pool;
@@ -291,6 +291,25 @@ impl Builder {
     /// [`test_on_check_out`]: #method.test_on_check_out
     pub fn health_check_interval(&mut self, health_check_interval: Duration) {
         self.health_check_interval = Some(health_check_interval);
+    }
+
+    /// Sets whether the URL points to a Postgres, Cockroach or Unknown database.
+    /// This is used to avoid a network roundtrip at connection to set the search path.
+    ///
+    /// The different behaviours are:
+    /// - Postgres: Always avoid a network roundtrip by setting the search path through client connection parameters.
+    /// - Cockroach: Avoid a network roundtrip if the schema name is deemed "safe" (i.e. no escape quoting required). Otherwise, set the search path through a database query.
+    /// - Unknown: Always add a network roundtrip by setting the search path through a database query.
+    ///
+    /// - Defaults to `PostgresFlavour::Unknown`.
+    pub fn set_postgres_flavour(&mut self, flavour: PostgresFlavour) {
+        if let ConnectionInfo::Postgres(ref mut url) = self.connection_info {
+            url.set_flavour(flavour);
+        }
+
+        if let QuaintManager::Postgres { ref mut url } = self.manager {
+            url.set_flavour(flavour);
+        }
     }
 
     /// Consume the builder and create a new instance of a pool.

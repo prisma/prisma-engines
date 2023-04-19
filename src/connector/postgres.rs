@@ -147,6 +147,36 @@ impl SslParams {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+pub enum PostgresFlavour {
+    Postgres,
+    Cockroach,
+    Unknown,
+}
+
+impl PostgresFlavour {
+    /// Returns `true` if the postgres flavour is [`Postgres`].
+    ///
+    /// [`Postgres`]: PostgresFlavour::Postgres
+    fn is_postgres(&self) -> bool {
+        matches!(self, Self::Postgres)
+    }
+
+    /// Returns `true` if the postgres flavour is [`Cockroach`].
+    ///
+    /// [`Cockroach`]: PostgresFlavour::Cockroach
+    fn is_cockroach(&self) -> bool {
+        matches!(self, Self::Cockroach)
+    }
+
+    /// Returns `true` if the postgres flavour is [`Unknown`].
+    ///
+    /// [`Unknown`]: PostgresFlavour::Unknown
+    fn is_unknown(&self) -> bool {
+        matches!(self, Self::Unknown)
+    }
+}
+
 /// Wraps a connection url and exposes the parsing logic used by Quaint,
 /// including default values.
 #[derive(Debug, Clone)]
@@ -154,6 +184,7 @@ impl SslParams {
 pub struct PostgresUrl {
     url: Url,
     query_params: PostgresUrlQueryParams,
+    flavour: PostgresFlavour,
 }
 
 impl PostgresUrl {
@@ -162,7 +193,11 @@ impl PostgresUrl {
     pub fn new(url: Url) -> Result<Self, Error> {
         let query_params = Self::parse_query_params(&url)?;
 
-        Ok(Self { url, query_params })
+        Ok(Self {
+            url,
+            query_params,
+            flavour: PostgresFlavour::Unknown,
+        })
     }
 
     /// The bare `Url` to the database.
@@ -275,6 +310,17 @@ impl PostgresUrl {
 
     pub(crate) fn options(&self) -> Option<&str> {
         self.query_params.options.as_deref()
+    }
+
+    /// Sets whether the URL points to a Postgres, Cockroach or Unknown database.
+    /// This is used to avoid a network roundtrip at connection to set the search path.
+    ///
+    /// The different behaviours are:
+    /// - Postgres: Always avoid a network roundtrip by setting the search path through client connection parameters.
+    /// - Cockroach: Avoid a network roundtrip if the schema name is deemed "safe" (i.e. no escape quoting required). Otherwise, set the search path through a database query.
+    /// - Unknown: Always add a network roundtrip by setting the search path through a database query.
+    pub fn set_flavour(&mut self, flavour: PostgresFlavour) {
+        self.flavour = flavour;
     }
 
     fn parse_query_params(url: &Url) -> Result<PostgresUrlQueryParams, Error> {
@@ -486,13 +532,30 @@ impl PostgresUrl {
 
         if let Some(connect_timeout) = self.query_params.connect_timeout {
             config.connect_timeout(connect_timeout);
-        };
+        }
+
+        // On Postgres, we set the SEARCH_PATH and client-encoding through client connection parameters to save a network roundtrip on connection.
+        // We can't always do it for CockroachDB because it does not expect quotes for unsafe identifiers (https://github.com/cockroachdb/cockroach/issues/101328), which might change once the issue is fixed.
+        // To circumvent that problem, we only set the SEARCH_PATH through client connection parameters for Cockroach when the identifier is safe, so that the quoting does not matter.
+        if let Some(schema) = &self.query_params.schema {
+            if self.flavour().is_cockroach() && is_safe_identifier(schema) {
+                config.search_path(CockroachSearchPath(schema).to_string());
+            }
+
+            if self.flavour().is_postgres() {
+                config.search_path(PostgresSearchPath(schema).to_string());
+            }
+        }
 
         config.ssl_mode(self.query_params.ssl_mode);
 
         config.channel_binding(self.query_params.channel_binding);
 
         config
+    }
+
+    pub fn flavour(&self) -> PostgresFlavour {
+        self.flavour
     }
 }
 
@@ -547,19 +610,20 @@ impl PostgreSql {
             }
         }));
 
-        // SET NAMES sets the client text encoding. It needs to be explicitly set for automatic
-        // conversion to and from UTF-8 to happen server-side.
-        //
-        // Relevant docs: https://www.postgresql.org/docs/current/multibyte.html
-        let session_variables = format!(
-            r##"
-            {set_search_path}
-            SET NAMES 'UTF8';
-            "##,
-            set_search_path = SetSearchPath(url.query_params.schema.as_deref())
-        );
+        // On Postgres, we set the SEARCH_PATH and client-encoding through client connection parameters to save a network roundtrip on connection.
+        // We can't always do it for CockroachDB because it does not expect quotes for unsafe identifiers (https://github.com/cockroachdb/cockroach/issues/101328), which might change once the issue is fixed.
+        // To circumvent that problem, we only set the SEARCH_PATH through client connection parameters for Cockroach when the identifier is safe, so that the quoting does not matter.
+        // Finally, to ensure backward compatibility, we keep sending a database query in case the flavour is set to Unknown.
+        if let Some(schema) = &url.query_params.schema {
+            if url.flavour().is_unknown() || (url.flavour().is_cockroach() && !is_safe_identifier(schema)) {
+                let session_variables = format!(
+                    r##"{set_search_path}"##,
+                    set_search_path = SetSearchPath(url.query_params.schema.as_deref())
+                );
 
-        client.simple_query(session_variables.as_str()).await?;
+                client.simple_query(session_variables.as_str()).await?;
+            }
+        }
 
         Ok(Self {
             client: PostgresClient(client),
@@ -638,6 +702,28 @@ impl PostgreSql {
         } else {
             Ok(())
         }
+    }
+}
+
+// A SearchPath connection parameter (Display-impl) for connection initialization.
+struct CockroachSearchPath<'a>(&'a str);
+
+impl Display for CockroachSearchPath<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.0)
+    }
+}
+
+// A SearchPath connection parameter (Display-impl) for connection initialization.
+struct PostgresSearchPath<'a>(&'a str);
+
+impl Display for PostgresSearchPath<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("\"")?;
+        f.write_str(self.0)?;
+        f.write_str("\"")?;
+
+        Ok(())
     }
 }
 
@@ -827,10 +913,153 @@ impl Queryable for PostgreSql {
     }
 }
 
+/// Sorted list of CockroachDB's reserved keywords.
+/// Taken from https://www.cockroachlabs.com/docs/stable/keywords-and-identifiers.html#keywords
+const RESERVED_KEYWORDS: [&str; 79] = [
+    "all",
+    "analyse",
+    "analyze",
+    "and",
+    "any",
+    "array",
+    "as",
+    "asc",
+    "asymmetric",
+    "both",
+    "case",
+    "cast",
+    "check",
+    "collate",
+    "column",
+    "concurrently",
+    "constraint",
+    "create",
+    "current_catalog",
+    "current_date",
+    "current_role",
+    "current_schema",
+    "current_time",
+    "current_timestamp",
+    "current_user",
+    "default",
+    "deferrable",
+    "desc",
+    "distinct",
+    "do",
+    "else",
+    "end",
+    "except",
+    "false",
+    "fetch",
+    "for",
+    "foreign",
+    "from",
+    "grant",
+    "group",
+    "having",
+    "in",
+    "initially",
+    "intersect",
+    "into",
+    "lateral",
+    "leading",
+    "limit",
+    "localtime",
+    "localtimestamp",
+    "not",
+    "null",
+    "offset",
+    "on",
+    "only",
+    "or",
+    "order",
+    "placing",
+    "primary",
+    "references",
+    "returning",
+    "select",
+    "session_user",
+    "some",
+    "symmetric",
+    "table",
+    "then",
+    "to",
+    "trailing",
+    "true",
+    "union",
+    "unique",
+    "user",
+    "using",
+    "variadic",
+    "when",
+    "where",
+    "window",
+    "with",
+];
+
+/// Sorted list of CockroachDB's reserved type function names.
+/// Taken from https://www.cockroachlabs.com/docs/stable/keywords-and-identifiers.html#keywords
+const RESERVED_TYPE_FUNCTION_NAMES: [&str; 18] = [
+    "authorization",
+    "collation",
+    "cross",
+    "full",
+    "ilike",
+    "inner",
+    "is",
+    "isnull",
+    "join",
+    "left",
+    "like",
+    "natural",
+    "none",
+    "notnull",
+    "outer",
+    "overlaps",
+    "right",
+    "similar",
+];
+
+/// Returns true if a Postgres identifier is considered "safe".
+///
+/// In this context, "safe" means that the value of an identifier would be the same quoted and unquoted or that it's not part of reserved keywords. In other words, that it does _not_ need to be quoted.
+///
+/// Spec can be found here: https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
+/// or here: https://www.cockroachlabs.com/docs/stable/keywords-and-identifiers.html#rules-for-identifiers
+fn is_safe_identifier(ident: &str) -> bool {
+    if ident.is_empty() {
+        return false;
+    }
+
+    // 1. Not equal any SQL keyword unless the keyword is accepted by the element's syntax. For example, name accepts Unreserved or Column Name keywords.
+    if RESERVED_KEYWORDS.binary_search(&ident).is_ok() || RESERVED_TYPE_FUNCTION_NAMES.binary_search(&ident).is_ok() {
+        return false;
+    }
+
+    let mut chars = ident.chars();
+
+    let first = chars.next().unwrap();
+
+    // 2. SQL identifiers must begin with a letter (a-z, but also letters with diacritical marks and non-Latin letters) or an underscore (_).
+    if (!first.is_alphabetic() || !first.is_lowercase()) && first != '_' {
+        return false;
+    }
+
+    for c in chars {
+        // 3. Subsequent characters in an identifier can be letters, underscores, digits (0-9), or dollar signs ($).
+        if (!c.is_alphabetic() || !c.is_lowercase()) && c != '_' && !c.is_ascii_digit() && c != '$' {
+            return false;
+        }
+    }
+
+    true
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::tests::test_api::postgres::CONN_STR;
+    use crate::tests::test_api::CRDB_CONN_STR;
     use crate::{connector::Queryable, error::*, single::Quaint};
     use url::Url;
 
@@ -907,16 +1136,207 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_custom_search_path() {
-        let mut url = Url::parse(&CONN_STR).unwrap();
-        url.query_pairs_mut().append_pair("schema", "musti-test");
+    async fn test_custom_search_path_pg() {
+        async fn test_path(schema_name: &str) -> Option<String> {
+            let mut url = Url::parse(&CONN_STR).unwrap();
+            url.query_pairs_mut().append_pair("schema", schema_name);
 
-        let client = Quaint::new(url.as_str()).await.unwrap();
+            let mut pg_url = PostgresUrl::new(url).unwrap();
+            pg_url.set_flavour(PostgresFlavour::Postgres);
 
-        let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
-        let row = result_set.first().unwrap();
+            let client = PostgreSql::new(pg_url).await.unwrap();
 
-        assert_eq!(Some("\"musti-test\""), row[0].as_str());
+            let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
+            let row = result_set.first().unwrap();
+
+            row[0].to_string()
+        }
+
+        // Safe
+        assert_eq!(test_path("hello").await.as_deref(), Some("\"hello\""));
+        assert_eq!(test_path("_hello").await.as_deref(), Some("\"_hello\""));
+        assert_eq!(test_path("àbracadabra").await.as_deref(), Some("\"àbracadabra\""));
+        assert_eq!(test_path("h3ll0").await.as_deref(), Some("\"h3ll0\""));
+        assert_eq!(test_path("héllo").await.as_deref(), Some("\"héllo\""));
+        assert_eq!(test_path("héll0$").await.as_deref(), Some("\"héll0$\""));
+        assert_eq!(test_path("héll_0$").await.as_deref(), Some("\"héll_0$\""));
+
+        // Not safe
+        assert_eq!(test_path("Hello").await.as_deref(), Some("\"Hello\""));
+        assert_eq!(test_path("hEllo").await.as_deref(), Some("\"hEllo\""));
+        assert_eq!(test_path("$hello").await.as_deref(), Some("\"$hello\""));
+        assert_eq!(test_path("hello!").await.as_deref(), Some("\"hello!\""));
+        assert_eq!(test_path("hello#").await.as_deref(), Some("\"hello#\""));
+        assert_eq!(test_path("he llo").await.as_deref(), Some("\"he llo\""));
+        assert_eq!(test_path(" hello").await.as_deref(), Some("\" hello\""));
+        assert_eq!(test_path("he-llo").await.as_deref(), Some("\"he-llo\""));
+        assert_eq!(test_path("hÉllo").await.as_deref(), Some("\"hÉllo\""));
+        assert_eq!(test_path("1337").await.as_deref(), Some("\"1337\""));
+        assert_eq!(test_path("_HELLO").await.as_deref(), Some("\"_HELLO\""));
+        assert_eq!(test_path("HELLO").await.as_deref(), Some("\"HELLO\""));
+        assert_eq!(test_path("HELLO$").await.as_deref(), Some("\"HELLO$\""));
+        assert_eq!(test_path("ÀBRACADABRA").await.as_deref(), Some("\"ÀBRACADABRA\""));
+
+        for ident in RESERVED_KEYWORDS {
+            assert_eq!(test_path(ident).await.as_deref(), Some(format!("\"{ident}\"").as_str()));
+        }
+
+        for ident in RESERVED_TYPE_FUNCTION_NAMES {
+            assert_eq!(test_path(ident).await.as_deref(), Some(format!("\"{ident}\"").as_str()));
+        }
+    }
+
+    #[tokio::test]
+    async fn test_custom_search_path_crdb() {
+        async fn test_path(schema_name: &str) -> Option<String> {
+            let mut url = Url::parse(&CRDB_CONN_STR).unwrap();
+            url.query_pairs_mut().append_pair("schema", schema_name);
+
+            let mut pg_url = PostgresUrl::new(url).unwrap();
+            pg_url.set_flavour(PostgresFlavour::Cockroach);
+
+            let client = PostgreSql::new(pg_url).await.unwrap();
+
+            let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
+            let row = result_set.first().unwrap();
+
+            row[0].to_string()
+        }
+
+        // Safe
+        assert_eq!(test_path("hello").await.as_deref(), Some("hello"));
+        assert_eq!(test_path("_hello").await.as_deref(), Some("_hello"));
+        assert_eq!(test_path("àbracadabra").await.as_deref(), Some("àbracadabra"));
+        assert_eq!(test_path("h3ll0").await.as_deref(), Some("h3ll0"));
+        assert_eq!(test_path("héllo").await.as_deref(), Some("héllo"));
+        assert_eq!(test_path("héll0$").await.as_deref(), Some("héll0$"));
+        assert_eq!(test_path("héll_0$").await.as_deref(), Some("héll_0$"));
+
+        // Not safe
+        assert_eq!(test_path("Hello").await.as_deref(), Some("\"Hello\""));
+        assert_eq!(test_path("hEllo").await.as_deref(), Some("\"hEllo\""));
+        assert_eq!(test_path("$hello").await.as_deref(), Some("\"$hello\""));
+        assert_eq!(test_path("hello!").await.as_deref(), Some("\"hello!\""));
+        assert_eq!(test_path("hello#").await.as_deref(), Some("\"hello#\""));
+        assert_eq!(test_path("he llo").await.as_deref(), Some("\"he llo\""));
+        assert_eq!(test_path(" hello").await.as_deref(), Some("\" hello\""));
+        assert_eq!(test_path("he-llo").await.as_deref(), Some("\"he-llo\""));
+        assert_eq!(test_path("hÉllo").await.as_deref(), Some("\"hÉllo\""));
+        assert_eq!(test_path("1337").await.as_deref(), Some("\"1337\""));
+        assert_eq!(test_path("_HELLO").await.as_deref(), Some("\"_HELLO\""));
+        assert_eq!(test_path("HELLO").await.as_deref(), Some("\"HELLO\""));
+        assert_eq!(test_path("HELLO$").await.as_deref(), Some("\"HELLO$\""));
+        assert_eq!(test_path("ÀBRACADABRA").await.as_deref(), Some("\"ÀBRACADABRA\""));
+
+        for ident in RESERVED_KEYWORDS {
+            assert_eq!(test_path(ident).await.as_deref(), Some(format!("\"{ident}\"").as_str()));
+        }
+
+        for ident in RESERVED_TYPE_FUNCTION_NAMES {
+            assert_eq!(test_path(ident).await.as_deref(), Some(format!("\"{ident}\"").as_str()));
+        }
+    }
+
+    #[tokio::test]
+    async fn test_custom_search_path_unknown_pg() {
+        async fn test_path(schema_name: &str) -> Option<String> {
+            let mut url = Url::parse(&CONN_STR).unwrap();
+            url.query_pairs_mut().append_pair("schema", schema_name);
+
+            let mut pg_url = PostgresUrl::new(url).unwrap();
+            pg_url.set_flavour(PostgresFlavour::Unknown);
+
+            let client = PostgreSql::new(pg_url).await.unwrap();
+
+            let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
+            let row = result_set.first().unwrap();
+
+            row[0].to_string()
+        }
+
+        // Safe
+        assert_eq!(test_path("hello").await.as_deref(), Some("hello"));
+        assert_eq!(test_path("_hello").await.as_deref(), Some("_hello"));
+        assert_eq!(test_path("àbracadabra").await.as_deref(), Some("\"àbracadabra\""));
+        assert_eq!(test_path("h3ll0").await.as_deref(), Some("h3ll0"));
+        assert_eq!(test_path("héllo").await.as_deref(), Some("\"héllo\""));
+        assert_eq!(test_path("héll0$").await.as_deref(), Some("\"héll0$\""));
+        assert_eq!(test_path("héll_0$").await.as_deref(), Some("\"héll_0$\""));
+
+        // Not safe
+        assert_eq!(test_path("Hello").await.as_deref(), Some("\"Hello\""));
+        assert_eq!(test_path("hEllo").await.as_deref(), Some("\"hEllo\""));
+        assert_eq!(test_path("$hello").await.as_deref(), Some("\"$hello\""));
+        assert_eq!(test_path("hello!").await.as_deref(), Some("\"hello!\""));
+        assert_eq!(test_path("hello#").await.as_deref(), Some("\"hello#\""));
+        assert_eq!(test_path("he llo").await.as_deref(), Some("\"he llo\""));
+        assert_eq!(test_path(" hello").await.as_deref(), Some("\" hello\""));
+        assert_eq!(test_path("he-llo").await.as_deref(), Some("\"he-llo\""));
+        assert_eq!(test_path("hÉllo").await.as_deref(), Some("\"hÉllo\""));
+        assert_eq!(test_path("1337").await.as_deref(), Some("\"1337\""));
+        assert_eq!(test_path("_HELLO").await.as_deref(), Some("\"_HELLO\""));
+        assert_eq!(test_path("HELLO").await.as_deref(), Some("\"HELLO\""));
+        assert_eq!(test_path("HELLO$").await.as_deref(), Some("\"HELLO$\""));
+        assert_eq!(test_path("ÀBRACADABRA").await.as_deref(), Some("\"ÀBRACADABRA\""));
+
+        for ident in RESERVED_KEYWORDS {
+            assert_eq!(test_path(ident).await.as_deref(), Some(format!("\"{ident}\"").as_str()));
+        }
+
+        for ident in RESERVED_TYPE_FUNCTION_NAMES {
+            assert_eq!(test_path(ident).await.as_deref(), Some(format!("\"{ident}\"").as_str()));
+        }
+    }
+
+    #[tokio::test]
+    async fn test_custom_search_path_unknown_crdb() {
+        async fn test_path(schema_name: &str) -> Option<String> {
+            let mut url = Url::parse(&CONN_STR).unwrap();
+            url.query_pairs_mut().append_pair("schema", schema_name);
+
+            let mut pg_url = PostgresUrl::new(url).unwrap();
+            pg_url.set_flavour(PostgresFlavour::Unknown);
+
+            let client = PostgreSql::new(pg_url).await.unwrap();
+
+            let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
+            let row = result_set.first().unwrap();
+
+            row[0].to_string()
+        }
+
+        // Safe
+        assert_eq!(test_path("hello").await.as_deref(), Some("hello"));
+        assert_eq!(test_path("_hello").await.as_deref(), Some("_hello"));
+        assert_eq!(test_path("àbracadabra").await.as_deref(), Some("\"àbracadabra\""));
+        assert_eq!(test_path("h3ll0").await.as_deref(), Some("h3ll0"));
+        assert_eq!(test_path("héllo").await.as_deref(), Some("\"héllo\""));
+        assert_eq!(test_path("héll0$").await.as_deref(), Some("\"héll0$\""));
+        assert_eq!(test_path("héll_0$").await.as_deref(), Some("\"héll_0$\""));
+
+        // Not safe
+        assert_eq!(test_path("Hello").await.as_deref(), Some("\"Hello\""));
+        assert_eq!(test_path("hEllo").await.as_deref(), Some("\"hEllo\""));
+        assert_eq!(test_path("$hello").await.as_deref(), Some("\"$hello\""));
+        assert_eq!(test_path("hello!").await.as_deref(), Some("\"hello!\""));
+        assert_eq!(test_path("hello#").await.as_deref(), Some("\"hello#\""));
+        assert_eq!(test_path("he llo").await.as_deref(), Some("\"he llo\""));
+        assert_eq!(test_path(" hello").await.as_deref(), Some("\" hello\""));
+        assert_eq!(test_path("he-llo").await.as_deref(), Some("\"he-llo\""));
+        assert_eq!(test_path("hÉllo").await.as_deref(), Some("\"hÉllo\""));
+        assert_eq!(test_path("1337").await.as_deref(), Some("\"1337\""));
+        assert_eq!(test_path("_HELLO").await.as_deref(), Some("\"_HELLO\""));
+        assert_eq!(test_path("HELLO").await.as_deref(), Some("\"HELLO\""));
+        assert_eq!(test_path("HELLO$").await.as_deref(), Some("\"HELLO$\""));
+        assert_eq!(test_path("ÀBRACADABRA").await.as_deref(), Some("\"ÀBRACADABRA\""));
+
+        for ident in RESERVED_KEYWORDS {
+            assert_eq!(test_path(ident).await.as_deref(), Some(format!("\"{ident}\"").as_str()));
+        }
+
+        for ident in RESERVED_TYPE_FUNCTION_NAMES {
+            assert_eq!(test_path(ident).await.as_deref(), Some(format!("\"{ident}\"").as_str()));
+        }
     }
 
     #[tokio::test]
@@ -994,6 +1414,47 @@ mod tests {
                 }
                 other => panic!("{:#?}", other),
             },
+        }
+    }
+
+    #[test]
+    fn test_safe_ident() {
+        // Safe
+        assert_eq!(is_safe_identifier("hello"), true);
+        assert_eq!(is_safe_identifier("_hello"), true);
+        assert_eq!(is_safe_identifier("àbracadabra"), true);
+        assert_eq!(is_safe_identifier("h3ll0"), true);
+        assert_eq!(is_safe_identifier("héllo"), true);
+        assert_eq!(is_safe_identifier("héll0$"), true);
+        assert_eq!(is_safe_identifier("héll_0$"), true);
+        assert_eq!(
+            is_safe_identifier("disconnect_security_must_honor_connect_scope_one2m"),
+            true
+        );
+
+        // Not safe
+        assert_eq!(is_safe_identifier(""), false);
+        assert_eq!(is_safe_identifier("Hello"), false);
+        assert_eq!(is_safe_identifier("hEllo"), false);
+        assert_eq!(is_safe_identifier("$hello"), false);
+        assert_eq!(is_safe_identifier("hello!"), false);
+        assert_eq!(is_safe_identifier("hello#"), false);
+        assert_eq!(is_safe_identifier("he llo"), false);
+        assert_eq!(is_safe_identifier(" hello"), false);
+        assert_eq!(is_safe_identifier("he-llo"), false);
+        assert_eq!(is_safe_identifier("hÉllo"), false);
+        assert_eq!(is_safe_identifier("1337"), false);
+        assert_eq!(is_safe_identifier("_HELLO"), false);
+        assert_eq!(is_safe_identifier("HELLO"), false);
+        assert_eq!(is_safe_identifier("HELLO$"), false);
+        assert_eq!(is_safe_identifier("ÀBRACADABRA"), false);
+
+        for ident in RESERVED_KEYWORDS {
+            assert_eq!(is_safe_identifier(ident), false);
+        }
+
+        for ident in RESERVED_TYPE_FUNCTION_NAMES {
+            assert_eq!(is_safe_identifier(ident), false);
         }
     }
 }
