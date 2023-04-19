@@ -73,6 +73,16 @@
 <a href="#73" id="73">73</a>
 <a href="#74" id="74">74</a>
 <a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::connection::SqlConnection;
 <span class="kw">use crate</span>::{FromSource, SqlError};
 <span class="kw">use </span>async_trait::async_trait;
@@ -80,7 +90,8 @@
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-<span class="kw">use </span>quaint::{pooled::Quaint, prelude::ConnectionInfo};
+<span class="kw">use </span>psl::builtin_connectors::COCKROACH;
+<span class="kw">use </span>quaint::{connector::PostgresFlavour, pooled::Quaint, prelude::ConnectionInfo};
 <span class="kw">use </span>std::time::Duration;
 
 <span class="kw">pub struct </span>PostgreSql {
@@ -99,13 +110,14 @@
 <span class="attr">#[async_trait]
 </span><span class="kw">impl </span>FromSource <span class="kw">for </span>PostgreSql {
     <span class="kw">async fn </span>from_source(
-        _source: <span class="kw-2">&amp;</span>psl::Datasource,
+        source: <span class="kw-2">&amp;</span>psl::Datasource,
         url: <span class="kw-2">&amp;</span>str,
         features: psl::PreviewFeatures,
     ) -&gt; connector_interface::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>database_str = url;
 
-        <span class="kw">let </span>connection_info = ConnectionInfo::from_url(database_str).map_err(|err| {
+        <span class="comment">// This connection info is only used for error rendering. It does not matter that the flavour is not set.
+        </span><span class="kw">let </span>err_conn_info = ConnectionInfo::from_url(url).map_err(|err| {
             ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl {
                 details: err.to_string(),
                 url: database_str.to_string(),
@@ -114,8 +126,16 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>builder = Quaint::builder(url)
             .map_err(SqlError::from)
-            .map_err(|sql_error| sql_error.into_connector_error(<span class="kw-2">&amp;</span>connection_info))<span class="question-mark">?</span>;
+            .map_err(|sql_error| sql_error.into_connector_error(<span class="kw-2">&amp;</span>err_conn_info))<span class="question-mark">?</span>;
 
+        <span class="kw">let </span>flavour = <span class="kw">if </span>COCKROACH.is_provider(source.active_provider) {
+            PostgresFlavour::Cockroach
+        } <span class="kw">else </span>{
+            PostgresFlavour::Postgres
+        };
+
+        <span class="comment">// The postgres flavour is set in order to avoid a network roundtrip when connecting to the database.
+        </span>builder.set_postgres_flavour(flavour);
         builder.health_check_interval(Duration::from_secs(<span class="number">15</span>));
         builder.test_on_check_out(<span class="bool-val">true</span>);
 
