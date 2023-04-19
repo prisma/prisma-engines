@@ -125,6 +125,24 @@
 <a href="#125" id="125">125</a>
 <a href="#126" id="126">126</a>
 <a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::ops::Range;
 
 <span class="kw">use crate</span>::{
@@ -240,6 +258,24 @@
     <span class="doccomment">/// Does the table have row level security enabled?
     </span><span class="kw">pub fn </span>has_row_level_security(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.table().properties.contains(TableProperties::HasRowLevelSecurity)
+    }
+
+    <span class="doccomment">/// Does the table have check constraints?
+    </span><span class="kw">pub fn </span>has_check_constraints(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.schema
+            .check_constraints
+            .binary_search_by_key(<span class="kw-2">&amp;</span><span class="self">self</span>.id, |(id, <span class="kw">_</span>)| <span class="kw-2">*</span>id)
+            .is_ok()
+    }
+
+    <span class="doccomment">/// The check constraint names for the table.
+    </span><span class="kw">pub fn </span>check_constraints(<span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        <span class="kw">let </span>low = <span class="self">self</span>.schema.check_constraints.partition_point(|(id, <span class="kw">_</span>)| <span class="kw-2">*</span>id &lt; <span class="self">self</span>.id);
+        <span class="kw">let </span>high = <span class="self">self</span>.schema.check_constraints[low..].partition_point(|(id, <span class="kw">_</span>)| <span class="kw-2">*</span>id &lt;= <span class="self">self</span>.id);
+
+        <span class="self">self</span>.schema.check_constraints[low..high]
+            .iter()
+            .map(|(<span class="kw">_</span>, name)| name.as_str())
     }
 
     <span class="doccomment">/// Description (comment) of the table.

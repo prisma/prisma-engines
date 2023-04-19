@@ -81,6 +81,22 @@
 <a href="#81" id="81">81</a>
 <a href="#82" id="82">82</a>
 <a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
 </pre><pre class="rust"><code><span class="kw">use </span>sql::{postgres::PostgresSchemaExt, ForeignKeyWalker, IndexWalker, TableWalker};
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
 
@@ -97,6 +113,8 @@
     }
 
     <span class="kw">fn </span>generate_warnings(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>DatamodelCalculatorContext&lt;<span class="lifetime">&#39;_</span>&gt;, warnings: <span class="kw-2">&amp;mut </span>Warnings) {
+        <span class="kw">let </span>pg_ext: <span class="kw-2">&amp;</span>PostgresSchemaExt = ctx.sql_schema.downcast_connector_data();
+
         <span class="kw">for </span>table <span class="kw">in </span>ctx.sql_schema.table_walkers() {
             <span class="kw">for </span>index <span class="kw">in </span>table.indexes() {
                 <span class="kw">for </span>column <span class="kw">in </span>index.columns().filter(|c| <span class="self">self</span>.uses_non_default_null_position(ctx, <span class="kw-2">*</span>c)) {
@@ -128,6 +146,15 @@
                 warnings.row_level_ttl.push(Model {
                     model: ctx.table_prisma_name(table.id).prisma_name().to_string(),
                 });
+            }
+
+            <span class="kw">for </span>constraint <span class="kw">in </span>pg_ext.exclude_constraints(table.id) {
+                <span class="kw">let </span>exclusion_constraint = ModelAndConstraint {
+                    model: ctx.table_prisma_name(table.id).prisma_name().to_string(),
+                    constraint: constraint.to_string(),
+                };
+
+                warnings.exclusion_constraints.push(exclusion_constraint);
             }
         }
     }
@@ -162,6 +189,11 @@
         <span class="kw">let </span>pg_ext: <span class="kw-2">&amp;</span>PostgresSchemaExt = ctx.sql_schema.downcast_connector_data();
 
         pg_ext.non_default_null_position(column)
+    }
+
+    <span class="kw">fn </span>uses_exclude_constraint(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>DatamodelCalculatorContext&lt;<span class="lifetime">&#39;_</span>&gt;, table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+        <span class="kw">let </span>pg_ext: <span class="kw-2">&amp;</span>PostgresSchemaExt = ctx.sql_schema.downcast_connector_data();
+        pg_ext.uses_exclude_constraint(table.id)
     }
 }
 </code></pre></div>

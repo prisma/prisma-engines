@@ -58,6 +58,10 @@
 <a href="#58" id="58">58</a>
 <a href="#59" id="59">59</a>
 <a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>mysql;
 <span class="kw">mod </span>postgresql;
 <span class="kw">mod </span>sqlite;
@@ -115,6 +119,10 @@
         _ctx: <span class="kw-2">&amp;</span>DatamodelCalculatorContext&lt;<span class="lifetime">&#39;_</span>&gt;,
         _column: IndexColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
+
+    <span class="kw">fn </span>uses_exclude_constraint(<span class="kw-2">&amp;</span><span class="self">self</span>, _ctx: <span class="kw-2">&amp;</span>DatamodelCalculatorContext&lt;<span class="lifetime">&#39;_</span>&gt;, _table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
         <span class="bool-val">false
     </span>}
 }

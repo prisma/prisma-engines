@@ -1642,6 +1642,76 @@
 <a href="#1642" id="1642">1642</a>
 <a href="#1643" id="1643">1643</a>
 <a href="#1644" id="1644">1644</a>
+<a href="#1645" id="1645">1645</a>
+<a href="#1646" id="1646">1646</a>
+<a href="#1647" id="1647">1647</a>
+<a href="#1648" id="1648">1648</a>
+<a href="#1649" id="1649">1649</a>
+<a href="#1650" id="1650">1650</a>
+<a href="#1651" id="1651">1651</a>
+<a href="#1652" id="1652">1652</a>
+<a href="#1653" id="1653">1653</a>
+<a href="#1654" id="1654">1654</a>
+<a href="#1655" id="1655">1655</a>
+<a href="#1656" id="1656">1656</a>
+<a href="#1657" id="1657">1657</a>
+<a href="#1658" id="1658">1658</a>
+<a href="#1659" id="1659">1659</a>
+<a href="#1660" id="1660">1660</a>
+<a href="#1661" id="1661">1661</a>
+<a href="#1662" id="1662">1662</a>
+<a href="#1663" id="1663">1663</a>
+<a href="#1664" id="1664">1664</a>
+<a href="#1665" id="1665">1665</a>
+<a href="#1666" id="1666">1666</a>
+<a href="#1667" id="1667">1667</a>
+<a href="#1668" id="1668">1668</a>
+<a href="#1669" id="1669">1669</a>
+<a href="#1670" id="1670">1670</a>
+<a href="#1671" id="1671">1671</a>
+<a href="#1672" id="1672">1672</a>
+<a href="#1673" id="1673">1673</a>
+<a href="#1674" id="1674">1674</a>
+<a href="#1675" id="1675">1675</a>
+<a href="#1676" id="1676">1676</a>
+<a href="#1677" id="1677">1677</a>
+<a href="#1678" id="1678">1678</a>
+<a href="#1679" id="1679">1679</a>
+<a href="#1680" id="1680">1680</a>
+<a href="#1681" id="1681">1681</a>
+<a href="#1682" id="1682">1682</a>
+<a href="#1683" id="1683">1683</a>
+<a href="#1684" id="1684">1684</a>
+<a href="#1685" id="1685">1685</a>
+<a href="#1686" id="1686">1686</a>
+<a href="#1687" id="1687">1687</a>
+<a href="#1688" id="1688">1688</a>
+<a href="#1689" id="1689">1689</a>
+<a href="#1690" id="1690">1690</a>
+<a href="#1691" id="1691">1691</a>
+<a href="#1692" id="1692">1692</a>
+<a href="#1693" id="1693">1693</a>
+<a href="#1694" id="1694">1694</a>
+<a href="#1695" id="1695">1695</a>
+<a href="#1696" id="1696">1696</a>
+<a href="#1697" id="1697">1697</a>
+<a href="#1698" id="1698">1698</a>
+<a href="#1699" id="1699">1699</a>
+<a href="#1700" id="1700">1700</a>
+<a href="#1701" id="1701">1701</a>
+<a href="#1702" id="1702">1702</a>
+<a href="#1703" id="1703">1703</a>
+<a href="#1704" id="1704">1704</a>
+<a href="#1705" id="1705">1705</a>
+<a href="#1706" id="1706">1706</a>
+<a href="#1707" id="1707">1707</a>
+<a href="#1708" id="1708">1708</a>
+<a href="#1709" id="1709">1709</a>
+<a href="#1710" id="1710">1710</a>
+<a href="#1711" id="1711">1711</a>
+<a href="#1712" id="1712">1712</a>
+<a href="#1713" id="1713">1713</a>
+<a href="#1714" id="1714">1714</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.
 
 </span><span class="kw">mod </span>default;
@@ -1794,6 +1864,7 @@
     <span class="kw">pub </span>index_null_position: HashMap&lt;IndexColumnId, IndexNullPosition&gt;,
     <span class="kw">pub </span>constraint_options: HashMap&lt;Constraint, BitFlags&lt;ConstraintOption&gt;&gt;,
     <span class="kw">pub </span>table_options: Vec&lt;BTreeMap&lt;String, String&gt;&gt;,
+    <span class="kw">pub </span>exclude_constraints: Vec&lt;(TableId, String)&gt;,
     <span class="doccomment">/// The schema&#39;s sequences.
     </span><span class="kw">pub </span>sequences: Vec&lt;Sequence&gt;,
     <span class="doccomment">/// The extensions included in the schema(s).
@@ -1890,6 +1961,21 @@
             <span class="prelude-val">Some</span>(opts) =&gt; opts.contains(ConstraintOption::Deferrable) || opts.contains(ConstraintOption::Deferred),
             <span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,
         }
+    }
+
+    <span class="kw">pub fn </span>exclude_constraints(<span class="kw-2">&amp;</span><span class="self">self</span>, table_id: TableId) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = <span class="kw-2">&amp;</span>str&gt; {
+        <span class="kw">let </span>low = <span class="self">self</span>.exclude_constraints.partition_point(|(id, <span class="kw">_</span>)| <span class="kw-2">*</span>id &lt; table_id);
+        <span class="kw">let </span>high = <span class="self">self</span>.exclude_constraints[low..].partition_point(|(id, <span class="kw">_</span>)| <span class="kw-2">*</span>id &lt;= table_id);
+
+        <span class="self">self</span>.exclude_constraints[low..high]
+            .iter()
+            .map(|(<span class="kw">_</span>, name)| name.as_str())
+    }
+
+    <span class="kw">pub fn </span>uses_exclude_constraint(<span class="kw-2">&amp;</span><span class="self">self</span>, id: TableId) -&gt; bool {
+        <span class="self">self</span>.exclude_constraints
+            .binary_search_by_key(<span class="kw-2">&amp;</span>id, |(id, <span class="kw">_</span>)| <span class="kw-2">*</span>id)
+            .is_ok()
     }
 }
 
@@ -2186,7 +2272,8 @@
         </span><span class="kw">let </span>table_names = <span class="self">self</span>.get_table_names(<span class="kw-2">&amp;mut </span>sql_schema, <span class="kw-2">&amp;mut </span>pg_ext).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="comment">// order matters
-        </span><span class="self">self</span>.get_views(<span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
+        </span><span class="self">self</span>.get_constraints(<span class="kw-2">&amp;</span>table_names, <span class="kw-2">&amp;mut </span>sql_schema, <span class="kw-2">&amp;mut </span>pg_ext).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.get_views(<span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.get_enums(<span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.get_columns(<span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.get_foreign_keys(<span class="kw-2">&amp;</span>table_names, <span class="kw-2">&amp;mut </span>pg_ext, <span class="kw-2">&amp;mut </span>sql_schema)
@@ -2401,14 +2488,20 @@
                 BitFlags::empty()
             };
 
-            <span class="kw">let </span>id = sql_schema.push_table_with_properties(
+            <span class="kw">let </span>constraints_key = (namespace.clone(), cloned_name);
+
+            <span class="comment">// TODO: we could build this without check and exclusion constraints.
+            // We could then mutate the tables by id to add these constraints as &quot;properties&quot;.
+            // This would allow &quot;get_constraints&quot; to avoid using BTreeMaps in favor of mutating
+            // the map in place.
+            </span><span class="kw">let </span>id = sql_schema.push_table_with_properties(
                 table_name,
                 sql_schema.get_namespace_id(<span class="kw-2">&amp;</span>namespace).unwrap(),
                 partition | subclass | row_level_security,
                 description,
             );
 
-            map.insert((namespace, cloned_name), id);
+            map.insert(constraints_key, id);
         }
 
         <span class="prelude-val">Ok</span>(map)
@@ -2859,6 +2952,53 @@
                 sql_schema.push_foreign_key_column(fkid, [column_id, referenced_column_id]);
             }
         }
+
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="doccomment">/// Return the constraints that are not primary keys, foreign keys, or unique keys.
+    /// Namely, this returns CHECK and EXCLUDE constraints.
+    </span><span class="kw">async fn </span>get_constraints(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        table_names: <span class="kw-2">&amp;</span>IndexMap&lt;(String, String), TableId&gt;,
+        sql_schema: <span class="kw-2">&amp;mut </span>SqlSchema,
+        pg_ext: <span class="kw-2">&amp;mut </span>PostgresSchemaExt,
+    ) -&gt; DescriberResult&lt;()&gt; {
+        <span class="kw">let </span>namespaces = <span class="kw-2">&amp;</span>sql_schema.namespaces;
+        <span class="kw">let </span>sql = <span class="macro">include_str!</span>(<span class="string">&quot;postgres/constraints_query.sql&quot;</span>);
+
+        <span class="kw">let </span>rows = <span class="self">self
+            </span>.conn
+            .query_raw(
+                sql,
+                <span class="kw-2">&amp;</span>[Array(<span class="prelude-val">Some</span>(namespaces.iter().map(|v| v.as_str().into()).collect()))],
+            )
+            .<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="kw">for </span>row <span class="kw">in </span>rows {
+            <span class="kw">let </span>namespace = row.get_expect_string(<span class="string">&quot;namespace&quot;</span>);
+            <span class="kw">let </span>table_name = row.get_expect_string(<span class="string">&quot;table_name&quot;</span>);
+            <span class="kw">let </span>constraint_name = row.get_expect_string(<span class="string">&quot;constraint_name&quot;</span>);
+            <span class="kw">let </span>constraint_type = row.get_expect_char(<span class="string">&quot;constraint_type&quot;</span>);
+
+            <span class="kw">let </span>table_id = <span class="kw">match </span>table_names.get(<span class="kw-2">&amp;</span>(namespace, table_name)) {
+                <span class="prelude-val">Some</span>(id) =&gt; <span class="kw-2">*</span>id,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">continue</span>,
+            };
+
+            <span class="kw">match </span>constraint_type {
+                <span class="string">&#39;c&#39; </span>=&gt; {
+                    sql_schema.check_constraints.push((table_id, constraint_name));
+                }
+                <span class="string">&#39;x&#39; </span>=&gt; {
+                    pg_ext.exclude_constraints.push((table_id, constraint_name));
+                }
+                <span class="kw">_ </span>=&gt; (),
+            }
+        }
+
+        sql_schema.check_constraints.sort_by_key(|(id, <span class="kw">_</span>)| <span class="kw-2">*</span>id);
+        pg_ext.exclude_constraints.sort_by_key(|(id, <span class="kw">_</span>)| <span class="kw-2">*</span>id);
 
         <span class="prelude-val">Ok</span>(())
     }

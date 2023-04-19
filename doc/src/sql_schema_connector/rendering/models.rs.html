@@ -136,6 +136,18 @@
 <a href="#136" id="136">136</a>
 <a href="#137" id="137">137</a>
 <a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Rendering of model blocks.
 
 </span><span class="kw">use super</span>::{id, indexes, relation_field, scalar_field};
@@ -192,6 +204,18 @@
 
     <span class="kw">if </span>model.new_with_subclass() {
         <span class="kw">let </span>docs = <span class="string">&quot;This table has subclasses and requires additional setup for migrations. Visit https://pris.ly/d/table-inheritance for more info.&quot;</span>;
+
+        rendered.documentation(docs);
+    }
+
+    <span class="kw">if </span>model.adds_check_constraints() {
+        <span class="kw">let </span>docs = <span class="string">&quot;This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.&quot;</span>;
+
+        rendered.documentation(docs);
+    }
+
+    <span class="kw">if </span>model.adds_exclusion_constraints() {
+        <span class="kw">let </span>docs = <span class="string">&quot;This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-exclusion-constraints for more info.&quot;</span>;
 
         rendered.documentation(docs);
     }
