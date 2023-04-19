@@ -177,15 +177,13 @@
 <a href="#177" id="177">177</a>
 <a href="#178" id="178">178</a>
 <a href="#179" id="179">179</a>
-<a href="#180" id="180">180</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{error::MongoError, vacuum_cursor, BsonTransform};
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>mongodb::{
     bson::{from_bson, Bson, Document},
     options::<span class="kw-2">*</span>,
 };
-<span class="kw">use </span>prisma_models::dml::PrismaValue;
-<span class="kw">use </span>prisma_models::ModelRef;
+<span class="kw">use </span>prisma_models::{ModelRef, PrismaValue};
 <span class="kw">use </span>std::collections::HashMap;
 
 <span class="attr">#[allow(clippy::large_enum_variant)]

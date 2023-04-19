@@ -339,7 +339,7 @@
     Datamodel, Enum, EnumValue, Field, Function, Model, PrimaryKey, UniqueIndex,
 };
 <span class="kw">use </span>bigdecimal::ToPrimitive;
-<span class="kw">use </span>prisma_models::dml::{<span class="self">self</span>, PrismaValue};
+<span class="kw">use </span>prisma_models::{dml_default_kind, encode_bytes, DefaultKind, FieldArity, PrismaValue};
 <span class="kw">use </span>psl::{
     parser_database::{walkers, ScalarFieldType},
     schema_ast::ast::WithDocumentation,
@@ -421,14 +421,14 @@
             ScalarFieldType::Unsupported(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
         },
         db_name: field.mapped_name().map(ToOwned::to_owned),
-        is_required: field.arity() == dml::FieldArity::Required || field.arity() == dml::FieldArity::List,
-        is_list: field.arity() == dml::FieldArity::List,
+        is_required: field.arity() == FieldArity::Required || field.arity() == FieldArity::List,
+        is_list: field.arity() == FieldArity::List,
         is_id: <span class="bool-val">false</span>,
         is_read_only: <span class="bool-val">false</span>,
         has_default_value: field.default_value().is_some(),
         default: field
             .default_value()
-            .map(|dv| default_value_to_serde(<span class="kw-2">&amp;</span>dml::dml_default_kind(dv, field.scalar_type()))),
+            .map(|dv| default_value_to_serde(<span class="kw-2">&amp;</span>dml_default_kind(dv, field.scalar_type()))),
         is_unique: <span class="bool-val">false</span>,
         relation_name: <span class="prelude-val">None</span>,
         relation_from_fields: <span class="prelude-val">None</span>,
@@ -513,7 +513,7 @@
             ScalarFieldType::Unsupported(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
         },
         is_list: ast_field.arity.is_list(),
-        is_required: <span class="macro">matches!</span>(ast_field.arity, dml::FieldArity::Required | dml::FieldArity::List),
+        is_required: <span class="macro">matches!</span>(ast_field.arity, FieldArity::Required | FieldArity::List),
         is_unique: !is_id &amp;&amp; field.is_unique(),
         is_id,
         is_read_only: field.model().relation_fields().any(|rf| {
@@ -531,7 +531,7 @@
         },
         default: field
             .default_value()
-            .map(|dv| default_value_to_serde(<span class="kw-2">&amp;</span>dml::dml_default_kind(dv.value(), field.scalar_type()))),
+            .map(|dv| default_value_to_serde(<span class="kw-2">&amp;</span>dml_default_kind(dv.value(), field.scalar_type()))),
         relation_name: <span class="prelude-val">None</span>,
         relation_from_fields: <span class="prelude-val">None</span>,
         relation_to_fields: <span class="prelude-val">None</span>,
@@ -549,7 +549,7 @@
         db_name: <span class="prelude-val">None</span>,
         kind: <span class="string">&quot;object&quot;</span>,
         is_list: ast_field.arity.is_list(),
-        is_required: <span class="macro">matches!</span>(ast_field.arity, dml::FieldArity::Required | dml::FieldArity::List),
+        is_required: <span class="macro">matches!</span>(ast_field.arity, FieldArity::Required | FieldArity::List),
         is_unique: <span class="bool-val">false</span>,
         is_id: <span class="bool-val">false</span>,
         is_read_only: <span class="bool-val">false</span>,
@@ -576,10 +576,10 @@
     }
 }
 
-<span class="kw">fn </span>default_value_to_serde(dv: <span class="kw-2">&amp;</span>dml::DefaultKind) -&gt; serde_json::Value {
+<span class="kw">fn </span>default_value_to_serde(dv: <span class="kw-2">&amp;</span>DefaultKind) -&gt; serde_json::Value {
     <span class="kw">match </span>dv {
-        dml::DefaultKind::Single(value) =&gt; prisma_value_to_serde(<span class="kw-2">&amp;</span>value.clone()),
-        dml::DefaultKind::Expression(vg) =&gt; {
+        DefaultKind::Single(value) =&gt; prisma_value_to_serde(<span class="kw-2">&amp;</span>value.clone()),
+        DefaultKind::Expression(vg) =&gt; {
             <span class="kw">let </span>args: Vec&lt;<span class="kw">_</span>&gt; = vg.args().iter().map(|(<span class="kw">_</span>, v)| v.clone()).collect();
             function_to_serde(vg.name(), <span class="kw-2">&amp;</span>args)
         }
@@ -602,7 +602,7 @@
         PrismaValue::Json(val) =&gt; serde_json::Value::String(val.to_string()),
         PrismaValue::Xml(val) =&gt; serde_json::Value::String(val.to_string()),
         PrismaValue::List(value_vec) =&gt; serde_json::Value::Array(value_vec.iter().map(prisma_value_to_serde).collect()),
-        PrismaValue::Bytes(b) =&gt; serde_json::Value::String(dml::prisma_value::encode_bytes(b)),
+        PrismaValue::Bytes(b) =&gt; serde_json::Value::String(encode_bytes(b)),
         PrismaValue::Object(pairs) =&gt; {
             <span class="kw">let </span><span class="kw-2">mut </span>map = serde_json::Map::with_capacity(pairs.len());
             pairs.iter().for_each(|(key, value)| {

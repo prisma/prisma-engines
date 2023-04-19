@@ -331,7 +331,7 @@
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>fmt::Debug;
 <span class="kw">use </span>once_cell::sync::OnceCell;
-<span class="kw">use </span>prisma_models::{dml, prelude::ParentContainer};
+<span class="kw">use </span>prisma_models::{prelude::ParentContainer, DefaultKind};
 <span class="kw">use </span>std::{boxed::Box, fmt};
 
 <span class="attr">#[derive(PartialEq)]
@@ -440,7 +440,7 @@
 <span class="attr">#[derive(Debug, PartialEq)]
 </span><span class="kw">pub struct </span>InputField {
     <span class="kw">pub </span>name: String,
-    <span class="kw">pub </span>default_value: <span class="prelude-ty">Option</span>&lt;dml::DefaultKind&gt;,
+    <span class="kw">pub </span>default_value: <span class="prelude-ty">Option</span>&lt;DefaultKind&gt;,
 
     <span class="doccomment">/// Possible field types, represented as a union of input types, but only one can be provided at any time.
     /// Slice expressed as (start, len).
@@ -452,7 +452,7 @@
 }
 
 <span class="kw">impl </span>InputField {
-    <span class="kw">pub fn </span>new(name: String, default_value: <span class="prelude-ty">Option</span>&lt;dml::DefaultKind&gt;, is_required: bool) -&gt; InputField {
+    <span class="kw">pub fn </span>new(name: String, default_value: <span class="prelude-ty">Option</span>&lt;DefaultKind&gt;, is_required: bool) -&gt; InputField {
         InputField {
             name,
             default_value,

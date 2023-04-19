@@ -87,7 +87,7 @@
 <a href="#87" id="87">87</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>once_cell::sync::OnceCell;
-<span class="kw">use </span>prisma_models::{ast, dml, walkers};
+<span class="kw">use </span>prisma_models::{ast, walkers, DefaultKind};
 
 <span class="doccomment">/// Object type convenience wrapper function.
 </span><span class="kw">pub fn </span>object_type(ident: Identifier, fields: Vec&lt;OutputField&gt;, model: <span class="prelude-ty">Option</span>&lt;ast::ModelId&gt;) -&gt; ObjectType {
@@ -139,7 +139,7 @@
     ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     name: T,
     field_types: S,
-    default_value: <span class="prelude-ty">Option</span>&lt;dml::DefaultKind&gt;,
+    default_value: <span class="prelude-ty">Option</span>&lt;DefaultKind&gt;,
 ) -&gt; InputField
 <span class="kw">where
     </span>T: Into&lt;String&gt;,

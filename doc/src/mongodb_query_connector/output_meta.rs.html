@@ -148,12 +148,10 @@
 <a href="#148" id="148">148</a>
 <a href="#149" id="149">149</a>
 <a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
 </pre><pre class="rust"><code><span class="kw">use </span>connector_interface::{AggregationSelection, RelAggregationSelection};
 <span class="kw">use </span>indexmap::IndexMap;
 <span class="kw">use </span>prisma_models::{
-    dml::{<span class="self">self</span>, FieldArity},
-    FieldSelection, PrismaValue, ScalarFieldRef, SelectedField, TypeIdentifier,
+    ast::FieldArity, DefaultKind, FieldSelection, PrismaValue, ScalarFieldRef, SelectedField, TypeIdentifier,
 };
 
 <span class="doccomment">/// Maps field db field names to their meta information.
@@ -247,7 +245,7 @@
 
     <span class="comment">// Only add a possible default return if the field is required.
     </span><span class="kw">let </span>default = field.default_value().and_then(|dv| <span class="kw">match </span>dv {
-        dml::DefaultKind::Single(pv) <span class="kw">if </span>field.is_required() =&gt; <span class="prelude-val">Some</span>(pv),
+        DefaultKind::Single(pv) <span class="kw">if </span>field.is_required() =&gt; <span class="prelude-val">Some</span>(pv),
         <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     });
 

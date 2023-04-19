@@ -243,7 +243,7 @@
 <a href="#243" id="243">243</a>
 <a href="#244" id="244">244</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::filter::Filter;
-<span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
+<span class="kw">use </span>prisma_models::{ast::FieldArity, <span class="kw-2">*</span>};
 
 <span class="attr">#[derive(Debug, Clone, Copy, PartialEq)]
 </span><span class="kw">pub struct </span>SkipAndLimit {
@@ -403,7 +403,7 @@
 
         <span class="kw">let </span>has_optional_hop = on_relation.iter().any(|o| {
             o.path.iter().any(|hop| <span class="kw">match </span>hop {
-                OrderByHop::Relation(rf) =&gt; rf.arity() == dml::FieldArity::Optional,
+                OrderByHop::Relation(rf) =&gt; rf.arity() == FieldArity::Optional,
                 OrderByHop::Composite(cf) =&gt; !cf.is_required(),
             })
         });

@@ -598,7 +598,7 @@
 <a href="#598" id="598">598</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{field_ref_type::WithFieldRefInputExt, objects::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
 <span class="kw">use </span>constants::{aggregations, filters};
-<span class="kw">use </span>prisma_models::{dml, CompositeFieldRef, PrismaValue};
+<span class="kw">use </span>prisma_models::{CompositeFieldRef, DefaultKind, NativeTypeInstance, PrismaValue};
 <span class="kw">use </span>psl::datamodel_connector::ConnectorCapability;
 
 <span class="doccomment">/// Builds filter types for the given model field.
@@ -830,7 +830,7 @@
 <span class="kw">fn </span>full_scalar_filter_type(
     ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     typ: <span class="kw-2">&amp;</span>TypeIdentifier,
-    native_type: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>dml::NativeTypeInstance&gt;,
+    native_type: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>NativeTypeInstance&gt;,
     list: bool,
     nullable: bool,
     nested: bool,
@@ -1117,7 +1117,7 @@
             ctx,
             filters::MODE,
             InputType::enum_type(enum_type),
-            <span class="prelude-val">Some</span>(dml::DefaultKind::Single(PrismaValue::Enum(filters::DEFAULT.to_owned()))),
+            <span class="prelude-val">Some</span>(DefaultKind::Single(PrismaValue::Enum(filters::DEFAULT.to_owned()))),
         )
         .optional();
 
@@ -1151,7 +1151,7 @@
 </span><span class="kw">fn </span>not_filter_field(
     ctx: <span class="kw-2">&amp;mut </span>BuilderContext&lt;<span class="lifetime">&#39;_</span>&gt;,
     typ: <span class="kw-2">&amp;</span>TypeIdentifier,
-    native_type: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>dml::NativeTypeInstance&gt;,
+    native_type: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>NativeTypeInstance&gt;,
     mapped_scalar_type: InputType,
     is_nullable: bool,
     include_aggregates: bool,

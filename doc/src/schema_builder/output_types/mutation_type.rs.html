@@ -230,7 +230,7 @@
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::mutations::{create_many, create_one};
 <span class="kw">use </span>input_types::fields::{arguments, input_fields};
-<span class="kw">use </span>prisma_models::{dml, PrismaValue};
+<span class="kw">use </span>prisma_models::{DefaultKind, PrismaValue};
 <span class="kw">use </span>psl::datamodel_connector::ConnectorCapability;
 
 <span class="doccomment">/// Builds the root `Mutation` type.
@@ -327,7 +327,7 @@
                 ctx,
                 <span class="string">&quot;parameters&quot;</span>,
                 InputType::json_list(),
-                <span class="prelude-val">Some</span>(dml::DefaultKind::Single(PrismaValue::String(<span class="string">&quot;[]&quot;</span>.into()))),
+                <span class="prelude-val">Some</span>(DefaultKind::Single(PrismaValue::String(<span class="string">&quot;[]&quot;</span>.into()))),
             )
             .optional(),
         ],
@@ -348,7 +348,7 @@
                 ctx,
                 <span class="string">&quot;parameters&quot;</span>,
                 InputType::json_list(),
-                <span class="prelude-val">Some</span>(dml::DefaultKind::Single(PrismaValue::String(<span class="string">&quot;[]&quot;</span>.into()))),
+                <span class="prelude-val">Some</span>(DefaultKind::Single(PrismaValue::String(<span class="string">&quot;[]&quot;</span>.into()))),
             )
             .optional(),
         ],

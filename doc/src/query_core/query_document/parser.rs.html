@@ -980,15 +980,13 @@
 <a href="#980" id="980">980</a>
 <a href="#981" id="981">981</a>
 <a href="#982" id="982">982</a>
-<a href="#983" id="983">983</a>
-<a href="#984" id="984">984</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{executor::get_engine_protocol, schema::<span class="kw-2">*</span>};
 <span class="kw">use </span>bigdecimal::{BigDecimal, ToPrimitive};
 <span class="kw">use </span>chrono::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>core::fmt;
 <span class="kw">use </span>indexmap::IndexSet;
-<span class="kw">use </span>prisma_models::dml::{<span class="self">self</span>, ValueGeneratorFn};
+<span class="kw">use </span>prisma_models::{DefaultKind, ValueGeneratorFn};
 <span class="kw">use </span>prisma_value::PrismaValue;
 <span class="kw">use </span>std::{convert::TryFrom, str::FromStr};
 <span class="kw">use </span>user_facing_errors::query_engine::validation::ValidationError;
@@ -1661,9 +1659,7 @@
                 </span><span class="kw">match </span><span class="kw-2">&amp;</span>field.default_value {
                     <span class="prelude-val">Some</span>(default_value) =&gt; {
                         <span class="kw">let </span>default_pv = <span class="kw">match </span><span class="kw-2">&amp;</span>default_value {
-                            dml::DefaultKind::Expression(<span class="kw-2">ref </span>expr)
-                                <span class="kw">if </span><span class="macro">matches!</span>(expr.generator(), ValueGeneratorFn::Now) =&gt;
-                            {
+                            DefaultKind::Expression(<span class="kw-2">ref </span>expr) <span class="kw">if </span><span class="macro">matches!</span>(expr.generator(), ValueGeneratorFn::Now) =&gt; {
                                 <span class="self">self</span>.default_now.clone()
                             }
                             <span class="kw">_ </span>=&gt; default_value.get()<span class="question-mark">?</span>,
