@@ -227,7 +227,6 @@ impl QueryEngine {
             let mut inner = self.inner.write().await;
             let builder = inner.as_builder()?;
             let arced_schema = Arc::clone(&builder.schema);
-            let arced_schema_2 = Arc::clone(&builder.schema);
 
             let url = {
                 let data_source = builder
@@ -242,35 +241,34 @@ impl QueryEngine {
             };
 
             let engine = async move {
-                let executor_fut = tokio::spawn(async move {
-                    // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
-                    let data_source = arced_schema
-                        .configuration
-                        .datasources
-                        .first()
-                        .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
+                // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
+                let data_source = arced_schema
+                    .configuration
+                    .datasources
+                    .first()
+                    .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
 
-                    let preview_features = arced_schema.configuration.preview_features();
+                let preview_features = arced_schema.configuration.preview_features();
 
-                    let executor = load_executor(data_source, preview_features, &url).await?;
-                    let connector = executor.primary_connector();
-                    connector.get_connection().await?;
-                    crate::Result::<_>::Ok(executor)
-                });
+                let executor = load_executor(data_source, preview_features, &url).await?;
+                let connector = executor.primary_connector();
+
+                let get_conn_fut = connector.get_connection();
 
                 let query_schema_fut = tokio::runtime::Handle::current().spawn_blocking(move || {
                     // Build internal data model
-                    let internal_data_model = prisma_models::convert(arced_schema_2);
+                    let internal_data_model = prisma_models::convert(arced_schema);
 
                     let enable_raw_queries = true;
                     schema_builder::build(internal_data_model, enable_raw_queries)
                 });
-                let (query_schema, executor) = tokio::join!(query_schema_fut, executor_fut);
+
+                let (query_schema, _) = tokio::join!(query_schema_fut, get_conn_fut);
 
                 Ok(ConnectedEngine {
                     schema: builder.schema.clone(),
                     query_schema: Arc::new(query_schema.unwrap()),
-                    executor: executor.unwrap()?,
+                    executor,
                     config_dir: builder.config_dir.clone(),
                     env: builder.env.clone(),
                     metrics: self.logger.metrics(),
