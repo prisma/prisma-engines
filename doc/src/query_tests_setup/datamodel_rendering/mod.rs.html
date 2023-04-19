@@ -102,14 +102,13 @@
 <a href="#102" id="102">102</a>
 <a href="#103" id="103">103</a>
 <a href="#104" id="104">104</a>
-<a href="#105" id="105">105</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>mongodb_renderer;
 <span class="kw">mod </span>sql_renderer;
 
 <span class="kw">pub use </span>mongodb_renderer::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>sql_renderer::<span class="kw-2">*</span>;
 
-<span class="kw">use crate</span>::{templating, ConnectorTagInterface, DatamodelFragment, IdFragment, M2mFragment, TestConfig};
+<span class="kw">use crate</span>::{templating, ConnectorTagInterface, DatamodelFragment, IdFragment, M2mFragment, CONFIG};
 <span class="kw">use </span>indoc::indoc;
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>lazy_static::lazy_static;
@@ -136,7 +135,6 @@
 
 <span class="doccomment">/// Render the complete datamodel with all bells and whistles.
 </span><span class="kw">pub fn </span>render_test_datamodel(
-    config: <span class="kw-2">&amp;</span>TestConfig,
     test_database: <span class="kw-2">&amp;</span>str,
     template: String,
     excluded_features: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
@@ -144,7 +142,7 @@
     db_schemas: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
     isolation_level: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
 ) -&gt; String {
-    <span class="kw">let </span>tag = config.test_connector_tag().unwrap();
+    <span class="kw">let </span>tag = CONFIG.test_connector_tag().unwrap();
     <span class="kw">let </span>preview_features = render_preview_features(excluded_features);
 
     <span class="kw">let </span>is_multi_schema = !db_schemas.is_empty();
@@ -170,7 +168,7 @@
             }}
         &quot;#</span>},
         tag.datamodel_provider(),
-        tag.connection_string(test_database, config.is_ci(), is_multi_schema, isolation_level),
+        tag.connection_string(test_database, CONFIG.is_ci(), is_multi_schema, isolation_level),
         relation_mode_override.unwrap_or_else(|| tag.relation_mode().to_string()),
         schema_def,
         preview_features

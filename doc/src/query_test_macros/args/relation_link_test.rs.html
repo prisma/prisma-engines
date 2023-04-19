@@ -104,41 +104,38 @@
 <a href="#104" id="104">104</a>
 <a href="#105" id="105">105</a>
 <a href="#106" id="106">106</a>
-<a href="#107" id="107">107</a>
-<a href="#108" id="108">108</a>
-<a href="#109" id="109">109</a>
-<a href="#110" id="110">110</a>
-<a href="#111" id="111">111</a>
-<a href="#112" id="112">112</a>
-<a href="#113" id="113">113</a>
-<a href="#114" id="114">114</a>
-<a href="#115" id="115">115</a>
-<a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">crate</span>::IntoDarlingError;
+</pre><pre class="rust"><code><span class="kw">use super</span>::{connector_test::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
 <span class="kw">use </span>darling::FromMeta;
-<span class="kw">use </span>query_tests_setup::{ConnectorTag, RelationField};
-<span class="kw">use </span>std::convert::TryFrom;
 <span class="kw">use </span>syn::{Meta, Path};
 
+<span class="attr">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>RelationField(String, bool);
+
+<span class="kw">impl </span>darling::ToTokens <span class="kw">for </span>RelationField {
+    <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>proc_macro2::TokenStream) {
+        <span class="kw">let </span>s = <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>;
+        <span class="kw">let </span>b = <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">1</span>;
+        tokens.extend(<span class="macro">quote::quote! </span>{ <span class="kw-2">&amp;</span>::query_tests_setup::RelationField::try_from((#s, #b)).unwrap() })
+    }
+}
+
 <span class="attr">#[derive(Debug, FromMeta)]
-</span><span class="kw">pub struct </span>RelationLinkTestArgs {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>RelationLinkTestArgs {
     <span class="attr">#[darling(default)]
     </span><span class="kw">pub </span>suite: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
     <span class="attr">#[darling(default)]
-    </span><span class="kw">pub </span>only: OnlyConnectorTags,
+    </span><span class="kw">pub </span>only: ConnectorTags,
 
-    <span class="kw">pub </span>on_child: OnChild,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) on_child: OnChild,
 
-    <span class="kw">pub </span>on_parent: OnParent,
-
-    <span class="attr">#[darling(default)]
-    </span><span class="kw">pub </span>id_only: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) on_parent: OnParent,
 
     <span class="attr">#[darling(default)]
-    </span><span class="kw">pub </span>exclude: ExcludeConnectorTags,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) id_only: bool,
+
+    <span class="attr">#[darling(default)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) exclude: ConnectorTags,
 
     <span class="attr">#[darling(default)]
     </span><span class="kw">pub </span>capabilities: RunOnlyForCapabilities,
@@ -146,37 +143,18 @@
 
 <span class="kw">impl </span>RelationLinkTestArgs {
     <span class="kw">pub fn </span>validate(<span class="kw-2">&amp;</span><span class="self">self</span>, on_module: bool) -&gt; <span class="prelude-ty">Result</span>&lt;(), darling::Error&gt; {
-        validate_suite(<span class="kw-2">&amp;</span><span class="self">self</span>.suite, on_module)<span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="doccomment">/// Returns all the connectors that the test is valid for.
-    </span><span class="kw">pub fn </span>connectors_to_test(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ConnectorTag&gt; {
-        connectors_to_test(<span class="kw-2">&amp;</span><span class="self">self</span>.only, <span class="kw-2">&amp;</span><span class="self">self</span>.exclude)
+        utils::validate_suite(<span class="kw-2">&amp;</span><span class="self">self</span>.suite, on_module)
     }
 }
 
 <span class="attr">#[derive(Debug)]
-</span><span class="kw">pub struct </span>OnChild {
-    relation_field: RelationField,
-}
-
-<span class="kw">impl </span>OnChild {
-    <span class="kw">pub fn </span>relation_field(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>RelationField {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.relation_field
-    }
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>OnChild {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) relation_field: RelationField,
 }
 
 <span class="attr">#[derive(Debug)]
-</span><span class="kw">pub struct </span>OnParent {
-    relation_field: RelationField,
-}
-
-<span class="kw">impl </span>OnParent {
-    <span class="kw">pub fn </span>relation_field(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>RelationField {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.relation_field
-    }
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>OnParent {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) relation_field: RelationField,
 }
 
 <span class="kw">impl </span>darling::FromMeta <span class="kw">for </span>OnChild {
@@ -230,7 +208,7 @@
         )))
     }<span class="question-mark">?</span>;
 
-    RelationField::try_from((tag.as_str(), child)).into_darling_error(<span class="kw-2">&amp;</span>lit_str.span())
+    <span class="prelude-val">Ok</span>(RelationField(tag, child))
 }
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="query_test_macros" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>

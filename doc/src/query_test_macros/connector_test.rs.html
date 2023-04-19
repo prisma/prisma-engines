@@ -85,11 +85,7 @@
 <a href="#85" id="85">85</a>
 <a href="#86" id="86">86</a>
 <a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
-<a href="#90" id="90">90</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">crate</span>::utils::quote_connector;
 <span class="kw">use </span>darling::FromMeta;
 <span class="kw">use </span>proc_macro::TokenStream;
 <span class="kw">use </span>proc_macro2::{Ident, Span};
@@ -110,11 +106,9 @@
 
     <span class="kw">let </span>excluded_features = args.exclude_features.features();
     <span class="kw">let </span>db_schemas = args.db_schemas.schemas();
-    <span class="kw">let </span>connectors = args.connectors_to_test();
+    <span class="kw">let </span>only = <span class="kw-2">&amp;</span>args.only;
+    <span class="kw">let </span>exclude = <span class="kw-2">&amp;</span>args.exclude;
     <span class="kw">let </span>handler = args.schema.unwrap().handler_path;
-
-    <span class="comment">// Renders the connectors as list to use in the code.
-    </span><span class="kw">let </span>connectors = connectors.into_iter().map(quote_connector);
 
     <span class="kw">let </span><span class="kw-2">mut </span>test_function = <span class="macro">parse_macro_input!</span>(input <span class="kw">as </span>ItemFn);
 
@@ -161,9 +155,9 @@
         <span class="attr">#[test]
         </span><span class="kw">fn </span>#test_fn_ident() {
             query_tests_setup::run_connector_test(
-                #test_name,
                 #test_database_name,
-                <span class="kw-2">&amp;</span>[#(#connectors,)<span class="kw-2">*</span>],
+                <span class="kw-2">&amp;</span>[#only],
+                <span class="kw-2">&amp;</span>[#exclude],
                 <span class="kw-2">&amp;</span>[#(ConnectorCapability::#capabilities),<span class="kw-2">*</span>],
                 <span class="kw-2">&amp;</span>[#(#excluded_features),<span class="kw-2">*</span>],
                 #handler,

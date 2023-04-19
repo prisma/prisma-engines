@@ -308,13 +308,7 @@
 <a href="#308" id="308">308</a>
 <a href="#309" id="309">309</a>
 <a href="#310" id="310">310</a>
-<a href="#311" id="311">311</a>
-<a href="#312" id="312">312</a>
-<a href="#313" id="313">313</a>
-<a href="#314" id="314">314</a>
-</pre><pre class="rust"><code><span class="attr">#![allow(clippy::derive_partial_eq_without_eq)]
-
-</span><span class="kw">mod </span>config;
+</pre><pre class="rust"><code><span class="kw">mod </span>config;
 <span class="kw">mod </span>connector_tag;
 <span class="kw">mod </span>datamodel_rendering;
 <span class="kw">mod </span>error;
@@ -410,13 +404,13 @@
 
 <span class="attr">#[allow(clippy::too_many_arguments)]
 </span><span class="kw">pub fn </span>run_relation_link_test&lt;F&gt;(
-    enabled_connectors: <span class="kw-2">&amp;</span>[ConnectorTag],
-    capabilities: <span class="kw-2">&amp;mut </span>Vec&lt;ConnectorCapability&gt;,
-    required_capabilities: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
-    datamodel: <span class="kw-2">&amp;</span>str,
-    dm_with_params: <span class="kw-2">&amp;</span>str,
-    test_name: <span class="kw-2">&amp;</span>str,
-    test_database: <span class="kw-2">&amp;</span>str,
+    on_parent: <span class="kw-2">&amp;</span>RelationField,
+    on_child: <span class="kw-2">&amp;</span>RelationField,
+    id_only: bool,
+    only: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)],
+    exclude: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)],
+    required_capabilities: <span class="kw-2">&amp;</span>[ConnectorCapability],
+    (suite_name, test_name): (<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str),
     test_fn: F,
 ) <span class="kw">where
     </span>F: (<span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; AsyncFn&lt;<span class="lifetime">&#39;a</span>, Runner, DatamodelWithParams, TestResult&lt;()&gt;&gt;) + <span class="lifetime">&#39;static</span>,
@@ -433,13 +427,13 @@
     }
 
     run_relation_link_test_impl(
-        enabled_connectors,
-        capabilities,
+        on_parent,
+        on_child,
+        id_only,
+        only,
+        exclude,
         required_capabilities,
-        datamodel,
-        dm_with_params,
-        test_name,
-        test_database,
+        (suite_name, test_name),
         <span class="kw-2">&amp;</span>boxify(test_fn),
     )
 }
@@ -447,31 +441,32 @@
 <span class="attr">#[allow(clippy::too_many_arguments)]
 #[inline(never)] </span><span class="comment">// currently not inlined, but let&#39;s make sure it doesn&#39;t change
 </span><span class="kw">fn </span>run_relation_link_test_impl(
-    enabled_connectors: <span class="kw-2">&amp;</span>[ConnectorTag],
-    capabilities: <span class="kw-2">&amp;mut </span>Vec&lt;ConnectorCapability&gt;,
-    required_capabilities: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
-    datamodel: <span class="kw-2">&amp;</span>str,
-    dm_with_params: <span class="kw-2">&amp;</span>str,
-    test_name: <span class="kw-2">&amp;</span>str,
-    test_database: <span class="kw-2">&amp;</span>str,
+    on_parent: <span class="kw-2">&amp;</span>RelationField,
+    on_child: <span class="kw-2">&amp;</span>RelationField,
+    id_only: bool,
+    only: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)],
+    exclude: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)],
+    required_capabilities: <span class="kw-2">&amp;</span>[ConnectorCapability],
+    (suite_name, test_name): (<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str),
     test_fn: <span class="kw-2">&amp;</span><span class="kw">dyn for</span>&lt;<span class="lifetime">&#39;a</span>&gt; Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Runner, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>DatamodelWithParams) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, TestResult&lt;()&gt;&gt;,
 ) {
-    <span class="kw">let </span>config = <span class="kw-2">&amp;</span>CONFIG;
-    <span class="kw">let </span><span class="kw-2">mut </span>required_capabilities = required_capabilities
-        .iter()
-        .map(|cap| cap.parse::&lt;ConnectorCapability&gt;().unwrap())
-        .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+    <span class="kw">let </span>(dms, capabilities) = schema_with_relation(on_parent, on_child, id_only);
+    <span class="kw">let </span><span class="kw-2">mut </span>required_capabilities_for_test = Vec::with_capacity(required_capabilities.len());
 
-    <span class="kw">if </span>!required_capabilities.is_empty() {
-        capabilities.append(<span class="kw-2">&amp;mut </span>required_capabilities);
-    }
+    <span class="kw">for </span>(i, (dm, caps)) <span class="kw">in </span>dms.into_iter().zip(capabilities.into_iter()).enumerate() {
+        required_capabilities_for_test.clear();
+        required_capabilities_for_test.extend(required_capabilities.iter());
+        required_capabilities_for_test.extend(caps);
 
-    <span class="kw">let </span>template = datamodel.to_string();
-    <span class="kw">let </span>dm_with_params_json: DatamodelWithParams = dm_with_params.parse().unwrap();
+        <span class="kw">let </span>test_db_name = <span class="macro">format!</span>(<span class="string">&quot;{suite_name}_{test_name}_{i}&quot;</span>);
+        <span class="kw">let </span>template = dm.datamodel().to_owned();
 
-    <span class="kw">if </span>ConnectorTag::should_run(config, enabled_connectors, capabilities, test_name) {
-        <span class="kw">let </span>datamodel = render_test_datamodel(config, test_database, template, <span class="kw-2">&amp;</span>[], <span class="prelude-val">None</span>, Default::default(), <span class="prelude-val">None</span>);
-        <span class="kw">let </span>connector = config.test_connector_tag().unwrap();
+        <span class="kw">if </span>!ConnectorTag::should_run(only, exclude, <span class="kw-2">&amp;</span>required_capabilities_for_test) {
+            <span class="kw">continue</span>;
+        }
+
+        <span class="kw">let </span>datamodel = render_test_datamodel(<span class="kw-2">&amp;</span>test_db_name, template, <span class="kw-2">&amp;</span>[], <span class="prelude-val">None</span>, Default::default(), <span class="prelude-val">None</span>);
+        <span class="kw">let </span>connector = CONFIG.test_connector_tag().unwrap();
         <span class="kw">let </span>metrics = setup_metrics();
         <span class="kw">let </span>metrics_for_subscriber = metrics.clone();
         <span class="kw">let </span>(log_capture, log_tx) = TestLogCapture::new();
@@ -485,7 +480,7 @@
                     .<span class="kw">await
                     </span>.unwrap();
 
-                test_fn(<span class="kw-2">&amp;</span>runner, <span class="kw-2">&amp;</span>dm_with_params_json).<span class="kw">await</span>.unwrap();
+                test_fn(<span class="kw-2">&amp;</span>runner, <span class="kw-2">&amp;</span>dm).<span class="kw">await</span>.unwrap();
 
                 teardown_project(<span class="kw-2">&amp;</span>datamodel, Default::default()).<span class="kw">await</span>.unwrap();
             }
@@ -518,9 +513,9 @@
 
 <span class="attr">#[allow(clippy::too_many_arguments)]
 </span><span class="kw">pub fn </span>run_connector_test&lt;T&gt;(
-    test_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
     test_database_name: <span class="kw-2">&amp;</span>str,
-    enabled_connectors: <span class="kw-2">&amp;</span>[ConnectorTag],
+    only: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)],
+    exclude: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)],
     capabilities: <span class="kw-2">&amp;</span>[ConnectorCapability],
     excluded_features: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
     handler: <span class="kw">fn</span>() -&gt; String,
@@ -538,9 +533,9 @@
     }
 
     run_connector_test_impl(
-        test_name,
         test_database_name,
-        enabled_connectors,
+        only,
+        exclude,
         capabilities,
         excluded_features,
         handler,
@@ -552,10 +547,10 @@
 
 <span class="attr">#[allow(clippy::too_many_arguments)]
 #[inline(never)]
-</span><span class="kw">pub fn </span>run_connector_test_impl(
-    test_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+</span><span class="kw">fn </span>run_connector_test_impl(
     test_database_name: <span class="kw-2">&amp;</span>str,
-    enabled_connectors: <span class="kw-2">&amp;</span>[ConnectorTag],
+    only: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)],
+    exclude: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)],
     capabilities: <span class="kw-2">&amp;</span>[ConnectorCapability],
     excluded_features: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
     handler: <span class="kw">fn</span>() -&gt; String,
@@ -563,15 +558,12 @@
     referential_override: <span class="prelude-ty">Option</span>&lt;String&gt;,
     test_fn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(Runner) -&gt; BoxFuture&lt;<span class="lifetime">&#39;static</span>, TestResult&lt;()&gt;&gt;,
 ) {
-    <span class="kw">let </span>config: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">_ </span>= <span class="kw-2">&amp;</span><span class="kw">crate</span>::CONFIG;
-
-    <span class="kw">if </span>!ConnectorTag::should_run(config, enabled_connectors, capabilities, test_name) {
+    <span class="kw">if </span>!ConnectorTag::should_run(only, exclude, capabilities) {
         <span class="kw">return</span>;
     }
 
     <span class="kw">let </span>template = handler();
     <span class="kw">let </span>datamodel = <span class="kw">crate</span>::render_test_datamodel(
-        config,
         test_database_name,
         template,
         excluded_features,
@@ -579,7 +571,7 @@
         db_schemas,
         <span class="prelude-val">None</span>,
     );
-    <span class="kw">let </span>connector = config.test_connector_tag().unwrap();
+    <span class="kw">let </span>connector = CONFIG.test_connector_tag().unwrap();
     <span class="kw">let </span>metrics = <span class="kw">crate</span>::setup_metrics();
     <span class="kw">let </span>metrics_for_subscriber = metrics.clone();
 

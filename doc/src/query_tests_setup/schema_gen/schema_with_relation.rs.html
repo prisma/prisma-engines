@@ -327,7 +327,7 @@
 
 <span class="kw">pub type </span>DatamodelsAndCapabilities = (Vec&lt;DatamodelWithParams&gt;, Vec&lt;Vec&lt;ConnectorCapability&gt;&gt;);
 
-<span class="kw">pub fn </span>schema_with_relation(
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>schema_with_relation(
     on_parent: <span class="kw-2">&amp;</span>RelationField,
     on_child: <span class="kw-2">&amp;</span>RelationField,
     id_only: bool,
