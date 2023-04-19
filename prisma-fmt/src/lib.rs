@@ -8,6 +8,12 @@ mod preview;
 mod text_document_completion;
 mod validate;
 
+pub use dmmf::DataModelMetaFormat;
+pub use get_dmmf::GetDmmfParams;
+
+pub use get_config::GetConfigParams;
+pub use psl::get_config::ConfigMetaFormat;
+
 use log::*;
 use lsp_types::{Position, Range};
 use psl::parser_database::ast;
@@ -103,80 +109,17 @@ pub fn referential_actions(schema: String) -> String {
 
 /// This is the same command as get_config()
 ///
-/// Params is a JSON string with the following shape:
-///
-/// ```ignore
-/// interface GetConfigParams {
-///   prismaSchema: string
-///   ignoreEnvVarErrors?: bool
-///   env?: { [key: string]: string }
-///   datasourceOverrides?: { [key: string]: string }
-/// }
-/// ```
-/// Params example:
-///
-/// ```ignore
-/// {
-///   "prismaSchema": <the prisma schema>,
-///   "env": {
-///     "DBURL": "postgresql://example.com/mydb"
-///   }
-/// }
-/// ```
-///
-/// The response is a JSON string with the following shape:
-///
-/// ```ignore
-/// type GetConfigSuccessResponse = any // same as QE getConfig
-///
-/// interface GetConfigErrorResponse {
-///   error: {
-///     error_code?: string
-///     message: string
-///   }
-/// }
-///
 /// type GetConfigResponse = GetConfigErrorResponse | GetConfigSuccessResponse
 ///
 /// ```
-pub fn get_config(get_config_params: String) -> Result<String, String> {
-    get_config::get_config(&get_config_params)
+pub fn get_config(get_config_params: GetConfigParams) -> Result<ConfigMetaFormat, String> {
+    get_config::get_config(get_config_params)
 }
 
 /// This is the same command as get_dmmf()
-///
-/// Params is a JSON string with the following shape:
-///
-/// ```ignore
-/// interface GetDmmfParams {
-///   prismaSchema: string
-/// }
-/// ```
-/// Params example:
-///
-/// ```ignore
-/// {
-///   "prismaSchema": <the prisma schema>,
-/// }
-/// ```
-///
-/// The response is a JSON string with the following shape:
-///
-/// ```ignore
-/// type GetDmmfSuccessResponse = any // same as QE getDmmf
-///
-/// interface GetDmmfErrorResponse {
-///   error: {
-///     error_code?: string
-///     message: string
-///   }
-/// }
-///
-/// type GetDmmfResponse = GetDmmfErrorResponse | GetDmmfSuccessResponse
-///
-/// ```
-pub fn get_dmmf(get_dmmf_params: String) -> Result<String, String> {
-    get_dmmf::get_dmmf(&get_dmmf_params)
+#[inline]
+pub fn get_dmmf(get_dmmf_params: GetDmmfParams) -> Result<DataModelMetaFormat, String> {
+    get_dmmf::get_dmmf(get_dmmf_params)
 }
 
 /// The LSP position is expressed as a (line, col) tuple, but our pest-based parser works with byte

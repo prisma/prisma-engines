@@ -38,9 +38,9 @@ impl Configuration {
     }
 
     pub fn preview_features(&self) -> BitFlags<PreviewFeature> {
-        self.generators.iter().fold(BitFlags::empty(), |acc, generator| {
-            acc | generator.preview_features.unwrap_or_default()
-        })
+        self.generators
+            .iter()
+            .fold(BitFlags::empty(), |acc, generator| acc | generator.preview_features)
     }
 
     /// Resolve datasource url for query engine.

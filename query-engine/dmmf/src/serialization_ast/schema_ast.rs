@@ -1,17 +1,29 @@
 use indexmap::IndexMap;
 use serde::Serialize;
+use tsify::Tsify;
 
 #[derive(Debug, Serialize, Default)]
 #[serde(rename_all = "camelCase")]
+#[derive(Tsify)]
+#[tsify(into_wasm_abi)]
 pub struct DmmfSchema {
+    #[tsify(type = "{ [key: string]: DmmfInputType[] }")]
     pub input_object_types: IndexMap<String, Vec<DmmfInputType>>,
+
+    #[tsify(type = "{ [key: string]: DmmfOutputType[] }")]
     pub output_object_types: IndexMap<String, Vec<DmmfOutputType>>,
+
+    #[tsify(type = "{ [key: string]: DmmfEnum[] }")]
     pub enum_types: IndexMap<String, Vec<DmmfEnum>>,
+
+    #[tsify(type = "{ [key: string]: DmmfFieldRefType[] }")]
     pub field_ref_types: IndexMap<String, Vec<DmmfFieldRefType>>,
 }
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
+#[derive(Tsify)]
+#[tsify(into_wasm_abi)]
 pub struct DmmfOutputField {
     pub name: String,
     pub args: Vec<DmmfInputField>,
@@ -24,6 +36,8 @@ pub struct DmmfOutputField {
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
+#[derive(Tsify)]
+#[tsify(into_wasm_abi)]
 pub struct DmmfInputType {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -34,6 +48,8 @@ pub struct DmmfInputType {
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
+#[derive(Tsify)]
+#[tsify(into_wasm_abi)]
 pub struct DmmfInputTypeConstraints {
     pub max_num_fields: Option<usize>,
     pub min_num_fields: Option<usize>,
@@ -43,6 +59,8 @@ pub struct DmmfInputTypeConstraints {
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
+#[derive(Tsify)]
+#[tsify(into_wasm_abi)]
 pub struct DmmfInputTypeMeta {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source: Option<String>,
@@ -50,6 +68,8 @@ pub struct DmmfInputTypeMeta {
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
+#[derive(Tsify)]
+#[tsify(into_wasm_abi)]
 pub struct DmmfFieldRefType {
     pub name: String,
     pub allow_types: Vec<DmmfTypeReference>,
@@ -58,6 +78,8 @@ pub struct DmmfFieldRefType {
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
+#[derive(Tsify)]
+#[tsify(into_wasm_abi)]
 pub struct DmmfOutputType {
     pub name: String,
     pub fields: Vec<DmmfOutputField>,
@@ -65,6 +87,8 @@ pub struct DmmfOutputType {
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
+#[derive(Tsify)]
+#[tsify(into_wasm_abi)]
 pub struct DmmfInputField {
     pub name: String,
     pub is_required: bool,
@@ -77,10 +101,13 @@ pub struct DmmfInputField {
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
+#[derive(Tsify)]
+#[tsify(into_wasm_abi)]
 pub struct DmmfTypeReference {
     #[serde(rename = "type")]
     pub typ: String,
 
+    #[tsify(type = "'model' | 'prisma'", optional)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub namespace: Option<String>,
     pub location: TypeLocation,
@@ -89,6 +116,8 @@ pub struct DmmfTypeReference {
 
 #[derive(Clone, Copy, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
+#[derive(Tsify)]
+#[tsify(into_wasm_abi)]
 pub enum TypeLocation {
     Scalar,
     InputObjectTypes,
@@ -99,6 +128,8 @@ pub enum TypeLocation {
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
+#[derive(Tsify)]
+#[tsify(into_wasm_abi)]
 pub struct DmmfEnum {
     pub name: String,
     pub values: Vec<String>,
@@ -106,6 +137,8 @@ pub struct DmmfEnum {
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
+#[derive(Tsify)]
+#[tsify(into_wasm_abi)]
 pub struct DmmfDeprecation {
     pub since_version: String,
     pub reason: String,

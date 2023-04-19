@@ -1,10 +1,13 @@
 use crate::parser_database::{ast, coerce};
 use diagnostics::{DatamodelError, Diagnostics};
 use serde::Serialize;
+use tsify::Tsify;
 
 /// Either an env var or a string literal.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
+#[derive(Tsify)]
+#[tsify(into_wasm_abi)]
 pub struct StringFromEnvVar {
     /// Contains the name of env var if the value was read from one.
     pub from_env_var: Option<String>,

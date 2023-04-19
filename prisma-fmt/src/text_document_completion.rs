@@ -77,7 +77,7 @@ impl<'a> CompletionContext<'a> {
 
     pub(crate) fn preview_features(self) -> BitFlags<PreviewFeature> {
         self.generator()
-            .and_then(|gen| gen.preview_features)
+            .and_then(|gen| Some(gen.preview_features))
             .unwrap_or_default()
     }
 
