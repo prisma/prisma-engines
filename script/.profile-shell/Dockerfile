@@ -2,7 +2,11 @@ ARG RUST_VERSION
 FROM rust:$RUST_VERSION-buster
 RUN printf "deb http://ftp.de.debian.org/debian buster main" >> /etc/apt/sources.list 
 RUN apt update
-RUN apt-get install -y git valgrind linux-perf
+RUN apt-get install -y git valgrind linux-perf strace
+
+RUN curl -fsSL https://fnm.vercel.app/install | bash
+RUN source ~/.bashrc
+RUN fnm install v16
 
 # Symlink caches
 RUN mkdir -p /.cargo/registry
