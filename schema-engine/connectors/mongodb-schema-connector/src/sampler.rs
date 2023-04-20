@@ -58,10 +58,16 @@ pub(super) async fn sample(
         data_model.to_string()
     };
 
+    let warnings = if !warnings.is_empty() {
+        Some(warnings.to_string())
+    } else {
+        None
+    };
+
     Ok(IntrospectionResult {
         data_model: psl::reformat(&psl_string, 2).unwrap(),
         is_empty: data_model.is_empty(),
-        warnings: warnings.finalize(),
+        warnings,
         views: None,
         version: Version::NonPrisma,
     })

@@ -6,13 +6,12 @@ mod model;
 mod view;
 
 use crate::datamodel_calculator::DatamodelCalculatorContext;
-use crate::Warning;
 use psl::PreviewFeature;
 use schema_connector::Warnings;
 
 /// Analyzes the described database schema, triggering
 /// warnings to the user if necessary.
-pub(crate) fn generate(ctx: &DatamodelCalculatorContext<'_>) -> Vec<Warning> {
+pub(crate) fn generate(ctx: &DatamodelCalculatorContext<'_>) -> Warnings {
     let mut warnings = Warnings::new();
 
     for r#enum in ctx.enum_pairs() {
@@ -31,5 +30,5 @@ pub(crate) fn generate(ctx: &DatamodelCalculatorContext<'_>) -> Vec<Warning> {
 
     ctx.flavour.generate_warnings(ctx, &mut warnings);
 
-    warnings.finalize()
+    warnings
 }

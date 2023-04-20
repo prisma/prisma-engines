@@ -1,17 +1,12 @@
 //! Warnings generator for Introspection
 
-mod warning;
-
-use serde::Serialize;
-pub use warning::Warning;
+use std::fmt;
 
 /// Collections used for warning generation. These should be preferred
 /// over directly creating warnings from the code, to prevent spamming
 /// the user.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, PartialEq)]
 pub struct Warnings {
-    /// Store final warnings to this vector.
-    warnings: Vec<Warning>,
     /// Fields that are using Prisma 1 UUID defaults.
     pub prisma_1_uuid_defaults: Vec<ModelAndField>,
     /// Fields that are using Prisma 1 CUID defaults.
@@ -50,6 +45,8 @@ pub struct Warnings {
     pub remapped_views: Vec<View>,
     /// The name of the enum variant is taken from a previous data model.
     pub remapped_values: Vec<EnumAndValue>,
+    /// The name of the enum is taken from a previous data model.
+    pub remapped_enums: Vec<Enum>,
     /// The relation is copied from a previous data model, only if
     /// `relationMode` is `prisma`.
     pub reintrospected_relations: Vec<Model>,
@@ -90,250 +87,315 @@ pub struct Warnings {
 impl Warnings {
     /// Generate a new empty warnings structure.
     pub fn new() -> Self {
-        Self {
-            warnings: Vec::new(),
-            ..Default::default()
-        }
+        Self::default()
     }
 
-    /// Push a warning to the collection.
-    pub fn push(&mut self, warning: Warning) {
-        self.warnings.push(warning);
+    /// True if we have no warnings
+    pub fn is_empty(&self) -> bool {
+        self == &Self::default()
     }
 
-    /// Generate warnings from all indicators. Must be called after
-    /// introspection.
-    pub fn finalize(mut self) -> Vec<Warning> {
-        fn maybe_warn<T>(elems: &[T], warning: impl Fn(&[T]) -> Warning, warnings: &mut Vec<Warning>) {
-            if !elems.is_empty() {
-                warnings.push(warning(elems))
+    /// True, if the datamodel has Prisma 1 style defaults
+    pub fn uses_prisma_1_defaults(&self) -> bool {
+        !self.prisma_1_uuid_defaults.is_empty() || !self.prisma_1_cuid_defaults.is_empty()
+    }
+}
+
+impl fmt::Display for Warnings {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("*** WARNING ***\n")?;
+
+        fn render_warnings<T>(msg: &str, items: &[T], f: &mut fmt::Formatter<'_>) -> fmt::Result
+        where
+            T: fmt::Display,
+        {
+            if !items.is_empty() {
+                writeln!(f)?;
+                f.write_str(msg)?;
+                writeln!(f)?;
+                writeln!(f)?;
+
+                for item in items {
+                    writeln!(f, "  - {item}")?;
+                }
             }
+
+            Ok(())
         }
 
-        maybe_warn(
-            &self.models_without_identifiers,
-            warning_models_without_identifier,
-            &mut self.warnings,
-        );
-
-        maybe_warn(
-            &self.views_without_identifiers,
-            warning_views_without_identifier,
-            &mut self.warnings,
-        );
-
-        maybe_warn(
-            &self.unsupported_types_in_model,
-            warning_unsupported_types_in_models,
-            &mut self.warnings,
-        );
-
-        maybe_warn(
-            &self.unsupported_types_in_view,
-            warning_unsupported_types_in_views,
-            &mut self.warnings,
-        );
-
-        maybe_warn(
-            &self.unsupported_types_in_type,
-            warning_unsupported_types_in_types,
-            &mut self.warnings,
-        );
-
-        maybe_warn(
-            &self.remapped_models,
-            warning_enriched_with_map_on_model,
-            &mut self.warnings,
-        );
-
-        maybe_warn(
-            &self.remapped_values,
-            warning_enriched_with_map_on_enum_value,
-            &mut self.warnings,
-        );
-
-        maybe_warn(
-            &self.remapped_views,
-            warning_enriched_with_map_on_view,
-            &mut self.warnings,
-        );
-
-        maybe_warn(
-            &self.remapped_fields_in_model,
-            warning_enriched_with_map_on_field_in_models,
-            &mut self.warnings,
-        );
-
-        maybe_warn(
-            &self.remapped_fields_in_view,
-            warning_enriched_with_map_on_field_in_views,
-            &mut self.warnings,
-        );
-
-        maybe_warn(
-            &self.models_without_columns,
-            warning_models_without_columns,
-            &mut self.warnings,
-        );
-
-        maybe_warn(
-            &self.reintrospected_id_names_in_model,
-            warning_enriched_with_custom_primary_key_names_in_models,
-            &mut self.warnings,
-        );
-
-        maybe_warn(
-            &self.reintrospected_id_names_in_view,
-            warning_enriched_with_custom_primary_key_names_in_views,
-            &mut self.warnings,
-        );
-
-        maybe_warn(
+        render_warnings(
+            "These id fields had a `@default(uuid())` added because we believe the schema was created by Prisma 1:",
             &self.prisma_1_uuid_defaults,
-            warning_default_uuid_warning,
-            &mut self.warnings,
-        );
+            f,
+        )?;
 
-        maybe_warn(
+        render_warnings(
+            "These id fields had a `@default(cuid())` added because we believe the schema was created by Prisma 1:",
             &self.prisma_1_cuid_defaults,
-            warning_default_cuid_warning,
-            &mut self.warnings,
-        );
+            f,
+        )?;
 
-        maybe_warn(
-            &self.enum_values_with_empty_names,
-            warning_enum_values_with_empty_names,
-            &mut self.warnings,
-        );
-
-        maybe_warn(
+        render_warnings(
+            "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:",
             &self.fields_with_empty_names_in_model,
-            warning_fields_with_empty_names_in_models,
-            &mut self.warnings,
-        );
+            f
+        )?;
 
-        maybe_warn(
+        render_warnings(
+            "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:",
             &self.fields_with_empty_names_in_view,
-            warning_fields_with_empty_names_in_views,
-            &mut self.warnings,
-        );
+            f
+        )?;
 
-        maybe_warn(
+        render_warnings(
+            "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:",
             &self.fields_with_empty_names_in_type,
-            warning_fields_with_empty_names_in_types,
-            &mut self.warnings,
-        );
+            f
+        )?;
 
-        maybe_warn(
+        render_warnings(
+            "These fields were enriched with `@map` information taken from the previous Prisma schema:",
+            &self.remapped_fields_in_model,
+            f,
+        )?;
+
+        render_warnings(
+            "These fields were enriched with `@map` information taken from the previous Prisma schema:",
+            &self.remapped_fields_in_view,
+            f,
+        )?;
+
+        render_warnings(
+            "These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:",
+            &self.enum_values_with_empty_names,
+            f
+        )?;
+
+        render_warnings(
+            "The following models were commented out as we could not retrieve columns for them. Please check your privileges:",
+            &self.models_without_columns,
+            f
+        )?;
+
+        render_warnings(
+            "The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client:",
+            &self.models_without_identifiers,
+            f
+        )?;
+
+        render_warnings(
+            "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers",
+            &self.views_without_identifiers,
+            f
+        )?;
+
+        render_warnings(
+            "These models were enriched with custom compound id names taken from the previous Prisma schema:",
+            &self.reintrospected_id_names_in_model,
+            f,
+        )?;
+
+        render_warnings(
+            "These views were enriched with custom compound id names taken from the previous Prisma schema:",
+            &self.reintrospected_id_names_in_view,
+            f,
+        )?;
+
+        render_warnings(
+            "These fields are not supported by the Prisma Client, because Prisma currently does not support their types:",
+            &self.unsupported_types_in_model,
+            f,
+        )?;
+
+        render_warnings(
+            "These fields are not supported by the Prisma Client, because Prisma currently does not support their types:",
+            &self.unsupported_types_in_view,
+            f,
+        )?;
+
+        render_warnings(
+            "These fields are not supported by the Prisma Client, because Prisma currently does not support their types:",
+            &self.unsupported_types_in_type,
+            f,
+        )?;
+
+        render_warnings(
+            "These models were enriched with `@@map` information taken from the previous Prisma schema:",
+            &self.remapped_models,
+            f,
+        )?;
+
+        render_warnings(
+            "These views were enriched with `@@map` information taken from the previous Prisma schema:",
+            &self.remapped_views,
+            f,
+        )?;
+
+        render_warnings(
+            "These views were enriched with `@@map` information taken from the previous Prisma schema:",
+            &self.remapped_views,
+            f,
+        )?;
+
+        render_warnings(
+            "These enum values were enriched with `@map` information taken from the previous Prisma schema:",
+            &self.remapped_values,
+            f,
+        )?;
+
+        render_warnings(
+            "These enums were enriched with `@@map` information taken from the previous Prisma schema:",
+            &self.remapped_enums,
+            f,
+        )?;
+
+        render_warnings(
+            "Relations were copied from the previous data model due to not using foreign keys in the database. If any of the relation columns changed in the database, the relations might not be correct anymore:",
             &self.reintrospected_relations,
-            warning_relations_added_from_the_previous_data_model,
-            &mut self.warnings,
-        );
+            f,
+        )?;
 
-        maybe_warn(
+        render_warnings(
+            "These items were renamed due to their names being duplicates in the Prisma Schema Language:",
             &self.duplicate_names,
-            warning_top_level_item_name_is_a_dupe,
-            &mut self.warnings,
-        );
+            f,
+        )?;
 
-        maybe_warn(&self.partition_tables, partition_tables_found, &mut self.warnings);
+        render_warnings(
+            "These tables are partition tables, which are not yet fully supported:",
+            &self.partition_tables,
+            f,
+        )?;
 
-        maybe_warn(&self.inherited_tables, inherited_tables_found, &mut self.warnings);
+        render_warnings(
+            "These tables are inherited tables, which are not yet fully supported:",
+            &self.inherited_tables,
+            f,
+        )?;
 
-        maybe_warn(
-            &self.row_level_security_tables,
-            row_level_security_tables_found,
-            &mut self.warnings,
-        );
-
-        maybe_warn(
+        render_warnings(
+            "These index columns are having a non-default null sort order, which is not yet fully supported. Read more: https://pris.ly/d/non-default-index-null-ordering",
             &self.non_default_index_null_sort_order,
-            non_default_index_null_sort_order,
-            &mut self.warnings,
-        );
+            f,
+        )?;
 
-        maybe_warn(&self.check_constraints, check_constraints_found, &mut self.warnings);
+        render_warnings(
+            "These tables contain row level security, which is not yet fully supported. Read more: https://pris.ly/d/row-level-security",
+            &self.row_level_security_tables,
+            f,
+        )?;
 
-        maybe_warn(
+        render_warnings(
+            "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints",
+            &self.check_constraints,
+            f,
+        )?;
+
+        render_warnings(
+            "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints",
             &self.exclusion_constraints,
-            exclusion_constraints_found,
-            &mut self.warnings,
-        );
+            f,
+        )?;
 
-        maybe_warn(&self.row_level_ttl, row_level_ttl_in_tables, &mut self.warnings);
-        maybe_warn(&self.non_default_deferring, non_default_deferring, &mut self.warnings);
-        maybe_warn(&self.objects_with_comments, commented_objects, &mut self.warnings);
+        render_warnings(
+            "These models are using a row level TTL setting defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/row-level-ttl",
+            &self.row_level_ttl,
+            f,
+        )?;
 
-        maybe_warn(
+        render_warnings(
+            "These primary key, foreign key or unique constraints are using non-default deferring in the database, which is not yet fully supported. Read more: https://pris.ly/d/constraint-deferring",
+            &self.non_default_deferring,
+            f,
+        )?;
+
+        render_warnings(
+            "These objects have comments defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/database-comments",
+            &self.objects_with_comments,
+            f,
+        )?;
+
+        render_warnings(
+            "The following fields point to nested objects without any data:",
             &self.model_fields_pointing_to_an_empty_type,
-            model_fields_pointing_an_empty_type,
-            &mut self.warnings,
-        );
+            f,
+        )?;
 
-        maybe_warn(
+        render_warnings(
+            "The following fields point to nested objects without any data:",
             &self.type_fields_pointing_to_an_empty_type,
-            type_fields_pointing_an_empty_type,
-            &mut self.warnings,
-        );
+            f,
+        )?;
 
-        maybe_warn(
+        render_warnings(
+            "Could not determine the types for the following fields:",
             &self.model_fields_with_unknown_type,
-            warning_unknown_types_in_models,
-            &mut self.warnings,
-        );
+            f,
+        )?;
 
-        maybe_warn(
+        render_warnings(
+            "Could not determine the types for the following fields:",
             &self.type_fields_with_unknown_type,
-            warning_unknown_types_in_types,
-            &mut self.warnings,
-        );
+            f,
+        )?;
 
-        maybe_warn(
+        render_warnings(
+            "The following fields had data stored in multiple types. Either use Json or normalize data to the wanted type:",
             &self.undecided_types_in_models,
-            warning_undecided_types_in_models,
-            &mut self.warnings,
-        );
+            f,
+        )?;
 
-        maybe_warn(
+        render_warnings(
+            "The following fields had data stored in multiple types. Either use Json or normalize data to the wanted type:",
             &self.undecided_types_in_types,
-            warning_undecided_types_in_types,
-            &mut self.warnings,
-        );
+            f,
+        )?;
 
-        self.warnings
+        Ok(())
     }
 }
 
 /// A model that triggered a warning.
-#[derive(Serialize, Debug, Clone)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct Model {
     /// The name of the model
     pub model: String,
 }
 
+impl fmt::Display for Model {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&self.model)
+    }
+}
+
 /// A view that triggered a warning.
-#[derive(Serialize, Debug, Clone)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct View {
     /// The name of the view
     pub view: String,
 }
 
-/// An enum that triggered a warning.
-#[derive(Serialize, Debug, Clone)]
-pub struct Enum {
-    /// The name of the enum
-    pub enm: String,
+impl fmt::Display for View {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&self.view)
+    }
 }
 
-impl Enum {
-    /// Create a new enum with given name.
-    pub fn new(name: &str) -> Self {
-        Enum { enm: name.to_owned() }
+/// An enum that triggered a warning.
+#[derive(PartialEq, Debug, Clone)]
+pub struct Enum {
+    /// The name of the enum
+    pub r#enum: String,
+}
+
+impl fmt::Display for Enum {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&self.r#enum)
     }
 }
 
 /// A field in a model that triggered a warning.
-#[derive(Serialize, Debug, Clone)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct ModelAndField {
     /// The name of the model
     pub model: String,
@@ -341,9 +403,14 @@ pub struct ModelAndField {
     pub field: String,
 }
 
+impl fmt::Display for ModelAndField {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "model: {}, field: {}", self.model, self.field)
+    }
+}
+
 /// A field in a type that triggered a warning.
-#[derive(Serialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
+#[derive(PartialEq, Debug, Clone)]
 pub struct TypeAndField {
     /// The name of the model
     pub composite_type: String,
@@ -351,8 +418,14 @@ pub struct TypeAndField {
     pub field: String,
 }
 
+impl fmt::Display for TypeAndField {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "composite type: {}, field: {}", self.composite_type, self.field)
+    }
+}
+
 /// A field in a view that triggered a warning.
-#[derive(Serialize, Debug, Clone)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct ViewAndField {
     /// The name of the view
     pub view: String,
@@ -360,8 +433,14 @@ pub struct ViewAndField {
     pub field: String,
 }
 
+impl fmt::Display for ViewAndField {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "view: {}, field: {}", self.view, self.field)
+    }
+}
+
 /// An index in a model that triggered a warning.
-#[derive(Serialize, Debug, Clone)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct ModelAndIndex {
     /// The name of the model
     pub model: String,
@@ -369,8 +448,14 @@ pub struct ModelAndIndex {
     pub index_db_name: String,
 }
 
+impl fmt::Display for ModelAndIndex {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "model: {}, index: {}", self.model, self.index_db_name)
+    }
+}
+
 /// A constraint in a model that triggered a warning.
-#[derive(Serialize, Debug, Clone)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct ModelAndConstraint {
     /// The name of the model
     pub model: String,
@@ -378,51 +463,84 @@ pub struct ModelAndConstraint {
     pub constraint: String,
 }
 
+impl fmt::Display for ModelAndConstraint {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "model: {}, constraint: {}", self.model, self.constraint)
+    }
+}
+
 /// A field type in a model that triggered a warning.
-#[derive(Serialize, Debug)]
+#[derive(PartialEq, Debug)]
 pub struct ModelAndFieldAndType {
     /// The name of the model
     pub model: String,
     /// The name of the field
     pub field: String,
     /// The name of the type
-    pub tpe: String,
+    pub r#type: String,
+}
+
+impl fmt::Display for ModelAndFieldAndType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "model: {}, field: {}, type: {}", self.model, self.field, self.r#type)
+    }
 }
 
 /// A field type in a view that triggered a warning.
-#[derive(Serialize, Debug)]
+#[derive(PartialEq, Debug)]
 pub struct ViewAndFieldAndType {
     /// The name of the view
     pub view: String,
     /// The name of the field
     pub field: String,
     /// The name of the type
-    pub tpe: String,
+    pub r#type: String,
+}
+
+impl fmt::Display for ViewAndFieldAndType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "view: {}, field: {}, type: {}", self.view, self.field, self.r#type)
+    }
 }
 
 /// A field type in a type that triggered a warning.
-#[derive(Serialize, Debug)]
-#[serde(rename_all = "camelCase")]
+#[derive(PartialEq, Debug)]
 pub struct TypeAndFieldAndType {
     /// The name of the type
     pub composite_type: String,
     /// The name of the field
     pub field: String,
     /// The name of the type
-    pub tpe: String,
+    pub r#type: String,
+}
+
+impl fmt::Display for TypeAndFieldAndType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "composite type: {}, field: {}, type: {}",
+            self.composite_type, self.field, self.r#type
+        )
+    }
 }
 
 /// An enum value that triggered a warning.
-#[derive(Serialize, Debug, Clone)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct EnumAndValue {
     /// The name of the enum
-    pub enm: String,
+    pub r#enum: String,
     /// The enum value
     pub value: String,
 }
 
+impl fmt::Display for EnumAndValue {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "enum: {}, value: {}", self.r#enum, self.value)
+    }
+}
+
 /// An top level type that triggered a warning.
-#[derive(Serialize, Debug, Clone, Copy)]
+#[derive(PartialEq, Debug, Clone, Copy)]
 pub enum TopLevelType {
     /// A model.
     Model,
@@ -432,8 +550,24 @@ pub enum TopLevelType {
     View,
 }
 
+impl AsRef<str> for TopLevelType {
+    fn as_ref(&self) -> &str {
+        match self {
+            TopLevelType::Model => "model",
+            TopLevelType::Enum => "enum",
+            TopLevelType::View => "view",
+        }
+    }
+}
+
+impl fmt::Display for TopLevelType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_ref())
+    }
+}
+
 /// An top level item that triggered a warning.
-#[derive(Serialize, Debug, Clone)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct TopLevelItem {
     /// The name of the top-level type
     pub r#type: TopLevelType,
@@ -441,8 +575,14 @@ pub struct TopLevelItem {
     pub name: String,
 }
 
+impl fmt::Display for TopLevelItem {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "type: {}, name: {}", self.r#type, self.name)
+    }
+}
+
 /// An object in the PSL.
-#[derive(Serialize, Debug, Clone)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct Object {
     /// The type of the object.
     pub r#type: &'static str,
@@ -450,9 +590,14 @@ pub struct Object {
     pub name: String,
 }
 
+impl fmt::Display for Object {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "type: {}, name: {}", self.r#type, self.name)
+    }
+}
+
 /// An indexed column that triggered a warning.
-#[derive(Serialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
+#[derive(PartialEq, Debug, Clone)]
 pub struct IndexedColumn {
     /// The name of the index
     pub index_name: String,
@@ -460,354 +605,8 @@ pub struct IndexedColumn {
     pub column_name: String,
 }
 
-fn warning_models_without_identifier(affected: &[Model]) -> Warning {
-    Warning {
-        code: 1,
-        message: "The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.".into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn warning_fields_with_empty_names_in_models(affected: &[ModelAndField]) -> Warning {
-    Warning {
-        code: 2,
-        message: "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute."
-            .into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn warning_unsupported_types_in_models(affected: &[ModelAndFieldAndType]) -> Warning {
-    Warning {
-        code: 3,
-        message: "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.".into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn warning_enum_values_with_empty_names(affected: &[EnumAndValue]) -> Warning {
-    Warning {
-        code: 4,
-        message: "These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute."
-            .into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn warning_default_cuid_warning(affected: &[ModelAndField]) -> Warning {
-    Warning {
-        code: 5,
-        message:
-            "These id fields had a `@default(cuid())` added because we believe the schema was created by Prisma 1."
-                .into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn warning_default_uuid_warning(affected: &[ModelAndField]) -> Warning {
-    Warning {
-        code: 6,
-        message:
-            "These id fields had a `@default(uuid())` added because we believe the schema was created by Prisma 1."
-                .into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn warning_enriched_with_map_on_model(affected: &[Model]) -> Warning {
-    Warning {
-        code: 7,
-        message: "These models were enriched with `@@map` information taken from the previous Prisma schema.".into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn warning_enriched_with_map_on_field_in_models(affected: &[ModelAndField]) -> Warning {
-    Warning {
-        code: 8,
-        message: "These fields were enriched with `@map` information taken from the previous Prisma schema.".into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-/// A model was given a `@@map` attribute during introspection.
-pub fn warning_enriched_with_map_on_enum(affected: &[Enum]) -> Warning {
-    Warning {
-        code: 9,
-        message: "These enums were enriched with `@@map` information taken from the previous Prisma schema.".into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn warning_enriched_with_map_on_enum_value(affected: &[EnumAndValue]) -> Warning {
-    Warning {
-        code: 10,
-        message: "These enum values were enriched with `@map` information taken from the previous Prisma schema."
-            .into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-//todo maybe we can get rid of this alltogether due to @@ignore
-//but maybe we should have warnings for ignored fields and models
-fn warning_models_without_columns(affected: &[Model]) -> Warning {
-    Warning {
-        code: 14,
-        message: "The following models were commented out as we could not retrieve columns for them. Please check your privileges.".into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn warning_enriched_with_custom_primary_key_names_in_models(affected: &[Model]) -> Warning {
-    Warning {
-        code: 18,
-        message: "These models were enriched with custom compound id names taken from the previous Prisma schema."
-            .into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn warning_relations_added_from_the_previous_data_model(affected: &[Model]) -> Warning {
-    Warning {
-        code: 19,
-        message: "Relations were copied from the previous data model due to not using foreign keys in the database. If any of the relation columns changed in the database, the relations might not be correct anymore.".into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn warning_top_level_item_name_is_a_dupe(affected: &[TopLevelItem]) -> Warning {
-    let has_enums = affected.iter().any(|i| matches!(i.r#type, TopLevelType::Enum));
-    let has_models = affected.iter().any(|i| matches!(i.r#type, TopLevelType::Model));
-    let has_views = affected.iter().any(|i| matches!(i.r#type, TopLevelType::View));
-
-    let message = if has_models && has_enums && has_views {
-        "These models, views and enums were renamed due to their names being duplicates in the Prisma Schema Language."
-    } else if has_models && has_enums {
-        "These models and enums were renamed due to their names being duplicates in the Prisma Schema Language."
-    } else if has_models && has_views {
-        "These models and views were renamed due to their names being duplicates in the Prisma Schema Language."
-    } else if has_enums && has_views {
-        "These enums and views were renamed due to their names being duplicates in the Prisma Schema Language."
-    } else if has_models {
-        "These models were renamed due to their names being duplicates in the Prisma Schema Language."
-    } else if has_views {
-        "These views were renamed due to their names being duplicates in the Prisma Schema Language."
-    } else {
-        "These enums were renamed due to their names being duplicates in the Prisma Schema Language."
-    };
-
-    Warning {
-        code: 20,
-        message: message.into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn warning_unsupported_types_in_views(affected: &[ViewAndFieldAndType]) -> Warning {
-    Warning {
-        code: 21,
-        message: "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.".into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn warning_enriched_with_map_on_field_in_views(affected: &[ViewAndField]) -> Warning {
-    Warning {
-        code: 22,
-        message: "These fields were enriched with `@map` information taken from the previous Prisma schema.".into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn warning_enriched_with_map_on_view(affected: &[View]) -> Warning {
-    Warning {
-        code: 23,
-        message: "These views were enriched with `@@map` information taken from the previous Prisma schema.".into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn warning_views_without_identifier(affected: &[View]) -> Warning {
-    Warning {
-        code: 24,
-        message: "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers".into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn warning_enriched_with_custom_primary_key_names_in_views(affected: &[View]) -> Warning {
-    Warning {
-        code: 25,
-        message: "These views were enriched with custom compound id names taken from the previous Prisma schema."
-            .into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn warning_fields_with_empty_names_in_views(affected: &[ViewAndField]) -> Warning {
-    Warning {
-        code: 26,
-        message: "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute."
-            .into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn partition_tables_found(affected: &[Model]) -> Warning {
-    let message = "These tables are partition tables, which are not yet fully supported.";
-
-    Warning {
-        code: 27,
-        message: message.into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn inherited_tables_found(affected: &[Model]) -> Warning {
-    let message = "These tables are inherited tables, which are not yet fully supported.";
-
-    Warning {
-        code: 28,
-        message: message.into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn non_default_index_null_sort_order(affected: &[IndexedColumn]) -> Warning {
-    let message = "These index columns are having a non-default null sort order, which is not yet fully supported. Read more: https://pris.ly/d/non-default-index-null-ordering";
-
-    Warning {
-        code: 29,
-        message: message.into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn row_level_security_tables_found(affected: &[Model]) -> Warning {
-    let message = "These tables contain row level security, which is not yet fully supported. Read more: https://pris.ly/d/row-level-security";
-
-    Warning {
-        code: 30,
-        message: message.into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn row_level_ttl_in_tables(affected: &[Model]) -> Warning {
-    let message = "These models are using a row level TTL setting defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/row-level-ttl";
-
-    Warning {
-        code: 31,
-        message: message.into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn check_constraints_found(affected: &[ModelAndConstraint]) -> Warning {
-    let message = "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints";
-
-    Warning {
-        code: 33,
-        message: message.into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn exclusion_constraints_found(affected: &[ModelAndConstraint]) -> Warning {
-    let message = "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints";
-
-    Warning {
-        code: 34,
-        message: message.into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn non_default_deferring(affected: &[ModelAndConstraint]) -> Warning {
-    let message = "These primary key, foreign key or unique constraints are using non-default deferring in the database, which is not yet fully supported. Read more: https://pris.ly/d/constraint-deferring";
-
-    Warning {
-        code: 35,
-        message: message.into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn commented_objects(affected: &[Object]) -> Warning {
-    let message = "These objects have comments defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/database-comments";
-
-    Warning {
-        code: 36,
-        message: message.into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn model_fields_pointing_an_empty_type(affected: &[ModelAndField]) -> Warning {
-    let message = "The following fields point to nested objects without any data.";
-
-    Warning {
-        code: 37,
-        message: message.to_string(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn type_fields_pointing_an_empty_type(affected: &[TypeAndField]) -> Warning {
-    let message = "The following fields point to nested objects without any data.";
-
-    Warning {
-        code: 38,
-        message: message.to_string(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn warning_unsupported_types_in_types(affected: &[TypeAndFieldAndType]) -> Warning {
-    Warning {
-        code: 39,
-        message: "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.".into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn warning_unknown_types_in_models(affected: &[ModelAndField]) -> Warning {
-    Warning {
-        code: 40,
-        message: "Could not determine the types for the following fields.".into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn warning_unknown_types_in_types(affected: &[TypeAndField]) -> Warning {
-    Warning {
-        code: 41,
-        message: "Could not determine the types for the following fields.".into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn warning_undecided_types_in_models(affected: &[ModelAndFieldAndType]) -> Warning {
-    Warning {
-        code: 42,
-        message: "The following fields had data stored in multiple types. Either use Json or normalize data to the wanted type.".into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn warning_undecided_types_in_types(affected: &[TypeAndFieldAndType]) -> Warning {
-    Warning {
-        code: 43,
-        message: "The following fields had data stored in multiple types. Either use Json or normalize data to the wanted type.".into(),
-        affected: serde_json::to_value(affected).unwrap(),
-    }
-}
-
-fn warning_fields_with_empty_names_in_types(affected: &[TypeAndField]) -> Warning {
-    Warning {
-        code: 44,
-        message: "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute."
-            .into(),
-        affected: serde_json::to_value(affected).unwrap(),
+impl fmt::Display for IndexedColumn {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "index: {}, column: {}", self.index_name, self.column_name)
     }
 }

@@ -102,18 +102,12 @@ fn remapping_composite_fields_with_numbers() {
     expected.assert_eq(res.datamodel());
 
     let expect = expect![[r#"
-        [
-          {
-            "code": 44,
-            "message": "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute.",
-            "affected": [
-              {
-                "compositeType": "OuterInner",
-                "field": "1"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:
+
+          - composite type: OuterInner, field: 1
+    "#]];
 
     res.expect_warnings(&expect);
 }
@@ -144,18 +138,12 @@ fn remapping_model_fields_with_numbers() {
     expected.assert_eq(res.datamodel());
 
     let expect = expect![[r#"
-        [
-          {
-            "code": 2,
-            "message": "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute.",
-            "affected": [
-              {
-                "model": "Outer",
-                "field": "1"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:
+
+          - model: Outer, field: 1
+    "#]];
 
     res.expect_warnings(&expect);
 }

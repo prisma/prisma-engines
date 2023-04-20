@@ -20,9 +20,13 @@ async fn add_cuid_default_postgres(api: &mut TestApi) -> TestResult {
     "#]];
     expected.assert_eq(&api.introspect_dml().await?);
 
-    let expected = expect![[
-        r#"[{"code":5,"message":"These id fields had a `@default(cuid())` added because we believe the schema was created by Prisma 1.","affected":[{"model":"Book","field":"id"}]}]"#
-    ]];
+    let expected = expect![[r#"
+        *** WARNING ***
+
+        These id fields had a `@default(cuid())` added because we believe the schema was created by Prisma 1:
+
+          - model: Book, field: id
+    "#]];
     expected.assert_eq(&api.introspection_warnings().await?);
 
     Ok(())
@@ -45,9 +49,13 @@ async fn add_cuid_default_mysql(api: &mut TestApi) -> TestResult {
     "#]];
     expected.assert_eq(&api.introspect_dml().await?);
 
-    let expected = expect![[
-        r#"[{"code":5,"message":"These id fields had a `@default(cuid())` added because we believe the schema was created by Prisma 1.","affected":[{"model":"Book","field":"id"}]}]"#
-    ]];
+    let expected = expect![[r#"
+        *** WARNING ***
+
+        These id fields had a `@default(cuid())` added because we believe the schema was created by Prisma 1:
+
+          - model: Book, field: id
+    "#]];
     expected.assert_eq(&api.introspection_warnings().await?);
 
     Ok(())
@@ -70,9 +78,13 @@ async fn add_uuid_default_postgres(api: &mut TestApi) -> TestResult {
     "#]];
     expected.assert_eq(&api.introspect_dml().await?);
 
-    let expected = expect![[
-        r#"[{"code":6,"message":"These id fields had a `@default(uuid())` added because we believe the schema was created by Prisma 1.","affected":[{"model":"Book","field":"id"}]}]"#
-    ]];
+    let expected = expect![[r#"
+        *** WARNING ***
+
+        These id fields had a `@default(uuid())` added because we believe the schema was created by Prisma 1:
+
+          - model: Book, field: id
+    "#]];
     expected.assert_eq(&api.introspection_warnings().await?);
 
     Ok(())
@@ -95,9 +107,13 @@ async fn add_uuid_default_mysql(api: &mut TestApi) -> TestResult {
     "#]];
     expected.assert_eq(&api.introspect_dml().await?);
 
-    let expected = expect![[
-        r#"[{"code":6,"message":"These id fields had a `@default(uuid())` added because we believe the schema was created by Prisma 1.","affected":[{"model":"Book","field":"id"}]}]"#
-    ]];
+    let expected = expect![[r#"
+        *** WARNING ***
+
+        These id fields had a `@default(uuid())` added because we believe the schema was created by Prisma 1:
+
+          - model: Book, field: id
+    "#]];
     expected.assert_eq(&api.introspection_warnings().await?);
 
     Ok(())

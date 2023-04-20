@@ -49,7 +49,7 @@ pub(super) fn generate_warnings(view: ViewPair<'_>, warnings: &mut Warnings) {
             let mf = generators::ViewAndFieldAndType {
                 view: view.name().to_string(),
                 field: field.name().to_string(),
-                tpe: field.prisma_type().to_string(),
+                r#type: field.prisma_type().to_string(),
             };
 
             warnings.unsupported_types_in_view.push(mf)

@@ -1,6 +1,5 @@
 use barrel::types;
-use serde_json::json;
-use sql_introspection_tests::{assert_eq_json, test_api::*};
+use sql_introspection_tests::test_api::*;
 
 #[test_connector(tags(CockroachDb))]
 async fn a_table_without_uniques_should_ignore(api: &mut TestApi) -> TestResult {
@@ -92,24 +91,16 @@ async fn unsupported_type_keeps_its_usages_cockroach(api: &mut TestApi) -> TestR
         })
         .await?;
 
-    let expected = json!([{
-        "code": 3,
-        "message": "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.",
-        "affected": [
-            {
-                "model": "Test",
-                "field": "broken",
-                "tpe": "geometry"
-            },
-            {
-                "model": "Test",
-                "field": "broken2",
-                "tpe": "geography"
-            },
-        ]
-    }]);
+    let expected = expect![[r#"
+        *** WARNING ***
 
-    assert_eq_json!(expected, api.introspection_warnings().await?);
+        These fields are not supported by the Prisma Client, because Prisma currently does not support their types:
+
+          - model: Test, field: broken, type: geometry
+          - model: Test, field: broken2, type: geography
+    "#]];
+
+    api.expect_warnings(&expected).await;
 
     let dm = expect![[r#"
         model Test {

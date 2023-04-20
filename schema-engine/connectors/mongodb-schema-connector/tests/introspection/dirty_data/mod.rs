@@ -71,19 +71,12 @@ fn mixing_types() {
     expected.assert_eq(res.datamodel());
 
     let expect = expect![[r#"
-        [
-          {
-            "code": 42,
-            "message": "The following fields had data stored in multiple types. Either use Json or normalize data to the wanted type.",
-            "affected": [
-              {
-                "model": "A",
-                "field": "first",
-                "tpe": "Json"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        The following fields had data stored in multiple types. Either use Json or normalize data to the wanted type:
+
+          - model: A, field: first, type: Json
+    "#]];
 
     res.expect_warnings(&expect);
 }
@@ -116,19 +109,12 @@ fn mixing_types_with_the_same_base_type() {
     expected.assert_eq(res.datamodel());
 
     let expect = expect![[r#"
-        [
-          {
-            "code": 42,
-            "message": "The following fields had data stored in multiple types. Either use Json or normalize data to the wanted type.",
-            "affected": [
-              {
-                "model": "A",
-                "field": "first",
-                "tpe": "DateTime (Timestamp)"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        The following fields had data stored in multiple types. Either use Json or normalize data to the wanted type:
+
+          - model: A, field: first, type: DateTime (Timestamp)
+    "#]];
 
     res.expect_warnings(&expect);
 }

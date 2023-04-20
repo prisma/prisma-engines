@@ -33,7 +33,7 @@ pub use introspection_context::{CompositeTypeDepth, IntrospectionContext};
 pub use introspection_result::{IntrospectionResult, IntrospectionResultOutput, Version, ViewDefinition};
 pub use migration::Migration;
 pub use migration_persistence::{MigrationPersistence, MigrationRecord, PersistenceNotInitializedError, Timestamp};
-pub use warnings::{Warning, Warnings};
+pub use warnings::Warnings;
 
 /// Alias for a pinned, boxed future, used by the traits.
 pub type BoxFuture<'a, O> = std::pin::Pin<Box<dyn std::future::Future<Output = O> + Send + 'a>>;

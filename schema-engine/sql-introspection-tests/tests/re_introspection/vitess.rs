@@ -87,23 +87,15 @@ async fn warning_is_given_for_copied_relations(api: &mut TestApi) -> TestResult 
     "#};
 
     let expected = expect![[r#"
-        [
-          {
-            "code": 19,
-            "message": "Relations were copied from the previous data model due to not using foreign keys in the database. If any of the relation columns changed in the database, the relations might not be correct anymore.",
-            "affected": [
-              {
-                "model": "B"
-              },
-              {
-                "model": "A"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
 
-    let warnings: serde_json::Value = serde_json::from_str(&api.re_introspect_warnings(input_dm).await?).unwrap();
-    expected.assert_eq(&serde_json::to_string_pretty(&warnings).unwrap());
+        Relations were copied from the previous data model due to not using foreign keys in the database. If any of the relation columns changed in the database, the relations might not be correct anymore:
+
+          - B
+          - A
+    "#]];
+
+    api.expect_re_introspect_warnings(input_dm, expected).await;
 
     Ok(())
 }
@@ -134,9 +126,8 @@ async fn no_warnings_are_given_for_if_no_relations_were_copied(api: &mut TestApi
         }
     "#};
 
-    let expected = expect![["[]"]];
-    let warnings: serde_json::Value = serde_json::from_str(&api.re_introspect_warnings(input_dm).await?).unwrap();
-    expected.assert_eq(&serde_json::to_string_pretty(&warnings).unwrap());
+    let expected = expect![[""]];
+    api.expect_re_introspect_warnings(input_dm, expected).await;
 
     Ok(())
 }

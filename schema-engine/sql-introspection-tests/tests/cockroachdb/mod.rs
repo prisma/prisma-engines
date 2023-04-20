@@ -363,17 +363,12 @@ async fn row_level_ttl_stopgap(api: &mut TestApi) -> TestResult {
     api.expect_datamodel(&expectation).await;
 
     let expectation = expect![[r#"
-        [
-          {
-            "code": 31,
-            "message": "These models are using a row level TTL setting defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/row-level-ttl",
-            "affected": [
-              {
-                "model": "ttl_test"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These models are using a row level TTL setting defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/row-level-ttl
+
+          - ttl_test
+    "#]];
 
     api.expect_warnings(&expectation).await;
 
@@ -436,22 +431,13 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
     api.expect_datamodel(&expectation).await;
 
     let expectation = expect![[r#"
-        [
-          {
-            "code": 36,
-            "message": "These objects have comments defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/database-comments",
-            "affected": [
-              {
-                "type": "model",
-                "name": "a"
-              },
-              {
-                "type": "field",
-                "name": "a.val"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These objects have comments defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/database-comments
+
+          - type: model, name: a
+          - type: field, name: a.val
+    "#]];
 
     api.expect_warnings(&expectation).await;
 

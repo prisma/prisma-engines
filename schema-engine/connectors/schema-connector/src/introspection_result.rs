@@ -1,7 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-use crate::Warning;
-
 /// Defines a view in the database.
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ViewDefinition {
@@ -21,7 +19,7 @@ pub struct IntrospectionResult {
     /// The introspected data model is empty
     pub is_empty: bool,
     /// Introspection warnings
-    pub warnings: Vec<Warning>,
+    pub warnings: Option<String>,
     /// Inferred Prisma version
     pub version: Version,
     /// The database view definitions. None if preview feature
@@ -35,7 +33,7 @@ pub struct IntrospectionResultOutput {
     /// Datamodel
     pub datamodel: String,
     /// warnings
-    pub warnings: Vec<Warning>,
+    pub warnings: Option<String>,
     /// version
     pub version: Version,
     /// views

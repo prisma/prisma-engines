@@ -842,22 +842,13 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
     api.expect_datamodel(&expectation).await;
 
     let expectation = expect![[r#"
-        [
-          {
-            "code": 36,
-            "message": "These objects have comments defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/database-comments",
-            "affected": [
-              {
-                "type": "model",
-                "name": "a"
-              },
-              {
-                "type": "field",
-                "name": "a.a"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These objects have comments defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/database-comments
+
+          - type: model, name: a
+          - type: field, name: a.a
+    "#]];
 
     api.expect_warnings(&expectation).await;
 

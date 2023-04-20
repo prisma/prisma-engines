@@ -1,6 +1,5 @@
 use barrel::types;
-use serde_json::json;
-use sql_introspection_tests::{assert_eq_json, test_api::*, TestResult};
+use sql_introspection_tests::{test_api::*, TestResult};
 
 #[test_connector(tags(Mysql))]
 async fn a_table_without_required_uniques(api: &mut TestApi) -> TestResult {
@@ -119,17 +118,15 @@ PARTITIONS 2; "#,
     )
     .await;
 
-    let expected = json!([{
-        "code": 27,
-        "message": "These tables are partition tables, which are not yet fully supported.",
-        "affected": [
-            {
-                "model": "blocks"
-            }
-        ]
-    }]);
+    let expected = expect![[r#"
+        *** WARNING ***
 
-    assert_eq_json!(expected, api.introspection_warnings().await?);
+        These tables are partition tables, which are not yet fully supported:
+
+          - blocks
+    "#]];
+
+    api.expect_warnings(&expected).await;
 
     let expected = expect![[r#"
         generator client {
@@ -146,6 +143,8 @@ PARTITIONS 2; "#,
           id Int @id @default(autoincrement())
         }
     "#]];
+
     api.expect_datamodel(&expected).await;
+
     Ok(())
 }
