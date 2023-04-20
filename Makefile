@@ -162,7 +162,7 @@ dev-mariadb: start-mysql_mariadb
 	cp $(CONFIG_PATH)/mariadb $(CONFIG_FILE)
 
 start-tidb:
-	docker-compose -f docker-compose.yml up -d --remove-orphans tidb
+	docker compose -f docker-compose.yml up -d --remove-orphans tidb
 
 dev-tidb: start-tidb
 	cp $(CONFIG_PATH)/tidb $(CONFIG_FILE)
