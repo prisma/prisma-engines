@@ -1,5 +1,6 @@
 use super::*;
 use crate::SqlDatamodelRenderer;
+use psl::datamodel_connector::ConnectorCapability;
 
 const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::Enums,
