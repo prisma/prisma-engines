@@ -113,25 +113,12 @@
 <a href="#113" id="113">113</a>
 <a href="#114" id="114">114</a>
 <a href="#115" id="115">115</a>
-<a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-<a href="#121" id="121">121</a>
-<a href="#122" id="122">122</a>
-<a href="#123" id="123">123</a>
-<a href="#124" id="124">124</a>
-<a href="#125" id="125">125</a>
-<a href="#126" id="126">126</a>
-<a href="#127" id="127">127</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{SqlDatamodelRenderer, TestResult};
 <span class="kw">use </span>std::{fmt::Display, str::FromStr};
 
 <span class="attr">#[derive(Debug, Default, Clone)]
 </span><span class="kw">pub struct </span>VitessConnectorTag {
-    capabilities: Vec&lt;ConnectorCapability&gt;,
     version: <span class="prelude-ty">Option</span>&lt;VitessVersion&gt;,
 }
 
@@ -158,8 +145,8 @@
         }
     }
 
-    <span class="kw">fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[ConnectorCapability] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.capabilities
+    <span class="kw">fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectorCapabilities {
+        psl::builtin_connectors::MYSQL.capabilities()
     }
 
     <span class="kw">fn </span>as_parse_pair(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (String, <span class="prelude-ty">Option</span>&lt;String&gt;) {
@@ -189,24 +176,17 @@
             <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
         };
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
-            version,
-            capabilities: vitess_capabilities(),
-        })
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ version })
     }
 
     <span class="doccomment">/// Returns all versions of this connector.
     </span><span class="kw">pub fn </span>all() -&gt; Vec&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">let </span>capabilities = vitess_capabilities();
-
         <span class="macro">vec!</span>[
             <span class="self">Self </span>{
                 version: <span class="prelude-val">Some</span>(VitessVersion::V5_7),
-                capabilities: capabilities.clone(),
             },
             <span class="self">Self </span>{
                 version: <span class="prelude-val">Some</span>(VitessVersion::V8_0),
-                capabilities,
             },
         ]
     }
@@ -247,10 +227,6 @@
             <span class="self">Self</span>::V8_0 =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;8.0&quot;</span>),
         }
     }
-}
-
-<span class="kw">fn </span>vitess_capabilities() -&gt; Vec&lt;ConnectorCapability&gt; {
-    psl::builtin_connectors::MYSQL.capabilities().to_owned()
 }
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="query_tests_setup" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>

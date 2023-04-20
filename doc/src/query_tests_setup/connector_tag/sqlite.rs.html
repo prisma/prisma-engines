@@ -51,21 +51,11 @@
 <a href="#51" id="51">51</a>
 <a href="#52" id="52">52</a>
 <a href="#53" id="53">53</a>
-<a href="#54" id="54">54</a>
-<a href="#55" id="55">55</a>
-<a href="#56" id="56">56</a>
-<a href="#57" id="57">57</a>
-<a href="#58" id="58">58</a>
-<a href="#59" id="59">59</a>
-<a href="#60" id="60">60</a>
-<a href="#61" id="61">61</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::SqlDatamodelRenderer;
 
 <span class="attr">#[derive(Debug, Default, Clone, PartialEq)]
-</span><span class="kw">pub struct </span>SqliteConnectorTag {
-    capabilities: Vec&lt;ConnectorCapability&gt;,
-}
+</span><span class="kw">pub struct </span>SqliteConnectorTag;
 
 <span class="kw">impl </span>ConnectorTagInterface <span class="kw">for </span>SqliteConnectorTag {
     <span class="kw">fn </span>datamodel_provider(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
@@ -91,8 +81,8 @@
         <span class="macro">format!</span>(<span class="string">&quot;file://{workspace_root}/db/{database}.db&quot;</span>)
     }
 
-    <span class="kw">fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[ConnectorCapability] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.capabilities
+    <span class="kw">fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectorCapabilities {
+        psl::builtin_connectors::SQLITE.capabilities()
     }
 
     <span class="kw">fn </span>as_parse_pair(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (String, <span class="prelude-ty">Option</span>&lt;String&gt;) {
@@ -106,19 +96,13 @@
 
 <span class="kw">impl </span>SqliteConnectorTag {
     <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            capabilities: sqlite_capabilities(),
-        }
-    }
+        <span class="self">Self
+    </span>}
 
     <span class="doccomment">/// Returns all versions of this connector.
     </span><span class="kw">pub fn </span>all() -&gt; Vec&lt;<span class="self">Self</span>&gt; {
         <span class="macro">vec!</span>[<span class="self">Self</span>::new()]
     }
-}
-
-<span class="kw">fn </span>sqlite_capabilities() -&gt; Vec&lt;ConnectorCapability&gt; {
-    psl::builtin_connectors::SQLITE.capabilities().to_owned()
 }
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="query_tests_setup" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>

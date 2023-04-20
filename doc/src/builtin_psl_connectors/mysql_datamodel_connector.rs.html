@@ -278,21 +278,21 @@
 </pre><pre class="rust"><code><span class="kw">mod </span>native_types;
 <span class="kw">mod </span>validations;
 
-<span class="kw">use </span>lsp_types::CompletionList;
 <span class="kw">pub use </span>native_types::MySqlType;
 
+<span class="kw">use </span><span class="kw">crate</span>::completions;
 <span class="kw">use </span>enumflags2::BitFlags;
+<span class="kw">use </span>lsp_types::CompletionList;
 <span class="kw">use </span>psl_core::{
     datamodel_connector::{
-        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
+        Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, NativeTypeConstructor,
+        NativeTypeInstance, RelationMode,
     },
     diagnostics::{DatamodelError, Diagnostics, Span},
     parser_database::{walkers, ReferentialAction, ScalarType},
     PreviewFeature,
 };
 <span class="kw">use </span>MySqlType::<span class="kw-2">*</span>;
-
-<span class="kw">use </span><span class="kw">crate</span>::completions;
 
 <span class="kw">const </span>TINY_BLOB_TYPE_NAME: <span class="kw-2">&amp;</span>str = <span class="string">&quot;TinyBlob&quot;</span>;
 <span class="kw">const </span>BLOB_TYPE_NAME: <span class="kw-2">&amp;</span>str = <span class="string">&quot;Blob&quot;</span>;
@@ -303,39 +303,39 @@
 <span class="kw">const </span>MEDIUM_TEXT_TYPE_NAME: <span class="kw-2">&amp;</span>str = <span class="string">&quot;MediumText&quot;</span>;
 <span class="kw">const </span>LONG_TEXT_TYPE_NAME: <span class="kw-2">&amp;</span>str = <span class="string">&quot;LongText&quot;</span>;
 
-<span class="kw">const </span>CAPABILITIES: <span class="kw-2">&amp;</span>[ConnectorCapability] = <span class="kw-2">&amp;</span>[
-    ConnectorCapability::Enums,
-    ConnectorCapability::EnumArrayPush,
-    ConnectorCapability::Json,
-    ConnectorCapability::AutoIncrementAllowedOnNonId,
-    ConnectorCapability::RelationFieldsInArbitraryOrder,
-    ConnectorCapability::CreateMany,
-    ConnectorCapability::WritableAutoincField,
-    ConnectorCapability::CreateSkipDuplicates,
-    ConnectorCapability::UpdateableId,
-    ConnectorCapability::JsonFiltering,
-    ConnectorCapability::JsonFilteringJsonPath,
-    ConnectorCapability::JsonFilteringAlphanumeric,
-    ConnectorCapability::CreateManyWriteableAutoIncId,
-    ConnectorCapability::AutoIncrement,
-    ConnectorCapability::CompoundIds,
-    ConnectorCapability::AnyId,
-    ConnectorCapability::SqlQueryRaw,
-    ConnectorCapability::NamedForeignKeys,
-    ConnectorCapability::AdvancedJsonNullability,
-    ConnectorCapability::IndexColumnLengthPrefixing,
-    ConnectorCapability::MultiSchema,
-    ConnectorCapability::FullTextIndex,
-    ConnectorCapability::FullTextSearchWithIndex,
-    ConnectorCapability::MultipleFullTextAttributesPerModel,
-    ConnectorCapability::ImplicitManyToManyRelation,
-    ConnectorCapability::DecimalType,
-    ConnectorCapability::OrderByNullsFirstLast,
-    ConnectorCapability::SupportsTxIsolationReadUncommitted,
-    ConnectorCapability::SupportsTxIsolationReadCommitted,
-    ConnectorCapability::SupportsTxIsolationRepeatableRead,
-    ConnectorCapability::SupportsTxIsolationSerializable,
-];
+<span class="kw">const </span>CAPABILITIES: ConnectorCapabilities = <span class="macro">enumflags2::make_bitflags!</span>(ConnectorCapability::{
+    Enums |
+    EnumArrayPush |
+    Json |
+    AutoIncrementAllowedOnNonId |
+    RelationFieldsInArbitraryOrder |
+    CreateMany |
+    WritableAutoincField |
+    CreateSkipDuplicates |
+    UpdateableId |
+    JsonFiltering |
+    JsonFilteringJsonPath |
+    JsonFilteringAlphanumeric |
+    CreateManyWriteableAutoIncId |
+    AutoIncrement |
+    CompoundIds |
+    AnyId |
+    SqlQueryRaw |
+    NamedForeignKeys |
+    AdvancedJsonNullability |
+    IndexColumnLengthPrefixing |
+    MultiSchema |
+    FullTextIndex |
+    FullTextSearchWithIndex |
+    MultipleFullTextAttributesPerModel |
+    ImplicitManyToManyRelation |
+    DecimalType |
+    OrderByNullsFirstLast |
+    SupportsTxIsolationReadUncommitted |
+    SupportsTxIsolationReadCommitted |
+    SupportsTxIsolationRepeatableRead |
+    SupportsTxIsolationSerializable
+});
 
 <span class="kw">const </span>CONSTRAINT_SCOPES: <span class="kw-2">&amp;</span>[ConstraintScope] = <span class="kw-2">&amp;</span>[ConstraintScope::GlobalForeignKey, ConstraintScope::ModelKeyIndex];
 
@@ -362,7 +362,7 @@
         <span class="string">&quot;MySQL&quot;
     </span>}
 
-    <span class="kw">fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[ConnectorCapability] {
+    <span class="kw">fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectorCapabilities {
         CAPABILITIES
     }
 

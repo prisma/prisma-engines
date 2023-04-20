@@ -230,7 +230,7 @@
 <span class="kw">use crate</span>::{datamodel_rendering::DatamodelRenderer, TestError, CONFIG};
 <span class="kw">use </span>cockroachdb::<span class="kw-2">*</span>;
 <span class="kw">use </span>enum_dispatch::enum_dispatch;
-<span class="kw">use </span>psl::datamodel_connector::ConnectorCapability;
+<span class="kw">use </span>psl::datamodel_connector::ConnectorCapabilities;
 <span class="kw">use </span>std::{convert::TryFrom, fmt};
 
 <span class="attr">#[enum_dispatch]
@@ -256,7 +256,7 @@
     ) -&gt; String;
 
     <span class="doccomment">/// Capabilities of the implementing connector.
-    </span><span class="kw">fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[ConnectorCapability];
+    </span><span class="kw">fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectorCapabilities;
 
     <span class="doccomment">/// Serialization of the connector. Expected to return `(tag_name, version)`.
     /// Todo: Think of something better.
@@ -376,11 +376,11 @@
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>should_run(
         only: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)],
         exclude: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)],
-        capabilities: <span class="kw-2">&amp;</span>[ConnectorCapability],
+        capabilities: ConnectorCapabilities,
     ) -&gt; bool {
         <span class="kw">let </span>connector = CONFIG.test_connector_tag().unwrap();
 
-        <span class="kw">if </span>!capabilities.is_empty() &amp;&amp; !capabilities.iter().all(|cap| connector.capabilities().contains(cap)) {
+        <span class="kw">if </span>!capabilities.is_empty() &amp;&amp; !connector.capabilities().contains(capabilities) {
             <span class="macro">println!</span>(<span class="string">&quot;Connector excluded. Missing required capability.&quot;</span>);
             <span class="kw">return </span><span class="bool-val">false</span>;
         }

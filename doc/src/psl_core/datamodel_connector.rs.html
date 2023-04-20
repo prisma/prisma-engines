@@ -460,11 +460,11 @@
     </span><span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str;
 
     <span class="doccomment">/// The static list of capabilities for the connector.
-    </span><span class="kw">fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[ConnectorCapability];
+    </span><span class="kw">fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectorCapabilities;
 
     <span class="doccomment">/// Does the connector have this capability?
     </span><span class="kw">fn </span>has_capability(<span class="kw-2">&amp;</span><span class="self">self</span>, capability: ConnectorCapability) -&gt; bool {
-        <span class="self">self</span>.capabilities().contains(<span class="kw-2">&amp;</span>capability)
+        <span class="self">self</span>.capabilities().contains(capability)
     }
 
     <span class="doccomment">/// The maximum length of constraint names in bytes. Connectors without a

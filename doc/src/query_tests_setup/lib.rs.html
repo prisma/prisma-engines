@@ -310,10 +310,6 @@
 <a href="#310" id="310">310</a>
 <a href="#311" id="311">311</a>
 <a href="#312" id="312">312</a>
-<a href="#313" id="313">313</a>
-<a href="#314" id="314">314</a>
-<a href="#315" id="315">315</a>
-<a href="#316" id="316">316</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>config;
 <span class="kw">mod </span>connector_tag;
 <span class="kw">mod </span>datamodel_rendering;
@@ -338,7 +334,7 @@
 
 <span class="kw">use </span>colored::Colorize;
 <span class="kw">use </span>once_cell::sync::Lazy;
-<span class="kw">use </span>psl::datamodel_connector::ConnectorCapability;
+<span class="kw">use </span>psl::datamodel_connector::ConnectorCapabilities;
 <span class="kw">use </span>query_engine_metrics::MetricRegistry;
 <span class="kw">use </span>std::future::Future;
 <span class="kw">use </span>std::sync::Once;
@@ -414,7 +410,7 @@
     id_only: bool,
     only: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)],
     exclude: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)],
-    required_capabilities: <span class="kw-2">&amp;</span>[ConnectorCapability],
+    required_capabilities: ConnectorCapabilities,
     (suite_name, test_name): (<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str),
     test_fn: F,
 ) <span class="kw">where
@@ -451,7 +447,7 @@
     id_only: bool,
     only: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)],
     exclude: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)],
-    required_capabilities: <span class="kw-2">&amp;</span>[ConnectorCapability],
+    required_capabilities: ConnectorCapabilities,
     (suite_name, test_name): (<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str),
     test_fn: <span class="kw-2">&amp;</span><span class="kw">dyn for</span>&lt;<span class="lifetime">&#39;a</span>&gt; Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Runner, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>DatamodelWithParams) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, TestResult&lt;()&gt;&gt;,
 ) {
@@ -459,21 +455,17 @@
         Lazy::new(|| std::env::var(<span class="string">&quot;RELATION_TEST_IDX&quot;</span>).ok().and_then(|s| s.parse().ok()));
 
     <span class="kw">let </span>(dms, capabilities) = schema_with_relation(on_parent, on_child, id_only);
-    <span class="kw">let </span><span class="kw-2">mut </span>required_capabilities_for_test = Vec::with_capacity(required_capabilities.len());
 
     <span class="kw">for </span>(i, (dm, caps)) <span class="kw">in </span>dms.into_iter().zip(capabilities.into_iter()).enumerate() {
         <span class="kw">if </span>RELATION_TEST_IDX.map(|idx| idx != i).unwrap_or(<span class="bool-val">false</span>) {
             <span class="kw">continue</span>;
         }
 
-        required_capabilities_for_test.clear();
-        required_capabilities_for_test.extend(required_capabilities.iter());
-        required_capabilities_for_test.extend(caps);
-
+        <span class="kw">let </span>required_capabilities_for_test = required_capabilities | caps;
         <span class="kw">let </span>test_db_name = <span class="macro">format!</span>(<span class="string">&quot;{suite_name}_{test_name}_{i}&quot;</span>);
         <span class="kw">let </span>template = dm.datamodel().to_owned();
 
-        <span class="kw">if </span>!ConnectorTag::should_run(only, exclude, <span class="kw-2">&amp;</span>required_capabilities_for_test) {
+        <span class="kw">if </span>!ConnectorTag::should_run(only, exclude, required_capabilities_for_test) {
             <span class="kw">continue</span>;
         }
 
@@ -528,7 +520,7 @@
     test_database_name: <span class="kw-2">&amp;</span>str,
     only: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)],
     exclude: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)],
-    capabilities: <span class="kw-2">&amp;</span>[ConnectorCapability],
+    capabilities: ConnectorCapabilities,
     excluded_features: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
     handler: <span class="kw">fn</span>() -&gt; String,
     db_schemas: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
@@ -563,7 +555,7 @@
     test_database_name: <span class="kw-2">&amp;</span>str,
     only: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)],
     exclude: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)],
-    capabilities: <span class="kw-2">&amp;</span>[ConnectorCapability],
+    capabilities: ConnectorCapabilities,
     excluded_features: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
     handler: <span class="kw">fn</span>() -&gt; String,
     db_schemas: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],

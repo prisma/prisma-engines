@@ -179,30 +179,12 @@
 <a href="#179" id="179">179</a>
 <a href="#180" id="180">180</a>
 <a href="#181" id="181">181</a>
-<a href="#182" id="182">182</a>
-<a href="#183" id="183">183</a>
-<a href="#184" id="184">184</a>
-<a href="#185" id="185">185</a>
-<a href="#186" id="186">186</a>
-<a href="#187" id="187">187</a>
-<a href="#188" id="188">188</a>
-<a href="#189" id="189">189</a>
-<a href="#190" id="190">190</a>
-<a href="#191" id="191">191</a>
-<a href="#192" id="192">192</a>
-<a href="#193" id="193">193</a>
-<a href="#194" id="194">194</a>
-<a href="#195" id="195">195</a>
-<a href="#196" id="196">196</a>
-<a href="#197" id="197">197</a>
-<a href="#198" id="198">198</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{datamodel_rendering::SqlDatamodelRenderer, TestError, TestResult};
 
 <span class="attr">#[derive(Debug, Default, Clone)]
 </span><span class="kw">pub struct </span>PostgresConnectorTag {
     version: <span class="prelude-ty">Option</span>&lt;PostgresVersion&gt;,
-    capabilities: Vec&lt;ConnectorCapability&gt;,
 }
 
 <span class="kw">impl </span>ConnectorTagInterface <span class="kw">for </span>PostgresConnectorTag {
@@ -262,8 +244,8 @@
         }
     }
 
-    <span class="kw">fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[ConnectorCapability] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.capabilities
+    <span class="kw">fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectorCapabilities {
+        psl::builtin_connectors::POSTGRES.capabilities()
     }
 
     <span class="kw">fn </span>as_parse_pair(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (String, <span class="prelude-ty">Option</span>&lt;String&gt;) {
@@ -295,47 +277,35 @@
             <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
         };
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
-            version,
-            capabilities: postgres_capabilities(),
-        })
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ version })
     }
 
     <span class="doccomment">/// Returns all versions of this connector.
     </span><span class="kw">pub fn </span>all() -&gt; Vec&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">let </span>capabilities = postgres_capabilities();
         <span class="macro">vec!</span>[
             <span class="self">Self </span>{
                 version: <span class="prelude-val">Some</span>(PostgresVersion::V9),
-                capabilities: capabilities.clone(),
             },
             <span class="self">Self </span>{
                 version: <span class="prelude-val">Some</span>(PostgresVersion::V10),
-                capabilities: capabilities.clone(),
             },
             <span class="self">Self </span>{
                 version: <span class="prelude-val">Some</span>(PostgresVersion::V11),
-                capabilities: capabilities.clone(),
             },
             <span class="self">Self </span>{
                 version: <span class="prelude-val">Some</span>(PostgresVersion::V12),
-                capabilities: capabilities.clone(),
             },
             <span class="self">Self </span>{
                 version: <span class="prelude-val">Some</span>(PostgresVersion::V13),
-                capabilities: capabilities.clone(),
             },
             <span class="self">Self </span>{
                 version: <span class="prelude-val">Some</span>(PostgresVersion::V14),
-                capabilities: capabilities.clone(),
             },
             <span class="self">Self </span>{
                 version: <span class="prelude-val">Some</span>(PostgresVersion::V15),
-                capabilities: capabilities.clone(),
             },
             <span class="self">Self </span>{
                 version: <span class="prelude-val">Some</span>(PostgresVersion::PgBouncer),
-                capabilities,
             },
         ]
     }
@@ -389,10 +359,6 @@
         }
         .to_owned()
     }
-}
-
-<span class="kw">fn </span>postgres_capabilities() -&gt; Vec&lt;ConnectorCapability&gt; {
-    psl::builtin_connectors::POSTGRES.capabilities().to_owned()
 }
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="query_tests_setup" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>

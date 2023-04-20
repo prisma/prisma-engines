@@ -281,7 +281,7 @@
 <a href="#281" id="281">281</a>
 <a href="#282" id="282">282</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
-<span class="kw">use </span>psl::datamodel_connector::ConnectorCapability;
+<span class="kw">use </span>psl::datamodel_connector::{ConnectorCapabilities, ConnectorCapability};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>std::{convert::TryFrom, str::FromStr};
 
@@ -325,7 +325,7 @@
     }
 }
 
-<span class="kw">pub type </span>DatamodelsAndCapabilities = (Vec&lt;DatamodelWithParams&gt;, Vec&lt;Vec&lt;ConnectorCapability&gt;&gt;);
+<span class="kw">pub type </span>DatamodelsAndCapabilities = (Vec&lt;DatamodelWithParams&gt;, Vec&lt;ConnectorCapabilities&gt;);
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>schema_with_relation(
     on_parent: <span class="kw-2">&amp;</span>RelationField,
@@ -402,7 +402,7 @@
     <span class="comment">// Reduces the amount of generated tests when `true`
     </span><span class="kw">let </span>simple_test_mode = std::env::var(<span class="string">&quot;SIMPLE_TEST_MODE&quot;</span>).is_ok();
     <span class="kw">let </span><span class="kw-2">mut </span>datamodels: Vec&lt;DatamodelWithParams&gt; = <span class="macro">vec!</span>[];
-    <span class="kw">let </span><span class="kw-2">mut </span>required_capabilities: Vec&lt;Vec&lt;ConnectorCapability&gt;&gt; = <span class="macro">vec!</span>[];
+    <span class="kw">let </span><span class="kw-2">mut </span>required_capabilities: Vec&lt;ConnectorCapabilities&gt; = <span class="macro">vec!</span>[];
 
     <span class="kw">for </span>parent_id <span class="kw">in </span>id_options.iter() {
         <span class="kw">for </span>child_id <span class="kw">in </span>id_options.iter() {
@@ -470,14 +470,14 @@
                                 }}
                             &quot;</span>};
 
-                            <span class="kw">let </span><span class="kw-2">mut </span>required_capabilities_for_dm = <span class="macro">vec!</span>[];
+                            <span class="kw">let </span><span class="kw-2">mut </span>required_capabilities_for_dm = ConnectorCapabilities::default();
 
                             <span class="kw">match </span>(parent_id, child_id) {
                                 (Identifier::Compound, <span class="kw">_</span>) | (<span class="kw">_</span>, Identifier::Compound) =&gt; {
-                                    required_capabilities_for_dm.push(ConnectorCapability::CompoundIds)
+                                    required_capabilities_for_dm |= ConnectorCapability::CompoundIds;
                                 }
                                 (Identifier::None, <span class="kw">_</span>) | (<span class="kw">_</span>, Identifier::None) =&gt; {
-                                    required_capabilities_for_dm.push(ConnectorCapability::AnyId)
+                                    required_capabilities_for_dm |= ConnectorCapability::AnyId;
                                 }
                                 <span class="kw">_ </span>=&gt; (),
                             }

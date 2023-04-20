@@ -134,27 +134,12 @@
 <a href="#134" id="134">134</a>
 <a href="#135" id="135">135</a>
 <a href="#136" id="136">136</a>
-<a href="#137" id="137">137</a>
-<a href="#138" id="138">138</a>
-<a href="#139" id="139">139</a>
-<a href="#140" id="140">140</a>
-<a href="#141" id="141">141</a>
-<a href="#142" id="142">142</a>
-<a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
-<a href="#149" id="149">149</a>
-<a href="#150" id="150">150</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{datamodel_rendering::SqlDatamodelRenderer, TestError, TestResult};
 
 <span class="attr">#[derive(Debug, Default, Clone)]
 </span><span class="kw">pub struct </span>MySqlConnectorTag {
     version: <span class="prelude-ty">Option</span>&lt;MySqlVersion&gt;,
-    capabilities: Vec&lt;ConnectorCapability&gt;,
 }
 
 <span class="kw">impl </span>MySqlConnectorTag {
@@ -198,8 +183,8 @@
         }
     }
 
-    <span class="kw">fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[ConnectorCapability] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.capabilities
+    <span class="kw">fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectorCapabilities {
+        psl::builtin_connectors::MYSQL.capabilities()
     }
 
     <span class="kw">fn </span>as_parse_pair(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (String, <span class="prelude-ty">Option</span>&lt;String&gt;) {
@@ -227,32 +212,23 @@
             <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
         };
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
-            version,
-            capabilities: mysql_capabilities(),
-        })
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ version })
     }
 
     <span class="doccomment">/// Returns all versions of this connector.
     </span><span class="kw">pub fn </span>all() -&gt; Vec&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">let </span>capabilities = mysql_capabilities();
-
         <span class="macro">vec!</span>[
             <span class="self">Self </span>{
                 version: <span class="prelude-val">Some</span>(MySqlVersion::V5_6),
-                capabilities: capabilities.clone(),
             },
             <span class="self">Self </span>{
                 version: <span class="prelude-val">Some</span>(MySqlVersion::V5_7),
-                capabilities: capabilities.clone(),
             },
             <span class="self">Self </span>{
                 version: <span class="prelude-val">Some</span>(MySqlVersion::V8),
-                capabilities: capabilities.clone(),
             },
             <span class="self">Self </span>{
                 version: <span class="prelude-val">Some</span>(MySqlVersion::MariaDb),
-                capabilities,
             },
         ]
     }
@@ -293,10 +269,6 @@
         }
         .to_owned()
     }
-}
-
-<span class="kw">fn </span>mysql_capabilities() -&gt; Vec&lt;ConnectorCapability&gt; {
-    psl::builtin_connectors::MYSQL.capabilities().to_owned()
 }
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="query_tests_setup" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>

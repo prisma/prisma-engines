@@ -135,7 +135,7 @@
                 #id_only,
                 <span class="kw-2">&amp;</span>[#only],
                 <span class="kw-2">&amp;</span>[#exclude],
-                <span class="kw-2">&amp;</span>[#(ConnectorCapability::#required_capabilities,)<span class="kw-2">*</span>],
+                <span class="macro">enumflags2::make_bitflags!</span>(ConnectorCapability::{#(#required_capabilities|)<span class="kw-2">*</span>}),
                 (#suite_name, #test_name),
                 #runner_fn_ident
             )

@@ -19,7 +19,7 @@
 </span><span class="attr">#[macro_export]
 </span><span class="macro">macro_rules! </span>jNull {
     (<span class="macro-nonterminal">$capabilities</span>:expr, <span class="macro-nonterminal">$s</span>:expr) =&gt; {
-        <span class="kw">if </span>!<span class="macro-nonterminal">$capabilities</span>.contains(<span class="kw-2">&amp;</span>ConnectorCapability::AdvancedJsonNullability) {
+        <span class="kw">if </span>!<span class="macro-nonterminal">$capabilities</span>.contains(ConnectorCapability::AdvancedJsonNullability) {
             <span class="macro-nonterminal">$s</span>.replace(<span class="string">&quot;DbNull&quot;</span>, <span class="string">&quot;null&quot;</span>)
                 .replace(<span class="string">&quot;JsonNull&quot;</span>, <span class="string">&quot;\&quot;null\&quot;&quot;</span>)
                 .replace(<span class="string">&quot;AnyNull&quot;</span>, <span class="string">&quot;null&quot;</span>)

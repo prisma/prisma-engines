@@ -325,7 +325,7 @@
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{EnumType, IdentifierType, ObjectType, OutputField, OutputObjectTypeId, QuerySchemaDatabase};
 <span class="kw">use </span>prisma_models::{InternalDataModelRef, ModelRef};
 <span class="kw">use </span>psl::{
-    datamodel_connector::{ConnectorCapability, RelationMode},
+    datamodel_connector::{ConnectorCapabilities, ConnectorCapability, RelationMode},
     PreviewFeatures,
 };
 <span class="kw">use </span>std::{collections::HashMap, fmt};
@@ -363,7 +363,7 @@
 </span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>ConnectorContext {
     <span class="doccomment">/// Capabilities of the provider.
-    </span><span class="kw">pub </span>capabilities: Vec&lt;ConnectorCapability&gt;,
+    </span><span class="kw">pub </span>capabilities: ConnectorCapabilities,
 
     <span class="doccomment">/// Enabled preview features.
     </span><span class="kw">pub </span>features: PreviewFeatures,
@@ -373,7 +373,7 @@
 }
 
 <span class="kw">impl </span>ConnectorContext {
-    <span class="kw">pub fn </span>new(capabilities: Vec&lt;ConnectorCapability&gt;, features: PreviewFeatures, relation_mode: RelationMode) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub fn </span>new(capabilities: ConnectorCapabilities, features: PreviewFeatures, relation_mode: RelationMode) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             capabilities,
             features,
@@ -382,7 +382,7 @@
     }
 
     <span class="kw">pub fn </span>can_native_upsert(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.capabilities.contains(<span class="kw-2">&amp;</span>ConnectorCapability::NativeUpsert)
+        <span class="self">self</span>.capabilities.contains(ConnectorCapability::NativeUpsert)
     }
 }
 
@@ -393,7 +393,7 @@
         mutation: OutputObjectTypeId,
         db: QuerySchemaDatabase,
         internal_data_model: InternalDataModelRef,
-        capabilities: Vec&lt;ConnectorCapability&gt;,
+        capabilities: ConnectorCapabilities,
     ) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>features = internal_data_model.schema.configuration.preview_features();
         <span class="kw">let </span>relation_mode = internal_data_model.schema.relation_mode();
