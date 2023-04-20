@@ -4232,7 +4232,6 @@ dependencies = [
  "psl",
  "quaint",
  "schema-connector",
- "serde_json",
  "sql-schema-connector",
  "sql-schema-describer",
  "test-macros",

@@ -7,28 +7,6 @@ use test_setup::{BitFlags, Tags};
 pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync + 'static>>;
 pub type TestResult = Result<()>;
 
-#[macro_export]
-macro_rules! assert_eq_schema {
-    ($left:expr, $right:expr) => {
-        let no_whitespace_expected = $left.replace(' ', "").replace('\n', "");
-        let no_whitespace_result = $right.replace(' ', "").replace('\n', "");
-
-        pretty_assertions::assert_eq!(no_whitespace_result, no_whitespace_expected);
-    };
-}
-
-/// Left side should be `serde_json::Value` and the right side a string that can
-/// be converted to JSON.
-#[macro_export]
-macro_rules! assert_eq_json {
-    ($expected:expr, $result:expr) => {
-        let val: serde_json::Value =
-            serde_json::from_str($result.as_str()).expect("The right side value was not valid JSON.");
-
-        pretty_assertions::assert_eq!($expected, val);
-    };
-}
-
 pub struct BarrelMigrationExecutor {
     database: Quaint,
     sql_variant: barrel::backend::SqlVariant,
