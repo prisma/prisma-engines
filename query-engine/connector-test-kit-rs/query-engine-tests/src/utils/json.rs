@@ -4,7 +4,7 @@
 #[macro_export]
 macro_rules! jNull {
     ($capabilities:expr, $s:expr) => {
-        if !$capabilities.contains(&ConnectorCapability::AdvancedJsonNullability) {
+        if !$capabilities.contains(ConnectorCapability::AdvancedJsonNullability) {
             $s.replace("DbNull", "null")
                 .replace("JsonNull", "\"null\"")
                 .replace("AnyNull", "null")

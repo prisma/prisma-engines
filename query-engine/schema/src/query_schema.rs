@@ -1,7 +1,7 @@
 use crate::{EnumType, IdentifierType, ObjectType, OutputField, OutputObjectTypeId, QuerySchemaDatabase};
 use prisma_models::{InternalDataModelRef, ModelRef};
 use psl::{
-    datamodel_connector::{ConnectorCapability, RelationMode},
+    datamodel_connector::{ConnectorCapabilities, ConnectorCapability, RelationMode},
     PreviewFeatures,
 };
 use std::{collections::HashMap, fmt};
@@ -39,7 +39,7 @@ pub struct QuerySchema {
 #[derive(Debug)]
 pub struct ConnectorContext {
     /// Capabilities of the provider.
-    pub capabilities: Vec<ConnectorCapability>,
+    pub capabilities: ConnectorCapabilities,
 
     /// Enabled preview features.
     pub features: PreviewFeatures,
@@ -49,7 +49,7 @@ pub struct ConnectorContext {
 }
 
 impl ConnectorContext {
-    pub fn new(capabilities: Vec<ConnectorCapability>, features: PreviewFeatures, relation_mode: RelationMode) -> Self {
+    pub fn new(capabilities: ConnectorCapabilities, features: PreviewFeatures, relation_mode: RelationMode) -> Self {
         Self {
             capabilities,
             features,
@@ -58,7 +58,7 @@ impl ConnectorContext {
     }
 
     pub fn can_native_upsert(&self) -> bool {
-        self.capabilities.contains(&ConnectorCapability::NativeUpsert)
+        self.capabilities.contains(ConnectorCapability::NativeUpsert)
     }
 }
 
@@ -69,7 +69,7 @@ impl QuerySchema {
         mutation: OutputObjectTypeId,
         db: QuerySchemaDatabase,
         internal_data_model: InternalDataModelRef,
-        capabilities: Vec<ConnectorCapability>,
+        capabilities: ConnectorCapabilities,
     ) -> Self {
         let features = internal_data_model.schema.configuration.preview_features();
         let relation_mode = internal_data_model.schema.relation_mode();
