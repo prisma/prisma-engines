@@ -5,7 +5,6 @@ use psl::builtin_connectors::MONGODB;
 #[derive(Debug, Default, Clone)]
 pub struct MongoDbConnectorTag {
     version: Option<MongoDbVersion>,
-    capabilities: Vec<ConnectorCapability>,
 }
 
 impl ConnectorTagInterface for MongoDbConnectorTag {
@@ -47,8 +46,8 @@ impl ConnectorTagInterface for MongoDbConnectorTag {
         }
     }
 
-    fn capabilities(&self) -> &[ConnectorCapability] {
-        &self.capabilities
+    fn capabilities(&self) -> ConnectorCapabilities {
+        MONGODB.capabilities()
     }
 
     fn as_parse_pair(&self) -> (String, Option<String>) {
@@ -79,10 +78,7 @@ impl MongoDbConnectorTag {
             None => None,
         };
 
-        Ok(Self {
-            version,
-            capabilities: mongo_capabilities(),
-        })
+        Ok(Self { version })
     }
 
     /// Returns all versions of this connector.
@@ -90,15 +86,12 @@ impl MongoDbConnectorTag {
         vec![
             Self {
                 version: Some(MongoDbVersion::V4_2),
-                capabilities: mongo_capabilities(),
             },
             Self {
                 version: Some(MongoDbVersion::V4_4),
-                capabilities: mongo_capabilities(),
             },
             Self {
                 version: Some(MongoDbVersion::V5),
-                capabilities: mongo_capabilities(),
             },
         ]
     }
@@ -142,8 +135,4 @@ impl ToString for MongoDbVersion {
         }
         .to_owned()
     }
-}
-
-fn mongo_capabilities() -> Vec<ConnectorCapability> {
-    MONGODB.capabilities().to_owned()
 }

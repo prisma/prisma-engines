@@ -262,6 +262,7 @@ name = "black-box-tests"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "enumflags2",
  "indoc",
  "insta",
  "query-engine-tests",
@@ -3346,6 +3347,7 @@ dependencies = [
  "base64 0.13.1",
  "chrono",
  "colored",
+ "enumflags2",
  "futures",
  "indoc",
  "insta",

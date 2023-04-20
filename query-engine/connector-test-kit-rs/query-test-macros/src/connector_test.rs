@@ -71,7 +71,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
                 #test_database_name,
                 &[#only],
                 &[#exclude],
-                &[#(ConnectorCapability::#capabilities),*],
+                enumflags2::make_bitflags!(ConnectorCapability::{#(#capabilities)|*}),
                 &[#(#excluded_features),*],
                 #handler,
                 &[#(#db_schemas),*],

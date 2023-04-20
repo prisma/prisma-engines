@@ -1,6 +1,9 @@
 use enumflags2::BitFlags;
 use psl_core::{
-    datamodel_connector::{Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance},
+    datamodel_connector::{
+        Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, NativeTypeConstructor,
+        NativeTypeInstance,
+    },
     diagnostics::{DatamodelError, Diagnostics, Span},
     parser_database::{ReferentialAction, ScalarType},
 };
@@ -8,20 +11,20 @@ use std::borrow::Cow;
 
 const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[];
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalKeyIndex];
-const CAPABILITIES: &[ConnectorCapability] = &[
-    ConnectorCapability::AnyId,
-    ConnectorCapability::AutoIncrement,
-    ConnectorCapability::CompoundIds,
-    ConnectorCapability::SqlQueryRaw,
-    ConnectorCapability::RelationFieldsInArbitraryOrder,
-    ConnectorCapability::UpdateableId,
-    ConnectorCapability::ImplicitManyToManyRelation,
-    ConnectorCapability::DecimalType,
-    ConnectorCapability::BackwardCompatibleQueryRaw,
-    ConnectorCapability::OrderByNullsFirstLast,
-    ConnectorCapability::SupportsTxIsolationSerializable,
-    ConnectorCapability::NativeUpsert,
-];
+const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
+    AnyId |
+    AutoIncrement |
+    CompoundIds |
+    SqlQueryRaw |
+    RelationFieldsInArbitraryOrder |
+    UpdateableId |
+    ImplicitManyToManyRelation |
+    DecimalType |
+    BackwardCompatibleQueryRaw |
+    OrderByNullsFirstLast |
+    SupportsTxIsolationSerializable |
+    NativeUpsert
+});
 
 pub struct SqliteDatamodelConnector;
 
@@ -34,7 +37,7 @@ impl Connector for SqliteDatamodelConnector {
         "sqlite"
     }
 
-    fn capabilities(&self) -> &'static [ConnectorCapability] {
+    fn capabilities(&self) -> ConnectorCapabilities {
         CAPABILITIES
     }
 

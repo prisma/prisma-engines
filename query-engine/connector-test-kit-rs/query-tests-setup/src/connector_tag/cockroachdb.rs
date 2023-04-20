@@ -1,9 +1,9 @@
 use super::*;
 use crate::{datamodel_rendering::SqlDatamodelRenderer, TestResult};
+use psl::datamodel_connector::ConnectorCapabilities;
 
 #[derive(Debug, Default, Clone)]
 pub struct CockroachDbConnectorTag {
-    capabilities: Vec<ConnectorCapability>,
     version: Option<CockroachDbVersion>,
 }
 
@@ -87,8 +87,8 @@ impl ConnectorTagInterface for CockroachDbConnectorTag {
         }
     }
 
-    fn capabilities(&self) -> &[ConnectorCapability] {
-        &self.capabilities
+    fn capabilities(&self) -> ConnectorCapabilities {
+        psl::builtin_connectors::COCKROACH.capabilities()
     }
 
     fn as_parse_pair(&self) -> (String, Option<String>) {
@@ -109,10 +109,7 @@ impl CockroachDbConnectorTag {
             None => None,
         };
 
-        Ok(Self {
-            capabilities: cockroachdb_capabilities(),
-            version,
-        })
+        Ok(Self { version })
     }
 
     /// Returns all versions of this connector.
@@ -120,16 +117,10 @@ impl CockroachDbConnectorTag {
         vec![
             Self {
                 version: Some(CockroachDbVersion::V221),
-                capabilities: cockroachdb_capabilities(),
             },
             Self {
                 version: Some(CockroachDbVersion::V222),
-                capabilities: cockroachdb_capabilities(),
             },
         ]
     }
-}
-
-fn cockroachdb_capabilities() -> Vec<ConnectorCapability> {
-    psl::builtin_connectors::COCKROACH.capabilities().to_owned()
 }
