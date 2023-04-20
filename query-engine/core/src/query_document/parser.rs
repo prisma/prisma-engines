@@ -4,8 +4,7 @@ use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
 use core::fmt;
 use indexmap::IndexSet;
-use prisma_models::{DefaultKind, ValueGeneratorFn};
-use prisma_value::PrismaValue;
+use prisma_models::{DefaultKind, PrismaValue, ValueGeneratorFn};
 use std::{convert::TryFrom, str::FromStr};
 use user_facing_errors::query_engine::validation::ValidationError;
 use uuid::Uuid;
@@ -433,7 +432,7 @@ impl QueryDocumentParser {
         argument_path: &Path,
         s: &str,
     ) -> QueryParserResult<DateTime<FixedOffset>> {
-        prisma_value::parse_datetime(s).map_err(|err| {
+        prisma_models::parse_datetime(s).map_err(|err| {
             ValidationError::invalid_argument_value(
                 selection_path.segments(),
                 argument_path.segments(),
@@ -445,7 +444,7 @@ impl QueryDocumentParser {
     }
 
     fn parse_bytes(&self, selection_path: &Path, argument_path: &Path, s: String) -> QueryParserResult<PrismaValue> {
-        prisma_value::decode_bytes(&s).map(PrismaValue::Bytes).map_err(|err| {
+        prisma_models::decode_bytes(&s).map(PrismaValue::Bytes).map_err(|err| {
             ValidationError::invalid_argument_value(
                 selection_path.segments(),
                 argument_path.segments(),
