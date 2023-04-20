@@ -51,7 +51,7 @@ impl ConnectorTagInterface for TiDBConnectorTag {
     }
 
     fn capabilities(&self) -> &[ConnectorCapability] {
-        CAPABILITIES
+        &CAPABILITIES
     }
 
     fn as_parse_pair(&self) -> (String, Option<String>) {
