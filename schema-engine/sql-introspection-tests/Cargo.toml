@@ -17,7 +17,6 @@ connection-string.workspace = true
 pretty_assertions = "1"
 tracing-futures = "0.2"
 tokio.workspace = true
-serde_json = { version = "1.0", features = ["float_roundtrip"] }
 tracing = "0.1"
 indoc.workspace = true
 expect-test = "1.1.0"
