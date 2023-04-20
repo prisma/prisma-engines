@@ -4,8 +4,7 @@ use connector::{
     self, filter::Filter, ConditionListValue, ConnectionLike, QueryArguments, RelAggregationRow,
     RelAggregationSelection, ScalarCompare,
 };
-use prisma_models::{FieldSelection, ManyRecords, Record, RelationFieldRef, SelectionResult};
-use prisma_value::PrismaValue;
+use prisma_models::{FieldSelection, ManyRecords, PrismaValue, Record, RelationFieldRef, SelectionResult};
 use std::collections::HashMap;
 
 pub(crate) async fn m2m(
