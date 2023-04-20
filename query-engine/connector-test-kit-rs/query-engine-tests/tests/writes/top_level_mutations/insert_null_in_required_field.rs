@@ -27,8 +27,8 @@ mod insert_null {
             ConnectorVersion::MySql(Some(MySqlVersion::V5_6))
         ) {
             assert_error!(
-              runner,
-              r#"mutation {
+                runner,
+                r#"mutation {
                 updateOneA(
                   where: { b: "abc" }
                   data: {
@@ -37,9 +37,9 @@ mod insert_null {
                   id
                 }
               }"#,
-              2009,
-              "`Mutation.updateOneA.data.AUpdateInput.key.StringFieldUpdateOperationsInput.set`: A value is required but not set."
-          );
+                2009,
+                "A value is required but not set"
+            );
         }
 
         Ok(())
@@ -72,7 +72,7 @@ mod insert_null {
             }
           }"#,
             2009,
-            "Mutation.createOneA.data.ACreateInput.key`: A value is required but not set."
+            "`data.key`: A value is required but not set"
         );
 
         Ok(())
@@ -150,7 +150,7 @@ mod insert_null {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneA(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneA(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())

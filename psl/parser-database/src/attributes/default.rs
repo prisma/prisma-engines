@@ -2,15 +2,16 @@ use crate::{
     ast::{self, WithName},
     coerce,
     context::Context,
-    types::{CompositeTypeField, DefaultAttribute, ScalarField, ScalarFieldType, ScalarType},
-    DatamodelError, StringId,
+    types::{DefaultAttribute, ScalarFieldType, ScalarType},
+    DatamodelError, ScalarFieldId, StringId,
 };
 
 /// @default on model scalar fields
 pub(super) fn visit_model_field_default(
-    field_data: &mut ScalarField,
+    scalar_field_id: ScalarFieldId,
     model_id: ast::ModelId,
     field_id: ast::FieldId,
+    r#type: ScalarFieldType,
     ctx: &mut Context<'_>,
 ) {
     let (argument_idx, value) = match ctx.visit_default_arg_with_idx("value") {
@@ -24,41 +25,42 @@ pub(super) fn visit_model_field_default(
     let mapped_name = default_attribute_mapped_name(ctx);
     let default_attribute_id = ctx.current_attribute_id();
 
-    let accept = || {
+    let mut accept = move |ctx: &mut Context<'_>| {
         let default_value = DefaultAttribute {
             argument_idx,
             mapped_name,
             default_attribute: default_attribute_id,
         };
 
-        field_data.default = Some(default_value);
+        ctx.types[scalar_field_id].default = Some(default_value);
     };
 
     // @default(dbgenerated(...)) is always valid.
     match value {
         ast::Expression::Function(name, funcargs, _span) if name == FN_DBGENERATED => {
-            validate_dbgenerated_args(&funcargs.arguments, accept, ctx);
+            validate_dbgenerated_args(&funcargs.arguments, &mut accept, ctx);
             return;
         }
         _ => (),
     }
 
-    match field_data.r#type {
+    match r#type {
         ScalarFieldType::CompositeType(ctid) => {
             validate_default_value_on_composite_type(ctid, ast_field, ctx);
         }
         ScalarFieldType::Enum(enum_id) => {
             if ast_field.arity.is_list() {
-                validate_enum_list_default(value, enum_id, accept, ctx);
+                validate_enum_list_default(value, enum_id, &mut accept, ctx);
             } else {
-                validate_enum_default(value, enum_id, accept, ctx);
+                validate_enum_default(value, enum_id, &mut accept, ctx);
             }
         }
         ScalarFieldType::BuiltInScalar(scalar_type) => validate_model_builtin_scalar_type_default(
+            scalar_field_id,
             scalar_type,
             value,
             mapped_name,
-            accept,
+            &mut accept,
             (model_id, field_id),
             ctx,
         ),
@@ -72,9 +74,9 @@ pub(super) fn visit_model_field_default(
 
 /// @default on composite type fields
 pub(super) fn visit_composite_field_default(
-    field_data: &mut CompositeTypeField,
     ct_id: ast::CompositeTypeId,
     field_id: ast::FieldId,
+    r#type: ScalarFieldType,
     ctx: &mut Context<'_>,
 ) {
     let (argument_idx, value) = match ctx.visit_default_arg_with_idx("value") {
@@ -91,13 +93,14 @@ pub(super) fn visit_composite_field_default(
 
     let default_attribute = ctx.current_attribute_id();
 
-    let accept = || {
+    let mut accept = move |ctx: &mut Context<'_>| {
         let default_value = DefaultAttribute {
             argument_idx,
             mapped_name: None,
             default_attribute,
         };
 
+        let field_data = ctx.types.composite_type_fields.get_mut(&(ct_id, field_id)).unwrap();
         field_data.default = Some(default_value);
     };
 
@@ -112,19 +115,19 @@ pub(super) fn visit_composite_field_default(
 
     // Resolve the default to a DefaultValue. We must loop in order to
     // resolve type aliases.
-    match field_data.r#type {
+    match r#type {
         ScalarFieldType::CompositeType(ctid) => {
             validate_default_value_on_composite_type(ctid, ast_field, ctx);
         }
         ScalarFieldType::Enum(enum_id) => {
             if ast_field.arity.is_list() {
-                validate_enum_list_default(value, enum_id, accept, ctx);
+                validate_enum_list_default(value, enum_id, &mut accept, ctx);
             } else {
-                validate_enum_default(value, enum_id, accept, ctx);
+                validate_enum_default(value, enum_id, &mut accept, ctx);
             }
         }
         ScalarFieldType::BuiltInScalar(scalar_type) => {
-            validate_composite_builtin_scalar_type_default(scalar_type, value, accept, ast_field.arity, ctx)
+            validate_composite_builtin_scalar_type_default(scalar_type, value, &mut accept, ast_field.arity, ctx)
         }
         ScalarFieldType::Unsupported(_) => {
             ctx.push_attribute_validation_error("Composite field of type `Unsupported` cannot have default values.")
@@ -135,7 +138,7 @@ pub(super) fn visit_composite_field_default(
 fn validate_singular_scalar_default_literal(
     scalar_type: ScalarType,
     value: &ast::Expression,
-    accept: impl FnMut(),
+    accept: AcceptFn<'_>,
     ctx: &mut Context<'_>,
 ) {
     if let ast::Expression::Array(..) = value {
@@ -148,7 +151,7 @@ fn validate_singular_scalar_default_literal(
 fn validate_scalar_default_literal(
     scalar_type: ScalarType,
     value: &ast::Expression,
-    mut accept: impl FnMut(),
+    accept: AcceptFn<'_>,
     ctx: &mut Context<'_>,
 ) {
     match (scalar_type, value) {
@@ -160,7 +163,7 @@ fn validate_scalar_default_literal(
         | (ScalarType::Float, ast::Expression::NumericValue(_, _))
         | (ScalarType::DateTime, ast::Expression::StringValue(_, _))
         | (ScalarType::Decimal, ast::Expression::NumericValue(_, _))
-        | (ScalarType::Decimal, ast::Expression::StringValue(_, _)) => accept(),
+        | (ScalarType::Decimal, ast::Expression::StringValue(_, _)) => accept(ctx),
         (ScalarType::Boolean, ast::Expression::ConstantValue(val, span)) => {
             validate_default_bool_value(val, *span, accept, ctx)
         }
@@ -173,10 +176,11 @@ fn validate_scalar_default_literal(
 }
 
 fn validate_model_builtin_scalar_type_default(
+    scalar_field_id: ScalarFieldId,
     scalar_type: ScalarType,
     value: &ast::Expression,
     mapped_name: Option<StringId>,
-    mut accept: impl FnMut(),
+    accept: AcceptFn<'_>,
     field_id: (ast::ModelId, ast::FieldId),
     ctx: &mut Context<'_>,
 ) {
@@ -197,6 +201,9 @@ fn validate_model_builtin_scalar_type_default(
         {
             validate_empty_function_args(funcname, &funcargs.arguments, accept, ctx)
         }
+        (ScalarType::String, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_NANOID => {
+            validate_nanoid_args(&funcargs.arguments, accept, ctx)
+        }
         (ScalarType::DateTime, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_NOW => {
             validate_empty_function_args(FN_NOW, &funcargs.arguments, accept, ctx)
         }
@@ -206,8 +213,8 @@ fn validate_model_builtin_scalar_type_default(
         }
 
         (_, ast::Expression::Function(funcname, _, _)) if !KNOWN_FUNCTIONS.contains(&funcname.as_str()) => {
-            ctx.types.unknown_function_defaults.push(field_id);
-            accept();
+            ctx.types.unknown_function_defaults.push(scalar_field_id);
+            accept(ctx);
         }
 
         // Invalid function default.
@@ -229,7 +236,7 @@ fn validate_model_builtin_scalar_type_default(
 fn validate_composite_builtin_scalar_type_default(
     scalar_type: ScalarType,
     value: &ast::Expression,
-    accept: impl FnMut(),
+    accept: AcceptFn<'_>,
     field_arity: ast::FieldArity,
     ctx: &mut Context<'_>,
 ) {
@@ -281,14 +288,9 @@ fn default_attribute_mapped_name(ctx: &mut Context<'_>) -> Option<StringId> {
     }
 }
 
-fn validate_default_bool_value(
-    bool_value: &str,
-    span: diagnostics::Span,
-    mut accept: impl FnMut(),
-    ctx: &mut Context<'_>,
-) {
+fn validate_default_bool_value(bool_value: &str, span: diagnostics::Span, accept: AcceptFn<'_>, ctx: &mut Context<'_>) {
     match bool_value {
-        "true" | "false" => accept(),
+        "true" | "false" => accept(ctx),
         _ => ctx.push_error(DatamodelError::new_attribute_validation_error(
             "A boolean literal must be `true` or `false`.",
             "@default",
@@ -334,14 +336,9 @@ fn validate_default_value_on_composite_type(ctid: ast::CompositeTypeId, ast_fiel
     ));
 }
 
-fn validate_empty_function_args(
-    fn_name: &str,
-    args: &[ast::Argument],
-    mut accept: impl FnMut(),
-    ctx: &mut Context<'_>,
-) {
+fn validate_empty_function_args(fn_name: &str, args: &[ast::Argument], accept: AcceptFn<'_>, ctx: &mut Context<'_>) {
     if args.is_empty() {
-        return accept();
+        return accept(ctx);
     }
 
     ctx.push_attribute_validation_error(&format!(
@@ -349,15 +346,15 @@ fn validate_empty_function_args(
     ));
 }
 
-fn validate_auto_args(args: &[ast::Argument], mut accept: impl FnMut(), ctx: &mut Context<'_>) {
+fn validate_auto_args(args: &[ast::Argument], accept: AcceptFn<'_>, ctx: &mut Context<'_>) {
     if !args.is_empty() {
         ctx.push_attribute_validation_error("`auto()` takes no arguments");
     } else {
-        accept()
+        accept(ctx)
     }
 }
 
-fn validate_dbgenerated_args(args: &[ast::Argument], mut accept: impl FnMut(), ctx: &mut Context<'_>) {
+fn validate_dbgenerated_args(args: &[ast::Argument], accept: AcceptFn<'_>, ctx: &mut Context<'_>) {
     let mut bail = || {
         // let's not mention what we don't want to see.
         ctx.push_attribute_validation_error("`dbgenerated()` takes a single String argument")
@@ -373,7 +370,25 @@ fn validate_dbgenerated_args(args: &[ast::Argument], mut accept: impl FnMut(), c
                 "dbgenerated() takes either no argument, or a single nonempty string argument.",
             );
         }
-        None | Some(ast::Expression::StringValue(_, _)) => accept(),
+        None | Some(ast::Expression::StringValue(_, _)) => accept(ctx),
+        _ => bail(),
+    }
+}
+
+fn validate_nanoid_args(args: &[ast::Argument], accept: AcceptFn<'_>, ctx: &mut Context<'_>) {
+    let mut bail = || ctx.push_attribute_validation_error("`nanoid()` takes a single Int argument.");
+
+    if args.len() > 1 {
+        bail()
+    }
+
+    match args.get(0).map(|arg| &arg.value) {
+        Some(ast::Expression::NumericValue(val, _)) if val.parse::<u8>().unwrap() < 2 => {
+            ctx.push_attribute_validation_error(
+                "`nanoid()` takes either no argument, or a single integer argument >= 2.",
+            );
+        }
+        None | Some(ast::Expression::NumericValue(_, _)) => accept(ctx),
         _ => bail(),
     }
 }
@@ -381,13 +396,13 @@ fn validate_dbgenerated_args(args: &[ast::Argument], mut accept: impl FnMut(), c
 fn validate_enum_default(
     found_value: &ast::Expression,
     enum_id: ast::EnumId,
-    mut accept: impl FnMut(),
+    accept: AcceptFn<'_>,
     ctx: &mut Context<'_>,
 ) {
     match found_value {
         ast::Expression::ConstantValue(enum_value, _) => {
             if ctx.ast[enum_id].values.iter().any(|v| v.name() == enum_value) {
-                accept()
+                accept(ctx)
             } else {
                 validate_invalid_default_enum_value(enum_value, ctx);
             }
@@ -399,7 +414,7 @@ fn validate_enum_default(
 fn validate_enum_list_default(
     found_value: &ast::Expression,
     enum_id: ast::EnumId,
-    mut accept: impl FnMut(),
+    accept: AcceptFn<'_>,
     ctx: &mut Context<'_>,
 ) {
     match found_value {
@@ -411,7 +426,7 @@ fn validate_enum_list_default(
                 validate_enum_default(
                     enum_value,
                     enum_id,
-                    || {
+                    &mut |_| {
                         valid = true;
                     },
                     ctx,
@@ -419,7 +434,7 @@ fn validate_enum_list_default(
             }
 
             if valid {
-                accept();
+                accept(ctx);
             }
         }
         bad_value => validate_invalid_default_enum_expr(bad_value, ctx),
@@ -429,7 +444,7 @@ fn validate_enum_list_default(
 fn validate_builtin_scalar_list_default(
     scalar_type: ScalarType,
     found_value: &ast::Expression,
-    mut accept: impl FnMut(),
+    accept: AcceptFn<'_>,
     ctx: &mut Context<'_>,
 ) {
     match found_value {
@@ -441,7 +456,7 @@ fn validate_builtin_scalar_list_default(
                 validate_scalar_default_literal(
                     scalar_type,
                     value,
-                    || {
+                    &mut |_| {
                         valid = true;
                     },
                     ctx,
@@ -449,7 +464,7 @@ fn validate_builtin_scalar_list_default(
             }
 
             if valid {
-                accept()
+                accept(ctx)
             }
         }
         _bad_value => ctx.push_attribute_validation_error("The default value of a list field must be a list."),
@@ -459,8 +474,19 @@ fn validate_builtin_scalar_list_default(
 const FN_AUTOINCREMENT: &str = "autoincrement";
 const FN_CUID: &str = "cuid";
 const FN_DBGENERATED: &str = "dbgenerated";
+const FN_NANOID: &str = "nanoid";
 const FN_NOW: &str = "now";
 const FN_UUID: &str = "uuid";
 const FN_AUTO: &str = "auto";
 
-const KNOWN_FUNCTIONS: &[&str] = &[FN_AUTOINCREMENT, FN_CUID, FN_DBGENERATED, FN_NOW, FN_UUID, FN_AUTO];
+const KNOWN_FUNCTIONS: &[&str] = &[
+    FN_AUTOINCREMENT,
+    FN_CUID,
+    FN_DBGENERATED,
+    FN_NANOID,
+    FN_NOW,
+    FN_UUID,
+    FN_AUTO,
+];
+
+type AcceptFn<'a> = &'a mut dyn for<'b, 'c> FnMut(&'b mut Context<'c>);

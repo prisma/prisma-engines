@@ -51,7 +51,7 @@ mod update_inside_update {
                 non_unique
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":{"non_unique":"updated"}}}}"###
         );
 
@@ -99,7 +99,7 @@ mod update_inside_update {
                 non_unique
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":{"non_unique":"updated"}}}}"###
         );
 
@@ -136,7 +136,7 @@ mod update_inside_update {
                   c
                 }}
               }}
-            }}"#, parent = parent),
+            }}"#),
             2025,
             "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on relation 'ChildToParent'."
         );
@@ -178,7 +178,7 @@ mod update_inside_update {
                   c
                 }}
               }}
-            }}"#, parent = parent),
+            }}"#),
             2025,
             "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on relation 'ChildToParent'."
         );
@@ -234,7 +234,7 @@ mod update_inside_update {
                 non_unique
               }}
             }}
-          }}"#, parent = parent, child = child)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"non_unique":"updated"},{"non_unique":null}]}}}"###
         );
 
@@ -282,7 +282,7 @@ mod update_inside_update {
                 non_unique
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"non_unique":"updated"},{"non_unique":"1"}]}}}"###
         );
 
@@ -324,7 +324,7 @@ mod update_inside_update {
                   c
                 }}
               }}
-            }}"#, parent = parent),
+            }}"#),
             2025,
             "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on relation 'ChildToParent'."
         );
@@ -371,7 +371,7 @@ mod update_inside_update {
                   c
                 }}
               }}
-            }}"#, parent = parent),
+            }}"#),
             2025,
             "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on relation 'ChildToParent'."
         );
@@ -426,7 +426,7 @@ mod update_inside_update {
                 non_unique
               }}
             }}
-          }}"#, parent = parent, child = child)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"non_unique":"updated"},{"non_unique":null}]}}}"###
         );
 
@@ -473,7 +473,7 @@ mod update_inside_update {
                 non_unique
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"non_unique":"updated"},{"non_unique":"1"}]}}}"###
         );
 
@@ -515,7 +515,7 @@ mod update_inside_update {
                   c
                 }}
               }}
-            }}"#, parent = parent),
+            }}"#),
             2025,
             "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on relation 'ChildToParent'."
         );
@@ -562,7 +562,7 @@ mod update_inside_update {
                   c
                 }}
               }}
-            }}"#, parent = parent),
+            }}"#),
             2025,
             "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested update on relation 'ChildToParent'."
         );
@@ -631,19 +631,19 @@ mod update_inside_update {
               ){{
                 text
               }}
-            }}"#, note_id = note_id),
+            }}"#),
             2025,
             "An operation failed because it depends on one or more records that were required but not found. No 'Todo' record was found for a nested update on relation 'NoteToTodo'."
             // No Node for the model Todo with value DOES NOT EXIST for id found.
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, format!(r#"query{{findUniqueNote(where:{{id: {note_id}}}){{text}}}}"#, note_id = note_id)),
+          run_query!(&runner, format!(r#"query{{findUniqueNote(where:{{id: {note_id}}}){{text}}}}"#)),
           @r###"{"data":{"findUniqueNote":{"text":"Some Text"}}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, format!(r#"query{{findUniqueTodo(where:{{id: {todo_id}}}){{title}}}}"#, todo_id = todo_id)),
+          run_query!(&runner, format!(r#"query{{findUniqueTodo(where:{{id: {todo_id}}}){{title}}}}"#)),
           @r###"{"data":{"findUniqueTodo":{"title":"the title"}}}"###
         );
 
@@ -690,7 +690,7 @@ mod update_inside_update {
             ){{
               text
             }}
-          }}"#, note_id = note_id),
+          }}"#),
           2025,
           "An operation failed because it depends on one or more records that were required but not found. No 'Todo' record was found for a nested update on relation 'NoteToTodo'."
       );
@@ -761,7 +761,7 @@ mod update_inside_update {
               }
             }"#,
             2009, // 3040
-            "`Mutation.updateOneNote.data.NoteUpdateInput.todos.TodoUpdateManyWithoutNotesNestedInput.update.TodoUpdateWithWhereUniqueWithoutNotesInput.where.TodoWhereUniqueInput.unique`: A value is required but not set."
+            "A value is required but not set"
         );
 
         Ok(())

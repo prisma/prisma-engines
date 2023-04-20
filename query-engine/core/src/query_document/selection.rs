@@ -1,16 +1,17 @@
-use super::QueryValue;
+use crate::{ArgumentValue, ArgumentValueObject};
+
 use indexmap::IndexMap;
 use itertools::Itertools;
 use schema_builder::constants::filters;
 use std::borrow::Cow;
 
-pub type SelectionArgument = (String, QueryValue);
+pub type SelectionArgument = (String, ArgumentValue);
 
 #[derive(Debug, Clone)]
 pub struct Selection {
     name: String,
     alias: Option<String>,
-    arguments: Vec<(String, QueryValue)>,
+    arguments: Vec<(String, ArgumentValue)>,
     nested_selections: Vec<Selection>,
 }
 
@@ -61,15 +62,15 @@ impl Selection {
         self.name.starts_with("findUnique")
     }
 
-    pub fn arguments(&self) -> &[(String, QueryValue)] {
+    pub fn arguments(&self) -> &[(String, ArgumentValue)] {
         &self.arguments
     }
 
-    pub fn pop_argument(&mut self) -> Option<(String, QueryValue)> {
+    pub fn pop_argument(&mut self) -> Option<(String, ArgumentValue)> {
         self.arguments.pop()
     }
 
-    pub fn push_argument(&mut self, key: impl Into<String>, arg: impl Into<QueryValue>) {
+    pub fn push_argument(&mut self, key: impl Into<String>, arg: impl Into<ArgumentValue>) {
         self.arguments.push((key.into(), arg.into()));
     }
 
@@ -104,8 +105,8 @@ impl Selection {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum SelectionSet<'a> {
-    Single(Cow<'a, str>, Vec<QueryValue>),
-    Multi(Vec<Vec<Cow<'a, str>>>, Vec<Vec<QueryValue>>),
+    Single(Cow<'a, str>, Vec<ArgumentValue>),
+    Multi(Vec<Vec<Cow<'a, str>>>, Vec<Vec<ArgumentValue>>),
     Empty,
 }
 
@@ -120,7 +121,7 @@ impl<'a> SelectionSet<'a> {
         Self::default()
     }
 
-    pub fn push(self, column: impl Into<Cow<'a, str>>, value: QueryValue) -> Self {
+    pub fn push(self, column: impl Into<Cow<'a, str>>, value: ArgumentValue) -> Self {
         let column = column.into();
 
         match self {
@@ -192,7 +193,7 @@ impl<'a> In<'a> {
     }
 }
 
-impl<'a> From<In<'a>> for QueryValue {
+impl<'a> From<In<'a>> for ArgumentValue {
     fn from(other: In<'a>) -> Self {
         match other.selection_set {
             SelectionSet::Multi(key_sets, val_sets) => {
@@ -212,22 +213,13 @@ impl<'a> From<In<'a>> for QueryValue {
                     acc.or(ands)
                 });
 
-                QueryValue::from(conjuctive)
+                ArgumentValue::from(conjuctive)
             }
-            SelectionSet::Single(key, vals) => {
-                let mut argument = IndexMap::new();
-                argument.insert(
-                    key.to_string(),
-                    QueryValue::Object(
-                        vec![(filters::IN.to_owned(), QueryValue::List(vals))]
-                            .into_iter()
-                            .collect(),
-                    ),
-                );
-
-                QueryValue::Object(argument)
-            }
-            SelectionSet::Empty => QueryValue::Null,
+            SelectionSet::Single(key, vals) => ArgumentValue::object([(
+                key.to_string(),
+                ArgumentValue::object([(filters::IN.to_owned(), ArgumentValue::list(vals))]),
+            )]),
+            SelectionSet::Empty => ArgumentValue::null(),
         }
     }
 }
@@ -236,12 +228,12 @@ impl<'a> From<In<'a>> for QueryValue {
 pub enum Conjuctive {
     Or(Vec<Conjuctive>),
     And(Vec<Conjuctive>),
-    Single(IndexMap<String, QueryValue>),
+    Single(ArgumentValueObject),
     None,
 }
 
-impl From<IndexMap<String, QueryValue>> for Conjuctive {
-    fn from(map: IndexMap<String, QueryValue>) -> Self {
+impl From<ArgumentValueObject> for Conjuctive {
+    fn from(map: ArgumentValueObject) -> Self {
         Self::Single(map)
     }
 }
@@ -280,38 +272,31 @@ impl Conjuctive {
     }
 }
 
-impl From<Conjuctive> for QueryValue {
+impl From<Conjuctive> for ArgumentValue {
     fn from(conjuctive: Conjuctive) -> Self {
         match conjuctive {
-            Conjuctive::None => Self::Null,
-            Conjuctive::Single(obj) => QueryValue::Object(single_to_multi_filter(obj)), // QueryValue::Object(obj),
+            Conjuctive::None => Self::null(),
+            Conjuctive::Single(obj) => ArgumentValue::object(single_to_multi_filter(obj)),
             Conjuctive::Or(conjuctives) => {
-                let conditions: Vec<QueryValue> = conjuctives.into_iter().map(QueryValue::from).collect();
+                let conditions: Vec<ArgumentValue> = conjuctives.into_iter().map(ArgumentValue::from).collect();
 
-                let mut map = IndexMap::new();
-                map.insert("OR".to_string(), QueryValue::List(conditions));
-
-                QueryValue::Object(map)
+                ArgumentValue::object([("OR".to_string(), ArgumentValue::list(conditions))])
             }
             Conjuctive::And(conjuctives) => {
-                let conditions: Vec<QueryValue> = conjuctives.into_iter().map(QueryValue::from).collect();
+                let conditions: Vec<ArgumentValue> = conjuctives.into_iter().map(ArgumentValue::from).collect();
 
-                let mut map = IndexMap::new();
-                map.insert("AND".to_string(), QueryValue::List(conditions));
-
-                QueryValue::Object(map)
+                ArgumentValue::object([("AND".to_string(), ArgumentValue::list(conditions))])
             }
         }
     }
 }
 
 /// Syntax for single-record and multi-record queries
-fn single_to_multi_filter(obj: IndexMap<String, QueryValue>) -> IndexMap<String, QueryValue> {
-    let mut new_obj = IndexMap::new();
+fn single_to_multi_filter(obj: ArgumentValueObject) -> ArgumentValueObject {
+    let mut new_obj: ArgumentValueObject = IndexMap::new();
 
     for (key, value) in obj {
-        let equality_obj = vec![(filters::EQUALS.to_owned(), value)].into_iter().collect();
-        new_obj.insert(key, QueryValue::Object(equality_obj));
+        new_obj.insert(key, ArgumentValue::object([(filters::EQUALS.to_owned(), value)]));
     }
 
     new_obj

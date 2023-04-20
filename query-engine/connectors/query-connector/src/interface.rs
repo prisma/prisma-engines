@@ -1,7 +1,6 @@
 use crate::{coerce_null_to_zero_value, Filter, NativeUpsert, QueryArguments, WriteArgs};
 use async_trait::async_trait;
-use dml::FieldArity;
-use prisma_models::*;
+use prisma_models::{ast::FieldArity, *};
 use prisma_value::PrismaValue;
 use std::collections::HashMap;
 
@@ -10,8 +9,12 @@ pub trait Connector {
     /// Returns a connection to a data source.
     async fn get_connection(&self) -> crate::Result<Box<dyn Connection + Send + Sync>>;
 
-    /// Returns name of the connector.
-    fn name(&self) -> String;
+    /// Returns the name of the connector.
+    fn name(&self) -> &'static str;
+
+    /// Returns whether a connector should retry an entire transaction when that transaction failed during its execution
+    /// because of a transient transaction error. Note: This is specific to MongoDB for now.
+    fn should_retry_on_transient_error(&self) -> bool;
 }
 
 #[async_trait]
@@ -117,11 +120,11 @@ pub enum AggregationSelection {
 }
 
 impl AggregationSelection {
-    /// Returns (<field db name>, TypeIdentifier, FieldArity)
+    /// Returns (field_db_name, TypeIdentifier, FieldArity)
     pub fn identifiers(&self) -> Vec<(String, TypeIdentifier, FieldArity)> {
         match self {
             AggregationSelection::Field(field) => {
-                vec![(field.db_name().to_owned(), field.type_identifier.clone(), field.arity)]
+                vec![(field.db_name().to_owned(), field.type_identifier(), field.arity())]
             }
 
             AggregationSelection::Count { all, fields } => {
@@ -150,7 +153,7 @@ impl AggregationSelection {
             .map(|f| {
                 (
                     f.db_name().to_owned(),
-                    fixed_type.clone().unwrap_or_else(|| f.type_identifier.clone()),
+                    fixed_type.clone().unwrap_or_else(|| f.type_identifier()),
                     FieldArity::Required,
                 )
             })
@@ -190,14 +193,14 @@ impl RelAggregationSelection {
     pub fn db_alias(&self) -> String {
         match self {
             RelAggregationSelection::Count(rf, _) => {
-                format!("_aggr_count_{}", rf.name.to_owned())
+                format!("_aggr_count_{}", rf.name())
             }
         }
     }
 
     pub fn field_name(&self) -> &str {
         match self {
-            RelAggregationSelection::Count(rf, _) => rf.name.as_str(),
+            RelAggregationSelection::Count(rf, _) => rf.name(),
         }
     }
 
@@ -339,6 +342,7 @@ pub trait WriteOperations {
         field: &RelationFieldRef,
         parent_id: &SelectionResult,
         child_ids: &[SelectionResult],
+        trace_id: Option<String>,
     ) -> crate::Result<()>;
 
     /// Disconnect the children from the parent (m2m relation only).

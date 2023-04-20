@@ -43,7 +43,7 @@ impl ConstraintNames {
             table_name
         };
 
-        format!("{}{}", table_name, suffix)
+        format!("{table_name}{suffix}")
     }
 
     pub fn unique_index_name(table_name: &str, column_names: &[&str], connector: &dyn Connector) -> String {
@@ -84,14 +84,14 @@ impl ConstraintNames {
 
     pub fn default_name(table_name: &str, column_name: &str, connector: &dyn Connector) -> String {
         let limit = connector.max_identifier_length();
-        let mut joined = format!("{}_{}", table_name, column_name);
+        let mut joined = format!("{table_name}_{column_name}");
 
         if joined.len() >= limit - 3 {
             let split = floor_char_boundary(&joined, limit - 3);
             joined.truncate(split);
         }
 
-        format!("{}_df", joined)
+        format!("{joined}_df")
     }
 
     /// Params:
@@ -102,14 +102,14 @@ impl ConstraintNames {
         let fk_suffix = "_fkey";
         let limit = connector.max_identifier_length();
 
-        let mut joined = format!("{}_{}", table_name, column_names.join("_"));
+        let mut joined = format!("{table_name}_{}", column_names.join("_"));
 
         if joined.len() >= limit - 5 {
             let split = floor_char_boundary(&joined, limit - 5);
             joined.truncate(split);
         }
 
-        format!("{}{}", joined, fk_suffix)
+        format!("{joined}{fk_suffix}")
     }
 
     pub fn is_db_name_too_long(
@@ -124,7 +124,8 @@ impl ConstraintNames {
             if name.len() > connector.max_identifier_length() {
                 let ats = if double_at { "@@" } else { "@" };
                 return Some(DatamodelError::new_model_validation_error(
-                    &format!("The constraint name '{}' specified in the `map` argument for the `{}{}` constraint is too long for your chosen provider. The maximum allowed length is {} bytes.", name, ats, attribute, connector.max_identifier_length()),
+                    &format!("The constraint name '{name}' specified in the `map` argument for the `{ats}{attribute}` constraint is too long for your chosen provider. The maximum allowed length is {} bytes.", connector.max_identifier_length()),
+                    "model",
                     object_name,
                     span,
                 ));

@@ -286,12 +286,11 @@ mod update_many {
                 r#"mutation {{
                   updateManyTestModel(
                     where: {{}}
-                    data: {{ {}: {{ {}: {} }} }}
+                    data: {{ {field}: {{ {op}: {value} }} }}
                   ){{
                     count
                   }}
-                }}"#,
-                field, op, value
+                }}"#
             )
         );
 
@@ -303,13 +302,13 @@ mod update_many {
             assert_eq!(count, 3);
         }
 
-        let res = run_query!(runner, format!(r#"{{ findManyTestModel {{ {} }} }}"#, field));
+        let res = run_query!(runner, format!(r#"{{ findManyTestModel {{ {field} }} }}"#));
         Ok(res)
     }
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneTestModel(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneTestModel(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
 
@@ -388,16 +387,20 @@ mod json_update_many {
 
     #[connector_test(capabilities(AdvancedJsonNullability))]
     async fn update_json_errors(runner: Runner) -> TestResult<()> {
-        assert_error!(
-            &runner,
-            r#"mutation {
-                  updateManyTestModel(where: { id: 1 }, data: { json: null }) {
-                    json
-                  }
-                }"#,
-            2009,
-            "A value is required but not set."
-        );
+        // On the JSON protocol, this succeeds because `null` is serialized as JSON.
+        // It doesn't matter since the client does _not_ allow to send null values, but only DbNull or JsonNull.
+        if runner.protocol().is_graphql() {
+            assert_error!(
+                &runner,
+                r#"mutation {
+                updateManyTestModel(where: { id: 1 }, data: { json: null }) {
+                  json
+                }
+              }"#,
+                2009,
+                "A value is required but not set"
+            );
+        }
 
         assert_error!(
             &runner,
@@ -407,7 +410,7 @@ mod json_update_many {
                 }
               }"#,
             2009,
-            "Value types mismatch. Have: Enum(\"AnyNull\")"
+            "`AnyNull` is not a valid `NullableJsonNullValueInput`"
         );
 
         Ok(())

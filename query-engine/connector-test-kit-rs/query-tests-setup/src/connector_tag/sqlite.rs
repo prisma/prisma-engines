@@ -27,7 +27,7 @@ impl ConnectorTagInterface for SqliteConnectorTag {
             .trim_end_matches('/')
             .to_owned();
 
-        format!("file://{}/db/{}.db", workspace_root, database)
+        format!("file://{workspace_root}/db/{database}.db")
     }
 
     fn capabilities(&self) -> &[ConnectorCapability] {

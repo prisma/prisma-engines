@@ -125,8 +125,8 @@ mod upsert {
     #[connector_test]
     async fn no_create_required_val_null(runner: Runner) -> TestResult<()> {
         assert_error!(
-          runner,
-          r#"mutation {
+            runner,
+            r#"mutation {
             upsertOneWithDefaultValue(
               where: {id: 1337}
               create: {
@@ -142,8 +142,8 @@ mod upsert {
               reqString
             }
           }"#,
-          2009,
-          "Mutation.upsertOneWithDefaultValue.create.WithDefaultValueCreateInput.reqString`: A value is required but not set."
+            2009,
+            "`create.reqString`: A value is required but not set"
         );
 
         Ok(())
@@ -717,14 +717,13 @@ mod upsert {
             format!(
                 r#"mutation {{
             upsertOneTestModel(
-              where: {{ id: {} }}
-              create: {{ id: {} }}
-              update: {{ {}: {{ {}: {} }} }}
+              where: {{ id: {id} }}
+              create: {{ id: {id} }}
+              update: {{ {field}: {{ {op}: {value} }} }}
             ){{
-              {}
+              {field}
             }}
-          }}"#,
-                id, id, field, op, value, field
+          }}"#
             )
         );
 
@@ -733,7 +732,7 @@ mod upsert {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneTestModel(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneTestModel(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())

@@ -4,17 +4,15 @@ mod sql_renderer;
 pub use mongodb_renderer::*;
 pub use sql_renderer::*;
 
-use crate::{templating, ConnectorTagInterface, DatamodelFragment, IdFragment, M2mFragment, TestConfig};
+use crate::{templating, ConnectorTagInterface, DatamodelFragment, IdFragment, M2mFragment, CONFIG};
 use indoc::indoc;
 use itertools::Itertools;
-use lazy_static::lazy_static;
+use once_cell::sync::Lazy;
 use psl::ALL_PREVIEW_FEATURES;
 use regex::Regex;
 
-lazy_static! {
-    /// Test configuration, loaded once at runtime.
-    static ref FRAGMENT_RE: Regex = Regex::new(r"#.*").unwrap();
-}
+/// Test configuration, loaded once at runtime.
+static FRAGMENT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"#.*").unwrap());
 
 /// The main trait a datamodel renderer for a connector has to implement.
 pub trait DatamodelRenderer {
@@ -31,7 +29,6 @@ pub trait DatamodelRenderer {
 
 /// Render the complete datamodel with all bells and whistles.
 pub fn render_test_datamodel(
-    config: &TestConfig,
     test_database: &str,
     template: String,
     excluded_features: &[&str],
@@ -39,13 +36,13 @@ pub fn render_test_datamodel(
     db_schemas: &[&str],
     isolation_level: Option<&'static str>,
 ) -> String {
-    let tag = config.test_connector_tag().unwrap();
+    let tag = CONFIG.test_connector_tag().unwrap();
     let preview_features = render_preview_features(excluded_features);
 
     let is_multi_schema = !db_schemas.is_empty();
 
     let schema_def = if is_multi_schema {
-        format!("schemas = {:?}", db_schemas)
+        format!("schemas = {db_schemas:?}")
     } else {
         String::default()
     };
@@ -65,7 +62,7 @@ pub fn render_test_datamodel(
             }}
         "#},
         tag.datamodel_provider(),
-        tag.connection_string(test_database, config.is_ci(), is_multi_schema, isolation_level),
+        tag.connection_string(test_database, CONFIG.is_ci(), is_multi_schema, isolation_level),
         relation_mode_override.unwrap_or_else(|| tag.relation_mode().to_string()),
         schema_def,
         preview_features
@@ -74,7 +71,7 @@ pub fn render_test_datamodel(
     let renderer = tag.datamodel_renderer();
     let models = process_template(template, renderer);
 
-    format!("{}\n\n{}", datasource_with_generator, models)
+    format!("{datasource_with_generator}\n\n{models}")
 }
 
 fn process_template(template: String, renderer: Box<dyn DatamodelRenderer>) -> String {
@@ -93,13 +90,13 @@ fn process_template(template: String, renderer: Box<dyn DatamodelRenderer>) -> S
 }
 
 fn render_preview_features(excluded_features: &[&str]) -> String {
-    let excluded_features: Vec<_> = excluded_features.iter().map(|f| format!(r#""{}""#, f)).collect();
+    let excluded_features: Vec<_> = excluded_features.iter().map(|f| format!(r#""{f}""#)).collect();
 
     ALL_PREVIEW_FEATURES
         .active_features()
         .iter()
         .chain(ALL_PREVIEW_FEATURES.hidden_features())
-        .map(|f| format!(r#""{}""#, f))
+        .map(|f| format!(r#""{f}""#))
         .filter(|f| !excluded_features.contains(f))
         .join(", ")
 }

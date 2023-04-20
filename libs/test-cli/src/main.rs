@@ -4,9 +4,8 @@ mod diagnose_migration_history;
 
 use anyhow::Context;
 use colored::Colorize;
-use introspection_connector::CompositeTypeDepth;
-use migration_connector::BoxFuture;
-use migration_core::json_rpc::types::*;
+use schema_connector::BoxFuture;
+use schema_core::json_rpc::types::*;
 use std::{fmt, fs::File, io::Read, str::FromStr, sync::Arc};
 use structopt::*;
 
@@ -47,10 +46,6 @@ enum Command {
 
 #[derive(Debug, StructOpt)]
 struct DmmfCommand {
-    /// The path to the `query-engine` binary. Defaults to the value of the `PRISMA_BINARY_PATH`
-    /// env var, or just `query-engine`.
-    #[structopt(env = "PRISMA_BINARY_PATH", default_value = "query-engine")]
-    query_engine_binary_path: String,
     /// A database URL to introspect and generate DMMF for.
     #[structopt(long = "url")]
     url: Option<String>,
@@ -93,7 +88,7 @@ impl FromStr for DiffOutputType {
             "ddl" => Ok(Self::Ddl),
             _ => {
                 let kind = std::io::ErrorKind::InvalidInput;
-                Err(std::io::Error::new(kind, format!("Invalid output type: `{}`", s)))
+                Err(std::io::Error::new(kind, format!("Invalid output type: `{s}`")))
             }
         }
     }
@@ -209,21 +204,23 @@ async fn main() -> anyhow::Result<()> {
                 unreachable!()
             };
 
-            //todo configurable
-            let introspected = introspection_core::RpcImpl::introspect_internal(
+            let api = schema_core::schema_api(Some(schema.clone()), None)?;
+
+            let params = IntrospectParams {
                 schema,
-                false,
-                CompositeTypeDepth::from(composite_type_depth.unwrap_or(0)),
-            )
-            .await
-            .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
+                force: false,
+                composite_type_depth: composite_type_depth.unwrap_or(0),
+                schemas: None,
+            };
+
+            let introspected = api.introspect(params).await.map_err(|err| anyhow::anyhow!("{err:?}"))?;
 
             println!("{}", &introspected.datamodel);
         }
         Command::ValidateDatamodel(cmd) => {
             use std::io::Read as _;
 
-            let mut file = std::fs::File::open(&cmd.schema_path).expect("error opening datamodel file");
+            let mut file = std::fs::File::open(cmd.schema_path).expect("error opening datamodel file");
 
             let mut datamodel = String::new();
             file.read_to_string(&mut datamodel).unwrap();
@@ -234,13 +231,13 @@ async fn main() -> anyhow::Result<()> {
         }
         Command::ResetDatabase(cmd) => {
             let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
-            let api = migration_core::migration_api(Some(schema), None)?;
+            let api = schema_core::schema_api(Some(schema), None)?;
 
             api.reset().await?;
         }
         Command::CreateDatabase(cmd) => {
             let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
-            let api = migration_core::migration_api(Some(schema.clone()), None)?;
+            let api = schema_core::schema_api(Some(schema.clone()), None)?;
 
             api.create_database(CreateDatabaseParams {
                 datasource: DatasourceParam::SchemaString(SchemaContainer { schema }),
@@ -251,7 +248,7 @@ async fn main() -> anyhow::Result<()> {
             let prisma_schema =
                 read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
 
-            let api = migration_core::migration_api(Some(prisma_schema.clone()), None)?;
+            let api = schema_core::schema_api(Some(prisma_schema.clone()), None)?;
 
             let input = CreateMigrationInput {
                 migrations_directory_path: cmd.migrations_path,
@@ -266,7 +263,7 @@ async fn main() -> anyhow::Result<()> {
             let prisma_schema =
                 read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
 
-            let api = migration_core::migration_api(Some(prisma_schema), None)?;
+            let api = schema_core::schema_api(Some(prisma_schema), None)?;
             api.apply_migrations(cmd.into()).await?;
         }
     }
@@ -301,11 +298,10 @@ fn minimal_schema_from_url(url: &str) -> anyhow::Result<String> {
     let schema = format!(
         r#"
             datasource db {{
-              provider = "{}"
-              url = "{}"
+              provider = "{provider}"
+              url = "{url}"
             }}
-        "#,
-        provider, url
+        "#
     );
 
     Ok(schema)
@@ -315,11 +311,17 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
     let schema_path: String = {
         if let Some(url) = cmd.url.as_ref() {
             let skeleton = minimal_schema_from_url(url)?;
-            //todo make this configurable
-            let introspected =
-                introspection_core::RpcImpl::introspect_internal(skeleton, false, CompositeTypeDepth::Infinite)
-                    .await
-                    .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
+
+            let api = schema_core::schema_api(Some(skeleton.clone()), None)?;
+
+            let params = IntrospectParams {
+                schema: skeleton,
+                force: false,
+                composite_type_depth: -1,
+                schemas: None,
+            };
+
+            let introspected = api.introspect(params).await.map_err(|err| anyhow::anyhow!("{err:?}"))?;
 
             eprintln!("{}", "Schema was successfully introspected from database URL".green());
 
@@ -340,26 +342,16 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
         }
     };
 
-    eprintln!(
-        "{} {}",
-        "Using the query engine binary at".yellow(),
-        cmd.query_engine_binary_path.bold()
-    );
-
-    let cmd = std::process::Command::new(&cmd.query_engine_binary_path)
-        .arg("cli")
-        .arg("dmmf")
-        .env("PRISMA_DML_PATH", schema_path)
-        .spawn()?;
-
-    cmd.wait_with_output()?;
+    let prisma_schema = std::fs::read_to_string(schema_path).unwrap();
+    let result = dmmf::dmmf_json_from_schema(&prisma_schema);
+    println!("{result}");
 
     Ok(())
 }
 
 async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
     let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
-    let api = migration_core::migration_api(Some(schema.clone()), None)?;
+    let api = schema_core::schema_api(Some(schema.clone()), None)?;
 
     let response = api
         .schema_push(SchemaPushInput {
@@ -410,17 +402,17 @@ async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
 
 struct DiffHost;
 
-impl migration_connector::ConnectorHost for DiffHost {
-    fn print(&self, s: &str) -> BoxFuture<'_, migration_core::CoreResult<()>> {
-        print!("{}", s);
+impl schema_connector::ConnectorHost for DiffHost {
+    fn print(&self, s: &str) -> BoxFuture<'_, schema_core::CoreResult<()>> {
+        print!("{s}");
         Box::pin(std::future::ready(Ok(())))
     }
 }
 
 async fn migrate_diff(cmd: &MigrateDiff) -> anyhow::Result<()> {
-    use migration_core::json_rpc::types::*;
+    use schema_core::json_rpc::types::*;
 
-    let api = migration_core::migration_api(None, Some(Arc::new(DiffHost)))?;
+    let api = schema_core::schema_api(None, Some(Arc::new(DiffHost)))?;
     let to = if let Some(to_schema_datamodel) = &cmd.to_schema_datamodel {
         DiffTarget::SchemaDatamodel(SchemaContainer {
             schema: to_schema_datamodel.clone(),
@@ -459,9 +451,9 @@ fn init_logger() {
         .with_writer(std::io::stderr)
         .finish()
         .with(ErrorLayer::default())
-        .with(migration_core::TimingsLayer::default());
+        .with(schema_core::TimingsLayer::default());
 
     tracing::subscriber::set_global_default(subscriber)
-        .map_err(|err| eprintln!("Error initializing the global logger: {}", err))
+        .map_err(|err| eprintln!("Error initializing the global logger: {err}"))
         .ok();
 }

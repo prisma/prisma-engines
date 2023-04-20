@@ -8,6 +8,10 @@ on:
       - 'CODEOWNERS'
       - 'renovate.json'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test-crate-compilation:
     name: "Compile top level crates on Linux"
@@ -22,10 +26,7 @@ jobs:
           toolchain: stable
           default: true
 
-      - run: "cargo clean && cargo build --release -p introspection-core"
-        name: "Compile Introspection Engine"
-
-      - run: "cargo clean && cargo build --release -p migration-engine-cli"
+      - run: "cargo clean && cargo build --release -p schema-engine-cli"
         name: "Compile Migration Engine"
 
       - run: "cargo clean && cargo build --release -p prisma-fmt"

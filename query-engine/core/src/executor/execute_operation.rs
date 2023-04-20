@@ -1,13 +1,15 @@
-use std::time::Instant;
-
 use super::pipeline::QueryPipeline;
-use crate::{IrSerializer, Operation, QueryGraph, QueryGraphBuilder, QueryInterpreter, ResponseData};
+use crate::{
+    executor::request_context, protocol::EngineProtocol, CoreError, IrSerializer, Operation, QueryGraph,
+    QueryGraphBuilder, QueryInterpreter, ResponseData,
+};
 use connector::{Connection, ConnectionLike, Connector};
 use futures::future;
 use query_engine_metrics::{
     histogram, increment_counter, metrics, PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, PRISMA_CLIENT_QUERIES_TOTAL,
 };
-use schema::QuerySchemaRef;
+use schema::{QuerySchema, QuerySchemaRef};
+use std::time::{Duration, Instant};
 use tracing::Instrument;
 use tracing_futures::WithSubscriber;
 
@@ -18,16 +20,12 @@ pub async fn execute_single_operation(
     trace_id: Option<String>,
 ) -> crate::Result<ResponseData> {
     let operation_timer = Instant::now();
-    let interpreter = QueryInterpreter::new(conn);
-    let (query_graph, serializer) = QueryGraphBuilder::new(query_schema.clone()).build(operation.clone())?;
 
-    increment_counter!(PRISMA_CLIENT_QUERIES_TOTAL);
-
-    let result = QueryPipeline::new(query_graph, interpreter, serializer)
-        .execute(trace_id)
-        .await;
+    let (graph, serializer) = build_graph(query_schema.clone(), operation.clone())?;
+    let result = execute_on(conn, graph, serializer, query_schema.as_ref(), trace_id).await;
 
     histogram!(PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, operation_timer.elapsed());
+
     result
 }
 
@@ -39,19 +37,14 @@ pub async fn execute_many_operations(
 ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
     let queries = operations
         .iter()
-        .map(|operation| QueryGraphBuilder::new(query_schema.clone()).build(operation.clone()))
+        .map(|operation| build_graph(query_schema.clone(), operation.clone()))
         .collect::<std::result::Result<Vec<_>, _>>()?;
 
     let mut results = Vec::with_capacity(queries.len());
 
-    for (i, (query_graph, serializer)) in queries.into_iter().enumerate() {
-        increment_counter!(PRISMA_CLIENT_QUERIES_TOTAL);
+    for (i, (graph, serializer)) in queries.into_iter().enumerate() {
         let operation_timer = Instant::now();
-        let interpreter = QueryInterpreter::new(conn);
-        let result = QueryPipeline::new(query_graph, interpreter, serializer)
-            .execute(trace_id.clone())
-            .await;
-
+        let result = execute_on(conn, graph, serializer, query_schema.as_ref(), trace_id.clone()).await;
         histogram!(PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, operation_timer.elapsed());
 
         match result {
@@ -75,15 +68,22 @@ pub async fn execute_single_self_contained<C: Connector + Send + Sync>(
     trace_id: Option<String>,
     force_transactions: bool,
 ) -> crate::Result<ResponseData> {
-    let (query_graph, serializer) = QueryGraphBuilder::new(query_schema).build(operation)?;
-    let connection_name = connector.name();
     let conn_span = info_span!(
         "prisma:engine:connection",
         user_facing = true,
-        "db.type" = connection_name.as_str()
+        "db.type" = connector.name()
     );
     let conn = connector.get_connection().instrument(conn_span).await?;
-    execute_self_contained(conn, query_graph, serializer, force_transactions, trace_id).await
+
+    execute_self_contained(
+        conn,
+        query_schema,
+        operation,
+        force_transactions,
+        connector.should_retry_on_transient_error(),
+        trace_id,
+    )
+    .await
 }
 
 pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
@@ -92,32 +92,35 @@ pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
     operations: &[Operation],
     trace_id: Option<String>,
     force_transactions: bool,
+    engine_protocol: EngineProtocol,
 ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
     let mut futures = Vec::with_capacity(operations.len());
 
     let dispatcher = crate::get_current_dispatcher();
     for op in operations {
-        match QueryGraphBuilder::new(query_schema.clone()).build(op.clone()) {
-            Ok((graph, serializer)) => {
-                increment_counter!(PRISMA_CLIENT_QUERIES_TOTAL);
+        increment_counter!(PRISMA_CLIENT_QUERIES_TOTAL);
 
-                let connection_name = connector.name();
-                let conn_span = info_span!(
-                    "prisma:engine:connection",
-                    user_facing = true,
-                    "db.type" = connection_name.as_str()
-                );
-                let conn = connector.get_connection().instrument(conn_span).await?;
+        let conn_span = info_span!(
+            "prisma:engine:connection",
+            user_facing = true,
+            "db.type" = connector.name(),
+        );
+        let conn = connector.get_connection().instrument(conn_span).await?;
 
-                futures.push(tokio::spawn(
-                    execute_self_contained(conn, graph, serializer, force_transactions, trace_id.clone())
-                        .with_subscriber(dispatcher.clone()),
-                ));
-            }
-
-            // This looks unnecessary, but is the simplest way to preserve ordering of results for the batch.
-            Err(err) => futures.push(tokio::spawn(async move { Err(err.into()) })),
-        }
+        futures.push(tokio::spawn(
+            request_context::with_request_context(
+                engine_protocol,
+                execute_self_contained(
+                    conn,
+                    query_schema.clone(),
+                    op.clone(),
+                    force_transactions,
+                    connector.should_retry_on_transient_error(),
+                    trace_id.clone(),
+                ),
+            )
+            .with_subscriber(dispatcher.clone()),
+        ));
     }
 
     let responses: Vec<_> = future::join_all(futures)
@@ -132,28 +135,119 @@ pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
 /// Execute the operation as a self-contained operation, if necessary wrapped in a transaction.
 async fn execute_self_contained(
     mut conn: Box<dyn Connection>,
-    graph: QueryGraph,
-    serializer: IrSerializer,
+    query_schema: QuerySchemaRef,
+    operation: Operation,
     force_transactions: bool,
+    retry_on_transient_error: bool,
     trace_id: Option<String>,
 ) -> crate::Result<ResponseData> {
     let operation_timer = Instant::now();
-    let result = if force_transactions || graph.needs_transaction() {
-        let mut tx = conn.start_transaction(None).await?;
-        let result = execute_on(tx.as_connection_like(), graph, serializer, trace_id).await;
-
-        if result.is_ok() {
-            tx.commit().await?;
-        } else {
-            tx.rollback().await?;
-        }
-
-        result
+    let result = if retry_on_transient_error {
+        execute_self_contained_with_retry(
+            &mut conn,
+            query_schema,
+            operation,
+            force_transactions,
+            Instant::now(),
+            trace_id,
+        )
+        .await
     } else {
-        execute_on(conn.as_connection_like(), graph, serializer, trace_id).await
+        let (graph, serializer) = build_graph(query_schema.clone(), operation)?;
+
+        execute_self_contained_without_retry(conn, graph, serializer, force_transactions, &query_schema, trace_id).await
     };
 
     histogram!(PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, operation_timer.elapsed());
+
+    result
+}
+
+async fn execute_self_contained_without_retry(
+    mut conn: Box<dyn Connection>,
+    graph: QueryGraph,
+    serializer: IrSerializer,
+    force_transactions: bool,
+    query_schema: &QuerySchema,
+    trace_id: Option<String>,
+) -> crate::Result<ResponseData> {
+    if force_transactions || graph.needs_transaction() {
+        return execute_in_tx(&mut conn, graph, serializer, query_schema, trace_id).await;
+    }
+
+    execute_on(conn.as_connection_like(), graph, serializer, query_schema, trace_id).await
+}
+
+// As suggested by the MongoDB documentation
+// https://github.com/mongodb/specifications/blob/master/source/transactions-convenient-api/transactions-convenient-api.rst#pseudo-code
+const MAX_TX_TIMEOUT_RETRY_LIMIT: Duration = Duration::from_secs(12);
+const TX_RETRY_BACKOFF: Duration = Duration::from_millis(5);
+
+// MongoDB-specific transient transaction error retry logic.
+// Hack: This should ideally live in MongoDb's connector but our current architecture doesn't allow us to easily do that.
+async fn execute_self_contained_with_retry(
+    conn: &mut Box<dyn Connection>,
+    query_schema: QuerySchemaRef,
+    operation: Operation,
+    force_transactions: bool,
+    retry_timeout: Instant,
+    trace_id: Option<String>,
+) -> crate::Result<ResponseData> {
+    let (graph, serializer) = build_graph(query_schema.clone(), operation.clone())?;
+
+    if force_transactions || graph.needs_transaction() {
+        let res = execute_in_tx(conn, graph, serializer, query_schema.as_ref(), trace_id.clone()).await;
+
+        if !is_transient_error(&res) {
+            return res;
+        }
+
+        loop {
+            let (graph, serializer) = build_graph(query_schema.clone(), operation.clone())?;
+            let res = execute_in_tx(conn, graph, serializer, query_schema.as_ref(), trace_id.clone()).await;
+
+            if is_transient_error(&res) && retry_timeout.elapsed() < MAX_TX_TIMEOUT_RETRY_LIMIT {
+                tokio::time::sleep(TX_RETRY_BACKOFF).await;
+                continue;
+            } else {
+                return res;
+            }
+        }
+    } else {
+        execute_on(
+            conn.as_connection_like(),
+            graph,
+            serializer,
+            query_schema.as_ref(),
+            trace_id,
+        )
+        .await
+    }
+}
+
+async fn execute_in_tx(
+    conn: &mut Box<dyn Connection>,
+    graph: QueryGraph,
+    serializer: IrSerializer,
+    query_schema: &QuerySchema,
+    trace_id: Option<String>,
+) -> crate::Result<ResponseData> {
+    let mut tx = conn.start_transaction(None).await?;
+    let result = execute_on(
+        tx.as_connection_like(),
+        graph,
+        serializer,
+        query_schema,
+        trace_id.clone(),
+    )
+    .await;
+
+    if result.is_ok() {
+        tx.commit().await?;
+    } else {
+        tx.rollback().await?;
+    }
+
     result
 }
 
@@ -162,11 +256,26 @@ async fn execute_on(
     conn: &mut dyn ConnectionLike,
     graph: QueryGraph,
     serializer: IrSerializer,
+    query_schema: &QuerySchema,
     trace_id: Option<String>,
 ) -> crate::Result<ResponseData> {
     increment_counter!(PRISMA_CLIENT_QUERIES_TOTAL);
+
     let interpreter = QueryInterpreter::new(conn);
     QueryPipeline::new(graph, interpreter, serializer)
-        .execute(trace_id)
+        .execute(query_schema, trace_id)
         .await
+}
+
+fn build_graph(query_schema: QuerySchemaRef, operation: Operation) -> crate::Result<(QueryGraph, IrSerializer)> {
+    let (query_graph, serializer) = QueryGraphBuilder::new(query_schema).build(operation)?;
+
+    Ok((query_graph, serializer))
+}
+
+fn is_transient_error<T>(res: &Result<T, CoreError>) -> bool {
+    match res {
+        Ok(_) => false,
+        Err(err) => err.is_transient(),
+    }
 }

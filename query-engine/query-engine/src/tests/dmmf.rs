@@ -9,7 +9,7 @@ use std::sync::Arc;
 
 pub fn get_query_schema(datamodel_string: &str) -> QuerySchema {
     let dm = psl::parse_schema(datamodel_string).unwrap();
-    let internal_ref = prisma_models::convert(Arc::new(dm), "db".to_owned());
+    let internal_ref = prisma_models::convert(Arc::new(dm));
     schema_builder::build(internal_ref, false)
 }
 
@@ -94,7 +94,9 @@ fn test_dmmf_cli_command(schema: &str) -> PrismaResult<()> {
         subcommand: Some(Subcommand::Cli(CliOpt::Dmmf)),
         enable_open_telemetry: false,
         open_telemetry_endpoint: String::new(),
+        enable_telemetry_in_response: false,
         dataproxy_metric_override: false,
+        engine_protocol: None,
     };
 
     let cli_cmd = CliCommand::from_opt(&prisma_opt)?.unwrap();

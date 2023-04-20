@@ -1,14 +1,14 @@
 use super::*;
 use fmt::Debug;
 use once_cell::sync::OnceCell;
-use prisma_models::{dml, prelude::ParentContainer};
-use std::{boxed::Box, fmt, sync::Arc};
+use prisma_models::{prelude::ParentContainer, DefaultKind};
+use std::{boxed::Box, fmt};
 
 #[derive(PartialEq)]
 pub struct InputObjectType {
     pub identifier: Identifier,
     pub constraints: InputObjectTypeConstraints,
-    pub fields: OnceCell<Vec<InputFieldRef>>,
+    pub fields: OnceCell<Vec<InputField>>,
     pub tag: Option<ObjectTag>,
 }
 
@@ -48,13 +48,13 @@ impl Debug for InputObjectType {
 }
 
 impl InputObjectType {
-    pub fn get_fields(&self) -> &Vec<InputFieldRef> {
+    pub fn get_fields(&self) -> &Vec<InputField> {
         self.fields.get().unwrap()
     }
 
     pub fn set_fields(&self, fields: Vec<InputField>) {
         self.fields
-            .set(fields.into_iter().map(Arc::new).collect())
+            .set(fields)
             .unwrap_or_else(|_| panic!("Fields of {:?} are already set", self.identifier));
     }
 
@@ -63,12 +63,12 @@ impl InputObjectType {
         self.get_fields().is_empty()
     }
 
-    pub fn find_field<T>(&self, name: T) -> Option<InputFieldRef>
+    pub fn find_field<T>(&self, name: T) -> Option<&InputField>
     where
         T: Into<String>,
     {
         let name = name.into();
-        self.get_fields().iter().find(|f| f.name == name).cloned()
+        self.get_fields().iter().find(|f| f.name == name)
     }
 
     /// Require exactly one field of the possible ones to be in the input.
@@ -110,11 +110,11 @@ impl InputObjectType {
 #[derive(Debug, PartialEq)]
 pub struct InputField {
     pub name: String,
-    pub default_value: Option<dml::DefaultValue>,
-    pub deprecation: Option<Deprecation>,
+    pub default_value: Option<DefaultKind>,
 
     /// Possible field types, represented as a union of input types, but only one can be provided at any time.
-    pub field_types: Vec<InputType>,
+    /// Slice expressed as (start, len).
+    field_types: Option<(usize, usize)>,
 
     /// Indicates if the presence of the field on the higher input objects
     /// is required, but doesn't state whether or not the input can be null.
@@ -122,6 +122,20 @@ pub struct InputField {
 }
 
 impl InputField {
+    pub fn new(name: String, default_value: Option<DefaultKind>, is_required: bool) -> InputField {
+        InputField {
+            name,
+            default_value,
+            field_types: None,
+            is_required,
+        }
+    }
+
+    pub fn field_types<'a>(&self, query_schema: &'a QuerySchema) -> &'a [InputType] {
+        let (start, len) = self.field_types.unwrap_or_default();
+        &query_schema.db.input_field_types[start..(start + len)]
+    }
+
     /// Sets the field as optional (not required to be present on the input).
     pub fn optional(mut self) -> Self {
         self.is_required = false;
@@ -144,36 +158,35 @@ impl InputField {
     }
 
     /// Sets the field as nullable (accepting null inputs).
-    pub fn nullable(self) -> Self {
-        self.add_type(InputType::null())
+    pub fn nullable(self, db: &mut QuerySchemaDatabase) -> Self {
+        self.add_type(InputType::null(), db)
     }
 
     /// Sets the field as nullable if the condition is true.
-    pub fn nullable_if(self, condition: bool) -> Self {
+    pub fn nullable_if(self, condition: bool, db: &mut QuerySchemaDatabase) -> Self {
         if condition {
-            self.nullable()
+            self.nullable(db)
         } else {
             self
         }
     }
 
-    /// Adds possible input type to this input field's type union.
-    pub fn add_type(mut self, typ: InputType) -> Self {
-        self.field_types.push(typ);
-        self
+    pub fn push_type(&mut self, typ: InputType, db: &mut QuerySchemaDatabase) {
+        match &mut self.field_types {
+            Some((_start, len)) => {
+                *len += 1;
+                db.input_field_types.push(typ);
+            }
+            None => {
+                self.field_types = Some((db.input_field_types.len(), 1));
+                db.input_field_types.push(typ);
+            }
+        }
     }
 
-    pub fn deprecate<T, S>(mut self, reason: T, since_version: S, planned_removal_version: Option<S>) -> Self
-    where
-        T: Into<String>,
-        S: Into<String>,
-    {
-        self.deprecation = Some(Deprecation {
-            reason: reason.into(),
-            since_version: since_version.into(),
-            planned_removal_version: planned_removal_version.map(Into::into),
-        });
-
+    /// Adds possible input type to this input field's type union.
+    pub fn add_type(mut self, typ: InputType, db: &mut QuerySchemaDatabase) -> Self {
+        self.push_type(typ, db);
         self
     }
 }
@@ -181,9 +194,9 @@ impl InputField {
 #[derive(Clone)]
 pub enum InputType {
     Scalar(ScalarType),
-    Enum(EnumTypeWeakRef),
+    Enum(EnumTypeId),
     List(Box<InputType>),
-    Object(InputObjectTypeWeakRef),
+    Object(InputObjectTypeId),
 }
 
 impl PartialEq for InputType {
@@ -192,9 +205,7 @@ impl PartialEq for InputType {
             (InputType::Scalar(st), InputType::Scalar(ost)) => st.eq(ost),
             (InputType::Enum(_), InputType::Enum(_)) => true,
             (InputType::List(lt), InputType::List(olt)) => lt.eq(olt),
-            (InputType::Object(obj), InputType::Object(oobj)) => {
-                obj.into_arc().identifier == oobj.into_arc().identifier
-            }
+            (InputType::Object(obj), InputType::Object(oobj)) => obj == oobj,
             _ => false,
         }
     }
@@ -203,10 +214,10 @@ impl PartialEq for InputType {
 impl Debug for InputType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            InputType::Object(obj) => write!(f, "Object({})", obj.into_arc().identifier.name()),
-            InputType::Scalar(s) => write!(f, "{:?}", s),
-            InputType::Enum(e) => write!(f, "{:?}", e),
-            InputType::List(l) => write!(f, "{:?}", l),
+            Self::Object(obj) => write!(f, "Object({obj:?})"),
+            Self::Scalar(s) => write!(f, "{s:?}"),
+            Self::Enum(e) => write!(f, "{e:?}"),
+            Self::List(l) => write!(f, "{l:?}"),
         }
     }
 }
@@ -216,7 +227,7 @@ impl InputType {
         InputType::List(Box::new(containing))
     }
 
-    pub fn object(containing: InputObjectTypeWeakRef) -> InputType {
+    pub fn object(containing: InputObjectTypeId) -> InputType {
         InputType::Object(containing)
     }
 
@@ -272,16 +283,16 @@ impl InputType {
         InputType::Scalar(ScalarType::Null)
     }
 
-    pub fn enum_type(containing: EnumTypeWeakRef) -> InputType {
+    pub fn enum_type(containing: EnumTypeId) -> InputType {
         InputType::Enum(containing)
     }
 
-    pub fn is_empty(&self) -> bool {
+    pub fn is_empty(&self, query_schema: &QuerySchemaDatabase) -> bool {
         match self {
             Self::Scalar(_) => false,
             Self::Enum(_) => false,
-            Self::List(inner) => inner.is_empty(),
-            Self::Object(weak) => weak.into_arc().is_empty(),
+            Self::List(inner) => inner.is_empty(query_schema),
+            Self::Object(id) => query_schema[*id].is_empty(),
         }
     }
 
@@ -291,10 +302,29 @@ impl InputType {
             Self::Scalar(ScalarType::Json) | Self::Scalar(ScalarType::JsonList)
         )
     }
+
+    pub fn as_object<'a>(&self, query_schema: &'a QuerySchemaDatabase) -> Option<&'a InputObjectType> {
+        if let Self::Object(v) = self {
+            Some(&query_schema[*v])
+        } else {
+            None
+        }
+    }
+
+    pub fn as_list(&self) -> Option<&InputType> {
+        if let Self::List(list) = self {
+            Some(list)
+        } else {
+            None
+        }
+    }
 }
 
-impl From<InputType> for Vec<InputType> {
-    fn from(r#type: InputType) -> Self {
-        vec![r#type]
+impl IntoIterator for InputType {
+    type Item = InputType;
+    type IntoIter = std::iter::Once<InputType>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        std::iter::once(self)
     }
 }

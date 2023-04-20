@@ -27,10 +27,10 @@ schema = {
 
 // At the syntax level, models and composite types are the same.
 model_declaration = { 
-    (MODEL_KEYWORD | TYPE_KEYWORD)
+    (MODEL_KEYWORD | TYPE_KEYWORD | VIEW_KEYWORD)
     ~ identifier
     ~ BLOCK_OPEN
-    ~ (field_declaration | (block_attribute ~ NEWLINE) | comment_block | empty_lines | BLOCK_LEVEL_CATCH_ALL)*
+    ~ model_contents
     ~ BLOCK_CLOSE
     }
 
@@ -42,6 +42,10 @@ field_declaration = {
     ~ trailing_comment?
     ~ NEWLINE
     }
+
+model_contents = {
+    (field_declaration | (block_attribute ~ NEWLINE) | comment_block | empty_lines | BLOCK_LEVEL_CATCH_ALL)*
+}
 
 // ######################################
 // Field Type
@@ -70,10 +74,15 @@ config_block = {
     (DATASOURCE_KEYWORD | GENERATOR_KEYWORD)
     ~ identifier
     ~ BLOCK_OPEN
-    ~ (key_value | comment_block | empty_lines | BLOCK_LEVEL_CATCH_ALL)*
+    ~ config_contents
     ~ BLOCK_CLOSE
     }
-key_value = { identifier ~ "=" ~ expression ~ trailing_comment? ~ NEWLINE }
+
+key_value = { identifier ~ "=" ~ expression? ~ trailing_comment? }
+
+config_contents = {
+    ((key_value ~ NEWLINE) | comment_block | empty_lines| BLOCK_LEVEL_CATCH_ALL)*
+}
 
 // a block definition without a keyword. Is not valid. Just acts as a catch for the parser to display a nice error.
 arbitrary_block = { identifier ~ BLOCK_OPEN ~ ((!BLOCK_CLOSE ~ ANY) | NEWLINE)* ~ BLOCK_CLOSE }
@@ -85,11 +94,14 @@ enum_declaration = {
     ENUM_KEYWORD
     ~ identifier
     ~ BLOCK_OPEN
-    ~ (enum_value_declaration | (block_attribute ~ NEWLINE) | comment_block | empty_lines | BLOCK_LEVEL_CATCH_ALL)* 
+    ~ enum_contents
     ~ BLOCK_CLOSE
     }
 
 enum_value_declaration = { identifier ~ field_attribute* ~ trailing_comment? ~ NEWLINE }
+enum_contents = {
+    (enum_value_declaration | (block_attribute ~ NEWLINE) | comment_block | empty_lines | BLOCK_LEVEL_CATCH_ALL)* 
+}
 
 // ######################################
 // Attributes
@@ -132,6 +144,7 @@ BLOCK_CLOSE = { "}" }
 ENUM_KEYWORD = { "enum" }
 MODEL_KEYWORD = { "model" }
 TYPE_KEYWORD = { "type" }
+VIEW_KEYWORD = { "view" }
 GENERATOR_KEYWORD = { "generator" }
 DATASOURCE_KEYWORD = { "datasource" }
 LEGACY_COLON = { ":" }

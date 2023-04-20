@@ -4,8 +4,8 @@ use prisma_models::{prelude::ParentContainer, ScalarFieldRef};
 pub(crate) mod group_by;
 pub(crate) mod plain;
 
-fn field_avg_output_type(ctx: &mut BuilderContext, field: &ScalarFieldRef) -> OutputType {
-    match field.type_identifier {
+fn field_avg_output_type(ctx: &mut BuilderContext<'_>, field: &ScalarFieldRef) -> OutputType {
+    match field.type_identifier() {
         TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float => OutputType::float(),
         TypeIdentifier::Decimal => OutputType::decimal(),
         _ => field::map_scalar_output_type_for_field(ctx, field),
@@ -17,7 +17,7 @@ pub fn collect_non_list_nor_json_fields(container: &ParentContainer) -> Vec<Scal
         .fields()
         .into_iter()
         .filter_map(|field| match field {
-            ModelField::Scalar(sf) if !sf.is_list() && sf.type_identifier != TypeIdentifier::Json => Some(sf),
+            ModelField::Scalar(sf) if !sf.is_list() && sf.type_identifier() != TypeIdentifier::Json => Some(sf),
             _ => None,
         })
         .collect()
@@ -37,7 +37,7 @@ pub fn collect_numeric_fields(container: &ParentContainer) -> Vec<ScalarFieldRef
 /// Returns an aggregation field with given name if the passed fields contains any fields.
 /// Field types inside the object type of the field are determined by the passed mapper fn.
 fn aggregation_field<F, G>(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     name: &str,
     model: &ModelRef,
     fields: Vec<ScalarFieldRef>,
@@ -46,7 +46,7 @@ fn aggregation_field<F, G>(
     is_count: bool,
 ) -> Option<OutputField>
 where
-    F: Fn(&mut BuilderContext, &ScalarFieldRef) -> OutputType,
+    F: Fn(&mut BuilderContext<'_>, &ScalarFieldRef) -> OutputType,
     G: Fn(ObjectType) -> ObjectType,
 {
     if fields.is_empty() {
@@ -68,35 +68,33 @@ where
 
 /// Maps the object type for aggregations that operate on a field level.
 fn map_field_aggregation_object<F, G>(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     model: &ModelRef,
     suffix: &str,
     fields: &[ScalarFieldRef],
     type_mapper: F,
     object_mapper: G,
     is_count: bool,
-) -> ObjectTypeWeakRef
+) -> OutputObjectTypeId
 where
-    F: Fn(&mut BuilderContext, &ScalarFieldRef) -> OutputType,
+    F: Fn(&mut BuilderContext<'_>, &ScalarFieldRef) -> OutputType,
     G: Fn(ObjectType) -> ObjectType,
 {
-    let ident = Identifier::new(
-        format!("{}{}AggregateOutputType", capitalize(&model.name), capitalize(suffix)),
-        PRISMA_NAMESPACE,
-    );
+    let ident = Identifier::new_prisma(format!(
+        "{}{}AggregateOutputType",
+        capitalize(model.name()),
+        capitalize(suffix)
+    ));
     return_cached_output!(ctx, &ident);
 
     // Non-numerical fields are always set as nullable
     // This is because when there's no data, doing aggregation on them will return NULL
     let fields: Vec<OutputField> = fields
         .iter()
-        .map(|sf| field(sf.name.clone(), vec![], type_mapper(ctx, sf), None).nullable_if(!is_count))
+        .map(|sf| field(sf.name(), vec![], type_mapper(ctx, sf), None).nullable_if(!is_count))
         .collect();
 
     let object = object_mapper(object_type(ident.clone(), fields, None));
-    let object = Arc::new(object);
 
-    ctx.cache_output_type(ident, object.clone());
-
-    Arc::downgrade(&object)
+    ctx.cache_output_type(ident, object)
 }

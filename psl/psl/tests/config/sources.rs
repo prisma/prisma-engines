@@ -170,6 +170,7 @@ fn must_error_for_empty_urls_derived_load_env_vars() {
         [1;94m 3 | [0m  url = [1;91menv("DB_URL_EMPTY_0001")[0m
         [1;94m   | [0m
     "#]];
+    std::env::remove_var("DB_URL_EMPTY_0001");
 
     expectation.assert_eq(&error)
 }
@@ -279,6 +280,7 @@ fn must_not_error_for_empty_shadow_database_urls_derived_load_env_vars() {
     let config = parse_configuration(schema);
     let shadow_database_url = config.datasources[0].load_shadow_database_url().unwrap();
 
+    std::env::remove_var("EMPTY_SHADOW_DB URL_0129");
     assert!(shadow_database_url.is_none());
 }
 
@@ -405,7 +407,47 @@ fn new_lines_in_source_must_work() {
             "url": {
               "fromEnvVar": null,
               "value": "postgresql://localhost"
-            }
+            },
+            "schemas": []
+          }
+        ]"#]];
+
+    expected.assert_eq(&rendered);
+}
+
+#[test]
+fn multischema_must_work() {
+    let schema = indoc! {r#"
+      generator client {
+        provider        = "prisma-client-js"
+        previewFeatures = ["multiSchema"]
+      }
+
+      datasource ds {
+        provider = "postgresql"
+        url = "postgresql://localhost"
+        schemas = ["transactional", "public"]
+      }
+    "#};
+
+    let config = parse_configuration(schema);
+    let rendered = psl::render_sources_to_json(&config.datasources);
+
+    // schemas are sorted in ascending order
+    let expected = expect![[r#"
+        [
+          {
+            "name": "ds",
+            "provider": "postgresql",
+            "activeProvider": "postgresql",
+            "url": {
+              "fromEnvVar": null,
+              "value": "postgresql://localhost"
+            },
+            "schemas": [
+              "public",
+              "transactional"
+            ]
           }
         ]"#]];
 
@@ -453,7 +495,7 @@ fn must_succeed_if_env_var_is_missing_but_override_was_provided() {
     let overrides = vec![("ds".to_string(), url.to_string())];
     let mut config = parse_configuration(schema);
     config
-        .resolve_datasource_urls_from_env(&overrides, load_env_var)
+        .resolve_datasource_urls_query_engine(&overrides, load_env_var, false)
         .unwrap();
     let data_source = config.datasources.first().unwrap();
 
@@ -480,7 +522,7 @@ fn must_succeed_if_env_var_exists_and_override_was_provided() {
     let mut config = parse_configuration(schema);
 
     config
-        .resolve_datasource_urls_from_env(&overrides, load_env_var)
+        .resolve_datasource_urls_query_engine(&overrides, load_env_var, false)
         .unwrap();
 
     let data_source = config.datasources.first().unwrap();
@@ -506,13 +548,63 @@ fn must_succeed_with_overrides() {
     let mut config = parse_configuration(schema);
 
     config
-        .resolve_datasource_urls_from_env(overrides, load_env_var)
+        .resolve_datasource_urls_query_engine(overrides, load_env_var, false)
         .unwrap();
 
     let data_source = config.datasources.first().unwrap();
 
     data_source.assert_name("ds");
     assert_eq!(data_source.url.value.as_deref(), Some(url));
+}
+
+#[test]
+fn must_succeed_when_ignoring_env_errors_and_retain_env_var_name() {
+    let schema = indoc! {r#"
+        datasource ds {
+          provider = "postgresql"
+          url = env("MISSING_DATABASE_URL_0003")
+        }
+    "#};
+
+    let mut config = parse_configuration(schema);
+
+    config
+        .resolve_datasource_urls_query_engine(&[], load_env_var, true)
+        .unwrap();
+
+    let data_source = config.datasources.first().unwrap();
+
+    data_source.assert_name("ds");
+    data_source.assert_url(StringFromEnvVar {
+        value: None,
+        from_env_var: Some("MISSING_DATABASE_URL_0003".to_string()),
+    });
+}
+
+#[test]
+fn must_process_overrides_when_ignoring_env_errors() {
+    let schema = indoc! {r#"
+        datasource ds {
+          provider = "postgresql"
+          url = env("MISSING_DATABASE_URL_0004")
+        }
+    "#};
+
+    let url = "postgres://localhost".to_string();
+    let overrides = vec![("ds".to_string(), url.clone())];
+    let mut config = parse_configuration(schema);
+
+    config
+        .resolve_datasource_urls_query_engine(&overrides, load_env_var, true)
+        .unwrap();
+
+    let data_source = config.datasources.first().unwrap();
+
+    data_source.assert_name("ds");
+    data_source.assert_url(StringFromEnvVar {
+        value: Some(url),
+        from_env_var: None,
+    });
 }
 
 #[test]
@@ -556,7 +648,6 @@ fn fail_when_preview_features_are_declared() {
         [1;94m   | [0m
         [1;94m 3 | [0m  url = "mysql://"
         [1;94m 4 | [0m  [1;91mpreviewFeatures = ["foo"][0m
-        [1;94m 5 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -643,4 +734,259 @@ fn relation_mode_default() {
 
 fn load_env_var(key: &str) -> Option<String> {
     std::env::var(key).ok()
+}
+
+#[test]
+fn must_error_for_empty_direct_urls() {
+    let dml = indoc! {r#"
+        datasource myds {
+          provider = "sqlite"
+          directUrl = ""
+          url = "file://hostfoo"
+        }
+    "#};
+
+    let config = parse_config(dml).unwrap();
+
+    let error = config.datasources[0]
+        .load_direct_url(load_env_var)
+        .map_err(|e| e.to_pretty_string("schema.prisma", dml))
+        .unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError validating datasource `myds`: You must provide a nonempty direct URL[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  provider = "sqlite"
+        [1;94m 3 | [0m  directUrl = [1;91m""[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn must_error_for_empty_env_direct_urls() {
+    std::env::set_var("DB_DIRECT_URL_EMPTY_0001", "  ");
+    let dml = indoc! {r#"
+        datasource myds {
+          provider = "sqlite"
+          directUrl = env("DB_DIRECT_URL_EMPTY_0001")
+          url = "file://hostfoo"
+        }
+    "#};
+
+    let config = parse_config(dml).unwrap();
+
+    let error = config.datasources[0]
+        .load_direct_url(load_env_var)
+        .map_err(|e| e.to_pretty_string("schema.prisma", dml))
+        .unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError validating datasource `myds`: You must provide a nonempty direct URL. The environment variable `DB_DIRECT_URL_EMPTY_0001` resolved to an empty string.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  provider = "sqlite"
+        [1;94m 3 | [0m  directUrl = [1;91menv("DB_DIRECT_URL_EMPTY_0001")[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn must_error_for_missing_env_direct_urls() {
+    let dml = indoc! {r#"
+        datasource myds {
+          provider = "sqlite"
+          directUrl = env("MISSING_DIRECT_ENV_VAR_0001")
+          url = "file://hostfoo"
+        }
+    "#};
+
+    let config = parse_config(dml).unwrap();
+
+    let error = config.datasources[0]
+        .load_direct_url(load_env_var)
+        .map_err(|e| e.to_pretty_string("schema.prisma", dml))
+        .unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mEnvironment variable not found: MISSING_DIRECT_ENV_VAR_0001.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  provider = "sqlite"
+        [1;94m 3 | [0m  directUrl = [1;91menv("MISSING_DIRECT_ENV_VAR_0001")[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn directurl_should_work_with_proxy_url() {
+    let dml = indoc! {r#"
+        datasource myds {
+          provider = "postgres"
+          directUrl = env("DATABASE_URL_0001")
+          url = "prisma://localhost:1234"
+        }
+    "#};
+
+    std::env::set_var("DATABASE_URL_0001", "postgres://hostfoo");
+
+    let config = parse_config(dml).unwrap();
+
+    let result = config.datasources[0]
+        .load_direct_url(load_env_var)
+        .map_err(|e| e.to_pretty_string("schema.prisma", dml))
+        .unwrap();
+
+    let expectation = expect!("postgres://hostfoo");
+
+    // make sure other tests that run afterwards are not run in a modified environment
+    std::env::remove_var("DATABASE_URL_0001");
+
+    expectation.assert_eq(&result)
+}
+
+#[test]
+fn load_url_should_not_work_with_proxy_url() {
+    let dml = indoc! {r#"
+        datasource myds {
+          provider = "postgres"
+          directUrl = env("DIRECT_URL_0002")
+          url = env("DATABASE_URL_0002")
+        }
+    "#};
+
+    std::env::set_var("DATABASE_URL_0002", "prisma://hostbar");
+    std::env::set_var("DIRECT_URL_0002", "postgres://hostfoo");
+
+    let config = parse_config(dml).unwrap();
+
+    let error = config.datasources[0]
+        .load_url(load_env_var)
+        .map_err(|e| e.to_pretty_string("schema.prisma", dml))
+        .unwrap_err();
+
+    let expectation = expect!([r#"
+        [1;91merror[0m: [1mError validating datasource `myds`: the URL must start with the protocol `postgresql://` or `postgres://`.
+
+        To use a URL with protocol `prisma://` the Data Proxy must be enabled via `prisma generate --data-proxy`.
+
+        More information about Data Proxy: https://pris.ly/d/data-proxy
+        [0m
+          [1;94m-->[0m  [4mschema.prisma:4[0m
+        [1;94m   | [0m
+        [1;94m 3 | [0m  directUrl = env("DIRECT_URL_0002")
+        [1;94m 4 | [0m  url = [1;91menv("DATABASE_URL_0002")[0m
+        [1;94m   | [0m
+    "#]);
+
+    // make sure other tests that run afterwards are not run in a modified environment
+    std::env::remove_var("DATABASE_URL_0002");
+    std::env::remove_var("DIRECT_URL_0002");
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn load_url_no_validation_should_work_with_proxy_url() {
+    let dml = indoc! {r#"
+        datasource myds {
+          provider = "postgres"
+          directUrl = env("DIRECT_URL_0003")
+          url = env("DATABASE_URL_0003")
+        }
+    "#};
+
+    std::env::set_var("DATABASE_URL_0003", "prisma://hostbar");
+    std::env::set_var("DIRECT_URL_0003", "postgres://hostfoo");
+
+    let config = parse_config(dml).unwrap();
+
+    let result = config.datasources[0]
+        .load_url_no_validation(load_env_var)
+        .map_err(|e| e.to_pretty_string("schema.prisma", dml))
+        .unwrap();
+
+    let expectation = expect!("prisma://hostbar");
+
+    // make sure other tests that run afterwards are not run in a modified environment
+    std::env::remove_var("DATABASE_URL_0003");
+    std::env::remove_var("DIRECT_URL_0003");
+
+    expectation.assert_eq(&result)
+}
+
+#[test]
+fn directurl_should_not_use_prisma_scheme_when_using_env_vars() {
+    std::env::set_var("DATABASE_URL_0004", "prisma://hostbar");
+    std::env::set_var("DIRECT_URL_0004", "prisma://hostfoo");
+
+    let dml = indoc! {r#"
+        datasource myds {
+          provider = "postgres"
+          directUrl = env("DIRECT_URL_0004")
+          url = env("DATABASE_URL_0004")
+        }
+    "#};
+
+    let config = parse_config(dml).unwrap();
+
+    let error = config.datasources[0]
+        .load_direct_url(load_env_var)
+        .map_err(|e| e.to_pretty_string("schema.prisma", dml))
+        .unwrap_err();
+
+    let expectation = expect!([r#"
+        [1;91merror[0m: [1mError validating datasource `myds`: You must provide a direct URL that points directly to the database. Using `prisma` in URL scheme is not allowed.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  provider = "postgres"
+        [1;94m 3 | [0m  directUrl = [1;91menv("DIRECT_URL_0004")[0m
+        [1;94m   | [0m
+    "#]);
+
+    expectation.assert_eq(&error);
+
+    // make sure other tests that run afterwards are not run in a modified environment
+    std::env::remove_var("DIRECT_URL_0004");
+    std::env::remove_var("DATABASE_URL_0004");
+}
+
+#[test]
+fn directurl_should_not_use_prisma_scheme() {
+    let dml = indoc! {r#"
+        datasource myds {
+          provider = "postgres"
+          directUrl = "prisma://kekw.lol"
+          url = env("DATABASE_URL_0005")
+        }
+    "#};
+
+    std::env::set_var("DATABASE_URL_0005", "prisma://hostbar");
+
+    let config = parse_config(dml).unwrap();
+
+    let error = config.datasources[0]
+        .load_direct_url(load_env_var)
+        .map_err(|e| e.to_pretty_string("schema.prisma", dml))
+        .unwrap_err();
+
+    let expectation = expect!([r#"
+        [1;91merror[0m: [1mError validating datasource `myds`: You must provide a direct URL that points directly to the database. Using `prisma` in URL scheme is not allowed.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  provider = "postgres"
+        [1;94m 3 | [0m  directUrl = [1;91m"prisma://kekw.lol"[0m
+        [1;94m   | [0m
+    "#]);
+
+    expectation.assert_eq(&error);
+
+    // make sure other tests that run afterwards are not run in a modified environment
+    std::env::remove_var("DIRECT_URL_0005");
 }

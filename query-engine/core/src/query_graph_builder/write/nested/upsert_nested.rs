@@ -8,7 +8,7 @@ use crate::{
 use connector::Filter;
 use prisma_models::RelationFieldRef;
 use schema_builder::constants::args;
-use std::{convert::TryInto, sync::Arc};
+use std::convert::TryInto;
 
 /// Handles a nested upsert.
 /// The constructed query graph can have different shapes based on the relation
@@ -137,12 +137,12 @@ pub fn nested_upsert(
 
         let if_node = graph.create_node(Flow::default_if());
         let create_node =
-            create::create_record_node(graph, connector_ctx, Arc::clone(&child_model), create_input.try_into()?)?;
+            create::create_record_node(graph, connector_ctx, child_model.clone(), create_input.try_into()?)?;
         let update_node = update::update_record_node(
             graph,
             connector_ctx,
             filter.clone(),
-            Arc::clone(&child_model),
+            child_model.clone(),
             update_input.try_into()?,
         )?;
 
@@ -161,8 +161,8 @@ pub fn nested_upsert(
             ),
         )?;
 
-        let relation_name = parent_relation_field.relation().name.clone();
-        let child_model_name = child_model.name.clone();
+        let relation_name = parent_relation_field.relation().name().to_owned();
+        let child_model_name = child_model.name().to_owned();
 
         graph.create_edge(
             &read_children_node,
@@ -174,8 +174,7 @@ pub fn nested_upsert(
                         let child_id = match child_ids.pop() {
                             Some(id) => Ok(id),
                             None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                                "No '{}' record (needed for nested update `where` on exists) was found for a nested upsert on relation '{}'.",
-                                child_model_name, relation_name
+                                "No '{child_model_name}' record (needed for nested update `where` on exists) was found for a nested upsert on relation '{relation_name}'."
                             ))),
                         }?;
 
@@ -213,11 +212,11 @@ pub fn nested_upsert(
         // Specific handling based on relation type and inlining side.
         if parent_relation_field.relation().is_many_to_many() {
             // Many to many only needs a connect node.
-            connect::connect_records_node(graph, &parent_node, &create_node, &parent_relation_field, 1)?;
+            connect::connect_records_node(graph, &parent_node, &create_node, parent_relation_field, 1)?;
         } else if parent_relation_field.is_inlined_on_enclosing_model() {
             let parent_model = parent_relation_field.model();
-            let parent_model_name = parent_model.name.clone();
-            let relation_name = parent_relation_field.relation().name.clone();
+            let parent_model_name = parent_model.name().to_owned();
+            let relation_name = parent_relation_field.relation().name().to_owned();
             let parent_model_id = parent_model.primary_identifier();
             let update_node = utils::update_records_node_placeholder(graph, filter, parent_model);
 
@@ -242,9 +241,9 @@ pub fn nested_upsert(
                 })),
             )?;
 
-            let parent_model_name = parent_relation_field.model().name.clone();
-            let child_model_name = parent_relation_field.related_model().name.clone();
-            let relation_name = parent_relation_field.relation().name.clone();
+            let parent_model_name = parent_relation_field.model().name().to_owned();
+            let child_model_name = parent_relation_field.related_model().name().to_owned();
+            let relation_name = parent_relation_field.relation().name().to_owned();
 
             // Edge to retrieve the child ID to inject
             graph.create_edge(
@@ -254,8 +253,7 @@ pub fn nested_upsert(
                     let child_link = match child_links.pop() {
                         Some(link) => Ok(link),
                         None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "No '{}' record (needed to update inlined relation on '{}') was found for a nested upsert on relation '{}'.",
-                            child_model_name, parent_model_name, relation_name
+                            "No '{child_model_name}' record (needed to update inlined relation on '{parent_model_name}') was found for a nested upsert on relation '{relation_name}'."
                         ))),
                     }?;
 
@@ -267,9 +265,9 @@ pub fn nested_upsert(
                 })),
             )?;
         } else {
-            let parent_model_name = parent_relation_field.model().name.clone();
-            let child_model_name = parent_relation_field.related_model().name.clone();
-            let relation_name = parent_relation_field.relation().name.clone();
+            let parent_model_name = parent_relation_field.model().name().to_owned();
+            let child_model_name = parent_relation_field.related_model().name().to_owned();
+            let relation_name = parent_relation_field.relation().name().to_owned();
 
             // Inlined on child
             // Edge to retrieve the child ID to inject (inject into the create)
@@ -280,8 +278,7 @@ pub fn nested_upsert(
                     let parent_link = match parent_links.pop() {
                         Some(link) => Ok(link),
                         None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "No '{}' record (needed to update inlined relation on '{}') was found for a nested upsert on relation '{}'.",
-                            parent_model_name, child_model_name, relation_name
+                            "No '{parent_model_name}' record (needed to update inlined relation on '{child_model_name}') was found for a nested upsert on relation '{relation_name}'."
                         ))),
                     }?;
 

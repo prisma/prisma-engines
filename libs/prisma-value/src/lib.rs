@@ -5,6 +5,7 @@ mod error;
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::prelude::*;
 use serde::de::Unexpected;
+use serde::ser::SerializeMap;
 use serde::{ser::Serializer, Deserialize, Deserializer, Serialize};
 use std::{convert::TryFrom, fmt, str::FromStr};
 use uuid::Uuid;
@@ -13,7 +14,7 @@ pub use error::ConversionFailure;
 pub type PrismaValueResult<T> = std::result::Result<T, ConversionFailure>;
 pub type PrismaListValue = Vec<PrismaValue>;
 
-#[derive(Debug, PartialEq, Clone, Eq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
 #[serde(untagged)]
 pub enum PrismaValue {
     String(String),
@@ -26,6 +27,7 @@ pub enum PrismaValue {
     Xml(String),
 
     /// A collections of key-value pairs constituting an object.
+    #[serde(serialize_with = "serialize_object")]
     Object(Vec<(String, PrismaValue)>),
 
     #[serde(serialize_with = "serialize_null")]
@@ -46,12 +48,18 @@ pub enum PrismaValue {
 
 /// Stringify a date to the following format
 /// 1999-05-01T00:00:00.000Z
-pub fn stringify_date(date: &DateTime<FixedOffset>) -> String {
+pub fn stringify_datetime(datetime: &DateTime<FixedOffset>) -> String {
     // Warning: Be careful if you plan on changing the code below
     // The findUnique batch optimization expects date inputs to have exactly the same format as date outputs
     // This works today because clients always send date inputs in the same format as the serialized format below
     // Updating this without transforming date inputs to the same format WILL break the findUnique batch optimization
-    date.to_rfc3339_opts(SecondsFormat::Millis, true)
+    datetime.to_rfc3339_opts(SecondsFormat::Millis, true)
+}
+
+/// Parses an RFC 3339 and ISO 8601 date and time string such as 1996-12-19T16:39:57-08:00,
+/// then returns a new DateTime with a parsed FixedOffset.
+pub fn parse_datetime(datetime: &str) -> chrono::ParseResult<DateTime<FixedOffset>> {
+    DateTime::parse_from_rfc3339(datetime)
 }
 
 pub fn encode_bytes(bytes: &[u8]) -> String {
@@ -135,7 +143,7 @@ fn serialize_date<S>(date: &DateTime<FixedOffset>, serializer: S) -> Result<S::O
 where
     S: Serializer,
 {
-    stringify_date(date).serialize(serializer)
+    stringify_datetime(date).serialize(serializer)
 }
 
 fn serialize_bytes<S>(bytes: &[u8], serializer: S) -> Result<S::Ok, S::Error>
@@ -171,6 +179,19 @@ where
     D: Deserializer<'de>,
 {
     deserializer.deserialize_f64(BigDecimalVisitor)
+}
+
+fn serialize_object<S>(obj: &Vec<(String, PrismaValue)>, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    let mut map = serializer.serialize_map(Some(obj.len()))?;
+
+    for (k, v) in obj {
+        map.serialize_entry(k, v)?;
+    }
+
+    map.end()
 }
 
 struct BigDecimalVisitor;
@@ -239,6 +260,11 @@ impl PrismaValue {
         }
     }
 
+    /// For reexport convenience.
+    pub fn decode_bytes(s: &str) -> PrismaValueResult<Vec<u8>> {
+        decode_bytes(s)
+    }
+
     pub fn is_null(&self) -> bool {
         matches!(self, PrismaValue::Null)
     }
@@ -258,12 +284,19 @@ impl PrismaValue {
         }
     }
 
+    pub fn into_object(self) -> Option<Vec<(String, PrismaValue)>> {
+        match self {
+            PrismaValue::Object(obj) => Some(obj),
+            _ => None,
+        }
+    }
+
     pub fn new_float(float: f64) -> PrismaValue {
         PrismaValue::Float(BigDecimal::from_f64(float).unwrap())
     }
 
     pub fn new_datetime(datetime: &str) -> PrismaValue {
-        PrismaValue::DateTime(DateTime::parse_from_rfc3339(datetime).unwrap())
+        PrismaValue::DateTime(parse_datetime(datetime).unwrap())
     }
 
     pub fn as_boolean(&self) -> Option<&bool> {
@@ -289,18 +322,18 @@ impl fmt::Display for PrismaValue {
             PrismaValue::Xml(x) => x.fmt(f),
             PrismaValue::BigInt(x) => x.fmt(f),
             PrismaValue::List(x) => {
-                let as_string = format!("{:?}", x);
+                let as_string = format!("{x:?}");
                 as_string.fmt(f)
             }
             PrismaValue::Bytes(b) => encode_bytes(b).fmt(f),
             PrismaValue::Object(pairs) => {
                 let joined = pairs
                     .iter()
-                    .map(|(key, value)| format!(r#""{}": {}"#, key, value))
+                    .map(|(key, value)| format!(r#""{key}": {value}"#))
                     .collect::<Vec<_>>()
                     .join(", ");
 
-                write!(f, "{{ {} }}", joined)
+                write!(f, "{{ {joined} }}")
             }
         }
     }

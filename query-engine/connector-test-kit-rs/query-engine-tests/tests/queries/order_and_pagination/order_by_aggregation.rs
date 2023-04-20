@@ -846,7 +846,7 @@ mod order_by_aggr {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneUser(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneUser(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())

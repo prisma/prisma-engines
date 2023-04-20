@@ -12,7 +12,7 @@ pub(crate) fn get_postgres_tags(database_url: &str) -> Result<BitFlags<Tags>, St
         match version {
             None => Ok(tags),
             Some(version) => {
-                eprintln!("version: {:?}", version);
+                eprintln!("version: {version:?}");
 
                 if version.contains("9.") {
                     tags |= Tags::Postgres9;
@@ -31,10 +31,16 @@ pub(crate) fn get_postgres_tags(database_url: &str) -> Result<BitFlags<Tags>, St
                 }
 
                 if version.contains("CockroachDB") {
+                    if version.contains("v22.2") {
+                        tags |= Tags::CockroachDb222
+                    } else if version.contains("v21.2") {
+                        tags |= Tags::CockroachDb221
+                    }
+
                     tags |= Tags::CockroachDb;
                 }
 
-                eprintln!("Inferred tags: {:?}", tags);
+                eprintln!("Inferred tags: {tags:?}");
 
                 Ok(tags)
             }
@@ -55,14 +61,12 @@ pub async fn create_postgres_database(database_url: &str, db_name: &str) -> Resu
         r#"
         DROP DATABASE IF EXISTS "{db_name}";
         "#,
-        db_name = db_name,
     );
 
     let recreate = format!(
         r#"
         CREATE DATABASE "{db_name}";
         "#,
-        db_name = db_name,
     );
 
     let conn = Quaint::new(postgres_db_url.as_str()).await?;

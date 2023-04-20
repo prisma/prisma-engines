@@ -47,7 +47,6 @@ impl IdFragment {
         let field_name = field_name.into_value_string()?;
         let field_type = field_type.into_value_string()?;
         let directives = args
-            .into_iter()
             .map(|arg| arg.into_directive())
             .collect::<TemplatingResult<Vec<_>>>()?;
 
@@ -123,7 +122,7 @@ impl FragmentArgument {
             FragmentArgument::Value(s) => Ok(s),
             FragmentArgument::Directive(_) => Err(TemplatingError::argument_error(
                 "unknown",
-                format!("Expected Value argument, got: {:?}", self),
+                format!("Expected Value argument, got: {self:?}"),
             )),
         }
     }
@@ -132,7 +131,7 @@ impl FragmentArgument {
         match self {
             FragmentArgument::Value(_) => Err(TemplatingError::argument_error(
                 "unknown",
-                format!("Expected Directive argument, got: {:?}", self),
+                format!("Expected Directive argument, got: {self:?}"),
             )),
             FragmentArgument::Directive(dir) => Ok(dir),
         }

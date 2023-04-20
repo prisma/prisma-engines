@@ -60,9 +60,31 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
 
                 &mut names.tops
             }
+            (ast::TopId::Model(model_id), ast::Top::Model(model)) if model.is_view() => {
+                validate_identifier(model.identifier(), "view", ctx);
+                validate_model_name(model, "view", ctx.diagnostics);
+                validate_attribute_identifiers(model, ctx);
+
+                for (field_id, field) in model.iter_fields() {
+                    validate_identifier(field.identifier(), "field", ctx);
+                    validate_attribute_identifiers(field, ctx);
+                    let field_name_id = ctx.interner.intern(field.name());
+
+                    if names.model_fields.insert((model_id, field_name_id), field_id).is_some() {
+                        ctx.push_error(DatamodelError::new_duplicate_field_error(
+                            model.name(),
+                            field.name(),
+                            "view",
+                            field.identifier().span,
+                        ))
+                    }
+                }
+
+                &mut names.tops
+            }
             (ast::TopId::Model(model_id), ast::Top::Model(model)) => {
                 validate_identifier(model.identifier(), "Model", ctx);
-                validate_model_name(model, ctx.diagnostics);
+                validate_model_name(model, "model", ctx.diagnostics);
                 validate_attribute_identifiers(model, ctx);
 
                 for (field_id, field) in model.iter_fields() {
@@ -74,6 +96,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
                         ctx.push_error(DatamodelError::new_duplicate_field_error(
                             model.name(),
                             field.name(),
+                            "model",
                             field.identifier().span,
                         ))
                     }
@@ -168,17 +191,17 @@ fn validate_attribute_identifiers(with_attrs: &dyn WithAttributes, ctx: &mut Con
 fn validate_identifier(ident: &ast::Identifier, schema_item: &str, ctx: &mut Context<'_>) {
     if ident.name.is_empty() {
         ctx.push_error(DatamodelError::new_validation_error(
-            &format!("The name of a {} must not be empty.", schema_item),
+            &format!("The name of a {schema_item} must not be empty."),
             ident.span,
         ))
     } else if ident.name.chars().next().unwrap().is_numeric() {
         ctx.push_error(DatamodelError::new_validation_error(
-            &format!("The name of a {} must not start with a number.", schema_item),
+            &format!("The name of a {schema_item} must not start with a number."),
             ident.span,
         ))
     } else if ident.name.contains('-') {
         ctx.push_error(DatamodelError::new_validation_error(
-            &format!("The character `-` is not allowed in {} names.", schema_item),
+            &format!("The character `-` is not allowed in {schema_item} names."),
             ident.span,
         ))
     }

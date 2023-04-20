@@ -54,7 +54,7 @@ mod delete_inside_update {
         insta::assert_snapshot!(
           run_query!(runner, format!(r#"mutation {{
             updateOneParent(
-            where: {parent}
+            where: {parent_2}
             data:{{
               childOpt: {{delete: true}}
             }}){{
@@ -62,7 +62,7 @@ mod delete_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent_2)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":null}}}"###
         );
 
@@ -75,7 +75,7 @@ mod delete_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"findUniqueParent":{"childOpt":{"c":"existingChild"}}}}"###
         );
 
@@ -128,7 +128,7 @@ mod delete_inside_update {
         insta::assert_snapshot!(
           run_query!(runner, format!(r#"mutation {{
             updateOneParent(
-            where: {parent}
+            where: {parent_2}
             data:{{
               childOpt: {{ delete: {{ non_unique: "0" }} }}
             }}){{
@@ -136,7 +136,7 @@ mod delete_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent_2)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":null}}}"###
         );
 
@@ -148,7 +148,7 @@ mod delete_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"findUniqueParent":{"childOpt":{"c":"existingChild"}}}}"###
         );
 
@@ -185,7 +185,7 @@ mod delete_inside_update {
                   c
                 }}
               }}
-            }}"#, parent = parent),
+            }}"#),
             2025,
             "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested delete on relation 'ChildToParent'."
         );
@@ -227,7 +227,7 @@ mod delete_inside_update {
                   c
                 }}
               }}
-            }}"#, parent = parent),
+            }}"#),
             2025,
             "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested delete on relation 'ChildToParent'."
         );
@@ -292,7 +292,7 @@ mod delete_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent, child = child)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c2"}]}}}"###
         );
 
@@ -353,7 +353,7 @@ mod delete_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent, child = child)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c2"}]}}}"###
         );
 
@@ -461,7 +461,7 @@ mod delete_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":null}}}"###
         );
 
@@ -502,7 +502,7 @@ mod delete_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":null}}}"###
         );
 
@@ -543,7 +543,7 @@ mod delete_inside_update {
                   c
                 }}
               }}
-            }}"#, parent = parent),
+            }}"#),
             2025,
             "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested delete on relation 'ChildToParent'."
         );
@@ -603,7 +603,7 @@ mod delete_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent, child = child)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c2"}]}}}"###
         );
 
@@ -659,7 +659,7 @@ mod delete_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent, child = child)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c2"}]}}}"###
         );
 
@@ -758,7 +758,8 @@ mod delete_inside_update {
 
         assert_error!(
             runner,
-            format!(r#"mutation {{
+            format!(
+                r#"mutation {{
               updateOneParent(
               where: {parent}
               data:{{
@@ -768,9 +769,10 @@ mod delete_inside_update {
                   c
                 }}
               }}
-            }}"#, parent = parent),
+            }}"#
+            ),
             2009,
-            "`Mutation.updateOneParent.data.ParentUpdateInput.childReq.ChildUpdateOneRequiredWithoutParentsOptNestedInput.delete`: Field does not exist on enclosing type."
+            "Field does not exist in enclosing type."
         );
         Ok(())
     }
@@ -813,7 +815,7 @@ mod delete_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":null}}}"###
         );
 
@@ -859,7 +861,7 @@ mod delete_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":null}}}"###
         );
 
@@ -901,7 +903,7 @@ mod delete_inside_update {
                   c
                 }}
               }}
-            }}"#, parent = parent),
+            }}"#),
             2025,
             "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested delete on relation 'ChildToParent'."
         );
@@ -943,7 +945,7 @@ mod delete_inside_update {
                   c
                 }}
               }}
-            }}"#, parent = parent),
+            }}"#),
             2025,
             "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested delete on relation 'ChildToParent'."
         );
@@ -1020,10 +1022,7 @@ mod delete_inside_update {
                       c
                     }}
                   }}
-                }}"#,
-                parent = parent,
-                child_1 = child_1,
-                child_2 = child_2
+                }}"#
             ),
             2017,
             "The records for relation `ChildToParent` between the `Parent` and `Child` models are not connected."
@@ -1040,7 +1039,7 @@ mod delete_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent, child_2 = child_2)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c3"},{"c":"c4"}]}}}"###
         );
 
@@ -1177,7 +1176,7 @@ mod delete_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent, child_2 = child_2)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c3"},{"c":"c4"}]}}}"###
         );
 
@@ -1259,10 +1258,7 @@ mod delete_inside_update {
                       c
                     }}
                   }}
-                }}"#,
-                parent = parent,
-                child_1 = child_1,
-                child_2 = child_2
+                }}"#
             ),
             2017,
             "The records for relation `ChildToParent` between the `Parent` and `Child` models are not connected"
@@ -1342,7 +1338,7 @@ mod delete_inside_update {
               c
             }}
           }}
-        }}"#, parent = parent, child_2 = child_2, child_3 = child_3)),
+        }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c4"}]}}}"###
         );
 

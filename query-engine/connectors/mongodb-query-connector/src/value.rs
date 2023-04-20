@@ -70,12 +70,12 @@ fn convert_composite_object(cf: &CompositeFieldRef, pairs: Vec<(String, PrismaVa
     let mut doc = Document::new();
 
     for (field, value) in pairs {
-        let field = cf
-            .typ
+        let composite_type = cf.typ();
+        let field = composite_type
             .find_field(&field) // Todo: This is assuming a lot by only checking the prisma names, not DB names.
             .expect("Writing unavailable composite field.");
 
-        let converted = (field, value).into_bson()?;
+        let converted = (&field, value).into_bson()?;
 
         doc.insert(field.db_name(), converted);
     }
@@ -103,7 +103,7 @@ impl IntoBson for (&FilterPrefix, &RelationFieldRef) {
     fn into_bson(self) -> crate::Result<Bson> {
         let (prefix, rf) = self;
 
-        Ok(Bson::String(prefix.render_with(rf.relation().name.to_owned())))
+        Ok(Bson::String(prefix.render_with(rf.relation().name())))
     }
 }
 
@@ -111,13 +111,14 @@ impl IntoBson for (&ScalarFieldRef, PrismaValue) {
     fn into_bson(self) -> crate::Result<Bson> {
         let (sf, value) = self;
 
-        let mongo_type: Option<&MongoDbType> = sf.native_type.as_ref().map(|nt| nt.deserialize_native_type());
+        let nt = sf.native_type();
+        let mongo_type: Option<MongoDbType> = nt.map(|nt| nt.deserialize_native_type::<MongoDbType>().to_owned());
 
         // If we have a native type, use that one as source of truth for mapping, else use the type ident for defaults.
-        match (mongo_type, &sf.type_identifier, value) {
+        match (mongo_type, &sf.type_identifier(), value) {
             // We assume this is always valid if it arrives here.
             (_, _, PrismaValue::Null) => Ok(Bson::Null),
-            (Some(mt), _, value) => (mt, value).into_bson(),
+            (Some(mt), _, value) => (&mt, value).into_bson(),
             (_, field_type, value) => (field_type, value).into_bson(),
         }
     }
@@ -189,8 +190,8 @@ impl IntoBson for (&MongoDbType, PrismaValue) {
             // Unhandled conversions
             (mdb_type, p_val) => {
                 return Err(MongoError::ConversionError {
-                    from: format!("{:?}", p_val),
-                    to: format!("{:?}", mdb_type),
+                    from: format!("{p_val:?}"),
+                    to: format!("{mdb_type:?}"),
                 })
             }
         })
@@ -275,8 +276,7 @@ impl IntoBson for (&TypeIdentifier, PrismaValue) {
 
             (ident, val) => {
                 return Err(MongoError::Unsupported(format!(
-                    "Unhandled and unsupported value mapping for MongoDB: {} as {:?}.",
-                    val, ident,
+                    "Unhandled and unsupported value mapping for MongoDB: {val} as {ident:?}.",
                 )))
             }
         })
@@ -305,8 +305,8 @@ fn read_scalar_value(bson: Bson, meta: &ScalarOutputMeta) -> crate::Result<Prism
 
             _ => {
                 return Err(MongoError::ConversionError {
-                    from: format!("{}", bson),
-                    to: format!("List of {:?}", type_identifier),
+                    from: format!("{bson}"),
+                    to: format!("List of {type_identifier:?}"),
                 });
             }
         },
@@ -333,10 +333,12 @@ fn read_scalar_value(bson: Bson, meta: &ScalarOutputMeta) -> crate::Result<Prism
         (TypeIdentifier::Int, Bson::Int64(i)) => PrismaValue::Int(i),
         (TypeIdentifier::Int, Bson::Int32(i)) => PrismaValue::Int(i as i64),
         (TypeIdentifier::Int, Bson::Double(i)) => PrismaValue::Int(i as i64),
+        (TypeIdentifier::Int, Bson::Boolean(bool)) => PrismaValue::Int(bool as i64),
 
         // BigInt
         (TypeIdentifier::BigInt, Bson::Int64(i)) => PrismaValue::BigInt(i),
         (TypeIdentifier::BigInt, Bson::Int32(i)) => PrismaValue::BigInt(i as i64),
+        (TypeIdentifier::BigInt, Bson::Boolean(bool)) => PrismaValue::BigInt(bool as i64),
 
         // Floats
         (TypeIdentifier::Float, Bson::Double(f)) => {
@@ -376,7 +378,7 @@ fn read_scalar_value(bson: Bson, meta: &ScalarOutputMeta) -> crate::Result<Prism
         (ident, bson) => {
             return Err(MongoError::ConversionError {
                 from: bson.to_string(),
-                to: format!("{:?}", ident),
+                to: format!("{ident:?}"),
             })
         }
     };
@@ -398,7 +400,7 @@ fn read_composite_value(bson: Bson, meta: &CompositeOutputMeta) -> crate::Result
 
             _ => {
                 return Err(MongoError::ConversionError {
-                    from: format!("{}", bson),
+                    from: format!("{bson}"),
                     to: "List".to_owned(),
                 });
             }
@@ -435,7 +437,7 @@ fn read_composite_value(bson: Bson, meta: &CompositeOutputMeta) -> crate::Result
             }
             bson => {
                 return Err(MongoError::ConversionError {
-                    from: format!("{:?}", bson),
+                    from: format!("{bson:?}"),
                     to: "Document".to_owned(),
                 })
             }
@@ -466,7 +468,7 @@ where
 
 fn format_opt<T: Display>(opt: Option<T>) -> String {
     match opt {
-        Some(t) => format!("{}", t),
+        Some(t) => format!("{t}"),
         None => "None".to_owned(),
     }
 }

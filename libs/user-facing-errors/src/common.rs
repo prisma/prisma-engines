@@ -94,9 +94,7 @@ impl UserFacingError for DatabaseDoesNotExist {
                 database_file_name,
                 database_file_path,
             } => format!(
-                "Database {database_file_name} does not exist at {database_file_path}",
-                database_file_name = database_file_name,
-                database_file_path = database_file_path
+                "Database {database_file_name} does not exist at {database_file_path}"
             ),
             DatabaseDoesNotExist::Postgres {
                 database_name,
@@ -104,9 +102,6 @@ impl UserFacingError for DatabaseDoesNotExist {
                 database_port,
             } => format!(
                 "Database `{database_name}` does not exist on the database server at `{database_host}:{database_port}`.",
-                database_name = database_name,
-                database_host = database_host,
-                database_port = database_port,
             ),
             DatabaseDoesNotExist::Mysql {
                 database_name,
@@ -114,9 +109,6 @@ impl UserFacingError for DatabaseDoesNotExist {
                 database_port,
             } => format!(
                 "Database `{database_name}` does not exist on the database server at `{database_host}:{database_port}`.",
-                database_name = database_name,
-                database_host = database_host,
-                database_port = database_port,
             ),
             DatabaseDoesNotExist::Mssql {
                 database_name,
@@ -124,9 +116,6 @@ impl UserFacingError for DatabaseDoesNotExist {
                 database_port,
             } => format!(
                 "Database `{database_name}` does not exist on the database server at `{database_host}:{database_port}`.",
-                database_name = database_name,
-                database_host = database_host,
-                database_port = database_port,
             ),
         }
     }

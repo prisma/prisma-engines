@@ -406,7 +406,7 @@ mod order_by_nulls {
             runner,
             r#"{ findManyTestModel(orderBy: { id: { sort: asc, nulls: first } }) { id } }"#,
             2009,
-            "Value types mismatch"
+            "Invalid argument type"
         );
 
         Ok(())
@@ -418,7 +418,7 @@ mod order_by_nulls {
             runner,
             r#"{ findManyTestModel(orderBy: { string: { sort: asc, nulls: first } }) { id } }"#,
             2009,
-            "Value types mismatch"
+            "Invalid argument type"
         );
 
         Ok(())
@@ -447,7 +447,7 @@ mod order_by_nulls {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneTestModel(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneTestModel(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
 

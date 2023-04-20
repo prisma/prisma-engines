@@ -1,0 +1,11 @@
+{
+  "isIncomplete": false,
+  "items": [
+    {
+      "label": "SHADOW_DATABASE_URL",
+      "kind": 21,
+      "insertText": "SHADOW_DATABASE_URL",
+      "insertTextFormat": 1
+    }
+  ]
+}

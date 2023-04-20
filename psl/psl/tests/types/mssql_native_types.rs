@@ -882,17 +882,12 @@ macro_rules! test_type {
                         }}
                     "#);
 
-                    let instance = parse(&dml)
+                    let schema = psl::parse_schema(&dml).unwrap();
+
+                    schema
                         .assert_has_model("Blog")
                         .assert_has_scalar_field("x")
-                        .field_type
-                        .native_type()
-                        .unwrap()
-                        .clone();
-
-                    let result: &MsSqlType = instance.deserialize_native_type();
-
-                    assert_eq!(&$output, result);
+                        .assert_native_type(schema.connector, &$output);
                 )+
             }
         }

@@ -17,22 +17,16 @@ fn relation_happy_path() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse_schema(dml);
     let user_model = schema.assert_has_model("User");
+    let post_model = schema.assert_has_model("Post");
     user_model
         .assert_has_relation_field("posts")
-        .assert_arity(&dml::FieldArity::List)
-        .assert_relation_to("Post")
-        .assert_relation_base_fields(&[])
-        .assert_relation_referenced_fields(&[]);
+        .assert_relation_to(post_model.id);
 
-    let post_model = schema.assert_has_model("Post");
     post_model
         .assert_has_relation_field("user")
-        .assert_arity(&dml::FieldArity::Required)
-        .assert_relation_to("User")
-        .assert_relation_base_fields(&["userId"])
-        .assert_relation_referenced_fields(&["id"]);
+        .assert_relation_to(user_model.id);
 }
 
 #[test]
@@ -123,7 +117,7 @@ fn optional_relation_field_must_succeed_when_all_underlying_fields_are_optional(
     "#;
 
     // must not crash
-    let _ = parse(dml);
+    let _ = parse_schema(dml);
 }
 
 #[test]
@@ -184,7 +178,7 @@ fn optional_relation_field_must_succeed_when_at_least_one_underlying_fields_is_o
     "#;
 
     // must not crash
-    let _ = parse(dml);
+    parse_schema(dml);
 }
 
 #[test]
@@ -783,7 +777,7 @@ fn must_error_nicely_when_a_many_to_many_is_not_possible() {
     }"#;
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating field `posts` in model `Category`: The relation field `posts` on Model `Category` references `Post` which does not have an `@id` field. Models without `@id` cannot be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.[0m
+        [1;91merror[0m: [1mError validating field `posts` in model `Category`: The relation field `posts` on model `Category` references `Post` which does not have an `@id` field. Models without `@id` cannot be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.[0m
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0m      id    Int    @id @default(autoincrement())
@@ -811,7 +805,7 @@ fn must_error_when_many_to_many_is_not_possible_due_to_missing_id() {
     "#;
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating field `posts` in model `Category`: The relation field `posts` on Model `Category` references `Post` which does not have an `@id` field. Models without `@id` cannot be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.[0m
+        [1;91merror[0m: [1mError validating field `posts` in model `Category`: The relation field `posts` on model `Category` references `Post` which does not have an `@id` field. Models without `@id` cannot be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.[0m
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m      id    Int    @id @default(autoincrement())

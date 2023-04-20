@@ -1,6 +1,6 @@
 use super::{
     parse_composite_type::parse_composite_type, parse_enum::parse_enum, parse_model::parse_model,
-    parse_source_and_generator::parse_config_block, PrismaDatamodelParser, Rule,
+    parse_source_and_generator::parse_config_block, parse_view::parse_view, PrismaDatamodelParser, Rule,
 };
 use crate::ast::*;
 use diagnostics::{DatamodelError, Diagnostics};
@@ -20,7 +20,7 @@ pub fn parse_schema(datamodel_string: &str, diagnostics: &mut Diagnostics) -> Sc
             while let Some(current) = pairs.next() {
                 match current.as_rule() {
                     Rule::model_declaration => {
-                        let keyword = current.clone().into_inner().find(|pair| matches!(pair.as_rule(), Rule::TYPE_KEYWORD | Rule::MODEL_KEYWORD) ).expect("Expected model or type keyword");
+                        let keyword = current.clone().into_inner().find(|pair| matches!(pair.as_rule(), Rule::TYPE_KEYWORD | Rule::MODEL_KEYWORD | Rule::VIEW_KEYWORD) ).expect("Expected model, type or view keyword");
 
                         match keyword.as_rule() {
                             Rule::TYPE_KEYWORD => {
@@ -28,6 +28,9 @@ pub fn parse_schema(datamodel_string: &str, diagnostics: &mut Diagnostics) -> Sc
                             }
                             Rule::MODEL_KEYWORD => {
                                 top_level_definitions.push(Top::Model(parse_model(current, pending_block_comment.take(), diagnostics)))
+                            }
+                            Rule::VIEW_KEYWORD => {
+                                top_level_definitions.push(Top::Model(parse_view(current, pending_block_comment.take(), diagnostics)))
                             }
                             _ => unreachable!(),
                         }
@@ -61,8 +64,9 @@ pub fn parse_schema(datamodel_string: &str, diagnostics: &mut Diagnostics) -> Sc
                         "This line is invalid. It does not start with any known Prisma schema keyword.",
                         current.as_span().into(),
                     )),
+                    // TODO: Add view when we want it to be more visible as a feature.
                     Rule::arbitrary_block => diagnostics.push_error(DatamodelError::new_validation_error(
-                        "This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include \'model\', \'enum\', \'datasource\' and \'generator\'.",
+                        "This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include \'model\', \'enum\', \'type\', \'datasource\' and \'generator\'.",
                         current.as_span().into(),
                     )),
                     Rule::empty_lines => (),
@@ -97,7 +101,7 @@ fn get_expected_from_error(positives: &[Rule]) -> String {
     let mut out = String::with_capacity(positives.len() * 6);
 
     for positive in positives {
-        write!(out, "{:?}", positive).unwrap();
+        write!(out, "{positive:?}").unwrap();
     }
 
     out

@@ -15,17 +15,10 @@ fn simple_composite_index() {
         }
     "#};
 
-    let datamodel = parse(&with_header(schema, crate::Provider::Mongo, &[]));
-
-    datamodel.assert_has_model("B").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("B_a_field_idx".to_string()),
-        fields: vec![IndexField::new_in_path(&[("a", None), ("field", Some("A"))])],
-        tpe: IndexType::Normal,
-        algorithm: None,
-        defined_on_field: false,
-        clustered: None,
-    });
+    psl::parse_schema(with_header(schema, crate::Provider::Mongo, &[]))
+        .unwrap()
+        .assert_has_model("B")
+        .assert_index_on_fields(&["field"]);
 }
 
 #[test]
@@ -43,17 +36,10 @@ fn simple_composite_unique() {
         }
     "#};
 
-    let datamodel = parse(&with_header(schema, crate::Provider::Mongo, &[]));
-
-    datamodel.assert_has_model("B").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("B_a_field_key".to_string()),
-        fields: vec![IndexField::new_in_path(&[("a", None), ("field", Some("A"))])],
-        tpe: IndexType::Unique,
-        algorithm: None,
-        defined_on_field: false,
-        clustered: None,
-    });
+    psl::parse_schema(with_header(schema, crate::Provider::Mongo, &[]))
+        .unwrap()
+        .assert_has_model("B")
+        .assert_unique_on_fields(&["field"]);
 }
 
 #[test]
@@ -73,31 +59,11 @@ fn composite_unique_with_normal_unique() {
         }
     "#};
 
-    let datamodel = parse(&with_header(schema, crate::Provider::Mongo, &[]));
+    let schema = psl::parse_schema(with_header(schema, crate::Provider::Mongo, &[])).unwrap();
+    let model = schema.assert_has_model("User");
 
-    datamodel
-        .assert_has_model("User")
-        .assert_has_index(IndexDefinition {
-            name: None,
-            db_name: Some("User_val_key".to_string()),
-            fields: vec![IndexField::new_in_model("val")],
-            tpe: IndexType::Unique,
-            algorithm: None,
-            defined_on_field: true,
-            clustered: None,
-        })
-        .assert_has_index(IndexDefinition {
-            name: None,
-            db_name: Some("User_address_number_key".to_string()),
-            fields: vec![IndexField::new_in_path(&[
-                ("address", None),
-                ("number", Some("Address")),
-            ])],
-            tpe: IndexType::Unique,
-            algorithm: None,
-            defined_on_field: false,
-            clustered: None,
-        });
+    model.assert_unique_on_fields(&["number"]);
+    model.assert_unique_on_fields(&["val"]);
 }
 
 #[test]
@@ -115,17 +81,10 @@ fn simple_composite_fulltext() {
         }
     "#};
 
-    let datamodel = parse(&with_header(schema, crate::Provider::Mongo, &["fullTextIndex"]));
-
-    datamodel.assert_has_model("B").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("B_a_field_idx".to_string()),
-        fields: vec![IndexField::new_in_path(&[("a", None), ("field", Some("A"))])],
-        tpe: IndexType::Fulltext,
-        algorithm: None,
-        defined_on_field: false,
-        clustered: None,
-    });
+    psl::parse_schema(with_header(schema, crate::Provider::Mongo, &["fullTextIndex"]))
+        .unwrap()
+        .assert_has_model("B")
+        .assert_fulltext_on_fields(&["field"]);
 }
 
 #[test]
@@ -143,17 +102,10 @@ fn composite_index_with_default() {
         }
     "#};
 
-    let datamodel = parse(&with_header(schema, crate::Provider::Mongo, &[]));
-
-    datamodel.assert_has_model("B").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("B_a_field_idx".to_string()),
-        fields: vec![IndexField::new_in_path(&[("a", None), ("field", Some("A"))])],
-        tpe: IndexType::Normal,
-        algorithm: None,
-        defined_on_field: false,
-        clustered: None,
-    });
+    psl::parse_schema(with_header(schema, crate::Provider::Mongo, &[]))
+        .unwrap()
+        .assert_has_model("B")
+        .assert_index_on_fields(&["field"]);
 }
 
 #[test]
@@ -171,17 +123,10 @@ fn composite_index_with_map() {
         }
     "#};
 
-    let datamodel = parse(&with_header(schema, crate::Provider::Mongo, &[]));
-
-    datamodel.assert_has_model("B").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("B_a_meow_idx".to_string()),
-        fields: vec![IndexField::new_in_path(&[("a", None), ("field", Some("A"))])],
-        tpe: IndexType::Normal,
-        algorithm: None,
-        defined_on_field: false,
-        clustered: None,
-    });
+    psl::parse_schema(with_header(schema, crate::Provider::Mongo, &[]))
+        .unwrap()
+        .assert_has_model("B")
+        .assert_index_on_fields(&["field"]);
 }
 
 #[test]
@@ -199,20 +144,12 @@ fn composite_index_with_sort() {
         }
     "#};
 
-    let datamodel = parse(&with_header(schema, crate::Provider::Mongo, &[]));
-
-    let mut field = IndexField::new_in_path(&[("a", None), ("field", Some("A"))]);
-    field.sort_order = Some(SortOrder::Desc);
-
-    datamodel.assert_has_model("B").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("B_a_field_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        algorithm: None,
-        defined_on_field: false,
-        clustered: None,
-    });
+    psl::parse_schema(with_header(schema, crate::Provider::Mongo, &[]))
+        .unwrap()
+        .assert_has_model("B")
+        .assert_index_on_fields(&["field"])
+        .assert_field("field")
+        .assert_descending();
 }
 
 #[test]

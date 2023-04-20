@@ -10,20 +10,20 @@ use prisma_models::{FieldSelection, ModelRef, SelectionResult};
 
 #[derive(Debug, Clone)]
 #[allow(clippy::large_enum_variant)]
-pub enum Query {
+pub(crate) enum Query {
     Read(ReadQuery),
     Write(WriteQuery),
 }
 
 impl Query {
-    pub fn returns(&self, fields: &FieldSelection) -> bool {
+    pub(crate) fn returns(&self, fields: &FieldSelection) -> bool {
         match self {
             Self::Read(rq) => rq.returns(fields),
             Self::Write(wq) => wq.returns(fields),
         }
     }
 
-    pub fn model(&self) -> ModelRef {
+    pub(crate) fn model(&self) -> ModelRef {
         match self {
             Self::Read(rq) => rq.model(),
             Self::Write(wq) => wq.model(),
@@ -93,10 +93,10 @@ pub trait FilteredNestedMutation {
 }
 
 impl std::fmt::Display for Query {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Read(q) => write!(f, "{}", q),
-            Self::Write(q) => write!(f, "{}", q),
+            Self::Read(q) => write!(f, "{q}"),
+            Self::Write(q) => write!(f, "{q}"),
         }
     }
 }

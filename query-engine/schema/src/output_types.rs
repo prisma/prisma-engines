@@ -1,23 +1,23 @@
 use super::*;
 use fmt::Debug;
 use once_cell::sync::OnceCell;
-use prisma_models::ModelRef;
-use std::{fmt, sync::Arc};
+use prisma_models::{ast::ModelId, ModelRef};
+use std::fmt;
 
 #[derive(Debug, Clone)]
 pub enum OutputType {
-    Enum(EnumTypeWeakRef),
-    List(OutputTypeRef),
-    Object(ObjectTypeWeakRef),
+    Enum(EnumTypeId),
+    List(Box<OutputType>),
+    Object(OutputObjectTypeId),
     Scalar(ScalarType),
 }
 
 impl OutputType {
     pub fn list(containing: OutputType) -> OutputType {
-        OutputType::List(Arc::new(containing))
+        OutputType::List(Box::new(containing))
     }
 
-    pub fn object(containing: ObjectTypeWeakRef) -> OutputType {
+    pub fn object(containing: OutputObjectTypeId) -> OutputType {
         OutputType::Object(containing)
     }
 
@@ -45,7 +45,7 @@ impl OutputType {
         OutputType::Scalar(ScalarType::Boolean)
     }
 
-    pub fn enum_type(containing: EnumTypeWeakRef) -> OutputType {
+    pub fn enum_type(containing: EnumTypeId) -> OutputType {
         OutputType::Enum(containing)
     }
 
@@ -71,11 +71,11 @@ impl OutputType {
 
     /// Attempts to recurse through the type until an object type is found.
     /// Returns Some(ObjectTypeStrongRef) if ab object type is found, None otherwise.
-    pub fn as_object_type(&self) -> Option<ObjectTypeStrongRef> {
+    pub fn as_object_type<'a>(&self, db: &'a QuerySchemaDatabase) -> Option<(OutputObjectTypeId, &'a ObjectType)> {
         match self {
             OutputType::Enum(_) => None,
-            OutputType::List(inner) => inner.as_object_type(),
-            OutputType::Object(obj) => Some(obj.into_arc()),
+            OutputType::List(inner) => inner.as_object_type(db),
+            OutputType::Object(obj) => Some((*obj, &db[*obj])),
             OutputType::Scalar(_) => None,
         }
     }
@@ -87,14 +87,36 @@ impl OutputType {
     pub fn is_object(&self) -> bool {
         matches!(self, OutputType::Object(_))
     }
+
+    pub fn is_scalar(&self) -> bool {
+        matches!(self, OutputType::Scalar(_))
+    }
+
+    pub fn is_enum(&self) -> bool {
+        matches!(self, OutputType::Enum(_))
+    }
+
+    pub fn is_scalar_list(&self) -> bool {
+        match self {
+            OutputType::List(typ) => typ.is_scalar(),
+            _ => false,
+        }
+    }
+
+    pub fn is_enum_list(&self) -> bool {
+        match self {
+            OutputType::List(typ) => typ.is_enum(),
+            _ => false,
+        }
+    }
 }
 
 pub struct ObjectType {
     pub identifier: Identifier,
-    fields: OnceCell<Vec<OutputFieldRef>>,
+    fields: OnceCell<Vec<OutputField>>,
 
     // Object types can directly map to models.
-    model: Option<ModelRef>,
+    model: Option<ModelId>,
 }
 
 impl Debug for ObjectType {
@@ -108,7 +130,7 @@ impl Debug for ObjectType {
 }
 
 impl ObjectType {
-    pub fn new(ident: Identifier, model: Option<ModelRef>) -> Self {
+    pub fn new(ident: Identifier, model: Option<ModelId>) -> Self {
         Self {
             identifier: ident,
             fields: OnceCell::new(),
@@ -121,19 +143,19 @@ impl ObjectType {
     }
 
     pub fn add_field(&mut self, field: OutputField) {
-        self.fields.get_mut().unwrap().push(Arc::new(field));
+        self.fields.get_mut().unwrap().push(field)
     }
 
-    pub fn get_fields(&self) -> &Vec<OutputFieldRef> {
+    pub fn get_fields(&self) -> &[OutputField] {
         self.fields.get().unwrap()
     }
 
     pub fn set_fields(&self, fields: Vec<OutputField>) {
-        self.fields.set(fields.into_iter().map(Arc::new).collect()).unwrap();
+        self.fields.set(fields).unwrap();
     }
 
-    pub fn find_field(&self, name: &str) -> Option<OutputFieldRef> {
-        self.get_fields().iter().find(|f| f.name == name).cloned()
+    pub fn find_field<'a>(&'a self, name: &str) -> Option<(usize, &'a OutputField)> {
+        self.get_fields().iter().enumerate().find(|(_, f)| f.name == name)
     }
 
     /// True if fields are empty, false otherwise.
@@ -145,12 +167,11 @@ impl ObjectType {
 #[derive(Debug)]
 pub struct OutputField {
     pub name: String,
-    pub field_type: OutputTypeRef,
-    pub deprecation: Option<Deprecation>,
+    pub field_type: OutputType,
 
     /// Arguments are input fields, but positioned in context of an output field
     /// instead of being attached to an input object.
-    pub arguments: Vec<InputFieldRef>,
+    pub arguments: Vec<InputField>,
 
     /// Indicates the presence of the field on the higher output objects.
     /// States whether or not the field can be null.
@@ -174,20 +195,6 @@ impl OutputField {
         }
     }
 
-    pub fn deprecate<T, S>(mut self, reason: T, since_version: S, planned_removal_version: Option<String>) -> Self
-    where
-        T: Into<String>,
-        S: Into<String>,
-    {
-        self.deprecation = Some(Deprecation {
-            reason: reason.into(),
-            since_version: since_version.into(),
-            planned_removal_version,
-        });
-
-        self
-    }
-
     pub fn model(&self) -> Option<&ModelRef> {
         self.query_info.as_ref().and_then(|info| info.model.as_ref())
     }
@@ -196,7 +203,18 @@ impl OutputField {
         matches!(self.query_tag(), Some(&QueryTag::FindUnique))
     }
 
-    fn query_tag(&self) -> Option<&QueryTag> {
-        self.query_info.as_ref().map(|info| &info.tag)
+    pub fn query_info(&self) -> Option<&QueryInfo> {
+        self.query_info.as_ref()
+    }
+
+    pub fn query_tag(&self) -> Option<&QueryTag> {
+        self.query_info().map(|info| &info.tag)
+    }
+
+    // Is relation determines whether the given output field maps to a a relation, i.e.
+    // is an object and that object is backed by a model, meaning that it is not an scalar list
+    pub fn maps_to_relation(&self, query_schema: &QuerySchema) -> bool {
+        let o = self.field_type.as_object_type(&query_schema.db);
+        o.is_some() && o.unwrap().1.model.is_some()
     }
 }

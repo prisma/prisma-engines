@@ -1,0 +1,21 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator js {
+  provider = "prisma-client-js"
+  previewFeatures = ["views"]
+}
+
+view Mountain {
+  id Int @unique
+  id Int
+}
+
+// [1;91merror[0m: [1mField "id" is already defined on view "Mountain".[0m
+//   [1;94m-->[0m  [4mschema.prisma:13[0m
+// [1;94m   | [0m
+// [1;94m12 | [0m  id Int @unique
+// [1;94m13 | [0m  [1;91mid[0m Int
+// [1;94m   | [0m

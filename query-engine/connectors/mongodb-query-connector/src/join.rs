@@ -1,6 +1,6 @@
 use crate::filter::MongoFilter;
 use mongodb::bson::{doc, Document};
-use prisma_models::RelationFieldRef;
+use prisma_models::{walkers, RelationFieldRef, ScalarFieldRef};
 
 /// A join stage describes a tree of joins and nested joins to be performed on a collection.
 /// Every document of the `source` side will be joined with the collection documents
@@ -82,7 +82,7 @@ impl JoinStage {
         let as_name = if let Some(alias) = self.alias {
             alias
         } else {
-            relation.name.clone()
+            relation.name()
         };
 
         let right_model = from_field.related_model();
@@ -92,7 +92,12 @@ impl JoinStage {
         let mut pipeline = Vec::with_capacity(1 + nested_stages.len());
 
         // First we start with the right side of the equation
-        let right_scalars = from_field.right_scalars();
+        let right_scalars: Vec<ScalarFieldRef> = match from_field.walker().relation().refine() {
+            walkers::RefinedRelationWalker::Inline(_) | walkers::RefinedRelationWalker::ImplicitManyToMany(_) => {
+                from_field.related_field().left_scalars()
+            }
+            walkers::RefinedRelationWalker::TwoWayEmbeddedManyToMany(_) => from_field.related_field().scalar_fields(),
+        };
 
         // What $expr operators we will need to express this lookup? (depends on right fields)
         let ops: Vec<Document> = right_scalars
@@ -100,7 +105,7 @@ impl JoinStage {
             .enumerate()
             .map(|(idx, right_field)| {
                 let right_ref = format!("${}", right_field.db_name());
-                let left_var = format!("$$left_{}", idx);
+                let left_var = format!("$$left_{idx}");
 
                 match relation.is_many_to_many() {
                     true if right_field.is_list() => doc! { "$in": [left_var, right_ref] },
@@ -118,7 +123,7 @@ impl JoinStage {
             // Go through every right field to place in the $addFields operator
             for right_field in right_scalars.iter() {
                 let right_name = right_field.db_name();
-                let right_ref = format!("${}", right_name);
+                let right_ref = format!("${right_name}");
 
                 add_fields.insert(
                     right_name,
@@ -153,7 +158,7 @@ impl JoinStage {
         // If the field is a to-one, add an unwind stage.
         let unwind_stage = if !from_field.is_list() {
             Some(doc! {
-                "$unwind": { "path": format!("${}", as_name), "preserveNullAndEmptyArrays": true }
+                "$unwind": { "path": format!("${as_name}"), "preserveNullAndEmptyArrays": true }
             })
         } else {
             None
@@ -166,7 +171,7 @@ impl JoinStage {
 
         // With the left side, we need to introduce the variable `left_x` pointing to the correct field
         for (idx, left_field) in left_scalars.iter().enumerate() {
-            let left_var = format!("left_{}", idx);
+            let left_var = format!("left_{idx}");
 
             let_vars.insert(left_var, format!("${}", left_field.db_name()));
         }

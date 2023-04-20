@@ -1,5 +1,4 @@
 use super::*;
-use crate::utils::quote_connector;
 use darling::FromMeta;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
@@ -20,11 +19,9 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
 
     let excluded_features = args.exclude_features.features();
     let db_schemas = args.db_schemas.schemas();
-    let connectors = args.connectors_to_test();
+    let only = &args.only;
+    let exclude = &args.exclude;
     let handler = args.schema.unwrap().handler_path;
-
-    // Renders the connectors as list to use in the code.
-    let connectors = connectors.into_iter().map(quote_connector);
 
     let mut test_function = parse_macro_input!(input as ItemFn);
 
@@ -44,17 +41,17 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
     }
 
     // The shell function retains the name of the original test definition.
-    let test_fn_ident = test_function.sig.ident.clone();
+    let test_fn_ident = test_function.sig.ident;
 
     // Rename original test function to run_<orig_name>.
-    let runner_fn_ident = Ident::new(&format!("run_{}", test_fn_ident), Span::call_site());
+    let runner_fn_ident = Ident::new(&format!("run_{test_fn_ident}"), Span::call_site());
     test_function.sig.ident = runner_fn_ident.clone();
 
     // The test database name is the name used as the database for data source rendering.
     // Combination of test name and test mod name.
     let test_name = test_fn_ident.to_string();
     let suite_name = args.suite.expect("A test must have a test suite.");
-    let test_database_name = format!("{}_{}", suite_name, test_name);
+    let test_database_name = format!("{suite_name}_{test_name}");
     let capabilities = args.capabilities.idents;
 
     let referential_override = match args.relation_mode.or(args.referential_integrity) {
@@ -71,9 +68,9 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
         #[test]
         fn #test_fn_ident() {
             query_tests_setup::run_connector_test(
-                #test_name,
                 #test_database_name,
-                &[#(#connectors,)*],
+                &[#only],
+                &[#exclude],
                 &[#(ConnectorCapability::#capabilities),*],
                 &[#(#excluded_features),*],
                 #handler,

@@ -1,49 +1,63 @@
-use super::{CompositeTypeFieldWalker, ModelWalker, RelationFieldWalker, ScalarFieldWalker};
-use crate::ScalarType;
+use super::{CompositeTypeFieldWalker, ModelWalker, RelationFieldWalker, ScalarFieldWalker, Walker};
+use crate::{
+    types::{RelationField, ScalarField},
+    ScalarType,
+};
 use schema_ast::ast;
 
-#[derive(Copy, Clone)]
-enum InnerWalker<'db> {
-    Scalar(ScalarFieldWalker<'db>),
-    Relation(RelationFieldWalker<'db>),
-}
-
 /// A model field, scalar or relation.
-#[derive(Clone, Copy)]
-pub struct FieldWalker<'db> {
-    inner: InnerWalker<'db>,
-}
+pub type FieldWalker<'db> = Walker<'db, (ast::ModelId, ast::FieldId)>;
 
 impl<'db> FieldWalker<'db> {
-    /// The field name.
-    pub fn name(self) -> &'db str {
-        match self.inner {
-            InnerWalker::Scalar(f) => f.name(),
-            InnerWalker::Relation(f) => f.name(),
-        }
+    /// The AST node for the field.
+    pub fn ast_field(self) -> &'db ast::Field {
+        &self.db.ast[self.id.0][self.id.1]
     }
 
-    /// The model name.
+    /// The field name.
+    pub fn name(self) -> &'db str {
+        self.ast_field().name()
+    }
+
+    /// Traverse the field's parent model.
     pub fn model(self) -> ModelWalker<'db> {
-        match self.inner {
-            InnerWalker::Scalar(f) => f.model(),
-            InnerWalker::Relation(f) => f.model(),
+        self.walk(self.id.0)
+    }
+
+    /// Find out which kind of field this is.
+    pub fn refine(self) -> RefinedFieldWalker<'db> {
+        match self.db.types.refine_field(self.id) {
+            either::Either::Left(id) => RefinedFieldWalker::Relation(self.walk(id)),
+            either::Either::Right(id) => RefinedFieldWalker::Scalar(self.walk(id)),
         }
     }
+}
+
+/// A field that has been identified as scalar field or relation field.
+#[derive(Copy, Clone)]
+pub enum RefinedFieldWalker<'db> {
+    /// A scalar field
+    Scalar(ScalarFieldWalker<'db>),
+    /// A relation field
+    Relation(RelationFieldWalker<'db>),
 }
 
 impl<'db> From<ScalarFieldWalker<'db>> for FieldWalker<'db> {
     fn from(w: ScalarFieldWalker<'db>) -> Self {
-        Self {
-            inner: InnerWalker::Scalar(w),
+        let ScalarField { model_id, field_id, .. } = w.db.types[w.id];
+        Walker {
+            db: w.db,
+            id: (model_id, field_id),
         }
     }
 }
 
 impl<'db> From<RelationFieldWalker<'db>> for FieldWalker<'db> {
     fn from(w: RelationFieldWalker<'db>) -> Self {
-        Self {
-            inner: InnerWalker::Relation(w),
+        let RelationField { model_id, field_id, .. } = w.db.types[w.id];
+        Walker {
+            db: w.db,
+            id: (model_id, field_id),
         }
     }
 }

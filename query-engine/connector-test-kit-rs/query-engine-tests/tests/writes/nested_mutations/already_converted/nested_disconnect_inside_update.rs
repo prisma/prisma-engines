@@ -44,7 +44,7 @@ mod disconnect_inside_update {
               c
             }}
           }}
-        }}"#, parent = parent)),
+        }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":null}}}"###
         );
 
@@ -91,7 +91,7 @@ mod disconnect_inside_update {
               c
             }}
           }}
-        }}"#, parent = parent)),
+        }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":null}}}"###
         );
 
@@ -99,7 +99,8 @@ mod disconnect_inside_update {
     }
 
     // "a P1 to C1 relation " should "be disconnectable through a nested mutation by id"
-    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt")]
+    // TODO: MongoDB doesn't support joins on top-level updates. It should be un-excluded once we fix that.
+    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt", exclude(MongoDb))]
     async fn p1_c1_by_fails_if_filters_no_match(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(
@@ -132,13 +133,13 @@ mod disconnect_inside_update {
             where: {parent}
             data:{{
               p: {{ set: "p2" }}
-              childOpt: {{disconnect: {{ non_unique: "1" }} }}
+              childOpt: {{ disconnect: {{ non_unique: "1" }} }}
           }}){{
             childOpt {{
               c
             }}
           }}
-        }}"#, parent = parent)),
+        }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":{"c":"c1"}}}}"###
         );
 
@@ -191,7 +192,7 @@ mod disconnect_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":null}}}"###
         );
 
@@ -286,7 +287,7 @@ mod disconnect_inside_update {
                   c
                 }}
               }}
-            }}"#, parent = parent),
+            }}"#),
             2014,
             "The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."
         );
@@ -329,13 +330,13 @@ mod disconnect_inside_update {
             updateOneParent(
             where: {parent}
             data:{{
-              childrenOpt: {{disconnect: [{child}]}}
+              childrenOpt: {{disconnect: [{second_child}]}}
             }}){{
               childrenOpt {{
                 c
               }}
             }}
-          }}"#, parent = parent, child = second_child)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"}]}}}"###
         );
         Ok(())
@@ -381,7 +382,7 @@ mod disconnect_inside_update {
                     c
                   }}
                 }}
-              }}"#, parent = parent)),
+              }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"}]}}}"###
         );
 
@@ -397,7 +398,7 @@ mod disconnect_inside_update {
                     c
                   }}
                 }}
-              }}"#, parent = parent)),
+              }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"}]}}}"###
         );
 
@@ -446,7 +447,7 @@ mod disconnect_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childOpt":null}}}"###
         );
 
@@ -530,7 +531,7 @@ mod disconnect_inside_update {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"}]}}}"###
         );
 
@@ -547,10 +548,7 @@ mod disconnect_inside_update {
                       c
                     }}
                   }}
-                }}"#,
-                parent = parent,
-                first_child = first_child,
-                other_child = other_child
+                }}"#
             )
         );
 
@@ -635,16 +633,13 @@ mod disconnect_inside_update {
                   updateOneParent(
                     where: {parent}
                     data:{{
-                      childrenOpt: {{disconnect: [{child_1}, {child_2}]}}
+                      childrenOpt: {{disconnect: [{child_1}, {other_child}]}}
                   }}){{
                     childrenOpt{{
                       c
                     }}
                   }}
-                }}"#,
-                parent = parent,
-                child_1 = child_1,
-                child_2 = other_child
+                }}"#
             )
         );
 
@@ -706,13 +701,13 @@ mod disconnect_inside_update {
             updateOneParent(
               where: {parent}
               data:{{
-                childrenOpt: {{disconnect: [{child}]}}
+                childrenOpt: {{disconnect: [{child_1}]}}
             }}){{
               childrenOpt{{
                 c
               }}
             }}
-          }}"#, parent = parent, child = child_1)),
+          }}"#)),
           @r###"{"data":{"updateOneParent":{"childrenOpt":[{"c":"c2"}]}}}"###
         );
 

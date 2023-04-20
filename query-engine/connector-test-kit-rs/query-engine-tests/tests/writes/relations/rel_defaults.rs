@@ -114,7 +114,7 @@ mod rel_defaults {
             &runner,
             r#"mutation { createOneList(data: { id: 2, name: "listWithTodoOne" }) { id todo { id } } }"#,
             2009,
-            "`Mutation.createOneList.data.ListCreateInput.todo`: A value is required but not set."
+            "A value is required but not set"
         );
 
         Ok(())
@@ -215,7 +215,7 @@ mod rel_defaults {
     }
 
     async fn count_items(runner: &Runner, name: &str) -> TestResult<usize> {
-        let res = run_query_json!(runner, format!(r#"query {{ {} {{ id }} }}"#, name));
+        let res = run_query_json!(runner, format!(r#"query {{ {name} {{ id }} }}"#));
         let data = &res["data"][name];
 
         match data {
@@ -226,7 +226,7 @@ mod rel_defaults {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneList(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneList(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
 

@@ -10,10 +10,11 @@ use crate::{diagnostics::DatamodelError, validate::validation_pipeline::context:
 use diagnostics::DatamodelWarning;
 use indoc::formatdoc;
 use itertools::Itertools;
+use parser_database::walkers::RelationFieldId;
 use parser_database::ReferentialAction;
 use parser_database::{
     ast::WithSpan,
-    walkers::{CompleteInlineRelationWalker, InlineRelationWalker, RelationFieldWalker},
+    walkers::{CompleteInlineRelationWalker, InlineRelationWalker},
     ScalarFieldType,
 };
 use std::{
@@ -239,7 +240,7 @@ pub(super) fn cycles(relation: CompleteInlineRelationWalker<'_>, ctx: &mut Conte
     let parent_model = relation.referencing_model();
 
     while let Some((next_relation, visited_relations)) = next_relations.pop() {
-        visited.insert(next_relation.referencing_field());
+        visited.insert(next_relation.referencing_field().id);
 
         let related_model = next_relation.referenced_model();
 
@@ -265,8 +266,7 @@ pub(super) fn cycles(relation: CompleteInlineRelationWalker<'_>, ctx: &mut Conte
 
             if related_model.id == parent_model.id {
                 let msg = format!(
-                    "Reference causes a cycle. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: {}.",
-                    visited_relations
+                    "Reference causes a cycle. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: {visited_relations}."
                 );
 
                 ctx.push_error(cascade_error_with_default_values(
@@ -280,7 +280,7 @@ pub(super) fn cycles(relation: CompleteInlineRelationWalker<'_>, ctx: &mut Conte
 
             let relations = related_model
                 .complete_inline_relations_from()
-                .filter(|r| !visited.contains(&r.referencing_field()));
+                .filter(|r| !visited.contains(&r.referencing_field().id));
 
             for relation in relations {
                 next_relations.push((relation, Rc::new(visited_relations.link_next(relation))));
@@ -339,7 +339,7 @@ pub(super) fn multiple_cascading_paths(relation: CompleteInlineRelationWalker<'_
             (
                 relation,
                 Rc::new(VisitedRelation::root(relation)),
-                HashSet::<RelationFieldWalker<'_>>::new(),
+                HashSet::<RelationFieldId>::new(),
             )
         })
         .collect();
@@ -348,7 +348,7 @@ pub(super) fn multiple_cascading_paths(relation: CompleteInlineRelationWalker<'_
         let model = next_relation.referencing_model();
         let related_model = next_relation.referenced_model();
 
-        current_path.insert(next_relation.referencing_field());
+        current_path.insert(next_relation.referencing_field().id);
 
         // Self-relations are detected elsewhere.
         if model.id == related_model.id {
@@ -363,7 +363,7 @@ pub(super) fn multiple_cascading_paths(relation: CompleteInlineRelationWalker<'_
         let mut forward_relations = related_model
             .complete_inline_relations_from()
             .filter(triggers_modifications)
-            .filter(|relation| !current_path.contains(&relation.referencing_field()))
+            .filter(|relation| !current_path.contains(&relation.referencing_field().id))
             .map(|relation| {
                 (
                     relation,
@@ -411,10 +411,7 @@ pub(super) fn multiple_cascading_paths(relation: CompleteInlineRelationWalker<'_
         }
     }
 
-    let models = reachable
-        .iter()
-        .map(|model_name| format!("`{}`", model_name))
-        .join(", ");
+    let models = reachable.iter().map(|model_name| format!("`{model_name}`")).join(", ");
 
     #[allow(clippy::comparison_chain)] // match looks horrible here...
     if reachable.len() == 1 {

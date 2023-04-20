@@ -559,7 +559,7 @@ mod aggregation_group_by {
             runner,
             "query { groupByA(by: [string]) { _sum } }",
             2009,
-            "Expected a minimum of 1 fields to be present, got 0."
+            "Expected a minimum of 1 field to be present, got 0"
         );
 
         Ok(())
@@ -567,7 +567,7 @@ mod aggregation_group_by {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneA(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneA(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())

@@ -1,3 +1,4 @@
+use enumflags2::BitFlags;
 use serde::{Serialize, Serializer};
 use std::fmt;
 
@@ -72,7 +73,9 @@ features!(
     PostgresqlExtensions,
     ClientExtensions,
     Deno,
-    ExtendedWhereUnique
+    ExtendedWhereUnique,
+    Views,
+    JsonProtocol
 );
 
 /// Generator preview features
@@ -89,6 +92,9 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
          | PostgresqlExtensions
          | ExtendedWhereUnique
          | ClientExtensions
+         | MultiSchema
+         | Views
+         | JsonProtocol
     }),
     deprecated: enumflags2::make_bitflags!(PreviewFeature::{
         AtomicNumberOperations
@@ -117,9 +123,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | DataProxy
         | InteractiveTransactions
     }),
-    hidden: enumflags2::make_bitflags!(PreviewFeature::{
-        MultiSchema
-    }),
+    hidden: BitFlags::EMPTY,
 };
 
 #[derive(Debug)]

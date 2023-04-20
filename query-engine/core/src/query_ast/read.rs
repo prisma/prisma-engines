@@ -6,8 +6,9 @@ use enumflags2::BitFlags;
 use prisma_models::prelude::*;
 use std::fmt::Display;
 
+#[allow(clippy::enum_variant_names)]
 #[derive(Debug, Clone)]
-pub enum ReadQuery {
+pub(crate) enum ReadQuery {
     RecordQuery(RecordQuery),
     ManyRecordsQuery(ManyRecordsQuery),
     RelatedRecordsQuery(RelatedRecordsQuery),
@@ -15,15 +16,6 @@ pub enum ReadQuery {
 }
 
 impl ReadQuery {
-    pub fn name(&self) -> &str {
-        match self {
-            ReadQuery::RecordQuery(x) => &x.name,
-            ReadQuery::ManyRecordsQuery(x) => &x.name,
-            ReadQuery::RelatedRecordsQuery(x) => &x.name,
-            ReadQuery::AggregateRecordsQuery(x) => &x.name,
-        }
-    }
-
     /// Checks whether or not this query returns a specific set of fields from the underlying data source model.
     pub fn returns(&self, field_selection: &FieldSelection) -> bool {
         match self {
@@ -63,7 +55,7 @@ impl FilteredQuery for ReadQuery {
 }
 
 impl Display for ReadQuery {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::RecordQuery(q) => write!(
                 f,
@@ -73,14 +65,17 @@ impl Display for ReadQuery {
             Self::ManyRecordsQuery(q) => write!(
                 f,
                 r#"ManyRecordsQuery(name: '{}', model: '{}', selection: {}, args: {:?})"#,
-                q.name, q.model.name, q.selected_fields, q.args
+                q.name,
+                q.model.name(),
+                q.selected_fields,
+                q.args
             ),
             Self::RelatedRecordsQuery(q) => write!(
                 f,
                 "RelatedRecordsQuery(name: '{}', parent model: '{}', parent relation field: {}, selection: {})",
                 q.name,
-                q.parent_field.model().name,
-                q.parent_field.name,
+                q.parent_field.model().name(),
+                q.parent_field.name(),
                 q.selected_fields
             ),
             Self::AggregateRecordsQuery(q) => write!(f, "AggregateRecordsQuery: {}", q.name),
@@ -94,13 +89,15 @@ impl ToGraphviz for ReadQuery {
             Self::RecordQuery(q) => format!("RecordQuery(name: '{}', selection: {})", q.name, q.selected_fields),
             Self::ManyRecordsQuery(q) => format!(
                 r#"ManyRecordsQuery(name: '{}', model: '{}', selection: {})"#,
-                q.name, q.model.name, q.selected_fields
+                q.name,
+                q.model.name(),
+                q.selected_fields
             ),
             Self::RelatedRecordsQuery(q) => format!(
                 "RelatedRecordsQuery(name: '{}', parent model: '{}', parent relation field: {}, selection: {})",
                 q.name,
-                q.parent_field.model().name,
-                q.parent_field.name,
+                q.parent_field.model().name(),
+                q.parent_field.name(),
                 q.selected_fields
             ),
             Self::AggregateRecordsQuery(q) => format!("AggregateRecordsQuery: {}", q.name),
@@ -150,7 +147,7 @@ pub struct RecordQuery {
     pub model: ModelRef,
     pub filter: Option<Filter>,
     pub selected_fields: FieldSelection,
-    pub nested: Vec<ReadQuery>,
+    pub(crate) nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
     pub aggregation_selections: Vec<RelAggregationSelection>,
     pub options: QueryOptions,
@@ -163,7 +160,7 @@ pub struct ManyRecordsQuery {
     pub model: ModelRef,
     pub args: QueryArguments,
     pub selected_fields: FieldSelection,
-    pub nested: Vec<ReadQuery>,
+    pub(crate) nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
     pub aggregation_selections: Vec<RelAggregationSelection>,
     pub options: QueryOptions,
@@ -176,7 +173,7 @@ pub struct RelatedRecordsQuery {
     pub parent_field: RelationFieldRef,
     pub args: QueryArguments,
     pub selected_fields: FieldSelection,
-    pub nested: Vec<ReadQuery>,
+    pub(crate) nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
     pub aggregation_selections: Vec<RelAggregationSelection>,
 

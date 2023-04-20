@@ -15,7 +15,7 @@ pub use sqlite::*;
 pub use tidb::*;
 pub use vitess::*;
 
-use crate::{datamodel_rendering::DatamodelRenderer, TestConfig, TestError};
+use crate::{datamodel_rendering::DatamodelRenderer, TestError, CONFIG};
 use cockroachdb::*;
 use enum_dispatch::enum_dispatch;
 use psl::datamodel_connector::ConnectorCapability;
@@ -52,11 +52,6 @@ pub trait ConnectorTagInterface {
 
     /// Must return `true` if the connector family is versioned (e.g. Postgres9, Postgres10, ...), false otherwise.
     fn is_versioned(&self) -> bool;
-
-    /// Indicates whether or not the test setup needs to explicitly tear down test databases (via `qe_teardown`).
-    fn requires_teardown(&self) -> bool {
-        false
-    }
 
     /// Defines where relational constraints are handled:
     ///   - "prisma" is handled in the Query Engine core
@@ -119,7 +114,7 @@ impl fmt::Display for ConnectorTag {
             Self::TiDB(_) => "TiDB",
         };
 
-        write!(f, "{}", printable)
+        write!(f, "{printable}")
     }
 }
 
@@ -144,14 +139,14 @@ impl fmt::Display for ConnectorVersion {
             },
             Self::Sqlite => "SQLite".to_string(),
             Self::Vitess(v) => match v {
-                Some(v) => format!("Vitess ({})", v),
+                Some(v) => format!("Vitess ({v})"),
                 None => "Vitess (unknown)".to_string(),
             },
             Self::CockroachDb => "CockroachDB".to_string(),
             Self::TiDB => "TiDB".to_string(),
         };
 
-        write!(f, "{}", printable)
+        write!(f, "{printable}")
     }
 }
 
@@ -172,57 +167,55 @@ impl ConnectorTag {
 
     /// Determines whether or not a test should run for the given enabled connectors and capabilities
     /// a connector is required to have.
-    pub fn should_run(
-        config: &TestConfig,
-        enabled: &[ConnectorTag],
+    pub(crate) fn should_run(
+        only: &[(&str, Option<&str>)],
+        exclude: &[(&str, Option<&str>)],
         capabilities: &[ConnectorCapability],
-        test_name: &str,
     ) -> bool {
-        let current_connector = config.test_connector_tag().unwrap();
-        if !enabled.contains(&current_connector) {
-            println!("Skipping test '{}', current test connector is not enabled.", test_name);
+        let connector = CONFIG.test_connector_tag().unwrap();
+
+        if !capabilities.is_empty() && !capabilities.iter().all(|cap| connector.capabilities().contains(cap)) {
+            println!("Connector excluded. Missing required capability.");
             return false;
         }
 
-        if capabilities
+        if !only.is_empty() {
+            return only
+                .iter()
+                .any(|only| ConnectorTag::try_from(*only).unwrap() == connector);
+        }
+
+        if exclude
             .iter()
-            .any(|cap| !current_connector.capabilities().contains(cap))
+            .any(|excl| ConnectorTag::try_from(*excl).unwrap() == connector)
         {
-            println!(
-                "Skipping test '{}', current test connector doesn't offer one or more capabilities that are required.",
-                test_name
-            );
+            println!("Connector excluded. Skipping test.");
             return false;
         }
 
-        true
-    }
-}
-
-impl TryFrom<&str> for ConnectorTag {
-    type Error = TestError;
-
-    fn try_from(tag: &str) -> Result<Self, Self::Error> {
-        Self::try_from((tag, None))
+        // FIXME: This skips vitess unless explicitly opted in. Replace with `true` when fixing
+        // https://github.com/prisma/client-planning/issues/332
+        !matches!(connector, ConnectorTag::Vitess(_))
     }
 }
 
 impl TryFrom<(&str, Option<&str>)> for ConnectorTag {
     type Error = TestError;
 
+    #[track_caller]
     fn try_from(value: (&str, Option<&str>)) -> Result<Self, Self::Error> {
         let (connector, version) = value;
 
         let tag = match connector.to_lowercase().as_str() {
             "sqlite" => Self::Sqlite(SqliteConnectorTag::new()),
             "sqlserver" => Self::SqlServer(SqlServerConnectorTag::new(version)?),
-            "cockroachdb" => Self::Cockroach(CockroachDbConnectorTag::new()),
+            "cockroachdb" => Self::Cockroach(CockroachDbConnectorTag::new(version)?),
             "postgres" => Self::Postgres(PostgresConnectorTag::new(version)?),
             "tidb" => Self::TiDB(TiDBConnectorTag::new()),
             "mysql" => Self::MySql(MySqlConnectorTag::new(version)?),
             "mongodb" => Self::MongoDb(MongoDbConnectorTag::new(version)?),
             "vitess" => Self::Vitess(VitessConnectorTag::new(version)?),
-            _ => return Err(TestError::parse_error(format!("Unknown connector tag `{}`", connector))),
+            _ => return Err(TestError::parse_error(format!("Unknown connector tag `{connector}`"))),
         };
 
         Ok(tag)

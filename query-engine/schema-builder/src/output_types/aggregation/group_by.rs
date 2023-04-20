@@ -3,14 +3,11 @@ use crate::constants::aggregations::*;
 use std::convert::identity;
 
 /// Builds group by aggregation object type for given model (e.g. GroupByUserOutputType).
-pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> ObjectTypeWeakRef {
-    let ident = Identifier::new(
-        format!("{}GroupByOutputType", capitalize(&model.name)),
-        PRISMA_NAMESPACE,
-    );
+pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> OutputObjectTypeId {
+    let ident = Identifier::new_prisma(format!("{}GroupByOutputType", capitalize(model.name())));
     return_cached_output!(ctx, &ident);
 
-    let object = Arc::new(ObjectType::new(ident.clone(), Some(ModelRef::clone(model))));
+    let object = ObjectType::new(ident.clone(), Some(model.id));
 
     // Model fields that can be grouped by value.
     let mut object_fields = scalar_output_fields(ctx, model);
@@ -89,24 +86,17 @@ pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &Mode
     );
 
     object.set_fields(object_fields);
-    ctx.cache_output_type(ident, ObjectTypeStrongRef::clone(&object));
-
-    ObjectTypeStrongRef::downgrade(&object)
+    ctx.cache_output_type(ident, object)
 }
 
-fn scalar_output_fields(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<OutputField> {
+fn scalar_output_fields(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> Vec<OutputField> {
     let fields = model.fields().scalar();
 
     fields
         .into_iter()
         .map(|f| {
-            field(
-                f.name.clone(),
-                vec![],
-                field::map_scalar_output_type_for_field(ctx, &f),
-                None,
-            )
-            .nullable_if(!f.is_required())
+            field(f.name(), vec![], field::map_scalar_output_type_for_field(ctx, &f), None)
+                .nullable_if(!f.is_required())
         })
         .collect()
 }

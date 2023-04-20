@@ -25,7 +25,8 @@ mod delete_many_inside_update {
 
         assert_error!(
             runner,
-            format!(r#"mutation {{
+            format!(
+                r#"mutation {{
               updateOneParent(
               where: {parent}
               data:{{
@@ -36,9 +37,10 @@ mod delete_many_inside_update {
                   c
                 }}
               }}
-            }}"#, parent = parent),
+            }}"#
+            ),
             2009,
-            "`Mutation.updateOneParent.data.ParentUpdateInput.childOpt.ChildUpdateOneWithoutParentOptNestedInput.deleteMany`: Field does not exist on enclosing type."
+            "Field does not exist in enclosing type."
         );
 
         Ok(())
@@ -64,8 +66,7 @@ mod delete_many_inside_update {
 
                       }}
                     }}
-                }}"#,
-                parent_1 = parent_1
+                }}"#
             )
         );
 
@@ -87,7 +88,7 @@ mod delete_many_inside_update {
             format!(
                 r#"mutation {{
           updateOneParent(
-            where: {parent}
+            where: {parent_1}
             data:{{
             childrenOpt: {{deleteMany: {{
                   c: {{ contains:"c" }}
@@ -99,8 +100,7 @@ mod delete_many_inside_update {
 
             }}
           }}
-        }}"#,
-                parent = parent_1
+        }}"#
             )
         );
 
@@ -122,7 +122,7 @@ mod delete_many_inside_update {
             format!(
                 r#"mutation {{
                     updateOneParent(
-                      where: {parent}
+                      where: {parent_1}
                       data:{{
                       childrenOpt: {{deleteMany: [
                         {{ c: {{ contains:"1" }} }},
@@ -133,8 +133,7 @@ mod delete_many_inside_update {
                         c
                       }}
                     }}
-                }}"#,
-                parent = parent_1
+                }}"#
             )
         );
 
@@ -156,7 +155,7 @@ mod delete_many_inside_update {
             format!(
                 r#"mutation {{
                     updateOneParent(
-                      where: {parent}
+                      where: {parent_1}
                       data:{{
                       childrenOpt: {{ deleteMany: [{{}}] }}
                     }}){{
@@ -164,8 +163,7 @@ mod delete_many_inside_update {
                         c
                       }}
                     }}
-                }}"#,
-                parent = parent_1
+                }}"#
             )
         );
 
@@ -187,7 +185,7 @@ mod delete_many_inside_update {
             format!(
                 r#"mutation {{
                     updateOneParent(
-                      where: {parent}
+                      where: {parent_1}
                       data:{{
                       childrenOpt: {{deleteMany: [
                         {{ c: {{ contains:"3" }} }},
@@ -198,8 +196,7 @@ mod delete_many_inside_update {
                         c
                       }}
                     }}
-                }}"#,
-                parent = parent_1
+                }}"#
             )
         );
 

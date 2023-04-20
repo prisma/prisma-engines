@@ -15,5 +15,9 @@ prisma-models = { path = "../prisma-models" }
 
 [dev-dependencies]
 expect-test = "1.2.2"
-indoc = "1.0.3"
-pretty_assertions = "0.6.1"
+indoc.workspace = true
+pretty_assertions = "1"
+flate2 = "1.0"
+similar = { version = "2.2.1", features=["text", "inline", "bytes"] }
+colored = "2.0.0"
+itertools = "0.10.5"

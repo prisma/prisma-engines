@@ -1,43 +1,18 @@
 use crate::{
     ast::{self, FieldArity},
-    types::RelationField,
-    walkers::{ModelWalker, RelationWalker, ScalarFieldWalker},
-    ParserDatabase, ReferentialAction,
+    types::{RelationField, RelationFieldId},
+    walkers::*,
+    ReferentialAction,
 };
-use std::{
-    borrow::Cow,
-    fmt,
-    hash::{Hash, Hasher},
-};
+use std::{borrow::Cow, fmt, hash::Hasher};
 
 /// A relation field on a model in the schema.
-#[derive(Copy, Clone, Debug)]
-pub struct RelationFieldWalker<'db> {
-    pub(crate) model_id: ast::ModelId,
-    pub(crate) field_id: ast::FieldId,
-    pub(crate) db: &'db ParserDatabase,
-    pub(crate) relation_field: &'db RelationField,
-}
-
-impl<'db> PartialEq for RelationFieldWalker<'db> {
-    fn eq(&self, other: &Self) -> bool {
-        self.model_id == other.model_id && self.field_id == other.field_id
-    }
-}
-
-impl<'db> Eq for RelationFieldWalker<'db> {}
-
-impl<'db> Hash for RelationFieldWalker<'db> {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.model_id.hash(state);
-        self.field_id.hash(state);
-    }
-}
+pub type RelationFieldWalker<'db> = Walker<'db, RelationFieldId>;
 
 impl<'db> RelationFieldWalker<'db> {
-    /// The ID of the AST node of the field.
-    pub fn field_id(self) -> ast::FieldId {
-        self.field_id
+    /// The relation starts or ends to a view.
+    pub fn one_side_is_view(self) -> bool {
+        self.model().ast_model().is_view() || self.related_model().ast_model().is_view()
     }
 
     /// The foreign key name of the relation (`@relation(map: ...)`).
@@ -52,11 +27,12 @@ impl<'db> RelationFieldWalker<'db> {
 
     /// The AST node of the field.
     pub fn ast_field(self) -> &'db ast::Field {
-        &self.db.ast[self.model_id][self.field_id]
+        let RelationField { model_id, field_id, .. } = self.db.types[self.id];
+        &self.db.ast[model_id][field_id]
     }
 
     pub(crate) fn attributes(self) -> &'db RelationField {
-        self.relation_field
+        &self.db.types[self.id]
     }
 
     /// The onDelete argument on the relation.
@@ -81,12 +57,12 @@ impl<'db> RelationFieldWalker<'db> {
 
     /// The relation name explicitly written in the schema source.
     pub fn explicit_relation_name(self) -> Option<&'db str> {
-        self.relation_field.name.map(|string_id| &self.db[string_id])
+        self.attributes().name.map(|string_id| &self.db[string_id])
     }
 
     /// Is there an `@ignore` attribute on the field?
     pub fn is_ignored(self) -> bool {
-        self.relation_field.is_ignored
+        self.attributes().is_ignored
     }
 
     /// Is the field required? (not optional, not list)
@@ -96,7 +72,13 @@ impl<'db> RelationFieldWalker<'db> {
 
     /// The model containing the field.
     pub fn model(self) -> ModelWalker<'db> {
-        self.db.walk(self.model_id)
+        self.walk(self.attributes().model_id)
+    }
+
+    /// A valid relation is defined by two relation fields. This method returns the _other_
+    /// relation field in the same relation.
+    pub fn opposite_relation_field(self) -> Option<RelationFieldWalker<'db>> {
+        self.relation().relation_fields().find(|rf| rf.id != self.id)
     }
 
     /// The `@relation` attribute in the field AST.
@@ -106,28 +88,25 @@ impl<'db> RelationFieldWalker<'db> {
 
     /// Does the relation field reference the passed in model?
     pub fn references_model(self, other: ast::ModelId) -> bool {
-        self.relation_field.referenced_model == other
+        self.attributes().referenced_model == other
     }
 
     /// The model referenced by the relation.
     pub fn related_model(self) -> ModelWalker<'db> {
-        self.db.walk(self.relation_field.referenced_model)
+        self.db.walk(self.attributes().referenced_model)
     }
 
     /// The fields in the `@relation(references: ...)` argument.
     pub fn referenced_fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'db>>> {
-        self.attributes().references.as_ref().map(|references| {
-            references
-                .iter()
-                .map(move |field_id| self.related_model().scalar_field(*field_id))
-        })
+        self.attributes()
+            .references
+            .as_ref()
+            .map(|references| references.iter().map(move |field_id| self.walk(*field_id)))
     }
 
     /// The relation this field is part of.
     pub fn relation(self) -> RelationWalker<'db> {
-        let model = self.model();
-        let mut relations = model.relations_from().chain(model.relations_to());
-        relations.find(|r| r.has_field(self.model_id, self.field_id)).unwrap()
+        self.walk(self.db.relations[self.id])
     }
 
     /// The name of the relation. Either uses the `name` (or default) argument,
@@ -176,16 +155,11 @@ impl<'db> RelationFieldWalker<'db> {
 
     /// The fields in the `fields: [...]` argument in the forward relation field.
     pub fn fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'db>> + Clone> {
-        let model_id = self.model_id;
-        let attributes = self.attributes();
-        attributes.fields.as_ref().map(move |fields| {
-            fields.iter().map(move |field_id| ScalarFieldWalker {
-                model_id,
-                field_id: *field_id,
-                db: self.db,
-                scalar_field: &self.db.types.scalar_fields[&(model_id, *field_id)],
-            })
-        })
+        let attributes = &self.db.types[self.id];
+        attributes
+            .fields
+            .as_ref()
+            .map(move |fields| fields.iter().map(move |field_id| self.db.walk(*field_id)))
     }
 }
 
@@ -245,9 +219,9 @@ impl<'db> std::hash::Hash for RelationName<'db> {
 impl<'db> RelationName<'db> {
     pub(crate) fn generated(model_a: &str, model_b: &str) -> Self {
         if model_a < model_b {
-            Self::Generated(format!("{}To{}", model_a, model_b))
+            Self::Generated(format!("{model_a}To{model_b}"))
         } else {
-            Self::Generated(format!("{}To{}", model_b, model_a))
+            Self::Generated(format!("{model_b}To{model_a}"))
         }
     }
 }

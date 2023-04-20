@@ -4,11 +4,10 @@
 mod panic_hook;
 
 pub mod common;
-pub mod introspection_engine;
-pub mod migration_engine;
 #[cfg(feature = "sql")]
 pub mod quaint;
 pub mod query_engine;
+pub mod schema_engine;
 
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
@@ -63,6 +62,15 @@ pub struct UnknownError {
     pub backtrace: Option<String>,
 }
 
+impl UnknownError {
+    pub fn new(err: &dyn std::error::Error) -> Self {
+        UnknownError {
+            message: err.to_string(),
+            backtrace: None,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct Error {
     is_panic: bool,
@@ -111,17 +119,6 @@ impl Error {
         }
     }
 
-    pub fn from_dyn_error(err: &dyn std::error::Error) -> Self {
-        Error {
-            inner: ErrorType::Unknown(UnknownError {
-                message: err.to_string(),
-                backtrace: None,
-            }),
-            is_panic: false,
-            batch_request_idx: None,
-        }
-    }
-
     /// Construct a new UnknownError from a `PanicInfo` in a panic hook. `UnknownError`s created
     /// with this constructor will have a proper, useful backtrace.
     pub fn new_in_panic_hook(panic_info: &std::panic::PanicInfo<'_>) -> Self {
@@ -135,12 +132,12 @@ impl Error {
         let backtrace = Some(format!("{:?}", backtrace::Backtrace::new()));
         let location = panic_info
             .location()
-            .map(|loc| format!("{}", loc))
+            .map(|loc| format!("{loc}"))
             .unwrap_or_else(|| "<unknown location>".to_owned());
 
         Error {
             inner: ErrorType::Unknown(UnknownError {
-                message: format!("[{}] {}", location, message),
+                message: format!("[{location}] {message}"),
                 backtrace,
             }),
             is_panic: true,
@@ -181,7 +178,7 @@ impl Error {
     pub fn unwrap_known(self) -> KnownError {
         match self.inner {
             ErrorType::Known(err) => err,
-            err @ ErrorType::Unknown(_) => panic!("Expected known error, got {:?}", err),
+            err @ ErrorType::Unknown(_) => panic!("Expected known error, got {err:?}"),
         }
     }
 
@@ -192,6 +189,12 @@ impl Error {
 
 pub fn new_backtrace() -> backtrace::Backtrace {
     backtrace::Backtrace::new()
+}
+
+impl<T: UserFacingError> From<T> for Error {
+    fn from(err: T) -> Self {
+        Self::from(KnownError::new(err))
+    }
 }
 
 impl From<UnknownError> for Error {

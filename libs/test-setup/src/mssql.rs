@@ -30,7 +30,7 @@ pub async fn init_mssql_database(original_url: &str, db_name: &str) -> Result<(Q
     let conn = Quaint::new(original_url).await?;
     reset_schema(&conn, db_name).await?;
 
-    let mut url: JdbcString = format!("jdbc:{}", original_url).parse().unwrap();
+    let mut url: JdbcString = format!("jdbc:{original_url}").parse().unwrap();
     url.properties_mut().insert("database".into(), db_name.into());
     let url = url.to_string().trim_start_matches("jdbc:").to_owned();
 

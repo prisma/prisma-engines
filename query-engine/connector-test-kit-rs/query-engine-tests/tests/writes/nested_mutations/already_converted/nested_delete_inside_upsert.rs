@@ -52,7 +52,7 @@ mod delete_inside_upsert {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"upsertOneParent":{"childOpt":null}}}"###
         );
         Ok(())
@@ -98,7 +98,7 @@ mod delete_inside_upsert {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"upsertOneParent":{"childOpt":null}}}"###
         );
         Ok(())
@@ -137,7 +137,7 @@ mod delete_inside_upsert {
                   c
                 }}
               }}
-            }}"#, parent = parent),
+            }}"#),
             2025,
             "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested delete on relation 'ChildToParent'."
         );
@@ -187,7 +187,7 @@ mod delete_inside_upsert {
                       c
                     }}
                   }}
-                }}"#, parent = parent),
+                }}"#),
                 2025,
                 "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested delete on relation 'ChildToParent'."
             );
@@ -238,7 +238,7 @@ mod delete_inside_upsert {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"upsertOneParent":{"childrenOpt":[]}}}"###
         );
         Ok(())
@@ -283,7 +283,7 @@ mod delete_inside_upsert {
                     c
                   }}
                 }}
-              }}"#, parent = parent)),
+              }}"#)),
           @r###"{"data":{"upsertOneParent":{"childrenOpt":[]}}}"###
         );
         Ok(())
@@ -323,8 +323,7 @@ mod delete_inside_upsert {
                    c
                  }}
                }}
-             }}"#,
-                parent = parent
+             }}"#
             ),
             2017,
             "The records for relation `ChildToParent` between the `Parent` and `Child` models are not connected."
@@ -375,8 +374,7 @@ mod delete_inside_upsert {
                         c
                       }}
                     }}
-                  }}"#,
-                parent = parent
+                  }}"#
             ),
             2017,
             "The records for relation `ChildToParent` between the `Parent` and `Child` models are not connected."
@@ -428,7 +426,7 @@ mod delete_inside_upsert {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"upsertOneParent":{"childOpt":null}}}"###
         );
 
@@ -474,7 +472,7 @@ mod delete_inside_upsert {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"upsertOneParent":{"childOpt":null}}}"###
         );
 
@@ -514,7 +512,7 @@ mod delete_inside_upsert {
                   c
                 }}
               }}
-            }}"#, parent = parent),
+            }}"#),
             2025,
             "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested delete on relation 'ChildToParent'."
         );
@@ -564,7 +562,7 @@ mod delete_inside_upsert {
                       c
                     }}
                   }}
-                }}"#, parent = parent),
+                }}"#),
                 2025,
                 "An operation failed because it depends on one or more records that were required but not found. No 'Child' record was found for a nested delete on relation 'ChildToParent'."
             );
@@ -615,7 +613,7 @@ mod delete_inside_upsert {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"upsertOneParent":{"childrenOpt":[{"c":"c1"}]}}}"###
         );
 
@@ -661,7 +659,7 @@ mod delete_inside_upsert {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"upsertOneParent":{"childrenOpt":[{"c":"c1"}]}}}"###
         );
 
@@ -702,8 +700,7 @@ mod delete_inside_upsert {
                     c
                   }}
                 }}
-              }}"#,
-                parent = parent
+              }}"#
             ),
             2017,
             "The records for relation `ChildToParent` between the `Parent` and `Child` models are not connected."
@@ -754,8 +751,7 @@ mod delete_inside_upsert {
                         c
                       }}
                     }}
-                  }}"#,
-                parent = parent
+                  }}"#
             ),
             2017,
             "The records for relation `ChildToParent` between the `Parent` and `Child` models are not connected."
@@ -800,7 +796,8 @@ mod delete_inside_upsert {
 
         assert_error!(
             runner,
-            format!(r#"mutation {{
+            format!(
+                r#"mutation {{
               upsertOneParent(
               where: {parent}
               update:{{
@@ -812,9 +809,10 @@ mod delete_inside_upsert {
                   c
                 }}
               }}
-            }}"#, parent = parent),
+            }}"#
+            ),
             2009,
-            "`Mutation.upsertOneParent.update.ParentUpdateInput.childReq.ChildUpdateOneRequiredWithoutParentsOptNestedInput.delete`: Field does not exist on enclosing type."
+            "Field does not exist in enclosing type."
         );
 
         Ok(())
@@ -853,7 +851,8 @@ mod delete_inside_upsert {
 
         assert_error!(
             runner,
-            format!(r#"mutation {{
+            format!(
+                r#"mutation {{
               upsertOneParent(
               where: {parent}
               update:{{
@@ -865,9 +864,10 @@ mod delete_inside_upsert {
                   c
                 }}
               }}
-            }}"#, parent = parent),
+            }}"#
+            ),
             2009,
-            "`Mutation.upsertOneParent.update.ParentUpdateInput.childReq.ChildUpdateOneRequiredWithoutParentsOptNestedInput.delete`: Field does not exist on enclosing type."
+            "Field does not exist in enclosing type."
         );
 
         Ok(())
@@ -920,7 +920,7 @@ mod delete_inside_upsert {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"upsertOneParent":{"childOpt":null}}}"###
         );
 
@@ -976,7 +976,7 @@ mod delete_inside_upsert {
                     c
                   }}
                 }}
-              }}"#, parent = parent)),
+              }}"#)),
           @r###"{"data":{"upsertOneParent":{"childOpt":null}}}"###
         );
 
@@ -1031,7 +1031,7 @@ mod delete_inside_upsert {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"upsertOneParent":{"childrenOpt":[]}}}"###
         );
 
@@ -1082,7 +1082,7 @@ mod delete_inside_upsert {
                 c
               }}
             }}
-          }}"#, parent = parent)),
+          }}"#)),
           @r###"{"data":{"upsertOneParent":{"childrenOpt":[]}}}"###
         );
 
@@ -1128,8 +1128,7 @@ mod delete_inside_upsert {
                         c
                       }}
                     }}
-                  }}"#,
-                parent = parent
+                  }}"#
             ),
             2017,
             "The records for relation `ChildToParent` between the `Parent` and `Child` models are not connected."
@@ -1180,8 +1179,7 @@ mod delete_inside_upsert {
                             c
                           }}
                         }}
-                      }}"#,
-                parent = parent
+                      }}"#
             ),
             2017,
             "The records for relation `ChildToParent` between the `Parent` and `Child` models are not connected."

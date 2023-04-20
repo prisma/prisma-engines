@@ -1,4 +1,5 @@
 use crate::TemplatingError;
+use quaint::error::Error as QuaintError;
 use std::env::VarError;
 use thiserror::Error;
 
@@ -22,6 +23,9 @@ pub enum TestError {
 
     #[error("Error during interactive transaction processing: {}", _0)]
     InteractiveTransactionError(String),
+
+    #[error("Raw execute error: {0}")]
+    RawExecute(QuaintError),
 }
 
 impl TestError {
@@ -43,5 +47,11 @@ impl TestError {
 impl From<VarError> for TestError {
     fn from(err: VarError) -> Self {
         Self::ConfigError(err.to_string())
+    }
+}
+
+impl From<QuaintError> for TestError {
+    fn from(err: QuaintError) -> Self {
+        Self::RawExecute(err)
     }
 }

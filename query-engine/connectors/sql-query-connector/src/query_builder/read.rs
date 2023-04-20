@@ -1,6 +1,6 @@
 use crate::{
     cursor_condition, filter_conversion::AliasedCondition, model_extensions::*, nested_aggregations,
-    ordering::OrderByBuilder, sql_trace::SqlTraceComment,
+    ordering::OrderByBuilder, sql_trace::SqlTraceComment, Context,
 };
 use connector_interface::{filter::Filter, AggregationSelection, QueryArguments, RelAggregationSelection};
 use itertools::Itertools;
@@ -8,12 +8,12 @@ use prisma_models::*;
 use quaint::ast::*;
 use tracing::Span;
 
-pub trait SelectDefinition {
+pub(crate) trait SelectDefinition {
     fn into_select(
         self,
         _: &ModelRef,
         aggr_selections: &[RelAggregationSelection],
-        trace_id: Option<String>,
+        ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>);
 }
 
@@ -22,10 +22,10 @@ impl SelectDefinition for Filter {
         self,
         model: &ModelRef,
         aggr_selections: &[RelAggregationSelection],
-        trace_id: Option<String>,
+        ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
         let args = QueryArguments::from((model.clone(), self));
-        args.into_select(model, aggr_selections, trace_id)
+        args.into_select(model, aggr_selections, ctx)
     }
 }
 
@@ -34,9 +34,9 @@ impl SelectDefinition for &Filter {
         self,
         model: &ModelRef,
         aggr_selections: &[RelAggregationSelection],
-        trace_id: Option<String>,
+        ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
-        self.clone().into_select(model, aggr_selections, trace_id)
+        self.clone().into_select(model, aggr_selections, ctx)
     }
 }
 
@@ -45,7 +45,7 @@ impl SelectDefinition for Select<'static> {
         self,
         _: &ModelRef,
         _: &[RelAggregationSelection],
-        _trace_id: Option<String>,
+        _ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
         (self, vec![])
     }
@@ -56,18 +56,18 @@ impl SelectDefinition for QueryArguments {
         self,
         model: &ModelRef,
         aggr_selections: &[RelAggregationSelection],
-        trace_id: Option<String>,
+        ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
-        let order_by_definitions = OrderByBuilder::default().build(&self);
-        let (table_opt, cursor_condition) = cursor_condition::build(&self, &model, &order_by_definitions);
-        let aggregation_joins = nested_aggregations::build(aggr_selections);
+        let order_by_definitions = OrderByBuilder::default().build(&self, ctx);
+        let cursor_condition = cursor_condition::build(&self, &model, &order_by_definitions, ctx);
+        let aggregation_joins = nested_aggregations::build(aggr_selections, ctx);
 
         let limit = if self.ignore_take { None } else { self.take_abs() };
         let skip = if self.ignore_skip { 0 } else { self.skip.unwrap_or(0) };
 
         let filter: ConditionTree = self
             .filter
-            .map(|f| f.aliased_condition_from(None, false))
+            .map(|f| f.aliased_condition_from(None, false, ctx))
             .unwrap_or(ConditionTree::NoCondition);
 
         let conditions = match (filter, cursor_condition) {
@@ -80,7 +80,7 @@ impl SelectDefinition for QueryArguments {
         let joined_table = order_by_definitions
             .iter()
             .flat_map(|j| &j.joins)
-            .fold(model.as_table(), |acc, join| acc.left_join(join.clone().data));
+            .fold(model.as_table(ctx), |acc, join| acc.left_join(join.clone().data));
 
         // Add joins necessary to the nested aggregations
         let joined_table = aggregation_joins
@@ -92,13 +92,7 @@ impl SelectDefinition for QueryArguments {
             .so_that(conditions)
             .offset(skip as usize)
             .append_trace(&Span::current())
-            .add_trace_id(trace_id);
-
-        let select_ast = if let Some(table) = table_opt {
-            select_ast.and_from(table)
-        } else {
-            select_ast
-        };
+            .add_trace_id(ctx.trace_id);
 
         let select_ast = order_by_definitions
             .iter()
@@ -111,20 +105,20 @@ impl SelectDefinition for QueryArguments {
     }
 }
 
-pub fn get_records<T>(
+pub(crate) fn get_records<T>(
     model: &ModelRef,
     columns: impl Iterator<Item = Column<'static>>,
     aggr_selections: &[RelAggregationSelection],
     query: T,
-    trace_id: Option<String>,
+    ctx: &Context<'_>,
 ) -> Select<'static>
 where
     T: SelectDefinition,
 {
-    let (select, additional_selection_set) = query.into_select(model, aggr_selections, trace_id.clone());
+    let (select, additional_selection_set) = query.into_select(model, aggr_selections, ctx);
     let select = columns.fold(select, |acc, col| acc.column(col));
 
-    let select = select.append_trace(&Span::current()).add_trace_id(trace_id);
+    let select = select.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
 
     additional_selection_set
         .into_iter()
@@ -157,20 +151,20 @@ where
 /// ```
 /// Important note: Do not use the AsColumn trait here as we need to construct column references that are relative,
 /// not absolute - e.g. `SELECT "field" FROM (...)` NOT `SELECT "full"."path"."to"."field" FROM (...)`.
-pub fn aggregate(
+pub(crate) fn aggregate(
     model: &ModelRef,
     selections: &[AggregationSelection],
     args: QueryArguments,
-    trace_id: Option<String>,
+    ctx: &Context<'_>,
 ) -> Select<'static> {
-    let columns = extract_columns(model, &selections);
-    let sub_query = get_records(model, columns.into_iter(), &[], args, trace_id.clone());
+    let columns = extract_columns(model, &selections, ctx);
+    let sub_query = get_records(model, columns.into_iter(), &[], args, ctx);
     let sub_table = Table::from(sub_query).alias("sub");
 
     selections.iter().fold(
         Select::from_table(sub_table)
             .append_trace(&Span::current())
-            .add_trace_id(trace_id),
+            .add_trace_id(ctx.trace_id),
         |select, next_op| match next_op {
             AggregationSelection::Field(field) => select.column(Column::from(field.db_name().to_owned())),
 
@@ -205,23 +199,23 @@ pub fn aggregate(
     )
 }
 
-pub fn group_by_aggregate(
+pub(crate) fn group_by_aggregate(
     model: &ModelRef,
     args: QueryArguments,
     selections: &[AggregationSelection],
     group_by: Vec<ScalarFieldRef>,
     having: Option<Filter>,
-    trace_id: Option<String>,
+    ctx: &Context<'_>,
 ) -> Select<'static> {
-    let (base_query, _) = args.into_select(model, &[], trace_id.clone());
+    let (base_query, _) = args.into_select(model, &[], ctx);
 
     let select_query = selections.iter().fold(base_query, |select, next_op| match next_op {
-        AggregationSelection::Field(field) => select.column(field.as_column()),
+        AggregationSelection::Field(field) => select.column(field.as_column(ctx)),
 
         AggregationSelection::Count { all, fields } => {
-            let select = fields
-                .iter()
-                .fold(select, |select, next_field| select.value(count(next_field.as_column())));
+            let select = fields.iter().fold(select, |select, next_field| {
+                select.value(count(next_field.as_column(ctx)))
+            });
 
             if *all {
                 select.value(count(asterisk()))
@@ -230,35 +224,35 @@ pub fn group_by_aggregate(
             }
         }
 
-        AggregationSelection::Average(fields) => fields
-            .iter()
-            .fold(select, |select, next_field| select.value(avg(next_field.as_column()))),
+        AggregationSelection::Average(fields) => fields.iter().fold(select, |select, next_field| {
+            select.value(avg(next_field.as_column(ctx)))
+        }),
 
-        AggregationSelection::Sum(fields) => fields
-            .iter()
-            .fold(select, |select, next_field| select.value(sum(next_field.as_column()))),
+        AggregationSelection::Sum(fields) => fields.iter().fold(select, |select, next_field| {
+            select.value(sum(next_field.as_column(ctx)))
+        }),
 
-        AggregationSelection::Min(fields) => fields
-            .iter()
-            .fold(select, |select, next_field| select.value(min(next_field.as_column()))),
+        AggregationSelection::Min(fields) => fields.iter().fold(select, |select, next_field| {
+            select.value(min(next_field.as_column(ctx)))
+        }),
 
-        AggregationSelection::Max(fields) => fields
-            .iter()
-            .fold(select, |select, next_field| select.value(max(next_field.as_column()))),
+        AggregationSelection::Max(fields) => fields.iter().fold(select, |select, next_field| {
+            select.value(max(next_field.as_column(ctx)))
+        }),
     });
 
     let grouped = group_by.into_iter().fold(
-        select_query.append_trace(&Span::current()).add_trace_id(trace_id),
-        |query, field| query.group_by(field.as_column()),
+        select_query.append_trace(&Span::current()).add_trace_id(ctx.trace_id),
+        |query, field| query.group_by(field.as_column(ctx)),
     );
 
     match having {
-        Some(filter) => grouped.having(filter.aliased_condition_from(None, false)),
+        Some(filter) => grouped.having(filter.aliased_condition_from(None, false, ctx)),
         None => grouped,
     }
 }
 
-fn extract_columns(model: &ModelRef, selections: &[AggregationSelection]) -> Vec<Column<'static>> {
+fn extract_columns(model: &ModelRef, selections: &[AggregationSelection], ctx: &Context<'_>) -> Vec<Column<'static>> {
     let fields: Vec<_> = selections
         .iter()
         .flat_map(|selection| match selection {
@@ -281,5 +275,5 @@ fn extract_columns(model: &ModelRef, selections: &[AggregationSelection]) -> Vec
         .unique_by(|field| field.db_name().to_owned())
         .collect();
 
-    fields.as_columns().collect()
+    fields.as_columns(ctx).collect()
 }

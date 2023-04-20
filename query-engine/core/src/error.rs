@@ -1,11 +1,9 @@
-use crate::{
-    InterpreterError, QueryGraphBuilderError, QueryGraphError, QueryParserError, QueryParserErrorKind,
-    RelationViolation, TransactionError,
-};
+use crate::{InterpreterError, QueryGraphBuilderError, QueryGraphError, RelationViolation, TransactionError};
 use bigdecimal::BigDecimal;
 use connector::error::ConnectorError;
 use prisma_models::DomainError;
 use thiserror::Error;
+use user_facing_errors::{query_engine::validation::ValidationError, UnknownError};
 
 #[derive(Debug, Error)]
 #[error(
@@ -44,7 +42,7 @@ pub enum CoreError {
     DomainError(DomainError),
 
     #[error("{0}")]
-    QueryParserError(QueryParserError),
+    QueryParserError(ValidationError),
 
     #[error("Unsupported feature: {}", _0)]
     UnsupportedFeatureError(String),
@@ -78,8 +76,7 @@ pub enum CoreError {
 impl CoreError {
     pub fn null_serialization_error(field_name: &str) -> Self {
         CoreError::SerializationError(format!(
-            "Inconsistent query result: Field {} is required to return data, got `null` instead.",
-            field_name
+            "Inconsistent query result: Field {field_name} is required to return data, got `null` instead."
         ))
     }
 
@@ -88,6 +85,14 @@ impl CoreError {
             value: decimal.to_string(),
             from_type: "BigDecimal".into(),
             to_type: to_type.into(),
+        }
+    }
+
+    pub fn is_transient(&self) -> bool {
+        match self {
+            CoreError::InterpreterError(InterpreterError::ConnectorError(err)) => err.is_transient(),
+            CoreError::ConnectorError(err) => err.is_transient(),
+            _ => false,
         }
     }
 }
@@ -116,8 +121,8 @@ impl From<DomainError> for CoreError {
     }
 }
 
-impl From<QueryParserError> for CoreError {
-    fn from(e: QueryParserError) -> CoreError {
+impl From<ValidationError> for CoreError {
+    fn from(e: ValidationError) -> CoreError {
         CoreError::QueryParserError(e)
     }
 }
@@ -125,18 +130,6 @@ impl From<QueryParserError> for CoreError {
 impl From<InterpreterError> for CoreError {
     fn from(e: InterpreterError) -> CoreError {
         CoreError::InterpreterError(e)
-    }
-}
-
-impl From<url::ParseError> for CoreError {
-    fn from(e: url::ParseError) -> Self {
-        Self::ConfigurationError(format!("Error parsing connection string: {}", e))
-    }
-}
-
-impl From<connection_string::Error> for CoreError {
-    fn from(e: connection_string::Error) -> Self {
-        Self::ConfigurationError(format!("Error parsing connection string: {}", e))
     }
 }
 
@@ -159,21 +152,9 @@ impl From<CoreError> for user_facing_errors::Error {
                 ..
             })) => user_facing_error.into(),
 
-            CoreError::QueryParserError(query_parser_error)
-            | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(query_parser_error)) => {
-                let known_error = match query_parser_error.error_kind {
-                    QueryParserErrorKind::RequiredValueNotSetError => {
-                        user_facing_errors::KnownError::new(user_facing_errors::query_engine::MissingRequiredValue {
-                            path: format!("{}", query_parser_error.path),
-                        })
-                    }
-                    _ => user_facing_errors::KnownError::new(user_facing_errors::query_engine::QueryValidationFailed {
-                        query_validation_error: format!("{}", query_parser_error.error_kind),
-                        query_position: format!("{}", query_parser_error.path),
-                    }),
-                };
-
-                known_error.into()
+            CoreError::QueryParserError(err)
+            | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(err)) => {
+                user_facing_errors::Error::from(err)
             }
 
             CoreError::QueryGraphBuilderError(QueryGraphBuilderError::MissingRequiredArgument {
@@ -248,7 +229,7 @@ impl From<CoreError> for user_facing_errors::Error {
                     })
                     .into(),
                     _ => user_facing_errors::KnownError::new(user_facing_errors::query_engine::InterpretationError {
-                        details: format!("{}: {}", msg, cause),
+                        details: format!("{msg}: {cause}"),
                     })
                     .into(),
                 }
@@ -278,7 +259,7 @@ impl From<CoreError> for user_facing_errors::Error {
                 inner_error
             }
 
-            _ => user_facing_errors::Error::from_dyn_error(&err),
+            _ => UnknownError::new(&err).into(),
         }
     }
 }

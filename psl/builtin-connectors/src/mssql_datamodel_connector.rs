@@ -12,11 +12,14 @@ use psl_core::{
     },
     diagnostics::{Diagnostics, Span},
     parser_database::{self, ast, ParserDatabase, ReferentialAction, ScalarType},
+    PreviewFeature,
 };
 use std::borrow::Cow;
 
 use MsSqlType::*;
 use MsSqlTypeParameter::*;
+
+use crate::completions;
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[
     ConstraintScope::GlobalPrimaryKeyForeignKeyDefault,
@@ -141,7 +144,7 @@ impl Connector for MsSqlDatamodelConnector {
             .iter()
             .find(|(st, _)| st == scalar_type)
             .map(|(_, native_type)| native_type)
-            .ok_or_else(|| format!("Could not find scalar type {:?} in SCALAR_TYPE_DEFAULTS", scalar_type))
+            .ok_or_else(|| format!("Could not find scalar type {scalar_type:?} in SCALAR_TYPE_DEFAULTS"))
             .unwrap();
         NativeTypeInstance::new::<MsSqlType>(*nt)
     }
@@ -276,7 +279,7 @@ impl Connector for MsSqlDatamodelConnector {
         Ok(())
     }
 
-    fn push_completions(
+    fn datamodel_completions(
         &self,
         _db: &ParserDatabase,
         position: ast::SchemaPosition<'_>,
@@ -292,6 +295,17 @@ impl Connector for MsSqlDatamodelConnector {
                 kind: Some(CompletionItemKind::PROPERTY),
                 ..Default::default()
             });
+        }
+    }
+
+    fn datasource_completions(&self, config: &psl_core::Configuration, completion_list: &mut CompletionList) {
+        let ds = match config.datasources.first() {
+            Some(ds) => ds,
+            None => return,
+        };
+
+        if config.preview_features().contains(PreviewFeature::MultiSchema) && !ds.schemas_defined() {
+            completions::schemas_completion(completion_list);
         }
     }
 }

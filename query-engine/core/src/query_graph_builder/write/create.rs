@@ -8,7 +8,7 @@ use connector::IntoFilter;
 use prisma_models::ModelRef;
 use schema::ConnectorContext;
 use schema_builder::constants::args;
-use std::{convert::TryInto, sync::Arc};
+use std::convert::TryInto;
 use write_args_parser::*;
 
 /// Creates a create record query and adds it to the query graph, together with it's nested queries and companion read query.
@@ -25,7 +25,7 @@ pub fn create_record(
         None => ParsedInputMap::default(),
     };
 
-    let create_node = create::create_record_node(graph, connector_ctx, Arc::clone(&model), data_map)?;
+    let create_node = create::create_record_node(graph, connector_ctx, model.clone(), data_map)?;
 
     // Follow-up read query on the write
     let read_query = read::find_unique(field, model.clone())?;
@@ -67,7 +67,7 @@ pub fn create_many_records(
     graph.flag_transactional();
 
     let data_list: ParsedInputList = match field.arguments.lookup(args::DATA) {
-        Some(data) => data.value.try_into()?,
+        Some(data) => utils::coerce_vec(data.value),
         None => vec![],
     };
 

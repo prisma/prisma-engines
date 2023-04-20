@@ -1,11 +1,9 @@
 use super::*;
 use once_cell::sync::OnceCell;
-use prisma_models::pk::PrimaryKey;
-use prisma_models::{dml, ModelRef};
-use std::sync::Arc;
+use prisma_models::{ast, walkers, DefaultKind};
 
 /// Object type convenience wrapper function.
-pub fn object_type(ident: Identifier, fields: Vec<OutputField>, model: Option<ModelRef>) -> ObjectType {
+pub fn object_type(ident: Identifier, fields: Vec<OutputField>, model: Option<ast::ModelId>) -> ObjectType {
     let object_type = ObjectType::new(ident, model);
 
     object_type.set_fields(fields);
@@ -42,80 +40,48 @@ where
 {
     OutputField {
         name: name.into(),
-        arguments: arguments.into_iter().map(Arc::new).collect(),
-        field_type: Arc::new(field_type),
+        arguments,
+        field_type,
         query_info,
         is_nullable: false,
-        deprecation: None,
     }
 }
 
 /// Field convenience wrapper function.
-pub fn input_field<T, S>(name: T, field_types: S, default_value: Option<dml::DefaultValue>) -> InputField
+pub(crate) fn input_field<T, S>(
+    ctx: &mut BuilderContext<'_>,
+    name: T,
+    field_types: S,
+    default_value: Option<DefaultKind>,
+) -> InputField
 where
     T: Into<String>,
-    S: Into<Vec<InputType>>,
+    S: IntoIterator<Item = InputType>,
 {
-    InputField {
-        name: name.into(),
-        field_types: field_types.into(),
-        default_value,
-        is_required: true,
-        deprecation: None,
+    let mut input_field = InputField::new(name.into(), default_value, true);
+    for field_type in field_types {
+        input_field.push_type(field_type, &mut ctx.db);
     }
-}
-
-/// Lowercases first letter, essentially.
-/// Assumes 1-byte characters, panics otherwise.
-pub fn camel_case<T>(s: T) -> String
-where
-    T: Into<String>,
-{
-    let s = s.into();
-
-    // This is safe to unwrap, as the validation regex for model / field
-    // names used in the data model essentially guarantees ASCII.
-    let first_char = s.chars().next().unwrap();
-
-    format!("{}{}", first_char.to_lowercase(), s[1..].to_owned())
-}
-
-/// Capitalizes first character.
-/// Assumes 1-byte characters.
-pub fn capitalize<T>(s: T) -> String
-where
-    T: Into<String>,
-{
-    let s = s.into();
-
-    // This is safe to unwrap, as the validation regex for model / field
-    // names used in the data model essentially guarantees ASCII.
-    let first_char = s.chars().next().unwrap();
-
-    format!("{}{}", first_char.to_uppercase(), s[1..].to_owned())
+    input_field
 }
 
 /// Appends an option of type T to a vector over T if the option is Some.
-pub fn append_opt<T>(vec: &mut Vec<T>, opt: Option<T>) {
+pub(crate) fn append_opt<T>(vec: &mut Vec<T>, opt: Option<T>) {
     vec.extend(opt.into_iter())
 }
 
 /// Computes a compound field name based on an index.
-pub fn compound_index_field_name(index: &Index) -> String {
-    index.name.clone().unwrap_or_else(|| {
-        let index_fields = index.fields();
-        let field_names: Vec<&str> = index_fields.iter().map(|sf| sf.name.as_ref()).collect();
+pub fn compound_index_field_name(index: &walkers::IndexWalker<'_>) -> String {
+    index.name().map(ToOwned::to_owned).unwrap_or_else(|| {
+        let field_names: Vec<&str> = index.fields().map(|sf| sf.name()).collect();
 
         field_names.join("_")
     })
 }
 
 /// Computes a compound field name based on a multi-field id.
-pub fn compound_id_field_name(pk: &PrimaryKey) -> String {
-    pk.alias.clone().unwrap_or_else(|| {
-        let pk_fields = pk.fields();
-        let field_names: Vec<&str> = pk_fields.iter().map(|sf| sf.name.as_ref()).collect();
-
-        field_names.join("_")
-    })
+pub fn compound_id_field_name(pk: walkers::PrimaryKeyWalker<'_>) -> String {
+    pk.name()
+        .map(ToOwned::to_owned)
+        .unwrap_or_else(|| pk.fields().map(|sf| sf.name()).collect::<Vec<_>>().join("_"))
 }

@@ -1,21 +1,24 @@
 use super::{internal::serialize_internal, response::*, *};
 use crate::{CoreError, ExpressionResult, QueryResult};
 use prisma_models::PrismaValue;
-use schema::{OutputFieldRef, OutputType};
-use std::borrow::Borrow;
+use schema::{OutputObjectTypeId, OutputType, QuerySchema};
 
 #[derive(Debug)]
 pub struct IrSerializer {
     /// Serialization key for root DataItem
     /// Note: This will change
-    pub key: String,
+    pub(crate) key: String,
 
     /// Output field describing the possible shape of the result
-    pub output_field: OutputFieldRef,
+    pub(crate) output_field: (OutputObjectTypeId, usize),
 }
 
 impl IrSerializer {
-    pub fn serialize(&self, result: ExpressionResult) -> crate::Result<ResponseData> {
+    pub(crate) fn serialize(
+        &self,
+        result: ExpressionResult,
+        query_schema: &QuerySchema,
+    ) -> crate::Result<ResponseData> {
         let _span = info_span!("prisma:engine:serialize", user_facing = true);
         match result {
             ExpressionResult::Query(QueryResult::Json(json)) => {
@@ -23,22 +26,23 @@ impl IrSerializer {
             }
 
             ExpressionResult::Query(r) => {
-                let serialized = serialize_internal(r, &self.output_field, false)?;
+                let output_field = &query_schema.db[self.output_field.0].get_fields()[self.output_field.1];
+                let serialized = serialize_internal(r, output_field, false, query_schema)?;
 
                 // On the top level, each result boils down to a exactly a single serialized result.
                 // All checks for lists and optionals have already been performed during the recursion,
                 // so we just unpack the only result possible.
                 // Todo: The following checks feel out of place. This probably needs to be handled already one level deeper.
                 let result = if serialized.is_empty() {
-                    if self.output_field.is_nullable {
+                    if output_field.is_nullable {
                         Item::Value(PrismaValue::Null)
                     } else {
-                        match self.output_field.field_type.borrow() {
+                        match output_field.field_type {
                             OutputType::List(_) => Item::list(Vec::new()),
                             _ => {
                                 return Err(CoreError::SerializationError(format!(
                                     "Query {} is required to return data, but found no record(s).",
-                                    self.output_field.name
+                                    output_field.name
                                 )))
                             }
                         }
@@ -53,7 +57,7 @@ impl IrSerializer {
 
             ExpressionResult::Empty => panic!("Internal error: Attempted to serialize empty result."),
 
-            _ => panic!("Internal error: Attempted to serialize non-query result {:?}.", result),
+            _ => panic!("Internal error: Attempted to serialize non-query result {result:?}."),
         }
     }
 }

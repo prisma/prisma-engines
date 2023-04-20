@@ -1,3 +1,5 @@
+use psl::parser_database::{IndexAlgorithm, OperatorClass};
+
 use crate::{common::*, with_header, Provider};
 
 #[test]
@@ -11,21 +13,13 @@ fn with_raw_unsupported() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::raw("tsvector_ops"));
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Gin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Gin)
+        .assert_field("a")
+        .assert_raw_ops("tsvector_ops");
 }
 
 #[test]
@@ -39,20 +33,11 @@ fn with_unsupported_no_ops() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Gin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Gin);
 }
 
 // JsonbOps
@@ -68,20 +53,11 @@ fn no_ops_json_prisma_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Gin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Gin);
 }
 
 #[test]
@@ -95,20 +71,11 @@ fn no_ops_jsonb_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Gin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Gin);
 }
 
 #[test]
@@ -122,21 +89,13 @@ fn valid_jsonb_ops_with_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::JsonbOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Gin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Gin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::JsonbOps);
 }
 
 #[test]
@@ -150,21 +109,13 @@ fn valid_jsonb_ops_without_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::JsonbOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Gin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Gin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::JsonbOps);
 }
 
 #[test]
@@ -258,21 +209,13 @@ fn valid_jsonb_path_ops_with_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::JsonbPathOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Gin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Gin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::JsonbPathOps);
 }
 
 #[test]
@@ -286,21 +229,13 @@ fn valid_jsonb_path_ops_without_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::JsonbPathOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Gin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Gin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::JsonbPathOps);
 }
 
 #[test]
@@ -394,20 +329,11 @@ fn array_field_default_ops() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Gin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Gin);
 }
 
 #[test]
@@ -421,21 +347,13 @@ fn array_field_array_ops() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::ArrayOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Gin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Gin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::ArrayOps);
 }
 
 #[test]
@@ -475,19 +393,11 @@ fn gin_raw_ops_to_supported_type() {
         }
     "#;
 
-    let schema = with_header(dm, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("data");
-    field.operator_class = Some(OperatorClass::raw("gin_trgm_ops"));
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_data_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Gin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dm, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["data"])
+        .assert_type(IndexAlgorithm::Gin)
+        .assert_field("data")
+        .assert_raw_ops("gin_trgm_ops");
 }

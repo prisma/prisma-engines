@@ -4,21 +4,28 @@ use crate::mutations::{create_many, create_one};
 use constants::{args, operations};
 use psl::datamodel_connector::ConnectorCapability;
 
-pub(crate) fn filter_input_field(ctx: &mut BuilderContext, field: &ModelField, include_aggregates: bool) -> InputField {
+pub(crate) fn filter_input_field(
+    ctx: &mut BuilderContext<'_>,
+    field: &ModelField,
+    include_aggregates: bool,
+) -> InputField {
     let types = field_filter_types::get_field_filter_types(ctx, field, include_aggregates);
     let nullable = !field.is_required()
         && !field.is_list()
         && match field {
-            ModelField::Scalar(sf) => sf.type_identifier != TypeIdentifier::Json,
+            ModelField::Scalar(sf) => sf.type_identifier() != TypeIdentifier::Json,
             _ => true,
         };
 
-    input_field(field.name().to_owned(), types, None)
+    input_field(ctx, field.name().to_owned(), types, None)
         .optional()
-        .nullable_if(nullable)
+        .nullable_if(nullable, &mut ctx.db)
 }
 
-pub(crate) fn nested_create_one_input_field(ctx: &mut BuilderContext, parent_field: &RelationFieldRef) -> InputField {
+pub(crate) fn nested_create_one_input_field(
+    ctx: &mut BuilderContext<'_>,
+    parent_field: &RelationFieldRef,
+) -> InputField {
     let create_types = create_one::create_one_input_types(ctx, &parent_field.related_model(), Some(parent_field));
 
     let types: Vec<InputType> = create_types
@@ -26,7 +33,7 @@ pub(crate) fn nested_create_one_input_field(ctx: &mut BuilderContext, parent_fie
         .flat_map(|typ| list_union_type(typ, parent_field.is_list()))
         .collect();
 
-    input_field(operations::CREATE, types, None).optional()
+    input_field(ctx, operations::CREATE, types, None).optional()
 }
 
 /// Nested create many calls can only ever be leaf operations because they can't return the ids of
@@ -35,7 +42,7 @@ pub(crate) fn nested_create_one_input_field(ctx: &mut BuilderContext, parent_fie
 /// It also means that we can't serve implicit m:n relations, as this would require a write to the join
 /// table, but we don't have the IDs.
 pub(crate) fn nested_create_many_input_field(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     parent_field: &RelationFieldRef,
 ) -> Option<InputField> {
     if ctx.has_capability(ConnectorCapability::CreateMany)
@@ -44,45 +51,46 @@ pub(crate) fn nested_create_many_input_field(
         && !parent_field.relation().is_many_to_many()
     {
         let envelope = nested_create_many_envelope(ctx, parent_field);
-        Some(input_field("createMany", InputType::object(envelope), None).optional())
+
+        Some(input_field(ctx, operations::CREATE_MANY, InputType::object(envelope), None).optional())
     } else {
         None
     }
 }
 
-fn nested_create_many_envelope(ctx: &mut BuilderContext, parent_field: &RelationFieldRef) -> InputObjectTypeWeakRef {
+fn nested_create_many_envelope(ctx: &mut BuilderContext<'_>, parent_field: &RelationFieldRef) -> InputObjectTypeId {
     let create_type = create_many::create_many_object_type(ctx, &parent_field.related_model(), Some(parent_field));
 
-    let nested_ident = &create_type.into_arc().identifier;
+    let nested_ident = &ctx.db[create_type].identifier;
     let name = format!("{}Envelope", nested_ident.name());
 
-    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    let ident = Identifier::new_prisma(name);
     return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, input_object.clone());
-
+    let input_object = init_input_object_type(ident.clone());
+    let id = ctx.cache_input_type(ident, input_object);
     let create_many_type = InputType::object(create_type);
-    let data_arg = input_field("data", InputType::list(create_many_type), None);
+    let data_arg = input_field(ctx, args::DATA, list_union_type(create_many_type, true), None);
 
     let fields = if ctx.has_capability(ConnectorCapability::CreateSkipDuplicates) {
-        let skip_arg = input_field(args::SKIP_DUPLICATES, InputType::boolean(), None).optional();
+        let skip_arg = input_field(ctx, args::SKIP_DUPLICATES, InputType::boolean(), None).optional();
 
         vec![data_arg, skip_arg]
     } else {
         vec![data_arg]
     };
 
-    input_object.set_fields(fields);
-    Arc::downgrade(&input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }
 
 pub(crate) fn nested_connect_or_create_field(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     parent_field: &RelationFieldRef,
 ) -> Option<InputField> {
     connect_or_create_objects::nested_connect_or_create_input_object(ctx, parent_field).map(|input_object_type| {
         input_field(
+            ctx,
             operations::CONNECT_OR_CREATE,
             list_union_object_type(input_object_type, parent_field.is_list()),
             None,
@@ -92,9 +100,10 @@ pub(crate) fn nested_connect_or_create_field(
 }
 
 /// Builds "upsert" field for nested updates (on relation fields).
-pub(crate) fn nested_upsert_field(ctx: &mut BuilderContext, parent_field: &RelationFieldRef) -> Option<InputField> {
+pub(crate) fn nested_upsert_field(ctx: &mut BuilderContext<'_>, parent_field: &RelationFieldRef) -> Option<InputField> {
     upsert_objects::nested_upsert_input_object(ctx, parent_field).map(|input_object_type| {
         input_field(
+            ctx,
             operations::UPSERT,
             list_union_object_type(input_object_type, parent_field.is_list()),
             None,
@@ -105,7 +114,7 @@ pub(crate) fn nested_upsert_field(ctx: &mut BuilderContext, parent_field: &Relat
 
 /// Builds "deleteMany" field for nested updates (on relation fields).
 pub(crate) fn nested_delete_many_field(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     parent_field: &RelationFieldRef,
 ) -> Option<InputField> {
     if parent_field.is_list() {
@@ -114,6 +123,7 @@ pub(crate) fn nested_delete_many_field(
 
         Some(
             input_field(
+                ctx,
                 operations::DELETE_MANY,
                 vec![input_type.clone(), InputType::list(input_type)],
                 None,
@@ -127,7 +137,7 @@ pub(crate) fn nested_delete_many_field(
 
 /// Builds "updateMany" field for nested updates (on relation fields).
 pub(crate) fn nested_update_many_field(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     parent_field: &RelationFieldRef,
 ) -> Option<InputField> {
     if parent_field.is_list() {
@@ -135,6 +145,7 @@ pub(crate) fn nested_update_many_field(
 
         Some(
             input_field(
+                ctx,
                 operations::UPDATE_MANY,
                 list_union_object_type(input_type, true), //vec![input_type.clone(), InputType::list(input_type)],
                 None,
@@ -147,7 +158,10 @@ pub(crate) fn nested_update_many_field(
 }
 
 /// Builds "set" field for nested updates (on relation fields).
-pub(crate) fn nested_set_input_field(ctx: &mut BuilderContext, parent_field: &RelationFieldRef) -> Option<InputField> {
+pub(crate) fn nested_set_input_field(
+    ctx: &mut BuilderContext<'_>,
+    parent_field: &RelationFieldRef,
+) -> Option<InputField> {
     if parent_field.is_list() {
         Some(where_unique_input_field(ctx, operations::SET, parent_field))
     } else {
@@ -157,7 +171,7 @@ pub(crate) fn nested_set_input_field(ctx: &mut BuilderContext, parent_field: &Re
 
 /// Builds "disconnect" field for nested updates (on relation fields).
 pub(crate) fn nested_disconnect_input_field(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     parent_field: &RelationFieldRef,
 ) -> Option<InputField> {
     match (parent_field.is_list(), parent_field.is_required()) {
@@ -172,7 +186,7 @@ pub(crate) fn nested_disconnect_input_field(
                 )));
             }
 
-            Some(input_field(operations::DISCONNECT, types, None).optional())
+            Some(input_field(ctx, operations::DISCONNECT, types, None).optional())
         }
         (false, true) => None,
     }
@@ -180,7 +194,7 @@ pub(crate) fn nested_disconnect_input_field(
 
 /// Builds "delete" field for nested updates (on relation fields).
 pub(crate) fn nested_delete_input_field(
-    ctx: &mut BuilderContext,
+    ctx: &mut BuilderContext<'_>,
     parent_field: &RelationFieldRef,
 ) -> Option<InputField> {
     match (parent_field.is_list(), parent_field.is_required()) {
@@ -195,18 +209,18 @@ pub(crate) fn nested_delete_input_field(
                 )));
             }
 
-            Some(input_field(operations::DELETE, types, None).optional())
+            Some(input_field(ctx, operations::DELETE, types, None).optional())
         }
         (false, true) => None,
     }
 }
 
 /// Builds the "connect" input field for a relation.
-pub(crate) fn nested_connect_input_field(ctx: &mut BuilderContext, parent_field: &RelationFieldRef) -> InputField {
+pub(crate) fn nested_connect_input_field(ctx: &mut BuilderContext<'_>, parent_field: &RelationFieldRef) -> InputField {
     where_unique_input_field(ctx, operations::CONNECT, parent_field)
 }
 
-pub(crate) fn nested_update_input_field(ctx: &mut BuilderContext, parent_field: &RelationFieldRef) -> InputField {
+pub(crate) fn nested_update_input_field(ctx: &mut BuilderContext<'_>, parent_field: &RelationFieldRef) -> InputField {
     let mut update_shorthand_types =
         update_one_objects::update_one_input_types(ctx, &parent_field.related_model(), Some(parent_field));
 
@@ -230,16 +244,17 @@ pub(crate) fn nested_update_input_field(ctx: &mut BuilderContext, parent_field: 
         update_shorthand_types
     };
 
-    input_field(operations::UPDATE, update_types, None).optional()
+    input_field(ctx, operations::UPDATE, update_types, None).optional()
 }
 
-fn where_unique_input_field<T>(ctx: &mut BuilderContext, name: T, field: &RelationFieldRef) -> InputField
+fn where_unique_input_field<T>(ctx: &mut BuilderContext<'_>, name: T, field: &RelationFieldRef) -> InputField
 where
     T: Into<String>,
 {
     let input_object_type = filter_objects::where_unique_object_type(ctx, &field.related_model());
 
     input_field(
+        ctx,
         name.into(),
         list_union_object_type(input_object_type, field.is_list()),
         None,

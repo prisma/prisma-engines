@@ -55,8 +55,7 @@ pub(super) fn unique_index_has_a_unique_custom_name_per_model(
             .local_custom_name_scope_violations(model.model_id(), name.as_ref())
         {
             let message = format!(
-                "The given custom name `{}` has to be unique on the model. Please provide a different name for the `name` argument.",
-                name,
+                "The given custom name `{name}` has to be unique on the model. Please provide a different name for the `name` argument."
             );
 
             let from_arg = index.ast_attribute().span_for_argument("name");
@@ -402,8 +401,15 @@ pub(super) fn unique_client_name_does_not_clash_with_field(index: IndexWalker<'_
     if index.model().scalar_fields().any(|f| f.name() == idx_client_name) {
         let attr_name = index.attribute_name();
 
+        let container_type = if index.model().ast_model().is_view() {
+            "view"
+        } else {
+            "model"
+        };
+
         ctx.push_error(DatamodelError::new_model_validation_error(
             &format!("The field `{idx_client_name}` clashes with the `{attr_name}` name. Please resolve the conflict by providing a custom id name: `{attr_name}([...], name: \"custom_name\")`"),
+            container_type,
             index.model().name(),
             index.ast_attribute().span,
         ));

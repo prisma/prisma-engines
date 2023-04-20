@@ -3,7 +3,7 @@ use query_engine_tests::*;
 #[test_suite(schema(schemas::json), capabilities(JsonFiltering), exclude(MySql(5.6)))]
 mod json_filters {
     use indoc::indoc;
-    use query_engine_tests::{assert_error, is_one_of, run_query, ConnectorTag, MySqlVersion, Runner};
+    use query_engine_tests::{assert_error, is_one_of, run_query, MySqlVersion, Runner};
 
     fn pg_json() -> String {
         let schema = indoc! {
@@ -871,14 +871,11 @@ mod json_filters {
 
     async fn create_row(runner: &Runner, id: u32, data: &str, nested: bool) -> TestResult<()> {
         let json = if nested {
-            format!(r#"{{ \"a\": {{ \"b\": {} }} }}"#, data)
+            format!(r#"{{ \"a\": {{ \"b\": {data} }} }}"#)
         } else {
             data.to_owned()
         };
-        let q = format!(
-            r#"mutation {{ createOneTestModel(data: {{ id: {}, json: "{}" }}) {{ id }} }}"#,
-            id, json
-        );
+        let q = format!(r#"mutation {{ createOneTestModel(data: {{ id: {id}, json: "{json}" }}) {{ id }} }}"#);
 
         runner.query(q).await?.assert_success();
         Ok(())
@@ -887,19 +884,13 @@ mod json_filters {
     fn jsonq(runner: &Runner, filter: &str, path: Option<&str>) -> String {
         let path = path.unwrap_or_else(|| json_path(runner));
 
-        format!(
-            r#"query {{ findManyTestModel(where: {{ json: {{ {}, {} }} }} ) {{ id }} }}"#,
-            filter, path
-        )
+        format!(r#"query {{ findManyTestModel(where: {{ json: {{ {filter}, {path} }} }} ) {{ id }} }}"#)
     }
 
     fn not_jsonq(runner: &Runner, filter: &str, path: Option<&str>) -> String {
         let path = path.unwrap_or_else(|| json_path(runner));
 
-        format!(
-            r#"query {{ findManyTestModel(where: {{ NOT: {{ json: {{ {}, {} }} }} }} ) {{ id }} }}"#,
-            filter, path
-        )
+        format!(r#"query {{ findManyTestModel(where: {{ NOT: {{ json: {{ {filter}, {path} }} }} }} ) {{ id }} }}"#)
     }
 
     fn json_path(runner: &Runner) -> &'static str {

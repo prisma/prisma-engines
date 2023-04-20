@@ -1,10 +1,12 @@
 mod actions;
 mod code_actions;
 mod get_config;
+mod get_dmmf;
 mod lint;
 mod native;
 mod preview;
 mod text_document_completion;
+mod validate;
 
 use log::*;
 use lsp_types::{Position, Range};
@@ -64,6 +66,29 @@ pub fn lint(schema: String) -> String {
     lint::run(&schema)
 }
 
+/// Function that throws a human-friendly error message when the schema is invalid, following the JSON formatting
+/// historically used by the Query Engine's `user_facing_errors::common::SchemaParserError`.
+/// When the schema is valid, nothing happens.
+/// When the schema is invalid, the function displays a human-friendly error message indicating the schema lines
+/// where the errors lie and the total error count, e.g.:
+///
+/// ```sh
+/// The `referentialIntegrity` and `relationMode` attributes cannot be used together. Please use only `relationMode` instead.
+///   -->  schema.prisma:5
+///   |
+/// 4 |   relationMode         = "prisma"
+/// 5 |   referentialIntegrity = "foreignKeys"
+/// 6 | }
+///   |
+///
+/// Validation Error Count: 1
+/// ```
+///
+/// This function isn't supposed to panic.
+pub fn validate(validate_params: String) -> Result<(), String> {
+    validate::validate(&validate_params)
+}
+
 pub fn native_types(schema: String) -> String {
     native::run(&schema)
 }
@@ -118,6 +143,42 @@ pub fn get_config(get_config_params: String) -> Result<String, String> {
     get_config::get_config(&get_config_params)
 }
 
+/// This is the same command as get_dmmf()
+///
+/// Params is a JSON string with the following shape:
+///
+/// ```ignore
+/// interface GetDmmfParams {
+///   prismaSchema: string
+/// }
+/// ```
+/// Params example:
+///
+/// ```ignore
+/// {
+///   "prismaSchema": <the prisma schema>,
+/// }
+/// ```
+///
+/// The response is a JSON string with the following shape:
+///
+/// ```ignore
+/// type GetDmmfSuccessResponse = any // same as QE getDmmf
+///
+/// interface GetDmmfErrorResponse {
+///   error: {
+///     error_code?: string
+///     message: string
+///   }
+/// }
+///
+/// type GetDmmfResponse = GetDmmfErrorResponse | GetDmmfSuccessResponse
+///
+/// ```
+pub fn get_dmmf(get_dmmf_params: String) -> Result<String, String> {
+    get_dmmf::get_dmmf(&get_dmmf_params)
+}
+
 /// The LSP position is expressed as a (line, col) tuple, but our pest-based parser works with byte
 /// offsets. This function converts from an LSP position to a pest byte offset. Returns `None` if
 /// the position has a line past the end of the document, or a character position past the end of
@@ -138,7 +199,7 @@ pub(crate) fn position_to_offset(position: &Position, document: &str) -> Option<
                 Some(_) => {
                     offset += 1;
                 }
-                None => return None,
+                None => return Some(offset),
             }
         }
 
@@ -147,7 +208,7 @@ pub(crate) fn position_to_offset(position: &Position, document: &str) -> Option<
 
     while character_offset > 0 {
         match chars.next() {
-            Some('\n') | None => return None,
+            Some('\n') | None => return Some(offset),
             Some(_) => {
                 offset += 1;
                 character_offset -= 1;
@@ -158,6 +219,7 @@ pub(crate) fn position_to_offset(position: &Position, document: &str) -> Option<
     Some(offset)
 }
 
+#[track_caller]
 /// Converts an LSP range to a span.
 pub(crate) fn range_to_span(range: Range, document: &str) -> ast::Span {
     let start = position_to_offset(&range.start, document).unwrap();
@@ -173,7 +235,7 @@ pub(crate) fn position_after_span(span: ast::Span, document: &str) -> Position {
 
 /// Converts a byte offset to an LSP position, if the given offset
 /// does not overflow the document.
-pub(crate) fn offset_to_position(offset: usize, document: &str) -> Position {
+pub fn offset_to_position(offset: usize, document: &str) -> Position {
     let mut position = Position::default();
 
     for (i, chr) in document.chars().enumerate() {

@@ -4,8 +4,7 @@ use mongodb::{
     bson::{from_bson, Bson, Document},
     options::*,
 };
-use prisma_models::ModelRef;
-use psl::dml::PrismaValue;
+use prisma_models::{ModelRef, PrismaValue};
 use std::collections::HashMap;
 
 #[allow(clippy::large_enum_variant)]
@@ -100,7 +99,7 @@ impl QueryRawParsingExtension for HashMap<String, PrismaValue> {
                     .into_iter()
                     .map(|stage| {
                         stage.into_document().map_err(|_| {
-                            MongoError::argument_type_mismatch(key, format!("{:?}", pv), "Json::Array<Json::Object>")
+                            MongoError::argument_type_mismatch(key, format!("{pv:?}"), "Json::Array<Json::Object>")
                         })
                     })
                     .try_collect()?;
@@ -134,7 +133,7 @@ impl QueryRawConversionExtension for &PrismaValue {
 
                 Ok(Bson::Array(bson))
             }
-            x => Err(MongoError::argument_type_mismatch(arg_name, format!("{:?}", x), "Json")),
+            x => Err(MongoError::argument_type_mismatch(arg_name, format!("{x:?}"), "Json")),
         }
     }
 
@@ -145,7 +144,7 @@ impl QueryRawConversionExtension for &PrismaValue {
             Bson::Document(doc) => Ok(doc),
             bson => Err(MongoError::argument_type_mismatch(
                 arg_name,
-                format!("{:?}", bson),
+                format!("{bson:?}"),
                 "Json::Object",
             )),
         }
@@ -158,7 +157,7 @@ impl QueryRawConversionExtension for &PrismaValue {
             Bson::Array(doc) => Ok(doc),
             bson => Err(MongoError::argument_type_mismatch(
                 arg_name,
-                format!("{:?}", bson),
+                format!("{bson:?}"),
                 "Json::Array",
             )),
         }

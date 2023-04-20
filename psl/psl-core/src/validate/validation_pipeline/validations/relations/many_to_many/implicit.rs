@@ -6,8 +6,14 @@ use parser_database::{ast::WithSpan, walkers::ImplicitManyToManyRelationWalker};
 pub(crate) fn validate_singular_id(relation: ImplicitManyToManyRelationWalker<'_>, ctx: &mut Context<'_>) {
     for relation_field in [relation.field_a(), relation.field_b()].iter() {
         if !relation_field.related_model().has_single_id_field() {
+            let container = if relation_field.related_model().ast_model().is_view() {
+                "view"
+            } else {
+                "model"
+            };
+
             let message = format!(
-                "The relation field `{}` on Model `{}` references `{}` which does not have an `@id` field. Models without `@id` cannot be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.",
+                "The relation field `{}` on {container} `{}` references `{}` which does not have an `@id` field. Models without `@id` cannot be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.",
                 &relation_field.name(),
                 &relation_field.model().name(),
                 &relation_field.related_model().name(),
@@ -15,6 +21,7 @@ pub(crate) fn validate_singular_id(relation: ImplicitManyToManyRelationWalker<'_
 
             ctx.push_error(DatamodelError::new_field_validation_error(
                 &message,
+                container,
                 relation_field.model().name(),
                 relation_field.name(),
                 relation_field.ast_field().span(),

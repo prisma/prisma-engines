@@ -162,9 +162,7 @@ fn try_parse_unicode_codepoint(
                 }
                 (consumed_second_codepoint, Some(second_codepoint)) => {
                     // UTF-16 surrogate with
-                    let char = match char::decode_utf16([first_codepoint as u16, second_codepoint as u16].into_iter())
-                        .next()
-                    {
+                    let char = match char::decode_utf16([first_codepoint, second_codepoint].into_iter()).next() {
                         Some(Ok(c)) => Some(c),
                         _ => {
                             diagnostics.push_error(unicode_sequence_error(

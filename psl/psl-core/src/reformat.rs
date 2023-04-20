@@ -222,7 +222,6 @@ fn push_missing_scalar_fields(inline: walkers::InlineRelationWalker<'_>, ctx: &m
 }
 
 /// A scalar inferred by magic reformatting.
-#[derive(Debug)]
 struct InferredScalarField<'db> {
     name: String,
     arity: ast::FieldArity,

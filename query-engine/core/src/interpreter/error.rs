@@ -26,17 +26,17 @@ pub enum InterpreterError {
 }
 
 impl fmt::Display for InterpreterError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::QueryGraphBuilderError(e) => write!(f, "{:?}", e),
-            _ => write!(f, "Error occurred during query execution:\n{:?}", self),
+            Self::QueryGraphBuilderError(e) => write!(f, "{e:?}"),
+            _ => write!(f, "Error occurred during query execution:\n{self:?}"),
         }
     }
 }
 
 impl From<CoreError> for InterpreterError {
     fn from(e: CoreError) -> Self {
-        InterpreterError::Generic(format!("{:?}", e))
+        InterpreterError::Generic(format!("{e:?}"))
     }
 }
 

@@ -1,4 +1,6 @@
 use crate::{error::PrismaError, PrismaResult};
+use psl::{PreviewFeature, PreviewFeatures};
+use query_core::protocol::EngineProtocol;
 use serde::Deserialize;
 use std::{env, ffi::OsStr, fs::File, io::Read};
 use structopt::StructOpt;
@@ -103,11 +105,19 @@ pub struct PrismaOpt {
     #[structopt(long)]
     pub enable_open_telemetry: bool,
 
+    #[structopt(long)]
+    /// Enable tracer to capture logs and traces and return in the response
+    pub enable_telemetry_in_response: bool,
+
     /// The url to the OpenTelemetry collector.
     /// Enabling this will send the OpenTelemtry tracing to a collector
     /// and not via our custom stdout tracer
     #[structopt(long, default_value)]
     pub open_telemetry_endpoint: String,
+
+    /// The protocol the Query Engine will used. Affects mostly the request and response format.
+    #[structopt(long, env = "PRISMA_ENGINE_PROTOCOL")]
+    pub engine_protocol: Option<String>,
 
     #[structopt(subcommand)]
     pub subcommand: Option<Subcommand>,
@@ -150,12 +160,14 @@ impl PrismaOpt {
             Vec::new()
         };
 
-        if !ignore_env_errors {
-            schema
-                .configuration
-                .resolve_datasource_urls_from_env(&datasource_url_overrides, |key| env::var(key).ok())
-                .map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))?;
-        }
+        schema
+            .configuration
+            .resolve_datasource_urls_query_engine(
+                &datasource_url_overrides,
+                |key| env::var(key).ok(),
+                ignore_env_errors,
+            )
+            .map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))?;
 
         Ok(schema)
     }
@@ -170,16 +182,17 @@ impl PrismaOpt {
             Vec::new()
         };
 
-        let config_result = if ignore_env_errors {
-            psl::parse_configuration(datamodel_str)
-        } else {
-            psl::parse_configuration(datamodel_str).and_then(|mut config| {
-                config.resolve_datasource_urls_from_env(&datasource_url_overrides, |key| env::var(key).ok())?;
+        psl::parse_configuration(datamodel_str)
+            .and_then(|mut config| {
+                config.resolve_datasource_urls_query_engine(
+                    &datasource_url_overrides,
+                    |key| env::var(key).ok(),
+                    ignore_env_errors,
+                )?;
 
                 Ok(config)
             })
-        };
-        config_result.map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))
+            .map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))
     }
 
     /// Extract the log format from on the RUST_LOG_FORMAT env var.
@@ -206,6 +219,30 @@ impl PrismaOpt {
     pub fn from_list(list: &[&str]) -> Self {
         PrismaOpt::from_iter_safe(list).unwrap()
     }
+
+    /// The EngineProtocol to use for communication, it will be [EngineProtocol::Json] in case
+    /// the [PreviewFeature::JsonProtocol] flag is set to "json". Otherwise it will be
+    /// [EngineProtocol::Graphql]
+    ///
+    /// This protocol will determine how the body of an HTTP request made by the client is processed.
+    /// [request_handlers::JsonBody] and [request_handlers::GraphqlBody] are in charge
+    /// of converting the respective representations into a protocol-agnostic(*)
+    /// [query_core::QueryDocument]
+    ///
+    /// (*) FIXME: at the time of writing, the heuristics to validate the [query_core::QueryDocument]
+    /// and  transform it into a [query_core::ParsedObject] require to know which protocol was used
+    /// for submitting the query, this is due to the fact that DMMF is no longer used by the client
+    /// to understand which types certain values are. See [query_core::QueryDocumentParser]
+    ///
+    pub fn engine_protocol(&self, preview_features: PreviewFeatures) -> EngineProtocol {
+        self.engine_protocol
+            .as_ref()
+            .map(EngineProtocol::from)
+            .unwrap_or_else(|| match preview_features.contains(PreviewFeature::JsonProtocol) {
+                true => EngineProtocol::Json,
+                false => EngineProtocol::Graphql,
+            })
+    }
 }
 
 fn parse_base64_string(s: &str) -> PrismaResult<String> {
@@ -223,11 +260,11 @@ fn parse_base64_string(s: &str) -> PrismaResult<String> {
 }
 
 fn load_datamodel_file(path: &OsStr) -> String {
-    let mut f = File::open(path).unwrap_or_else(|_| panic!("Could not open datamodel file {:?}", path));
+    let mut f = File::open(path).unwrap_or_else(|_| panic!("Could not open datamodel file {path:?}"));
     let mut datamodel = String::new();
 
     f.read_to_string(&mut datamodel)
-        .unwrap_or_else(|_| panic!("Could not read datamodel file: {:?}", path));
+        .unwrap_or_else(|_| panic!("Could not read datamodel file: {path:?}"));
 
     datamodel
 }

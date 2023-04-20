@@ -100,7 +100,7 @@ mod delete {
             &runner,
             r#"mutation { deleteOneScalarModel(where: {unicorn: null}) { unicorn }}"#,
             2012,
-            "Missing a required value at `Mutation.deleteOneScalarModel.where.ScalarModelWhereUniqueInput.unicorn`"
+            "A value is required but not set"
         );
 
         insta::assert_snapshot!(
@@ -134,7 +134,7 @@ mod delete {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneScalarModel(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneScalarModel(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())

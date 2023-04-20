@@ -53,7 +53,7 @@ fn find_all_schemas(prefix: &str, all_schemas: &mut Vec<String>, root_dir: &'sta
         let entry = entry.unwrap();
         let file_name = entry.file_name();
         let file_name = file_name.to_str().unwrap();
-        let entry_path = format!("{}/{}", prefix, file_name);
+        let entry_path = format!("{prefix}/{file_name}");
         let file_type = entry.file_type().unwrap();
 
         if file_name == "." || file_name == ".." {

@@ -7,7 +7,6 @@ use crate::{
 use connector::IntoFilter;
 use prisma_models::ModelRef;
 use schema::ConnectorContext;
-use std::sync::Arc;
 
 /// Handles a top-level upsert
 ///
@@ -81,6 +80,7 @@ pub fn upsert_record(
 
             create_write_args.add_datetimes(&model);
             update_write_args.add_datetimes(&model);
+
             graph.create_node(WriteQuery::native_upsert(
                 field.name,
                 model,
@@ -89,6 +89,7 @@ pub fn upsert_record(
                 update_write_args,
                 read,
             ));
+
             return Ok(());
         }
     }
@@ -100,9 +101,9 @@ pub fn upsert_record(
     let read_parent_records = utils::read_ids_infallible(model.clone(), model_id.clone(), filter.clone());
     let read_parent_records_node = graph.create_node(read_parent_records);
 
-    let create_node = create::create_record_node(graph, connector_ctx, Arc::clone(&model), create_argument)?;
+    let create_node = create::create_record_node(graph, connector_ctx, model.clone(), create_argument)?;
 
-    let update_node = update::update_record_node(graph, connector_ctx, filter, Arc::clone(&model), update_argument)?;
+    let update_node = update::update_record_node(graph, connector_ctx, filter, model.clone(), update_argument)?;
 
     let read_node_create = graph.create_node(Query::Read(read_query.clone()));
     let read_node_update = graph.create_node(Query::Read(read_query));
@@ -213,11 +214,11 @@ fn can_use_connector_native_upsert(
 
     let has_nested_create = create_argument
         .iter()
-        .any(|(field_name, _)| model.fields().find_from_relation_fields(&field_name).is_ok());
+        .any(|(field_name, _)| model.fields().find_from_relation_fields(field_name).is_ok());
 
     let has_nested_update = update_argument
         .iter()
-        .any(|(field_name, _)| model.fields().find_from_relation_fields(&field_name).is_ok());
+        .any(|(field_name, _)| model.fields().find_from_relation_fields(field_name).is_ok());
 
     let empty_update = update_argument.iter().len() == 0;
 
@@ -229,7 +230,7 @@ fn can_use_connector_native_upsert(
 
     let where_values_same_as_create = where_field
         .iter()
-        .all(|(field_name, input)| where_and_create_equal(&field_name, &input, &create_argument));
+        .all(|(field_name, input)| where_and_create_equal(field_name, input, create_argument));
 
     connector_ctx.can_native_upsert()
         && has_one_unique
@@ -238,10 +239,11 @@ fn can_use_connector_native_upsert(
         && !empty_update
         && !has_nested_selects
         && where_values_same_as_create
+        && !connector_ctx.relation_mode.is_prisma()
 }
 
-fn is_unique_field(field_name: &String, model: &ModelRef) -> bool {
-    match model.fields().find_from_scalar(&field_name) {
+fn is_unique_field(field_name: &str, model: &ModelRef) -> bool {
+    match model.fields().find_from_scalar(field_name) {
         Ok(field) => field.unique(),
         Err(_) => resolve_compound_field(field_name, model).is_some(),
     }

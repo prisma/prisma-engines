@@ -68,7 +68,7 @@ mod byoid {
               createOneParent(data: {p: "Parent2", id: "Own Id"}){p, id}
             }"#,
             2002,
-            format!("Unique constraint failed on the {}", error_target)
+            format!("Unique constraint failed on the {error_target}")
         );
 
         Ok(())
@@ -96,7 +96,7 @@ mod byoid {
                   createOneParent(data: {p: "Parent2", id: "Own Id"}){p, id}
                 }"#,
             2002,
-            format!("Unique constraint failed on the {}", error_target)
+            format!("Unique constraint failed on the {error_target}")
         );
 
         Ok(())
@@ -111,7 +111,7 @@ mod byoid {
               createOneParent(data: {p: "Parent", id: true}){p, id}
             }"#,
             2009,
-            "`Mutation.createOneParent.data.ParentCreateInput.id`: Value types mismatch. Have: Boolean(true), want: String"
+            "Invalid argument type"
         );
 
         Ok(())
@@ -121,13 +121,13 @@ mod byoid {
     #[connector_test(schema(schema_2))]
     async fn error_for_invalid_id_2_2(runner: Runner) -> TestResult<()> {
         assert_error!(
-                runner,
-                r#"mutation {
+            runner,
+            r#"mutation {
                   createOneParent(data: {p: "Parent", id: true}){p, id}
                 }"#,
-                2009,
-                "`Mutation.createOneParent.data.ParentCreateInput.id`: Value types mismatch. Have: Boolean(true), want: String"
-            );
+            2009,
+            "Invalid argument type"
+        );
 
         Ok(())
     }
@@ -154,7 +154,7 @@ mod byoid {
               createOneParent(data: {p: "Parent 2", id: "Own Id 2", childOpt:{create:{c:"Child 2", id: "Own Child Id"}}}){p, id, childOpt { c, id} }
             }"#,
             2002,
-            format!("Unique constraint failed on the {}", error_target)
+            format!("Unique constraint failed on the {error_target}")
         );
 
         Ok(())
@@ -182,7 +182,7 @@ mod byoid {
                   createOneParent(data: {p: "Parent 2", id: "Own Id 2", childOpt:{create:{c:"Child 2", id: "Own Child Id"}}}){p, id, childOpt { c, id} }
                 }"#,
             2002,
-            format!("Unique constraint failed on the {}", error_target)
+            format!("Unique constraint failed on the {error_target}")
         );
 
         Ok(())

@@ -1,5 +1,6 @@
-use crate::{dml::FieldArity, Field, FieldSelection, ScalarFieldRef, SelectedField, SelectionResult, TypeIdentifier};
+use crate::{Field, FieldSelection, ScalarFieldRef, SelectedField, SelectionResult, TypeIdentifier};
 use itertools::Itertools;
+use psl::schema_ast::ast::FieldArity;
 
 /// Projection of a `Model`. A projection is a (sub)set of fields of a model.
 /// There can only ever be fields of one model contained in a particular `ModelProjection`
@@ -77,8 +78,7 @@ impl ModelProjection {
                 Field::Relation(rf) => rf.scalar_fields(),
                 Field::Composite(_) => todo!(), // [Composites] todo
             })
-            .into_iter()
-            .unique_by(|field| field.name.clone())
+            .unique_by(|field| field.name().to_owned())
     }
 
     pub fn map_db_name(&self, name: &str) -> Option<ScalarFieldRef> {

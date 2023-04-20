@@ -8,7 +8,7 @@ use crate::{
 use connector::{Filter, IntoFilter};
 use prisma_models::{ModelRef, RelationFieldRef};
 use schema_builder::constants::args;
-use std::{convert::TryInto, sync::Arc};
+use std::convert::TryInto;
 
 /// Handles nested create one cases.
 /// The resulting graph can take multiple forms, based on the relation type to the parent model.
@@ -26,7 +26,7 @@ pub fn nested_create(
     // Build all create nodes upfront.
     let creates: Vec<NodeRef> = utils::coerce_vec(value)
         .into_iter()
-        .map(|value| create::create_record_node(graph, connector_ctx, Arc::clone(child_model), value.try_into()?))
+        .map(|value| create::create_record_node(graph, connector_ctx, child_model.clone(), value.try_into()?))
         .collect::<QueryGraphBuilderResult<Vec<NodeRef>>>()?;
 
     if relation.is_many_to_many() {
@@ -69,7 +69,7 @@ fn handle_many_to_many(
     // Todo optimize with createMany
     for create_node in create_nodes {
         graph.create_edge(&parent_node, &create_node, QueryGraphDependency::ExecutionOrder)?;
-        connect::connect_records_node(graph, &parent_node, &create_node, &parent_relation_field, 1)?;
+        connect::connect_records_node(graph, &parent_node, &create_node, parent_relation_field, 1)?;
     }
 
     Ok(())
@@ -144,9 +144,9 @@ fn handle_one_to_many(
         let parent_link = parent_relation_field.linking_fields();
         let child_link = parent_relation_field.related_field().linking_fields();
 
-        let relation_name = parent_relation_field.relation().name.clone();
-        let parent_model_name = parent_relation_field.model().name.clone();
-        let child_model_name = parent_relation_field.related_model().name.clone();
+        let relation_name = parent_relation_field.relation().name();
+        let parent_model_name = parent_relation_field.model().name().to_owned();
+        let child_model_name = parent_relation_field.related_model().name().to_owned();
 
         // We extract the child linking fields in the edge, because after the swap, the child is the new parent.
         graph.create_edge(
@@ -156,8 +156,7 @@ fn handle_one_to_many(
                 let child_link = match child_links.pop() {
                     Some(link) => Ok(link),
                     None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "No '{}' record (needed to inline the relation on '{}' record) was found for a nested create on one-to-many relation '{}'.",
-                        child_model_name, parent_model_name, relation_name
+                        "No '{child_model_name}' record (needed to inline the relation on '{parent_model_name}' record) was found for a nested create on one-to-many relation '{relation_name}'."
                     ))),
                 }?;
 
@@ -173,9 +172,9 @@ fn handle_one_to_many(
             let parent_link = parent_relation_field.linking_fields();
             let child_link = parent_relation_field.related_field().linking_fields();
 
-            let relation_name = parent_relation_field.relation().name.clone();
-            let parent_model_name = parent_relation_field.model().name.clone();
-            let child_model_name = parent_relation_field.related_model().name.clone();
+            let relation_name = parent_relation_field.relation().name().to_owned();
+            let parent_model_name = parent_relation_field.model().name().to_owned();
+            let child_model_name = parent_relation_field.related_model().name().to_owned();
 
             graph.create_edge(
                 &parent_node,
@@ -184,8 +183,7 @@ fn handle_one_to_many(
                     let parent_link = match parent_links.pop() {
                         Some(link) => Ok(link),
                         None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "No '{}' record (needed to inline the relation on '{}' record) was found for a nested create on one-to-many relation '{}'.",
-                            parent_model_name, child_model_name, relation_name
+                            "No '{parent_model_name}' record (needed to inline the relation on '{child_model_name}' record) was found for a nested create on one-to-many relation '{relation_name}'."
                         ))),
                     }?;
 
@@ -337,9 +335,9 @@ fn handle_one_to_one(
         )
     };
 
-    let relation_name = parent_relation_field.relation().name.clone();
-    let parent_model_name = extractor_model.name.clone();
-    let child_model_name = assimilator_model.name.clone();
+    let relation_name = parent_relation_field.relation().name();
+    let parent_model_name = extractor_model.name().to_owned();
+    let child_model_name = assimilator_model.name().to_owned();
 
     graph.create_edge(
         &parent_node,
@@ -348,8 +346,7 @@ fn handle_one_to_one(
             let link = match links.pop() {
                 Some(link) => Ok(link),
                 None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                    "No '{}' record (needed to inline the relation with create on '{}' record) was found for a nested create on one-to-one relation '{}'.",
-                    parent_model_name, child_model_name, relation_name
+                    "No '{parent_model_name}' record (needed to inline the relation with create on '{child_model_name}' record) was found for a nested create on one-to-one relation '{relation_name}'."
                 ))),
             }?;
 
@@ -367,9 +364,9 @@ fn handle_one_to_one(
     // For explanation see end of doc comment.
     if relation_inlined_parent && !parent_is_create {
         let parent_model = parent_relation_field.model();
-        let relation_name = parent_relation_field.relation().name.clone();
-        let parent_model_name = parent_model.name.clone();
-        let child_model_name = parent_relation_field.related_model().name.clone();
+        let relation_name = parent_relation_field.relation().name();
+        let parent_model_name = parent_model.name().to_owned();
+        let child_model_name = parent_relation_field.related_model().name().to_owned();
         let update_node = utils::update_records_node_placeholder(graph, Filter::empty(), parent_model);
         let parent_link = parent_relation_field.linking_fields();
 
@@ -380,8 +377,7 @@ fn handle_one_to_one(
                 let child_link = match child_links.pop() {
                     Some(link) => Ok(link),
                     None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "No '{}' record (needed to inline the relation with an update on '{}' record) was found for a nested create on one-to-one relation '{}'.",
-                        child_model_name, parent_model_name, relation_name
+                        "No '{child_model_name}' record (needed to inline the relation with an update on '{parent_model_name}' record) was found for a nested create on one-to-one relation '{relation_name}'."
                     ))),
                 }?;
 
@@ -394,8 +390,8 @@ fn handle_one_to_one(
          )?;
 
         let parent_model_identifier = parent_relation_field.model().primary_identifier();
-        let relation_name = parent_relation_field.relation().name.clone();
-        let parent_model_name = parent_relation_field.model().name.clone();
+        let relation_name = parent_relation_field.relation().name();
+        let parent_model_name = parent_relation_field.model().name().to_owned();
 
         graph.create_edge(
             &parent_node,
@@ -431,7 +427,7 @@ pub fn nested_create_many(
     // Nested input is an object of { data: [...], skipDuplicates: bool }
     let mut obj: ParsedInputMap = value.try_into()?;
 
-    let data_list: ParsedInputList = obj.remove(args::DATA).unwrap().try_into()?;
+    let data_list: ParsedInputList = utils::coerce_vec(obj.remove(args::DATA).unwrap());
     let skip_duplicates: bool = match obj.remove(args::SKIP_DUPLICATES) {
         Some(val) => val.try_into()?,
         None => false,
@@ -441,15 +437,15 @@ pub fn nested_create_many(
         .into_iter()
         .map(|data_value| {
             let data_map = data_value.try_into()?;
-            let mut args = WriteArgsParser::from(&child_model, data_map)?.args;
+            let mut args = WriteArgsParser::from(child_model, data_map)?.args;
 
-            args.add_datetimes(&child_model);
+            args.add_datetimes(child_model);
             Ok(args)
         })
         .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
 
     let query = CreateManyRecords {
-        model: Arc::clone(child_model),
+        model: child_model.clone(),
         args,
         skip_duplicates,
     };
@@ -460,9 +456,9 @@ pub fn nested_create_many(
     let linking_fields = parent_relation_field.linking_fields();
     let child_linking_fields = parent_relation_field.related_field().linking_fields();
 
-    let relation_name = parent_relation_field.relation().name.clone();
-    let parent_model_name = parent_relation_field.model().name.clone();
-    let child_model_name = child_model.name.clone();
+    let relation_name = parent_relation_field.relation().name();
+    let parent_model_name = parent_relation_field.model().name().to_owned();
+    let child_model_name = child_model.name().to_owned();
 
     graph.create_edge(
         &parent_node,
@@ -474,8 +470,7 @@ pub fn nested_create_many(
                 let parent_link = match parent_links.pop() {
                     Some(p) => Ok(p),
                     None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "No '{}' record (needed to inline the relation on '{}' record) was found for a nested createMany on relation '{}'.",
-                        parent_model_name, child_model_name, relation_name
+                        "No '{parent_model_name}' record (needed to inline the relation on '{child_model_name}' record) was found for a nested createMany on relation '{relation_name}'."
                     ))),
                 }?;
 

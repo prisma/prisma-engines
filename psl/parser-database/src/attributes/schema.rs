@@ -17,6 +17,5 @@ fn visit_schema_attribute(ctx: &mut Context<'_>) -> Option<(StringId, ast::Span)
         }
     };
     let name = coerce::string(arg, ctx.diagnostics)?;
-    ctx.types.flags |= crate::types::SchemaFlags::UsesSchemaAttribute;
     Some((ctx.interner.intern(name), arg.span()))
 }

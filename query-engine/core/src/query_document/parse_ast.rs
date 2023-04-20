@@ -1,18 +1,17 @@
 //! Parsed query document tree. Naming is WIP.
 //! Structures represent parsed and validated parts of the query document, used by the query builders.
+use crate::QueryParserResult;
 use indexmap::IndexMap;
 use prisma_models::{OrderBy, PrismaValue, ScalarFieldRef};
-use schema::{ObjectTag, OutputFieldRef};
+use schema::{ObjectTag, OutputFieldId};
 use std::ops::{Deref, DerefMut};
 
-use crate::QueryParserResult;
-
-pub type ParsedInputList = Vec<ParsedInputValue>;
+pub(crate) type ParsedInputList = Vec<ParsedInputValue>;
 
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct ParsedInputMap {
     pub tag: Option<ObjectTag>,
-    pub map: IndexMap<String, ParsedInputValue>,
+    pub(crate) map: IndexMap<String, ParsedInputValue>,
 }
 
 impl ParsedInputMap {
@@ -86,7 +85,7 @@ pub struct FieldPair {
     pub parsed_field: ParsedField,
 
     /// The schema field that the parsed field corresponds to.
-    pub schema_field: OutputFieldRef,
+    pub schema_field: OutputFieldId,
 }
 
 #[derive(Debug, Clone)]
@@ -98,15 +97,15 @@ pub struct ParsedField {
 }
 
 impl ParsedField {
-    pub fn where_arg(&mut self) -> QueryParserResult<Option<ParsedInputMap>> {
+    pub(crate) fn where_arg(&mut self) -> QueryParserResult<Option<ParsedInputMap>> {
         self.look_arg("where")
     }
 
-    pub fn create_arg(&mut self) -> QueryParserResult<Option<ParsedInputMap>> {
+    pub(crate) fn create_arg(&mut self) -> QueryParserResult<Option<ParsedInputMap>> {
         self.look_arg("create")
     }
 
-    pub fn update_arg(&mut self) -> QueryParserResult<Option<ParsedInputMap>> {
+    pub(crate) fn update_arg(&mut self) -> QueryParserResult<Option<ParsedInputMap>> {
         self.look_arg("update")
     }
 
@@ -122,7 +121,7 @@ impl ParsedField {
 #[derive(Debug, Clone)]
 pub struct ParsedArgument {
     pub name: String,
-    pub value: ParsedInputValue,
+    pub(crate) value: ParsedInputValue,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -134,16 +133,7 @@ pub enum ParsedInputValue {
     Map(ParsedInputMap),
 }
 
-impl ParsedArgument {
-    pub fn into_value(self) -> Option<PrismaValue> {
-        match self.value {
-            ParsedInputValue::Single(val) => Some(val),
-            _ => None,
-        }
-    }
-}
-
-pub trait ArgumentListLookup {
+pub(crate) trait ArgumentListLookup {
     fn lookup(&mut self, name: &str) -> Option<ParsedArgument>;
 }
 

@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["views"]
+}
+
+model User {
+  id      String @id
+  email   String   @unique
+  name    String?
+  profile Profile?
+}
+model Profile {
+  id        String @id
+  bio       String
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String @unique
+}
+
+view UserInfo {
+  id    String @id
+  email String
+  name  String
+  bio   String
+}

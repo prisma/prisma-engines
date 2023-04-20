@@ -8,7 +8,7 @@ macro_rules! assert_query {
 
 #[macro_export]
 macro_rules! match_connector_result {
-    ($runner:expr, $q:expr, $( $($matcher:pat)|+ $( if $pred:expr )? => $result:expr ),*) => {
+    ($runner:expr, $q:expr, $( $($matcher:pat_param)|+ $( if $pred:expr )? => $result:expr ),*) => {
         use query_tests_setup::*;
         use query_tests_setup::ConnectorVersion::*;
 
@@ -23,16 +23,13 @@ macro_rules! match_connector_result {
         let query_result = $runner.query($q).await?.to_string();
 
         if results.len() == 0 {
-            panic!(format!("No results defined for connector {}. Query result: {}", connector, query_result));
+            panic!("No results defined for connector {connector}. Query result: {query_result}");
         }
 
         assert_eq!(
             results.contains(&query_result.as_str()),
             true,
-            "Query result: {} is not part of the expected results: {:?} for connector {}",
-            query_result,
-            results,
-            connector
+            "Query result: {query_result} is not part of the expected results: {results:?} for connector {connector}",
         );
     };
 }
@@ -91,4 +88,30 @@ macro_rules! assert_error {
     ($runner:expr, $q:expr, $code:expr, $msg:expr) => {
         $runner.query($q).await?.assert_failure($code, Some($msg.to_string()));
     };
+}
+
+#[macro_export]
+macro_rules! retry {
+    ($body:block, $times:expr) => {{
+        use std::time::Duration;
+        use tokio::time::sleep;
+
+        let mut retries = $times;
+
+        loop {
+            let res = $body.await?;
+
+            if !res.failed() {
+                break res;
+            }
+
+            if retries > 0 {
+                retries -= 1;
+                sleep(Duration::from_millis(5)).await;
+                continue;
+            }
+
+            break res;
+        }
+    }};
 }

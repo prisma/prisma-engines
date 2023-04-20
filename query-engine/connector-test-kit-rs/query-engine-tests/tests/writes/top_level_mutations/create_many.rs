@@ -36,6 +36,20 @@ mod create_many {
         Ok(())
     }
 
+    #[connector_test(schema(schema_1))]
+    async fn basic_create_many_shorthand(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            createManyTest(data: { id: 1, str1: "1", str2: "1", str3: "1"}) {
+              count
+            }
+          }"#),
+          @r###"{"data":{"createManyTest":{"count":1}}}"###
+        );
+
+        Ok(())
+    }
+
     fn schema_2() -> String {
         let schema = indoc! {
             r#"model Test {
@@ -198,7 +212,7 @@ mod create_many {
         let mut records: Vec<String> = vec![];
 
         for i in 1..=1000 {
-            records.push(format!("{{ id: {} }}", i));
+            records.push(format!("{{ id: {i} }}"));
         }
 
         insta::assert_snapshot!(
@@ -236,7 +250,7 @@ mod create_many {
         let mut records: Vec<String> = vec![];
 
         for i in 1..=2000 {
-            records.push(format!("{{ id: {}, a: {}, b: {}, c: {} }}", i, i, i, i));
+            records.push(format!("{{ id: {i}, a: {i}, b: {i}, c: {i} }}"));
         }
 
         insta::assert_snapshot!(
@@ -346,18 +360,22 @@ mod json_create_many {
 
     #[connector_test(capabilities(AdvancedJsonNullability))]
     async fn create_many_json_errors(runner: Runner) -> TestResult<()> {
-        assert_error!(
-            &runner,
-            r#"mutation {
-                  createManyTestModel(data: [
-                    { id: 1, json: null },
-                  ]) {
-                    count
-                  }
-                }"#,
-            2009,
-            "A value is required but not set."
-        );
+        // On the JSON protocol, this succeeds because `null` is serialized as JSON.
+        // It doesn't matter since the client does _not_ allow to send null values, but only DbNull or JsonNull.
+        if runner.protocol().is_graphql() {
+            assert_error!(
+                &runner,
+                r#"mutation {
+                    createManyTestModel(data: [
+                      { id: 1, json: null },
+                    ]) {
+                      count
+                    }
+                  }"#,
+                2009,
+                "A value is required but not set"
+            );
+        }
 
         assert_error!(
             &runner,
@@ -369,7 +387,7 @@ mod json_create_many {
                 }
               }"#,
             2009,
-            "Value types mismatch. Have: Enum(\"AnyNull\")"
+            "`AnyNull` is not a valid `NullableJsonNullValueInput`"
         );
 
         Ok(())

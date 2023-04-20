@@ -6,7 +6,7 @@ use crate::{
 };
 use connector::{Filter, RecordFilter};
 use prisma_models::{ModelRef, PrismaValue, RelationFieldRef};
-use std::{convert::TryInto, sync::Arc};
+use std::convert::TryInto;
 
 /// Adds a delete (single) record node to the graph and connects it to the parent.
 ///
@@ -35,14 +35,14 @@ pub fn nested_delete(
             .into_iter()
             .map(|value: ParsedInputValue| {
                 let value: ParsedInputMap = value.try_into()?;
-                extract_unique_filter(value, &child_model)
+                extract_unique_filter(value, child_model)
             })
             .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?;
 
         let filter_len = filters.len();
         let or_filter = Filter::Or(filters);
         let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
-            model: Arc::clone(&child_model),
+            model: child_model.clone(),
             record_filter: or_filter.clone().into(),
         });
 
@@ -58,9 +58,9 @@ pub fn nested_delete(
             &delete_many_node,
         )?;
 
-        let relation_name = parent_relation_field.relation().name.clone();
-        let parent_name = parent_relation_field.model().name.clone();
-        let child_name = child_model.name.clone();
+        let relation_name = parent_relation_field.relation().name();
+        let parent_name = parent_relation_field.model().name().to_owned();
+        let child_name = child_model.name().to_owned();
 
         graph.create_edge(
             &find_child_records_node,
@@ -101,7 +101,7 @@ pub fn nested_delete(
                 utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, filter.clone())?;
 
             let delete_record_node = graph.create_node(Query::Write(WriteQuery::DeleteRecord(DeleteRecord {
-                model: Arc::clone(&child_model),
+                model: child_model.clone(),
                 record_filter: Some(filter.into()),
             })));
 
@@ -113,8 +113,8 @@ pub fn nested_delete(
                 &delete_record_node,
             )?;
 
-            let relation_name = parent_relation_field.relation().name.clone();
-            let child_model_name = child_model.name.clone();
+            let relation_name = parent_relation_field.relation().name();
+            let child_model_name = child_model.name().to_owned();
 
             graph.create_edge(
                 &find_child_records_node,
@@ -125,8 +125,7 @@ pub fn nested_delete(
                         let child_id = match child_ids.pop() {
                             Some(pid) => Ok(pid),
                             None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                                "No '{}' record was found for a nested delete on relation '{}'.",
-                                child_model_name, relation_name
+                                "No '{child_model_name}' record was found for a nested delete on relation '{relation_name}'."
                             ))),
                         }?;
 
@@ -162,7 +161,7 @@ pub fn nested_delete_many(
             utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())?;
 
         let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
-            model: Arc::clone(&child_model),
+            model: child_model.clone(),
             record_filter: RecordFilter::empty(),
         });
 

@@ -1,39 +1,45 @@
-use super::IndexFieldWalker;
 use crate::{
     ast::{self, WithName},
     types::{DefaultAttribute, FieldWithArgs, OperatorClassStore, ScalarField, ScalarType, SortOrder},
-    walkers::{EnumWalker, ModelWalker, Walker},
-    OperatorClass, ParserDatabase, ScalarFieldType,
+    walkers::*,
+    OperatorClass, ParserDatabase, ScalarFieldId, ScalarFieldType,
 };
 use diagnostics::Span;
 use either::Either;
 
 /// A scalar field, as part of a model.
-#[derive(Debug, Copy, Clone)]
-pub struct ScalarFieldWalker<'db> {
-    pub(crate) model_id: ast::ModelId,
-    pub(crate) field_id: ast::FieldId,
-    pub(crate) db: &'db ParserDatabase,
-    pub(crate) scalar_field: &'db ScalarField,
-}
-
-impl<'db> PartialEq for ScalarFieldWalker<'db> {
-    fn eq(&self, other: &Self) -> bool {
-        self.model_id == other.model_id && self.field_id == other.field_id
-    }
-}
-
-impl<'db> Eq for ScalarFieldWalker<'db> {}
+pub type ScalarFieldWalker<'db> = Walker<'db, ScalarFieldId>;
 
 impl<'db> ScalarFieldWalker<'db> {
     /// The ID of the field node in the AST.
     pub fn field_id(self) -> ast::FieldId {
-        self.field_id
+        self.attributes().field_id
     }
 
     /// The field node in the AST.
     pub fn ast_field(self) -> &'db ast::Field {
-        &self.db.ast[self.model_id][self.field_id]
+        let ScalarField { model_id, field_id, .. } = self.attributes();
+        &self.db.ast[*model_id][*field_id]
+    }
+
+    /// Is this field unique? This method will return true if:
+    ///
+    /// - The field has an `@id` or `@unique` attribute.
+    /// - There is an `@@id` or `@@unique` on the model that contains __only__ this field.
+    pub fn is_unique(self) -> bool {
+        let model = self.model();
+
+        if let Some(true) = model
+            .primary_key()
+            .map(|pk| pk.contains_exactly_fields_by_id(&[self.id]))
+        {
+            return true;
+        }
+
+        self.model().indexes().any(|idx| {
+            let mut fields = idx.fields();
+            idx.is_unique() && fields.len() == 1 && fields.next().map(|f| f.field_id()) == Some(self.field_id())
+        })
     }
 
     /// The name of the field.
@@ -43,7 +49,7 @@ impl<'db> ScalarFieldWalker<'db> {
 
     /// The `@default()` AST attribute on the field, if any.
     pub fn default_attribute(self) -> Option<&'db ast::Attribute> {
-        self.scalar_field
+        self.attributes()
             .default
             .as_ref()
             .map(|d| d.default_attribute)
@@ -65,12 +71,12 @@ impl<'db> ScalarFieldWalker<'db> {
 
     /// Does the field define a primary key by its own.
     pub fn is_single_pk(self) -> bool {
-        self.model().field_is_single_pk(self.field_id)
+        self.model().field_is_single_pk(self.field_id())
     }
 
     /// Is the field part of a compound primary key.
     pub fn is_part_of_a_compound_pk(self) -> bool {
-        self.model().field_is_part_of_a_compound_pk(self.field_id)
+        self.model().field_is_part_of_a_compound_pk(self.field_id())
     }
 
     /// Is there an `@ignore` attribute on the field?
@@ -83,24 +89,23 @@ impl<'db> ScalarFieldWalker<'db> {
         self.ast_field().arity.is_optional()
     }
 
+    /// Is the field a list
+    pub fn is_list(self) -> bool {
+        self.ast_field().arity.is_list()
+    }
+
     /// Is there an `@updatedAt` attribute on the field?
     pub fn is_updated_at(self) -> bool {
         self.attributes().is_updated_at
     }
 
     fn attributes(self) -> &'db ScalarField {
-        self.scalar_field
+        &self.db.types[self.id]
     }
 
     /// Is this field's type an enum? If yes, walk the enum.
     pub fn field_type_as_enum(self) -> Option<EnumWalker<'db>> {
-        match self.scalar_field_type() {
-            ScalarFieldType::Enum(enum_id) => Some(Walker {
-                db: self.db,
-                id: enum_id,
-            }),
-            _ => None,
-        }
+        self.scalar_field_type().as_enum().map(|id| self.db.walk(id))
     }
 
     /// The name in the `@map(<name>)` attribute.
@@ -110,7 +115,7 @@ impl<'db> ScalarFieldWalker<'db> {
 
     /// The model that contains the field.
     pub fn model(self) -> ModelWalker<'db> {
-        self.db.walk(self.model_id)
+        self.walk(self.attributes().model_id)
     }
 
     /// (attribute scope, native type name, arguments, span)
@@ -131,9 +136,9 @@ impl<'db> ScalarFieldWalker<'db> {
 
     /// The `@default()` attribute of the field, if any.
     pub fn default_value(self) -> Option<DefaultValueWalker<'db>> {
-        self.attributes().default.as_ref().map(|default| DefaultValueWalker {
-            model_id: self.model_id,
-            field_id: self.field_id,
+        let ScalarField { default, .. } = self.attributes();
+        default.as_ref().map(|default| DefaultValueWalker {
+            field_id: self.id,
             db: self.db,
             default,
         })
@@ -146,8 +151,8 @@ impl<'db> ScalarFieldWalker<'db> {
 
     /// The type of the field in case it is a scalar type (not an enum, not a composite type).
     pub fn scalar_type(self) -> Option<ScalarType> {
-        match &self.scalar_field.r#type {
-            ScalarFieldType::BuiltInScalar(scalar) => Some(*scalar),
+        match self.attributes().r#type {
+            ScalarFieldType::BuiltInScalar(scalar) => Some(scalar),
             _ => None,
         }
     }
@@ -156,8 +161,7 @@ impl<'db> ScalarFieldWalker<'db> {
 /// An `@default()` attribute on a field.
 #[derive(Clone, Copy)]
 pub struct DefaultValueWalker<'db> {
-    pub(super) model_id: ast::ModelId,
-    pub(super) field_id: ast::FieldId,
+    pub(super) field_id: ScalarFieldId,
     pub(super) db: &'db ParserDatabase,
     pub(super) default: &'db DefaultAttribute,
 }
@@ -186,6 +190,11 @@ impl<'db> DefaultValueWalker<'db> {
     /// Is this an `@default(cuid())`?
     pub fn is_cuid(self) -> bool {
         matches!(self.value(), ast::Expression::Function(name, _, _) if name == "cuid")
+    }
+
+    /// Is this an `@default(nanoid())`?
+    pub fn is_nanoid(self) -> bool {
+        matches!(self.value(), ast::Expression::Function(name, _, _) if name == "nanoid")
     }
 
     /// Is this an `@default(dbgenerated())`?
@@ -231,12 +240,7 @@ impl<'db> DefaultValueWalker<'db> {
     /// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     /// ```
     pub fn field(self) -> ScalarFieldWalker<'db> {
-        ScalarFieldWalker {
-            model_id: self.model_id,
-            field_id: self.field_id,
-            db: self.db,
-            scalar_field: &self.db.types.scalar_fields[&(self.model_id, self.field_id)],
-        }
+        self.db.walk(self.field_id)
     }
 }
 
@@ -267,7 +271,6 @@ impl<'db> OperatorClassWalker<'db> {
 /// A scalar field as referenced in a key specification (id, index or unique).
 #[derive(Copy, Clone)]
 pub struct ScalarFieldAttributeWalker<'db> {
-    pub(crate) model_id: ast::ModelId,
     pub(crate) fields: &'db [FieldWithArgs],
     pub(crate) db: &'db ParserDatabase,
     pub(crate) field_arg_id: usize,
@@ -328,20 +331,9 @@ impl<'db> ScalarFieldAttributeWalker<'db> {
     /// }
     /// ```
     pub fn as_index_field(self) -> IndexFieldWalker<'db> {
-        let path = &self.args().path;
-        let field_id = path.field_in_index();
-
-        match path.type_holding_the_indexed_field() {
-            None => {
-                let field_id = path.field_in_index();
-                let walker = self.db.walk(self.model_id).scalar_field(field_id);
-
-                IndexFieldWalker::new(walker)
-            }
-            Some(ctid) => {
-                let walker = self.db.walk((ctid, field_id));
-                IndexFieldWalker::new(walker)
-            }
+        match self.args().path.field_in_index() {
+            Either::Left(id) => IndexFieldWalker::new(self.db.walk(id)),
+            Either::Right(ctid) => IndexFieldWalker::new(self.db.walk(ctid)),
         }
     }
 
@@ -378,9 +370,8 @@ impl<'db> ScalarFieldAttributeWalker<'db> {
     /// writing to the database.
     pub fn as_path_to_indexed_field(self) -> Vec<(&'db str, Option<&'db str>)> {
         let path = &self.args().path;
-        let root = self.db.ast[self.model_id][path.root()].name();
-
-        let mut result = vec![(root, None)];
+        let root_name = self.db.walk(path.root()).name();
+        let mut result = vec![(root_name, None)];
 
         for (ctid, field_id) in path.path() {
             let ct = &self.db.ast[*ctid];
@@ -399,11 +390,11 @@ impl<'db> ScalarFieldAttributeWalker<'db> {
     pub fn as_mapped_path_to_indexed_field(self) -> Vec<(&'db str, Option<&'db str>)> {
         let path = &self.args().path;
         let root = {
-            let mapped = &self.db.types.scalar_fields[&(self.model_id, path.root())].mapped_name;
+            let mapped = &self.db.types[path.root()].mapped_name;
 
             mapped
                 .and_then(|id| self.db.interner.get(id))
-                .unwrap_or_else(|| self.db.ast[self.model_id][path.root()].name())
+                .unwrap_or_else(|| self.db.walk(path.root()).name())
         };
 
         let mut result = vec![(root, None)];

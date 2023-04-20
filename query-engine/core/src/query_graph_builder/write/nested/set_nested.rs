@@ -4,7 +4,6 @@ use connector::Filter;
 use itertools::Itertools;
 use prisma_models::{ModelRef, RelationFieldRef, SelectionResult};
 use std::convert::TryInto;
-use std::sync::Arc;
 
 /// Only for x-to-many relations.
 ///
@@ -25,7 +24,7 @@ pub fn nested_set(
         .into_iter()
         .map(|value: ParsedInputValue| {
             let value: ParsedInputMap = value.try_into()?;
-            extract_unique_filter(value, &child_model)
+            extract_unique_filter(value, child_model)
         })
         .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
         .into_iter()
@@ -97,12 +96,12 @@ fn handle_many_to_many(
     let disconnect = WriteQuery::DisconnectRecords(DisconnectRecords {
         parent_id: None,
         child_ids: vec![],
-        relation_field: Arc::clone(parent_relation_field),
+        relation_field: parent_relation_field.clone(),
     });
 
     let disconnect_node = graph.create_node(Query::Write(disconnect));
-    let relation_name = parent_relation_field.relation().name.clone();
-    let parent_model_name = parent_relation_field.model().name.clone();
+    let relation_name = parent_relation_field.relation().name();
+    let parent_model_name = parent_relation_field.model().name().to_owned();
 
     // Edge from parent to disconnect
     graph.create_edge(
@@ -112,8 +111,7 @@ fn handle_many_to_many(
              let parent_id = match parent_ids.pop() {
                  Some(pid) => Ok(pid),
                  None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                    "No '{}' records (needed to disconnect existing child records) were found for a nested set on many-to-many relation '{}'.",
-                    parent_model_name, relation_name
+                    "No '{parent_model_name}' records (needed to disconnect existing child records) were found for a nested set on many-to-many relation '{relation_name}'."
                 ))),
              }?;
 
@@ -261,7 +259,7 @@ fn handle_one_to_many(
 
     // Update (connect) case: Check left diff IDs
     let connect_if_node = graph.create_node(Node::Flow(Flow::default_if()));
-    let update_connect_node = utils::update_records_node_placeholder(graph, Filter::empty(), Arc::clone(&child_model));
+    let update_connect_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model.clone());
 
     graph.create_edge(
         &diff_node,
@@ -278,8 +276,8 @@ fn handle_one_to_many(
         })),
     )?;
 
-    let relation_name = parent_relation_field.relation().name.clone();
-    let parent_model_name = parent_relation_field.model().name.clone();
+    let relation_name = parent_relation_field.relation().name();
+    let parent_model_name = parent_relation_field.model().name().to_owned();
 
     // Connect to the if node, the parent node (for the inlining ID) and the diff node (to get the IDs to update)
     graph.create_edge(&connect_if_node, &update_connect_node, QueryGraphDependency::Then)?;
@@ -292,8 +290,7 @@ fn handle_one_to_many(
                 let parent_link = match parent_links.pop() {
                     Some(link) => Ok(link),
                     None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "No '{}' records were found for a nested set on many-to-many relation '{}'.",
-                        parent_model_name, relation_name
+                        "No '{parent_model_name}' records were found for a nested set on many-to-many relation '{relation_name}'."
                     ))),
                 }?;
 
@@ -322,11 +319,10 @@ fn handle_one_to_many(
 
     // Update (disconnect) case: Check right diff IDs.
     let disconnect_if_node = graph.create_node(Node::Flow(Flow::default_if()));
-    let update_disconnect_node =
-        utils::update_records_node_placeholder(graph, Filter::empty(), Arc::clone(&child_model));
+    let update_disconnect_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model);
 
     let child_side_required = parent_relation_field.related_field().is_required();
-    let rf = Arc::clone(parent_relation_field);
+    let rf = parent_relation_field.clone();
 
     graph.create_edge(
         &diff_node,

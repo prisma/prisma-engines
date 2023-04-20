@@ -1073,7 +1073,7 @@ impl FilterPrefix {
         }
 
         if self.parts.is_empty() {
-            format!("${}", target)
+            format!("${target}")
         } else {
             format!("${}.{}", self.render(), target)
         }

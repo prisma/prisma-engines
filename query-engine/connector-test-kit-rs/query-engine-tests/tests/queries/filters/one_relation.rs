@@ -162,6 +162,60 @@ mod one_relation {
         Ok(())
     }
 
+    // nested to-one-relation read filters.
+    #[connector_test]
+    async fn nested_to_one_filter(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+            run_query!(&runner, r#"query { findManyBlog { name, post(where: { title: "post1" }) { title } }}"#),
+            @r###"{"data":{"findManyBlog":[{"name":"blog 1","post":null},{"name":"blog 2","post":null},{"name":"blog 3","post":null}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(&runner, r#"query { findManyBlog { name, post(where: { title: "post 1", comment: { is: { text: "comment 1" } } }) { title, comment { text } } }}"#),
+            @r###"{"data":{"findManyBlog":[{"name":"blog 1","post":{"title":"post 1","comment":{"text":"comment 1"}}},{"name":"blog 2","post":null},{"name":"blog 3","post":null}]}}"###
+        );
+
+        Ok(())
+    }
+
+    fn to_one_req() -> String {
+        let schema = indoc! {
+            r#"
+            model Blog {
+                #id(id, String, @id, @default(cuid()))
+                name   String
+                post   Post   @relation(fields: [postId], references: [id])
+                postId String @unique
+              }
+              
+              model Post {
+                #id(id, String, @id, @default(cuid()))
+                title      String
+                popularity Int
+                blog       Blog?
+              }
+              
+            "#
+        };
+
+        schema.to_owned()
+    }
+
+    // nested to-one-relation read filters.
+    #[connector_test(schema(to_one_req))]
+    async fn nested_req_to_one_filter_should_fail(runner: Runner) -> TestResult<()> {
+        assert_error!(
+            runner,
+            r#"query { findManyBlog { post(where: { title: "title 1" }) { title } } }"#,
+            2009,
+            "Argument does not exist in enclosing type"
+        );
+
+        Ok(())
+    }
+
     // Note: Only the original author knows why this is considered crazy.
     #[connector_test]
     async fn crazy_filters(runner: Runner) -> TestResult<()> {

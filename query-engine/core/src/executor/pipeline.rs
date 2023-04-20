@@ -1,16 +1,16 @@
+use crate::{Env, Expressionista, IrSerializer, QueryGraph, QueryInterpreter, ResponseData};
+use schema::QuerySchema;
 use tracing::Instrument;
 
-use crate::{Env, Expressionista, IrSerializer, QueryGraph, QueryInterpreter, ResponseData};
-
 #[derive(Debug)]
-pub struct QueryPipeline<'conn> {
+pub(crate) struct QueryPipeline<'conn> {
     graph: QueryGraph,
     interpreter: QueryInterpreter<'conn>,
     serializer: IrSerializer,
 }
 
 impl<'conn> QueryPipeline<'conn> {
-    pub fn new(graph: QueryGraph, interpreter: QueryInterpreter<'conn>, serializer: IrSerializer) -> Self {
+    pub(crate) fn new(graph: QueryGraph, interpreter: QueryInterpreter<'conn>, serializer: IrSerializer) -> Self {
         Self {
             graph,
             interpreter,
@@ -18,7 +18,11 @@ impl<'conn> QueryPipeline<'conn> {
         }
     }
 
-    pub async fn execute(mut self, trace_id: Option<String>) -> crate::Result<ResponseData> {
+    pub(crate) async fn execute(
+        mut self,
+        query_schema: &QuerySchema,
+        trace_id: Option<String>,
+    ) -> crate::Result<ResponseData> {
         let serializer = self.serializer;
         let expr = Expressionista::translate(self.graph)?;
 
@@ -31,6 +35,6 @@ impl<'conn> QueryPipeline<'conn> {
             .await;
 
         trace!("{}", self.interpreter.log_output());
-        serializer.serialize(result?)
+        serializer.serialize(result?, query_schema)
     }
 }

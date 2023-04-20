@@ -9,7 +9,7 @@ use connector::{Filter, IntoFilter};
 use prisma_models::ModelRef;
 use schema::ConnectorContext;
 use schema_builder::constants::args;
-use std::{convert::TryInto, sync::Arc};
+use std::convert::TryInto;
 
 /// Creates an update record query and adds it to the query graph, together with it's nested queries and companion read query.
 pub fn update_record(
@@ -26,7 +26,7 @@ pub fn update_record(
     let data_argument = field.arguments.lookup(args::DATA).unwrap();
     let data_map: ParsedInputMap = data_argument.value.try_into()?;
 
-    let update_node = update_record_node(graph, connector_ctx, filter.clone(), Arc::clone(&model), data_map)?;
+    let update_node = update_record_node(graph, connector_ctx, filter.clone(), model.clone(), data_map)?;
 
     let read_query = read::find_unique(field, model.clone())?;
     let read_node = graph.create_node(Query::Read(read_query));

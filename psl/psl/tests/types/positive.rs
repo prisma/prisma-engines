@@ -1,6 +1,5 @@
 use crate::common::*;
 use psl::builtin_connectors::{MySqlType, PostgresType};
-use psl::dml::{DefaultValue, ValueGenerator};
 
 #[test]
 fn should_be_able_to_handle_native_type_combined_with_default_autoincrement_attribute() {
@@ -17,18 +16,13 @@ fn should_be_able_to_handle_native_type_combined_with_default_autoincrement_attr
 
     "#;
 
-    let datamodel = parse(dml);
+    let datamodel = psl::parse_schema(dml).unwrap();
 
     let user_model = datamodel.assert_has_model("User");
 
-    user_model
-        .assert_has_scalar_field("name")
-        .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_autoincrement()));
-
-    let sft = user_model.assert_has_scalar_field("name").assert_native_type();
-
-    let postgres_type: &PostgresType = sft.deserialize_native_type();
-    assert_eq!(postgres_type, &PostgresType::SmallInt);
+    let field = user_model.assert_has_scalar_field("name");
+    field.assert_default_value().assert_autoincrement();
+    field.assert_native_type(datamodel.connector, &PostgresType::SmallInt);
 }
 
 #[test]
@@ -45,17 +39,12 @@ fn should_be_able_to_handle_native_type_combined_with_default_attribute() {
         }
     "#;
 
-    let datamodel = parse(dml);
-
+    let datamodel = psl::parse_schema(dml).unwrap();
     let user_model = datamodel.assert_has_model("User");
 
-    user_model.assert_has_scalar_field("test");
-
-    let sft = user_model.assert_has_scalar_field("test").assert_native_type();
-
-    let mysql_type: &MySqlType = sft.deserialize_native_type();
-
-    assert_eq!(mysql_type, &MySqlType::Decimal(Some((8, 2))));
+    user_model
+        .assert_has_scalar_field("test")
+        .assert_native_type(datamodel.connector, &MySqlType::Decimal(Some((8, 2))));
 }
 
 #[test]
@@ -73,17 +62,16 @@ fn should_handle_type_specifications_on_postgres() {
         }
     "#;
 
-    let datamodel = parse(dml);
-
+    let datamodel = psl::parse_schema(dml).unwrap();
     let user_model = datamodel.assert_has_model("Blog");
 
-    let sft = user_model.assert_has_scalar_field("foobar").assert_native_type();
-    let postgres_type: &PostgresType = sft.deserialize_native_type();
-    assert_eq!(postgres_type, &PostgresType::VarChar(Some(26)));
+    user_model
+        .assert_has_scalar_field("foobar")
+        .assert_native_type(datamodel.connector, &PostgresType::VarChar(Some(26)));
 
-    let sft = user_model.assert_has_scalar_field("foobaz").assert_native_type();
-    let postgres_type: &PostgresType = sft.deserialize_native_type();
-    assert_eq!(postgres_type, &PostgresType::VarChar(None));
+    user_model
+        .assert_has_scalar_field("foobaz")
+        .assert_native_type(datamodel.connector, &PostgresType::VarChar(None));
 }
 
 #[test]
@@ -103,27 +91,22 @@ fn should_handle_type_specifications_on_mysql() {
         }
     "#;
 
-    let datamodel = parse(dml);
-
+    let datamodel = psl::parse_schema(dml).unwrap();
     let user_model = datamodel.assert_has_model("Blog");
 
-    let sft = user_model.assert_has_scalar_field("smallInt").assert_native_type();
+    user_model
+        .assert_has_scalar_field("smallInt")
+        .assert_native_type(datamodel.connector, &MySqlType::SmallInt);
 
-    let mysql_type: &MySqlType = sft.deserialize_native_type();
-    assert_eq!(mysql_type, &MySqlType::SmallInt);
+    user_model
+        .assert_has_scalar_field("foobar")
+        .assert_native_type(datamodel.connector, &MySqlType::DateTime(Some(6)));
 
-    let sft = user_model.assert_has_scalar_field("foobar").assert_native_type();
+    user_model
+        .assert_has_scalar_field("fooBool")
+        .assert_native_type(datamodel.connector, &MySqlType::TinyInt);
 
-    let mysql_type: &MySqlType = sft.deserialize_native_type();
-    assert_eq!(mysql_type, &MySqlType::DateTime(Some(6)));
-
-    let sft = user_model.assert_has_scalar_field("fooBool").assert_native_type();
-
-    let mysql_type: &MySqlType = sft.deserialize_native_type();
-    assert_eq!(mysql_type, &MySqlType::TinyInt);
-
-    let sft = user_model.assert_has_scalar_field("fooInt").assert_native_type();
-
-    let mysql_type: &MySqlType = sft.deserialize_native_type();
-    assert_eq!(mysql_type, &MySqlType::TinyInt);
+    user_model
+        .assert_has_scalar_field("fooInt")
+        .assert_native_type(datamodel.connector, &MySqlType::TinyInt);
 }

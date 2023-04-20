@@ -161,7 +161,7 @@ mod update {
             updateOneTestModel(
               where: {{ id: 1 }}
               data: {{
-                optString: {{ set: "test{}" }}
+                optString: {{ set: "test{TROUBLE_CHARS}" }}
                 optInt: {{ set: 1337 }}
                 optFloat: {{ set: 1.234 }}
                 optBoolean: {{ set: true }}
@@ -174,7 +174,7 @@ mod update {
               optBoolean
               optDateTime
             }}
-          }}"#, TROUBLE_CHARS)),
+          }}"#)),
           @r###"{"data":{"updateOneTestModel":{"optString":"test¥฿😀😁😂😃😄😅😆😇😈😉😊😋😌😍😎😏😐😑😒😓😔😕😖😗😘😙😚😛😜😝😞😟😠😡😢😣😤😥😦😧😨😩😪😫😬😭😮😯😰😱😲😳😴😵😶😷😸😹😺😻😼😽😾😿🙀🙁🙂🙃🙄🙅🙆🙇🙈🙉🙊🙋🙌🙍🙎🙏ऀँंःऄअआइईउऊऋऌऍऎएऐऑऒओऔकखगघङचछजझञटठडढणतथदधनऩपफबभमयर€₭₮₯₰₱₲₳₴₵₶₷₸₹₺₻₼₽₾₿⃀","optInt":1337,"optFloat":1.234,"optBoolean":true,"optDateTime":"2016-07-31T23:59:01.000Z"}}}"###
         );
 
@@ -196,7 +196,7 @@ mod update {
             updateOneTestModel(
               where: {{ id: 1 }}
               data: {{
-                optString: "test{}",
+                optString: "test{TROUBLE_CHARS}",
                 optInt: 1337,
                 optFloat: 1.234,
                 optBoolean: true,
@@ -209,7 +209,7 @@ mod update {
               optBoolean
               optDateTime
             }}
-          }}"#, TROUBLE_CHARS)),
+          }}"#)),
           @r###"{"data":{"updateOneTestModel":{"optString":"test¥฿😀😁😂😃😄😅😆😇😈😉😊😋😌😍😎😏😐😑😒😓😔😕😖😗😘😙😚😛😜😝😞😟😠😡😢😣😤😥😦😧😨😩😪😫😬😭😮😯😰😱😲😳😴😵😶😷😸😹😺😻😼😽😾😿🙀🙁🙂🙃🙄🙅🙆🙇🙈🙉🙊🙋🙌🙍🙎🙏ऀँंःऄअआइईउऊऋऌऍऎएऐऑऒओऔकखगघङचछजझञटठडढणतथदधनऩपफबभमयर€₭₮₯₰₱₲₳₴₵₶₷₸₹₺₻₼₽₾₿⃀","optInt":1337,"optFloat":1.234,"optBoolean":true,"optDateTime":"2016-07-31T23:59:01.000Z"}}}"###
         );
 
@@ -642,13 +642,12 @@ mod update {
             format!(
                 r#"mutation {{
               updateOneTestModel(
-                where: {{ id: {} }}
-                data: {{ {}: {{ {}: {} }} }}
+                where: {{ id: {id} }}
+                data: {{ {field}: {{ {op}: {value} }} }}
               ){{
-                {}
+                {field}
               }}
-            }}"#,
-                id, field, op, value, field
+            }}"#
             )
         );
 
@@ -678,7 +677,7 @@ mod update {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneTestModel(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneTestModel(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())
@@ -741,16 +740,20 @@ mod json_update {
 
     #[connector_test(capabilities(AdvancedJsonNullability))]
     async fn update_json_errors(runner: Runner) -> TestResult<()> {
-        assert_error!(
-            &runner,
-            r#"mutation {
+        // On the JSON protocol, this succeeds because `null` is serialized as JSON.
+        // It doesn't matter since the client does _not_ allow to send null values, but only DbNull or JsonNull.
+        if runner.protocol().is_graphql() {
+            assert_error!(
+                &runner,
+                r#"mutation {
                   updateOneTestModel(where: { id: 1 }, data: { json: null }) {
                     json
                   }
                 }"#,
-            2009,
-            "A value is required but not set."
-        );
+                2009,
+                "A value is required but not set"
+            );
+        }
 
         assert_error!(
             &runner,
@@ -760,7 +763,7 @@ mod json_update {
                 }
               }"#,
             2009,
-            "Value types mismatch. Have: Enum(\"AnyNull\")"
+            "`AnyNull` is not a valid `NullableJsonNullValueInput`"
         );
 
         Ok(())

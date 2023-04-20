@@ -1,8 +1,9 @@
 use super::{CachedTx, TransactionError, TxOpRequest, TxOpRequestMsg, TxOpResponse};
 use crate::{
-    execute_many_operations, execute_single_operation, set_span_link_from_trace_id, ClosedTx, OpenTx, Operation,
-    ResponseData, TxId,
+    execute_many_operations, execute_single_operation, protocol::EngineProtocol,
+    telemetry::helpers::set_span_link_from_traceparent, ClosedTx, Operation, ResponseData, TxId,
 };
+use connector::Connection;
 use schema::QuerySchemaRef;
 use std::{collections::HashMap, sync::Arc};
 use tokio::{
@@ -23,18 +24,18 @@ enum RunState {
     Finished,
 }
 
-pub struct ITXServer {
+pub struct ITXServer<'a> {
     id: TxId,
-    pub cached_tx: CachedTx,
+    pub cached_tx: CachedTx<'a>,
     pub timeout: Duration,
     receive: Receiver<TxOpRequest>,
     query_schema: QuerySchemaRef,
 }
 
-impl ITXServer {
+impl<'a> ITXServer<'a> {
     pub fn new(
         id: TxId,
-        tx: CachedTx,
+        tx: CachedTx<'a>,
         timeout: Duration,
         receive: Receiver<TxOpRequest>,
         query_schema: QuerySchemaRef,
@@ -51,13 +52,13 @@ impl ITXServer {
     // RunState is used to tell if the run loop should continue
     async fn process_msg(&mut self, op: TxOpRequest) -> RunState {
         match op.msg {
-            TxOpRequestMsg::Single(ref operation, trace_id) => {
-                let result = self.execute_single(&operation, trace_id).await;
+            TxOpRequestMsg::Single(ref operation, traceparent) => {
+                let result = self.execute_single(operation, traceparent).await;
                 let _ = op.respond_to.send(TxOpResponse::Single(result));
                 RunState::Continue
             }
-            TxOpRequestMsg::Batch(ref operations, trace_id) => {
-                let result = self.execute_batch(&operations, trace_id).await;
+            TxOpRequestMsg::Batch(ref operations, traceparent) => {
+                let result = self.execute_batch(operations, traceparent).await;
                 let _ = op.respond_to.send(TxOpResponse::Batch(result));
                 RunState::Continue
             }
@@ -74,16 +75,20 @@ impl ITXServer {
         }
     }
 
-    async fn execute_single(&mut self, operation: &Operation, trace_id: Option<String>) -> crate::Result<ResponseData> {
+    async fn execute_single(
+        &mut self,
+        operation: &Operation,
+        traceparent: Option<String>,
+    ) -> crate::Result<ResponseData> {
         let span = info_span!("prisma:engine:itx_query_builder", user_facing = true);
-        set_span_link_from_trace_id(&span, trace_id.clone());
+        set_span_link_from_traceparent(&span, traceparent.clone());
 
         let conn = self.cached_tx.as_open()?;
         execute_single_operation(
             self.query_schema.clone(),
             conn.as_connection_like(),
             operation,
-            trace_id,
+            traceparent,
         )
         .instrument(span)
         .await
@@ -92,7 +97,7 @@ impl ITXServer {
     async fn execute_batch(
         &mut self,
         operations: &[Operation],
-        trace_id: Option<String>,
+        traceparent: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
         let span = info_span!("prisma:engine:itx_execute", user_facing = true);
 
@@ -101,7 +106,7 @@ impl ITXServer {
             self.query_schema.clone(),
             conn.as_connection_like(),
             operations,
-            trace_id,
+            traceparent,
         )
         .instrument(span)
         .await
@@ -111,7 +116,7 @@ impl ITXServer {
         if let CachedTx::Open(_) = self.cached_tx {
             let open_tx = self.cached_tx.as_open()?;
             trace!("[{}] committing.", self.id.to_string());
-            open_tx.tx.commit().await?;
+            open_tx.commit().await?;
             self.cached_tx = CachedTx::Committed;
         }
 
@@ -122,7 +127,7 @@ impl ITXServer {
         debug!("[{}] rolling back, was timed out = {was_timeout}", self.name());
         if let CachedTx::Open(_) = self.cached_tx {
             let open_tx = self.cached_tx.as_open()?;
-            open_tx.tx.rollback().await?;
+            open_tx.rollback().await?;
             if was_timeout {
                 trace!("[{}] Expired Rolling back", self.id.to_string());
                 self.cached_tx = CachedTx::Expired;
@@ -168,8 +173,8 @@ impl ITXClient {
         }
     }
 
-    pub async fn execute(&self, operation: Operation, trace_id: Option<String>) -> crate::Result<ResponseData> {
-        let msg_req = TxOpRequestMsg::Single(operation, trace_id);
+    pub async fn execute(&self, operation: Operation, traceparent: Option<String>) -> crate::Result<ResponseData> {
+        let msg_req = TxOpRequestMsg::Single(operation, traceparent);
         let msg = self.send_and_receive(msg_req).await?;
 
         if let TxOpResponse::Single(resp) = msg {
@@ -182,9 +187,9 @@ impl ITXClient {
     pub async fn batch_execute(
         &self,
         operations: Vec<Operation>,
-        trace_id: Option<String>,
+        traceparent: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
-        let msg_req = TxOpRequestMsg::Batch(operations, trace_id);
+        let msg_req = TxOpRequestMsg::Batch(operations, traceparent);
 
         let msg = self.send_and_receive(msg_req).await?;
 
@@ -222,10 +227,6 @@ impl ITXClient {
 
     fn handle_error(&self, msg: TxOpResponse) -> TransactionError {
         match msg {
-            TxOpResponse::Expired => {
-                let reason = "Transaction is no longer valid. Last state: 'Expired'".to_string();
-                TransactionError::Closed { reason }
-            }
             TxOpResponse::Committed(..) => {
                 let reason = "Transaction is no longer valid. Last state: 'Committed'".to_string();
                 TransactionError::Closed { reason }
@@ -236,43 +237,60 @@ impl ITXClient {
             }
             other => {
                 error!("Unexpected iTx response, {}", other);
-                let reason = format!("response '{}'", other);
+                let reason = format!("response '{other}'");
                 TransactionError::Closed { reason }
             }
         }
     }
 }
 
-pub fn spawn_itx_actor(
+#[allow(clippy::too_many_arguments)]
+pub(crate) async fn spawn_itx_actor(
     query_schema: QuerySchemaRef,
     tx_id: TxId,
-    value: OpenTx,
+    mut conn: Box<dyn Connection + Send + Sync>,
+    isolation_level: Option<String>,
     timeout: Duration,
     channel_size: usize,
     send_done: Sender<(TxId, Option<ClosedTx>)>,
-) -> ITXClient {
-    let (tx_to_server, rx_from_client) = channel::<TxOpRequest>(channel_size);
+    engine_protocol: EngineProtocol,
+) -> crate::Result<ITXClient> {
+    let span = Span::current();
+    let tx_id_str = tx_id.to_string();
+    span.record("itx_id", tx_id_str.as_str());
+    let dispatcher = crate::get_current_dispatcher();
 
+    let (tx_to_server, rx_from_client) = channel::<TxOpRequest>(channel_size);
     let client = ITXClient {
         send: tx_to_server,
         tx_id: tx_id.clone(),
     };
-
-    let mut server = ITXServer::new(
-        tx_id.clone(),
-        CachedTx::Open(value),
-        timeout,
-        rx_from_client,
-        query_schema,
-    );
-    let dispatcher = crate::get_current_dispatcher();
-    let span = Span::current();
-
-    let tx_id_str = tx_id.to_string();
-    span.record("itx_id", &tx_id_str.as_str());
+    let (open_transaction_send, open_transaction_rcv) = oneshot::channel();
 
     tokio::task::spawn(
-        crate::executor::with_request_now(async move {
+        crate::executor::with_request_context(engine_protocol, async move {
+            // We match on the result in order to send the error to the parent task and abort this
+            // task, on error. This is a separate task (actor), not a function where we can just bubble up the
+            // result.
+            let c_tx = match conn.start_transaction(isolation_level).await {
+                Ok(c_tx) => {
+                    open_transaction_send.send(Ok(())).unwrap();
+                    c_tx
+                }
+                Err(err) => {
+                    open_transaction_send.send(Err(err)).unwrap();
+                    return;
+                }
+            };
+
+            let mut server = ITXServer::new(
+                tx_id.clone(),
+                CachedTx::Open(c_tx),
+                timeout,
+                rx_from_client,
+                query_schema,
+            );
+
             let start_time = Instant::now();
             let sleep = time::sleep(timeout);
             tokio::pin!(sleep);
@@ -311,7 +329,9 @@ pub fn spawn_itx_actor(
         .with_subscriber(dispatcher),
     );
 
-    client
+    open_transaction_rcv.await.unwrap()?;
+
+    Ok(client)
 }
 
 /// Spawn the client list clear actor
@@ -355,7 +375,7 @@ pub fn spawn_itx_actor(
         }
    ```
 */
-pub fn spawn_client_list_clear_actor(
+pub(crate) fn spawn_client_list_clear_actor(
     clients: Arc<RwLock<HashMap<TxId, ITXClient>>>,
     closed_txs: Arc<RwLock<lru::LruCache<TxId, Option<ClosedTx>>>>,
     mut rx: Receiver<(TxId, Option<ClosedTx>)>,

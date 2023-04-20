@@ -13,10 +13,12 @@ use psl_core::{
     },
     diagnostics::Diagnostics,
     parser_database::{ast, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction, ScalarType},
-    Datasource, DatasourceConnectorData, PreviewFeature,
+    Configuration, Datasource, DatasourceConnectorData, PreviewFeature,
 };
 use std::{borrow::Cow, collections::HashMap};
 use PostgresType::*;
+
+use crate::completions;
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[
     ConstraintScope::GlobalPrimaryKeyKeyIndex,
@@ -93,6 +95,11 @@ impl PostgresDatasourceProperties {
             extensions,
             span: ast::Span::empty(),
         });
+    }
+
+    // Validation for property existence
+    pub fn extensions_defined(&self) -> bool {
+        self.extensions.is_some()
     }
 }
 
@@ -320,7 +327,7 @@ impl Connector for PostgresDatamodelConnector {
             .iter()
             .find(|(st, _)| st == scalar_type)
             .map(|(_, native_type)| native_type)
-            .ok_or_else(|| format!("Could not find scalar type {:?} in SCALAR_TYPE_DEFAULTS", scalar_type))
+            .ok_or_else(|| format!("Could not find scalar type {scalar_type:?} in SCALAR_TYPE_DEFAULTS"))
             .unwrap();
 
         NativeTypeInstance::new::<PostgresType>(*native_type)
@@ -443,7 +450,7 @@ impl Connector for PostgresDatamodelConnector {
         Ok(())
     }
 
-    fn push_completions(
+    fn datamodel_completions(
         &self,
         db: &ParserDatabase,
         position: ast::SchemaPosition<'_>,
@@ -478,6 +485,7 @@ impl Connector for PostgresDatamodelConnector {
 
                 let index_field = db
                     .walk_models()
+                    .chain(db.walk_views())
                     .find(|model| model.model_id() == model_id)
                     .and_then(|model| {
                         model.indexes().find(|index| {
@@ -514,6 +522,28 @@ impl Connector for PostgresDatamodelConnector {
                 }
             }
             _ => (),
+        }
+    }
+
+    fn datasource_completions(&self, config: &Configuration, completion_list: &mut CompletionList) {
+        let ds = match config.datasources.first() {
+            Some(ds) => ds,
+            None => return,
+        };
+
+        let connector_data = ds
+            .connector_data
+            .downcast_ref::<PostgresDatasourceProperties>()
+            .unwrap();
+
+        if config.preview_features().contains(PreviewFeature::PostgresqlExtensions)
+            && !connector_data.extensions_defined()
+        {
+            completions::extensions_completion(completion_list);
+        }
+
+        if config.preview_features().contains(PreviewFeature::MultiSchema) && !ds.schemas_defined() {
+            completions::schemas_completion(completion_list);
         }
     }
 

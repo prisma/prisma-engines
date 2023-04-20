@@ -34,7 +34,7 @@ mod basic_types {
           run_query!(&runner, format!(r#"mutation {{
             createOneScalarModel(data: {{
               id: 1,
-              strings:   {{ set: ["test{}"] }}
+              strings:   {{ set: ["test{TROUBLE_CHARS}"] }}
               ints:      {{ set: [1337, 12] }}
               floats:    {{ set: [1.234, 1.45] }}
               booleans:  {{ set: [true, false] }}
@@ -50,7 +50,7 @@ mod basic_types {
               dateTimes
               bytes
             }}
-          }}"#, TROUBLE_CHARS)),
+          }}"#)),
           @r###"{"data":{"createOneScalarModel":{"strings":["test¥฿😀😁😂😃😄😅😆😇😈😉😊😋😌😍😎😏😐😑😒😓😔😕😖😗😘😙😚😛😜😝😞😟😠😡😢😣😤😥😦😧😨😩😪😫😬😭😮😯😰😱😲😳😴😵😶😷😸😹😺😻😼😽😾😿🙀🙁🙂🙃🙄🙅🙆🙇🙈🙉🙊🙋🙌🙍🙎🙏ऀँंःऄअआइईउऊऋऌऍऎएऐऑऒओऔकखगघङचछजझञटठडढणतथदधनऩपफबभमयर€₭₮₯₰₱₲₳₴₵₶₷₸₹₺₻₼₽₾₿⃀"],"ints":[1337,12],"floats":[1.234,1.45],"booleans":[true,false],"enums":["A","A"],"dateTimes":["2016-07-31T23:59:01.000Z","2017-07-31T23:59:01.000Z"],"bytes":["dGVzdA==","dA=="]}}}"###
         );
 
@@ -65,7 +65,7 @@ mod basic_types {
           run_query!(&runner, format!(r#"mutation {{
             createOneScalarModel(data: {{
               id: 1,
-              strings:   {{ set: ["test{}"] }}
+              strings:   {{ set: ["test{TROUBLE_CHARS}"] }}
               ints:      {{ set: [1337, 12] }}
               floats:    {{ set: [1.234, 1.45] }}
               booleans:  {{ set: [true, false] }}
@@ -81,7 +81,7 @@ mod basic_types {
               dateTimes
               bytes
             }}
-          }}"#, TROUBLE_CHARS)),
+          }}"#)),
           @r###"{"data":{"createOneScalarModel":{"strings":["test¥฿😀😁😂😃😄😅😆😇😈😉😊😋😌😍😎😏😐😑😒😓😔😕😖😗😘😙😚😛😜😝😞😟😠😡😢😣😤😥😦😧😨😩😪😫😬😭😮😯😰😱😲😳😴😵😶😷😸😹😺😻😼😽😾😿🙀🙁🙂🙃🙄🙅🙆🙇🙈🙉🙊🙋🙌🙍🙎🙏ऀँंःऄअआइईउऊऋऌऍऎएऐऑऒओऔकखगघङचछजझञटठडढणतथदधनऩपफबभमयर€₭₮₯₰₱₲₳₴₵₶₷₸₹₺₻₼₽₾₿⃀"],"ints":[1337,12],"floats":[1.234,1.45],"booleans":[true,false],"enums":["A","A"],"dateTimes":["2016-07-31T23:59:01.000Z","2017-07-31T23:59:01.000Z"],"bytes":["dGVzdA==","dA=="]}}}"###
         );
 
@@ -164,7 +164,7 @@ mod basic_types {
           run_query!(&runner, format!(r#"mutation {{
             createOneScalarModel(data: {{
               id: 1
-              strings:   ["test{}"]
+              strings:   ["test{TROUBLE_CHARS}"]
               ints:      [1337, 12]
               floats:    [1.234, 1.45]
               booleans:  [true, false]
@@ -180,7 +180,7 @@ mod basic_types {
               dateTimes
               bytes
             }}
-          }}"#, TROUBLE_CHARS)),
+          }}"#)),
           @r###"{"data":{"createOneScalarModel":{"strings":["test¥฿😀😁😂😃😄😅😆😇😈😉😊😋😌😍😎😏😐😑😒😓😔😕😖😗😘😙😚😛😜😝😞😟😠😡😢😣😤😥😦😧😨😩😪😫😬😭😮😯😰😱😲😳😴😵😶😷😸😹😺😻😼😽😾😿🙀🙁🙂🙃🙄🙅🙆🙇🙈🙉🙊🙋🙌🙍🙎🙏ऀँंःऄअआइईउऊऋऌऍऎएऐऑऒओऔकखगघङचछजझञटठडढणतथदधनऩपफबभमयर€₭₮₯₰₱₲₳₴₵₶₷₸₹₺₻₼₽₾₿⃀"],"ints":[1337,12],"floats":[1.234,1.45],"booleans":[true,false],"enums":["A","A"],"dateTimes":["2016-07-31T23:59:01.000Z","2017-07-31T23:59:01.000Z"],"bytes":["dGVzdA==","dA=="]}}}"###
         );
 
@@ -221,16 +221,16 @@ mod basic_types {
     #[connector_test]
     async fn create_mut_empty_scalar_should_fail(runner: Runner) -> TestResult<()> {
         assert_error!(
-          runner,
-          r#"mutation {
+            runner,
+            r#"mutation {
             createOneScalarModel(data: {
               id: 1
               strings: {},
             }){ strings, ints, floats, booleans, enums, dateTimes }
           }"#,
-          2009,
-          "`Mutation.createOneScalarModel.data.ScalarModelCreateInput.strings.ScalarModelCreatestringsInput.set`: A value is required but not set."
-      );
+            2009,
+            "A value is required but not set"
+        );
 
         Ok(())
     }
@@ -239,15 +239,15 @@ mod basic_types {
     #[connector_test]
     async fn update_mut_empty_scalar_should_fail(runner: Runner) -> TestResult<()> {
         assert_error!(
-          runner,
-          r#"mutation {
+            runner,
+            r#"mutation {
             updateOneScalarModel(data: {
               strings: {},
             }){ strings, ints, floats, booleans, enums, dateTimes }
           }"#,
-          2009,
-          "`Mutation.updateOneScalarModel.data.ScalarModelUpdateInput.strings.ScalarModelUpdatestringsInput`: Expected exactly one field to be present, got 0."
-      );
+            2009,
+            "Some fields are missing: Expected exactly one field to be present, got 0."
+        );
 
         Ok(())
     }
@@ -318,7 +318,7 @@ mod basic_types {
             &runner,
             r#"mutation { updateOneScalarModel(where: { id: 1 }, data: { enums: { push: A }}) { id }}"#,
             2009,
-            "`Mutation.updateOneScalarModel.data.ScalarModelUpdateInput.enums`: Unable to match input value to any allowed input type for the field."
+            "Unable to match input value to any allowed input type for the field"
         );
 
         Ok(())
@@ -326,7 +326,7 @@ mod basic_types {
 
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
-            .query(format!("mutation {{ createOneScalarModel(data: {}) {{ id }} }}", data))
+            .query(format!("mutation {{ createOneScalarModel(data: {data}) {{ id }} }}"))
             .await?
             .assert_success();
         Ok(())

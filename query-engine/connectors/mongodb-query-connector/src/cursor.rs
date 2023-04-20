@@ -62,7 +62,7 @@ impl CursorBuilder {
             let (left_bind_field_name, right_binding_field_name) = order_data.binding_names();
 
             // For: `"let": { fieldName: "$fieldName" }` bindings for the outer pipeline.
-            bindings.insert(left_bind_field_name, format!("${}", right_binding_field_name));
+            bindings.insert(left_bind_field_name, format!("${right_binding_field_name}"));
         }
 
         let cursor_condition = cursor_conditions(self.order_data, self.reverse);

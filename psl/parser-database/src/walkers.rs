@@ -15,6 +15,7 @@ mod relation;
 mod relation_field;
 mod scalar_field;
 
+pub use crate::types::RelationFieldId;
 pub use composite_type::*;
 pub use field::*;
 pub use index::*;
@@ -50,6 +51,15 @@ where
 }
 
 impl crate::ParserDatabase {
+    /// Find an enum by name.
+    pub fn find_enum<'db>(&'db self, name: &str) -> Option<EnumWalker<'db>> {
+        self.interner
+            .lookup(name)
+            .and_then(|name_id| self.names.tops.get(&name_id))
+            .and_then(|top_id| top_id.as_enum_id())
+            .map(|enum_id| self.walk(enum_id))
+    }
+
     /// Traverse a schema element by id.
     pub fn walk<I>(&self, id: I) -> Walker<'_, I> {
         Walker { db: self, id }
@@ -69,6 +79,16 @@ impl crate::ParserDatabase {
             .iter_tops()
             .filter_map(|(top_id, _)| top_id.as_model_id())
             .map(move |model_id| self.walk(model_id))
+            .filter(|m| !m.ast_model().is_view())
+    }
+
+    /// Walk all the views in the schema.
+    pub fn walk_views(&self) -> impl Iterator<Item = ModelWalker<'_>> + '_ {
+        self.ast()
+            .iter_tops()
+            .filter_map(|(top_id, _)| top_id.as_model_id())
+            .map(move |model_id| self.walk(model_id))
+            .filter(|m| m.ast_model().is_view())
     }
 
     /// Walk all the composite types in the schema.
@@ -84,20 +104,16 @@ impl crate::ParserDatabase {
         self.types
             .unknown_function_defaults
             .iter()
-            .map(|(model_id, field_id)| DefaultValueWalker {
-                model_id: *model_id,
-                field_id: *field_id,
+            .map(|id| DefaultValueWalker {
+                field_id: *id,
                 db: self,
-                default: self.types.scalar_fields[&(*model_id, *field_id)]
-                    .default
-                    .as_ref()
-                    .unwrap(),
+                default: self.types[*id].default.as_ref().unwrap(),
             })
     }
 
     /// Walk all the relations in the schema. A relation may be defined by one or two fields; in
     /// both cases, it is still a single relation.
-    pub fn walk_relations(&self) -> impl Iterator<Item = RelationWalker<'_>> + '_ {
+    pub fn walk_relations(&self) -> impl ExactSizeIterator<Item = RelationWalker<'_>> + Clone + '_ {
         self.relations.iter().map(move |relation_id| Walker {
             db: self,
             id: relation_id,
@@ -110,13 +126,13 @@ impl crate::ParserDatabase {
     pub fn walk_complete_inline_relations(&self) -> impl Iterator<Item = CompleteInlineRelationWalker<'_>> + '_ {
         self.relations
             .iter_relations()
-            .filter(|(_, _, relation)| !relation.is_implicit_many_to_many())
-            .filter_map(move |(model_a, model_b, relation)| {
+            .filter(|(relation, _)| !relation.is_implicit_many_to_many())
+            .filter_map(move |(relation, _)| {
                 relation
                     .as_complete_fields()
                     .map(|(field_a, field_b)| CompleteInlineRelationWalker {
-                        side_a: (model_a, field_a),
-                        side_b: (model_b, field_b),
+                        side_a: field_a,
+                        side_b: field_b,
                         db: self,
                     })
             })

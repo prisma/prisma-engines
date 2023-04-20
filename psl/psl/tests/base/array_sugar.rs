@@ -16,11 +16,12 @@ fn should_treat_single_values_as_arrays_of_length_one() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = psl::parse_schema(dml).unwrap();
 
+    let user_model = schema.assert_has_model("User");
     let post_model = schema.assert_has_model("Post");
+
     post_model
         .assert_has_relation_field("user")
-        .assert_relation_to("User")
-        .assert_relation_referenced_fields(&["id"]);
+        .assert_relation_to(user_model.id);
 }

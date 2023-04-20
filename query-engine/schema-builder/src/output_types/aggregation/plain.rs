@@ -1,14 +1,13 @@
-use crate::constants::aggregations::*;
-
 use super::*;
+use crate::constants::aggregations::*;
 use std::convert::identity;
 
 /// Builds plain aggregation object type for given model (e.g. AggregateUser).
-pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> ObjectTypeWeakRef {
-    let ident = Identifier::new(format!("Aggregate{}", capitalize(&model.name)), PRISMA_NAMESPACE);
+pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> OutputObjectTypeId {
+    let ident = Identifier::new_prisma(format!("Aggregate{}", capitalize(model.name())));
     return_cached_output!(ctx, &ident);
 
-    let object = ObjectTypeStrongRef::new(ObjectType::new(ident.clone(), Some(ModelRef::clone(model))));
+    let object = ObjectType::new(ident.clone(), Some(model.id));
     let mut object_fields = vec![];
 
     let non_list_nor_json_fields = collect_non_list_nor_json_fields(&model.into());
@@ -84,7 +83,5 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
     );
 
     object.set_fields(object_fields);
-    ctx.cache_output_type(ident, ObjectTypeStrongRef::clone(&object));
-
-    ObjectTypeStrongRef::downgrade(&object)
+    ctx.cache_output_type(ident, object)
 }

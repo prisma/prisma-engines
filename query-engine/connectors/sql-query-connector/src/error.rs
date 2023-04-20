@@ -5,7 +5,7 @@ use std::{any::Any, string::FromUtf8Error};
 use thiserror::Error;
 use user_facing_errors::query_engine::DatabaseConstraint;
 
-pub enum RawError {
+pub(crate) enum RawError {
     IncorrectNumberOfParameters {
         expected: usize,
         actual: usize,
@@ -31,8 +31,7 @@ impl From<RawError> for SqlError {
             RawError::UnsupportedColumnType { column_type } => Self::RawError {
                 code: String::from("N/A"),
                 message: format!(
-                    r#"Failed to deserialize column of type '{}'. If you're using $queryRaw and this column is explicitly marked as `Unsupported` in your Prisma schema, try casting this column to any supported Prisma type such as `String`."#,
-                    column_type
+                    r#"Failed to deserialize column of type '{column_type}'. If you're using $queryRaw and this column is explicitly marked as `Unsupported` in your Prisma schema, try casting this column to any supported Prisma type such as `String`."#
                 ),
             },
             RawError::ConnectionClosed => Self::ConnectionClosed,
@@ -181,14 +180,9 @@ pub enum SqlError {
 impl SqlError {
     pub(crate) fn into_connector_error(self, connection_info: &quaint::prelude::ConnectionInfo) -> ConnectorError {
         match self {
-            SqlError::UniqueConstraintViolation { constraint } => ConnectorError {
-                user_facing_error: Some(user_facing_errors::KnownError::new(
-                    user_facing_errors::query_engine::UniqueKeyViolation {
-                        constraint: constraint.clone(),
-                    },
-                )),
-                kind: ErrorKind::UniqueConstraintViolation { constraint },
-            },
+            SqlError::UniqueConstraintViolation { constraint } => {
+                ConnectorError::from_kind(ErrorKind::UniqueConstraintViolation { constraint })
+            }
             SqlError::NullConstraintViolation { constraint } => {
                 ConnectorError::from_kind(ErrorKind::NullConstraintViolation { constraint })
             }
@@ -201,6 +195,7 @@ impl SqlError {
             SqlError::ConnectionError(e) => ConnectorError {
                 user_facing_error: user_facing_errors::quaint::render_quaint_error(&e, connection_info),
                 kind: ErrorKind::ConnectionError(e.into()),
+                transient: false,
             },
             SqlError::ColumnReadFailure(e) => ConnectorError::from_kind(ErrorKind::ColumnReadFailure(e)),
             SqlError::FieldCannotBeNull { field } => ConnectorError::from_kind(ErrorKind::FieldCannotBeNull { field }),
@@ -240,40 +235,19 @@ impl SqlError {
                             connection_info,
                         ),
                         kind: ErrorKind::QueryError(e),
+                        transient: false,
                     },
                     None => ConnectorError::from_kind(ErrorKind::QueryError(e)),
                 }
             }
-            SqlError::RawError { code, message } => ConnectorError {
-                user_facing_error: Some(user_facing_errors::KnownError::new(
-                    user_facing_errors::query_engine::RawQueryFailed {
-                        code: code.clone(),
-                        message: message.clone(),
-                    },
-                )),
-                kind: ErrorKind::RawDatabaseError { code, message },
-            },
-            SqlError::ConnectionClosed => ConnectorError {
-                user_facing_error: Some(user_facing_errors::KnownError::new(
-                    user_facing_errors::common::ConnectionClosed,
-                )),
-                kind: ErrorKind::ConnectionClosed,
-            },
-            SqlError::TransactionAlreadyClosed(message) => ConnectorError {
-                user_facing_error: Some(user_facing_errors::KnownError::new(
-                    user_facing_errors::common::TransactionAlreadyClosed {
-                        message: message.clone(),
-                    },
-                )),
-                kind: ErrorKind::TransactionAlreadyClosed { message },
-            },
-
-            SqlError::TransactionWriteConflict => ConnectorError {
-                user_facing_error: Some(user_facing_errors::KnownError::new(
-                    user_facing_errors::query_engine::TransactionWriteConflict {},
-                )),
-                kind: ErrorKind::TransactionWriteConflict,
-            },
+            SqlError::RawError { code, message } => {
+                ConnectorError::from_kind(ErrorKind::RawDatabaseError { code, message })
+            }
+            SqlError::ConnectionClosed => ConnectorError::from_kind(ErrorKind::ConnectionClosed),
+            SqlError::TransactionAlreadyClosed(message) => {
+                ConnectorError::from_kind(ErrorKind::TransactionAlreadyClosed { message })
+            }
+            SqlError::TransactionWriteConflict => ConnectorError::from_kind(ErrorKind::TransactionWriteConflict),
             SqlError::RollbackWithoutBegin => ConnectorError::from_kind(ErrorKind::RollbackWithoutBegin),
             SqlError::QueryParameterLimitExceeded(e) => {
                 ConnectorError::from_kind(ErrorKind::QueryParameterLimitExceeded(e))
@@ -311,14 +285,14 @@ impl From<quaint::error::Error> for SqlError {
             QuaintKind::MissingFullTextSearchIndex => Self::MissingFullTextSearchIndex,
             e @ QuaintKind::ConnectionError(_) => Self::ConnectionError(e),
             QuaintKind::ColumnReadFailure(e) => Self::ColumnReadFailure(e),
-            QuaintKind::ColumnNotFound { column } => SqlError::ColumnDoesNotExist(format!("{}", column)),
-            QuaintKind::TableDoesNotExist { table } => SqlError::TableDoesNotExist(format!("{}", table)),
+            QuaintKind::ColumnNotFound { column } => SqlError::ColumnDoesNotExist(format!("{column}")),
+            QuaintKind::TableDoesNotExist { table } => SqlError::TableDoesNotExist(format!("{table}")),
             QuaintKind::ConnectionClosed => SqlError::ConnectionClosed,
             QuaintKind::InvalidIsolationLevel(msg) => Self::InvalidIsolationLevel(msg),
             QuaintKind::TransactionWriteConflict => Self::TransactionWriteConflict,
             QuaintKind::RollbackWithoutBegin => Self::RollbackWithoutBegin,
             e @ QuaintKind::UnsupportedColumnType { .. } => SqlError::ConversionError(e.into()),
-            e @ QuaintKind::TransactionAlreadyClosed(_) => SqlError::TransactionAlreadyClosed(format!("{}", e)),
+            e @ QuaintKind::TransactionAlreadyClosed(_) => SqlError::TransactionAlreadyClosed(format!("{e}")),
             e @ QuaintKind::IncorrectNumberOfParameters { .. } => SqlError::QueryError(e.into()),
             e @ QuaintKind::ConversionError(_) => SqlError::ConversionError(e.into()),
             e @ QuaintKind::ResultIndexOutOfBounds { .. } => SqlError::QueryError(e.into()),

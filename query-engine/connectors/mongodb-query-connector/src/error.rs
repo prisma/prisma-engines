@@ -2,7 +2,7 @@ use connector_interface::error::{ConnectorError, ErrorKind, MultiError};
 use itertools::Itertools;
 use mongodb::{
     bson::{self, extjson},
-    error::{CommandError, Error as DriverError},
+    error::{CommandError, Error as DriverError, TRANSIENT_TRANSACTION_ERROR},
 };
 use prisma_models::{CompositeFieldRef, Field, ScalarFieldRef, SelectedField};
 use regex::Regex;
@@ -95,12 +95,11 @@ impl MongoError {
                 ConnectorError::from_kind(ErrorKind::ConversionError(err.into()))
             }
             MongoError::MissingRequiredArgumentError { argument } => ConnectorError::from_kind(ErrorKind::RawApiError(
-                format!("Missing required argument: '{}'.", argument),
+                format!("Missing required argument: '{argument}'."),
             )),
             MongoError::ArgumentTypeMismatchError { argument, have, want } => {
                 ConnectorError::from_kind(ErrorKind::RawApiError(format!(
-                    "Argument type mismatch for '{}'. Have: {}, want: {}.",
-                    argument, have, want
+                    "Argument type mismatch for '{argument}'. Have: {have}, want: {want}."
                 )))
             }
 
@@ -118,102 +117,109 @@ impl MongoError {
                 ConnectorError::from_kind(ErrorKind::ConversionError(err.into()))
             }
 
-            MongoError::DriverError(err) => match err.kind.as_ref() {
-                mongodb::error::ErrorKind::InvalidArgument { .. } => {
-                    ConnectorError::from_kind(ErrorKind::QueryError(Box::new(err.clone())))
-                }
-                mongodb::error::ErrorKind::Authentication { message, .. } => {
-                    // Todo this mapping is only half correct.
-                    ConnectorError::from_kind(ErrorKind::AuthenticationFailed { user: message.clone() })
-                }
+            MongoError::DriverError(err) => {
+                let is_transient = err.contains_label(TRANSIENT_TRANSACTION_ERROR);
+                let mut conn_err = driver_error_to_connector_error(err);
+                conn_err.set_transient(is_transient);
 
-                // Transaction aborted error.
-                mongodb::error::ErrorKind::Command(CommandError { code, message, .. }) if *code == 251 => {
-                    ConnectorError::from_kind(ErrorKind::TransactionAborted {
-                        message: message.to_owned(),
-                    })
-                }
+                conn_err
+            }
+        }
+    }
+}
 
-                mongodb::error::ErrorKind::Command(CommandError { code, .. }) if *code == 20 => {
-                    ConnectorError::from_kind(ErrorKind::MongoReplicaSetRequired)
-                }
+fn driver_error_to_connector_error(err: DriverError) -> ConnectorError {
+    match err.kind.as_ref() {
+        mongodb::error::ErrorKind::InvalidArgument { .. } => {
+            ConnectorError::from_kind(ErrorKind::QueryError(Box::new(err.clone())))
+        }
+        mongodb::error::ErrorKind::Authentication { message, .. } => {
+            // Todo this mapping is only half correct.
+            ConnectorError::from_kind(ErrorKind::AuthenticationFailed { user: message.clone() })
+        }
 
-                mongodb::error::ErrorKind::Command(CommandError { code, .. }) if *code == 112 => {
-                    ConnectorError::from_kind(ErrorKind::TransactionWriteConflict)
-                }
+        // Transaction aborted error.
+        mongodb::error::ErrorKind::Command(CommandError { code, message, .. }) if *code == 251 => {
+            ConnectorError::from_kind(ErrorKind::TransactionAborted {
+                message: message.to_owned(),
+            })
+        }
 
-                mongodb::error::ErrorKind::Write(write_failure) => match write_failure {
-                    mongodb::error::WriteFailure::WriteConcernError(concern_error) => match concern_error.code {
-                        11000 => ConnectorError::from_kind(unique_violation_error(concern_error.message.as_str())),
-                        code => ConnectorError::from_kind(ErrorKind::RawDatabaseError {
-                            code: code.to_string(),
-                            message: concern_error.message.clone(),
-                        }),
-                    },
+        mongodb::error::ErrorKind::Command(CommandError { code, .. }) if *code == 20 => {
+            ConnectorError::from_kind(ErrorKind::MongoReplicaSetRequired)
+        }
 
-                    mongodb::error::WriteFailure::WriteError(write_error) => match write_error.code {
-                        11000 => ConnectorError::from_kind(unique_violation_error(write_error.message.as_str())),
-                        code => ConnectorError::from_kind(ErrorKind::RawDatabaseError {
-                            code: code.to_string(),
-                            message: write_error.message.clone(),
-                        }),
-                    },
+        mongodb::error::ErrorKind::Command(CommandError { code, .. }) if *code == 112 => {
+            ConnectorError::from_kind(ErrorKind::TransactionWriteConflict)
+        }
 
-                    _ => ConnectorError::from_kind(ErrorKind::QueryError(Box::new(err.clone()))),
-                },
-
-                mongodb::error::ErrorKind::BulkWrite(err) => {
-                    let mut errors = match err.write_errors {
-                        Some(ref errors) => errors
-                            .iter()
-                            .map(|err| match err.code {
-                                11000 => unique_violation_error(err.message.as_str()),
-                                _ => ErrorKind::RawDatabaseError {
-                                    code: err.code.to_string(),
-                                    message: format!(
-                                        "Bulk write error on write index '{}': {}",
-                                        err.index, err.message
-                                    ),
-                                },
-                            })
-                            .collect_vec(),
-
-                        None => vec![],
-                    };
-
-                    if let Some(ref err) = err.write_concern_error {
-                        let kind = match err.code {
-                            11000 => unique_violation_error(err.message.as_str()),
-                            _ => ErrorKind::RawDatabaseError {
-                                code: err.code.to_string(),
-                                message: format!("Bulk write concern error: {}", err.message),
-                            },
-                        };
-
-                        errors.push(kind);
-                    };
-
-                    if errors.len() == 1 {
-                        ConnectorError::from_kind(errors.into_iter().next().unwrap())
-                    } else {
-                        ConnectorError::from_kind(ErrorKind::MultiError(MultiError { errors }))
-                    }
-                }
-
-                mongodb::error::ErrorKind::BsonDeserialization(err) => ConnectorError::from_kind(
-                    ErrorKind::InternalConversionError(format!("BSON decode error: {}", err)),
-                ),
-
-                mongodb::error::ErrorKind::BsonSerialization(err) => ConnectorError::from_kind(
-                    ErrorKind::InternalConversionError(format!("BSON encode error: {}", err)),
-                ),
-
-                _ => ConnectorError::from_kind(ErrorKind::RawDatabaseError {
-                    code: "unknown".to_owned(),
-                    message: format!("{}", err),
+        mongodb::error::ErrorKind::Write(write_failure) => match write_failure {
+            mongodb::error::WriteFailure::WriteConcernError(concern_error) => match concern_error.code {
+                11000 => ConnectorError::from_kind(unique_violation_error(concern_error.message.as_str())),
+                code => ConnectorError::from_kind(ErrorKind::RawDatabaseError {
+                    code: code.to_string(),
+                    message: concern_error.message.clone(),
                 }),
             },
+
+            mongodb::error::WriteFailure::WriteError(write_error) => match write_error.code {
+                11000 => ConnectorError::from_kind(unique_violation_error(write_error.message.as_str())),
+                code => ConnectorError::from_kind(ErrorKind::RawDatabaseError {
+                    code: code.to_string(),
+                    message: write_error.message.clone(),
+                }),
+            },
+
+            _ => ConnectorError::from_kind(ErrorKind::QueryError(Box::new(err.clone()))),
+        },
+
+        mongodb::error::ErrorKind::BulkWrite(err) => {
+            let mut errors = match err.write_errors {
+                Some(ref errors) => errors
+                    .iter()
+                    .map(|err| match err.code {
+                        11000 => unique_violation_error(err.message.as_str()),
+                        _ => ErrorKind::RawDatabaseError {
+                            code: err.code.to_string(),
+                            message: format!("Bulk write error on write index '{}': {}", err.index, err.message),
+                        },
+                    })
+                    .collect_vec(),
+
+                None => vec![],
+            };
+
+            if let Some(ref err) = err.write_concern_error {
+                let kind = match err.code {
+                    11000 => unique_violation_error(err.message.as_str()),
+                    _ => ErrorKind::RawDatabaseError {
+                        code: err.code.to_string(),
+                        message: format!("Bulk write concern error: {}", err.message),
+                    },
+                };
+
+                errors.push(kind);
+            };
+
+            if errors.len() == 1 {
+                ConnectorError::from_kind(errors.into_iter().next().unwrap())
+            } else {
+                ConnectorError::from_kind(ErrorKind::MultiError(MultiError { errors }))
+            }
         }
+
+        mongodb::error::ErrorKind::BsonDeserialization(err) => {
+            ConnectorError::from_kind(ErrorKind::InternalConversionError(format!("BSON decode error: {err}")))
+        }
+
+        mongodb::error::ErrorKind::BsonSerialization(err) => {
+            ConnectorError::from_kind(ErrorKind::InternalConversionError(format!("BSON encode error: {err}")))
+        }
+
+        _ => ConnectorError::from_kind(ErrorKind::RawDatabaseError {
+            code: "unknown".to_owned(),
+            message: format!("{err}"),
+        }),
     }
 }
 
@@ -237,7 +243,7 @@ fn parse_unique_index_violation(message: &str) -> Option<String> {
 
 impl From<mongodb::bson::oid::Error> for MongoError {
     fn from(err: mongodb::bson::oid::Error) -> Self {
-        MongoError::MalformedObjectId(format!("{}", err))
+        MongoError::MalformedObjectId(format!("{err}"))
     }
 }
 
@@ -276,7 +282,7 @@ impl<T> DecorateErrorWithFieldInformationExtension for crate::Result<T> {
     }
 
     fn decorate_with_scalar_field_info(self, sf: &ScalarFieldRef) -> Self {
-        self.map_err(|err| err.decorate_with_field_name(&sf.name))
+        self.map_err(|err| err.decorate_with_field_name(sf.name()))
     }
 
     fn decorate_with_field_name(self, field_name: &str) -> Self {
@@ -284,6 +290,6 @@ impl<T> DecorateErrorWithFieldInformationExtension for crate::Result<T> {
     }
 
     fn decorate_with_composite_field_info(self, cf: &CompositeFieldRef) -> Self {
-        self.map_err(|err| err.decorate_with_field_name(&cf.name))
+        self.map_err(|err| err.decorate_with_field_name(&cf.name()))
     }
 }

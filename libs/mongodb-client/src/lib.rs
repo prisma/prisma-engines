@@ -143,8 +143,7 @@ impl FromStr for MongoConnectionString {
                     Some(part) => {
                         if part.is_empty() {
                             return Err(ErrorKind::invalid_argument(format!(
-                                "invalid server address: \"{}\"; hostname cannot be empty",
-                                address
+                                "invalid server address: \"{address}\"; hostname cannot be empty"
                             ))
                             .into());
                         }
@@ -152,7 +151,7 @@ impl FromStr for MongoConnectionString {
                     }
                     None => {
                         return Err(
-                            ErrorKind::invalid_argument(format!("invalid server address: \"{}\"", address)).into(),
+                            ErrorKind::invalid_argument(format!("invalid server address: \"{address}\"")).into(),
                         );
                     }
                 };
@@ -161,22 +160,19 @@ impl FromStr for MongoConnectionString {
                     Some(part) => {
                         let port = u16::from_str(part).map_err(|_| {
                             ErrorKind::invalid_argument(format!(
-                                "port must be valid 16-bit unsigned integer, instead got: {}",
-                                part
+                                "port must be valid 16-bit unsigned integer, instead got: {part}"
                             ))
                         })?;
 
                         if port == 0 {
                             return Err(ErrorKind::invalid_argument(format!(
-                                "invalid server address: \"{}\"; port must be non-zero",
-                                address
+                                "invalid server address: \"{address}\"; port must be non-zero"
                             ))
                             .into());
                         }
                         if parts.next().is_some() {
                             return Err(ErrorKind::invalid_argument(format!(
-                                "address \"{}\" contains more than one unescaped ':'",
-                                address
+                                "address \"{address}\" contains more than one unescaped ':'"
                             ))
                             .into());
                         }

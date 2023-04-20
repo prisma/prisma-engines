@@ -1,32 +1,23 @@
-use super::*;
-use fmt::Debug;
+use crate::{EnumType, IdentifierType, ObjectType, OutputField, OutputObjectTypeId, QuerySchemaDatabase};
 use prisma_models::{InternalDataModelRef, ModelRef};
 use psl::{
     datamodel_connector::{ConnectorCapability, RelationMode},
     PreviewFeatures,
 };
-use std::{borrow::Borrow, fmt};
+use std::{collections::HashMap, fmt};
 
-/// The query schema.
-/// Defines which operations (query/mutations) are possible on a database, based on the (internal) data model.
+/// The query schema defines which operations (query/mutations) are possible on a database, based
+/// on a Prisma schema.
 ///
-/// Conceptually, a query schema stores two trees (query / mutation) that consist of
-/// input and output types. Special consideration is required when dealing with object types.
-///
-/// Object types can be referenced multiple times throughout the schema, also recursively, which requires the use
-/// of weak references to prevent memory leaks. To simplify the overall management of Arcs and weaks, the
-/// query schema is subject to a number of invariants.
-/// The most important one is that the only strong references (Arc) to a single object types
-/// is only ever held by the top-level QuerySchema struct, never by the trees, which only ever hold weak refs.
-///
-/// Using a QuerySchema should never involve dealing with the strong references.
+/// Conceptually, a query schema stores two trees (query/mutation) that consist of input and output
+/// types.
 #[derive(Debug)]
 pub struct QuerySchema {
     /// Root query object (read queries).
-    pub query: OutputTypeRef,
+    pub query: OutputObjectTypeId,
 
     /// Root mutation object (write queries).
-    pub mutation: OutputTypeRef,
+    pub mutation: OutputObjectTypeId,
 
     /// Internal abstraction over the datamodel AST.
     pub internal_data_model: InternalDataModelRef,
@@ -34,14 +25,14 @@ pub struct QuerySchema {
     /// Information about the connector this schema was build for.
     pub context: ConnectorContext,
 
-    /// Internal. Stores all strong Arc refs to the input object types.
-    _input_object_types: Vec<InputObjectTypeStrongRef>,
+    /// The primary source of truth for schema data.
+    pub db: QuerySchemaDatabase,
 
-    /// Internal. Stores all strong Arc refs to the output object types.
-    _output_object_types: Vec<ObjectTypeStrongRef>,
+    // Indexes query fields by their own query info for easier access.
+    query_map: HashMap<QueryInfo, usize>,
 
-    /// Internal. Stores all enum refs.
-    _enum_types: Vec<EnumTypeRef>,
+    // Indexes mutation fields by their own query info for easier access.
+    mutation_map: HashMap<QueryInfo, usize>,
 }
 
 /// Connector meta information, to be used in query execution if necessary.
@@ -74,59 +65,92 @@ impl ConnectorContext {
 impl QuerySchema {
     #[allow(clippy::too_many_arguments)]
     pub fn new(
-        query: OutputTypeRef,
-        mutation: OutputTypeRef,
-        _input_object_types: Vec<InputObjectTypeStrongRef>,
-        _output_object_types: Vec<ObjectTypeStrongRef>,
-        _enum_types: Vec<EnumTypeRef>,
+        query: OutputObjectTypeId,
+        mutation: OutputObjectTypeId,
+        db: QuerySchemaDatabase,
         internal_data_model: InternalDataModelRef,
         capabilities: Vec<ConnectorCapability>,
     ) -> Self {
         let features = internal_data_model.schema.configuration.preview_features();
         let relation_mode = internal_data_model.schema.relation_mode();
+        let mut query_map: HashMap<QueryInfo, usize> = HashMap::new();
+        let mut mutation_map: HashMap<QueryInfo, usize> = HashMap::new();
+
+        for (field_idx, field) in db[query].get_fields().iter().enumerate() {
+            if let Some(query_info) = field.query_info() {
+                query_map.insert(query_info.to_owned(), field_idx);
+            }
+        }
+
+        for (field_idx, field) in db[mutation].get_fields().iter().enumerate() {
+            if let Some(query_info) = field.query_info() {
+                mutation_map.insert(query_info.to_owned(), field_idx);
+            }
+        }
+
         QuerySchema {
             query,
             mutation,
-            _input_object_types,
-            _output_object_types,
-            _enum_types,
+            query_map,
+            mutation_map,
+            db,
             internal_data_model,
             context: ConnectorContext::new(capabilities, features, relation_mode),
         }
     }
 
-    pub fn find_mutation_field<T>(&self, name: T) -> Option<OutputFieldRef>
+    pub fn find_mutation_field<T>(&self, name: T) -> Option<&OutputField>
     where
         T: Into<String>,
     {
         let name = name.into();
-        self.mutation().get_fields().iter().find(|f| f.name == name).cloned()
+        self.mutation().get_fields().iter().find(|f| f.name == name)
     }
 
-    pub fn find_query_field<T>(&self, name: T) -> Option<OutputFieldRef>
+    pub fn find_query_field<T>(&self, name: T) -> Option<&OutputField>
     where
         T: Into<String>,
     {
         let name = name.into();
-        self.query().get_fields().iter().find(|f| f.name == name).cloned()
+        self.query().get_fields().iter().find(|f| f.name == name)
     }
 
-    pub fn mutation(&self) -> ObjectTypeStrongRef {
-        match self.mutation.borrow() {
-            OutputType::Object(ref o) => o.into_arc(),
-            _ => unreachable!(),
-        }
+    pub fn find_query_field_by_model_and_action(
+        &self,
+        model_name: Option<&str>,
+        tag: QueryTag,
+    ) -> Option<&OutputField> {
+        let model = model_name.and_then(|name| self.internal_data_model.find_model(name).ok());
+        let query_info = QueryInfo { model, tag };
+
+        self.query_map
+            .get(&query_info)
+            .map(|idx| &self.query().get_fields()[*idx])
     }
 
-    pub fn query(&self) -> ObjectTypeStrongRef {
-        match self.query.borrow() {
-            OutputType::Object(ref o) => o.into_arc(),
-            _ => unreachable!(),
-        }
+    pub fn find_mutation_field_by_model_and_action(
+        &self,
+        model_name: Option<&str>,
+        tag: QueryTag,
+    ) -> Option<&OutputField> {
+        let model = model_name.and_then(|name| self.internal_data_model.find_model(name).ok());
+        let query_info = QueryInfo { model, tag };
+
+        self.mutation_map
+            .get(&query_info)
+            .map(|idx| &self.mutation().get_fields()[*idx])
     }
 
-    pub fn enum_types(&self) -> &[EnumTypeRef] {
-        &self._enum_types
+    pub fn mutation(&self) -> &ObjectType {
+        &self.db[self.mutation]
+    }
+
+    pub fn query(&self) -> &ObjectType {
+        &self.db[self.query]
+    }
+
+    pub fn enum_types(&self) -> impl Iterator<Item = &EnumType> {
+        self.db.iter_enum_types()
     }
 
     pub fn context(&self) -> &ConnectorContext {
@@ -135,14 +159,14 @@ impl QuerySchema {
 }
 
 /// Designates a specific top-level operation on a corresponding model.
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Hash, Eq)]
 pub struct QueryInfo {
     pub model: Option<ModelRef>,
     pub tag: QueryTag,
 }
 
 /// A `QueryTag` designates a top level query possible with Prisma.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Hash, Eq)]
 pub enum QueryTag {
     FindUnique,
     FindUniqueOrThrow,
@@ -158,12 +182,16 @@ pub enum QueryTag {
     UpsertOne,
     Aggregate,
     GroupBy,
+    // Raw operations
     ExecuteRaw,
-    QueryRaw { query_type: Option<String> },
+    QueryRaw,
+    RunCommandRaw,
+    FindRaw,
+    AggregateRaw,
 }
 
 impl fmt::Display for QueryTag {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let s = match self {
             Self::FindUnique => "findUnique",
             Self::FindUniqueOrThrow => "findUniqueOrThrow",
@@ -180,43 +208,79 @@ impl fmt::Display for QueryTag {
             Self::Aggregate => "aggregate",
             Self::GroupBy => "groupBy",
             Self::ExecuteRaw => "executeRaw",
-            Self::QueryRaw { query_type: _ } => "queryRaw",
+            Self::QueryRaw => "queryRaw",
+            Self::RunCommandRaw => "runCommandRaw",
+            Self::FindRaw => "findRaw",
+            Self::AggregateRaw => "aggregateRaw",
         };
 
-        write!(f, "{}", s)
+        f.write_str(s)
+    }
+}
+
+impl From<&str> for QueryTag {
+    fn from(value: &str) -> Self {
+        match value {
+            "findUnique" => Self::FindUnique,
+            "findUniqueOrThrow" => Self::FindUniqueOrThrow,
+            "findFirst" => Self::FindFirst,
+            "findFirstOrThrow" => Self::FindFirstOrThrow,
+            "findMany" => Self::FindMany,
+            "createOne" => Self::CreateOne,
+            "createMany" => Self::CreateMany,
+            "updateOne" => Self::UpdateOne,
+            "updateMany" => Self::UpdateMany,
+            "deleteOne" => Self::DeleteOne,
+            "deleteMany" => Self::DeleteMany,
+            "upsertOne" => Self::UpsertOne,
+            "aggregate" => Self::Aggregate,
+            "groupBy" => Self::GroupBy,
+            "executeRaw" => Self::ExecuteRaw,
+            "queryRaw" => Self::QueryRaw,
+            "findRaw" => Self::FindRaw,
+            "aggregateRaw" => Self::AggregateRaw,
+            "runCommandRaw" => Self::RunCommandRaw,
+            v => panic!("Unknown query tag: {v}"),
+        }
     }
 }
 
 #[derive(PartialEq, Hash, Eq, Debug, Clone)]
 pub struct Identifier {
-    name: String,
-    namespace: String,
+    name: IdentifierType,
+    namespace: IdentifierNamespace,
+}
+
+#[derive(PartialEq, Eq, Hash, Debug, Clone)]
+enum IdentifierNamespace {
+    Prisma,
+    Model,
 }
 
 impl Identifier {
-    pub fn new<T, U>(name: T, namespace: U) -> Self
-    where
-        T: Into<String>,
-        U: Into<String>,
-    {
+    pub fn new_prisma(name: impl Into<IdentifierType>) -> Self {
         Self {
             name: name.into(),
-            namespace: namespace.into(),
+            namespace: IdentifierNamespace::Prisma,
         }
     }
 
-    pub fn name(&self) -> &str {
-        &self.name
+    pub fn new_model(name: impl Into<IdentifierType>) -> Self {
+        Self {
+            name: name.into(),
+            namespace: IdentifierNamespace::Model,
+        }
+    }
+
+    pub fn name(&self) -> String {
+        self.name.to_string()
     }
 
     pub fn namespace(&self) -> &str {
-        &self.namespace
-    }
-}
-
-impl ToString for Identifier {
-    fn to_string(&self) -> String {
-        format!("{}.{}", self.namespace(), self.name())
+        match self.namespace {
+            IdentifierNamespace::Prisma => "prisma",
+            IdentifierNamespace::Model => "model",
+        }
     }
 }
 
@@ -237,8 +301,8 @@ pub enum ScalarType {
     Bytes,
 }
 
-impl std::fmt::Display for ScalarType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl fmt::Display for ScalarType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let typ = match self {
             ScalarType::Null => "Null",
             ScalarType::String => "String",
@@ -255,6 +319,6 @@ impl std::fmt::Display for ScalarType {
             ScalarType::Bytes => "Bytes",
         };
 
-        write!(f, "{}", typ)
+        f.write_str(typ)
     }
 }

@@ -3,7 +3,21 @@ CONFIG_FILE = .test_config
 SCHEMA_EXAMPLES_PATH = ./query-engine/example_schemas
 DEV_SCHEMA_FILE = dev_datamodel.prisma
 
+LIBRARY_EXT := $(shell                            \
+    case "$$(uname -s)" in                        \
+        (Darwin)               echo "dylib" ;;    \
+        (MINGW*|MSYS*|CYGWIN*) echo "dll"   ;;    \
+        (*)                    echo "so"    ;;    \
+    esac)
+
 default: build
+
+#####################
+# Boostrap commands #
+#####################
+
+bootstrap-darwin:
+	script/bootstrap-darwin
 
 ##################
 # Build commands #
@@ -11,6 +25,9 @@ default: build
 
 build:
 	cargo build
+
+build-qe:
+	cargo build --package query-engine
 
 # Emulate pedantic CI compilation.
 pedantic:
@@ -36,6 +53,11 @@ test-qe-st:
 # Single threaded thread execution, verbose.
 test-qe-verbose-st:
 	cargo test --package query-engine-tests -- --nocapture --test-threads 1
+
+# Black-box tests, exercising the query engine HTTP apis (metrics, tracing, etc)
+test-qe-black-box: build-qe
+	cargo test --package black-box-tests -- --test-threads 1
+
 
 ###########################
 # Database setup commands #
@@ -94,11 +116,17 @@ start-postgres15:
 dev-postgres15: start-postgres15
 	cp $(CONFIG_PATH)/postgres15 $(CONFIG_FILE)
 
+start-cockroach_22_2:
+	docker compose -f docker-compose.yml up -d --remove-orphans cockroach_22_2
+
+dev-cockroach_22_2: start-cockroach_22_2
+	cp $(CONFIG_PATH)/cockroach_22_2 $(CONFIG_FILE)
+
 start-cockroach_22_1_0:
 	docker compose -f docker-compose.yml up -d --remove-orphans cockroach_22_1_0
 
 dev-cockroach_22_1_0: start-cockroach_22_1_0
-	cp $(CONFIG_PATH)/cockroach $(CONFIG_FILE)
+	cp $(CONFIG_PATH)/cockroach_22_1 $(CONFIG_FILE)
 
 start-cockroach_21_2_0_patched:
 	docker compose -f docker-compose.yml up -d --remove-orphans cockroach_21_2_0_patched
@@ -213,7 +241,7 @@ validate:
 	cargo run --bin test-cli -- validate-datamodel dev_datamodel.prisma
 
 qe:
-	cargo run --bin query-engine -- --enable-playground --enable-raw-queries --enable-metrics --enable-open-telemetry
+	cargo run --bin query-engine -- --enable-playground --enable-raw-queries --enable-metrics --enable-open-telemetry --enable-telemetry-in-response
 
 qe-dmmf:
 	cargo run --bin query-engine -- cli dmmf > dmmf.json
@@ -247,3 +275,13 @@ show-metrics:
 ## OpenTelemetry
 otel:
 	docker compose up --remove-orphans -d otel
+
+# Build the debug version of Query Engine Node-API library ready to be consumed by Node.js
+.PHONY: qe-node-api
+qe-node-api: build target/debug/libquery_engine.node
+
+%.node: %.$(LIBRARY_EXT)
+# Remove the file first to work around a macOS bug: https://openradar.appspot.com/FB8914243
+# otherwise macOS gatekeeper may kill the Node.js process when it tries to load the library
+	if [[ "$$(uname -sm)" == "Darwin arm64" ]]; then rm -f $@; fi
+	cp $< $@

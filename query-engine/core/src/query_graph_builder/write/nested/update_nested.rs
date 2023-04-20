@@ -7,7 +7,7 @@ use crate::{
 use connector::Filter;
 use prisma_models::{ModelRef, RelationFieldRef};
 use schema_builder::constants::args;
-use std::{convert::TryInto, sync::Arc};
+use std::convert::TryInto;
 
 /// Handles nested update (single record) cases.
 ///
@@ -82,12 +82,12 @@ pub fn nested_update(
             utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())?;
 
         let update_node =
-            update::update_record_node(graph, connector_ctx, filter, Arc::clone(child_model), data.try_into()?)?;
+            update::update_record_node(graph, connector_ctx, filter, child_model.clone(), data.try_into()?)?;
 
         let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
-        let relation_name = parent_relation_field.relation().name.clone();
-        let child_model_name = child_model.name.clone();
+        let relation_name = parent_relation_field.relation().name().to_owned();
+        let child_model_name = child_model.name().to_owned();
 
         graph.create_edge(
             &find_child_records_node,
@@ -98,8 +98,7 @@ pub fn nested_update(
                     let child_id = match child_ids.pop() {
                         Some(pid) => Ok(pid),
                         None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "No '{}' record was found for a nested update on relation '{}'.",
-                            child_model_name, relation_name
+                            "No '{child_model_name}' record was found for a nested update on relation '{relation_name}'."
                         ))),
                     }?;
 
@@ -115,7 +114,7 @@ pub fn nested_update(
         utils::insert_emulated_on_update(
             graph,
             connector_ctx,
-            &child_model,
+            child_model,
             &find_child_records_node,
             &update_node,
         )?;
@@ -146,7 +145,7 @@ pub fn nested_update_many(
             utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter)?;
 
         let update_many_node =
-            update::update_many_record_node(graph, connector_ctx, Filter::empty(), Arc::clone(child_model), data_map)?;
+            update::update_many_record_node(graph, connector_ctx, Filter::empty(), child_model.clone(), data_map)?;
 
         graph.create_edge(
             &find_child_records_node,

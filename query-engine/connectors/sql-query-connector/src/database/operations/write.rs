@@ -1,11 +1,11 @@
 use crate::filter_conversion::AliasedCondition;
 use crate::query_builder::write::{build_update_and_set_query, chunk_update_with_ids};
-use crate::sql_trace::SqlTraceComment;
-use crate::{error::SqlError, model_extensions::*, query_builder::write, sql_info::SqlInfo, QueryExt};
+use crate::{
+    error::SqlError, model_extensions::*, query_builder::write, sql_trace::SqlTraceComment, Context, QueryExt,
+};
 use connector_interface::*;
 use itertools::Itertools;
 use prisma_models::*;
-use psl::dml::prisma_value::PrismaValue;
 use quaint::{
     error::ErrorKind,
     prelude::{native_uuid, uuid_to_bin, uuid_to_bin_swapped, Aliasable, Select, SqlFamily},
@@ -21,16 +21,15 @@ use user_facing_errors::query_engine::DatabaseConstraint;
 async fn generate_id(
     conn: &dyn QueryExt,
     primary_key: &FieldSelection,
-    trace_id: Option<String>,
     args: &WriteArgs,
+    ctx: &Context<'_>,
 ) -> crate::Result<Option<SelectionResult>> {
     // Go through all the values and generate a select statement with the correct MySQL function
     let (pk_select, need_select) = primary_key
         .selections()
         .filter_map(|field| match field {
-            SelectedField::Scalar(x) if x.default_value.is_some() && !args.has_arg_for(x.db_name()) => x
-                .default_value
-                .clone()
+            SelectedField::Scalar(x) if x.default_value().is_some() && !args.has_arg_for(x.db_name()) => x
+                .default_value()
                 .unwrap()
                 .to_dbgenerated_func()
                 .map(|func| (field.db_name().to_string(), func)),
@@ -50,7 +49,7 @@ async fn generate_id(
 
     // db generate values only if needed
     if need_select {
-        let pk_select = pk_select.add_trace_id(trace_id);
+        let pk_select = pk_select.add_trace_id(ctx.trace_id);
         let pk_result = conn.query(pk_select.into()).await?;
         let result = try_convert(&(primary_key.into()), pk_result)?;
 
@@ -62,17 +61,17 @@ async fn generate_id(
 
 /// Create a single record to the database defined in `conn`, resulting into a
 /// `RecordProjection` as an identifier pointing to the just-created record.
-pub async fn create_record(
+pub(crate) async fn create_record(
     conn: &dyn QueryExt,
     sql_family: &SqlFamily,
     model: &ModelRef,
     mut args: WriteArgs,
-    trace_id: Option<String>,
+    ctx: &Context<'_>,
 ) -> crate::Result<SelectionResult> {
     let pk = model.primary_identifier();
 
     let returned_id = if *sql_family == SqlFamily::Mysql {
-        generate_id(conn, &pk, trace_id.clone(), &args).await?
+        generate_id(conn, &pk, &args, ctx).await?
     } else {
         args.as_record_projection(pk.clone().into())
     };
@@ -91,7 +90,7 @@ pub async fn create_record(
         _ => args,
     };
 
-    let insert = write::create_record(model, args, trace_id);
+    let insert = write::create_record(model, args, ctx);
 
     let result_set = match conn.insert(insert).await {
         Ok(id) => id,
@@ -153,13 +152,12 @@ pub async fn create_record(
     }
 }
 
-pub async fn create_records(
+pub(crate) async fn create_records(
     conn: &dyn QueryExt,
-    sql_info: SqlInfo,
     model: &ModelRef,
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
-    trace_id: Option<String>,
+    ctx: &Context<'_>,
 ) -> crate::Result<usize> {
     if args.is_empty() {
         return Ok(0);
@@ -167,7 +165,7 @@ pub async fn create_records(
 
     // Compute the set of fields affected by the createMany.
     let mut fields = HashSet::new();
-    args.iter().for_each(|arg| fields.extend(arg.keys().into_iter()));
+    args.iter().for_each(|arg| fields.extend(arg.keys()));
 
     #[allow(clippy::mutable_key_type)]
     let affected_fields: HashSet<ScalarFieldRef> = fields
@@ -184,9 +182,9 @@ pub async fn create_records(
 
     if affected_fields.is_empty() {
         // If no fields are to be inserted (everything is DEFAULT) we need to fall back to inserting default rows `args.len()` times.
-        create_many_empty(conn, model, args.len(), skip_duplicates, trace_id).await
+        create_many_empty(conn, model, args.len(), skip_duplicates, ctx).await
     } else {
-        create_many_nonempty(conn, sql_info, model, args, skip_duplicates, affected_fields, trace_id).await
+        create_many_nonempty(conn, model, args, skip_duplicates, affected_fields, ctx).await
     }
 }
 
@@ -194,14 +192,13 @@ pub async fn create_records(
 #[allow(clippy::mutable_key_type)]
 async fn create_many_nonempty(
     conn: &dyn QueryExt,
-    sql_info: SqlInfo,
     model: &ModelRef,
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
     affected_fields: HashSet<ScalarFieldRef>,
-    trace_id: Option<String>,
+    ctx: &Context<'_>,
 ) -> crate::Result<usize> {
-    let batches = if let Some(max_params) = sql_info.max_bind_values {
+    let batches = if let Some(max_params) = ctx.max_bind_values {
         // We need to split inserts if they are above a parameter threshold, as well as split based on number of rows.
         // -> Horizontal partitioning by row number, vertical by number of args.
         args.into_iter()
@@ -242,7 +239,7 @@ async fn create_many_nonempty(
         vec![args]
     };
 
-    let partitioned_batches = if let Some(max_rows) = sql_info.max_rows {
+    let partitioned_batches = if let Some(max_rows) = ctx.max_rows {
         let capacity = batches.len();
         batches
             .into_iter()
@@ -273,7 +270,7 @@ async fn create_many_nonempty(
 
     let mut count = 0;
     for batch in partitioned_batches {
-        let stmt = write::create_records_nonempty(model, batch, skip_duplicates, &affected_fields, trace_id.clone());
+        let stmt = write::create_records_nonempty(model, batch, skip_duplicates, &affected_fields, ctx);
         count += conn.execute(stmt.into()).await?;
     }
 
@@ -286,9 +283,9 @@ async fn create_many_empty(
     model: &ModelRef,
     num_records: usize,
     skip_duplicates: bool,
-    trace_id: Option<String>,
+    ctx: &Context<'_>,
 ) -> crate::Result<usize> {
-    let stmt = write::create_records_empty(model, skip_duplicates, trace_id);
+    let stmt = write::create_records_empty(model, skip_duplicates, ctx);
     let mut count = 0;
 
     for _ in 0..num_records {
@@ -301,26 +298,24 @@ async fn create_many_empty(
 /// Update one record in a database defined in `conn` and the records
 /// defined in `args`, resulting the identifiers that were modified in the
 /// operation.
-pub async fn update_record(
+pub(crate) async fn update_record(
     conn: &dyn QueryExt,
     model: &ModelRef,
     record_filter: RecordFilter,
     args: WriteArgs,
-    trace_id: Option<String>,
+    ctx: &Context<'_>,
 ) -> crate::Result<Vec<SelectionResult>> {
     let id_args = pick_args(&model.primary_identifier().into(), &args);
 
     // This is to match the behaviour expected but it seems a bit strange to me
     // This comes across as if the update happened even if it didn't
     if args.args.is_empty() {
-        let ids: Vec<SelectionResult> = conn
-            .filter_selectors(model, record_filter.clone(), trace_id.clone())
-            .await?;
+        let ids: Vec<SelectionResult> = conn.filter_selectors(model, record_filter.clone(), ctx).await?;
 
         return Ok(ids);
     }
 
-    let (_, ids) = update_records_from_ids_and_filter(conn, model, record_filter, args, trace_id).await?;
+    let (_, ids) = update_records_from_ids_and_filter(conn, model, record_filter, args, ctx).await?;
 
     Ok(merge_write_args(ids, id_args))
 }
@@ -332,20 +327,20 @@ async fn update_records_from_ids_and_filter(
     model: &ModelRef,
     record_filter: RecordFilter,
     args: WriteArgs,
-    trace_id: Option<String>,
+    ctx: &Context<'_>,
 ) -> crate::Result<(usize, Vec<SelectionResult>)> {
-    let filter_condition = record_filter.clone().filter.aliased_condition_from(None, false);
-    let ids: Vec<SelectionResult> = conn.filter_selectors(model, record_filter, trace_id.clone()).await?;
+    let filter_condition = record_filter.clone().filter.aliased_condition_from(None, false, ctx);
+    let ids: Vec<SelectionResult> = conn.filter_selectors(model, record_filter, ctx).await?;
 
     if ids.is_empty() {
         return Ok((0, Vec::new()));
     }
 
-    let update = build_update_and_set_query(model, args, trace_id);
+    let update = build_update_and_set_query(model, args, ctx);
 
     let updates = {
         let ids: Vec<&SelectionResult> = ids.iter().collect();
-        chunk_update_with_ids(update, model, &ids, filter_condition)?
+        chunk_update_with_ids(update, model, &ids, filter_condition, ctx)?
     };
 
     let mut count = 0;
@@ -365,10 +360,10 @@ async fn update_records_from_filter(
     model: &ModelRef,
     record_filter: RecordFilter,
     args: WriteArgs,
-    trace_id: Option<String>,
+    ctx: &Context<'_>,
 ) -> crate::Result<usize> {
-    let update = build_update_and_set_query(model, args, trace_id);
-    let filter_condition = record_filter.clone().filter.aliased_condition_from(None, false);
+    let update = build_update_and_set_query(model, args, ctx);
+    let filter_condition = record_filter.filter.aliased_condition_from(None, false, ctx);
 
     let update = update.so_that(filter_condition);
     let count = conn.execute(update.into()).await?;
@@ -380,34 +375,34 @@ async fn update_records_from_filter(
 /// defined in `args`, and returning the number of updates
 /// This works via two ways, when there are ids in record_filter.selectors, it uses that to update
 /// Otherwise it used the passed down arguments to update.
-pub async fn update_records(
+pub(crate) async fn update_records(
     conn: &dyn QueryExt,
     model: &ModelRef,
     record_filter: RecordFilter,
     args: WriteArgs,
-    trace_id: Option<String>,
+    ctx: &Context<'_>,
 ) -> crate::Result<usize> {
     if args.args.is_empty() {
         return Ok(0);
     }
 
     if record_filter.has_selectors() {
-        let (count, _) = update_records_from_ids_and_filter(conn, model, record_filter, args, trace_id).await?;
+        let (count, _) = update_records_from_ids_and_filter(conn, model, record_filter, args, ctx).await?;
         Ok(count)
     } else {
-        update_records_from_filter(conn, model, record_filter, args, trace_id).await
+        update_records_from_filter(conn, model, record_filter, args, ctx).await
     }
 }
 
 /// Delete multiple records in `conn`, defined in the `Filter`. Result is the number of items deleted.
-pub async fn delete_records(
+pub(crate) async fn delete_records(
     conn: &dyn QueryExt,
     model: &ModelRef,
     record_filter: RecordFilter,
-    trace_id: Option<String>,
+    ctx: &Context<'_>,
 ) -> crate::Result<usize> {
-    let filter_condition = record_filter.clone().filter.aliased_condition_from(None, false);
-    let ids = conn.filter_selectors(model, record_filter, trace_id.clone()).await?;
+    let filter_condition = record_filter.clone().filter.aliased_condition_from(None, false, ctx);
+    let ids = conn.filter_selectors(model, record_filter, ctx).await?;
     let ids: Vec<&SelectionResult> = ids.iter().collect();
     let count = ids.len();
 
@@ -416,7 +411,7 @@ pub async fn delete_records(
     }
 
     let mut row_count = 0;
-    for delete in write::delete_many(model, ids.as_slice(), filter_condition, trace_id) {
+    for delete in write::delete_many(model, ids.as_slice(), filter_condition, ctx) {
         row_count += conn.execute(delete).await?;
     }
 
@@ -428,13 +423,14 @@ pub async fn delete_records(
 
 /// Connect relations defined in `child_ids` to a parent defined in `parent_id`.
 /// The relation information is in the `RelationFieldRef`.
-pub async fn m2m_connect(
+pub(crate) async fn m2m_connect(
     conn: &dyn QueryExt,
     field: &RelationFieldRef,
     parent_id: &SelectionResult,
     child_ids: &[SelectionResult],
+    ctx: &Context<'_>,
 ) -> crate::Result<()> {
-    let query = write::create_relation_table_records(field, parent_id, child_ids);
+    let query = write::create_relation_table_records(field, parent_id, child_ids, ctx);
     conn.query(query).await?;
 
     Ok(())
@@ -442,14 +438,14 @@ pub async fn m2m_connect(
 
 /// Disconnect relations defined in `child_ids` to a parent defined in `parent_id`.
 /// The relation information is in the `RelationFieldRef`.
-pub async fn m2m_disconnect(
+pub(crate) async fn m2m_disconnect(
     conn: &dyn QueryExt,
     field: &RelationFieldRef,
     parent_id: &SelectionResult,
     child_ids: &[SelectionResult],
-    trace_id: Option<String>,
+    ctx: &Context<'_>,
 ) -> crate::Result<()> {
-    let query = write::delete_relation_table_records(field, parent_id, child_ids, trace_id);
+    let query = write::delete_relation_table_records(field, parent_id, child_ids, ctx);
     conn.delete(query).await?;
 
     Ok(())
@@ -457,7 +453,7 @@ pub async fn m2m_disconnect(
 
 /// Execute a plain SQL query with the given parameters, returning the number of
 /// affected rows.
-pub async fn execute_raw(
+pub(crate) async fn execute_raw(
     conn: &dyn QueryExt,
     features: psl::PreviewFeatures,
     inputs: HashMap<String, PrismaValue>,
@@ -469,13 +465,9 @@ pub async fn execute_raw(
 
 /// Execute a plain SQL query with the given parameters, returning the answer as
 /// a JSON `Value`.
-pub async fn query_raw(
+pub(crate) async fn query_raw(
     conn: &dyn QueryExt,
-    sql_info: SqlInfo,
-    features: psl::PreviewFeatures,
     inputs: HashMap<String, PrismaValue>,
 ) -> crate::Result<serde_json::Value> {
-    let value = conn.raw_json(sql_info, features, inputs).await?;
-
-    Ok(value)
+    Ok(conn.raw_json(inputs).await?)
 }

@@ -8,12 +8,12 @@ pub fn trace_parent_to_string(context: &SpanContext) -> String {
     let span_id = context.span_id();
 
     // see https://www.w3.org/TR/trace-context/#traceparent-header-field-values
-    format!("traceparent=00-{:032x}-{:032x}-01", trace_id, span_id)
+    format!("traceparent=00-{trace_id:032x}-{span_id:032x}-01")
 }
 
 pub trait SqlTraceComment: Sized {
     fn append_trace(self, span: &Span) -> Self;
-    fn add_trace_id(self, trace_id: Option<String>) -> Self;
+    fn add_trace_id(self, trace_id: Option<&str>) -> Self;
 }
 
 macro_rules! sql_trace {
@@ -31,7 +31,7 @@ macro_rules! sql_trace {
                 }
             }
             // Temporary method to pass the traceid in an operation
-            fn add_trace_id(self, trace_id: Option<String>) -> Self {
+            fn add_trace_id(self, trace_id: Option<&str>) -> Self {
                 if let Some(traceparent) = trace_id {
                     if should_sample(&traceparent) {
                         self.comment(format!("traceparent={}", traceparent))

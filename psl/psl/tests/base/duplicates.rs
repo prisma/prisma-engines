@@ -1,4 +1,4 @@
-use crate::{common::*, with_header};
+use crate::{common::*, with_header, Provider};
 
 #[test]
 fn fail_on_duplicate_models() {
@@ -39,7 +39,7 @@ fn fail_on_duplicate_models_with_map() {
     "#};
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mThe model with database name "User" could not be defined because another model with this name exists: "User"[0m
+        [1;91merror[0m: [1mThe model with database name "User" could not be defined because another model or view with this name exists: "User"[0m
           [1;94m-->[0m  [4mschema.prisma:4[0m
         [1;94m   | [0m
         [1;94m 3 | [0m
@@ -314,12 +314,11 @@ fn mapped_names_should_not_cause_collisions_with_names() {
         }
     "#};
 
-    let dml = with_header(schema, crate::Provider::Mongo, &[]);
-    let datamodel = parse(&dml);
-    let r#type = datamodel.assert_has_composite_type("TestData");
+    let schema = psl::parse_schema(with_header(schema, Provider::Mongo, &[])).unwrap();
+    let typ = schema.assert_has_type("TestData");
 
-    r#type.assert_has_scalar_field("id");
-    r#type.assert_has_scalar_field("id_");
+    typ.assert_has_scalar_field("id");
+    typ.assert_has_scalar_field("id_");
 }
 
 #[test]

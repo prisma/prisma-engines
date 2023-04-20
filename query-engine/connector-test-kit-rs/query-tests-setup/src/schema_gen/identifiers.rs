@@ -17,6 +17,6 @@ impl std::fmt::Display for Identifier {
             Identifier::None => "",
         };
 
-        write!(f, "{}", name)
+        write!(f, "{name}")
     }
 }

@@ -1,7 +1,7 @@
 use crate::{
     datamodel_connector::ConnectorCapability,
     diagnostics::DatamodelError,
-    parser_database::{self, ast::WithSpan, walkers::EnumWalker},
+    parser_database::{ast::WithSpan, walkers::EnumWalker},
     validate::validation_pipeline::context::Context,
 };
 use std::collections::HashSet;
@@ -76,11 +76,12 @@ pub(super) fn schema_attribute_missing(r#enum: EnumWalker<'_>, ctx: &mut Context
         return;
     }
 
-    if !ctx
-        .db
-        .schema_flags()
-        .contains(parser_database::SchemaFlags::UsesSchemaAttribute)
-    {
+    let datasource = match ctx.datasource {
+        Some(datasource) => datasource,
+        None => return,
+    };
+
+    if datasource.schemas_span.is_none() {
         return;
     }
 

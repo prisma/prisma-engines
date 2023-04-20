@@ -52,6 +52,30 @@ mod nested_create_many {
         Ok(())
     }
 
+    // "A basic createMany on a create top level" should "work"
+    #[connector_test(exclude(Sqlite))]
+    async fn create_many_shorthand_on_create(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+                createOneModelA(data: {
+                  id: 1,
+                  bs: {
+                    createMany: {
+                      data: { id: 1, str1: "1", str2: "1", str3: "1"}
+                    }
+                  }
+                }) {
+                  bs {
+                    id
+                  }
+                }
+              }"#),
+          @r###"{"data":{"createOneModelA":{"bs":[{"id":1}]}}}"###
+        );
+
+        Ok(())
+    }
+
     // "Nested createMany" should "error on duplicates by default"
     // TODO(dom): Not working for mongo
     #[connector_test(exclude(Sqlite, MongoDb))]
@@ -118,9 +142,7 @@ mod nested_create_many {
     // "Nested createMany" should "allow creating a large number of records (horizontal partitioning check)"
     #[connector_test(exclude(Sqlite))]
     async fn allow_create_large_number_records(runner: Runner) -> TestResult<()> {
-        let records: Vec<_> = (1..=1000)
-            .map(|i| format!(r#"{{ id: {}, str1: "{}" }}"#, i, i))
-            .collect();
+        let records: Vec<_> = (1..=1000).map(|i| format!(r#"{{ id: {i}, str1: "{i}" }}"#)).collect();
 
         run_query!(
             runner,

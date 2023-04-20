@@ -1,5 +1,5 @@
 use crate::filter::Filter;
-use prisma_models::*;
+use prisma_models::{ast::FieldArity, *};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct SkipAndLimit {
@@ -35,7 +35,7 @@ pub struct QueryArguments {
 impl std::fmt::Debug for QueryArguments {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("QueryArguments")
-            .field("model", &self.model.name)
+            .field("model", &self.model.name())
             .field("cursor", &self.cursor)
             .field("take", &self.take)
             .field("skip", &self.skip)
@@ -140,11 +140,12 @@ impl QueryArguments {
             stable_candidates.iter().partition(|o| o.path.is_empty());
 
         // Indicates whether or not a combination of contained fields is on the source model (we don't check for relations for now).
-        let order_by_contains_unique_index = self.model.unique_indexes().into_iter().any(|index| {
-            index
-                .fields()
-                .into_iter()
-                .all(|f| on_model.iter().any(|o| o.field == f))
+        let order_by_contains_unique_index = self.model.unique_indexes().any(|index| {
+            index.fields().all(|f| {
+                on_model
+                    .iter()
+                    .any(|o| Some(o.field.id) == f.as_scalar_field().map(|sf| ScalarFieldId::InModel(sf.id)))
+            })
         });
 
         let source_contains_unique = on_model.iter().any(|o| o.field.unique());
@@ -158,7 +159,7 @@ impl QueryArguments {
 
         let has_optional_hop = on_relation.iter().any(|o| {
             o.path.iter().any(|hop| match hop {
-                OrderByHop::Relation(rf) => rf.arity == dml::FieldArity::Optional,
+                OrderByHop::Relation(rf) => rf.arity() == FieldArity::Optional,
                 OrderByHop::Composite(cf) => !cf.is_required(),
             })
         });

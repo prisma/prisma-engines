@@ -6,7 +6,7 @@ use url::Url;
 /// The maximum length of identifiers on mysql is 64 bytes.
 ///
 /// Source: https://dev.mysql.com/doc/mysql-reslimits-excerpt/5.5/en/identifier-length.html
-fn mysql_safe_identifier(identifier: &str) -> &str {
+pub fn mysql_safe_identifier(identifier: &str) -> &str {
     if identifier.len() <= 64 {
         identifier
     } else {
@@ -41,7 +41,7 @@ pub(crate) fn get_mysql_tags(database_url: &str) -> Result<BitFlags<Tags>, Strin
         match first_row.get("version").and_then(|version| version.to_string()) {
             None => Ok(tags),
             Some(version) => {
-                eprintln!("Version: {:?}", version);
+                eprintln!("Version: {version:?}");
 
                 // order matters...
 
@@ -69,7 +69,7 @@ pub(crate) fn get_mysql_tags(database_url: &str) -> Result<BitFlags<Tags>, Strin
                     }
                 }
 
-                eprintln!("Inferred tags: {:?}", tags);
+                eprintln!("Inferred tags: {tags:?}");
 
                 Ok(tags)
             }
@@ -103,14 +103,12 @@ pub async fn create_mysql_database<'a>(database_url: &str, db_name: &'a str) -> 
         r#"
         DROP DATABASE IF EXISTS `{db_name}`;
         "#,
-        db_name = db_name,
     );
 
     let recreate = format!(
         r#"
         CREATE DATABASE `{db_name}`;
         "#,
-        db_name = db_name,
     );
 
     // The two commands have to be run separately on mariadb.

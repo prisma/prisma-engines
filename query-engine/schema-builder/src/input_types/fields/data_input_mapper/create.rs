@@ -17,81 +17,64 @@ impl CreateDataInputFieldMapper {
 }
 
 impl DataInputFieldMapper for CreateDataInputFieldMapper {
-    fn map_scalar(&self, ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputField {
+    fn map_scalar(&self, ctx: &mut BuilderContext<'_>, sf: &ScalarFieldRef) -> InputField {
         let typ = map_scalar_input_type_for_field(ctx, sf);
         let supports_advanced_json = ctx.has_capability(ConnectorCapability::AdvancedJsonNullability);
 
-        match &sf.type_identifier {
+        match &sf.type_identifier() {
             TypeIdentifier::Json if supports_advanced_json => {
                 let enum_type = InputType::enum_type(json_null_input_enum(ctx, !sf.is_required()));
 
-                input_field(sf.name.clone(), vec![enum_type, typ], sf.default_value.clone())
-                    .optional_if(!sf.is_required() || sf.default_value.is_some() || sf.is_updated_at)
+                input_field(ctx, sf.name(), vec![enum_type, typ], sf.default_value())
+                    .optional_if(!sf.is_required() || sf.default_value().is_some() || sf.is_updated_at())
             }
 
-            _ => input_field(sf.name.clone(), typ, sf.default_value.clone())
-                .optional_if(!sf.is_required() || sf.default_value.is_some() || sf.is_updated_at)
-                .nullable_if(!sf.is_required()),
+            _ => input_field(ctx, sf.name(), typ, sf.default_value())
+                .optional_if(!sf.is_required() || sf.default_value().is_some() || sf.is_updated_at())
+                .nullable_if(!sf.is_required(), &mut ctx.db),
         }
     }
 
-    fn map_scalar_list(&self, ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputField {
+    fn map_scalar_list(&self, ctx: &mut BuilderContext<'_>, sf: &ScalarFieldRef) -> InputField {
         let typ = map_scalar_input_type_for_field(ctx, sf);
-        let ident = Identifier::new(
-            format!("{}Create{}Input", sf.container.name(), sf.name),
-            PRISMA_NAMESPACE,
-        );
+        let ident = Identifier::new_prisma(IdentifierType::CreateOneScalarList(sf.clone()));
 
         let input_object = match ctx.get_input_type(&ident) {
             Some(cached) => cached,
             None => {
-                let object_fields = vec![input_field(operations::SET, typ.clone(), None)];
+                let object_fields = vec![input_field(ctx, operations::SET, typ.clone(), None)];
                 let mut input_object = input_object_type(ident.clone(), object_fields);
                 input_object.require_exactly_one_field();
-
-                let input_object = Arc::new(input_object);
-                ctx.cache_input_type(ident, input_object.clone());
-
-                Arc::downgrade(&input_object)
+                ctx.cache_input_type(ident, input_object)
             }
         };
 
         let input_type = InputType::object(input_object);
 
         // Shorthand type (`list_field: <typ>`) + full object (`list_field: { set: { <typ> }}`)
-        input_field(sf.name.clone(), vec![input_type, typ], sf.default_value.clone()).optional()
+        input_field(ctx, sf.name(), vec![input_type, typ], sf.default_value()).optional()
     }
 
-    fn map_relation(&self, ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputField {
-        let related_model = rf.related_model();
-        let related_field = rf.related_field();
-
-        // Compute input object name
-        let arity_part = if rf.is_list() { "NestedMany" } else { "NestedOne" };
-        let without_part = format!("Without{}", capitalize(&related_field.name));
-        let unchecked_part = if self.unchecked { "Unchecked" } else { "" };
-        let ident = Identifier::new(
-            format!(
-                "{}{}Create{}{}Input",
-                related_model.name, unchecked_part, arity_part, without_part
-            ),
-            PRISMA_NAMESPACE,
-        );
+    fn map_relation(&self, ctx: &mut BuilderContext<'_>, rf: &RelationFieldRef) -> InputField {
+        let ident = Identifier::new_prisma(IdentifierType::RelationCreateInput(
+            rf.clone(),
+            rf.related_field(),
+            self.unchecked,
+        ));
 
         let input_object = match ctx.get_input_type(&ident) {
             Some(t) => t,
             None => {
-                let input_object = Arc::new(init_input_object_type(ident.clone()));
-                ctx.cache_input_type(ident, input_object.clone());
+                let input_object = init_input_object_type(ident.clone());
+                let id = ctx.cache_input_type(ident, input_object);
 
                 // Enqueue the nested create input for its fields to be
                 // created at a later point, to avoid recursing too deep
                 // (that has caused stack overflows on large schemas in
                 // the past).
-                ctx.nested_create_inputs_queue
-                    .push((Arc::clone(&input_object), Arc::clone(rf)));
+                ctx.nested_create_inputs_queue.push((id, rf.clone()));
 
-                Arc::downgrade(&input_object)
+                id
             }
         };
 
@@ -101,9 +84,9 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
             .as_scalar_fields()
             .expect("Expected linking fields to be scalar.")
             .into_iter()
-            .all(|scalar_field| scalar_field.default_value.is_some());
+            .all(|scalar_field| scalar_field.default_value().is_some());
 
-        let input_field = input_field(rf.name.clone(), InputType::object(input_object), None);
+        let input_field = input_field(ctx, rf.name(), InputType::object(input_object), None);
 
         if rf.is_required() && !all_required_scalar_fields_have_defaults {
             input_field
@@ -112,7 +95,7 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
         }
     }
 
-    fn map_composite(&self, ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputField {
+    fn map_composite(&self, ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputField {
         // Shorthand object (just the plain create object for the composite).
         let shorthand_type = InputType::Object(composite_create_object_type(ctx, cf));
 
@@ -131,8 +114,8 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
             input_types.push(InputType::list(shorthand_type));
         }
 
-        input_field(cf.name.clone(), input_types, None)
-            .nullable_if(!cf.is_required() && !cf.is_list())
+        input_field(ctx, cf.name().to_owned(), input_types, None)
+            .nullable_if(!cf.is_required() && !cf.is_list(), &mut ctx.db)
             .optional_if(!cf.is_required())
     }
 }
@@ -145,27 +128,14 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
 ///   ... more ops ...
 /// }
 /// ```
-fn composite_create_envelope_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let arity = if cf.is_optional() {
-        "Nullable"
-    } else if cf.is_list() {
-        "List"
-    } else {
-        ""
-    };
-
-    let name = format!("{}{}CreateEnvelopeInput", cf.typ.name, arity);
-
-    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+fn composite_create_envelope_object_type(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputObjectTypeId {
+    let ident = Identifier::new_prisma(IdentifierType::CompositeCreateEnvelopeInput(cf.typ(), cf.arity()));
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
     input_object.require_exactly_one_field();
     input_object.set_tag(ObjectTag::CompositeEnvelope);
-
-    let input_object = Arc::new(input_object);
-
-    ctx.cache_input_type(ident, input_object.clone());
+    let id = ctx.cache_input_type(ident, input_object);
 
     let create_input = InputType::Object(composite_create_object_type(ctx, cf));
     let mut input_types = vec![create_input.clone()];
@@ -174,29 +144,27 @@ fn composite_create_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
         input_types.push(InputType::list(create_input));
     }
 
-    let set_field = input_field("set", input_types, None)
-        .nullable_if(!cf.is_required() && !cf.is_list())
+    let set_field = input_field(ctx, "set", input_types, None)
+        .nullable_if(!cf.is_required() && !cf.is_list(), &mut ctx.db)
         .optional();
 
-    input_object.set_fields(vec![set_field]);
-
-    Arc::downgrade(&input_object)
+    ctx.db[id].set_fields(vec![set_field]);
+    id
 }
 
-pub(crate) fn composite_create_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+pub(crate) fn composite_create_object_type(ctx: &mut BuilderContext<'_>, cf: &CompositeFieldRef) -> InputObjectTypeId {
     // It's called "Create" input because it's used across multiple create-type operations, not only "set".
-    let name = format!("{}CreateInput", cf.typ.name);
+    let ident = Identifier::new_prisma(IdentifierType::CompositeCreateInput(cf.typ()));
 
-    let ident = Identifier::new(name, PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, input_object.clone());
+    let input_object = init_input_object_type(ident.clone());
+    let id = ctx.cache_input_type(ident, input_object);
 
     let mapper = CreateDataInputFieldMapper::new_checked();
-    let fields = mapper.map_all(ctx, cf.typ.fields());
+    let fields = cf.typ().fields().collect::<Vec<_>>();
+    let fields = mapper.map_all(ctx, &fields);
 
-    input_object.set_fields(fields);
-
-    Arc::downgrade(&input_object)
+    ctx.db[id].set_fields(fields);
+    id
 }

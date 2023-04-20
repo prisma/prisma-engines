@@ -1,4 +1,5 @@
 use super::Selection;
+use crate::ArgumentValue;
 use schema::QuerySchemaRef;
 
 #[derive(Debug, Clone)]
@@ -29,11 +30,25 @@ impl Operation {
         }
     }
 
+    pub fn into_selection(self) -> Selection {
+        match self {
+            Operation::Read(selection) => selection,
+            Operation::Write(selection) => selection,
+        }
+    }
+
     pub fn as_read(&self) -> Option<&Selection> {
         if let Self::Read(v) = self {
             Some(v)
         } else {
             None
+        }
+    }
+
+    pub fn arguments(&self) -> &[(String, ArgumentValue)] {
+        match self {
+            Operation::Read(x) => x.arguments(),
+            Operation::Write(x) => x.arguments(),
         }
     }
 }

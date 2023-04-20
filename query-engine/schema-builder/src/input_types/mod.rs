@@ -7,11 +7,11 @@ use fields::*;
 use prisma_models::ScalarFieldRef;
 use schema::*;
 
-fn map_scalar_input_type_for_field(ctx: &mut BuilderContext, field: &ScalarFieldRef) -> InputType {
-    map_scalar_input_type(ctx, &field.type_identifier, field.is_list())
+fn map_scalar_input_type_for_field(ctx: &mut BuilderContext<'_>, field: &ScalarFieldRef) -> InputType {
+    map_scalar_input_type(ctx, &field.type_identifier(), field.is_list())
 }
 
-fn map_scalar_input_type(ctx: &mut BuilderContext, typ: &TypeIdentifier, list: bool) -> InputType {
+fn map_scalar_input_type(ctx: &mut BuilderContext<'_>, typ: &TypeIdentifier, list: bool) -> InputType {
     let typ = match typ {
         TypeIdentifier::String => InputType::string(),
         TypeIdentifier::Int => InputType::int(),
@@ -21,7 +21,7 @@ fn map_scalar_input_type(ctx: &mut BuilderContext, typ: &TypeIdentifier, list: b
         TypeIdentifier::UUID => InputType::uuid(),
         TypeIdentifier::DateTime => InputType::date_time(),
         TypeIdentifier::Json => InputType::json(),
-        TypeIdentifier::Enum(e) => InputType::enum_type(map_schema_enum_type(ctx, e)),
+        TypeIdentifier::Enum(id) => InputType::enum_type(map_schema_enum_type(ctx, *id)),
         TypeIdentifier::Xml => InputType::xml(),
         TypeIdentifier::Bytes => InputType::bytes(),
         TypeIdentifier::BigInt => InputType::bigint(),
@@ -37,14 +37,14 @@ fn map_scalar_input_type(ctx: &mut BuilderContext, typ: &TypeIdentifier, list: b
 
 /// Convenience function to return [object_type, list_object_type]
 /// (shorthand + full type) if the field is a list.
-fn list_union_object_type(input: InputObjectTypeWeakRef, as_list: bool) -> Vec<InputType> {
+pub(crate) fn list_union_object_type(input: InputObjectTypeId, as_list: bool) -> Vec<InputType> {
     let input_type = InputType::object(input);
     list_union_type(input_type, as_list)
 }
 
 /// Convenience function to return [input_type, list_input_type]
 /// (shorthand + full type) if the field is a list.
-fn list_union_type(input_type: InputType, as_list: bool) -> Vec<InputType> {
+pub(crate) fn list_union_type(input_type: InputType, as_list: bool) -> Vec<InputType> {
     if as_list {
         vec![input_type.clone(), InputType::list(input_type)]
     } else {
@@ -52,9 +52,12 @@ fn list_union_type(input_type: InputType, as_list: bool) -> Vec<InputType> {
     }
 }
 
-fn compound_object_name(alias: Option<&String>, from_fields: &[ScalarFieldRef]) -> String {
-    alias.map(capitalize).unwrap_or_else(|| {
-        let field_names: Vec<String> = from_fields.iter().map(|field| capitalize(&field.name)).collect();
+fn compound_object_name(alias: Option<&str>, from_fields: &[ScalarFieldRef]) -> String {
+    alias.map(|a| capitalize(a).to_string()).unwrap_or_else(|| {
+        let field_names: Vec<String> = from_fields
+            .iter()
+            .map(|field| capitalize(field.name()).to_string())
+            .collect();
         field_names.join("")
     })
 }

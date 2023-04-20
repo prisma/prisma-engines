@@ -1,12 +1,14 @@
-use crate::{context::PrismaContext, opt::PrismaOpt, PrismaResult};
+use crate::context::PrismaContext;
+use crate::features::Feature;
+use crate::{opt::PrismaOpt, PrismaResult};
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
-use opentelemetry::{global, propagation::Extractor, Context};
-use psl::PreviewFeature;
-use query_core::schema::QuerySchemaRef;
-use query_core::{schema::QuerySchemaRenderer, TxId};
-use query_engine_metrics::{MetricFormat, MetricRegistry};
-use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler, TxInput};
+use opentelemetry::trace::TraceContextExt;
+use opentelemetry::{global, propagation::Extractor};
+use query_core::helpers::*;
+use query_core::telemetry::capturing::TxTraceExt;
+use query_core::{telemetry, ExtendedTransactionUserFacingError, TransactionOptions, TxId};
+use request_handlers::{dmmf, render_graphql_schema, RequestBody, RequestHandler};
 use serde_json::json;
 use std::collections::HashMap;
 use std::net::SocketAddr;
@@ -15,93 +17,11 @@ use std::time::Instant;
 use tracing::{field, Instrument, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
-const TRANSACTION_ID_HEADER: &str = "X-transaction-id";
-
-//// Shared application state.
-pub struct State {
-    cx: Arc<PrismaContext>,
-    enable_playground: bool,
-    enable_debug_mode: bool,
-    enable_metrics: bool,
-}
-
-impl State {
-    /// Create a new instance of `State`.
-    fn new(cx: PrismaContext) -> Self {
-        Self {
-            cx: Arc::new(cx),
-            enable_playground: false,
-            enable_debug_mode: false,
-            enable_metrics: false,
-        }
-    }
-
-    pub fn enable_playground(mut self, enable: bool) -> Self {
-        self.enable_playground = enable;
-        self
-    }
-
-    pub fn enable_debug_mode(mut self, enable: bool) -> Self {
-        self.enable_debug_mode = enable;
-        self
-    }
-
-    pub fn enable_metrics(mut self, enable: bool) -> Self {
-        self.enable_metrics = enable;
-        self
-    }
-
-    pub fn get_metrics(&self) -> MetricRegistry {
-        self.cx.metrics.clone()
-    }
-
-    pub fn query_schema(&self) -> &QuerySchemaRef {
-        self.cx.query_schema()
-    }
-}
-
-impl Clone for State {
-    fn clone(&self) -> Self {
-        Self {
-            cx: self.cx.clone(),
-            enable_playground: self.enable_playground,
-            enable_debug_mode: self.enable_debug_mode,
-            enable_metrics: self.enable_metrics,
-        }
-    }
-}
-
-pub async fn setup(opts: &PrismaOpt, metrics: MetricRegistry) -> PrismaResult<State> {
-    let datamodel = opts.schema(false)?;
-    let config = &datamodel.configuration;
-    config.validate_that_one_datasource_is_provided()?;
-
-    let span = tracing::info_span!("prisma:engine:connect");
-
-    let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics) || opts.dataproxy_metric_override;
-
-    let cx = PrismaContext::builder(datamodel)
-        .set_metrics(metrics)
-        .enable_raw_queries(opts.enable_raw_queries)
-        .build()
-        .instrument(span)
-        .await?;
-
-    let state = State::new(cx)
-        .enable_playground(opts.enable_playground)
-        .enable_debug_mode(opts.enable_debug_mode)
-        .enable_metrics(enable_metrics);
-
-    Ok(state)
-}
-
 /// Starts up the graphql query engine server
-pub async fn listen(opts: PrismaOpt, metrics: MetricRegistry) -> PrismaResult<()> {
-    let state = setup(&opts, metrics).await?;
-
+pub async fn listen(cx: Arc<PrismaContext>, opts: &PrismaOpt) -> PrismaResult<()> {
     let query_engine = make_service_fn(move |_| {
-        let state = state.clone();
-        async move { Ok::<_, hyper::Error>(service_fn(move |req| routes(state.clone(), req))) }
+        let cx = cx.clone();
+        async move { Ok::<_, hyper::Error>(service_fn(move |req| routes(cx.clone(), req))) }
     });
 
     let ip = opts.host.parse().expect("Host was not a valid IP address.");
@@ -112,29 +32,29 @@ pub async fn listen(opts: PrismaOpt, metrics: MetricRegistry) -> PrismaResult<()
     info!("Started query engine http server on http://{}", addr);
 
     if let Err(e) = server.await {
-        eprintln!("server error: {}", e);
+        eprintln!("server error: {e}");
     }
 
     Ok(())
 }
 
-pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+pub async fn routes(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     let start = Instant::now();
 
-    if req.method() == Method::POST && req.uri().path().contains("transaction") {
-        return handle_transaction(state, req).await;
+    if req.method() == Method::POST && req.uri().path().starts_with("/transaction") {
+        return transaction_handler(cx, req).await;
     }
 
     if [Method::POST, Method::GET].contains(req.method())
-        && req.uri().path().contains("metrics")
-        && state.enable_metrics
+        && req.uri().path().starts_with("/metrics")
+        && cx.enabled_features.contains(Feature::Metrics)
     {
-        return handle_metrics(state, req).await;
+        return metrics_handler(cx, req).await;
     }
 
     let mut res = match (req.method(), req.uri().path()) {
-        (&Method::POST, "/") => graphql_handler(state, req).await?,
-        (&Method::GET, "/") if state.enable_playground => playground_handler(),
+        (&Method::POST, "/") => request_handler(cx, req).await?,
+        (&Method::GET, "/") if cx.enabled_features.contains(Feature::Playground) => playground_handler(),
         (&Method::GET, "/status") => Response::builder()
             .status(StatusCode::OK)
             .header(CONTENT_TYPE, "application/json")
@@ -142,7 +62,7 @@ pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, 
             .unwrap(),
 
         (&Method::GET, "/sdl") => {
-            let schema = GraphQLSchemaRenderer::render(state.cx.query_schema().clone());
+            let schema = render_graphql_schema(cx.query_schema().clone());
 
             Response::builder()
                 .status(StatusCode::OK)
@@ -152,7 +72,7 @@ pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, 
         }
 
         (&Method::GET, "/dmmf") => {
-            let schema = dmmf::render_dmmf(Arc::clone(state.cx.query_schema()));
+            let schema = dmmf::render_dmmf(Arc::clone(cx.query_schema()));
 
             Response::builder()
                 .status(StatusCode::OK)
@@ -165,7 +85,7 @@ pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, 
             let body = json!({
                 "commit": env!("GIT_HASH"),
                 "version": env!("CARGO_PKG_VERSION"),
-                "primary_connector": state.cx.primary_connector(),
+                "primary_connector": cx.primary_connector(),
             });
 
             Response::builder()
@@ -186,42 +106,86 @@ pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, 
     Ok(res)
 }
 
-/// The main query handler. This handles incoming GraphQL queries and passes it
+/// The main query handler. This handles incoming requests and passes it
 /// to the query engine.
-async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     // Check for debug headers if enabled.
-    if state.enable_debug_mode {
+    if cx.enabled_features.contains(Feature::DebugMode) {
         return Ok(handle_debug_headers(&req));
     }
 
-    let tx_id = get_transaction_id_from_header(&req);
+    let headers = req.headers();
+    let capture_settings = capture_settings(headers);
+
+    let tx_id = transaction_id(headers);
+    let tracing_cx = get_parent_span_context(headers);
 
     let span = if tx_id.is_none() {
-        let cx = get_parent_span_context(&req);
         let span = info_span!("prisma:engine", user_facing = true);
-        span.set_parent(cx);
+        span.set_parent(tracing_cx);
         span
     } else {
         Span::none()
     };
 
-    let trace_id = match req.headers().get("traceparent") {
-        Some(traceparent) => {
-            let s = traceparent.to_str().unwrap_or_default().to_string();
-            Some(s)
+    let mut traceparent = traceparent(headers);
+    let mut trace_id = get_trace_id_from_traceparent(traceparent.as_deref());
+
+    if traceparent.is_none() {
+        // If telemetry needs to be captured, we use the span trace_id to correlate the logs happening
+        // during the different operations within a transaction. The trace_id is propagated in the
+        // traceparent header, but if it's not present, we need to synthetically create one for the
+        // transaction. This is needed, in case the client is interested in capturing logs and not
+        // traces, because:
+        //  - The client won't send a traceparent header
+        //  - A transaction initial span is created here (prisma:engine:itx_runner) and stored in the
+        //    ITXServer for that transaction
+        //  - When a query comes in, the graphql handler process it, but we need to tell the capturer
+        //    to start capturing logs, and for that we need a trace_id. There are two places were we
+        //    could get that information from:
+        //      - First, it's the traceparent, but the client didn't send it, because they are only
+        //      interested in logs.
+        //      - Second, it's the root span for the transaction, but it's not in scope but instead
+        //      stored in the ITXServer, in a different tokio task.
+        //
+        // For the above reasons, we need to create a trace_id that we can predict and use accross the
+        // different operations happening within a transaction. So we do it by converting the tx_id
+        // into a trace_id, leaning on the fact that the tx_id has more entropy, and there's no
+        // information loss.
+        if capture_settings.logs_enabled() && tx_id.is_some() {
+            let tx_id = tx_id.clone().unwrap();
+            traceparent = Some(tx_id.as_traceparent());
+            trace_id = tx_id.into_trace_id();
+        } else {
+            // this is the root span, and we are in a single operation.
+            traceparent = Some(get_trace_parent_from_span(&span));
+            trace_id = get_trace_id_from_span(&span);
         }
-        _ => None,
-    };
+    }
+    let capture_config = telemetry::capturing::capturer(trace_id, capture_settings);
+
+    if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
+        capturer.start_capturing().await;
+    }
+
+    let body_start = req.into_body();
+    // block and buffer request until the request has completed
+    let full_body = hyper::body::to_bytes(body_start).await?;
+    let serialized_body = RequestBody::try_from_slice(full_body.as_ref(), cx.engine_protocol());
 
     let work = async move {
-        let body_start = req.into_body();
-        // block and buffer request until the request has completed
-        let full_body = hyper::body::to_bytes(body_start).await?;
-
-        match serde_json::from_slice(full_body.as_ref()) {
+        match serialized_body {
             Ok(body) => {
-                let handler = GraphQlHandler::new(&*state.cx.executor, state.cx.query_schema());
-                let result = handler.handle(body, tx_id, trace_id).instrument(span).await;
+                let handler = RequestHandler::new(cx.executor(), cx.query_schema(), cx.engine_protocol());
+                let mut result = handler.handle(body, tx_id, traceparent).instrument(span).await;
+
+                if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
+                    let telemetry = capturer.fetch_captures().await;
+                    if let Some(telemetry) = telemetry {
+                        result.set_extension("traces".to_owned(), json!(telemetry.traces));
+                        result.set_extension("logs".to_owned(), json!(telemetry.logs));
+                    }
+                }
 
                 let result_bytes = serde_json::to_vec(&result).unwrap();
 
@@ -233,10 +197,20 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
 
                 Ok(res)
             }
-            Err(_e) => {
+            Err(e) => {
+                let ufe: user_facing_errors::Error = request_handlers::HandlerError::query_conversion(format!(
+                    "Error parsing {:?} query. {}",
+                    cx.engine_protocol(),
+                    e
+                ))
+                .into();
+
+                let result_bytes = serde_json::to_vec(&ufe).unwrap();
+
                 let res = Response::builder()
-                    .status(StatusCode::BAD_REQUEST)
-                    .body(Body::empty())
+                    .status(StatusCode::UNPROCESSABLE_ENTITY) // 422
+                    .header(CONTENT_TYPE, "application/json")
+                    .body(Body::from(result_bytes))
                     .unwrap();
 
                 Ok(res)
@@ -263,17 +237,8 @@ fn playground_handler() -> Response<Body> {
         .unwrap()
 }
 
-async fn handle_metrics(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
-    let format = if let Some(query) = req.uri().query() {
-        if query.contains("format=json") {
-            MetricFormat::Json
-        } else {
-            MetricFormat::Prometheus
-        }
-    } else {
-        MetricFormat::Prometheus
-    };
-
+async fn metrics_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+    let requested_json = req.uri().query().map(|q| q.contains("format=json")).unwrap_or_default();
     let body_start = req.into_body();
     // block and buffer request until the request has completed
     let full_body = hyper::body::to_bytes(body_start).await?;
@@ -283,101 +248,119 @@ async fn handle_metrics(state: State, req: Request<Body>) -> Result<Response<Bod
         Err(_e) => HashMap::new(),
     };
 
-    if format == MetricFormat::Json {
-        let metrics = state.cx.metrics.to_json(global_labels);
+    let response = if requested_json {
+        let metrics = cx.metrics.to_json(global_labels);
 
-        let res = Response::builder()
+        Response::builder()
             .status(StatusCode::OK)
             .header(CONTENT_TYPE, "application/json")
             .body(Body::from(metrics.to_string()))
-            .unwrap();
+            .unwrap()
+    } else {
+        let metrics = cx.metrics.to_prometheus(global_labels);
 
-        return Ok(res);
-    }
+        Response::builder()
+            .status(StatusCode::OK)
+            .header(CONTENT_TYPE, "text/plain; version=0.0.4")
+            .body(Body::from(metrics))
+            .unwrap()
+    };
 
-    let metrics = state.cx.metrics.to_prometheus(global_labels);
-
-    let res = Response::builder()
-        .status(StatusCode::OK)
-        .header(CONTENT_TYPE, "text/plain; version=0.0.4")
-        .body(Body::from(metrics))
-        .unwrap();
-
-    Ok(res)
+    Ok(response)
 }
 
 /// Sadly the routing doesn't make it obvious what the transaction routes are:
 /// POST /transaction/start -> start a transaction
 /// POST /transaction/{tx_id}/commit -> commit a transaction
 /// POST /transaction/{tx_id}/rollback -> rollback a transaction
-async fn handle_transaction(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
-    let path = req.uri().path();
-
-    if path.contains("start") {
-        return transaction_start_handler(state, req).await;
-    }
-
+async fn transaction_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+    let path = req.uri().path().to_owned();
     let sections: Vec<&str> = path.split('/').collect();
 
-    if sections.len() < 2 {
-        return Ok(Response::builder()
-            .status(StatusCode::INTERNAL_SERVER_ERROR)
-            .body(Body::from("Request does not contain the transaction id"))
-            .unwrap());
+    if sections.len() == 3 && sections[2] == "start" {
+        return transaction_start_handler(cx, req).await;
     }
 
-    let tx_id: TxId = sections[2].into();
+    if sections.len() == 4 && sections[3] == "commit" {
+        return transaction_commit_handler(cx, req, sections[2].into()).await;
+    }
 
-    let succuss_resp = Response::builder()
-        .status(StatusCode::OK)
-        .header(CONTENT_TYPE, "application/json")
-        .body(Body::from(r#"{}"#))
+    if sections.len() == 4 && sections[3] == "rollback" {
+        return transaction_rollback_handler(cx, req, sections[2].into()).await;
+    }
+
+    let res = Response::builder()
+        .status(StatusCode::BAD_REQUEST)
+        .body(Body::from(format!("wrong transaction handler path: {}", &path)))
         .unwrap();
-
-    if path.contains("commit") {
-        match state.cx.executor.commit_tx(tx_id).await {
-            Ok(_) => Ok(succuss_resp),
-            Err(err) => Ok(err_to_http_resp(err)),
-        }
-    } else if path.contains("rollback") {
-        match state.cx.executor.rollback_tx(tx_id).await {
-            Ok(_) => Ok(succuss_resp),
-            Err(err) => Ok(err_to_http_resp(err)),
-        }
-    } else {
-        let res = Response::builder()
-            .status(StatusCode::BAD_REQUEST)
-            .body(Body::empty())
-            .unwrap();
-        Ok(res)
-    }
+    Ok(res)
 }
 
-async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
-    let cx = get_parent_span_context(&req);
+async fn transaction_start_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+    let headers = req.headers().to_owned();
 
     let body_start = req.into_body();
-    // block and buffer request until the request has completed
     let full_body = hyper::body::to_bytes(body_start).await?;
-    let input: TxInput = serde_json::from_slice(full_body.as_ref()).unwrap();
+    let mut tx_opts: TransactionOptions = serde_json::from_slice(full_body.as_ref()).unwrap();
+    let tx_id = tx_opts.with_new_transaction_id();
 
-    let span = tracing::info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
-    span.set_parent(cx);
+    // This is the span we use to instrument the execution of a transaction. This span will be open
+    // during the tx execution, and held in the ITXServer for that transaction (see ITXServer])
+    let span = info_span!("prisma:engine:itx_runner", user_facing = true, itx_id = field::Empty);
 
-    match state
-        .cx
+    // If telemetry needs to be captured, we use the span trace_id to correlate the logs happening
+    // during the different operations within a transaction. The trace_id is propagated in the
+    // traceparent header, but if it's not present, we need to synthetically create one for the
+    // transaction. This is needed, in case the client is interested in capturing logs and not
+    // traces, because:
+    //  - The client won't send a traceparent header
+    //  - A transaction initial span is created here (prisma:engine:itx_runner) and stored in the
+    //    ITXServer for that transaction
+    //  - When a query comes in, the graphql handler process it, but we need to tell the capturer
+    //    to start capturing logs, and for that we need a trace_id. There are two places were we
+    //    could get that information from:
+    //      - First, it's the traceparent, but the client didn't send it, because they are only
+    //      interested in logs.
+    //      - Second, it's the root span for the transaction, but it's not in scope but instead
+    //      stored in the ITXServer, in a different tokio task.
+    //
+    // For the above reasons, we need to create a trace_id that we can predict and use accross the
+    // different operations happening within a transaction. So we do it by converting the tx_id
+    // into a trace_id, leaning on the fact that the tx_id has more entropy, and there's no
+    // information loss.
+    let capture_settings = capture_settings(&headers);
+    let traceparent = traceparent(&headers);
+    if traceparent.is_none() && capture_settings.logs_enabled() {
+        span.set_parent(tx_id.into_trace_context())
+    } else {
+        span.set_parent(get_parent_span_context(&headers))
+    }
+    let trace_id = span.context().span().span_context().trace_id();
+    let capture_config = telemetry::capturing::capturer(trace_id, capture_settings);
+
+    if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
+        capturer.start_capturing().await;
+    }
+
+    let result = cx
         .executor
-        .start_tx(
-            state.cx.query_schema().clone(),
-            input.max_wait,
-            input.timeout,
-            input.isolation_level,
-        )
+        .start_tx(cx.query_schema().clone(), cx.engine_protocol(), tx_opts)
         .instrument(span)
-        .await
-    {
+        .await;
+
+    let telemetry = if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
+        capturer.fetch_captures().await
+    } else {
+        None
+    };
+
+    match result {
         Ok(tx_id) => {
-            let result = json!({ "id": tx_id.to_string() });
+            let result = if let Some(telemetry) = telemetry {
+                json!({ "id": tx_id.to_string(), "extensions": { "logs": json!(telemetry.logs), "traces": json!(telemetry.traces) } })
+            } else {
+                json!({ "id": tx_id.to_string() })
+            };
             let result_bytes = serde_json::to_vec(&result).unwrap();
 
             let res = Response::builder()
@@ -385,22 +368,59 @@ async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<R
                 .header(CONTENT_TYPE, "application/json")
                 .body(Body::from(result_bytes))
                 .unwrap();
-
             Ok(res)
         }
-        Err(err) => Ok(err_to_http_resp(err)),
+        Err(err) => Ok(err_to_http_resp(err, telemetry)),
     }
 }
 
-fn get_transaction_id_from_header(req: &Request<Body>) -> Option<TxId> {
-    match req.headers().get(TRANSACTION_ID_HEADER) {
-        Some(id_header) => {
-            let msg = format!("{} has not been correctly set.", TRANSACTION_ID_HEADER);
-            let id = id_header.to_str().unwrap_or(msg.as_str());
-            Some(TxId::from(id))
-        }
+async fn transaction_commit_handler(
+    cx: Arc<PrismaContext>,
+    req: Request<Body>,
+    tx_id: TxId,
+) -> Result<Response<Body>, hyper::Error> {
+    let capture_config = capture_config(req.headers(), tx_id.clone());
 
-        None => None,
+    if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
+        capturer.start_capturing().await;
+    }
+
+    let result = cx.executor.commit_tx(tx_id).await;
+
+    let telemetry = if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
+        capturer.fetch_captures().await
+    } else {
+        None
+    };
+
+    match result {
+        Ok(_) => Ok(empty_json_to_http_resp(telemetry)),
+        Err(err) => Ok(err_to_http_resp(err, telemetry)),
+    }
+}
+
+async fn transaction_rollback_handler(
+    cx: Arc<PrismaContext>,
+    req: Request<Body>,
+    tx_id: TxId,
+) -> Result<Response<Body>, hyper::Error> {
+    let capture_config = capture_config(req.headers(), tx_id.clone());
+
+    if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
+        capturer.start_capturing().await;
+    }
+
+    let result = cx.executor.rollback_tx(tx_id).await;
+
+    let telemetry = if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
+        capturer.fetch_captures().await
+    } else {
+        None
+    };
+
+    match result {
+        Ok(_) => Ok(empty_json_to_http_resp(telemetry)),
+        Err(err) => Ok(err_to_http_resp(err, telemetry)),
     }
 }
 
@@ -439,14 +459,25 @@ impl<'a> Extractor for HeaderExtractor<'a> {
     }
 }
 
-/// If the client sends us a trace and span id, extracting a new context if the
-/// headers are set. If not, returns current context.
-fn get_parent_span_context(req: &Request<Body>) -> Context {
-    let extractor = HeaderExtractor(req.headers());
-    global::get_text_map_propagator(|propagator| propagator.extract(&extractor))
+fn empty_json_to_http_resp(captured_telemetry: Option<telemetry::capturing::storage::Storage>) -> Response<Body> {
+    let result = if let Some(telemetry) = captured_telemetry {
+        json!({ "extensions": { "logs": json!(telemetry.logs), "traces": json!(telemetry.traces) } })
+    } else {
+        json!({})
+    };
+    let result_bytes = serde_json::to_vec(&result).unwrap();
+
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(CONTENT_TYPE, "application/json")
+        .body(Body::from(result_bytes))
+        .unwrap()
 }
 
-fn err_to_http_resp(err: query_core::CoreError) -> Response<Body> {
+fn err_to_http_resp(
+    err: query_core::CoreError,
+    captured_telemetry: Option<telemetry::capturing::storage::Storage>,
+) -> Response<Body> {
     let status = match err {
         query_core::CoreError::TransactionError(ref err) => match err {
             query_core::TransactionError::AcquisitionTimeout => 504,
@@ -460,8 +491,64 @@ fn err_to_http_resp(err: query_core::CoreError) -> Response<Body> {
         _ => 500,
     };
 
-    let user_error: user_facing_errors::Error = err.into();
-    let body = Body::from(serde_json::to_vec(&user_error).unwrap());
-
+    let mut err: ExtendedTransactionUserFacingError = err.into();
+    if let Some(telemetry) = captured_telemetry {
+        err.set_extension("traces".to_owned(), json!(telemetry.traces));
+        err.set_extension("logs".to_owned(), json!(telemetry.logs));
+    }
+    let body = Body::from(serde_json::to_vec(&err).unwrap());
     Response::builder().status(status).body(body).unwrap()
+}
+
+fn capture_config(headers: &HeaderMap, tx_id: TxId) -> telemetry::capturing::Capturer {
+    let capture_settings = capture_settings(headers);
+    let mut traceparent = traceparent(headers);
+
+    if traceparent.is_none() && capture_settings.is_enabled() {
+        traceparent = Some(tx_id.as_traceparent())
+    }
+
+    let trace_id = get_trace_id_from_traceparent(traceparent.as_deref());
+
+    telemetry::capturing::capturer(trace_id, capture_settings)
+}
+
+#[allow(clippy::bind_instead_of_map)]
+fn capture_settings(headers: &HeaderMap) -> telemetry::capturing::Settings {
+    const CAPTURE_TELEMETRY_HEADER: &str = "X-capture-telemetry";
+    let s = if let Some(hv) = headers.get(CAPTURE_TELEMETRY_HEADER) {
+        hv.to_str().unwrap_or("")
+    } else {
+        ""
+    };
+
+    telemetry::capturing::Settings::from(s)
+}
+
+fn traceparent(headers: &HeaderMap) -> Option<String> {
+    const TRACEPARENT_HEADER: &str = "traceparent";
+
+    let value = headers
+        .get(TRACEPARENT_HEADER)
+        .and_then(|h| h.to_str().ok())
+        .map(|s| s.to_owned());
+
+    let is_valid_traceparent = |s: &String| s.split_terminator('-').count() >= 4;
+
+    value.filter(is_valid_traceparent)
+}
+
+fn transaction_id(headers: &HeaderMap) -> Option<TxId> {
+    const TRANSACTION_ID_HEADER: &str = "X-transaction-id";
+    headers
+        .get(TRANSACTION_ID_HEADER)
+        .and_then(|h| h.to_str().ok())
+        .map(TxId::from)
+}
+
+/// If the client sends us a trace and span id, extracting a new context if the
+/// headers are set. If not, returns current context.
+fn get_parent_span_context(headers: &HeaderMap) -> opentelemetry::Context {
+    let extractor = HeaderExtractor(headers);
+    global::get_text_map_propagator(|propagator| propagator.extract(&extractor))
 }

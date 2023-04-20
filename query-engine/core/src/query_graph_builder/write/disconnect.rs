@@ -4,7 +4,6 @@ use crate::{
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use prisma_models::RelationFieldRef;
-use std::sync::Arc;
 
 /// Only for many to many relations.
 ///
@@ -47,11 +46,11 @@ pub fn disconnect_records_node(
     let disconnect = WriteQuery::DisconnectRecords(DisconnectRecords {
         parent_id: None,
         child_ids: vec![],
-        relation_field: Arc::clone(parent_relation_field),
+        relation_field: parent_relation_field.clone(),
     });
 
     let disconnect_node = graph.create_node(Query::Write(disconnect));
-    let relation_name = parent_relation_field.relation().name.clone();
+    let relation_name = parent_relation_field.relation().name();
 
     // Edge from parent to disconnect.
     graph.create_edge(
@@ -63,8 +62,7 @@ pub fn disconnect_records_node(
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),
                     None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "No parent record was found for a nested disconnect on relation '{}'.",
-                        relation_name
+                        "No parent record was found for a nested disconnect on relation '{relation_name}'."
                     ))),
                 }?;
 
@@ -79,7 +77,7 @@ pub fn disconnect_records_node(
 
     // Edge from child to disconnect.
     graph.create_edge(
-        &child_node,
+        child_node,
         &disconnect_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model_id,

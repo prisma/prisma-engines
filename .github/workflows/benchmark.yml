@@ -1,0 +1,44 @@
+name: Benchmark
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    paths-ignore:
+      - '.buildkite/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
+      - 'renovate.json'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  benchmark:
+    name: "Run benchmarks on Linux"
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          default: true
+
+      - run: cargo bench --bench schema_builder_bench
+
+      - name: Install cargo-codspeed
+        run: cargo install cargo-codspeed
+
+      - name: Build the benchmark target(s)
+        run: cargo codspeed build
+        working-directory: ./query-engine/schema-builder
+
+      - name: Run the benchmarks
+        uses: CodSpeedHQ/action@v1
+        with:
+          run: cargo codspeed run
+          token: ${{ secrets.CODSPEED_TOKEN }}

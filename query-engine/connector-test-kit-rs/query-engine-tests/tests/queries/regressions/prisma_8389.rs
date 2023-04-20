@@ -42,14 +42,13 @@ mod prisma_8389 {
 
     async fn create_test_data(runner: &Runner) -> TestResult<()> {
         let data = (1..104)
-            .map(|n| format!("{{ id: {} }}", n))
+            .map(|n| format!("{{ id: {n} }}"))
             .collect::<Vec<String>>()
             .join(", ");
 
         runner
             .query(format!(
-                "mutation {{ createManyTestModel(data: [{}]) {{ count }} }}",
-                data
+                "mutation {{ createManyTestModel(data: [{data}]) {{ count }} }}"
             ))
             .await?
             .assert_success();

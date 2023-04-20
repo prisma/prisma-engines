@@ -186,8 +186,8 @@ pub async fn update_records<'conn>(
     let filter = doc! { id_field.db_name(): { "$in": ids.clone() } };
     let fields: Vec<_> = model
         .fields()
-        .all
-        .iter()
+        .filter_all(|_| true)
+        .into_iter()
         .filter_map(|field| {
             args.take_field_value(field.db_name())
                 .map(|write_op| (field.clone(), write_op))
@@ -210,7 +210,10 @@ pub async fn update_records<'conn>(
         .instrument(span)
         .await?;
 
-        if update_type == UpdateType::Many && res.modified_count == 0 {
+        // It's important we check the `matched_count` and not the `modified_count` here.
+        // MongoDB returns `modified_count: 0` when performing a noop update, which breaks
+        // nested connect mutations as it rely on the returned count to know whether the update happened.
+        if update_type == UpdateType::Many && res.matched_count == 0 {
             return Ok(Vec::new());
         }
     }
@@ -326,7 +329,7 @@ pub async fn m2m_connect<'conn>(
     let parent_id = parent_id.values().next().unwrap();
     let parent_id_field = pick_singular_id(&parent_model);
 
-    let parent_ids_scalar_field_name = field.relation_info.fields.get(0).unwrap();
+    let parent_ids_scalar_field_name = field.walker().fields().unwrap().next().unwrap().name().to_owned();
     let parent_id = (&parent_id_field, parent_id)
         .into_bson()
         .decorate_with_scalar_field_info(&parent_id_field)?;
@@ -354,7 +357,16 @@ pub async fn m2m_connect<'conn>(
 
     // Then update all children and add the parent
     let child_filter = doc! { "_id": { "$in": child_ids } };
-    let child_ids_scalar_field_name = field.related_field().relation_info.fields.get(0).unwrap().clone();
+    let child_ids_scalar_field_name = field
+        .walker()
+        .opposite_relation_field()
+        .unwrap()
+        .fields()
+        .unwrap()
+        .next()
+        .unwrap()
+        .name()
+        .to_owned();
     let child_update = doc! { "$addToSet": { child_ids_scalar_field_name: parent_id } };
 
     let child_updates = vec![child_update.clone()];
@@ -383,7 +395,7 @@ pub async fn m2m_disconnect<'conn>(
     let parent_id = parent_id.values().next().unwrap();
     let parent_id_field = pick_singular_id(&parent_model);
 
-    let parent_ids_scalar_field_name = field.relation_info.fields.get(0).unwrap();
+    let parent_ids_scalar_field_name = field.walker().fields().unwrap().next().unwrap().name().to_owned();
     let parent_id = (&parent_id_field, parent_id)
         .into_bson()
         .decorate_with_scalar_field_info(&parent_id_field)?;
@@ -411,7 +423,16 @@ pub async fn m2m_disconnect<'conn>(
 
     // Then update all children and add the parent
     let child_filter = doc! { "_id": { "$in": child_ids } };
-    let child_ids_scalar_field_name = field.related_field().relation_info.fields.get(0).unwrap().clone();
+    let child_ids_scalar_field_name = field
+        .walker()
+        .opposite_relation_field()
+        .unwrap()
+        .fields()
+        .unwrap()
+        .next()
+        .unwrap()
+        .name()
+        .to_owned();
 
     let child_update = doc! { "$pull": { child_ids_scalar_field_name: parent_id } };
 

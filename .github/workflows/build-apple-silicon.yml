@@ -42,13 +42,12 @@ jobs:
       - run: xcodebuild -showsdks
 
       - run: |
-          cargo build --target=aarch64-apple-darwin --release -p query-engine -p query-engine-node-api -p migration-engine-cli -p introspection-core -p prisma-fmt
+          cargo build --target=aarch64-apple-darwin --release -p query-engine -p query-engine-node-api -p schema-engine-cli -p prisma-fmt
 
       - uses: actions/upload-artifact@v3
         with:
           name: binaries
           path: |
-            ${{ github.workspace }}/target/aarch64-apple-darwin/release/introspection-engine
             ${{ github.workspace }}/target/aarch64-apple-darwin/release/migration-engine
             ${{ github.workspace }}/target/aarch64-apple-darwin/release/prisma-fmt
             ${{ github.workspace }}/target/aarch64-apple-darwin/release/query-engine

@@ -1,7 +1,7 @@
 # Prisma Engines
 
 [![Query Engine](https://github.com/prisma/prisma-engines/actions/workflows/query-engine.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/query-engine.yml)
-[![Introspection Engine + Migration Engine + sql_schema_describer](https://github.com/prisma/prisma-engines/actions/workflows/migration-engine.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/migration-engine.yml)
+[![Schema Engine + sql_schema_describer](https://github.com/prisma/prisma-engines/actions/workflows/schema-engine.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/schema-engine.yml)
 [![Cargo docs](https://github.com/prisma/prisma-engines/actions/workflows/cargo-doc.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/cargo-doc.yml)
 
 This repository contains a collection of engines that power the core stack for
@@ -20,9 +20,7 @@ and test them.
 This repository contains four engines:
 
 - *Query engine*, used by the client to run database queries from Prisma Client
-- *Migration engine*, used to create and run migrations
-- *Introspection engine*, used to get the state of the database, compare it
-    to the schema file, and figure out what the differences are
+- *Schema engine*, used to create and run migrations and introspection
 - *Prisma Format*, used to format prisma files
 
 Additionally, the *psl* (Prisma Schema Language) is the library that defines how
@@ -73,9 +71,10 @@ compiled binaries inside the repository root in the `target/debug` (without
 | Prisma Component     | Path to Binary                                   |
 | -------------------- | ------------------------------------------------ |
 | Query Engine         | `./target/[debug\|release]/query-engine`         |
-| Migration Engine     | `./target/[debug\|release]/migration-engine`     |
-| Introspection Engine | `./target/[debug\|release]/introspection-engine` |
+| Schema Engine        | `./target/[debug\|release]/migration-engine`(*)  |
 | Prisma Format        | `./target/[debug\|release]/prisma-fmt`           |
+
+(*) Will be renamed to schema-engine in Prisma 5.
 
 ## Prisma Schema Language
 
@@ -83,7 +82,7 @@ The *Prisma Schema Language* is a library which defines the data structures and
 parsing rules for prisma files, including the available database connectors. For
 more technical details, please check the [library README](./psl/README.md).
 
-The PSL is used throughout the migration and introspection engines, as well as
+The PSL is used throughout the schema engine, as well as
 prisma format. The DataModeL (DML), which is an annotated version of the PSL is
 also used as input for the query engine.
 
@@ -148,35 +147,20 @@ Prometheus will scrape the `/metrics` endpoint to collect the engine's metrics
 
 Navigate to `http://localhost:3000` to view the Grafana dashboard.
 
-## Migration Engine
+## Schema Engine
 
-The *Migration Engine* does a couple of things:
+The *Schema Engine* does a couple of things:
 - creates new migrations by comparing the prisma file with the current state of
     the database, in order to bring the database in sync with the prisma file
 - run these migrations and keeps track of which migrations have been executed
+- (re-)generate a prisma schema file starting from a live database
 
 The engine uses:
 - the prisma files, as the source of truth
 - the database it connects to, for diffing and running migrations, as well as
-    keeping track of migrations in the `_prisma_migrations` table
+  keeping track of migrations in the `_prisma_migrations` table
 - the `prisma/migrations` directory which acts as a database of existing
-    migrations
-
-For more information about the migrations engine, check the [crate
-README](./migration-engine/README.md).
-
-## Introspection Engine
-
-The *Introspection Engine* is able to (re-)generate a prisma file starting from
-a live database.
-
-In a way, it's the opposite of the migration engine: whereas the migration
-engine uses the prisma file as the source of truth to update the database, the
-introspection engine reverses that dependency. It inspects the database, and
-generates a prisma schema file as a result.
-
-For more information about the introspection engine, check the [crate README
-](./introspection-engine/README.md).
+  migrations
 
 ## Prisma format
 

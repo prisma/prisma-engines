@@ -1,8 +1,6 @@
 use super::*;
 use crate::*;
-
 use prisma_models::*;
-use std::sync::Arc;
 
 impl ScalarCompare for ScalarFieldRef {
     /// Field is in a given value
@@ -11,7 +9,7 @@ impl ScalarCompare for ScalarFieldRef {
         T: Into<ConditionListValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             condition: ScalarCondition::In(values.into()),
             mode: QueryMode::Default,
         })
@@ -23,7 +21,7 @@ impl ScalarCompare for ScalarFieldRef {
         T: Into<ConditionListValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             condition: ScalarCondition::NotIn(values.into()),
             mode: QueryMode::Default,
         })
@@ -35,7 +33,7 @@ impl ScalarCompare for ScalarFieldRef {
         T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             condition: ScalarCondition::Equals(val.into()),
             mode: QueryMode::Default,
         })
@@ -47,7 +45,7 @@ impl ScalarCompare for ScalarFieldRef {
         T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             condition: ScalarCondition::NotEquals(val.into()),
             mode: QueryMode::Default,
         })
@@ -59,7 +57,7 @@ impl ScalarCompare for ScalarFieldRef {
         T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             condition: ScalarCondition::Contains(val.into()),
             mode: QueryMode::Default,
         })
@@ -71,7 +69,7 @@ impl ScalarCompare for ScalarFieldRef {
         T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             condition: ScalarCondition::NotContains(val.into()),
             mode: QueryMode::Default,
         })
@@ -83,7 +81,7 @@ impl ScalarCompare for ScalarFieldRef {
         T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             condition: ScalarCondition::StartsWith(val.into()),
             mode: QueryMode::Default,
         })
@@ -95,7 +93,7 @@ impl ScalarCompare for ScalarFieldRef {
         T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             condition: ScalarCondition::NotStartsWith(val.into()),
             mode: QueryMode::Default,
         })
@@ -107,7 +105,7 @@ impl ScalarCompare for ScalarFieldRef {
         T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             condition: ScalarCondition::EndsWith(val.into()),
             mode: QueryMode::Default,
         })
@@ -119,7 +117,7 @@ impl ScalarCompare for ScalarFieldRef {
         T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             condition: ScalarCondition::NotEndsWith(val.into()),
             mode: QueryMode::Default,
         })
@@ -131,7 +129,7 @@ impl ScalarCompare for ScalarFieldRef {
         T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             condition: ScalarCondition::LessThan(val.into()),
             mode: QueryMode::Default,
         })
@@ -143,7 +141,7 @@ impl ScalarCompare for ScalarFieldRef {
         T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             condition: ScalarCondition::LessThanOrEquals(val.into()),
             mode: QueryMode::Default,
         })
@@ -155,7 +153,7 @@ impl ScalarCompare for ScalarFieldRef {
         T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             condition: ScalarCondition::GreaterThan(val.into()),
             mode: QueryMode::Default,
         })
@@ -167,7 +165,7 @@ impl ScalarCompare for ScalarFieldRef {
         T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             condition: ScalarCondition::GreaterThanOrEquals(val.into()),
             mode: QueryMode::Default,
         })
@@ -178,7 +176,7 @@ impl ScalarCompare for ScalarFieldRef {
         T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             condition: ScalarCondition::Search(val.into(), vec![]),
             mode: QueryMode::Default,
         })
@@ -189,7 +187,7 @@ impl ScalarCompare for ScalarFieldRef {
         T: Into<ConditionValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             condition: ScalarCondition::NotSearch(val.into(), vec![]),
             mode: QueryMode::Default,
         })
@@ -197,7 +195,7 @@ impl ScalarCompare for ScalarFieldRef {
 
     fn is_set(&self, val: bool) -> Filter {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Single(Arc::clone(self)),
+            projection: ScalarProjection::Single(self.clone()),
             condition: ScalarCondition::IsSet(val),
             mode: QueryMode::Default,
         })

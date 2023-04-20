@@ -11,33 +11,27 @@ use indexmap::map::Entry;
 use object_renderer::*;
 use schema::*;
 use schema_renderer::*;
-use std::{
-    collections::HashSet,
-    sync::{Arc, Weak},
-};
+use std::{collections::HashSet, sync::Arc};
 use type_renderer::*;
 
-pub struct DmmfQuerySchemaRenderer;
+pub(crate) fn render(query_schema: QuerySchemaRef) -> (DmmfSchema, DmmfOperationMappings) {
+    let mut ctx = RenderContext::new(&query_schema);
+    ctx.mark_to_be_rendered(&query_schema);
 
-impl QuerySchemaRenderer<(DmmfSchema, DmmfOperationMappings)> for DmmfQuerySchemaRenderer {
-    fn render(query_schema: QuerySchemaRef) -> (DmmfSchema, DmmfOperationMappings) {
-        let mut ctx = RenderContext::new();
-        ctx.mark_to_be_rendered(&query_schema);
+    while !ctx.next_pass.is_empty() {
+        let renderers = std::mem::take(&mut ctx.next_pass);
 
-        while !ctx.next_pass.is_empty() {
-            let renderers = std::mem::take(&mut ctx.next_pass);
-
-            for renderer in renderers {
-                renderer.render(&mut ctx)
-            }
+        for renderer in renderers {
+            renderer.render(&mut ctx)
         }
-
-        ctx.finalize()
     }
+
+    ctx.finalize()
 }
 
-#[derive(Default)]
-pub struct RenderContext {
+pub(crate) struct RenderContext<'a> {
+    query_schema: &'a QuerySchema,
+
     /// Aggregator for query schema
     schema: DmmfSchema,
 
@@ -53,9 +47,15 @@ pub struct RenderContext {
     next_pass: Vec<Box<dyn Renderer>>,
 }
 
-impl RenderContext {
-    pub fn new() -> Self {
-        Self::default()
+impl<'a> RenderContext<'a> {
+    pub fn new(query_schema: &'a QuerySchema) -> Self {
+        RenderContext {
+            query_schema,
+            schema: Default::default(),
+            mappings: Default::default(),
+            rendered: Default::default(),
+            next_pass: Default::default(),
+        }
     }
 
     pub fn finalize(self) -> (DmmfSchema, DmmfOperationMappings) {
@@ -118,18 +118,11 @@ impl RenderContext {
         self.mark_as_rendered(identifier);
     }
 
-    pub fn add_mapping(&mut self, name: String, operation: Option<&QueryInfo>) {
+    pub(crate) fn add_mapping(&mut self, name: String, operation: Option<&QueryInfo>) {
         if let Some(info) = operation {
             if let Some(ref model) = info.model {
-                let model_name = model.name.clone();
-                let tag_str = match &info.tag {
-                    // If it's a QueryRaw with a query_type, then use this query_type as operation name
-                    // eg: findRaw, aggregateRaw..
-                    QueryTag::QueryRaw { query_type } if query_type.is_some() => {
-                        query_type.as_ref().unwrap().to_owned()
-                    }
-                    tag => format!("{}", tag),
-                };
+                let model_name = model.name();
+                let tag_str = info.tag.to_string();
                 let model_op = self
                     .mappings
                     .model_operations
@@ -139,7 +132,7 @@ impl RenderContext {
                 match model_op {
                     Some(existing) => existing.add_operation(tag_str, name),
                     None => {
-                        let new_mapping = DmmfModelOperations::new(model_name);
+                        let new_mapping = DmmfModelOperations::new(model_name.to_owned());
 
                         new_mapping.add_operation(tag_str, name);
                         self.mappings.model_operations.push(new_mapping);
@@ -147,15 +140,7 @@ impl RenderContext {
                 };
             } else {
                 match &info.tag {
-                    // If it's a QueryRaw with a query_type, then use this query_type as operation name
-                    // eg: runCommandRaw
-                    QueryTag::QueryRaw { query_type } if query_type.is_some() => {
-                        self.mappings
-                            .other_operations
-                            .write
-                            .push(query_type.as_ref().unwrap().to_owned());
-                    }
-                    QueryTag::ExecuteRaw | QueryTag::QueryRaw { query_type: _ } => {
+                    QueryTag::ExecuteRaw | QueryTag::QueryRaw | QueryTag::RunCommandRaw => {
                         self.mappings.other_operations.write.push(info.tag.to_string());
                     }
                     _ => unreachable!("Invalid operations mapping."),
@@ -172,7 +157,7 @@ impl RenderContext {
     }
 }
 
-pub trait Renderer {
+pub(crate) trait Renderer {
     fn render(&self, ctx: &mut RenderContext);
 }
 
@@ -206,22 +191,22 @@ impl<'a> IntoRenderer for &'a EnumType {
     }
 }
 
-impl IntoRenderer for InputObjectTypeWeakRef {
+impl IntoRenderer for InputObjectTypeId {
     fn into_renderer(&self) -> Box<dyn Renderer> {
-        Box::new(DmmfObjectRenderer::Input(Weak::clone(self)))
+        Box::new(DmmfObjectRenderer::Input(*self))
     }
 
     fn is_already_rendered(&self, ctx: &RenderContext) -> bool {
-        ctx.already_rendered(&self.into_arc().identifier)
+        ctx.already_rendered(&ctx.query_schema.db[*self].identifier)
     }
 }
 
-impl IntoRenderer for ObjectTypeWeakRef {
+impl IntoRenderer for OutputObjectTypeId {
     fn into_renderer(&self) -> Box<dyn Renderer> {
-        Box::new(DmmfObjectRenderer::Output(Weak::clone(self)))
+        Box::new(DmmfObjectRenderer::Output(*self))
     }
 
     fn is_already_rendered(&self, ctx: &RenderContext) -> bool {
-        ctx.already_rendered(&self.into_arc().identifier)
+        ctx.already_rendered(&ctx.query_schema.db[*self].identifier)
     }
 }

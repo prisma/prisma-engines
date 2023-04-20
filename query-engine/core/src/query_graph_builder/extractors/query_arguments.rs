@@ -71,7 +71,7 @@ fn extract_order_by(container: &ParentContainer, value: ParsedInputValue) -> Que
             .into_iter()
             .map(|list_value| {
                 let object: ParsedInputMap = list_value.try_into()?;
-                Ok(process_order_object(container, object, vec![], None)?)
+                process_order_object(container, object, vec![], None)
             })
             .collect::<QueryGraphBuilderResult<Vec<_>>>()
             .map(|results| results.into_iter().flatten().collect()),
@@ -136,14 +136,9 @@ fn process_order_object(
 
                     if let Some(sort_aggr) = parent_sort_aggregation {
                         // If the parent is a sort aggregation then this scalar is part of that one.
-                        Ok(Some(OrderBy::scalar_aggregation(
-                            sf.clone(),
-                            vec![],
-                            sort_order,
-                            sort_aggr,
-                        )))
+                        Ok(Some(OrderBy::scalar_aggregation(sf, vec![], sort_order, sort_aggr)))
                     } else {
-                        Ok(Some(OrderBy::scalar(sf.clone(), path, sort_order, nulls_order)))
+                        Ok(Some(OrderBy::scalar(sf, path, sort_order, nulls_order)))
                     }
                 }
 
@@ -164,7 +159,7 @@ fn process_order_object(
                     let object: ParsedInputMap = field_value.try_into()?;
                     path.push((&cf).into());
 
-                    process_order_object(&cf.typ.clone().into(), object, path, None)
+                    process_order_object(&cf.typ().into(), object, path, None)
                 }
             }
         }
@@ -185,8 +180,7 @@ fn extract_order_by_relevance(
         PrismaValue::Enum(e) => Ok(vec![PrismaValue::String(e)]),
         PrismaValue::List(l) => Ok(l),
         x => Err(QueryGraphBuilderError::InputError(format!(
-            "Expected field `fields` to be of type String, Enum or List<Enum>, found: {:?}",
-            x
+            "Expected field `fields` to be of type String, Enum or List<Enum>, found: {x:?}"
         ))),
     }?;
 
@@ -196,8 +190,7 @@ fn extract_order_by_relevance(
         .map(|field_name| match container.find_field(&field_name) {
             Some(Field::Scalar(sf)) => Ok(sf),
             _ => Err(QueryGraphBuilderError::InputError(format!(
-                "Invalid order-by reference input: Field {} is not a valid scalar field.",
-                field_name
+                "Invalid order-by reference input: Field {field_name} is not a valid scalar field."
             ))),
         })
         .collect::<Result<Vec<ScalarFieldRef>, _>>()?;
@@ -275,8 +268,7 @@ fn extract_skip(value: ParsedInputValue) -> QueryGraphBuilderResult<Option<i64>>
 
     match val {
         Some(val) if val < 0 => Err(QueryGraphBuilderError::AssertionError(format!(
-            "Invalid value for skip argument: Value can only be positive, found: {}",
-            val,
+            "Invalid value for skip argument: Value can only be positive, found: {val}",
         ))),
 
         val => Ok(val),
@@ -290,12 +282,13 @@ fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilde
     for (field_name, map_value) in input_map {
         let additional_pairs = match model.fields().find_from_scalar(&field_name) {
             Ok(field) => extract_cursor_field(field, map_value)?,
-            Err(_) => match utils::resolve_compound_field(&field_name, &model) {
+            Err(_) => match utils::resolve_compound_field(&field_name, model) {
                 Some(fields) => extract_compound_cursor_field(fields, map_value)?,
                 None => {
                     return Err(QueryGraphBuilderError::AssertionError(format!(
                         "Unable to resolve field {} to a field or a set of fields on model {}",
-                        field_name, model.name
+                        field_name,
+                        model.name()
                     )))
                 }
             },
@@ -323,7 +316,7 @@ fn extract_compound_cursor_field(
     let mut pairs = vec![];
 
     for field in fields {
-        let value = map.remove(&field.name).unwrap();
+        let value = map.remove(field.name()).unwrap();
         pairs.extend(extract_cursor_field(field, value)?);
     }
 

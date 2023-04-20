@@ -146,6 +146,16 @@ mod filter_spec {
           @r###"{"data":{"findManyUser":[{"unique":1},{"unique":2}]}}"###
         );
 
+        insta::assert_snapshot!(
+          &user_uniques(&runner, r#"(where: { name: { in: "Bernd" }})"#).await?,
+          @r###"{"data":{"findManyUser":[{"unique":2}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          &user_uniques(&runner, r#"(where: { NOT: { name: { in: "Bernd" } }})"#).await?,
+          @r###"{"data":{"findManyUser":[{"unique":1},{"unique":3},{"unique":4}]}}"###
+        );
+
         Ok(())
     }
 
@@ -156,6 +166,17 @@ mod filter_spec {
         insta::assert_snapshot!(
           &user_uniques(&runner, r#"(where: { name: { notIn: ["Bernd", "Paul"] }})"#).await?,
           @r###"{"data":{"findManyUser":[{"unique":3},{"unique":4}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          &user_uniques(&runner, r#"(where: { name: { notIn: "Bernd" }})"#).await?,
+          @r###"{"data":{"findManyUser":[{"unique":1},{"unique":3},{"unique":4}]}}"###
+        );
+
+        // NOT notIn == in
+        insta::assert_snapshot!(
+          &user_uniques(&runner, r#"(where: { NOT: { name: { notIn: "Bernd" }}})"#).await?,
+          @r###"{"data":{"findManyUser":[{"unique":2}]}}"###
         );
 
         Ok(())
@@ -349,14 +370,14 @@ mod filter_spec {
             runner,
             "{ findManyUser(where: { unique: { not: null }}){ unique } }",
             2009,
-            "`Query.findManyUser.where.UserWhereInput.unique.IntFilter.not`: A value is required but not set."
+            "A value is required but not set"
         );
 
         Ok(())
     }
 
     fn user_uniques_query(filter: &str) -> String {
-        format!(r#"query {{ findManyUser{} {{ unique }} }}"#, filter)
+        format!(r#"query {{ findManyUser{filter} {{ unique }} }}"#)
     }
 
     async fn user_uniques(runner: &Runner, filter: &str) -> TestResult<String> {
@@ -368,7 +389,7 @@ mod filter_spec {
 
     async fn vehicle_uniques(runner: &Runner, filter: &str) -> TestResult<String> {
         let result = runner
-            .query(format!(r#"query {{ findManyVehicle{} {{ unique }} }}"#, filter))
+            .query(format!(r#"query {{ findManyVehicle{filter} {{ unique }} }}"#))
             .await?;
 
         result.assert_success();
@@ -377,7 +398,7 @@ mod filter_spec {
 
     async fn lot_uniques(runner: &Runner, filter: &str) -> TestResult<String> {
         let result = runner
-            .query(format!(r#"query {{ findManyParkingLot{} {{ unique }} }}"#, filter))
+            .query(format!(r#"query {{ findManyParkingLot{filter} {{ unique }} }}"#))
             .await?;
 
         result.assert_success();

@@ -29,9 +29,9 @@ pub fn extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -> Que
     let (unique_map, rest_map): (IndexMap<_, _>, IndexMap<_, _>) =
         value_map
             .into_iter()
-            .partition(|(field_name, _)| match model.fields().find_from_scalar(&field_name) {
+            .partition(|(field_name, _)| match model.fields().find_from_scalar(field_name) {
                 Ok(field) => field.unique(),
-                Err(_) => utils::resolve_compound_field(&field_name, &model).is_some(),
+                Err(_) => utils::resolve_compound_field(field_name, model).is_some(),
             });
     let mut unique_map = ParsedInputMap::from(unique_map);
     let mut rest_map = ParsedInputMap::from(rest_map);
@@ -56,11 +56,12 @@ fn internal_extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -
                     let value: PrismaValue = value.try_into()?;
                     Ok(field.equals(value))
                 }
-                Err(_) => utils::resolve_compound_field(&field_name, &model)
+                Err(_) => utils::resolve_compound_field(&field_name, model)
                     .ok_or_else(|| {
                         QueryGraphBuilderError::AssertionError(format!(
                             "Unable to resolve field {} to a field or set of scalar fields on model {}",
-                            field_name, model.name
+                            field_name,
+                            model.name()
                         ))
                     })
                     .and_then(|fields| handle_compound_field(fields, value)),
@@ -77,7 +78,7 @@ fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue) -
     let filters: Vec<Filter> = fields
         .into_iter()
         .map(|sf| {
-            let pv: PrismaValue = input_map.remove(&sf.name).unwrap().try_into()?;
+            let pv: PrismaValue = input_map.remove(sf.name()).unwrap().try_into()?;
             Ok(sf.equals(pv))
         })
         .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
@@ -214,7 +215,7 @@ fn merge_search_filters(filter: Filter) -> Filter {
     }
 }
 
-fn fold_search_filters(filters: &Vec<Filter>) -> Vec<Filter> {
+fn fold_search_filters(filters: &[Filter]) -> Vec<Filter> {
     let mut filters_by_val: HashMap<PrismaValue, &Filter> = HashMap::new();
     let mut projections_by_val: HashMap<PrismaValue, Vec<ScalarProjection>> = HashMap::new();
     let mut output: Vec<Filter> = vec![];
@@ -251,16 +252,16 @@ fn fold_search_filters(filters: &Vec<Filter>) -> Vec<Filter> {
 
     // Merge the search filters that have the same condition
     for (pv, filter) in filters_by_val.into_iter() {
-        let mut projections = projections_by_val.get_mut(&pv).unwrap();
+        let projections = projections_by_val.get_mut(&pv).unwrap();
         let mut filter = filter.clone();
 
         match filter {
             Filter::Scalar(ref mut sf) => match sf.condition {
                 ScalarCondition::Search(_, ref mut search_proj) => {
-                    search_proj.append(&mut projections);
+                    search_proj.append(projections);
                 }
                 ScalarCondition::NotSearch(_, ref mut search_proj) => {
-                    search_proj.append(&mut projections);
+                    search_proj.append(projections);
                 }
                 _ => unreachable!(),
             },
@@ -290,8 +291,7 @@ fn extract_scalar_filters(field: &ScalarFieldRef, value: ParsedInputValue) -> Qu
             Ok(filters)
         }
         x => Err(QueryGraphBuilderError::InputError(format!(
-            "Invalid scalar filter input: {:?}",
-            x
+            "Invalid scalar filter input: {x:?}"
         ))),
     }
 }
@@ -305,7 +305,6 @@ fn extract_relation_filters(field: &RelationFieldRef, value: ParsedInputValue) -
 
         // Complex relation filter
         ParsedInputValue::Map(filter_map) if filter_map.is_relation_envelope() => filter_map
-            .clone()
             .into_iter()
             .map(|(k, v)| relation::parse(&k, field, v))
             .collect::<QueryGraphBuilderResult<Vec<_>>>(),
@@ -316,8 +315,7 @@ fn extract_relation_filters(field: &RelationFieldRef, value: ParsedInputValue) -
         }
 
         x => Err(QueryGraphBuilderError::InputError(format!(
-            "Invalid relation filter input: {:?}",
-            x
+            "Invalid relation filter input: {x:?}"
         ))),
     }
 }
@@ -348,8 +346,7 @@ fn extract_composite_filters(
         ParsedInputValue::List(_) => Ok(vec![field.equals(PrismaValue::List(value.try_into()?))]),
         ParsedInputValue::Map(filter_map) => Ok(vec![composite::parse(filter_map, field, false)?]),
         x => Err(QueryGraphBuilderError::InputError(format!(
-            "Invalid composite filter input: {:?}",
-            x
+            "Invalid composite filter input: {x:?}"
         ))),
     }
 }

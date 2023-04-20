@@ -3,7 +3,7 @@
 use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(suite = "setnull_onU_1to1_opt", schema(optional))]
+#[test_suite(suite = "setnull_onU_1to1_opt", schema(optional), relation_mode = "prisma")]
 mod one2one_opt {
     fn optional() -> String {
         let schema = indoc! {
@@ -206,20 +206,12 @@ mod one2one_opt {
 
         let query = r#"mutation { updateOneA(where: { id: 1 }, data: { b_id: 2 }) { id } }"#;
 
-        match runner.connector_version() {
-          ConnectorVersion::MongoDb(_) | ConnectorVersion::TiDB => assert_error!(
-              runner,
-              query,
-              2014,
-              "The change you are trying to make would violate the required relation 'BToC' between the `B` and `C` models."
-          ),
-          _ => assert_error!(
-              runner,
-              query,
-              2003,
-              "Foreign key constraint failed on the field"
-          ),
-        };
+        assert_error!(
+          runner,
+          query,
+          2014,
+          "The change you are trying to make would violate the required relation 'BToC' between the `C` and `B` models."
+        );
 
         insta::assert_snapshot!(
           run_query!(runner, r#"{ findManyA { id b_id b { id a_id c { id b_id } } } }"#),
@@ -351,7 +343,7 @@ mod one2one_opt {
     }
 }
 
-#[test_suite(suite = "setnull_onU_1toM_opt", schema(optional))]
+#[test_suite(suite = "setnull_onU_1toM_opt", schema(optional), relation_mode = "prisma")]
 mod one2many_opt {
     fn optional() -> String {
         let schema = indoc! {
@@ -654,20 +646,12 @@ mod one2many_opt {
 
         let query = r#"mutation { updateOneA(where: { id: 1 }, data: { b_id: 2 }) { id } }"#;
 
-        match runner.connector_version() {
-        ConnectorVersion::MongoDb(_) | ConnectorVersion::TiDB => assert_error!(
-            runner,
-            query,
-            2014,
-            "The change you are trying to make would violate the required relation 'BToC' between the `B` and `C` models."
-        ),
-        _ => assert_error!(
-            runner,
-            query,
-            2003,
-            "Foreign key constraint failed on the field"
-        ),
-      };
+        assert_error!(
+          runner,
+          query,
+          2014,
+          "The change you are trying to make would violate the required relation 'BToC' between the `C` and `B` models."
+        );
 
         insta::assert_snapshot!(
           run_query!(runner, r#"{ findManyA { id b_id bs { id a_id cs { id b_id } } } }"#),
@@ -676,6 +660,7 @@ mod one2many_opt {
 
         Ok(())
     }
+
     fn one2m2m_no_shared_fk() -> String {
         let schema = indoc! {
             r#"model A {

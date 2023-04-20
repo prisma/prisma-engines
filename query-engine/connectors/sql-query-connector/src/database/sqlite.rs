@@ -72,8 +72,7 @@ impl FromSource for Sqlite {
 
 fn invalid_file_path_error(file_path: &str, connection_info: &ConnectionInfo) -> ConnectorError {
     SqlError::ConnectionError(QuaintKind::DatabaseUrlIsInvalid(format!(
-        "\"{}\" is not a valid sqlite file path",
-        file_path
+        "\"{file_path}\" is not a valid sqlite file path"
     )))
     .into_connector_error(&connection_info)
 }
@@ -90,7 +89,11 @@ impl Connector for Sqlite {
         .await
     }
 
-    fn name(&self) -> String {
-        "sqlite".to_owned()
+    fn name(&self) -> &'static str {
+        "sqlite"
+    }
+
+    fn should_retry_on_transient_error(&self) -> bool {
+        false
     }
 }

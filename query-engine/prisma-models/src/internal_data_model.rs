@@ -1,144 +1,79 @@
-use crate::{parent_container::ParentContainer, prelude::*, CompositeTypeRef, InternalEnumRef};
-use once_cell::sync::OnceCell;
-use std::sync::{Arc, Weak};
+use crate::{prelude::*, CompositeType, InternalEnum};
+use psl::schema_ast::ast;
+use std::sync::Arc;
 
-pub type InternalDataModelRef = Arc<InternalDataModel>;
-pub type InternalDataModelWeakRef = Weak<InternalDataModel>;
+pub type InternalDataModelRef = InternalDataModel;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct InternalDataModel {
-    pub(crate) models: OnceCell<Vec<ModelRef>>,
-    pub(crate) composite_types: OnceCell<Vec<CompositeTypeRef>>,
-    pub(crate) relations: OnceCell<Vec<RelationRef>>,
-    pub(crate) relation_fields: OnceCell<Vec<RelationFieldRef>>,
-
-    /// Todo clarify / rename.
-    /// The db name influences how data is queried from the database.
-    /// E.g. this influences the schema part of a postgres query: `database`.`schema`.`table`.
-    /// Other connectors do not use `schema`, like postgres does, and this variable would
-    /// influence the `database` part instead.
-    pub db_name: String,
-    pub enums: Vec<InternalEnumRef>,
     pub schema: Arc<psl::ValidatedSchema>,
 }
 
 impl InternalDataModel {
-    pub(crate) fn finalize(&self) {
-        self.models().iter().for_each(|model| model.finalize());
+    pub fn models(&self) -> impl Iterator<Item = ModelRef> + '_ {
+        self.schema
+            .db
+            .walk_models()
+            .chain(self.schema.db.walk_views())
+            .filter(|model| !model.is_ignored())
+            .map(|model| self.clone().zip(model.id))
     }
 
-    pub fn models(&self) -> &[ModelRef] {
-        self.models.get().unwrap()
+    pub fn composite_types(&self) -> impl Iterator<Item = CompositeType> + '_ {
+        self.schema
+            .db
+            .walk_composite_types()
+            .map(move |ct| self.clone().zip(ct.id))
     }
 
-    pub fn composite_types(&self) -> &[CompositeTypeRef] {
-        self.composite_types.get().unwrap()
+    pub fn relations(&self) -> impl Iterator<Item = Relation> + Clone + '_ {
+        self.schema
+            .db
+            .walk_relations()
+            .filter(|relation| !relation.is_ignored())
+            .map(|relation| self.clone().zip(relation.id))
     }
 
-    pub fn models_cloned(&self) -> Vec<ModelRef> {
-        self.models.get().unwrap().iter().map(Arc::clone).collect()
-    }
-
-    pub fn relations(&self) -> &[RelationRef] {
-        self.relations.get().unwrap().as_slice()
-    }
-
-    pub fn find_enum(&self, name: &str) -> crate::Result<InternalEnumRef> {
-        self.enums
-            .iter()
-            .find(|e| e.name == name)
-            .cloned()
+    pub fn find_enum(&self, name: &str) -> crate::Result<InternalEnum> {
+        self.schema
+            .db
+            .find_enum(name)
+            .map(|enum_walker| self.clone().zip(enum_walker.id))
             .ok_or_else(|| DomainError::EnumNotFound { name: name.to_string() })
     }
 
     pub fn find_model(&self, name: &str) -> crate::Result<ModelRef> {
-        self.models
-            .get()
-            .and_then(|models| models.iter().find(|model| model.name == name))
-            .cloned()
+        self.schema
+            .db
+            .walk_models()
+            .chain(self.schema.db.walk_views())
+            .find(|model| model.name() == name)
+            .map(|m| self.clone().zip(m.id))
             .ok_or_else(|| DomainError::ModelNotFound { name: name.to_string() })
     }
 
-    /// This method takes the two models at the ends of the relation as a first argument, because
-    /// relation names are scoped by the pair of models in the relation. Relation names are _not_
-    /// globally unique.
-    pub fn find_relation(&self, model_names: (&str, &str), relation_name: &str) -> crate::Result<RelationWeakRef> {
-        self.relations
-            .get()
-            .and_then(|relations| {
-                relations
-                    .iter()
-                    .find(|relation| relation_matches(relation, model_names, relation_name))
-            })
-            .map(Arc::downgrade)
-            .ok_or_else(|| DomainError::RelationNotFound {
-                name: relation_name.to_owned(),
-            })
+    pub fn find_composite_type_by_id(&self, ctid: ast::CompositeTypeId) -> CompositeType {
+        self.clone().zip(ctid)
     }
 
-    /// Finds all non-list relation fields pointing to the given model.
-    /// `required` may narrow down the returned fields to required fields only. Returns all on `false`.
-    pub fn fields_pointing_to_model(&self, model: &ModelRef, required: bool) -> Vec<RelationFieldRef> {
-        self.relation_fields()
-            .iter()
-            .filter(|rf| &rf.related_model() == model) // All relation fields pointing to `model`.
-            .filter(|rf| rf.is_inlined_on_enclosing_model()) // Not a list, not a virtual field.
-            .filter(|rf| !required || rf.is_required()) // If only required fields should be returned
-            .map(Arc::clone)
-            .collect()
+    pub fn find_model_by_id(&self, model_id: ast::ModelId) -> ModelRef {
+        self.clone().zip(model_id)
     }
 
-    /// Finds all relation fields where the foreign key refers to the given field (as either singular or compound).
-    pub fn fields_refering_to_field(&self, field: &ScalarFieldRef) -> Vec<RelationFieldRef> {
-        match &field.container {
-            ParentContainer::Model(model) => {
-                let model_name = &model.upgrade().unwrap().name;
-
-                self.relation_fields()
-                    .iter()
-                    .filter(|rf| &rf.relation_info.referenced_model == model_name)
-                    .filter(|rf| rf.relation_info.references.contains(&field.name))
-                    .map(Arc::clone)
-                    .collect()
-            }
-            // Relation fields can not refer to composite fields.
-            ParentContainer::CompositeType(_) => vec![],
-        }
+    /// Finds all inline relation fields pointing to the given model.
+    pub fn fields_pointing_to_model(&self, model: &ModelRef) -> impl Iterator<Item = RelationFieldRef> + '_ {
+        self.walk(model.id)
+            .relations_to()
+            .filter_map(|rel| rel.refine().as_inline())
+            .filter_map(|inline_rel| inline_rel.forward_relation_field())
+            .map(move |rf| self.clone().zip(rf.id))
     }
 
-    pub fn relation_fields(&self) -> &[RelationFieldRef] {
-        self.relation_fields
-            .get_or_init(|| {
-                self.models()
-                    .iter()
-                    .flat_map(|model| model.fields().relation())
-                    .collect()
-            })
-            .as_slice()
-    }
-}
-
-/// A relation's "primary key" in a Prisma schema is the relation name (defaulting to an empty
-/// string) qualified by the one or two models involved in the relation.
-///
-/// In other words, the scope for a relation name is only between two models. Every pair of models
-/// has its own scope for relation names.
-fn relation_matches(relation: &Relation, model_names: (&str, &str), relation_name: &str) -> bool {
-    if relation.name != relation_name {
-        return false;
+    pub fn walk<I>(&self, id: I) -> psl::parser_database::walkers::Walker<I> {
+        self.schema.db.walk(id)
     }
 
-    if relation.is_self_relation() && model_names.0 == model_names.1 && relation.model_a_name == model_names.0 {
-        return true;
+    pub fn zip<I>(self, id: I) -> crate::Zipper<I> {
+        crate::Zipper { id, dm: self }
     }
-
-    if model_names.0 == relation.model_a_name && model_names.1 == relation.model_b_name {
-        return true;
-    }
-
-    if model_names.0 == relation.model_b_name && model_names.1 == relation.model_a_name {
-        return true;
-    }
-
-    false
 }

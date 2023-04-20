@@ -20,47 +20,45 @@ impl ConnectorTagInterface for PostgresConnectorTag {
         let database = if is_multi_schema {
             database.to_string()
         } else {
-            format!("db?schema={}", database)
+            format!("db?schema={database}")
         };
 
         match self.version {
             Some(PostgresVersion::V9) if is_ci => {
-                format!("postgresql://postgres:prisma@test-db-postgres-9:5432/{}", database)
+                format!("postgresql://postgres:prisma@test-db-postgres-9:5432/{database}")
             }
             Some(PostgresVersion::V10) if is_ci => {
-                format!("postgresql://postgres:prisma@test-db-postgres-10:5432/{}", database)
+                format!("postgresql://postgres:prisma@test-db-postgres-10:5432/{database}")
             }
             Some(PostgresVersion::V11) if is_ci => {
-                format!("postgresql://postgres:prisma@test-db-postgres-11:5432/{}", database)
+                format!("postgresql://postgres:prisma@test-db-postgres-11:5432/{database}")
             }
             Some(PostgresVersion::V12) if is_ci => {
-                format!("postgresql://postgres:prisma@test-db-postgres-12:5432/{}", database)
+                format!("postgresql://postgres:prisma@test-db-postgres-12:5432/{database}")
             }
             Some(PostgresVersion::V13) if is_ci => {
-                format!("postgresql://postgres:prisma@test-db-postgres-13:5432/{}", database)
+                format!("postgresql://postgres:prisma@test-db-postgres-13:5432/{database}")
             }
             Some(PostgresVersion::V14) if is_ci => {
-                format!("postgresql://postgres:prisma@test-db-postgres-14:5432/{}", database)
+                format!("postgresql://postgres:prisma@test-db-postgres-14:5432/{database}")
             }
             Some(PostgresVersion::V15) if is_ci => {
-                format!("postgresql://postgres:prisma@test-db-postgres-15:5432/{}", database)
+                format!("postgresql://postgres:prisma@test-db-postgres-15:5432/{database}")
             }
-            Some(PostgresVersion::PgBouncer) if is_ci => format!(
-                "postgresql://postgres:prisma@test-db-pgbouncer:6432/{}&pgbouncer=true",
-                database
-            ),
+            Some(PostgresVersion::PgBouncer) if is_ci => {
+                format!("postgresql://postgres:prisma@test-db-pgbouncer:6432/{database}&pgbouncer=true")
+            }
 
-            Some(PostgresVersion::V9) => format!("postgresql://postgres:prisma@127.0.0.1:5431/{}", database),
-            Some(PostgresVersion::V10) => format!("postgresql://postgres:prisma@127.0.0.1:5432/{}", database),
-            Some(PostgresVersion::V11) => format!("postgresql://postgres:prisma@127.0.0.1:5433/{}", database),
-            Some(PostgresVersion::V12) => format!("postgresql://postgres:prisma@127.0.0.1:5434/{}", database),
-            Some(PostgresVersion::V13) => format!("postgresql://postgres:prisma@127.0.0.1:5435/{}", database),
-            Some(PostgresVersion::V14) => format!("postgresql://postgres:prisma@127.0.0.1:5437/{}", database),
-            Some(PostgresVersion::V15) => format!("postgresql://postgres:prisma@127.0.0.1:5438/{}", database),
-            Some(PostgresVersion::PgBouncer) => format!(
-                "postgresql://postgres:prisma@127.0.0.1:6432/db?{}&pgbouncer=true",
-                database
-            ),
+            Some(PostgresVersion::V9) => format!("postgresql://postgres:prisma@127.0.0.1:5431/{database}"),
+            Some(PostgresVersion::V10) => format!("postgresql://postgres:prisma@127.0.0.1:5432/{database}"),
+            Some(PostgresVersion::V11) => format!("postgresql://postgres:prisma@127.0.0.1:5433/{database}"),
+            Some(PostgresVersion::V12) => format!("postgresql://postgres:prisma@127.0.0.1:5434/{database}"),
+            Some(PostgresVersion::V13) => format!("postgresql://postgres:prisma@127.0.0.1:5435/{database}"),
+            Some(PostgresVersion::V14) => format!("postgresql://postgres:prisma@127.0.0.1:5437/{database}"),
+            Some(PostgresVersion::V15) => format!("postgresql://postgres:prisma@127.0.0.1:5438/{database}"),
+            Some(PostgresVersion::PgBouncer) => {
+                format!("postgresql://postgres:prisma@127.0.0.1:6432/db?{database}&pgbouncer=true")
+            }
 
             None => unreachable!("A versioned connector must have a concrete version to run."),
         }
@@ -77,10 +75,6 @@ impl ConnectorTagInterface for PostgresConnectorTag {
 
     fn is_versioned(&self) -> bool {
         true
-    }
-
-    fn requires_teardown(&self) -> bool {
-        false
     }
 }
 
@@ -176,7 +170,7 @@ impl TryFrom<&str> for PostgresVersion {
             "14" => Self::V14,
             "15" => Self::V15,
             "pgbouncer" => Self::PgBouncer,
-            _ => return Err(TestError::parse_error(format!("Unknown Postgres version `{}`", s))),
+            _ => return Err(TestError::parse_error(format!("Unknown Postgres version `{s}`"))),
         };
 
         Ok(version)

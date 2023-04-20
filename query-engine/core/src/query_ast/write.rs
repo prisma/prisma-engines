@@ -3,10 +3,10 @@ use super::{FilteredNestedMutation, FilteredQuery};
 use crate::{RecordQuery, ToGraphviz};
 use connector::{filter::Filter, DatasourceFieldName, NativeUpsert, RecordFilter, WriteArgs};
 use prisma_models::prelude::*;
-use std::{collections::HashMap, sync::Arc};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
-pub enum WriteQuery {
+pub(crate) enum WriteQuery {
     CreateRecord(CreateRecord),
     CreateManyRecords(CreateManyRecords),
     UpdateRecord(UpdateRecord),
@@ -46,7 +46,7 @@ impl WriteQuery {
             Self::UpdateManyRecords(x) => x.set_selectors(selectors),
             Self::UpdateRecord(x) => x.set_selectors(selectors),
             Self::DeleteRecord(x) => x.set_selectors(selectors),
-            _ => return,
+            _ => (),
         }
     }
 
@@ -73,13 +73,13 @@ impl WriteQuery {
 
     pub fn model(&self) -> ModelRef {
         match self {
-            Self::CreateRecord(q) => Arc::clone(&q.model),
-            Self::CreateManyRecords(q) => Arc::clone(&q.model),
-            Self::UpdateRecord(q) => Arc::clone(&q.model),
+            Self::CreateRecord(q) => q.model.clone(),
+            Self::CreateManyRecords(q) => q.model.clone(),
+            Self::UpdateRecord(q) => q.model.clone(),
             Self::Upsert(q) => q.model().clone(),
-            Self::DeleteRecord(q) => Arc::clone(&q.model),
-            Self::UpdateManyRecords(q) => Arc::clone(&q.model),
-            Self::DeleteManyRecords(q) => Arc::clone(&q.model),
+            Self::DeleteRecord(q) => q.model.clone(),
+            Self::UpdateManyRecords(q) => q.model.clone(),
+            Self::DeleteManyRecords(q) => q.model.clone(),
             Self::ConnectRecords(q) => q.relation_field.model(),
             Self::DisconnectRecords(q) => q.relation_field.model(),
             Self::ExecuteRaw(_) => unimplemented!(),
@@ -130,18 +130,20 @@ impl FilteredQuery for WriteQuery {
 }
 
 impl std::fmt::Display for WriteQuery {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::CreateRecord(q) => write!(f, "CreateRecord(model: {}, args: {:?})", q.model.name, q.args),
-            Self::CreateManyRecords(q) => write!(f, "CreateManyRecord(model: {})", q.model.name),
+            Self::CreateRecord(q) => write!(f, "CreateRecord(model: {}, args: {:?})", q.model.name(), q.args),
+            Self::CreateManyRecords(q) => write!(f, "CreateManyRecord(model: {})", q.model.name()),
             Self::UpdateRecord(q) => write!(
                 f,
                 "UpdateRecord(model: {}, filter: {:?}, args: {:?})",
-                q.model.name, q.record_filter, q.args,
+                q.model.name(),
+                q.record_filter,
+                q.args,
             ),
-            Self::DeleteRecord(q) => write!(f, "DeleteRecord: {}, {:?}", q.model.name, q.record_filter),
-            Self::UpdateManyRecords(q) => write!(f, "UpdateManyRecords(model: {}, args: {:?})", q.model.name, q.args),
-            Self::DeleteManyRecords(q) => write!(f, "DeleteManyRecords: {}", q.model.name),
+            Self::DeleteRecord(q) => write!(f, "DeleteRecord: {}, {:?}", q.model.name(), q.record_filter),
+            Self::UpdateManyRecords(q) => write!(f, "UpdateManyRecords(model: {}, args: {:?})", q.model.name(), q.args),
+            Self::DeleteManyRecords(q) => write!(f, "DeleteManyRecords: {}", q.model.name()),
             Self::ConnectRecords(_) => write!(f, "ConnectRecords"),
             Self::DisconnectRecords(_) => write!(f, "DisconnectRecords"),
             Self::ExecuteRaw(r) => write!(f, "ExecuteRaw: {:?}", r.inputs),
@@ -149,7 +151,7 @@ impl std::fmt::Display for WriteQuery {
             Self::Upsert(q) => write!(
                 f,
                 "Upsert(model: {}, filter: {:?}, create: {:?}, update: {:?}",
-                q.model().name,
+                q.model().name(),
                 q.record_filter(),
                 q.create(),
                 q.update()
@@ -161,17 +163,17 @@ impl std::fmt::Display for WriteQuery {
 impl ToGraphviz for WriteQuery {
     fn to_graphviz(&self) -> String {
         match self {
-            Self::CreateRecord(q) => format!("CreateRecord(model: {}, args: {:?})", q.model.name, q.args),
-            Self::CreateManyRecords(q) => format!("CreateManyRecord(model: {})", q.model.name),
-            Self::UpdateRecord(q) => format!("UpdateRecord(model: {})", q.model.name,),
-            Self::DeleteRecord(q) => format!("DeleteRecord: {}, {:?}", q.model.name, q.record_filter),
-            Self::UpdateManyRecords(q) => format!("UpdateManyRecords(model: {}, args: {:?})", q.model.name, q.args),
-            Self::DeleteManyRecords(q) => format!("DeleteManyRecords: {}", q.model.name),
+            Self::CreateRecord(q) => format!("CreateRecord(model: {}, args: {:?})", q.model.name(), q.args),
+            Self::CreateManyRecords(q) => format!("CreateManyRecord(model: {})", q.model.name()),
+            Self::UpdateRecord(q) => format!("UpdateRecord(model: {})", q.model.name(),),
+            Self::DeleteRecord(q) => format!("DeleteRecord: {}, {:?}", q.model.name(), q.record_filter),
+            Self::UpdateManyRecords(q) => format!("UpdateManyRecords(model: {}, args: {:?})", q.model.name(), q.args),
+            Self::DeleteManyRecords(q) => format!("DeleteManyRecords: {}", q.model.name()),
             Self::ConnectRecords(_) => "ConnectRecords".to_string(),
             Self::DisconnectRecords(_) => "DisconnectRecords".to_string(),
             Self::ExecuteRaw(r) => format!("ExecuteRaw: {:?}", r.inputs),
             Self::QueryRaw(r) => format!("QueryRaw: {:?}", r.inputs),
-            Self::Upsert(q) => format!("Upsert(model: {}", q.model().name),
+            Self::Upsert(q) => format!("Upsert(model: {}", q.model().name()),
         }
     }
 }

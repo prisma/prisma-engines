@@ -1,0 +1,11 @@
+{
+  "isIncomplete": false,
+  "items": [
+    {
+      "label": "DATABASE_URL",
+      "kind": 21,
+      "insertText": "DATABASE_URL",
+      "insertTextFormat": 1
+    }
+  ]
+}

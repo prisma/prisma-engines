@@ -1,16 +1,27 @@
+use crate::features::{EnabledFeatures, Feature};
+use crate::{logger::Logger, opt::PrismaOpt};
 use crate::{PrismaError, PrismaResult};
-use query_core::{executor, schema::QuerySchemaRef, schema_builder, QueryExecutor};
+use psl::PreviewFeature;
+use query_core::{protocol::EngineProtocol, schema::QuerySchemaRef, schema_builder, QueryExecutor};
+use query_engine_metrics::setup as metric_setup;
 use query_engine_metrics::MetricRegistry;
+use request_handlers::load_executor;
 use std::{env, fmt, sync::Arc};
+use tracing::Instrument;
 
 /// Prisma request context containing all immutable state of the process.
 /// There is usually only one context initialized per process.
 pub struct PrismaContext {
     /// The api query schema.
     query_schema: QuerySchemaRef,
+    /// The metrics registry
     pub metrics: MetricRegistry,
     /// Central query executor.
     pub executor: Box<dyn QueryExecutor + Send + Sync + 'static>,
+    /// The engine protocol in use
+    pub engine_protocol: EngineProtocol,
+    /// Enabled features
+    pub enabled_features: EnabledFeatures,
 }
 
 impl fmt::Debug for PrismaContext {
@@ -19,82 +30,107 @@ impl fmt::Debug for PrismaContext {
     }
 }
 
-pub struct ContextBuilder {
-    enable_raw_queries: bool,
-    schema: psl::ValidatedSchema,
-    metrics: Option<MetricRegistry>,
-}
-
-impl ContextBuilder {
-    pub fn enable_raw_queries(mut self, val: bool) -> Self {
-        self.enable_raw_queries = val;
-        self
-    }
-
-    pub fn set_metrics(mut self, metrics: MetricRegistry) -> Self {
-        self.metrics = Some(metrics);
-        self
-    }
-
-    pub async fn build(self) -> PrismaResult<PrismaContext> {
-        PrismaContext::new(self.schema, self.enable_raw_queries, self.metrics.unwrap_or_default()).await
-    }
-}
-
 impl PrismaContext {
-    /// Initializes a new Prisma context.
-    async fn new(
+    pub async fn new(
         schema: psl::ValidatedSchema,
-        enable_raw_queries: bool,
-        metrics: MetricRegistry,
-    ) -> PrismaResult<Self> {
-        let config = &schema.configuration;
-        // We only support one data source at the moment, so take the first one (default not exposed yet).
-        let data_source = config
-            .datasources
-            .first()
-            .ok_or_else(|| PrismaError::ConfigurationError("No valid data source found".into()))?;
+        protocol: EngineProtocol,
+        enabled_features: EnabledFeatures,
+        metrics: Option<MetricRegistry>,
+    ) -> PrismaResult<PrismaContext> {
+        let arced_schema = Arc::new(schema);
+        let arced_schema_2 = Arc::clone(&arced_schema);
 
-        let url = data_source.load_url(|key| env::var(key).ok())?;
+        let query_schema_fut = tokio::runtime::Handle::current().spawn_blocking(move || {
+            // Build internal data model
+            let internal_data_model = prisma_models::convert(arced_schema);
 
-        // Load executor
-        let (db_name, executor) = executor::load(data_source, config.preview_features(), &url).await?;
+            // Construct query schema
+            Arc::new(schema_builder::build(
+                internal_data_model,
+                enabled_features.contains(Feature::RawQueries),
+            ))
+        });
+        let executor_fut = tokio::spawn(async move {
+            let config = &arced_schema_2.configuration;
+            let preview_features = config.preview_features();
 
-        // Build internal data model
-        let internal_data_model = prisma_models::convert(Arc::new(schema), db_name);
+            // We only support one data source at the moment, so take the first one (default not exposed yet).
+            let data_source = config
+                .datasources
+                .first()
+                .ok_or_else(|| PrismaError::ConfigurationError("No valid data source found".into()))?;
 
-        // Construct query schema
-        let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(internal_data_model, enable_raw_queries));
+            let url = data_source.load_url(|key| env::var(key).ok())?;
+            // Load executor
+            let executor = load_executor(data_source, preview_features, &url).await?;
+            executor.primary_connector().get_connection().await?;
+            PrismaResult::<_>::Ok(executor)
+        });
+
+        let (query_schema, executor) = tokio::join!(query_schema_fut, executor_fut);
 
         let context = Self {
-            query_schema,
-            executor,
-            metrics,
+            query_schema: query_schema.unwrap(),
+            executor: executor.unwrap()?,
+            metrics: metrics.unwrap_or_default(),
+            engine_protocol: protocol,
+            enabled_features,
         };
 
-        context.verify_connection().await?;
-
         Ok(context)
-    }
-
-    async fn verify_connection(&self) -> PrismaResult<()> {
-        self.executor.primary_connector().get_connection().await?;
-        Ok(())
-    }
-
-    pub fn builder(schema: psl::ValidatedSchema) -> ContextBuilder {
-        ContextBuilder {
-            enable_raw_queries: false,
-            schema,
-            metrics: None,
-        }
     }
 
     pub fn query_schema(&self) -> &QuerySchemaRef {
         &self.query_schema
     }
 
-    pub fn primary_connector(&self) -> String {
+    pub fn executor(&self) -> &(dyn QueryExecutor + Send + Sync + 'static) {
+        self.executor.as_ref()
+    }
+
+    pub fn primary_connector(&self) -> &'static str {
         self.executor.primary_connector().name()
     }
+
+    pub fn engine_protocol(&self) -> EngineProtocol {
+        self.engine_protocol
+    }
+}
+
+pub async fn setup(
+    opts: &PrismaOpt,
+    install_logger: bool,
+    metrics: Option<MetricRegistry>,
+) -> PrismaResult<Arc<PrismaContext>> {
+    let metrics = metrics.unwrap_or_default();
+
+    if install_logger {
+        Logger::new("prisma-engine-http", Some(metrics.clone()), opts)
+            .install()
+            .unwrap();
+    }
+
+    if opts.enable_metrics || opts.dataproxy_metric_override {
+        metric_setup();
+    }
+
+    let datamodel = opts.schema(false)?;
+    let config = &datamodel.configuration;
+    let protocol = opts.engine_protocol(config.preview_features());
+    config.validate_that_one_datasource_is_provided()?;
+
+    let span = tracing::info_span!("prisma:engine:connect");
+
+    let mut features = EnabledFeatures::from(opts);
+
+    if config.preview_features().contains(PreviewFeature::Metrics) || opts.dataproxy_metric_override {
+        features |= Feature::Metrics
+    }
+
+    let cx = PrismaContext::new(datamodel, protocol, features, Some(metrics))
+        .instrument(span)
+        .await?;
+
+    let state = Arc::new(cx);
+    Ok(state)
 }

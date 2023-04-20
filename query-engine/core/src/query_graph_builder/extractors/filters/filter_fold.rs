@@ -178,7 +178,7 @@ impl FilterVisitor {
         }
     }
 
-    fn visit_and(&self, filters: &Vec<Filter>) -> bool {
+    fn visit_and(&self, filters: &[Filter]) -> bool {
         let mut res = true;
 
         for (index, f) in filters.iter().enumerate() {
@@ -214,7 +214,7 @@ impl FilterVisitor {
         res
     }
 
-    fn visit_or(&self, filters: &Vec<Filter>) -> bool {
+    fn visit_or(&self, filters: &[Filter]) -> bool {
         let mut res = true;
 
         for (index, f) in filters.iter().enumerate() {
@@ -250,7 +250,7 @@ impl FilterVisitor {
         res
     }
 
-    fn visit_not(&self, filters: &Vec<Filter>) -> bool {
+    fn visit_not(&self, filters: &[Filter]) -> bool {
         let mut res = true;
 
         for (index, f) in filters.iter().enumerate() {

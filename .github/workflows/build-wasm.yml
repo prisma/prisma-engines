@@ -10,7 +10,6 @@ on:
       - 'LICENSE'
       - 'CODEOWNERS'
       - 'renovate.json'
-      - 'query-engine/**'
 
 jobs:
   build:
@@ -18,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v18
+      - uses: cachix/install-nix-action@v20
 
       - run: nix build .#prisma-fmt-wasm
       - run: nix flake check

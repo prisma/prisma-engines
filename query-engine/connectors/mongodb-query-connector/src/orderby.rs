@@ -75,7 +75,7 @@ impl OrderByData {
                 let mut parts = path
                     .iter()
                     .map(|hop| match hop {
-                        OrderByHop::Relation(rf) => rf.relation().name.clone(),
+                        OrderByHop::Relation(rf) => rf.relation().name(),
                         OrderByHop::Composite(cf) => cf.db_name().to_owned(),
                     })
                     .collect_vec();
@@ -115,7 +115,7 @@ impl OrderByData {
             // TODO: Order by relevance won't work here
             let field = self.order_by.field().expect("a field on which to order by is expected");
             let right = field.db_name().to_owned();
-            let mut left = field.name.clone();
+            let mut left = field.name().to_owned();
 
             // Issue: https://github.com/prisma/prisma/issues/14001
             // Here we can assume the field name is ASCII, because it is the _client_ field name,
@@ -269,7 +269,7 @@ impl OrderByBuilder {
                                     &data,
                                 ));
 
-                                order_aggregate_proj_doc.push(doc! { "$addFields": { field_name.clone(): { "$size": { "$ifNull": [format!("${}", field_name), []] } } } });
+                                order_aggregate_proj_doc.push(doc! { "$addFields": { field_name.clone(): { "$size": { "$ifNull": [format!("${field_name}"), []] } } } });
                             }
                         }
                         _ => unimplemented!("Order by aggregate only supports COUNT"),
@@ -324,13 +324,12 @@ fn unwind_aggregate_joins(
                 if let Some(next_part) = data.prefix.as_ref().and_then(|prefix| prefix.parts.get(i + 1)) {
                     additional_stages.push(doc! {
                         "$unwind": {
-                            "path": format!("${}", join_name),
+                            "path": format!("${join_name}"),
                             "preserveNullAndEmptyArrays": true
                         }
                     });
 
-                    additional_stages
-                        .push(doc! { "$addFields": { join_name: format!("${}.{}", join_name, next_part) } });
+                    additional_stages.push(doc! { "$addFields": { join_name: format!("${join_name}.{next_part}") } });
                 }
 
                 Some(additional_stages)

@@ -1,7 +1,8 @@
 use connector_interface::{AggregationSelection, RelAggregationSelection};
 use indexmap::IndexMap;
-use prisma_models::{FieldSelection, PrismaValue, ScalarFieldRef, SelectedField, TypeIdentifier};
-use psl::dml::FieldArity;
+use prisma_models::{
+    ast::FieldArity, DefaultKind, FieldSelection, PrismaValue, ScalarFieldRef, SelectedField, TypeIdentifier,
+};
 
 /// Maps field db field names to their meta information.
 pub type OutputMetaMapping = IndexMap<String, OutputMeta>;
@@ -93,8 +94,8 @@ pub fn from_scalar_field(field: &ScalarFieldRef) -> OutputMeta {
     let (ident, field_arity) = field.type_identifier_with_arity();
 
     // Only add a possible default return if the field is required.
-    let default = field.default_value.clone().and_then(|dv| match dv.into_kind() {
-        psl::dml::DefaultKind::Single(pv) if field.is_required() => Some(pv),
+    let default = field.default_value().and_then(|dv| match dv {
+        DefaultKind::Single(pv) if field.is_required() => Some(pv),
         _ => None,
     });
 

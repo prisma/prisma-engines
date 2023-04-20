@@ -69,7 +69,11 @@ impl Connector for Mssql {
         .await
     }
 
-    fn name(&self) -> String {
-        "mssql".to_owned()
+    fn name(&self) -> &'static str {
+        "mssql"
+    }
+
+    fn should_retry_on_transient_error(&self) -> bool {
+        false
     }
 }

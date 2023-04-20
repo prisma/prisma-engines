@@ -4,7 +4,6 @@ use crate::{
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use prisma_models::RelationFieldRef;
-use std::sync::Arc;
 
 /// Only for many to many relations.
 ///
@@ -49,7 +48,7 @@ pub fn connect_records_node(
     let connect = WriteQuery::ConnectRecords(ConnectRecords {
         parent_id: None,
         child_ids: vec![],
-        relation_field: Arc::clone(parent_relation_field),
+        relation_field: parent_relation_field.clone(),
     });
 
     let connect_node = graph.create_node(Query::Write(connect));
@@ -81,7 +80,7 @@ pub fn connect_records_node(
 
     // Edge from child to connect.
     graph.create_edge(
-        &child_node,
+        child_node,
         &connect_node,
         QueryGraphDependency::ProjectedDataDependency(
             child_model_id,
@@ -90,8 +89,7 @@ pub fn connect_records_node(
 
                 if len != expected_connects {
                     return Err(QueryGraphBuilderError::RecordNotFound(format!(
-                        "Expected {} records to be connected, found only {}.",
-                        expected_connects, len,
+                        "Expected {expected_connects} records to be connected, found only {len}.",
                     )));
                 }
 

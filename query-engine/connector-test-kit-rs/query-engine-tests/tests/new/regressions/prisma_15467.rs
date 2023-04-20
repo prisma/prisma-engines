@@ -36,12 +36,11 @@ mod mongodb {
             format!(
                 r#"
                 mutation {{
-                    updateManyStanding(data:{{awayLosses:{{set: 0}}, teamId:{{set: 972030012}}, leagueId:{{set: 2363725}}}}, where:{{id: {{equals: {} }}}}) {{
+                    updateManyStanding(data:{{awayLosses:{{set: 0}}, teamId:{{set: 972030012}}, leagueId:{{set: 2363725}}}}, where:{{id: {{equals: {object_id} }}}}) {{
                         count
                     }}
                 }}
-                "#,
-                object_id
+                "#
             )
         );
         let logs = runner.get_logs().await;
@@ -51,7 +50,7 @@ mod mongodb {
 db.Standing.updateMany({{
     _id: {{
         $in: [
-            ObjectId({}),
+            ObjectId({object_id}),
         ],
     }},
 }},[
@@ -75,25 +74,20 @@ db.Standing.updateMany({{
             $literal: 0,
         }},
     }},
-}}])"#,
-            object_id
+}}])"#
         );
 
         let expected_query = query.trim();
         assert!(
             last_log_line.contains(expected_query),
-            "{} should have contained {}",
-            last_log_line,
-            expected_query,
+            r#"{last_log_line} should have contained {expected_query}"#,
         );
 
         // Piggybacking assertion reproducing https://github.com/prisma/prisma/issues/14378
         let expected_duration_field = "duration_ms";
         assert!(
             last_log_line.contains(expected_duration_field),
-            "{} should have contained {}",
-            last_log_line,
-            expected_duration_field
+            r#"{last_log_line} should have contained {expected_duration_field}"#
         );
 
         Ok(())

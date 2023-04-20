@@ -3,7 +3,7 @@ mod cycle_detection;
 use crate::common::*;
 use psl::{
     datamodel_connector::RelationMode,
-    dml::ReferentialAction::{self, *},
+    parser_database::ReferentialAction::{self, *},
 };
 
 #[test]
@@ -27,7 +27,7 @@ fn on_delete_actions() {
             action
         );
 
-        parse(&dml)
+        parse_schema(&dml)
             .assert_has_model("B")
             .assert_has_relation_field("a")
             .assert_relation_delete_strategy(*action);
@@ -55,7 +55,7 @@ fn on_update_actions() {
             action
         );
 
-        parse(&dml)
+        parse_schema(&dml)
             .assert_has_model("B")
             .assert_has_relation_field("a")
             .assert_relation_update_strategy(*action);
@@ -88,7 +88,7 @@ fn actions_on_mongo() {
             action = action
         );
 
-        parse(&dml)
+        parse_schema(&dml)
             .assert_has_model("B")
             .assert_has_relation_field("a")
             .assert_relation_delete_strategy(*action);
@@ -126,7 +126,7 @@ fn actions_on_mysql_with_prisma_relation_mode() {
             action = action
         );
 
-        parse(&dml)
+        parse_schema(&dml)
             .assert_has_model("B")
             .assert_has_relation_field("a")
             .assert_relation_delete_strategy(*action);
@@ -164,7 +164,7 @@ fn actions_on_sqlserver_with_prisma_relation_mode() {
             action = action
         );
 
-        parse(&dml)
+        parse_schema(&dml)
             .assert_has_model("B")
             .assert_has_relation_field("a")
             .assert_relation_delete_strategy(*action);
@@ -202,7 +202,7 @@ fn actions_on_cockroachdb_with_prisma_relation_mode() {
             action = action
         );
 
-        parse(&dml)
+        parse_schema(&dml)
             .assert_has_model("B")
             .assert_has_relation_field("a")
             .assert_relation_delete_strategy(*action);
@@ -240,7 +240,7 @@ fn actions_on_postgres_with_prisma_relation_mode() {
             action = action
         );
 
-        parse(&dml)
+        parse_schema(&dml)
             .assert_has_model("B")
             .assert_has_relation_field("a")
             .assert_relation_delete_strategy(*action);
@@ -278,7 +278,7 @@ fn actions_on_sqlite_with_prisma_relation_mode() {
             action = action
         );
 
-        parse(&dml)
+        parse_schema(&dml)
             .assert_has_model("B")
             .assert_has_relation_field("a")
             .assert_relation_delete_strategy(*action);
@@ -316,7 +316,7 @@ fn on_delete_actions_should_work_on_prisma_relation_mode() {
             action = action
         );
 
-        parse(&dml)
+        parse_schema(&dml)
             .assert_has_model("B")
             .assert_has_relation_field("a")
             .assert_relation_delete_strategy(*action);
@@ -348,7 +348,7 @@ fn on_update_no_action_should_work_on_prisma_relation_mode() {
         }
     "#};
 
-    parse(dml)
+    parse_schema(dml)
         .assert_has_model("B")
         .assert_has_relation_field("a")
         .assert_relation_update_strategy(ReferentialAction::NoAction);

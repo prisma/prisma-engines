@@ -9,18 +9,18 @@ use diagnostics::DatamodelWarning;
 use enumflags2::BitFlags;
 use itertools::Itertools;
 use parser_database::{
-    walkers::{ModelWalker, RelationFieldWalker, RelationName},
+    walkers::{ModelWalker, RelationFieldId, RelationFieldWalker, RelationName},
     ReferentialAction,
 };
 use std::fmt;
 
 struct Fields<'db> {
-    fields: &'db [ast::FieldId],
+    fields: &'db [RelationFieldId],
     model: ModelWalker<'db>,
 }
 
 impl<'db> Fields<'db> {
-    fn new(fields: &'db [ast::FieldId], model: ModelWalker<'db>) -> Self {
+    fn new(fields: &'db [RelationFieldId], model: ModelWalker<'db>) -> Self {
         Self { fields, model }
     }
 }
@@ -30,8 +30,8 @@ impl<'db> fmt::Display for Fields<'db> {
         let mut fields = self
             .fields
             .iter()
-            .map(|field_id| self.model.relation_field(*field_id).name())
-            .map(|name| format!("`{}`", name));
+            .map(|field_id| self.model.walk(*field_id).name())
+            .map(|name| format!("`{name}`"));
 
         match fields.len() {
             x if x < 2 => f.write_str(&fields.join(", ")),
@@ -108,8 +108,11 @@ pub(super) fn ambiguity(field: RelationFieldWalker<'_>, names: &Names<'_>) -> Re
                 }
             };
 
+            let container_type = if model.ast_model().is_view() { "view" } else { "model" };
+
             Err(DatamodelError::new_model_validation_error(
                 &message,
+                container_type,
                 model.name(),
                 field.ast_field().span(),
             ))
@@ -284,6 +287,10 @@ pub(super) fn validate_missing_relation_indexes(relation_field: RelationFieldWal
     }
 }
 
+pub(super) fn connector_specific(field: RelationFieldWalker<'_>, ctx: &mut Context<'_>) {
+    ctx.connector.validate_relation_field(field, ctx.diagnostics)
+}
+
 /// An subgroup is left-wise included in a supergroup if the subgroup is contained in the supergroup, and all the entries of
 /// the left-most entries of the supergroup match the order of definitions of the subgroup.
 /// More formally: { x_1, x_2, ..., x_n } is left-wise included in { y_1, y_2, ..., y_m } if and only if
@@ -302,19 +309,15 @@ mod tests {
     fn test_is_left_wise_included() {
         let item = vec![1, 2];
         let group = vec![1, 2, 3, 4];
-        assert_eq!(is_leftwise_included_it(item.iter(), group.iter()), true);
+        assert!(is_leftwise_included_it(item.iter(), group.iter()));
         let item = vec![1, 2, 3, 4];
         let group = vec![1, 2, 3, 4];
-        assert_eq!(is_leftwise_included_it(item.iter(), group.iter()), true);
+        assert!(is_leftwise_included_it(item.iter(), group.iter()));
         let item = vec![1, 2, 3, 4];
         let group = vec![1, 2];
-        assert_eq!(is_leftwise_included_it(item.iter(), group.iter()), false);
+        assert!(!is_leftwise_included_it(item.iter(), group.iter()));
         let item = vec![2, 3];
         let group = vec![1, 2, 3, 4];
-        assert_eq!(is_leftwise_included_it(item.iter(), group.iter()), false);
+        assert!(!is_leftwise_included_it(item.iter(), group.iter()));
     }
-}
-
-pub(super) fn connector_specific(field: RelationFieldWalker<'_>, ctx: &mut Context<'_>) {
-    ctx.connector.validate_relation_field(field, ctx.diagnostics)
 }

@@ -1,14 +1,13 @@
 #![allow(
     clippy::wrong_self_convention,
-    clippy::upper_case_acronyms,
-    clippy::needless_question_mark,
     clippy::branches_sharing_code,
-    clippy::mem_replace_with_default,
     clippy::needless_borrow,
     clippy::needless_collect
 )]
+#![deny(unsafe_code)]
 
 mod column_metadata;
+mod context;
 mod cursor_condition;
 mod database;
 mod error;
@@ -21,17 +20,13 @@ mod query_arguments_ext;
 mod query_builder;
 mod query_ext;
 mod row;
-mod sql_info;
 mod sql_trace;
 mod value;
 mod value_ext;
 
-use column_metadata::*;
-use filter_conversion::*;
-use query_ext::QueryExt;
-use row::*;
+use self::{column_metadata::*, context::Context, filter_conversion::*, query_ext::QueryExt, row::*};
 
-pub use database::*;
+pub use database::{FromSource, Mssql, Mysql, PostgreSql, Sqlite};
 pub use error::SqlError;
 
 type Result<T> = std::result::Result<T, error::SqlError>;

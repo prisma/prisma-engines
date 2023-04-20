@@ -108,7 +108,7 @@ impl Connector for SqliteDatamodelConnector {
         };
 
         if let Some(path) = set_root(url.trim_start_matches("file:")) {
-            return Cow::Owned(format!("file:{}", path));
+            return Cow::Owned(format!("file:{path}"));
         };
 
         Cow::Borrowed(url)

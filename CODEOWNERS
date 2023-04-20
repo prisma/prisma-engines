@@ -1,15 +1,15 @@
 # This file is organized in alphabetical order.
 
-/introspection-engine @prisma/schema-team
-
 /libs/json-rpc-stdio @prisma/schema-team
 /libs/sql-ddl @prisma/schema-team
-/libs/sql-schema-describer @prisma/schema-team
 /libs/test-macros @prisma/schema-team
 /libs/test-setup @prisma/schema-team
 
-/migration-engine @prisma/schema-team
+/schema-engine @prisma/schema-team
 
 /prisma-fmt @prisma/schema-team
+/prisma-fmt-wasm @prisma/schema-team
 
 /psl @prisma/schema-team
+
+/query-engine @prisma/client-team-rust

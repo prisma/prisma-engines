@@ -63,7 +63,12 @@ impl<'db> ConstraintNamespace<'db> {
 
     /// Add all index and unique constraints from the data model to a global validation scope.
     pub(super) fn add_global_indexes(&mut self, scope: ConstraintScope, ctx: &super::Context<'db>) {
-        for index in ctx.db.walk_models().flat_map(|m| m.indexes()) {
+        for index in ctx
+            .db
+            .walk_models()
+            .chain(ctx.db.walk_views())
+            .flat_map(|m| m.indexes())
+        {
             let counter = self
                 .global
                 .entry((scope, index.model().schema_name(), index.constraint_name(ctx.connector)))
@@ -84,7 +89,7 @@ impl<'db> ConstraintNamespace<'db> {
 
     /// Add all primary key constraints from the data model to a global validation scope.
     pub(super) fn add_global_primary_keys(&mut self, scope: ConstraintScope, ctx: &super::Context<'db>) {
-        for model in ctx.db.walk_models() {
+        for model in ctx.db.walk_models().chain(ctx.db.walk_views()) {
             if let Some(name) = model.primary_key().and_then(|k| k.constraint_name(ctx.connector)) {
                 let schema_name = model.schema_name();
                 let counter = self.global.entry((scope, schema_name, name)).or_default();
@@ -95,7 +100,12 @@ impl<'db> ConstraintNamespace<'db> {
 
     /// Add all default constraints from the data model to a global validation scope.
     pub(super) fn add_global_default_constraints(&mut self, scope: ConstraintScope, ctx: &super::Context<'db>) {
-        for field in ctx.db.walk_models().flat_map(|m| m.scalar_fields()) {
+        for field in ctx
+            .db
+            .walk_models()
+            .chain(ctx.db.walk_views())
+            .flat_map(|m| m.scalar_fields())
+        {
             if let Some(name) = field.default_value().map(|d| d.constraint_name(ctx.connector)) {
                 let name = match name {
                     Cow::Borrowed(bor) => Cow::Owned(bor.to_string()),
@@ -113,7 +123,7 @@ impl<'db> ConstraintNamespace<'db> {
 
     /// Add all index and unique constraints to separate namespaces per model.
     pub(super) fn add_local_indexes(&mut self, scope: ConstraintScope, ctx: &super::Context<'db>) {
-        for model in ctx.db.walk_models() {
+        for model in ctx.db.walk_models().chain(ctx.db.walk_views()) {
             for index in model.indexes() {
                 let counter = self
                     .local
@@ -127,7 +137,7 @@ impl<'db> ConstraintNamespace<'db> {
 
     /// Add all primary key constraints to separate namespaces per model.
     pub(super) fn add_local_primary_keys(&mut self, scope: ConstraintScope, ctx: &super::Context<'db>) {
-        for model in ctx.db.walk_models() {
+        for model in ctx.db.walk_models().chain(ctx.db.walk_views()) {
             if let Some(name) = model.primary_key().and_then(|pk| pk.constraint_name(ctx.connector)) {
                 let counter = self.local.entry((model.model_id(), scope, name)).or_default();
                 *counter += 1;
@@ -137,7 +147,7 @@ impl<'db> ConstraintNamespace<'db> {
 
     /// Add all primary key and unique index custom names to separate namespaces per model.
     pub(super) fn add_local_custom_names_for_primary_keys_and_uniques(&mut self, ctx: &super::Context<'db>) {
-        for model in ctx.db.walk_models() {
+        for model in ctx.db.walk_models().chain(ctx.db.walk_views()) {
             if let Some(name) = model.primary_key().and_then(|pk| pk.name()) {
                 let counter = self
                     .local_custom_name

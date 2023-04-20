@@ -8,11 +8,11 @@ pub struct SingleRecord {
     pub field_names: Vec<String>,
 }
 
-impl Into<ManyRecords> for SingleRecord {
-    fn into(self) -> ManyRecords {
+impl From<SingleRecord> for ManyRecords {
+    fn from(single: SingleRecord) -> ManyRecords {
         ManyRecords {
-            records: vec![self.record],
-            field_names: self.field_names,
+            records: vec![single.record],
+            field_names: single.field_names,
         }
     }
 }
@@ -161,7 +161,6 @@ impl Record {
     ) -> crate::Result<SelectionResult> {
         let pairs: Vec<_> = extraction_selection
             .selections()
-            .into_iter()
             .map(|selection| {
                 self.get_field_value(field_names, selection.db_name())
                     .and_then(|val| Ok((selection.clone(), selection.coerce_value(val.clone())?)))
@@ -178,12 +177,11 @@ impl Record {
     ) -> crate::Result<Vec<&PrismaValue>> {
         let x: Vec<&PrismaValue> = model_projection
             .fields()
-            .into_iter()
             .flat_map(|field| {
                 field
                     .scalar_fields()
                     .into_iter()
-                    .map(|source_field| self.get_field_value(field_names, &source_field.name))
+                    .map(|source_field| self.get_field_value(field_names, source_field.name()))
             })
             .collect::<crate::Result<Vec<_>>>()?;
 

@@ -1,135 +1,117 @@
 use super::*;
 use crate::constants::{filters, itx, json_null, ordering};
-use schema::EnumType;
+use prisma_models::prelude::ParentContainer;
+use schema::{EnumType, EnumTypeId};
 
-pub(crate) fn sort_order_enum(ctx: &mut BuilderContext) -> EnumTypeWeakRef {
-    let ident = Identifier::new(ordering::SORT_ORDER, PRISMA_NAMESPACE);
+pub(crate) fn sort_order_enum(ctx: &mut BuilderContext<'_>) -> EnumTypeId {
+    let ident = Identifier::new_prisma(ordering::SORT_ORDER);
     return_cached_enum!(ctx, &ident);
 
-    let typ = Arc::new(EnumType::string(
-        ident.clone(),
-        vec![ordering::ASC.to_owned(), ordering::DESC.to_owned()],
-    ));
+    let typ = EnumType::string(ident.clone(), vec![ordering::ASC.to_owned(), ordering::DESC.to_owned()]);
 
-    ctx.cache_enum_type(ident, typ.clone());
-    Arc::downgrade(&typ)
+    ctx.cache_enum_type(ident, typ)
 }
 
-pub(crate) fn nulls_order_enum(ctx: &mut BuilderContext) -> EnumTypeWeakRef {
-    let ident = Identifier::new(ordering::NULLS_ORDER, PRISMA_NAMESPACE);
+pub(crate) fn nulls_order_enum(ctx: &mut BuilderContext<'_>) -> EnumTypeId {
+    let ident = Identifier::new_prisma(ordering::NULLS_ORDER);
     return_cached_enum!(ctx, &ident);
 
-    let typ = Arc::new(EnumType::string(
+    let typ = EnumType::string(
         ident.clone(),
         vec![ordering::FIRST.to_owned(), ordering::LAST.to_owned()],
-    ));
+    );
 
-    ctx.cache_enum_type(ident, typ.clone());
-    Arc::downgrade(&typ)
+    ctx.cache_enum_type(ident, typ)
 }
 
-pub(crate) fn map_schema_enum_type(ctx: &mut BuilderContext, enum_name: &str) -> EnumTypeWeakRef {
-    let ident = Identifier::new(enum_name, MODEL_NAMESPACE);
+pub(crate) fn map_schema_enum_type(ctx: &mut BuilderContext<'_>, enum_id: ast::EnumId) -> EnumTypeId {
+    let ident = Identifier::new_model(IdentifierType::Enum(ctx.internal_data_model.clone().zip(enum_id)));
     return_cached_enum!(ctx, &ident);
 
-    let schema_enum = ctx
-        .internal_data_model
-        .find_enum(enum_name)
-        .expect("Enum references must always be valid.");
-
-    let typ = Arc::new(EnumType::database(ident.clone(), schema_enum));
-
-    ctx.cache_enum_type(ident, typ.clone());
-    Arc::downgrade(&typ)
+    let schema_enum = ctx.internal_data_model.clone().zip(enum_id);
+    let typ = EnumType::database(ident.clone(), schema_enum);
+    ctx.cache_enum_type(ident, typ)
 }
 
-pub(crate) fn model_field_enum(ctx: &mut BuilderContext, model: &ModelRef) -> EnumTypeWeakRef {
-    let name = format!("{}ScalarFieldEnum", capitalize(&model.name));
-    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+pub(crate) fn model_field_enum(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> EnumTypeId {
+    let ident = Identifier::new_prisma(IdentifierType::ScalarFieldEnum(model.clone()));
     return_cached_enum!(ctx, &ident);
 
     let values = model
         .fields()
         .scalar()
         .into_iter()
-        .map(|field| (field.name.clone(), field))
+        .map(|field| (field.name().to_owned(), field))
         .collect();
 
-    let typ = Arc::new(EnumType::field_ref(ident.clone(), values));
-
-    ctx.cache_enum_type(ident, typ.clone());
-    Arc::downgrade(&typ)
+    let typ = EnumType::field_ref(ident.clone(), values);
+    ctx.cache_enum_type(ident, typ)
 }
 
-pub(crate) fn json_null_filter_enum(ctx: &mut BuilderContext) -> EnumTypeWeakRef {
-    let ident = Identifier::new(json_null::FILTER_ENUM_NAME, PRISMA_NAMESPACE);
+pub(crate) fn json_null_filter_enum(ctx: &mut BuilderContext<'_>) -> EnumTypeId {
+    let ident = Identifier::new_prisma(json_null::FILTER_ENUM_NAME);
     return_cached_enum!(ctx, &ident);
 
-    let typ = Arc::new(EnumType::string(
+    let typ = EnumType::string(
         ident.clone(),
         vec![
             json_null::DB_NULL.to_owned(),
             json_null::JSON_NULL.to_owned(),
             json_null::ANY_NULL.to_owned(),
         ],
-    ));
+    );
 
-    ctx.cache_enum_type(ident, typ.clone());
-    Arc::downgrade(&typ)
+    ctx.cache_enum_type(ident, typ)
 }
 
-pub(crate) fn json_null_input_enum(ctx: &mut BuilderContext, nullable: bool) -> EnumTypeWeakRef {
+pub(crate) fn json_null_input_enum(ctx: &mut BuilderContext<'_>, nullable: bool) -> EnumTypeId {
     let ident = if nullable {
-        Identifier::new(json_null::NULLABLE_INPUT_ENUM_NAME, PRISMA_NAMESPACE)
+        Identifier::new_prisma(json_null::NULLABLE_INPUT_ENUM_NAME)
     } else {
-        Identifier::new(json_null::INPUT_ENUM_NAME, PRISMA_NAMESPACE)
+        Identifier::new_prisma(json_null::INPUT_ENUM_NAME)
     };
 
     return_cached_enum!(ctx, &ident);
 
     let typ = if nullable {
-        Arc::new(EnumType::string(
+        EnumType::string(
             ident.clone(),
             vec![json_null::DB_NULL.to_owned(), json_null::JSON_NULL.to_owned()],
-        ))
+        )
     } else {
-        Arc::new(EnumType::string(ident.clone(), vec![json_null::JSON_NULL.to_owned()]))
+        EnumType::string(ident.clone(), vec![json_null::JSON_NULL.to_owned()])
     };
 
-    ctx.cache_enum_type(ident, typ.clone());
-    Arc::downgrade(&typ)
+    ctx.cache_enum_type(ident, typ)
 }
 
 pub(crate) fn order_by_relevance_enum(
-    ctx: &mut BuilderContext,
-    container: &str,
+    ctx: &mut BuilderContext<'_>,
+    container: &ParentContainer,
     values: Vec<String>,
-) -> EnumTypeWeakRef {
-    let name = format!("{}OrderByRelevanceFieldEnum", container);
-    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+) -> EnumTypeId {
+    let ident = Identifier::new_prisma(IdentifierType::OrderByRelevanceFieldEnum(container.clone()));
     return_cached_enum!(ctx, &ident);
 
-    let typ = Arc::new(EnumType::string(ident.clone(), values));
+    let typ = EnumType::string(ident.clone(), values);
 
-    ctx.cache_enum_type(ident, typ.clone());
-    Arc::downgrade(&typ)
+    ctx.cache_enum_type(ident, typ)
 }
 
-pub(crate) fn query_mode_enum(ctx: &mut BuilderContext) -> EnumTypeWeakRef {
-    let ident = Identifier::new("QueryMode", PRISMA_NAMESPACE);
+pub(crate) fn query_mode_enum(ctx: &mut BuilderContext<'_>) -> EnumTypeId {
+    let ident = Identifier::new_prisma("QueryMode");
     return_cached_enum!(ctx, &ident);
 
-    let typ = Arc::new(EnumType::string(
+    let typ = EnumType::string(
         ident.clone(),
         vec![filters::DEFAULT.to_owned(), filters::INSENSITIVE.to_owned()],
-    ));
+    );
 
-    ctx.cache_enum_type(ident, typ.clone());
-    Arc::downgrade(&typ)
+    ctx.cache_enum_type(ident, typ)
 }
 
-pub(crate) fn itx_isolation_levels(ctx: &mut BuilderContext) -> Option<EnumTypeWeakRef> {
-    let ident = Identifier::new("TransactionIsolationLevel", PRISMA_NAMESPACE);
+pub(crate) fn itx_isolation_levels(ctx: &mut BuilderContext<'_>) -> Option<EnumTypeId> {
+    let ident = Identifier::new_prisma(IdentifierType::TransactionIsolationLevel);
     if let e @ Some(_) = ctx.get_enum_type(&ident) {
         return e;
     }
@@ -160,8 +142,6 @@ pub(crate) fn itx_isolation_levels(ctx: &mut BuilderContext) -> Option<EnumTypeW
         return None;
     }
 
-    let typ = Arc::new(EnumType::string(ident.clone(), values));
-    ctx.cache_enum_type(ident, typ.clone());
-
-    Some(Arc::downgrade(&typ))
+    let typ = EnumType::string(ident.clone(), values);
+    Some(ctx.cache_enum_type(ident, typ))
 }

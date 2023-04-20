@@ -3,7 +3,7 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputMap, ParsedInputValue, Query, WriteQuery,
 };
-use connector::Filter;
+use connector::{Filter, RelationCompare};
 use itertools::Itertools;
 use prisma_models::{ModelRef, PrismaValue, RelationFieldRef, SelectionResult};
 use std::convert::TryInto;
@@ -27,7 +27,7 @@ pub fn nested_disconnect(
             .into_iter()
             .map(|value: ParsedInputValue| {
                 let value: ParsedInputMap = value.try_into()?;
-                extract_unique_filter(value, &child_model)
+                extract_unique_filter(value, child_model)
             })
             .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
             .into_iter()
@@ -57,7 +57,7 @@ pub fn nested_disconnect(
                     .into_iter()
                     .map(|value: ParsedInputValue| {
                         let value: ParsedInputMap = value.try_into()?;
-                        extract_unique_filter(value, &child_model)
+                        extract_unique_filter(value, child_model)
                     })
                     .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
                     .into_iter()
@@ -114,7 +114,7 @@ fn handle_many_to_many(
     let find_child_records_node =
         utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, filter)?;
 
-    disconnect::disconnect_records_node(graph, parent_node, &find_child_records_node, &parent_relation_field)?;
+    disconnect::disconnect_records_node(graph, parent_node, &find_child_records_node, parent_relation_field)?;
     Ok(())
 }
 
@@ -154,7 +154,7 @@ fn handle_one_to_x(
 ) -> QueryGraphBuilderResult<()> {
     // Fetches the children to be disconnected.
     let find_child_records_node =
-        utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, filter.clone())?;
+        utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, filter.clone())?;
 
     let child_relation_field = parent_relation_field.related_field();
 
@@ -165,14 +165,21 @@ fn handle_one_to_x(
     }
 
     // Depending on where the relation is inlined, we update the parent or the child nodes.
-    let (node_to_attach, model_to_update, extractor_model_id, null_record_id) =
+    let (node_to_attach, model_to_update, extractor_model_id, null_record_id, filter) =
         if parent_relation_field.is_inlined_on_enclosing_model() {
             // Inlined on parent
             let parent_model = parent_relation_field.model();
             let extractor_model_id = parent_model.primary_identifier();
             let null_record_id = SelectionResult::from(&parent_relation_field.linking_fields());
+            // If the relation is inlined on the parent and a filter is applied on the child then it means the update will be done on the parent table.
+            // Therefore, the filter applied on the child needs to be converted to a "relational" filter so that the connector renders the adequate SQL to join the Child table.
+            let filter = if !filter.is_empty() {
+                parent_relation_field.to_one_related(filter)
+            } else {
+                filter
+            };
 
-            (parent_node, parent_model, extractor_model_id, null_record_id)
+            (parent_node, parent_model, extractor_model_id, null_record_id, filter)
         } else {
             // Inlined on child
             let child_model = child_relation_field.model();
@@ -184,10 +191,11 @@ fn handle_one_to_x(
                 child_model,
                 extractor_model_id,
                 null_record_id,
+                filter,
             )
         };
 
-    let update_node = utils::update_records_node_placeholder(graph, filter.clone(), model_to_update);
+    let update_node = utils::update_records_node_placeholder(graph, filter, model_to_update);
 
     // Edge to inject the correct data into the update (either from the parent or child).
     graph.create_edge(

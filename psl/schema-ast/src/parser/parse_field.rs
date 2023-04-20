@@ -10,6 +10,7 @@ use diagnostics::{DatamodelError, Diagnostics};
 
 pub(crate) fn parse_field(
     model_name: &str,
+    container_type: &'static str,
     pair: Pair<'_>,
     block_comment: Option<Pair<'_>>,
     diagnostics: &mut Diagnostics,
@@ -54,6 +55,7 @@ pub(crate) fn parse_field(
         }),
         _ => Err(DatamodelError::new_model_validation_error(
             "This field declaration is invalid. It is either missing a name or a type.",
+            container_type,
             model_name,
             pair_span.into(),
         )),
