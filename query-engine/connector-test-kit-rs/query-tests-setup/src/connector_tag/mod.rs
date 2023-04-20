@@ -18,7 +18,7 @@ pub use vitess::*;
 use crate::{datamodel_rendering::DatamodelRenderer, TestError, CONFIG};
 use cockroachdb::*;
 use enum_dispatch::enum_dispatch;
-use psl::datamodel_connector::ConnectorCapability;
+use psl::datamodel_connector::ConnectorCapabilities;
 use std::{convert::TryFrom, fmt};
 
 #[enum_dispatch]
@@ -44,7 +44,7 @@ pub trait ConnectorTagInterface {
     ) -> String;
 
     /// Capabilities of the implementing connector.
-    fn capabilities(&self) -> &[ConnectorCapability];
+    fn capabilities(&self) -> ConnectorCapabilities;
 
     /// Serialization of the connector. Expected to return `(tag_name, version)`.
     /// Todo: Think of something better.
@@ -170,11 +170,11 @@ impl ConnectorTag {
     pub(crate) fn should_run(
         only: &[(&str, Option<&str>)],
         exclude: &[(&str, Option<&str>)],
-        capabilities: &[ConnectorCapability],
+        capabilities: ConnectorCapabilities,
     ) -> bool {
         let connector = CONFIG.test_connector_tag().unwrap();
 
-        if !capabilities.is_empty() && !capabilities.iter().all(|cap| connector.capabilities().contains(cap)) {
+        if !capabilities.is_empty() && !connector.capabilities().contains(capabilities) {
             println!("Connector excluded. Missing required capability.");
             return false;
         }

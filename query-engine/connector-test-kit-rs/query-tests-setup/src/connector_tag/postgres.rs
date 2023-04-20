@@ -4,7 +4,6 @@ use crate::{datamodel_rendering::SqlDatamodelRenderer, TestError, TestResult};
 #[derive(Debug, Default, Clone)]
 pub struct PostgresConnectorTag {
     version: Option<PostgresVersion>,
-    capabilities: Vec<ConnectorCapability>,
 }
 
 impl ConnectorTagInterface for PostgresConnectorTag {
@@ -64,8 +63,8 @@ impl ConnectorTagInterface for PostgresConnectorTag {
         }
     }
 
-    fn capabilities(&self) -> &[ConnectorCapability] {
-        &self.capabilities
+    fn capabilities(&self) -> ConnectorCapabilities {
+        psl::builtin_connectors::POSTGRES.capabilities()
     }
 
     fn as_parse_pair(&self) -> (String, Option<String>) {
@@ -97,47 +96,35 @@ impl PostgresConnectorTag {
             None => None,
         };
 
-        Ok(Self {
-            version,
-            capabilities: postgres_capabilities(),
-        })
+        Ok(Self { version })
     }
 
     /// Returns all versions of this connector.
     pub fn all() -> Vec<Self> {
-        let capabilities = postgres_capabilities();
         vec![
             Self {
                 version: Some(PostgresVersion::V9),
-                capabilities: capabilities.clone(),
             },
             Self {
                 version: Some(PostgresVersion::V10),
-                capabilities: capabilities.clone(),
             },
             Self {
                 version: Some(PostgresVersion::V11),
-                capabilities: capabilities.clone(),
             },
             Self {
                 version: Some(PostgresVersion::V12),
-                capabilities: capabilities.clone(),
             },
             Self {
                 version: Some(PostgresVersion::V13),
-                capabilities: capabilities.clone(),
             },
             Self {
                 version: Some(PostgresVersion::V14),
-                capabilities: capabilities.clone(),
             },
             Self {
                 version: Some(PostgresVersion::V15),
-                capabilities: capabilities.clone(),
             },
             Self {
                 version: Some(PostgresVersion::PgBouncer),
-                capabilities,
             },
         ]
     }
@@ -191,8 +178,4 @@ impl ToString for PostgresVersion {
         }
         .to_owned()
     }
-}
-
-fn postgres_capabilities() -> Vec<ConnectorCapability> {
-    psl::builtin_connectors::POSTGRES.capabilities().to_owned()
 }

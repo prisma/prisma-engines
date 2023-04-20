@@ -22,7 +22,7 @@ pub use templating::*;
 
 use colored::Colorize;
 use once_cell::sync::Lazy;
-use psl::datamodel_connector::ConnectorCapability;
+use psl::datamodel_connector::ConnectorCapabilities;
 use query_engine_metrics::MetricRegistry;
 use std::future::Future;
 use std::sync::Once;
@@ -98,7 +98,7 @@ pub fn run_relation_link_test<F>(
     id_only: bool,
     only: &[(&str, Option<&str>)],
     exclude: &[(&str, Option<&str>)],
-    required_capabilities: &[ConnectorCapability],
+    required_capabilities: ConnectorCapabilities,
     (suite_name, test_name): (&str, &str),
     test_fn: F,
 ) where
@@ -135,7 +135,7 @@ fn run_relation_link_test_impl(
     id_only: bool,
     only: &[(&str, Option<&str>)],
     exclude: &[(&str, Option<&str>)],
-    required_capabilities: &[ConnectorCapability],
+    required_capabilities: ConnectorCapabilities,
     (suite_name, test_name): (&str, &str),
     test_fn: &dyn for<'a> Fn(&'a Runner, &'a DatamodelWithParams) -> BoxFuture<'a, TestResult<()>>,
 ) {
@@ -143,21 +143,17 @@ fn run_relation_link_test_impl(
         Lazy::new(|| std::env::var("RELATION_TEST_IDX").ok().and_then(|s| s.parse().ok()));
 
     let (dms, capabilities) = schema_with_relation(on_parent, on_child, id_only);
-    let mut required_capabilities_for_test = Vec::with_capacity(required_capabilities.len());
 
     for (i, (dm, caps)) in dms.into_iter().zip(capabilities.into_iter()).enumerate() {
         if RELATION_TEST_IDX.map(|idx| idx != i).unwrap_or(false) {
             continue;
         }
 
-        required_capabilities_for_test.clear();
-        required_capabilities_for_test.extend(required_capabilities.iter());
-        required_capabilities_for_test.extend(caps);
-
+        let required_capabilities_for_test = required_capabilities | caps;
         let test_db_name = format!("{suite_name}_{test_name}_{i}");
         let template = dm.datamodel().to_owned();
 
-        if !ConnectorTag::should_run(only, exclude, &required_capabilities_for_test) {
+        if !ConnectorTag::should_run(only, exclude, required_capabilities_for_test) {
             continue;
         }
 
@@ -212,7 +208,7 @@ pub fn run_connector_test<T>(
     test_database_name: &str,
     only: &[(&str, Option<&str>)],
     exclude: &[(&str, Option<&str>)],
-    capabilities: &[ConnectorCapability],
+    capabilities: ConnectorCapabilities,
     excluded_features: &[&str],
     handler: fn() -> String,
     db_schemas: &[&str],
@@ -247,7 +243,7 @@ fn run_connector_test_impl(
     test_database_name: &str,
     only: &[(&str, Option<&str>)],
     exclude: &[(&str, Option<&str>)],
-    capabilities: &[ConnectorCapability],
+    capabilities: ConnectorCapabilities,
     excluded_features: &[&str],
     handler: fn() -> String,
     db_schemas: &[&str],
