@@ -11,7 +11,6 @@ mod migration_persistence;
 mod migration_step_applier;
 mod sampler;
 mod schema_calculator;
-mod warnings;
 
 use client_wrapper::{mongo_error_to_connector_error, Client};
 use enumflags2::BitFlags;

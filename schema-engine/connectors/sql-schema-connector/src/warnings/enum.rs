@@ -1,6 +1,5 @@
 use crate::{introspection_pair::EnumPair, sanitize_datamodel_names};
-
-use super::generators::{self, Warnings};
+use schema_connector::{warnings as generators, Warnings};
 
 /// Analyze and generate warnigs from an enum.
 pub(super) fn generate_warnings(r#enum: EnumPair<'_>, warnings: &mut Warnings) {

@@ -42,30 +42,6 @@ impl TestResult {
         let warnings = serde_json::to_string_pretty(&self.warnings).unwrap();
         expect.assert_eq(&warnings);
     }
-
-    #[track_caller]
-    pub fn assert_warning_code(&self, code: u32) {
-        assert!(self.warnings.iter().any(|w| w.code == code), "{:#?}", self.warnings)
-    }
-
-    #[track_caller]
-    pub fn assert_warning(&self, warning: &str) {
-        assert!(
-            self.warnings.iter().any(|w| w.message == warning),
-            "{:#?}",
-            self.warnings
-        )
-    }
-
-    #[track_caller]
-    pub fn assert_no_warnings(&self) {
-        assert!(self.warnings.is_empty(), "{:#?}", self.warnings)
-    }
-
-    #[track_caller]
-    pub fn assert_warning_affected(&self, affected: &serde_json::Value) {
-        assert!(&self.warnings[0].affected == affected, "{:#?}", self.warnings);
-    }
 }
 
 pub(super) fn introspect_features<F, U>(
