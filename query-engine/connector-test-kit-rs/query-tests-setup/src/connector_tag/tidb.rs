@@ -2,39 +2,35 @@ use super::*;
 use crate::SqlDatamodelRenderer;
 use psl::datamodel_connector::ConnectorCapability;
 
-const CAPABILITIES: &[ConnectorCapability] = &[
-    ConnectorCapability::Enums,
-    ConnectorCapability::EnumArrayPush,
-    ConnectorCapability::Json,
-    ConnectorCapability::AutoIncrementAllowedOnNonId,
-    ConnectorCapability::RelationFieldsInArbitraryOrder,
-    ConnectorCapability::CreateMany,
-    ConnectorCapability::WritableAutoincField,
-    ConnectorCapability::CreateSkipDuplicates,
-    ConnectorCapability::UpdateableId,
-    ConnectorCapability::JsonFiltering,
-    ConnectorCapability::JsonFilteringJsonPath,
-    ConnectorCapability::JsonFilteringAlphanumeric,
-    ConnectorCapability::CreateManyWriteableAutoIncId,
-    ConnectorCapability::AutoIncrement,
-    ConnectorCapability::CompoundIds,
-    ConnectorCapability::AnyId,
-    ConnectorCapability::SqlQueryRaw,
-    ConnectorCapability::NamedForeignKeys,
-    ConnectorCapability::AdvancedJsonNullability,
-    ConnectorCapability::IndexColumnLengthPrefixing,
-    ConnectorCapability::MultiSchema,
-    // ConnectorCapability::FullTextIndex,
-    // ConnectorCapability::FullTextSearchWithIndex,
-    // ConnectorCapability::MultipleFullTextAttributesPerModel,
-    ConnectorCapability::ImplicitManyToManyRelation,
-    ConnectorCapability::DecimalType,
-    ConnectorCapability::OrderByNullsFirstLast,
-    ConnectorCapability::SupportsTxIsolationReadUncommitted,
-    ConnectorCapability::SupportsTxIsolationReadCommitted,
-    ConnectorCapability::SupportsTxIsolationRepeatableRead,
-    // ConnectorCapability::SupportsTxIsolationSerializable,
-];
+const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
+    Enums |
+    EnumArrayPush |
+    Json |
+    AutoIncrementAllowedOnNonId |
+    RelationFieldsInArbitraryOrder |
+    CreateMany |
+    WritableAutoincField |
+    CreateSkipDuplicates |
+    UpdateableId |
+    JsonFiltering |
+    JsonFilteringJsonPath |
+    JsonFilteringAlphanumeric |
+    CreateManyWriteableAutoIncId |
+    AutoIncrement |
+    CompoundIds |
+    AnyId |
+    SqlQueryRaw |
+    NamedForeignKeys |
+    AdvancedJsonNullability |
+    IndexColumnLengthPrefixing |
+    MultiSchema |
+    ImplicitManyToManyRelation |
+    DecimalType |
+    OrderByNullsFirstLast |
+    SupportsTxIsolationReadUncommitted |
+    SupportsTxIsolationReadCommitted |
+    SupportsTxIsolationRepeatableRead
+});
 
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct TiDBConnectorTag {
@@ -69,19 +65,11 @@ impl ConnectorTagInterface for TiDBConnectorTag {
 
 impl TiDBConnectorTag {
     pub fn new() -> Self {
-        Self {
-            capabilities: tidb_capabilities(),
-        }
+        Self
     }
 
     /// Returns all versions of this connector.
     pub fn all() -> Vec<Self> {
-        vec![Self {
-            capabilities: tidb_capabilities(),
-        }]
+        vec![Self::new()]
     }
-}
-
-fn tidb_capabilities() -> Vec<ConnectorCapability> {
-    CAPABILITIES.to_owned()
 }
