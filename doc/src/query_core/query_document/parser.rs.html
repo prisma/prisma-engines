@@ -979,15 +979,13 @@
 <a href="#979" id="979">979</a>
 <a href="#980" id="980">980</a>
 <a href="#981" id="981">981</a>
-<a href="#982" id="982">982</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{executor::get_engine_protocol, schema::<span class="kw-2">*</span>};
 <span class="kw">use </span>bigdecimal::{BigDecimal, ToPrimitive};
 <span class="kw">use </span>chrono::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>core::fmt;
 <span class="kw">use </span>indexmap::IndexSet;
-<span class="kw">use </span>prisma_models::{DefaultKind, ValueGeneratorFn};
-<span class="kw">use </span>prisma_value::PrismaValue;
+<span class="kw">use </span>prisma_models::{DefaultKind, PrismaValue, ValueGeneratorFn};
 <span class="kw">use </span>std::{convert::TryFrom, str::FromStr};
 <span class="kw">use </span>user_facing_errors::query_engine::validation::ValidationError;
 <span class="kw">use </span>uuid::Uuid;
@@ -1415,7 +1413,7 @@
         argument_path: <span class="kw-2">&amp;</span>Path,
         s: <span class="kw-2">&amp;</span>str,
     ) -&gt; QueryParserResult&lt;DateTime&lt;FixedOffset&gt;&gt; {
-        prisma_value::parse_datetime(s).map_err(|err| {
+        prisma_models::parse_datetime(s).map_err(|err| {
             ValidationError::invalid_argument_value(
                 selection_path.segments(),
                 argument_path.segments(),
@@ -1427,7 +1425,7 @@
     }
 
     <span class="kw">fn </span>parse_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>, selection_path: <span class="kw-2">&amp;</span>Path, argument_path: <span class="kw-2">&amp;</span>Path, s: String) -&gt; QueryParserResult&lt;PrismaValue&gt; {
-        prisma_value::decode_bytes(<span class="kw-2">&amp;</span>s).map(PrismaValue::Bytes).map_err(|err| {
+        prisma_models::decode_bytes(<span class="kw-2">&amp;</span>s).map(PrismaValue::Bytes).map_err(|err| {
             ValidationError::invalid_argument_value(
                 selection_path.segments(),
                 argument_path.segments(),
