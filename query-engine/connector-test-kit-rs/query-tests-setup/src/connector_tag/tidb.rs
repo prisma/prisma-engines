@@ -62,7 +62,6 @@ impl ConnectorTagInterface for TiDBConnectorTag {
     fn is_versioned(&self) -> bool {
         false
     }
-
 }
 
 impl TiDBConnectorTag {

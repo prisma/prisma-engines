@@ -358,4 +358,3 @@ async fn introspect_tidb_non_prisma(api: &mut TestApi) -> TestResult {
 
     Ok(())
 }
-
