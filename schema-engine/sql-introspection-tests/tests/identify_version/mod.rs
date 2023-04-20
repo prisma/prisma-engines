@@ -340,3 +340,22 @@ async fn introspect_mssql_non_prisma_empty(api: &mut TestApi) -> TestResult {
 
     Ok(())
 }
+
+// TiDB
+
+#[test_connector(tags(TiDB))]
+async fn introspect_tidb_non_prisma(api: &mut TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Book", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("meta json");
+            });
+        })
+        .await?;
+
+    assert_eq!(Version::NonPrisma, api.introspect_version().await?);
+
+    Ok(())
+}
+

@@ -18,7 +18,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::CompoundIds,
     ConnectorCapability::AnyId,
     ConnectorCapability::SqlQueryRaw,
-    // ConnectorCapability::NamedForeignKeys,
+    ConnectorCapability::NamedForeignKeys,
     ConnectorCapability::AdvancedJsonNullability,
     ConnectorCapability::IndexColumnLengthPrefixing,
     // ConnectorCapability::FullTextIndex,
@@ -63,9 +63,6 @@ impl ConnectorTagInterface for TiDBConnectorTag {
         false
     }
 
-    fn relation_mode(&self) -> &'static str {
-        "prisma"
-    }
 }
 
 impl TiDBConnectorTag {

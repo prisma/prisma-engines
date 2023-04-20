@@ -142,7 +142,7 @@ mod views {
              => {
                 r#"CREATE VIEW "TestView" AS SELECT "TestModel".id, "TestModel"."firstName", "TestModel"."lastName", CONCAT("TestModel"."firstName", ' ', "TestModel"."lastName") as "fullName" From "TestModel""#.to_owned()
             }
-            ConnectorTag::MySql(_) | ConnectorTag::Vitess(_)
+            ConnectorTag::MySql(_) | ConnectorTag::Vitess(_) | ConnectorTag::TiDB(_)
              => {
               r#"CREATE VIEW TestView AS SELECT TestModel.*, CONCAT(TestModel.firstName, ' ', TestModel.lastName) AS "fullName" FROM TestModel"#.to_owned()
             },

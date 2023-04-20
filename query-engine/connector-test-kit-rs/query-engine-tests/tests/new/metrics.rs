@@ -32,6 +32,7 @@ mod metrics {
             MongoDb(_) => assert_eq!(total_queries, 5),
             CockroachDb => assert_eq!(total_queries, 10),
             MySql(_) => assert_eq!(total_queries, 9),
+            TiDB => assert_eq!(total_queries, 9),
             Vitess(_) => assert_eq!(total_queries, 11),
             _ => assert_eq!(total_queries, 11),
         }
