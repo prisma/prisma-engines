@@ -18,7 +18,6 @@ itertools = "0.10"
 once_cell = "1"
 petgraph = "0.4"
 prisma-models = { path = "../prisma-models", features = ["default_generators"] }
-prisma-value = { path = "../../libs/prisma-value" }
 opentelemetry = { version = "0.17.0", features = ["rt-tokio", "serialize"] }
 query-engine-metrics = {path = "../metrics"}
 serde.workspace = true
