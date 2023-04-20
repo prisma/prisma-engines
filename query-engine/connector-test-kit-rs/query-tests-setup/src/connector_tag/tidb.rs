@@ -12,6 +12,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::WritableAutoincField,
     ConnectorCapability::CreateSkipDuplicates,
     ConnectorCapability::UpdateableId,
+    ConnectorCapability::JsonFiltering,
     ConnectorCapability::JsonFilteringJsonPath,
     ConnectorCapability::JsonFilteringAlphanumeric,
     ConnectorCapability::CreateManyWriteableAutoIncId,
@@ -22,6 +23,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::NamedForeignKeys,
     ConnectorCapability::AdvancedJsonNullability,
     ConnectorCapability::IndexColumnLengthPrefixing,
+    ConnectorCapability::MultiSchema,
     // ConnectorCapability::FullTextIndex,
     // ConnectorCapability::FullTextSearchWithIndex,
     // ConnectorCapability::MultipleFullTextAttributesPerModel,
@@ -74,10 +76,12 @@ impl TiDBConnectorTag {
 
     /// Returns all versions of this connector.
     pub fn all() -> Vec<Self> {
-        vec![Self::new()]
+        vec![Self {
+            capabilities: tidb_capabilities(),
+        }]
     }
 }
 
 fn tidb_capabilities() -> Vec<ConnectorCapability> {
-    (CAPABILITIES).to_vec()
+    CAPABILITIES.to_owned()
 }
