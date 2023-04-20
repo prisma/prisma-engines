@@ -512,6 +512,27 @@ impl PostgresUrl {
         self.query_params.connection_limit
     }
 
+    /// On Postgres, we set the SEARCH_PATH and client-encoding through client connection parameters to save a network roundtrip on connection.
+    /// We can't always do it for CockroachDB because it does not expect quotes for unsafe identifiers (https://github.com/cockroachdb/cockroach/issues/101328), which might change once the issue is fixed.
+    /// To circumvent that problem, we only set the SEARCH_PATH through client connection parameters for Cockroach when the identifier is safe, so that the quoting does not matter.
+    fn set_search_path(&self, config: &mut Config) {
+        // PGBouncer does not support the search_path connection parameter.
+        // https://www.pgbouncer.org/config.html#ignore_startup_parameters
+        if self.query_params.pg_bouncer {
+            return;
+        }
+
+        if let Some(schema) = &self.query_params.schema {
+            if self.flavour().is_cockroach() && is_safe_identifier(schema) {
+                config.search_path(CockroachSearchPath(schema).to_string());
+            }
+
+            if self.flavour().is_postgres() {
+                config.search_path(PostgresSearchPath(schema).to_string());
+            }
+        }
+    }
+
     pub(crate) fn to_config(&self) -> Config {
         let mut config = Config::new();
 
@@ -534,18 +555,7 @@ impl PostgresUrl {
             config.connect_timeout(connect_timeout);
         }
 
-        // On Postgres, we set the SEARCH_PATH and client-encoding through client connection parameters to save a network roundtrip on connection.
-        // We can't always do it for CockroachDB because it does not expect quotes for unsafe identifiers (https://github.com/cockroachdb/cockroach/issues/101328), which might change once the issue is fixed.
-        // To circumvent that problem, we only set the SEARCH_PATH through client connection parameters for Cockroach when the identifier is safe, so that the quoting does not matter.
-        if let Some(schema) = &self.query_params.schema {
-            if self.flavour().is_cockroach() && is_safe_identifier(schema) {
-                config.search_path(CockroachSearchPath(schema).to_string());
-            }
-
-            if self.flavour().is_postgres() {
-                config.search_path(PostgresSearchPath(schema).to_string());
-            }
-        }
+        self.set_search_path(&mut config);
 
         config.ssl_mode(self.query_params.ssl_mode);
 
@@ -615,7 +625,12 @@ impl PostgreSql {
         // To circumvent that problem, we only set the SEARCH_PATH through client connection parameters for Cockroach when the identifier is safe, so that the quoting does not matter.
         // Finally, to ensure backward compatibility, we keep sending a database query in case the flavour is set to Unknown.
         if let Some(schema) = &url.query_params.schema {
-            if url.flavour().is_unknown() || (url.flavour().is_cockroach() && !is_safe_identifier(schema)) {
+            // PGBouncer does not support the search_path connection parameter.
+            // https://www.pgbouncer.org/config.html#ignore_startup_parameters
+            if url.query_params.pg_bouncer
+                || url.flavour().is_unknown()
+                || (url.flavour().is_cockroach() && !is_safe_identifier(schema))
+            {
                 let session_variables = format!(
                     r##"{set_search_path}"##,
                     set_search_path = SetSearchPath(url.query_params.schema.as_deref())
@@ -1187,6 +1202,58 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn test_custom_search_path_pg_pgbouncer() {
+        async fn test_path(schema_name: &str) -> Option<String> {
+            let mut url = Url::parse(&CONN_STR).unwrap();
+            url.query_pairs_mut().append_pair("schema", schema_name);
+            url.query_pairs_mut().append_pair("pbbouncer", "true");
+
+            let mut pg_url = PostgresUrl::new(url).unwrap();
+            pg_url.set_flavour(PostgresFlavour::Postgres);
+
+            let client = PostgreSql::new(pg_url).await.unwrap();
+
+            let result_set = client.query_raw("SHOW search_path", &[]).await.unwrap();
+            let row = result_set.first().unwrap();
+
+            row[0].to_string()
+        }
+
+        // Safe
+        assert_eq!(test_path("hello").await.as_deref(), Some("\"hello\""));
+        assert_eq!(test_path("_hello").await.as_deref(), Some("\"_hello\""));
+        assert_eq!(test_path("àbracadabra").await.as_deref(), Some("\"àbracadabra\""));
+        assert_eq!(test_path("h3ll0").await.as_deref(), Some("\"h3ll0\""));
+        assert_eq!(test_path("héllo").await.as_deref(), Some("\"héllo\""));
+        assert_eq!(test_path("héll0$").await.as_deref(), Some("\"héll0$\""));
+        assert_eq!(test_path("héll_0$").await.as_deref(), Some("\"héll_0$\""));
+
+        // Not safe
+        assert_eq!(test_path("Hello").await.as_deref(), Some("\"Hello\""));
+        assert_eq!(test_path("hEllo").await.as_deref(), Some("\"hEllo\""));
+        assert_eq!(test_path("$hello").await.as_deref(), Some("\"$hello\""));
+        assert_eq!(test_path("hello!").await.as_deref(), Some("\"hello!\""));
+        assert_eq!(test_path("hello#").await.as_deref(), Some("\"hello#\""));
+        assert_eq!(test_path("he llo").await.as_deref(), Some("\"he llo\""));
+        assert_eq!(test_path(" hello").await.as_deref(), Some("\" hello\""));
+        assert_eq!(test_path("he-llo").await.as_deref(), Some("\"he-llo\""));
+        assert_eq!(test_path("hÉllo").await.as_deref(), Some("\"hÉllo\""));
+        assert_eq!(test_path("1337").await.as_deref(), Some("\"1337\""));
+        assert_eq!(test_path("_HELLO").await.as_deref(), Some("\"_HELLO\""));
+        assert_eq!(test_path("HELLO").await.as_deref(), Some("\"HELLO\""));
+        assert_eq!(test_path("HELLO$").await.as_deref(), Some("\"HELLO$\""));
+        assert_eq!(test_path("ÀBRACADABRA").await.as_deref(), Some("\"ÀBRACADABRA\""));
+
+        for ident in RESERVED_KEYWORDS {
+            assert_eq!(test_path(ident).await.as_deref(), Some(format!("\"{ident}\"").as_str()));
+        }
+
+        for ident in RESERVED_TYPE_FUNCTION_NAMES {
+            assert_eq!(test_path(ident).await.as_deref(), Some(format!("\"{ident}\"").as_str()));
+        }
+    }
+
+    #[tokio::test]
     async fn test_custom_search_path_crdb() {
         async fn test_path(schema_name: &str) -> Option<String> {
             let mut url = Url::parse(&CRDB_CONN_STR).unwrap();
@@ -1456,5 +1523,64 @@ mod tests {
         for ident in RESERVED_TYPE_FUNCTION_NAMES {
             assert_eq!(is_safe_identifier(ident), false);
         }
+    }
+
+    #[test]
+    fn search_path_pgbouncer_should_be_set_with_query() {
+        let mut url = Url::parse(&CONN_STR).unwrap();
+        url.query_pairs_mut().append_pair("schema", "hello");
+        url.query_pairs_mut().append_pair("pgbouncer", "true");
+
+        let mut pg_url = PostgresUrl::new(url).unwrap();
+        pg_url.set_flavour(PostgresFlavour::Postgres);
+
+        let config = pg_url.to_config();
+
+        // PGBouncer does not support the `search_path` connection parameter.
+        // When `pgbouncer=true`, config.search_path should be None,
+        // And the `search_path` should be set via a db query after connection.
+        assert_eq!(config.get_search_path(), None);
+    }
+
+    #[test]
+    fn search_path_pg_should_be_set_with_param() {
+        let mut url = Url::parse(&CONN_STR).unwrap();
+        url.query_pairs_mut().append_pair("schema", "hello");
+
+        let mut pg_url = PostgresUrl::new(url).unwrap();
+        pg_url.set_flavour(PostgresFlavour::Postgres);
+
+        let config = pg_url.to_config();
+
+        // Postgres supports setting the search_path via a connection parameter.
+        assert_eq!(config.get_search_path(), Some(&"\"hello\"".to_owned()));
+    }
+
+    #[test]
+    fn search_path_crdb_safe_ident_should_be_set_with_param() {
+        let mut url = Url::parse(&CONN_STR).unwrap();
+        url.query_pairs_mut().append_pair("schema", "hello");
+
+        let mut pg_url = PostgresUrl::new(url).unwrap();
+        pg_url.set_flavour(PostgresFlavour::Cockroach);
+
+        let config = pg_url.to_config();
+
+        // CRDB supports setting the search_path via a connection parameter if the identifier is safe.
+        assert_eq!(config.get_search_path(), Some(&"hello".to_owned()));
+    }
+
+    #[test]
+    fn search_path_crdb_unsafe_ident_should_be_set_with_query() {
+        let mut url = Url::parse(&CONN_STR).unwrap();
+        url.query_pairs_mut().append_pair("schema", "HeLLo");
+
+        let mut pg_url = PostgresUrl::new(url).unwrap();
+        pg_url.set_flavour(PostgresFlavour::Cockroach);
+
+        let config = pg_url.to_config();
+
+        // CRDB does NOT support setting the search_path via a connection parameter if the identifier is unsafe.
+        assert_eq!(config.get_search_path(), None);
     }
 }
