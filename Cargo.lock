@@ -2987,7 +2987,7 @@ dependencies = [
 name = "prisma-value"
 version = "0.1.0"
 dependencies = [
- "base64 0.12.3",
+ "base64 0.13.1",
  "bigdecimal",
  "chrono",
  "once_cell",
@@ -3221,7 +3221,6 @@ name = "query-core"
 version = "0.1.0"
 dependencies = [
  "async-trait",
- "base64 0.12.3",
  "bigdecimal",
  "chrono",
  "connection-string",
@@ -3260,7 +3259,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "base64 0.12.3",
+ "base64 0.13.1",
  "connection-string",
  "enumflags2",
  "graphql-parser",
