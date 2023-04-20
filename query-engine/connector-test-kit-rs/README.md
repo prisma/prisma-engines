@@ -67,7 +67,8 @@ Note that by default tests run concurrently.
 - VSCode should automatically detect tests and display `run test`.
 - Use `make test-qe` (minimal log output) or `make test-qe-verbose` (all log output) in `$WORKSPACE_ROOT`.
 - `cargo test` in the `query-engine-tests` crate.
-- A single test can be tested with the normal cargo rust facilitied from command line, eg. `cargo test --package query-engine-tests --test query_engine_tests --all-features -- queries::filters::where_unique::where_unique::no_unique_fields --exact --nocapture` where `queries::filters::where_unique::where_unique::no_unique_fields` can be substituted for the path you want to test.
+- A single test can be tested with the normal cargo rust facilities from command line, e.g. `cargo test --package query-engine-tests --test query_engine_tests --all-features -- queries::filters::where_unique::where_unique::no_unique_fields --exact --nocapture` where `queries::filters::where_unique::where_unique::no_unique_fields` can be substituted for the path you want to test.
+- If you want to test a single relation test, define the `RELATION_TEST_IDX` env var with its index.
 
 ## Authoring tests
 The following is an example on how to write a new test suite, as extending or changing an existing one follows the same rules and considerations.

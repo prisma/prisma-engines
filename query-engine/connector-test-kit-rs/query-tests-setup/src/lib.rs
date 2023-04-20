@@ -21,7 +21,7 @@ pub use schema_gen::*;
 pub use templating::*;
 
 use colored::Colorize;
-use lazy_static::lazy_static;
+use once_cell::sync::Lazy;
 use psl::datamodel_connector::ConnectorCapability;
 use query_engine_metrics::MetricRegistry;
 use std::future::Future;
@@ -32,16 +32,15 @@ use tracing_futures::WithSubscriber;
 
 pub type TestResult<T> = Result<T, TestError>;
 
-lazy_static! {
-    /// Test configuration, loaded once at runtime.
-    pub static ref CONFIG: TestConfig = TestConfig::load();
+/// Test configuration, loaded once at runtime.
+pub static CONFIG: Lazy<TestConfig> = Lazy::new(TestConfig::load);
 
-    /// The log level from the environment.
-    pub static ref ENV_LOG_LEVEL: String = std::env::var("LOG_LEVEL").unwrap_or_else(|_| "info".to_owned());
+/// The log level from the environment.
+pub static ENV_LOG_LEVEL: Lazy<String> = Lazy::new(|| std::env::var("LOG_LEVEL").unwrap_or_else(|_| "info".to_owned()));
 
-    /// Engine protocol used to run tests. Either 'graphql' or 'json'.
-    pub static ref ENGINE_PROTOCOL: String = std::env::var("PRISMA_ENGINE_PROTOCOL").unwrap_or_else(|_| "graphql".to_owned());
-}
+/// Engine protocol used to run tests. Either 'graphql' or 'json'.
+pub static ENGINE_PROTOCOL: Lazy<String> =
+    Lazy::new(|| std::env::var("PRISMA_ENGINE_PROTOCOL").unwrap_or_else(|_| "graphql".to_owned()));
 
 /// Setup of everything as defined in the passed datamodel.
 pub async fn setup_project(datamodel: &str, db_schemas: &[&str]) -> TestResult<()> {
@@ -140,10 +139,17 @@ fn run_relation_link_test_impl(
     (suite_name, test_name): (&str, &str),
     test_fn: &dyn for<'a> Fn(&'a Runner, &'a DatamodelWithParams) -> BoxFuture<'a, TestResult<()>>,
 ) {
+    static RELATION_TEST_IDX: Lazy<Option<usize>> =
+        Lazy::new(|| std::env::var("RELATION_TEST_IDX").ok().and_then(|s| s.parse().ok()));
+
     let (dms, capabilities) = schema_with_relation(on_parent, on_child, id_only);
     let mut required_capabilities_for_test = Vec::with_capacity(required_capabilities.len());
 
     for (i, (dm, caps)) in dms.into_iter().zip(capabilities.into_iter()).enumerate() {
+        if RELATION_TEST_IDX.map(|idx| idx != i).unwrap_or(false) {
+            continue;
+        }
+
         required_capabilities_for_test.clear();
         required_capabilities_for_test.extend(required_capabilities.iter());
         required_capabilities_for_test.extend(caps);
