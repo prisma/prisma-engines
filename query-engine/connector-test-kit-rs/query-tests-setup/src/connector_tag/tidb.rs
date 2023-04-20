@@ -33,9 +33,7 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
 });
 
 #[derive(Debug, Default, Clone, PartialEq)]
-pub struct TiDBConnectorTag {
-    capabilities: Vec<ConnectorCapability>,
-}
+pub struct TiDBConnectorTag {}
 
 impl ConnectorTagInterface for TiDBConnectorTag {
     fn datamodel_provider(&self) -> &'static str {
@@ -50,8 +48,8 @@ impl ConnectorTagInterface for TiDBConnectorTag {
         format!("mysql://root@localhost:4000/{}", database)
     }
 
-    fn capabilities(&self) -> &[ConnectorCapability] {
-        &CAPABILITIES
+    fn capabilities(&self) -> ConnectorCapabilities {
+        CAPABILITIES
     }
 
     fn as_parse_pair(&self) -> (String, Option<String>) {
@@ -65,7 +63,7 @@ impl ConnectorTagInterface for TiDBConnectorTag {
 
 impl TiDBConnectorTag {
     pub fn new() -> Self {
-        Self
+        Self {}
     }
 
     /// Returns all versions of this connector.
