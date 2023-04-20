@@ -372,15 +372,7 @@ impl GenericApi for EngineState {
                             datamodel: result.data_model,
                             version: format!("{:?}", result.version),
                             views,
-                            warnings: result
-                                .warnings
-                                .into_iter()
-                                .map(|warning| crate::json_rpc::types::IntrospectionWarning {
-                                    code: warning.code,
-                                    message: warning.message,
-                                    affected: warning.affected,
-                                })
-                                .collect(),
+                            warnings: result.warnings,
                         })
                     }
                 })

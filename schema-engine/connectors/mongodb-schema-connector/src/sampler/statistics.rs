@@ -288,12 +288,12 @@ impl<'a> Statistics<'a> {
                     Name::Model(name) => warnings.unsupported_types_in_model.push(ModelAndFieldAndType {
                         model: name.to_string(),
                         field: field_name.to_string(),
-                        tpe: field_type.prisma_type().to_string(),
+                        r#type: field_type.prisma_type().to_string(),
                     }),
                     Name::CompositeType(name) => warnings.unsupported_types_in_type.push(TypeAndFieldAndType {
                         composite_type: name.to_string(),
                         field: field_name.to_string(),
-                        tpe: field_type.prisma_type().to_string(),
+                        r#type: field_type.prisma_type().to_string(),
                     }),
                 }
             }
@@ -303,12 +303,12 @@ impl<'a> Statistics<'a> {
                     Name::Model(name) => warnings.undecided_types_in_models.push(ModelAndFieldAndType {
                         model: name.to_string(),
                         field: field_name.to_string(),
-                        tpe: field_type.to_string(),
+                        r#type: field_type.to_string(),
                     }),
                     Name::CompositeType(name) => warnings.undecided_types_in_types.push(TypeAndFieldAndType {
                         composite_type: name.to_string(),
                         field: field_name.to_string(),
-                        tpe: field_type.to_string(),
+                        r#type: field_type.to_string(),
                     }),
                 }
             }

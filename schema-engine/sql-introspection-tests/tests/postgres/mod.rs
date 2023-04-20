@@ -205,22 +205,13 @@ async fn index_sort_order_stopgap(api: &mut TestApi) -> TestResult {
     api.expect_datamodel(&expectation).await;
 
     let expectation = expect![[r#"
-        [
-          {
-            "code": 29,
-            "message": "These index columns are having a non-default null sort order, which is not yet fully supported. Read more: https://pris.ly/d/non-default-index-null-ordering",
-            "affected": [
-              {
-                "indexName": "idx_a",
-                "columnName": "a"
-              },
-              {
-                "indexName": "idx_b",
-                "columnName": "b"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These index columns are having a non-default null sort order, which is not yet fully supported. Read more: https://pris.ly/d/non-default-index-null-ordering
+
+          - index: idx_a, column: a
+          - index: idx_b, column: b
+    "#]];
 
     api.expect_warnings(&expectation).await;
 
@@ -317,26 +308,14 @@ async fn deferrable_stopgap(api: &mut TestApi) -> TestResult {
     api.expect_datamodel(&expectation).await;
 
     let expectation = expect![[r#"
-        [
-          {
-            "code": 35,
-            "message": "These primary key, foreign key or unique constraints are using non-default deferring in the database, which is not yet fully supported. Read more: https://pris.ly/d/constraint-deferring",
-            "affected": [
-              {
-                "model": "a",
-                "constraint": "foo_key"
-              },
-              {
-                "model": "a",
-                "constraint": "foo_pkey"
-              },
-              {
-                "model": "a",
-                "constraint": "a_b_fk"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These primary key, foreign key or unique constraints are using non-default deferring in the database, which is not yet fully supported. Read more: https://pris.ly/d/constraint-deferring
+
+          - model: a, constraint: foo_key
+          - model: a, constraint: foo_pkey
+          - model: a, constraint: a_b_fk
+    "#]];
 
     api.expect_warnings(&expectation).await;
 
@@ -433,43 +412,20 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
     api.expect_datamodel(&expectation).await;
 
     let expectation = expect![[r#"
-        [
-          {
-            "code": 24,
-            "message": "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers",
-            "affected": [
-              {
-                "view": "b"
-              }
-            ]
-          },
-          {
-            "code": 36,
-            "message": "These objects have comments defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/database-comments",
-            "affected": [
-              {
-                "type": "enum",
-                "name": "c"
-              },
-              {
-                "type": "model",
-                "name": "a"
-              },
-              {
-                "type": "field",
-                "name": "a.val"
-              },
-              {
-                "type": "view",
-                "name": "b"
-              },
-              {
-                "type": "field",
-                "name": "b.val"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
+
+          - b
+
+        These objects have comments defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/database-comments
+
+          - type: enum, name: c
+          - type: model, name: a
+          - type: field, name: a.val
+          - type: view, name: b
+          - type: field, name: b.val
+    "#]];
 
     api.expect_warnings(&expectation).await;
 

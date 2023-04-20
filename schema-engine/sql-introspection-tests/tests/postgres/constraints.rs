@@ -52,28 +52,16 @@ async fn check_and_exclusion_constraints_stopgap(api: &mut TestApi) -> TestResul
     psl::parse_schema(schema.data()).unwrap();
 
     let expectation = expect![[r#"
-        [
-          {
-            "code": 33,
-            "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints",
-            "affected": [
-              {
-                "model": "room_reservation",
-                "constraint": "room_reservation_price_check"
-              }
-            ]
-          },
-          {
-            "code": 34,
-            "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints",
-            "affected": [
-              {
-                "model": "room_reservation",
-                "constraint": "room_reservation_room_id_tstzrange_excl"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints
+
+          - model: room_reservation, constraint: room_reservation_price_check
+
+        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints
+
+          - model: room_reservation, constraint: room_reservation_room_id_tstzrange_excl
+    "#]];
 
     api.expect_warnings(&expectation).await;
 
@@ -153,18 +141,12 @@ async fn exclusion_constraints_stopgap(api: &mut TestApi) -> TestResult {
     psl::parse_schema(schema.data()).unwrap();
 
     let expectation = expect![[r#"
-        [
-          {
-            "code": 34,
-            "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints",
-            "affected": [
-              {
-                "model": "room_reservation",
-                "constraint": "room_reservation_room_id_tstzrange_excl"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints
+
+          - model: room_reservation, constraint: room_reservation_room_id_tstzrange_excl
+    "#]];
 
     api.expect_warnings(&expectation).await;
 
@@ -238,18 +220,12 @@ async fn exclusion_constraints_without_where_stopgap(api: &mut TestApi) -> TestR
     psl::parse_schema(schema.data()).unwrap();
 
     let expectation = expect![[r#"
-        [
-          {
-            "code": 34,
-            "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints",
-            "affected": [
-              {
-                "model": "room_reservation",
-                "constraint": "room_reservation_room_id_tstzrange_excl"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints
+
+          - model: room_reservation, constraint: room_reservation_room_id_tstzrange_excl
+    "#]];
 
     api.expect_warnings(&expectation).await;
 
@@ -317,18 +293,12 @@ async fn exclusion_constraints_without_where_and_expressions_stopgap(api: &mut T
     psl::parse_schema(schema.data()).unwrap();
 
     let expectation = expect![[r#"
-        [
-          {
-            "code": 34,
-            "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints",
-            "affected": [
-              {
-                "model": "room_reservation",
-                "constraint": "room_reservation_room_id_excl"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints
+
+          - model: room_reservation, constraint: room_reservation_room_id_excl
+    "#]];
 
     api.expect_warnings(&expectation).await;
 
@@ -390,18 +360,12 @@ async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
     psl::parse_schema(schema.data()).unwrap();
 
     let expectation = expect![[r#"
-          [
-            {
-              "code": 33,
-              "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints",
-              "affected": [
-                {
-                  "model": "products",
-                  "constraint": "products_price_check"
-                }
-              ]
-            }
-          ]"#]];
+        *** WARNING ***
+
+        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints
+
+          - model: products, constraint: products_price_check
+    "#]];
 
     api.expect_warnings(&expectation).await;
 

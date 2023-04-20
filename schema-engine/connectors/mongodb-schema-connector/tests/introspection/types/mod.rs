@@ -443,18 +443,12 @@ fn empty_arrays() {
     expected.assert_eq(res.datamodel());
 
     let expect = expect![[r#"
-        [
-          {
-            "code": 40,
-            "message": "Could not determine the types for the following fields.",
-            "affected": [
-              {
-                "model": "A",
-                "field": "data"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        Could not determine the types for the following fields:
+
+          - model: A, field: data
+    "#]];
 
     res.expect_warnings(&expect);
 }
@@ -481,18 +475,12 @@ fn unknown_types() {
     expected.assert_eq(res.datamodel());
 
     let expect = expect![[r#"
-        [
-          {
-            "code": 40,
-            "message": "Could not determine the types for the following fields.",
-            "affected": [
-              {
-                "model": "A",
-                "field": "data"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        Could not determine the types for the following fields:
+
+          - model: A, field: data
+    "#]];
 
     res.expect_warnings(&expect);
 }

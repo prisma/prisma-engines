@@ -178,9 +178,18 @@ async fn mapped_model_and_field_name(api: &mut TestApi) -> TestResult {
 
     expected.assert_eq(&api.re_introspect_dml(input_dm).await?);
 
-    let expected = expect![[
-        r#"[{"code":7,"message":"These models were enriched with `@@map` information taken from the previous Prisma schema.","affected":[{"model":"Custom_User"}]},{"code":8,"message":"These fields were enriched with `@map` information taken from the previous Prisma schema.","affected":[{"model":"Post","field":"c_user_id"},{"model":"Custom_User","field":"c_id"}]}]"#
-    ]];
+    let expected = expect![[r#"
+        *** WARNING ***
+
+        These fields were enriched with `@map` information taken from the previous Prisma schema:
+
+          - model: Post, field: c_user_id
+          - model: Custom_User, field: c_id
+
+        These models were enriched with `@@map` information taken from the previous Prisma schema:
+
+          - Custom_User
+    "#]];
 
     expected.assert_eq(&api.re_introspect_warnings(input_dm).await?);
 
@@ -298,9 +307,14 @@ async fn mysql_keeps_renamed_enum_defaults(api: &mut TestApi) -> TestResult {
     let result = api.re_introspect_dml(input).await?;
     expected.assert_eq(&result);
 
-    let expected = expect![[
-        r#"[{"code":10,"message":"These enum values were enriched with `@map` information taken from the previous Prisma schema.","affected":[{"enm":"A_val","value":"is_false"},{"enm":"A_val","value":"is_true"}]}]"#
-    ]];
+    let expected = expect![[r#"
+        *** WARNING ***
+
+        These enum values were enriched with `@map` information taken from the previous Prisma schema:
+
+          - enum: A_val, value: is_false
+          - enum: A_val, value: is_true
+    "#]];
 
     expected.assert_eq(&api.re_introspect_warnings(input).await?);
 
@@ -355,18 +369,12 @@ async fn mapped_enum_value_name(api: &mut TestApi) -> TestResult {
     api.expect_re_introspected_datamodel(input_dm, expectation).await;
 
     let expectation = expect![[r#"
-        [
-          {
-            "code": 10,
-            "message": "These enum values were enriched with `@map` information taken from the previous Prisma schema.",
-            "affected": [
-              {
-                "enm": "color",
-                "value": "BLACK"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These enum values were enriched with `@map` information taken from the previous Prisma schema:
+
+          - enum: color, value: BLACK
+    "#]];
 
     api.expect_re_introspect_warnings(input_dm, expectation).await;
 
