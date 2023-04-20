@@ -5,7 +5,6 @@ use mongodb::{
     IndexModel,
 };
 use schema_connector::CompositeTypeDepth;
-use serde_json::json;
 
 #[test]
 fn single_column_normal_index() {
@@ -1249,10 +1248,22 @@ fn unsupported_types_in_an_index() {
 
     expected.assert_eq(res.datamodel());
 
-    res.assert_warning_code(3);
-    res.assert_warning(
-        "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.",
-    );
+    let expect = expect![[r#"
+        [
+          {
+            "code": 3,
+            "message": "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.",
+            "affected": [
+              {
+                "model": "A",
+                "field": "data",
+                "tpe": "JavaScriptCode"
+              }
+            ]
+          }
+        ]"#]];
+
+    res.expect_warnings(&expect);
 }
 
 #[test]
@@ -1363,12 +1374,21 @@ fn index_pointing_to_non_existing_field_should_add_the_field() {
 
     expected.assert_eq(res.datamodel());
 
-    res.assert_warning("Could not determine the types for the following fields.");
-    res.assert_warning_code(103);
-    res.assert_warning_affected(&json!([{
-        "model": "A",
-        "field": "age"
-    }]));
+    let expect = expect![[r#"
+        [
+          {
+            "code": 40,
+            "message": "Could not determine the types for the following fields.",
+            "affected": [
+              {
+                "model": "A",
+                "field": "age"
+              }
+            ]
+          }
+        ]"#]];
+
+    res.expect_warnings(&expect);
 }
 
 #[test]
@@ -1410,18 +1430,31 @@ fn index_pointing_to_non_existing_composite_field_should_add_the_field_and_type(
 
     expected.assert_eq(res.datamodel());
 
-    res.assert_warning("Could not determine the types for the following fields.");
-    res.assert_warning_code(103);
-    res.assert_warning_affected(&json!([
-        {
-            "model": "Cat",
-            "field": "info"
-        },
-        {
-            "compositeType": "CatInfo",
-            "field": "age"
-        }
-    ]));
+    let expect = expect![[r#"
+        [
+          {
+            "code": 40,
+            "message": "Could not determine the types for the following fields.",
+            "affected": [
+              {
+                "model": "Cat",
+                "field": "info"
+              }
+            ]
+          },
+          {
+            "code": 41,
+            "message": "Could not determine the types for the following fields.",
+            "affected": [
+              {
+                "compositeType": "CatInfo",
+                "field": "age"
+              }
+            ]
+          }
+        ]"#]];
+
+    res.expect_warnings(&expect);
 }
 
 #[test]
@@ -1468,22 +1501,35 @@ fn deep_index_pointing_to_non_existing_composite_field_should_add_the_field_and_
 
     expected.assert_eq(res.datamodel());
 
-    res.assert_warning("Could not determine the types for the following fields.");
-    res.assert_warning_code(103);
-    res.assert_warning_affected(&json!([
-        {
-            "model": "Cat",
-            "field": "info"
-        },
-        {
-            "compositeType": "CatInfo",
-            "field": "specific"
-        },
-        {
-            "compositeType": "CatInfoSpecific",
-            "field": "age"
-        }
-    ]));
+    let expect = expect![[r#"
+        [
+          {
+            "code": 40,
+            "message": "Could not determine the types for the following fields.",
+            "affected": [
+              {
+                "model": "Cat",
+                "field": "info"
+              }
+            ]
+          },
+          {
+            "code": 41,
+            "message": "Could not determine the types for the following fields.",
+            "affected": [
+              {
+                "compositeType": "CatInfo",
+                "field": "specific"
+              },
+              {
+                "compositeType": "CatInfoSpecific",
+                "field": "age"
+              }
+            ]
+          }
+        ]"#]];
+
+    res.expect_warnings(&expect);
 }
 
 #[test]
@@ -1520,12 +1566,21 @@ fn index_pointing_to_mapped_non_existing_field_should_add_the_mapped_field() {
 
     expected.assert_eq(res.datamodel());
 
-    res.assert_warning("Could not determine the types for the following fields.");
-    res.assert_warning_code(103);
-    res.assert_warning_affected(&json!([{
-        "model": "A",
-        "field": "_age"
-    }]));
+    let expect = expect![[r#"
+        [
+          {
+            "code": 40,
+            "message": "Could not determine the types for the following fields.",
+            "affected": [
+              {
+                "model": "A",
+                "field": "_age"
+              }
+            ]
+          }
+        ]"#]];
+
+    res.expect_warnings(&expect);
 }
 
 #[test]
@@ -1567,18 +1622,31 @@ fn composite_index_pointing_to_mapped_non_existing_field_should_add_the_mapped_f
 
     expected.assert_eq(res.datamodel());
 
-    res.assert_warning("Could not determine the types for the following fields.");
-    res.assert_warning_code(103);
-    res.assert_warning_affected(&json!([
-        {
-            "model": "A",
-            "field": "info"
-        },
-        {
-            "compositeType": "AInfo",
-            "field": "_age"
-        }
-    ]));
+    let expected = expect![[r#"
+        [
+          {
+            "code": 40,
+            "message": "Could not determine the types for the following fields.",
+            "affected": [
+              {
+                "model": "A",
+                "field": "info"
+              }
+            ]
+          },
+          {
+            "code": 41,
+            "message": "Could not determine the types for the following fields.",
+            "affected": [
+              {
+                "compositeType": "AInfo",
+                "field": "_age"
+              }
+            ]
+          }
+        ]"#]];
+
+    res.expect_warnings(&expected);
 }
 
 #[test]
@@ -1617,18 +1685,25 @@ fn compound_index_pointing_to_non_existing_field_should_add_the_field() {
 
     expected.assert_eq(res.datamodel());
 
-    res.assert_warning("Could not determine the types for the following fields.");
-    res.assert_warning_code(103);
-    res.assert_warning_affected(&json!([
-        {
-            "model": "A",
-            "field": "age"
-        },
-        {
-            "model": "A",
-            "field": "play"
-        },
-    ]));
+    let expect = expect![[r#"
+        [
+          {
+            "code": 40,
+            "message": "Could not determine the types for the following fields.",
+            "affected": [
+              {
+                "model": "A",
+                "field": "age"
+              },
+              {
+                "model": "A",
+                "field": "play"
+              }
+            ]
+          }
+        ]"#]];
+
+    res.expect_warnings(&expect);
 }
 
 #[test]
@@ -1670,14 +1745,21 @@ fn composite_index_with_one_existing_field_should_add_missing_stuff_only() {
 
     expected.assert_eq(res.datamodel());
 
-    res.assert_warning("Could not determine the types for the following fields.");
-    res.assert_warning_code(103);
-    res.assert_warning_affected(&json!([
-        {
-            "compositeType": "AInfo",
-            "field": "play"
-        },
-    ]));
+    let expect = expect![[r#"
+        [
+          {
+            "code": 41,
+            "message": "Could not determine the types for the following fields.",
+            "affected": [
+              {
+                "compositeType": "AInfo",
+                "field": "play"
+              }
+            ]
+          }
+        ]"#]];
+
+    res.expect_warnings(&expect);
 }
 
 #[test]
@@ -1724,18 +1806,25 @@ fn deep_composite_index_with_one_existing_field_should_add_missing_stuff_only() 
 
     expected.assert_eq(res.datamodel());
 
-    res.assert_warning("Could not determine the types for the following fields.");
-    res.assert_warning_code(103);
-    res.assert_warning_affected(&json!([
-        {
-            "compositeType": "AInfo",
-            "field": "special"
-        },
-        {
-            "compositeType": "AInfoSpecial",
-            "field": "play"
-        },
-    ]));
+    let expect = expect![[r#"
+        [
+          {
+            "code": 41,
+            "message": "Could not determine the types for the following fields.",
+            "affected": [
+              {
+                "compositeType": "AInfo",
+                "field": "special"
+              },
+              {
+                "compositeType": "AInfoSpecial",
+                "field": "play"
+              }
+            ]
+          }
+        ]"#]];
+
+    res.expect_warnings(&expect);
 }
 
 #[test]
@@ -1781,14 +1870,21 @@ fn deep_composite_index_with_one_existing_field_should_add_missing_stuff_only_2(
 
     expected.assert_eq(res.datamodel());
 
-    res.assert_warning("Could not determine the types for the following fields.");
-    res.assert_warning_code(103);
-    res.assert_warning_affected(&json!([
-        {
-            "compositeType": "AInfoSpecial",
-            "field": "play"
-        },
-    ]));
+    let expect = expect![[r#"
+        [
+          {
+            "code": 41,
+            "message": "Could not determine the types for the following fields.",
+            "affected": [
+              {
+                "compositeType": "AInfoSpecial",
+                "field": "play"
+              }
+            ]
+          }
+        ]"#]];
+
+    res.expect_warnings(&expect);
 }
 
 #[test]
@@ -1837,26 +1933,39 @@ fn deep_composite_index_should_add_missing_stuff_in_different_layers() {
 
     expected.assert_eq(res.datamodel());
 
-    res.assert_warning("Could not determine the types for the following fields.");
-    res.assert_warning_code(103);
-    res.assert_warning_affected(&json!([
-        {
-            "model": "A",
-            "field": "info",
-        },
-        {
-            "compositeType": "AInfo",
-            "field": "play",
-        },
-        {
-            "compositeType": "AInfo",
-            "field": "special",
-        },
-        {
-            "compositeType": "AInfoSpecial",
-            "field": "age",
-        },
-    ]));
+    let expect = expect![[r#"
+        [
+          {
+            "code": 40,
+            "message": "Could not determine the types for the following fields.",
+            "affected": [
+              {
+                "model": "A",
+                "field": "info"
+              }
+            ]
+          },
+          {
+            "code": 41,
+            "message": "Could not determine the types for the following fields.",
+            "affected": [
+              {
+                "compositeType": "AInfo",
+                "field": "play"
+              },
+              {
+                "compositeType": "AInfo",
+                "field": "special"
+              },
+              {
+                "compositeType": "AInfoSpecial",
+                "field": "age"
+              }
+            ]
+          }
+        ]"#]];
+
+    res.expect_warnings(&expect);
 }
 
 #[test]
@@ -1894,14 +2003,21 @@ fn compound_index_with_one_existing_field_pointing_to_non_existing_field_should_
 
     expected.assert_eq(res.datamodel());
 
-    res.assert_warning("Could not determine the types for the following fields.");
-    res.assert_warning_code(103);
-    res.assert_warning_affected(&json!([
-        {
-            "model": "A",
-            "field": "play"
-        },
-    ]));
+    let expect = expect![[r#"
+        [
+          {
+            "code": 40,
+            "message": "Could not determine the types for the following fields.",
+            "affected": [
+              {
+                "model": "A",
+                "field": "play"
+              }
+            ]
+          }
+        ]"#]];
+
+    res.expect_warnings(&expect);
 }
 
 #[test]
@@ -1936,12 +2052,21 @@ fn unique_index_pointing_to_non_existing_field_should_add_the_field() {
 
     expected.assert_eq(res.datamodel());
 
-    res.assert_warning("Could not determine the types for the following fields.");
-    res.assert_warning_code(103);
-    res.assert_warning_affected(&json!([{
-        "model": "A",
-        "field": "age"
-    }]));
+    let expect = expect![[r#"
+        [
+          {
+            "code": 40,
+            "message": "Could not determine the types for the following fields.",
+            "affected": [
+              {
+                "model": "A",
+                "field": "age"
+              }
+            ]
+          }
+        ]"#]];
+
+    res.expect_warnings(&expect);
 }
 
 #[test]
@@ -1976,12 +2101,21 @@ fn fulltext_index_pointing_to_non_existing_field_should_add_the_field() {
 
     expected.assert_eq(res.datamodel());
 
-    res.assert_warning("Could not determine the types for the following fields.");
-    res.assert_warning_code(103);
-    res.assert_warning_affected(&json!([{
-        "model": "A",
-        "field": "age"
-    }]));
+    let expect = expect![[r#"
+        [
+          {
+            "code": 40,
+            "message": "Could not determine the types for the following fields.",
+            "affected": [
+              {
+                "model": "A",
+                "field": "age"
+              }
+            ]
+          }
+        ]"#]];
+
+    res.expect_warnings(&expect);
 }
 
 #[test]

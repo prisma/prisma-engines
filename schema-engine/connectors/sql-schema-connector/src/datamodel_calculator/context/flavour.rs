@@ -11,7 +11,7 @@ pub(super) use postgresql::PostgresIntrospectionFlavour;
 pub(super) use sqlite::SqliteIntrospectionFlavour;
 pub(super) use sqlserver::SqlServerIntrospectionFlavour;
 
-use crate::warnings::generators::Warnings;
+use schema_connector::Warnings;
 
 use super::DatamodelCalculatorContext;
 

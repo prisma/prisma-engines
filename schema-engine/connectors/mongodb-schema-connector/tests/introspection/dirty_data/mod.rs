@@ -1,6 +1,5 @@
 use crate::introspection::test_api::*;
 use mongodb::bson::{doc, Bson, DateTime, Timestamp};
-use serde_json::json;
 
 #[test]
 fn explicit_id_field() {
@@ -71,16 +70,22 @@ fn mixing_types() {
 
     expected.assert_eq(res.datamodel());
 
-    res.assert_warning_code(101);
-    res.assert_warning(
-        "The following fields had data stored in multiple types. Either use Json or normalize data to the wanted type.",
-    );
+    let expect = expect![[r#"
+        [
+          {
+            "code": 42,
+            "message": "The following fields had data stored in multiple types. Either use Json or normalize data to the wanted type.",
+            "affected": [
+              {
+                "model": "A",
+                "field": "first",
+                "tpe": "Json"
+              }
+            ]
+          }
+        ]"#]];
 
-    res.assert_warning_affected(&json!([{
-        "model": "A",
-        "field": "first",
-        "tpe": "Json",
-    }]));
+    res.expect_warnings(&expect);
 }
 
 #[test]
@@ -110,9 +115,20 @@ fn mixing_types_with_the_same_base_type() {
 
     expected.assert_eq(res.datamodel());
 
-    res.assert_warning_affected(&json!([{
-        "model": "A",
-        "field": "first",
-        "tpe": "DateTime (Timestamp)",
-    }]));
+    let expect = expect![[r#"
+        [
+          {
+            "code": 42,
+            "message": "The following fields had data stored in multiple types. Either use Json or normalize data to the wanted type.",
+            "affected": [
+              {
+                "model": "A",
+                "field": "first",
+                "tpe": "DateTime (Timestamp)"
+              }
+            ]
+          }
+        ]"#]];
+
+    res.expect_warnings(&expect);
 }

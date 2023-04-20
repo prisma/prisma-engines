@@ -6,7 +6,10 @@ use renderer::{
     datamodel::{IdFieldDefinition, UniqueFieldAttribute},
     value::Function,
 };
-use schema_connector::{CompositeTypeDepth, Warning};
+use schema_connector::{
+    warnings::{ModelAndField, ModelAndFieldAndType, TypeAndField, TypeAndFieldAndType},
+    CompositeTypeDepth, Warnings,
+};
 
 use super::field_type::FieldType;
 use convert_case::{Case, Casing};
@@ -119,7 +122,7 @@ impl<'a> Statistics<'a> {
         &'a self,
         datasource: &'a psl::Datasource,
         rendered: &mut renderer::Datamodel<'a>,
-        warnings: &mut Vec<Warning>,
+        warnings: &mut Warnings,
     ) {
         let mut models: BTreeMap<&str, renderer::datamodel::Model<'_>> = self
             .models
@@ -167,12 +170,6 @@ impl<'a> Statistics<'a> {
             .map(|name| (name, renderer::datamodel::CompositeType::new(name)))
             .collect();
 
-        let mut unsupported = Vec::new();
-        let mut unknown_types = Vec::new();
-        let mut undecided_types = Vec::new();
-        let mut fields_with_empty_names = Vec::new();
-        let mut fields_with_an_empty_type = Vec::new();
-
         for (model_name, indices) in self.indices.iter() {
             let model = models.get_mut(model_name.as_str()).unwrap();
 
@@ -217,7 +214,16 @@ impl<'a> Statistics<'a> {
 
             let mut field = match sanitized {
                 Some(sanitized) if sanitized.is_empty() => {
-                    fields_with_empty_names.push((container.clone(), field_name.clone()));
+                    match container {
+                        Name::Model(name) => warnings.fields_with_empty_names_in_model.push(ModelAndField {
+                            model: name.to_string(),
+                            field: field_name.to_string(),
+                        }),
+                        Name::CompositeType(name) => warnings.fields_with_empty_names_in_type.push(TypeAndField {
+                            composite_type: name.to_string(),
+                            field: field_name.to_string(),
+                        }),
+                    }
 
                     let mut field = renderer::datamodel::Field::new(field_name, prisma_type.to_string());
                     field.map(field_name);
@@ -244,7 +250,17 @@ impl<'a> Statistics<'a> {
             if points_to_an_empty_type {
                 let docs = "Nested objects had no data in the sample dataset to introspect a nested type.";
                 field.documentation(docs);
-                fields_with_an_empty_type.push((container.clone(), field_name.clone()));
+
+                match container {
+                    Name::Model(name) => warnings.model_fields_pointing_to_an_empty_type.push(ModelAndField {
+                        model: name.to_string(),
+                        field: field_name.to_string(),
+                    }),
+                    Name::CompositeType(name) => warnings.type_fields_pointing_to_an_empty_type.push(TypeAndField {
+                        composite_type: name.to_string(),
+                        field: field_name.to_string(),
+                    }),
+                }
             }
 
             if field_name == "_id" && !container.is_composite_type() {
@@ -268,21 +284,49 @@ impl<'a> Statistics<'a> {
             if field_type.is_unsupported() {
                 field.unsupported();
 
-                unsupported.push((
-                    container.clone(),
-                    field_name.to_string(),
-                    field_type.prisma_type().to_string(),
-                ));
+                match container {
+                    Name::Model(name) => warnings.unsupported_types_in_model.push(ModelAndFieldAndType {
+                        model: name.to_string(),
+                        field: field_name.to_string(),
+                        tpe: field_type.prisma_type().to_string(),
+                    }),
+                    Name::CompositeType(name) => warnings.unsupported_types_in_type.push(TypeAndFieldAndType {
+                        composite_type: name.to_string(),
+                        field: field_name.to_string(),
+                        tpe: field_type.prisma_type().to_string(),
+                    }),
+                }
             }
 
             if percentages.data.len() > 1 {
-                undecided_types.push((container.clone(), field_name.to_string(), field_type.to_string()));
+                match container {
+                    Name::Model(name) => warnings.undecided_types_in_models.push(ModelAndFieldAndType {
+                        model: name.to_string(),
+                        field: field_name.to_string(),
+                        tpe: field_type.to_string(),
+                    }),
+                    Name::CompositeType(name) => warnings.undecided_types_in_types.push(TypeAndFieldAndType {
+                        composite_type: name.to_string(),
+                        field: field_name.to_string(),
+                        tpe: field_type.to_string(),
+                    }),
+                }
             }
 
             if sampler.from_index {
                 let docs = "Field referred in an index, but found no data to define the type.";
                 field.documentation(docs);
-                unknown_types.push((container.clone(), field_name.to_string()));
+
+                match container {
+                    Name::Model(name) => warnings.model_fields_with_unknown_type.push(ModelAndField {
+                        model: name.to_string(),
+                        field: field_name.to_string(),
+                    }),
+                    Name::CompositeType(name) => warnings.type_fields_with_unknown_type.push(TypeAndField {
+                        composite_type: name.to_string(),
+                        field: field_name.to_string(),
+                    }),
+                }
             }
 
             if percentages.has_type_variety() {
@@ -294,7 +338,16 @@ impl<'a> Statistics<'a> {
                 let doc = "Could not determine type: the field only had null or empty values in the sample set.";
                 field.documentation(doc);
 
-                unknown_types.push((container.clone(), field_name.to_string()));
+                match container {
+                    Name::Model(name) => warnings.model_fields_with_unknown_type.push(ModelAndField {
+                        model: name.to_string(),
+                        field: field_name.to_string(),
+                    }),
+                    Name::CompositeType(name) => warnings.type_fields_with_unknown_type.push(TypeAndField {
+                        composite_type: name.to_string(),
+                        field: field_name.to_string(),
+                    }),
+                }
             }
 
             match container {
@@ -350,28 +403,6 @@ impl<'a> Statistics<'a> {
 
         for (_, model) in models.into_iter() {
             rendered.push_model(model);
-        }
-
-        if !fields_with_an_empty_type.is_empty() {
-            warnings.push(crate::warnings::fields_pointing_to_an_empty_type(
-                &fields_with_an_empty_type,
-            ));
-        }
-
-        if !unsupported.is_empty() {
-            warnings.push(crate::warnings::unsupported_type(&unsupported));
-        }
-
-        if !undecided_types.is_empty() {
-            warnings.push(crate::warnings::undecided_field_type(&undecided_types));
-        }
-
-        if !fields_with_empty_names.is_empty() {
-            warnings.push(crate::warnings::fields_with_empty_names(&fields_with_empty_names));
-        }
-
-        if !unknown_types.is_empty() {
-            warnings.push(crate::warnings::fields_with_unknown_types(&unknown_types));
         }
     }
 
