@@ -3235,7 +3235,6 @@ dependencies = [
  "opentelemetry",
  "petgraph 0.4.13",
  "prisma-models",
- "prisma-value",
  "psl",
  "query-connector",
  "query-engine-metrics",
