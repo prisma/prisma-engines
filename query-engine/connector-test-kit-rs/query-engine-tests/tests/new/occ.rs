@@ -112,7 +112,7 @@ mod occ {
         assert_eq!(booked_user_id, found_booked_user_id);
     }
 
-    #[connector_test(schema(occ_simple), exclude(MongoDB, CockroachDb, TiDB))]
+    #[connector_test(schema(occ_simple), exclude(MongoDB, CockroachDb))]
     async fn occ_update_many_test(runner: Runner) -> TestResult<()> {
         let runner = Arc::new(runner);
 
@@ -127,7 +127,7 @@ mod occ {
         Ok(())
     }
 
-    #[connector_test(schema(occ_simple), exclude(CockroachDb, TiDB))]
+    #[connector_test(schema(occ_simple), exclude(CockroachDb))]
     async fn occ_update_test(runner: Runner) -> TestResult<()> {
         let runner = Arc::new(runner);
 
@@ -158,7 +158,7 @@ mod occ {
         Ok(())
     }
 
-    #[connector_test(schema(occ_simple), exclude(TiDB))]
+    #[connector_test(schema(occ_simple))]
     async fn occ_delete_test(runner: Runner) -> TestResult<()> {
         let runner = Arc::new(runner);
 
