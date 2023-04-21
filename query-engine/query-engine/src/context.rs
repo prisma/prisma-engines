@@ -19,13 +19,13 @@ pub struct PrismaContext {
     /// The api query schema.
     query_schema: QuerySchemaRef,
     /// The metrics registry
-    pub metrics: MetricRegistry,
+    pub(crate) metrics: MetricRegistry,
     /// Central query executor.
-    pub executor: Box<dyn QueryExecutor + Send + Sync + 'static>,
+    pub(crate) executor: Box<dyn QueryExecutor + Send + Sync + 'static>,
     /// The engine protocol in use
-    pub engine_protocol: EngineProtocol,
+    pub(crate) engine_protocol: EngineProtocol,
     /// Enabled features
-    pub enabled_features: EnabledFeatures,
+    pub(crate) enabled_features: EnabledFeatures,
 }
 
 impl fmt::Debug for PrismaContext {
@@ -35,7 +35,7 @@ impl fmt::Debug for PrismaContext {
 }
 
 impl PrismaContext {
-    pub async fn new(
+    pub(crate) async fn new(
         schema: psl::ValidatedSchema,
         protocol: EngineProtocol,
         enabled_features: EnabledFeatures,
@@ -81,19 +81,19 @@ impl PrismaContext {
         Ok(context)
     }
 
-    pub fn query_schema(&self) -> &QuerySchemaRef {
+    pub(crate) fn query_schema(&self) -> &QuerySchemaRef {
         &self.query_schema
     }
 
-    pub fn executor(&self) -> &(dyn QueryExecutor + Send + Sync + 'static) {
+    pub(crate) fn executor(&self) -> &(dyn QueryExecutor + Send + Sync + 'static) {
         self.executor.as_ref()
     }
 
-    pub fn primary_connector(&self) -> &'static str {
+    pub(crate) fn primary_connector(&self) -> &'static str {
         self.executor.primary_connector().name()
     }
 
-    pub fn engine_protocol(&self) -> EngineProtocol {
+    pub(crate) fn engine_protocol(&self) -> EngineProtocol {
         self.engine_protocol
     }
 }

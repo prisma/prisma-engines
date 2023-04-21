@@ -9,7 +9,7 @@ use std::{convert::TryFrom, str::FromStr};
 use user_facing_errors::query_engine::validation::ValidationError;
 use uuid::Uuid;
 
-pub struct QueryDocumentParser {
+pub(crate) struct QueryDocumentParser {
     /// NOW() default value that's reused for all NOW() defaults on a single query
     default_now: PrismaValue,
 }

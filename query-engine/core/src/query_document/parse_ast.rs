@@ -10,28 +10,24 @@ pub(crate) type ParsedInputList = Vec<ParsedInputValue>;
 
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct ParsedInputMap {
-    pub tag: Option<ObjectTag>,
+    pub(crate) tag: Option<ObjectTag>,
     pub(crate) map: IndexMap<String, ParsedInputValue>,
 }
 
 impl ParsedInputMap {
-    pub fn set_tag(&mut self, tag: Option<ObjectTag>) {
+    pub(crate) fn set_tag(&mut self, tag: Option<ObjectTag>) {
         self.tag = tag;
     }
 
-    pub fn is_relation_envelope(&self) -> bool {
+    pub(crate) fn is_relation_envelope(&self) -> bool {
         matches!(&self.tag, Some(ObjectTag::RelationEnvelope))
     }
 
-    pub fn is_composite_envelope(&self) -> bool {
+    pub(crate) fn is_composite_envelope(&self) -> bool {
         matches!(&self.tag, Some(ObjectTag::CompositeEnvelope))
     }
 
-    pub fn is_field_ref_type(&self) -> bool {
-        matches!(&self.tag, Some(ObjectTag::FieldRefType(_)))
-    }
-
-    pub fn is_nested_to_one_update_envelope(&self) -> bool {
+    pub(crate) fn is_nested_to_one_update_envelope(&self) -> bool {
         matches!(&self.tag, Some(ObjectTag::NestedToOneUpdateEnvelope))
     }
 }
@@ -76,24 +72,24 @@ impl DerefMut for ParsedInputMap {
 
 #[derive(Debug, Clone)]
 pub struct ParsedObject {
-    pub fields: Vec<FieldPair>,
+    pub(crate) fields: Vec<FieldPair>,
 }
 
 #[derive(Debug, Clone)]
 pub struct FieldPair {
     /// The field parsed from the incoming query.
-    pub parsed_field: ParsedField,
+    pub(crate) parsed_field: ParsedField,
 
     /// The schema field that the parsed field corresponds to.
-    pub schema_field: OutputFieldId,
+    pub(crate) schema_field: OutputFieldId,
 }
 
 #[derive(Debug, Clone)]
 pub struct ParsedField {
-    pub name: String,
-    pub alias: Option<String>,
-    pub arguments: Vec<ParsedArgument>,
-    pub nested_fields: Option<ParsedObject>,
+    pub(crate) name: String,
+    pub(crate) alias: Option<String>,
+    pub(crate) arguments: Vec<ParsedArgument>,
+    pub(crate) nested_fields: Option<ParsedObject>,
 }
 
 impl ParsedField {
@@ -120,7 +116,7 @@ impl ParsedField {
 
 #[derive(Debug, Clone)]
 pub struct ParsedArgument {
-    pub name: String,
+    pub(crate) name: String,
     pub(crate) value: ParsedInputValue,
 }
 

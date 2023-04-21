@@ -45,7 +45,7 @@ pub async fn listen(cx: Arc<PrismaContext>, opts: &PrismaOpt) -> PrismaResult<()
     Ok(())
 }
 
-pub async fn routes(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+pub(crate) async fn routes(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     let start = Instant::now();
 
     if req.method() == Method::POST && req.uri().path().starts_with("/transaction") {

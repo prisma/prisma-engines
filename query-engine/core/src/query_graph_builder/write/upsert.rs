@@ -50,7 +50,7 @@ use schema::ConnectorContext;
 ///  │   Read Parent   │
 ///  └─────────────────┘
 /// ```
-pub fn upsert_record(
+pub(crate) fn upsert_record(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
     model: ModelRef,
