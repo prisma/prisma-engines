@@ -171,11 +171,9 @@ async fn check_and_exclusion_constraints_stopgap(api: &mut TestApi) -> TestResul
         *** WARNING ***
 
         These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints
-
           - model: room_reservation, constraint: room_reservation_price_check
 
         These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints
-
           - model: room_reservation, constraint: room_reservation_room_id_tstzrange_excl
     "#]];
 
@@ -260,7 +258,6 @@ async fn exclusion_constraints_stopgap(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints
-
           - model: room_reservation, constraint: room_reservation_room_id_tstzrange_excl
     "#]];
 
@@ -339,7 +336,6 @@ async fn exclusion_constraints_without_where_stopgap(api: &mut TestApi) -> TestR
         *** WARNING ***
 
         These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints
-
           - model: room_reservation, constraint: room_reservation_room_id_tstzrange_excl
     "#]];
 
@@ -412,7 +408,6 @@ async fn exclusion_constraints_without_where_and_expressions_stopgap(api: &mut T
         *** WARNING ***
 
         These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints
-
           - model: room_reservation, constraint: room_reservation_room_id_excl
     "#]];
 
@@ -479,7 +474,6 @@ async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints
-
           - model: products, constraint: products_price_check
     "#]];
 

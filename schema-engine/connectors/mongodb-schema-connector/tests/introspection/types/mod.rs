@@ -446,7 +446,6 @@ fn empty_arrays() {
         *** WARNING ***
 
         Could not determine the types for the following fields:
-
           - model: A, field: data
     "#]];
 
@@ -478,7 +477,6 @@ fn unknown_types() {
         *** WARNING ***
 
         Could not determine the types for the following fields:
-
           - model: A, field: data
     "#]];
 

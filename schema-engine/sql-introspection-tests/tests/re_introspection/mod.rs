@@ -52,7 +52,6 @@ async fn mapped_model_name(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These models were enriched with `@@map` information taken from the previous Prisma schema:
-
           - Custom_User
     "#]];
 
@@ -103,7 +102,6 @@ async fn manually_overwritten_mapped_field_name(api: &mut TestApi) -> TestResult
         *** WARNING ***
 
         These fields were enriched with `@map` information taken from the previous Prisma schema:
-
           - model: User, field: custom_test
     "#]];
 
@@ -172,12 +170,10 @@ async fn mapped_model_and_field_name(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These fields were enriched with `@map` information taken from the previous Prisma schema:
-
           - model: Post, field: c_user_id
           - model: Custom_User, field: c_id
 
         These models were enriched with `@@map` information taken from the previous Prisma schema:
-
           - Custom_User
     "#]];
 
@@ -246,12 +242,10 @@ async fn manually_mapped_model_and_field_name(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These fields were enriched with `@map` information taken from the previous Prisma schema:
-
           - model: Post, field: c_user_id
           - model: Custom_User, field: c_id
 
         These models were enriched with `@@map` information taken from the previous Prisma schema:
-
           - Custom_User
     "#]];
 
@@ -326,7 +320,6 @@ async fn mapped_field_name(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These fields were enriched with `@map` information taken from the previous Prisma schema:
-
           - model: User, field: c_id_1
           - model: User, field: c_index
           - model: User, field: c_unique_1
@@ -414,7 +407,6 @@ async fn mapped_enum_name(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These enums were enriched with `@@map` information taken from the previous Prisma schema:
-
           - BlackNWhite
     "#]];
 
@@ -476,7 +468,6 @@ async fn manually_remapped_enum_value_name(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These enum values were enriched with `@map` information taken from the previous Prisma schema:
-
           - enum: color, value: BLACK
     "#]];
 
@@ -541,7 +532,6 @@ async fn manually_re_mapped_enum_name(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These enums were enriched with `@@map` information taken from the previous Prisma schema:
-
           - BlackNWhite
     "#]];
 
@@ -601,7 +591,6 @@ async fn manually_re_mapped_invalid_enum_values(api: &mut TestApi) -> TestResult
         *** WARNING ***
 
         These enum values were enriched with `@map` information taken from the previous Prisma schema:
-
           - enum: invalid, value: at
           - enum: invalid, value: dash
     "#]];

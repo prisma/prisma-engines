@@ -74,7 +74,6 @@ async fn fields_we_cannot_sanitize_are_commented_out_and_warned(api: &mut TestAp
         *** WARNING ***
 
         These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:
-
           - model: Test, field: 12
     "#]];
 
@@ -102,7 +101,6 @@ async fn unsupported_type_keeps_its_usages(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These fields are not supported by the Prisma Client, because Prisma currently does not support their types:
-
           - model: Test, field: broken, type: macaddr
     "#]];
 
@@ -152,11 +150,9 @@ async fn a_table_with_only_an_unsupported_id(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client:
-
           - Test
 
         These fields are not supported by the Prisma Client, because Prisma currently does not support their types:
-
           - model: Test, field: network_mac, type: macaddr
     "#]];
 
@@ -265,7 +261,6 @@ async fn commenting_out_a_table_without_columns(api: &mut TestApi) -> TestResult
         *** WARNING ***
 
         The following models were commented out as we could not retrieve columns for them. Please check your privileges:
-
           - Test
     "#]];
 
@@ -365,7 +360,6 @@ ALTER TABLE blocks
         *** WARNING ***
 
         These tables are partition tables, which are not yet fully supported:
-
           - blocks
     "#]];
 
@@ -427,11 +421,9 @@ ALTER TABLE blocks_p2_0 ADD CONSTRAINT b2_unique UNIQUE (id);
         *** WARNING ***
 
         The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client:
-
           - blocks
 
         These tables are partition tables, which are not yet fully supported:
-
           - blocks
     "#]];
 
@@ -479,7 +471,6 @@ ALTER TABLE foo ENABLE ROW LEVEL SECURITY; "#,
         *** WARNING ***
 
         These tables contain row level security, which is not yet fully supported. Read more: https://pris.ly/d/row-level-security
-
           - foo
     "#]];
 

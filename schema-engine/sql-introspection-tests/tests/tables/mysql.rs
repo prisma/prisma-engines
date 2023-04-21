@@ -845,7 +845,6 @@ async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These objects have comments defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/database-comments
-
           - type: model, name: a
           - type: field, name: a.a
     "#]];
