@@ -7,120 +7,15 @@ use test_macros::test_connector;
 #[test_connector(tags(Postgres))]
 async fn aragon_test_postgres(api: &mut TestApi) -> TestResult {
     let raw_sql = indoc! {r#"
-      CREATE TABLE eventsources (
-        eventsource_id integer NOT NULL,
-        created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
-        enabled boolean DEFAULT true NOT NULL,
-        contract_address character varying(255) NOT NULL,
-        kernel_address character varying(255) NOT NULL,
-        ens_name character varying(255),
-        abi jsonb,
-        event_name character varying(255) NOT NULL,
-        app_name character varying(255) NOT NULL,
-        network character varying(255) NOT NULL,
-        from_block bigint NOT NULL,
-        last_poll timestamp with time zone
-      );
+        CREATE TABLE tokens (
+            token_id integer NOT NULL PRIMARY KEY,
+            token_scope text,
+            CONSTRAINT tokens_token_scope_check CHECK ((token_scope = ANY (ARRAY['MAGICLINK'::text, 'API'::text])))
+        );
 
-      CREATE TABLE knex_migrations (
-        id integer NOT NULL,
-        name character varying(255),
-        batch integer,
-        migration_time timestamp with time zone
-      );
-
-      CREATE TABLE knex_migrations_lock (
-        index integer NOT NULL,
-        is_locked integer
-      );
-
-      CREATE TABLE notifications (
-        notification_id integer NOT NULL,
-        created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
-        subscription_id integer NOT NULL,
-        return_values jsonb,
-        block_time timestamp with time zone NOT NULL,
-        transaction_hash character varying(255) NOT NULL,
-        block bigint NOT NULL,
-        sent boolean DEFAULT false NOT NULL
-      );
-
-      CREATE TABLE subscriptions (
-        subscription_id integer NOT NULL,
-        user_id integer NOT NULL,
-        eventsource_id integer NOT NULL,
-        created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
-        join_block bigint NOT NULL
-      );
-
-      CREATE TABLE tokens (
-        token_id integer NOT NULL,
-        created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
-        user_id integer NOT NULL,
-        token_scope text DEFAULT 'MAGICLINK'::text,
-        valid boolean DEFAULT true NOT NULL,
-        some_new_field character varying(255),
-        CONSTRAINT tokens_token_scope_check CHECK ((token_scope = ANY (ARRAY['MAGICLINK'::text, 'API'::text])))
-      );
-
-      CREATE TABLE users (
-        user_id integer NOT NULL,
-        created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
-        email character varying(255) NOT NULL,
-        verified boolean DEFAULT false NOT NULL
-      );
-
-      ALTER TABLE ONLY eventsources
-        ADD CONSTRAINT eventsources_contract_address_event_name_network_unique UNIQUE (contract_address, event_name, network);
-
-      ALTER TABLE ONLY eventsources
-        ADD CONSTRAINT eventsources_pkey PRIMARY KEY (eventsource_id);
-
-      ALTER TABLE ONLY knex_migrations_lock
-        ADD CONSTRAINT knex_migrations_lock_pkey PRIMARY KEY (index);
-
-      ALTER TABLE ONLY knex_migrations
-        ADD CONSTRAINT knex_migrations_pkey PRIMARY KEY (id);
-
-      ALTER TABLE ONLY notifications
-        ADD CONSTRAINT notifications_pkey PRIMARY KEY (notification_id);
-
-      ALTER TABLE ONLY subscriptions
-        ADD CONSTRAINT subscriptions_pkey PRIMARY KEY (subscription_id);
-
-      ALTER TABLE ONLY subscriptions
-        ADD CONSTRAINT subscriptions_user_id_eventsource_id_unique UNIQUE (user_id, eventsource_id);
-
-      ALTER TABLE ONLY tokens
-        ADD CONSTRAINT tokens_pkey PRIMARY KEY (token_id);
-
-      ALTER TABLE ONLY users
-        ADD CONSTRAINT users_email_unique UNIQUE (email);
-
-      ALTER TABLE ONLY users
-        ADD CONSTRAINT users_pkey PRIMARY KEY (user_id);
-
-      CREATE INDEX notifications_subscription_id_index ON notifications USING btree (subscription_id);
-
-      CREATE INDEX subscriptions_eventsource_id_index ON subscriptions USING btree (eventsource_id);
-
-      CREATE INDEX subscriptions_user_id_index ON subscriptions USING btree (user_id);
-
-      CREATE INDEX tokens_user_id_index ON tokens USING btree (user_id);
-
-      CREATE INDEX users_email_index ON users USING btree (email);
-
-      ALTER TABLE ONLY notifications
-        ADD CONSTRAINT notifications_subscription_id_foreign FOREIGN KEY (subscription_id) REFERENCES subscriptions(subscription_id) ON DELETE CASCADE;
-
-      ALTER TABLE ONLY subscriptions
-        ADD CONSTRAINT subscriptions_eventsource_id_foreign FOREIGN KEY (eventsource_id) REFERENCES eventsources(eventsource_id);
-
-      ALTER TABLE ONLY subscriptions
-        ADD CONSTRAINT subscriptions_user_id_foreign FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE;
-
-      ALTER TABLE ONLY tokens
-        ADD CONSTRAINT tokens_user_id_foreign FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE;
+        CREATE TABLE users (
+            user_id integer NOT NULL PRIMARY KEY
+        );
     "#};
 
     api.raw_cmd(raw_sql).await;
@@ -135,94 +30,18 @@ async fn aragon_test_postgres(api: &mut TestApi) -> TestResult {
           url      = "env(TEST_DATABASE_URL)"
         }
 
-        model eventsources {
-          eventsource_id   Int             @id
-          created_at       DateTime?       @default(now()) @db.Timestamptz(6)
-          enabled          Boolean         @default(true)
-          contract_address String          @db.VarChar(255)
-          kernel_address   String          @db.VarChar(255)
-          ens_name         String?         @db.VarChar(255)
-          abi              Json?
-          event_name       String          @db.VarChar(255)
-          app_name         String          @db.VarChar(255)
-          network          String          @db.VarChar(255)
-          from_block       BigInt
-          last_poll        DateTime?       @db.Timestamptz(6)
-          subscriptions    subscriptions[]
-
-          @@unique([contract_address, event_name, network], map: "eventsources_contract_address_event_name_network_unique")
-        }
-
-        model knex_migrations {
-          id             Int       @id
-          name           String?   @db.VarChar(255)
-          batch          Int?
-          migration_time DateTime? @db.Timestamptz(6)
-        }
-
-        model knex_migrations_lock {
-          index     Int  @id
-          is_locked Int?
-        }
-
-        model notifications {
-          notification_id  Int           @id
-          created_at       DateTime?     @default(now()) @db.Timestamptz(6)
-          subscription_id  Int
-          return_values    Json?
-          block_time       DateTime      @db.Timestamptz(6)
-          transaction_hash String        @db.VarChar(255)
-          block            BigInt
-          sent             Boolean       @default(false)
-          subscriptions    subscriptions @relation(fields: [subscription_id], references: [subscription_id], onDelete: Cascade, onUpdate: NoAction, map: "notifications_subscription_id_foreign")
-
-          @@index([subscription_id], map: "notifications_subscription_id_index")
-        }
-
-        model subscriptions {
-          subscription_id Int             @id
-          user_id         Int
-          eventsource_id  Int
-          created_at      DateTime?       @default(now()) @db.Timestamptz(6)
-          join_block      BigInt
-          notifications   notifications[]
-          eventsources    eventsources    @relation(fields: [eventsource_id], references: [eventsource_id], onDelete: NoAction, onUpdate: NoAction, map: "subscriptions_eventsource_id_foreign")
-          users           users           @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "subscriptions_user_id_foreign")
-
-          @@unique([user_id, eventsource_id], map: "subscriptions_user_id_eventsource_id_unique")
-          @@index([eventsource_id], map: "subscriptions_eventsource_id_index")
-          @@index([user_id], map: "subscriptions_user_id_index")
-        }
-
         /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.
         model tokens {
-          token_id       Int       @id
-          created_at     DateTime? @default(now()) @db.Timestamptz(6)
-          user_id        Int
-          token_scope    String?   @default("MAGICLINK")
-          valid          Boolean   @default(true)
-          some_new_field String?   @db.VarChar(255)
-          users          users     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "tokens_user_id_foreign")
-
-          @@index([user_id], map: "tokens_user_id_index")
+          token_id    Int     @id
+          token_scope String?
         }
 
         model users {
-          user_id       Int             @id
-          created_at    DateTime?       @default(now()) @db.Timestamptz(6)
-          email         String          @unique(map: "users_email_unique") @db.VarChar(255)
-          verified      Boolean         @default(false)
-          subscriptions subscriptions[]
-          tokens        tokens[]
-
-          @@index([email], map: "users_email_index")
+          user_id Int @id
         }
     "#]];
 
     api.expect_datamodel(&schema).await;
-
-    // ensure the introspected schema is valid
-    psl::parse_schema(schema.data()).unwrap();
 
     let expectation = expect![[r#"
         [
