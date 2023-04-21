@@ -4,7 +4,7 @@ use indoc::indoc;
 use sql_introspection_tests::test_api::*;
 use test_macros::test_connector;
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn aragon_test_postgres(api: &mut TestApi) -> TestResult {
     let raw_sql = indoc! {r#"
         CREATE TABLE tokens (
@@ -120,7 +120,7 @@ async fn aragon_test_cockroachdb(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres, CockroachDb))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn check_and_exclusion_constraints_stopgap(api: &mut TestApi) -> TestResult {
     let raw_sql = indoc! {r#"
         CREATE EXTENSION btree_gist;
