@@ -1,6 +1,5 @@
 use super::*;
 use fmt::Debug;
-use once_cell::sync::OnceCell;
 use prisma_models::{prelude::ParentContainer, DefaultKind};
 use std::{boxed::Box, fmt};
 
@@ -9,8 +8,6 @@ pub struct InputObjectType {
     pub identifier: Identifier,
     pub constraints: InputObjectTypeConstraints,
     pub tag: Option<ObjectTag>,
-    /// (start, len)
-    pub fields: (usize, usize),
 }
 
 /// Object tags help differentiating objects during parsing / raw input data processing,

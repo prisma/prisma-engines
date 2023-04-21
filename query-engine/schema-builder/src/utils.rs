@@ -1,5 +1,4 @@
 use super::*;
-use once_cell::sync::OnceCell;
 use prisma_models::{ast, walkers, DefaultKind};
 
 /// Object type convenience wrapper function.

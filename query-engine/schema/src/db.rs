@@ -6,7 +6,7 @@ use std::ops;
 #[derive(Default, Debug)]
 pub struct QuerySchemaDatabase {
     input_object_types: Vec<InputObjectType>,
-    input_object_fields: Vec<InputField>,
+    input_object_fields: Vec<(InputObjectTypeId, InputField)>,
     output_object_types: Vec<ObjectType>,
     enum_types: Vec<EnumType>,
 
@@ -21,12 +21,7 @@ impl QuerySchemaDatabase {
         input_object_id: InputObjectTypeId,
         fields: impl Iterator<Item = InputField>,
     ) {
-        let mut object_type = &mut self.input_object_types[input_object_id.0];
-        object_type.fields.0 = self.input_object_fields.len();
-        for field in fields {
-            object_type.fields.1 += 1;
-            self.input_object_fields.push(field);
-        }
+        self.input_object_fields.extend(fields.map(|f| (input_object_id, f)));
     }
 
     pub fn find_input_object_field(&self, input_object_id: InputObjectTypeId, field_name: &str) -> Option<&InputField> {
@@ -34,9 +29,11 @@ impl QuerySchemaDatabase {
     }
 
     pub fn input_object_fields(&self, input_object_id: InputObjectTypeId) -> impl Iterator<Item = &InputField> + Clone {
-        let input_object = &self[input_object_id];
-        let (start, len) = input_object.fields;
-        self.input_object_fields[start..(start + len)].iter()
+        let start = self.input_object_fields.partition_point(|(id, _)| *id < input_object_id);
+        self.input_object_fields[start..]
+            .iter()
+            .take_while(move |(id, _)| *id == input_object_id)
+            .map(|(_, f)| f)
     }
 
     pub(crate) fn iter_enum_types(&self) -> impl Iterator<Item = &EnumType> {
@@ -44,12 +41,7 @@ impl QuerySchemaDatabase {
     }
 
     pub fn push_input_field(&mut self, input_object_id: InputObjectTypeId, input_field: InputField) {
-        let (start, len) = &mut self.input_object_types[input_object_id.0].fields;
-        if *len == 0 {
-            *start = self.input_object_fields.len();
-        }
-        *len += 1;
-        self.input_object_fields.push(input_field);
+        self.input_object_fields.push((input_object_id, input_field));
     }
 
     pub fn push_input_object_type(&mut self, ty: InputObjectType) -> InputObjectTypeId {
