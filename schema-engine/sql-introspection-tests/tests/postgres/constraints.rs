@@ -44,18 +44,11 @@ async fn aragon_test_postgres(api: &mut TestApi) -> TestResult {
     api.expect_datamodel(&schema).await;
 
     let expectation = expect![[r#"
-        [
-          {
-            "code": 33,
-            "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints",
-            "affected": [
-              {
-                "model": "tokens",
-                "constraint": "tokens_token_scope_check"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints
+          - model: tokens, constraint: tokens_token_scope_check
+    "#]];
 
     api.expect_warnings(&expectation).await;
 
@@ -102,18 +95,11 @@ async fn aragon_test_cockroachdb(api: &mut TestApi) -> TestResult {
     api.expect_datamodel(&schema).await;
 
     let expectation = expect![[r#"
-        [
-          {
-            "code": 33,
-            "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints",
-            "affected": [
-              {
-                "model": "tokens",
-                "constraint": "tokens_token_scope_check"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints
+          - model: tokens, constraint: tokens_token_scope_check
+    "#]];
 
     api.expect_warnings(&expectation).await;
 
