@@ -253,7 +253,7 @@ impl PostgresSchemaExt {
         let low = self.exclude_constraints.partition_point(|(id, _)| *id < table_id);
         let high = self.exclude_constraints[low..].partition_point(|(id, _)| *id <= table_id);
 
-        self.exclude_constraints[low..high]
+        self.exclude_constraints[low..low + high]
             .iter()
             .map(|(_, name)| name.as_str())
     }

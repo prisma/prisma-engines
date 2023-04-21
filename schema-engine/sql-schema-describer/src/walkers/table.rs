@@ -128,7 +128,7 @@ impl<'a> TableWalker<'a> {
         let low = self.schema.check_constraints.partition_point(|(id, _)| *id < self.id);
         let high = self.schema.check_constraints[low..].partition_point(|(id, _)| *id <= self.id);
 
-        self.schema.check_constraints[low..high]
+        self.schema.check_constraints[low..low + high]
             .iter()
             .map(|(_, name)| name.as_str())
     }

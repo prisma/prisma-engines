@@ -5,6 +5,122 @@ use sql_introspection_tests::test_api::*;
 use test_macros::test_connector;
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
+async fn aragon_test_postgres(api: &mut TestApi) -> TestResult {
+    let raw_sql = indoc! {r#"
+        CREATE TABLE tokens (
+            token_id integer NOT NULL PRIMARY KEY,
+            token_scope text,
+            CONSTRAINT tokens_token_scope_check CHECK ((token_scope = ANY (ARRAY['MAGICLINK'::text, 'API'::text])))
+        );
+
+        CREATE TABLE users (
+            user_id integer NOT NULL PRIMARY KEY
+        );
+    "#};
+
+    api.raw_cmd(raw_sql).await;
+
+    let schema = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.
+        model tokens {
+          token_id    Int     @id
+          token_scope String?
+        }
+
+        model users {
+          user_id Int @id
+        }
+    "#]];
+
+    api.expect_datamodel(&schema).await;
+
+    let expectation = expect![[r#"
+        [
+          {
+            "code": 33,
+            "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints",
+            "affected": [
+              {
+                "model": "tokens",
+                "constraint": "tokens_token_scope_check"
+              }
+            ]
+          }
+        ]"#]];
+
+    api.expect_warnings(&expectation).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(CockroachDb))]
+async fn aragon_test_cockroachdb(api: &mut TestApi) -> TestResult {
+    let raw_sql = indoc! {r#"
+        CREATE TABLE users (
+            user_id INT8 PRIMARY KEY
+        );
+        
+        CREATE TABLE tokens (
+            token_id INT8 PRIMARY KEY,
+            token_scope STRING NULL,
+            CONSTRAINT tokens_token_scope_check CHECK (token_scope = ANY ARRAY['MAGICLINK':::STRING, 'API':::STRING]:::STRING[])
+        );
+    "#};
+
+    api.raw_cmd(raw_sql).await;
+
+    let schema = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "cockroachdb"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.
+        model tokens {
+          token_id    BigInt  @id
+          token_scope String?
+        }
+
+        model users {
+          user_id BigInt @id
+        }
+    "#]];
+
+    api.expect_datamodel(&schema).await;
+
+    let expectation = expect![[r#"
+        [
+          {
+            "code": 33,
+            "message": "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints",
+            "affected": [
+              {
+                "model": "tokens",
+                "constraint": "tokens_token_scope_check"
+              }
+            ]
+          }
+        ]"#]];
+
+    api.expect_warnings(&expectation).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn check_and_exclusion_constraints_stopgap(api: &mut TestApi) -> TestResult {
     let raw_sql = indoc! {r#"
         CREATE EXTENSION btree_gist;
