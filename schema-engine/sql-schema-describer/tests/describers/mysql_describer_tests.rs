@@ -2602,6 +2602,10 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                         0,
                     ),
                     name: "User",
+                    properties: BitFlags<TableProperties> {
+                        bits: 0b0,
+                    },
+                    description: None,
                 },
             ],
             enums: [
@@ -2610,6 +2614,7 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                         0,
                     ),
                     name: "User_enum_col",
+                    description: None,
                 },
             ],
             enum_variants: [
@@ -2626,7 +2631,7 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                     variant_name: "b",
                 },
             ],
-            columns: [
+            table_columns: [
                 (
                     TableId(
                         0,
@@ -2641,8 +2646,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: true,
+                        description: None,
                     },
                 ),
                 (
@@ -2659,8 +2664,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2677,8 +2682,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2695,8 +2700,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2713,8 +2718,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2731,8 +2736,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2749,8 +2754,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2767,8 +2772,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2785,8 +2790,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2803,8 +2808,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2821,8 +2826,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2839,8 +2844,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2857,8 +2862,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2875,8 +2880,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2893,8 +2898,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2911,8 +2916,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2929,8 +2934,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2947,8 +2952,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2965,8 +2970,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -2983,8 +2988,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -3001,8 +3006,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -3019,8 +3024,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -3039,8 +3044,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -3055,8 +3060,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                             arity: Nullable,
                             native_type: None,
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -3073,8 +3078,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -3091,8 +3096,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -3109,8 +3114,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -3127,8 +3132,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -3145,8 +3150,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -3163,8 +3168,8 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -3181,13 +3186,14 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                                 NativeTypeInstance(..),
                             ),
                         },
-                        default_value_id: None,
                         auto_increment: false,
+                        description: None,
                     },
                 ),
             ],
             foreign_keys: [],
-            default_values: [],
+            table_default_values: [],
+            view_default_values: [],
             foreign_key_columns: [],
             indexes: [
                 Index {
@@ -3203,7 +3209,7 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                     index_id: IndexId(
                         0,
                     ),
-                    column_id: ColumnId(
+                    column_id: TableColumnId(
                         0,
                     ),
                     sort_order: Some(
@@ -3212,7 +3218,9 @@ fn all_tidb_column_types_must_work(api: TestApi) {
                     length: None,
                 },
             ],
+            check_constraints: [],
             views: [],
+            view_columns: [],
             procedures: [],
             user_defined_types: [],
             connector_data: <ConnectorData>,

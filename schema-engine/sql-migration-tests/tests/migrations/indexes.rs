@@ -108,7 +108,7 @@ fn unique_directive_on_required_one_to_one_relation_creates_one_index(api: TestA
         .assert_table("Cat", |table| table.assert_indexes_count(1));
 }
 
-#[test_connector(exclude(Vitess, TiDB))]
+#[test_connector(exclude(Vitess))]
 fn one_to_many_self_relations_do_not_create_a_unique_index(api: TestApi) {
     let dm = r#"
         model Location {

@@ -107,7 +107,7 @@ fn length_prefixed_compound_primary_key(api: TestApi) {
     });
 }
 
-// Ignoring TiDB, unsupported drop primary key when the table's pkIsHandle is true.
+// Ignoring TiDB, unsupported drop primary key when the table is using clustered index.
 // TODO: ignore because not possible on cockroachdb. We would need a multi-step process there.
 #[test_connector(exclude(Vitess, CockroachDb, TiDB))]
 fn changing_the_type_of_an_id_field_must_work(api: TestApi) {
@@ -185,8 +185,8 @@ fn models_with_an_autoincrement_field_as_part_of_a_multi_field_id_can_be_created
 }
 
 // Ignoring sqlite is OK, because sqlite integer primary keys are always auto-incrementing.
-// Ignoring TiDB, we can't set auto_increment for an existing id field to auto-incrementing in TiDB.
-#[test_connector(exclude(Sqlite, CockroachDb, TiDB))]
+// Ignoring TiDB, we can't set auto_increment for an existing field.
+#[test_connector(exclude(Sqlite, CockroachDb))]
 fn making_an_existing_id_field_autoincrement_works(api: TestApi) {
     use quaint::ast::{Insert, Select};
 

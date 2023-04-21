@@ -221,7 +221,7 @@ async fn introspect_mysql_non_prisma(api: &mut TestApi) -> TestResult {
         .execute(|migration| {
             migration.create_table("Book", |t| {
                 t.add_column("id", types::primary());
-                t.inject_custom("location   json");
+                t.inject_custom("location   point");
             });
         })
         .await?;
