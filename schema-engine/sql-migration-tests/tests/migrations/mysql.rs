@@ -217,18 +217,8 @@ fn native_type_columns_can_be_created(api: TestApi) {
         ("decimal", "Decimal", "Decimal(5, 3)", "decimal(5,3)"),
         ("float", "Float", "Float", "float"),
         ("double", "Float", "Double", "double"),
-        (
-            "bits",
-            "Bytes",
-            "Bit(10)",
-            "bit(10)",
-        ),
-        (
-            "bit",
-            "Boolean",
-            "Bit(1)",
-            "bit(1)",
-        ),
+        ("bits", "Bytes", "Bit(10)", "bit(10)"),
+        ("bit", "Boolean", "Bit(1)", "bit(1)"),
         ("chars", "String", "Char(10)", "char(10)"),
         ("varchars", "String", "VarChar(500)", "varchar(500)"),
         ("binary", "Bytes", "Binary(230)", "binary(230)"),
@@ -250,16 +240,7 @@ fn native_type_columns_can_be_created(api: TestApi) {
             "Timestamp(3)",
             "timestamp(3)",
         ),
-        (
-            "year",
-            "Int",
-            "Year",
-            if api.is_mysql_8() {
-                "year"
-            } else {
-                "year(4)"
-            },
-        ),
+        ("year", "Int", "Year", if api.is_mysql_8() { "year" } else { "year(4)" }),
     ];
 
     let mut dm = r#"
