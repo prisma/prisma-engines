@@ -7,14 +7,12 @@ pub use sql_renderer::*;
 use crate::{templating, ConnectorTagInterface, DatamodelFragment, IdFragment, M2mFragment, CONFIG};
 use indoc::indoc;
 use itertools::Itertools;
-use lazy_static::lazy_static;
+use once_cell::sync::Lazy;
 use psl::ALL_PREVIEW_FEATURES;
 use regex::Regex;
 
-lazy_static! {
-    /// Test configuration, loaded once at runtime.
-    static ref FRAGMENT_RE: Regex = Regex::new(r"#.*").unwrap();
-}
+/// Test configuration, loaded once at runtime.
+static FRAGMENT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"#.*").unwrap());
 
 /// The main trait a datamodel renderer for a connector has to implement.
 pub trait DatamodelRenderer {

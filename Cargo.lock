@@ -262,6 +262,7 @@ name = "black-box-tests"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "enumflags2",
  "indoc",
  "insta",
  "query-engine-tests",
@@ -2208,7 +2209,7 @@ checksum = "e5ce46fe64a9d73be07dcbe690a38ce1b293be448fd8ce1e6c1b8062c9f72c6a"
 [[package]]
 name = "mysql_async"
 version = "0.31.3"
-source = "git+https://github.com/prisma/mysql_async?branch=vendored-openssl#d39990b6db77ab5116ee5b5d821b27bd5f54f268"
+source = "git+https://github.com/prisma/mysql_async?branch=vendored-openssl#dad187b50dc7e8ce2b61fec126822e8e172a9c8a"
 dependencies = [
  "bytes",
  "crossbeam",
@@ -2986,7 +2987,7 @@ dependencies = [
 name = "prisma-value"
 version = "0.1.0"
 dependencies = [
- "base64 0.12.3",
+ "base64 0.13.1",
  "bigdecimal",
  "chrono",
  "once_cell",
@@ -3143,7 +3144,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#7d5729d56ae594e98b1f34672b8551d783ea59b7"
+source = "git+https://github.com/prisma/quaint#5103129655cc10afcffcc08a4b0200f5262d7766"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -3220,7 +3221,6 @@ name = "query-core"
 version = "0.1.0"
 dependencies = [
  "async-trait",
- "base64 0.12.3",
  "bigdecimal",
  "chrono",
  "connection-string",
@@ -3235,7 +3235,6 @@ dependencies = [
  "opentelemetry",
  "petgraph 0.4.13",
  "prisma-models",
- "prisma-value",
  "psl",
  "query-connector",
  "query-engine-metrics",
@@ -3259,7 +3258,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "base64 0.12.3",
+ "base64 0.13.1",
  "connection-string",
  "enumflags2",
  "graphql-parser",
@@ -3346,6 +3345,7 @@ dependencies = [
  "base64 0.13.1",
  "chrono",
  "colored",
+ "enumflags2",
  "futures",
  "indoc",
  "insta",
@@ -3385,8 +3385,8 @@ dependencies = [
  "indexmap",
  "indoc",
  "itertools",
- "lazy_static",
  "nom",
+ "once_cell",
  "parse-hyperlinks",
  "prisma-models",
  "psl",

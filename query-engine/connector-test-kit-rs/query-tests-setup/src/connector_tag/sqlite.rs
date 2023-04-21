@@ -2,9 +2,7 @@ use super::*;
 use crate::SqlDatamodelRenderer;
 
 #[derive(Debug, Default, Clone, PartialEq)]
-pub struct SqliteConnectorTag {
-    capabilities: Vec<ConnectorCapability>,
-}
+pub struct SqliteConnectorTag;
 
 impl ConnectorTagInterface for SqliteConnectorTag {
     fn datamodel_provider(&self) -> &'static str {
@@ -30,8 +28,8 @@ impl ConnectorTagInterface for SqliteConnectorTag {
         format!("file://{workspace_root}/db/{database}.db")
     }
 
-    fn capabilities(&self) -> &[ConnectorCapability] {
-        &self.capabilities
+    fn capabilities(&self) -> ConnectorCapabilities {
+        psl::builtin_connectors::SQLITE.capabilities()
     }
 
     fn as_parse_pair(&self) -> (String, Option<String>) {
@@ -45,17 +43,11 @@ impl ConnectorTagInterface for SqliteConnectorTag {
 
 impl SqliteConnectorTag {
     pub fn new() -> Self {
-        Self {
-            capabilities: sqlite_capabilities(),
-        }
+        Self
     }
 
     /// Returns all versions of this connector.
     pub fn all() -> Vec<Self> {
         vec![Self::new()]
     }
-}
-
-fn sqlite_capabilities() -> Vec<ConnectorCapability> {
-    psl::builtin_connectors::SQLITE.capabilities().to_owned()
 }
