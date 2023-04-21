@@ -95,7 +95,6 @@ async fn unsupported_type_keeps_its_usages_cockroach(api: &mut TestApi) -> TestR
         *** WARNING ***
 
         These fields are not supported by the Prisma Client, because Prisma currently does not support their types:
-
           - model: Test, field: broken, type: geometry
           - model: Test, field: broken2, type: geography
     "#]];

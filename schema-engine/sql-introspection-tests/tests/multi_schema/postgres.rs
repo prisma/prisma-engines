@@ -196,7 +196,6 @@ async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut Tes
         *** WARNING ***
 
         These items were renamed due to their names being duplicates in the Prisma Schema Language:
-
           - type: model, name: first_A
           - type: model, name: second_A
     "#]];
@@ -259,7 +258,6 @@ async fn multiple_schemas_w_duplicate_sanitized_table_names_are_introspected(api
         *** WARNING ***
 
         These items were renamed due to their names being duplicates in the Prisma Schema Language:
-
           - type: model, name: first_2A
           - type: model, name: second_1A
     "#]];
@@ -542,7 +540,6 @@ async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &mut TestApi) 
         *** WARNING ***
 
         These items were renamed due to their names being duplicates in the Prisma Schema Language:
-
           - type: enum, name: first_HappyMood
           - type: enum, name: second_HappyMood
           - type: model, name: first_HappyPerson
@@ -612,7 +609,6 @@ async fn multiple_schemas_w_duplicate_models_are_reintrospected(api: &mut TestAp
         *** WARNING ***
 
         These models were enriched with `@@map` information taken from the previous Prisma schema:
-
           - FooBar
     "#]];
 
@@ -672,7 +668,6 @@ async fn multiple_schemas_w_duplicate_models_are_reintrospected_never_renamed(ap
         *** WARNING ***
 
         These items were renamed due to their names being duplicates in the Prisma Schema Language:
-
           - type: model, name: second_HappyPerson
     "#]];
 
@@ -732,7 +727,6 @@ async fn multiple_schemas_w_duplicate_enums_are_reintrospected(api: &mut TestApi
         *** WARNING ***
 
         These enums were enriched with `@@map` information taken from the previous Prisma schema:
-
           - RenamedMood
     "#]];
 

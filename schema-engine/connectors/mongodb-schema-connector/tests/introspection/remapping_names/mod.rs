@@ -105,7 +105,6 @@ fn remapping_composite_fields_with_numbers() {
         *** WARNING ***
 
         These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:
-
           - composite type: OuterInner, field: 1
     "#]];
 
@@ -141,7 +140,6 @@ fn remapping_model_fields_with_numbers() {
         *** WARNING ***
 
         These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:
-
           - model: Outer, field: 1
     "#]];
 

@@ -113,7 +113,6 @@ impl fmt::Display for Warnings {
                 writeln!(f)?;
                 f.write_str(msg)?;
                 writeln!(f)?;
-                writeln!(f)?;
 
                 for item in items {
                     writeln!(f, "  - {item}")?;

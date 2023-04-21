@@ -1252,7 +1252,6 @@ fn unsupported_types_in_an_index() {
         *** WARNING ***
 
         These fields are not supported by the Prisma Client, because Prisma currently does not support their types:
-
           - model: A, field: data, type: JavaScriptCode
     "#]];
 
@@ -1371,7 +1370,6 @@ fn index_pointing_to_non_existing_field_should_add_the_field() {
         *** WARNING ***
 
         Could not determine the types for the following fields:
-
           - model: A, field: age
     "#]];
 
@@ -1421,11 +1419,9 @@ fn index_pointing_to_non_existing_composite_field_should_add_the_field_and_type(
         *** WARNING ***
 
         Could not determine the types for the following fields:
-
           - model: Cat, field: info
 
         Could not determine the types for the following fields:
-
           - composite type: CatInfo, field: age
     "#]];
 
@@ -1480,11 +1476,9 @@ fn deep_index_pointing_to_non_existing_composite_field_should_add_the_field_and_
         *** WARNING ***
 
         Could not determine the types for the following fields:
-
           - model: Cat, field: info
 
         Could not determine the types for the following fields:
-
           - composite type: CatInfo, field: specific
           - composite type: CatInfoSpecific, field: age
     "#]];
@@ -1530,7 +1524,6 @@ fn index_pointing_to_mapped_non_existing_field_should_add_the_mapped_field() {
         *** WARNING ***
 
         Could not determine the types for the following fields:
-
           - model: A, field: _age
     "#]];
 
@@ -1580,11 +1573,9 @@ fn composite_index_pointing_to_mapped_non_existing_field_should_add_the_mapped_f
         *** WARNING ***
 
         Could not determine the types for the following fields:
-
           - model: A, field: info
 
         Could not determine the types for the following fields:
-
           - composite type: AInfo, field: _age
     "#]];
 
@@ -1631,7 +1622,6 @@ fn compound_index_pointing_to_non_existing_field_should_add_the_field() {
         *** WARNING ***
 
         Could not determine the types for the following fields:
-
           - model: A, field: age
           - model: A, field: play
     "#]];
@@ -1682,7 +1672,6 @@ fn composite_index_with_one_existing_field_should_add_missing_stuff_only() {
         *** WARNING ***
 
         Could not determine the types for the following fields:
-
           - composite type: AInfo, field: play
     "#]];
 
@@ -1737,7 +1726,6 @@ fn deep_composite_index_with_one_existing_field_should_add_missing_stuff_only() 
         *** WARNING ***
 
         Could not determine the types for the following fields:
-
           - composite type: AInfo, field: special
           - composite type: AInfoSpecial, field: play
     "#]];
@@ -1792,7 +1780,6 @@ fn deep_composite_index_with_one_existing_field_should_add_missing_stuff_only_2(
         *** WARNING ***
 
         Could not determine the types for the following fields:
-
           - composite type: AInfoSpecial, field: play
     "#]];
 
@@ -1849,11 +1836,9 @@ fn deep_composite_index_should_add_missing_stuff_in_different_layers() {
         *** WARNING ***
 
         Could not determine the types for the following fields:
-
           - model: A, field: info
 
         Could not determine the types for the following fields:
-
           - composite type: AInfo, field: play
           - composite type: AInfo, field: special
           - composite type: AInfoSpecial, field: age
@@ -1901,7 +1886,6 @@ fn compound_index_with_one_existing_field_pointing_to_non_existing_field_should_
         *** WARNING ***
 
         Could not determine the types for the following fields:
-
           - model: A, field: play
     "#]];
 
@@ -1944,7 +1928,6 @@ fn unique_index_pointing_to_non_existing_field_should_add_the_field() {
         *** WARNING ***
 
         Could not determine the types for the following fields:
-
           - model: A, field: age
     "#]];
 
@@ -1987,7 +1970,6 @@ fn fulltext_index_pointing_to_non_existing_field_should_add_the_field() {
         *** WARNING ***
 
         Could not determine the types for the following fields:
-
           - model: A, field: age
     "#]];
 

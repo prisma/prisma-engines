@@ -182,12 +182,10 @@ async fn mapped_model_and_field_name(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These fields were enriched with `@map` information taken from the previous Prisma schema:
-
           - model: Post, field: c_user_id
           - model: Custom_User, field: c_id
 
         These models were enriched with `@@map` information taken from the previous Prisma schema:
-
           - Custom_User
     "#]];
 
@@ -311,7 +309,6 @@ async fn mysql_keeps_renamed_enum_defaults(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These enum values were enriched with `@map` information taken from the previous Prisma schema:
-
           - enum: A_val, value: is_false
           - enum: A_val, value: is_true
     "#]];
@@ -372,7 +369,6 @@ async fn mapped_enum_value_name(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These enum values were enriched with `@map` information taken from the previous Prisma schema:
-
           - enum: color, value: BLACK
     "#]];
 

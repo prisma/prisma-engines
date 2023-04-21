@@ -74,7 +74,6 @@ fn mixing_types() {
         *** WARNING ***
 
         The following fields had data stored in multiple types. Either use Json or normalize data to the wanted type:
-
           - model: A, field: first, type: Json
     "#]];
 
@@ -112,7 +111,6 @@ fn mixing_types_with_the_same_base_type() {
         *** WARNING ***
 
         The following fields had data stored in multiple types. Either use Json or normalize data to the wanted type:
-
           - model: A, field: first, type: DateTime (Timestamp)
     "#]];
 
