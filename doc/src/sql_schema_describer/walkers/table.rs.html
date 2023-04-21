@@ -273,7 +273,7 @@
         <span class="kw">let </span>low = <span class="self">self</span>.schema.check_constraints.partition_point(|(id, <span class="kw">_</span>)| <span class="kw-2">*</span>id &lt; <span class="self">self</span>.id);
         <span class="kw">let </span>high = <span class="self">self</span>.schema.check_constraints[low..].partition_point(|(id, <span class="kw">_</span>)| <span class="kw-2">*</span>id &lt;= <span class="self">self</span>.id);
 
-        <span class="self">self</span>.schema.check_constraints[low..high]
+        <span class="self">self</span>.schema.check_constraints[low..low + high]
             .iter()
             .map(|(<span class="kw">_</span>, name)| name.as_str())
     }
