@@ -221,13 +221,13 @@ fn native_type_columns_can_be_created(api: TestApi) {
             "bits",
             "Bytes",
             "Bit(10)",
-            if api.is_tidb() { "bit(10) unsigned" } else { "bit(10)" },
+            "bit(10)",
         ),
         (
             "bit",
             "Boolean",
             "Bit(1)",
-            if api.is_tidb() { "bit(1) unsigned" } else { "bit(1)" },
+            "bit(1)",
         ),
         ("chars", "String", "Char(10)", "char(10)"),
         ("varchars", "String", "VarChar(500)", "varchar(500)"),
@@ -256,8 +256,6 @@ fn native_type_columns_can_be_created(api: TestApi) {
             "Year",
             if api.is_mysql_8() {
                 "year"
-            } else if api.is_tidb() {
-                "year(4) unsigned"
             } else {
                 "year(4)"
             },

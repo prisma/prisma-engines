@@ -1,6 +1,6 @@
 use query_engine_tests::test_suite;
 
-#[test_suite(capabilities(MultiSchema), exclude(Mysql))]
+#[test_suite(capabilities(MultiSchema), exclude(Mysql, TiDB))]
 mod multi_schema {
     use query_engine_tests::*;
 

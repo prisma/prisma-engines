@@ -4,7 +4,8 @@ use expect_test::expect;
 use sql_introspection_tests::test_api::*;
 use test_macros::test_connector;
 
-#[test_connector(tags(Mysql), exclude(Vitess))]
+// Exclude TiDB, cause: https://github.com/pingcap/tidb/issues/43267
+#[test_connector(tags(Mysql), exclude(Vitess, TiDB))]
 async fn introspecting_custom_fk_names_works(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -45,7 +46,8 @@ async fn introspecting_custom_fk_names_works(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql), exclude(Vitess))]
+// Exclude TiDB, cause: https://github.com/pingcap/tidb/issues/43267
+#[test_connector(tags(Mysql), exclude(Vitess, TiDB))]
 async fn introspecting_default_fk_names_works(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {

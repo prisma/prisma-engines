@@ -1,7 +1,8 @@
 use indoc::indoc;
 use sql_introspection_tests::test_api::*;
 
-#[test_connector(tags(Mysql), exclude(Vitess), preview_features("views"))]
+// Exclude TiDB, cause: https://github.com/pingcap/tidb/issues/43265
+#[test_connector(tags(Mysql), exclude(Vitess, TiDB), preview_features("views"))]
 async fn simple_view_from_one_table(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE A (
@@ -72,7 +73,8 @@ async fn simple_view_from_one_table(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql), exclude(Vitess, Mariadb), preview_features("views"))]
+// Exclude TiDB, cause: https://github.com/pingcap/tidb/issues/43264
+#[test_connector(tags(Mysql), exclude(Vitess, Mariadb), preview_features("views"), exclude(TiDB))]
 async fn simple_view_from_two_tables(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE User (
@@ -150,7 +152,8 @@ async fn simple_view_from_two_tables(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql), exclude(Vitess), preview_features("views"))]
+// Exclude TiDB, cause: https://github.com/pingcap/tidb/issues/43265
+#[test_connector(tags(Mysql), exclude(Vitess, TiDB), preview_features("views"))]
 async fn re_intro_keeps_view_uniques(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE User (
@@ -198,7 +201,8 @@ async fn re_intro_keeps_view_uniques(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql), exclude(Vitess), preview_features("views"))]
+// Exclude TiDB, cause: https://github.com/pingcap/tidb/issues/43265
+#[test_connector(tags(Mysql), exclude(Vitess), preview_features("views"), exclude(TiDB))]
 async fn re_intro_keeps_id(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE User (
@@ -246,7 +250,8 @@ async fn re_intro_keeps_id(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql), exclude(Vitess), preview_features("views"))]
+// Exclude TiDB, cause: https://github.com/pingcap/tidb/issues/43265
+#[test_connector(tags(Mysql), exclude(Vitess), preview_features("views"), exclude(TiDB))]
 async fn re_intro_keeps_compound_unique(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE User (
@@ -308,7 +313,8 @@ async fn re_intro_keeps_compound_unique(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql), exclude(Vitess), preview_features("views"))]
+// Exclude TiDB, cause: https://github.com/pingcap/tidb/issues/43265
+#[test_connector(tags(Mysql), exclude(Vitess, TiDB), preview_features("views"))]
 async fn re_intro_keeps_view_to_view_relations(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE VIEW A AS SELECT 1 AS id;
@@ -348,7 +354,8 @@ async fn re_intro_keeps_view_to_view_relations(api: &mut TestApi) -> TestResult 
     Ok(())
 }
 
-#[test_connector(tags(Mysql), exclude(Vitess), preview_features("views"))]
+// Exclude TiDB, cause: https://github.com/pingcap/tidb/issues/43265
+#[test_connector(tags(Mysql), exclude(Vitess), preview_features("views"), exclude(TiDB))]
 async fn defaults_are_introspected(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE A (id INT PRIMARY KEY, val INT DEFAULT 2);

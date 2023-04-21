@@ -28,7 +28,8 @@ async fn a_table_without_required_uniques(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql), exclude(Vitess))]
+// Exclude TiDB, cause: https://github.com/pingcap/tidb/issues/43267
+#[test_connector(tags(Mysql), exclude(Vitess, TiDB))]
 async fn a_table_without_uniques_should_ignore(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -104,7 +105,9 @@ async fn remapping_field_names_to_empty_mysql(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql), exclude(Vitess))]
+// Exclude TiDB, cause alter table partition is unsupported.
+// Related issue: https://github.com/pingcap/tidb/issues/42728
+#[test_connector(tags(Mysql), exclude(Vitess, TiDB))]
 async fn partition_table_gets_comment(api: &mut TestApi) -> TestResult {
     api.raw_cmd(
         r#"

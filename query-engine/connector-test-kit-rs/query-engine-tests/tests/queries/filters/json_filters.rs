@@ -224,7 +224,7 @@ mod json_filters {
 
         match runner.connector_version() {
             // MariaDB does not support finding arrays in arrays, unlike MySQL
-            ConnectorVersion::MySql(Some(MySqlVersion::MariaDb)) => {
+            ConnectorVersion::MySql(Some(MySqlVersion::MariaDb)) | ConnectorVersion::TiDB => {
                 insta::assert_snapshot!(
                     run_query!(
                         runner,

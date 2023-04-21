@@ -534,7 +534,7 @@ async fn id_fields_with_foreign_key(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql), exclude(Vitess))]
+#[test_connector(tags(Mysql), exclude(Vitess, TiDB))]
 async fn one_to_one_req_relation_with_custom_fk_name(api: &mut TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -642,7 +642,8 @@ async fn one_to_one_relation_on_a_singular_primary_key(api: &mut TestApi) -> Tes
     Ok(())
 }
 
-#[test_connector(tags(Mysql), exclude(Vitess))]
+// Exclude TiDB, cause: https://github.com/pingcap/tidb/issues/43267
+#[test_connector(tags(Mysql), exclude(Vitess, TiDB))]
 async fn multiple_foreign_key_constraints_are_taken_always_in_the_same_order(api: &mut TestApi) -> TestResult {
     let migration = indoc! {r#"
         CREATE TABLE A (
