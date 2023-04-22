@@ -71,7 +71,7 @@ fn creating_tables_without_primary_key_must_work(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Vitess, TiDB))]
+#[test_connector(exclude(Vitess))]
 fn relations_to_models_without_a_primary_key_work(api: TestApi) {
     let dm = r#"
         model Pair {
@@ -282,7 +282,7 @@ fn id_as_part_of_relation_must_work(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Vitess, TiDB))]
+#[test_connector(exclude(Vitess))]
 fn multi_field_id_as_part_of_relation_must_work(api: TestApi) {
     let dm = r##"
         model Cat {
@@ -314,7 +314,7 @@ fn multi_field_id_as_part_of_relation_must_work(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Vitess, TiDB))]
+#[test_connector(exclude(Vitess))]
 fn remapped_multi_field_id_as_part_of_relation_must_work(api: TestApi) {
     let dm = r##"
         model Cat {
