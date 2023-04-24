@@ -1,11 +1,28 @@
-name: Quaint tests
+name: Quaint
 on:
   push:
     branches:
       - main
   pull_request:
 jobs:
-  cargo-test:
+  clippy:
+    runs-on: ubuntu-latest
+    env:
+      RUSTFLAGS: "-Dwarnings"
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions-rs/toolchain@v1
+        with:
+            components: clippy
+            override: true
+            toolchain: stable
+      - name: Install dependencies
+        run: sudo apt install -y openssl libkrb5-dev
+      - uses: actions-rs/clippy-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --features=all --manifest-path quaint/Cargo.toml
+  tests:
     runs-on: ubuntu-latest
 
     strategy:
