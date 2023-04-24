@@ -1,5 +1,5 @@
 use super::*;
-use crate::constants::aggregations::*;
+use constants::aggregations::*;
 use std::convert::identity;
 
 /// Builds plain aggregation object type for given model (e.g. AggregateUser).

@@ -1,8 +1,7 @@
-use crate::constants::args;
-use crate::input_types::fields::arguments::where_argument;
-use crate::mutations::create_one;
-
 use super::*;
+use constants::args;
+use input_types::fields::arguments::where_argument;
+use mutations::create_one;
 
 pub(crate) fn nested_upsert_input_object(
     ctx: &mut BuilderContext<'_>,

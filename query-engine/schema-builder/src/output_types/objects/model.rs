@@ -1,7 +1,5 @@
-#![allow(clippy::unnecessary_to_owned)]
-
 use super::*;
-use crate::constants::aggregations::*;
+use constants::aggregations::*;
 use std::convert::identity;
 
 /// Compute initial model cache. No fields are computed because we first

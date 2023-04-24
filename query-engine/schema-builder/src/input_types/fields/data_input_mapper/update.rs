@@ -1,5 +1,5 @@
 use super::*;
-use crate::{constants::*, enum_types::*};
+use constants::*;
 use prisma_models::CompositeFieldRef;
 
 pub(crate) struct UpdateDataInputFieldMapper {
