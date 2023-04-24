@@ -1144,13 +1144,7 @@ async fn reserved_name_docs_are_only_added_once(api: &mut TestApi) -> TestResult
         *** WARNING ***
 
         These views were enriched with `@@map` information taken from the previous Prisma schema:
-          - Renamedif
-<<<<<<< HEAD
-=======
-
-        These views were enriched with `@@map` information taken from the previous Prisma schema:
-          - Renamedif
->>>>>>> f7209cce364692930db56e825b1c3c20dc04d678
+          - "Renamedif"
     "#]];
 
     api.expect_re_introspect_warnings(input_dm, expectation).await;
