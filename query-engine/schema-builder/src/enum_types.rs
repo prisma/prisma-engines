@@ -1,5 +1,5 @@
 use super::*;
-use crate::constants::{filters, itx, json_null, ordering};
+use constants::{filters, itx, json_null, ordering};
 use prisma_models::prelude::ParentContainer;
 use schema::{EnumType, EnumTypeId};
 

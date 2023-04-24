@@ -2,7 +2,6 @@ pub(crate) mod fields;
 pub(crate) mod objects;
 
 use super::*;
-use crate::enum_types::*;
 use fields::*;
 use prisma_models::ScalarFieldRef;
 use schema::*;

@@ -36,6 +36,7 @@ mod utils;
 
 pub use self::utils::{compound_id_field_name, compound_index_field_name};
 
+use self::{enum_types::*, utils::*};
 use cache::TypeRefCache;
 use prisma_models::{ast, Field as ModelField, InternalDataModel, ModelRef, RelationFieldRef, TypeIdentifier};
 use psl::{
@@ -43,7 +44,6 @@ use psl::{
     PreviewFeature, PreviewFeatures,
 };
 use schema::*;
-use utils::*;
 
 pub(crate) struct BuilderContext<'a> {
     internal_data_model: &'a InternalDataModel,

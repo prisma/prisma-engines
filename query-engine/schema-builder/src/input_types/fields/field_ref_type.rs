@@ -1,5 +1,5 @@
 use super::*;
-use crate::constants::filters;
+use constants::filters;
 
 pub(crate) trait WithFieldRefInputExt {
     fn with_field_ref_input(self, ctx: &mut BuilderContext<'_>) -> Vec<InputType>;
