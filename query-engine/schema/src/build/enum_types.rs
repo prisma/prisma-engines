@@ -1,7 +1,7 @@
 use super::*;
+use crate::{EnumType, EnumTypeId};
 use constants::{filters, itx, json_null, ordering};
 use prisma_models::prelude::ParentContainer;
-use schema::{EnumType, EnumTypeId};
 
 pub(crate) fn sort_order_enum(ctx: &mut BuilderContext<'_>) -> EnumTypeId {
     let ident = Identifier::new_prisma(ordering::SORT_ORDER);

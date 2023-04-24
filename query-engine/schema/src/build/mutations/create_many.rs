@@ -1,12 +1,12 @@
 use super::*;
+use crate::{
+    Identifier, IdentifierType, InputField, InputObjectTypeId, InputType, OutputField, OutputType, QueryInfo, QueryTag,
+};
 use constants::*;
 use input_types::{fields::data_input_mapper::*, list_union_type};
 use output_types::objects;
 use prisma_models::{ModelRef, RelationFieldRef};
 use psl::datamodel_connector::ConnectorCapability;
-use schema::{
-    Identifier, IdentifierType, InputField, InputObjectTypeId, InputType, OutputField, OutputType, QueryInfo, QueryTag,
-};
 
 /// Builds a create many mutation field (e.g. createManyUsers) for given model.
 pub(crate) fn create_many(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> Option<OutputField> {

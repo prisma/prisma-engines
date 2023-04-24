@@ -43,4 +43,3 @@ pub type Result<T> = std::result::Result<T, CoreError>;
 
 // Re-exports
 pub use schema;
-pub use schema_builder;

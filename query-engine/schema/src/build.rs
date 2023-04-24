@@ -1,5 +1,3 @@
-#![deny(rust_2018_idioms, unsafe_code)]
-
 //! Query schema builder. Root for query schema building.
 //!
 //! The schema builder creates all builders necessary for the process,
@@ -24,8 +22,6 @@
 //! Without caching, processing D (in fact, visiting any type after the intial computation) would also
 //! trigger a complete recomputation of A, B, C.
 
-pub mod constants;
-
 #[macro_use]
 mod cache;
 mod enum_types;
@@ -37,13 +33,13 @@ mod utils;
 pub use self::utils::{compound_id_field_name, compound_index_field_name};
 
 use self::{enum_types::*, utils::*};
+use crate::*;
 use cache::TypeRefCache;
 use prisma_models::{ast, Field as ModelField, InternalDataModel, ModelRef, RelationFieldRef, TypeIdentifier};
 use psl::{
     datamodel_connector::{Connector, ConnectorCapability},
     PreviewFeature, PreviewFeatures,
 };
-use schema::*;
 
 pub(crate) struct BuilderContext<'a> {
     internal_data_model: &'a InternalDataModel,

@@ -16,7 +16,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
         let idm = prisma_models::convert(validated_schema);
 
         c.bench_function(&format!("schema_builder::build ({name})"), |b| {
-            b.iter(|| black_box(schema_builder::build(idm.clone(), true)));
+            b.iter(|| black_box(schema::build(idm.clone(), true)));
         });
     }
 }

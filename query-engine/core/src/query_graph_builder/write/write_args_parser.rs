@@ -4,7 +4,7 @@ use connector::{DatasourceFieldName, WriteArgs, WriteOperation};
 use prisma_models::{
     CompositeFieldRef, Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef, TypeIdentifier,
 };
-use schema_builder::constants::{args, json_null, operations};
+use schema::constants::{args, json_null, operations};
 use std::convert::TryInto;
 
 #[derive(Debug)]

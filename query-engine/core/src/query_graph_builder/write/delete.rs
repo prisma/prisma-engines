@@ -6,8 +6,7 @@ use crate::{
 };
 use connector::filter::Filter;
 use prisma_models::ModelRef;
-use schema::ConnectorContext;
-use schema_builder::constants::args;
+use schema::{constants::args, ConnectorContext};
 use std::convert::TryInto;
 
 /// Creates a top level delete record query and adds it to the query graph.
