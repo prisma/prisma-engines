@@ -37,11 +37,11 @@ pub struct Warnings {
     pub unsupported_types_in_model: Vec<ModelAndFieldAndType>,
     /// The field in view has a type we do not currently support in Prisma.
     pub unsupported_types_in_view: Vec<ViewAndFieldAndType>,
-    /// The field in view has a type we do not currently support in Prisma.
+    /// The field in the composite type has a type we do not currently support in Prisma.
     pub unsupported_types_in_type: Vec<TypeAndFieldAndType>,
     /// The name of the model is taken from a previous data model.
     pub remapped_models: Vec<Model>,
-    /// The name of the model is taken from a previous data model.
+    /// The name of the view is taken from a previous data model.
     pub remapped_views: Vec<View>,
     /// The name of the enum variant is taken from a previous data model.
     pub remapped_values: Vec<EnumAndValue>,
