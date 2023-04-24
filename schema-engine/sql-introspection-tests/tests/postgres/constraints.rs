@@ -322,7 +322,7 @@ async fn exclusion_constraints_without_where_stopgap(api: &mut TestApi) -> TestR
         *** WARNING ***
 
         These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints
-          - model: room_reservation, constraint: room_reservation_room_id_tstzrange_excl
+          - Model: "room_reservation", constraint: "room_reservation_room_id_tstzrange_excl"
     "#]];
 
     api.expect_warnings(&expectation).await;

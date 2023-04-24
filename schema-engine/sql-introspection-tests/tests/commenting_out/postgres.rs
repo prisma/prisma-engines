@@ -360,7 +360,7 @@ ALTER TABLE blocks
         *** WARNING ***
 
         These tables are partition tables, which are not yet fully supported:
-          - "Blocks"
+          - "blocks"
     "#]];
 
     api.expect_warnings(&expected).await;
@@ -421,10 +421,10 @@ ALTER TABLE blocks_p2_0 ADD CONSTRAINT b2_unique UNIQUE (id);
         *** WARNING ***
 
         The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client:
-          - "Blocks"
+          - "blocks"
 
         These tables are partition tables, which are not yet fully supported:
-          - "Blocks"
+          - "blocks"
     "#]];
 
     api.expect_warnings(&expected).await;
@@ -471,7 +471,7 @@ ALTER TABLE foo ENABLE ROW LEVEL SECURITY; "#,
         *** WARNING ***
 
         These tables contain row level security, which is not yet fully supported. Read more: https://pris.ly/d/row-level-security
-          - "Foo"
+          - "foo"
     "#]];
 
     api.expect_warnings(&expected).await;
