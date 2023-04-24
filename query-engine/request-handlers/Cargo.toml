@@ -26,7 +26,7 @@ sql-query-connector = { path = "../connectors/sql-query-connector", optional = t
 
 [dev-dependencies]
 insta = "1.7.1"
-schema-builder = { path = "../schema-builder" }
+schema = { path = "../schema" }
 
 [features]
 default = ["mongodb", "sql"]

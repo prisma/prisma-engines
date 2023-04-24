@@ -2,9 +2,9 @@ pub(crate) mod fields;
 pub(crate) mod objects;
 
 use super::*;
+use crate::*;
 use fields::*;
 use prisma_models::ScalarFieldRef;
-use schema::*;
 
 fn map_scalar_input_type_for_field(ctx: &mut BuilderContext<'_>, field: &ScalarFieldRef) -> InputType {
     map_scalar_input_type(ctx, &field.type_identifier(), field.is_list())

@@ -18,7 +18,7 @@ use indexmap::IndexMap;
 use prisma_models::{
     prelude::ParentContainer, CompositeFieldRef, Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef,
 };
-use schema_builder::constants::filters;
+use schema::constants::filters;
 use std::{collections::HashMap, convert::TryInto, str::FromStr};
 
 /// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.

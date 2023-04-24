@@ -8,7 +8,7 @@ pub fn resolve_compound_field(name: &str, model: &ModelRef) -> Option<Vec<Scalar
 /// Attempts to match a given name to the (schema) name of a compound id field on the model.
 pub fn resolve_compound_id(name: &str, model: &ModelRef) -> Option<Vec<ScalarFieldRef>> {
     model.fields().compound_id().and_then(|pk| {
-        (name == schema_builder::compound_id_field_name(model.walker().primary_key().unwrap())).then(|| pk.collect())
+        (name == schema::compound_id_field_name(model.walker().primary_key().unwrap())).then(|| pk.collect())
     })
 }
 
@@ -16,7 +16,7 @@ pub fn resolve_compound_id(name: &str, model: &ModelRef) -> Option<Vec<ScalarFie
 pub fn resolve_index_fields(name: &str, model: &ModelRef) -> Option<Vec<ScalarFieldRef>> {
     model
         .unique_indexes()
-        .find(|index| schema_builder::compound_index_field_name(index) == name)
+        .find(|index| schema::compound_index_field_name(index) == name)
         .map(|index| {
             index
                 .fields()

@@ -1,22 +1,23 @@
 mod json_adapter;
 
-use std::{env, sync::Arc};
+pub use json_adapter::*;
 
 use crate::{ConnectorTag, ConnectorVersion, QueryResult, TestLogCapture, TestResult, ENGINE_PROTOCOL};
-pub use json_adapter::*;
+use colored::Colorize;
 use quaint::{prelude::Queryable, single::Quaint};
 use query_core::{
-    protocol::EngineProtocol, schema::QuerySchemaRef, schema_builder, QueryExecutor, TransactionOptions, TxId,
+    protocol::EngineProtocol,
+    schema::{self, QuerySchemaRef},
+    QueryExecutor, TransactionOptions, TxId,
 };
 use query_engine_metrics::MetricRegistry;
-
-pub type TxResult = Result<(), user_facing_errors::Error>;
-
-use colored::Colorize;
 use request_handlers::{
     load_executor, BatchTransactionOption, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery,
     RequestBody, RequestHandler,
 };
+use std::{env, sync::Arc};
+
+pub type TxResult = Result<(), user_facing_errors::Error>;
 
 pub(crate) type Executor = Box<dyn QueryExecutor + Send + Sync>;
 
@@ -50,7 +51,7 @@ impl Runner {
         let executor = load_executor(data_source, schema.configuration.preview_features(), &url).await?;
         let internal_data_model = prisma_models::convert(Arc::new(schema));
 
-        let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(internal_data_model, true));
+        let query_schema: QuerySchemaRef = Arc::new(schema::build(internal_data_model, true));
 
         Ok(Self {
             executor,

@@ -6,8 +6,7 @@ use crate::{
 };
 use connector::IntoFilter;
 use prisma_models::ModelRef;
-use schema::ConnectorContext;
-use schema_builder::constants::args;
+use schema::{constants::args, ConnectorContext};
 use std::convert::TryInto;
 use write_args_parser::*;
 
