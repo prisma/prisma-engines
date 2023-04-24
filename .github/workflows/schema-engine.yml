@@ -76,6 +76,7 @@ jobs:
             url: "mysql://root:prisma@localhost:3308"
           - name: tidb
             url: "mysql://root@localhost:4000"
+            single_threaded: true
           - name: postgres9
             url: "postgresql://postgres:prisma@localhost:5431"
           - name: postgres10
