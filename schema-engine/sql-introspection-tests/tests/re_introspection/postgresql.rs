@@ -65,8 +65,8 @@ async fn re_introspecting_custom_compound_id_names(api: &mut TestApi) -> TestRes
         *** WARNING ***
 
         These models were enriched with custom compound id names taken from the previous Prisma schema:
-          - User
-          - User2
+          - "User"
+          - "User2"
     "#]];
 
     api.expect_re_introspect_warnings(input_dm, expected).await;
@@ -171,7 +171,7 @@ async fn mapped_enum_value_name(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These enum values were enriched with `@map` information taken from the previous Prisma schema:
-          - enum: color, value: BLACK
+          - Enum: "color", value: "BLACK"
     "#]];
 
     api.expect_re_introspect_warnings(input_dm, expectation).await;
@@ -249,7 +249,7 @@ async fn reserved_name_docs_are_only_added_once(api: &mut TestApi) -> TestResult
         *** WARNING ***
 
         These models were enriched with `@@map` information taken from the previous Prisma schema:
-          - Renamedif
+          - "Renamedif"
     "#]];
 
     api.expect_re_introspect_warnings(input_dm, expectation).await;

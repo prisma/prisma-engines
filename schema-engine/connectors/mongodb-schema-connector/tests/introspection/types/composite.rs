@@ -66,7 +66,7 @@ fn dirty_data() {
         *** WARNING ***
 
         The following fields had data stored in multiple types. Either use Json or normalize data to the wanted type:
-          - composite type: CatAddress, field: number, type: Json
+          - Composite type: "CatAddress", field: "number", type: "Json"
     "#]];
 
     res.expect_warnings(&expect);
@@ -482,7 +482,7 @@ fn do_not_create_empty_types() {
         *** WARNING ***
 
         The following fields point to nested objects without any data:
-          - model: Test, field: data
+          - Model: "Test", field: "data"
     "#]];
 
     res.expect_warnings(&expect);
@@ -511,7 +511,7 @@ fn do_not_spam_empty_type_warnings() {
         *** WARNING ***
 
         The following fields point to nested objects without any data:
-          - model: Test, field: data
+          - Model: "Test", field: "data"
     "#]];
 
     res.expect_warnings(&expect);
@@ -545,7 +545,7 @@ fn do_not_create_empty_types_in_types() {
         *** WARNING ***
 
         The following fields point to nested objects without any data:
-          - composite type: TestTost, field: data
+          - Composite type: "TestTost", field: "data"
     "#]];
 
     res.expect_warnings(&expect);

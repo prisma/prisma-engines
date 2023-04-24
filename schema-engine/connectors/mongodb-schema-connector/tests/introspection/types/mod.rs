@@ -446,7 +446,7 @@ fn empty_arrays() {
         *** WARNING ***
 
         Could not determine the types for the following fields:
-          - model: A, field: data
+          - Model: "A", field: "data"
     "#]];
 
     res.expect_warnings(&expect);
@@ -477,7 +477,7 @@ fn unknown_types() {
         *** WARNING ***
 
         Could not determine the types for the following fields:
-          - model: A, field: data
+          - Model: "A", field: "data"
     "#]];
 
     res.expect_warnings(&expect);

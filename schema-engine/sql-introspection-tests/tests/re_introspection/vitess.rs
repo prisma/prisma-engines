@@ -90,8 +90,8 @@ async fn warning_is_given_for_copied_relations(api: &mut TestApi) -> TestResult 
         *** WARNING ***
 
         Relations were copied from the previous data model due to not using foreign keys in the database. If any of the relation columns changed in the database, the relations might not be correct anymore:
-          - B
-          - A
+          - "B"
+          - "A"
     "#]];
 
     api.expect_re_introspect_warnings(input_dm, expected).await;

@@ -182,11 +182,11 @@ async fn mapped_model_and_field_name(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These fields were enriched with `@map` information taken from the previous Prisma schema:
-          - model: Post, field: c_user_id
-          - model: Custom_User, field: c_id
+          - Model: "Post", field: "c_user_id"
+          - Model: "Custom_User", field: "c_id"
 
         These models were enriched with `@@map` information taken from the previous Prisma schema:
-          - Custom_User
+          - "Custom_User"
     "#]];
 
     expected.assert_eq(&api.re_introspect_warnings(input_dm).await?);
@@ -309,8 +309,8 @@ async fn mysql_keeps_renamed_enum_defaults(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These enum values were enriched with `@map` information taken from the previous Prisma schema:
-          - enum: A_val, value: is_false
-          - enum: A_val, value: is_true
+          - Enum: "A_val", value: "is_false"
+          - Enum: "A_val", value: "is_true"
     "#]];
 
     expected.assert_eq(&api.re_introspect_warnings(input).await?);
@@ -369,7 +369,7 @@ async fn mapped_enum_value_name(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These enum values were enriched with `@map` information taken from the previous Prisma schema:
-          - enum: color, value: BLACK
+          - Enum: "color", value: "BLACK"
     "#]];
 
     api.expect_re_introspect_warnings(input_dm, expectation).await;

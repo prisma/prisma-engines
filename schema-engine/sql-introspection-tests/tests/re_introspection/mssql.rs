@@ -221,11 +221,11 @@ async fn mapped_model_and_field_name(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These fields were enriched with `@map` information taken from the previous Prisma schema:
-          - model: Post, field: c_user_id
-          - model: Custom_User, field: c_id
+          - Model: "Post", field: "c_user_id"
+          - Model: "Custom_User", field: "c_id"
 
         These models were enriched with `@@map` information taken from the previous Prisma schema:
-          - Custom_User
+          - "Custom_User"
     "#]];
 
     expected.assert_eq(&api.re_introspect_warnings(input_dm).await?);
@@ -345,8 +345,8 @@ async fn re_introspecting_custom_compound_id_names(api: &mut TestApi) -> TestRes
         *** WARNING ***
 
         These models were enriched with custom compound id names taken from the previous Prisma schema:
-          - User
-          - User2
+          - "User"
+          - "User2"
     "#]];
 
     api.expect_re_introspect_warnings(input_dm, expected).await;

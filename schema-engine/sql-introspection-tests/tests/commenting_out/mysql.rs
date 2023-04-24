@@ -122,7 +122,7 @@ PARTITIONS 2; "#,
         *** WARNING ***
 
         These tables are partition tables, which are not yet fully supported:
-          - blocks
+          - "blocks"
     "#]];
 
     api.expect_warnings(&expected).await;

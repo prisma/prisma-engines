@@ -52,7 +52,7 @@ async fn mapped_model_name(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These models were enriched with `@@map` information taken from the previous Prisma schema:
-          - Custom_User
+          - "Custom_User"
     "#]];
 
     api.expect_re_introspect_warnings(input_dm, expected).await;
@@ -102,7 +102,7 @@ async fn manually_overwritten_mapped_field_name(api: &mut TestApi) -> TestResult
         *** WARNING ***
 
         These fields were enriched with `@map` information taken from the previous Prisma schema:
-          - model: User, field: custom_test
+          - Model: "User", field: "custom_test"
     "#]];
 
     api.expect_re_introspect_warnings(input_dm, expectation).await;
@@ -170,11 +170,11 @@ async fn mapped_model_and_field_name(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These fields were enriched with `@map` information taken from the previous Prisma schema:
-          - model: Post, field: c_user_id
-          - model: Custom_User, field: c_id
+          - Model: "Post", field: "c_user_id"
+          - Model: "Custom_User", field: "c_id"
 
         These models were enriched with `@@map` information taken from the previous Prisma schema:
-          - Custom_User
+          - "Custom_User"
     "#]];
 
     expected.assert_eq(&api.re_introspect_warnings(input_dm).await?);
@@ -242,11 +242,11 @@ async fn manually_mapped_model_and_field_name(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These fields were enriched with `@map` information taken from the previous Prisma schema:
-          - model: Post, field: c_user_id
-          - model: Custom_User, field: c_id
+          - Model: "Post", field: "c_user_id"
+          - Model: "Custom_User", field: "c_id"
 
         These models were enriched with `@@map` information taken from the previous Prisma schema:
-          - Custom_User
+          - "Custom_User"
     "#]];
 
     expected.assert_eq(&api.re_introspect_warnings(input_dm).await?);
@@ -320,9 +320,9 @@ async fn mapped_field_name(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These fields were enriched with `@map` information taken from the previous Prisma schema:
-          - model: User, field: c_id_1
-          - model: User, field: c_index
-          - model: User, field: c_unique_1
+          - Model: "User", field: "c_id_1"
+          - Model: "User", field: "c_index"
+          - Model: "User", field: "c_unique_1"
     "#]];
 
     api.expect_re_introspect_warnings(input_dm, expected).await;
@@ -407,7 +407,7 @@ async fn mapped_enum_name(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These enums were enriched with `@@map` information taken from the previous Prisma schema:
-          - BlackNWhite
+          - "BlackNWhite"
     "#]];
 
     api.expect_re_introspect_warnings(&input_dm, expected).await;
@@ -468,7 +468,7 @@ async fn manually_remapped_enum_value_name(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These enum values were enriched with `@map` information taken from the previous Prisma schema:
-          - enum: color, value: BLACK
+          - Enum: "color", value: "BLACK"
     "#]];
 
     api.expect_re_introspect_warnings(input_dm, expectation).await;
@@ -532,7 +532,7 @@ async fn manually_re_mapped_enum_name(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These enums were enriched with `@@map` information taken from the previous Prisma schema:
-          - BlackNWhite
+          - "BlackNWhite"
     "#]];
 
     api.expect_re_introspect_warnings(input_dm, expected).await;
@@ -591,8 +591,8 @@ async fn manually_re_mapped_invalid_enum_values(api: &mut TestApi) -> TestResult
         *** WARNING ***
 
         These enum values were enriched with `@map` information taken from the previous Prisma schema:
-          - enum: invalid, value: at
-          - enum: invalid, value: dash
+          - Enum: "invalid", value: "at"
+          - Enum: "invalid", value: "dash"
     "#]];
 
     api.expect_re_introspect_warnings(input_dm, expected).await;

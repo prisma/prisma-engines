@@ -96,7 +96,7 @@ async fn simple_view_from_one_table(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
-          - Schwuser
+          - "Schwuser"
     "#]];
     api.expect_warnings(&expected).await;
 
@@ -725,10 +725,10 @@ async fn unsupported_types_trigger_a_warning(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
-          - A
+          - "A"
 
         These fields are not supported by the Prisma Client, because Prisma currently does not support their types:
-          - view: A, field: vector, type: tsvector
+          - View: "A", field: "vector", type: "tsvector"
     "#]];
 
     api.expect_warnings(&expected).await;
@@ -766,7 +766,7 @@ async fn re_intro_keeps_the_map(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These views were enriched with `@@map` information taken from the previous Prisma schema:
-          - B
+          - "B"
     "#]];
 
     api.expect_re_introspect_warnings(input, expected).await;
@@ -800,7 +800,7 @@ async fn re_intro_keeps_the_field_map(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These fields were enriched with `@map` information taken from the previous Prisma schema:
-          - view: A, field: meow
+          - View: "A", field: "meow"
     "#]];
 
     api.expect_re_introspect_warnings(input, expected).await;
@@ -918,7 +918,7 @@ async fn id_names_are_reintrospected(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These views were enriched with custom compound id names taken from the previous Prisma schema:
-          - A
+          - "A"
     "#]];
 
     api.expect_re_introspect_warnings(input, expected).await;
@@ -961,10 +961,10 @@ async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:
-          - view: A, field: 1
+          - View: "A", field: "1"
 
         The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
-          - A
+          - "A"
     "#]];
 
     api.expect_warnings(&expected).await;
@@ -1022,11 +1022,11 @@ async fn dupes_are_renamed(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
-          - public_A
+          - "public_A"
 
         These items were renamed due to their names being duplicates in the Prisma Schema Language:
-          - type: model, name: private_A
-          - type: view, name: public_A
+          - Type: "model", name: "private_A"
+          - Type: "view", name: "public_A"
     "#]];
 
     api.expect_warnings(&expected).await;
