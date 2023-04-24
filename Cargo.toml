@@ -32,6 +32,14 @@ members = [
   "psl/*",
 ]
 
+# All path dependencies residing in the workspace directory automatically become members.
+# The following shouldn't be considered members but embedded dependencies.
+exclude = [
+  "quaint",
+  "quaint/test-macros",
+  "quaint/test-setup"
+]
+
 [workspace.dependencies]
 psl = { path = "./psl/psl" }
 serde_json = { version = "1", features = ["float_roundtrip", "preserve_order"] }
@@ -43,7 +51,7 @@ indoc = "2.0.1"
 connection-string = "0.2"
 
 [workspace.dependencies.quaint]
-git = "https://github.com/prisma/quaint"
+path = "quaint"
 features = [
   "bigdecimal",
   "chrono",
