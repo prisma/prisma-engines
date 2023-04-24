@@ -1726,8 +1726,8 @@ fn deep_composite_index_with_one_existing_field_should_add_missing_stuff_only() 
         *** WARNING ***
 
         Could not determine the types for the following fields:
-        - Composite type: "AInfo", field: "special"
-        - Composite type: "AInfoSpecial", field: "play"
+          - Composite type: "AInfo", field: "special"
+          - Composite type: "AInfoSpecial", field: "play"
     "#]];
 
     res.expect_warnings(&expect);
