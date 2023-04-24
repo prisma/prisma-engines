@@ -1,7 +1,7 @@
 use super::*;
-use crate::input_types::objects::order_by_objects::OrderByOptions;
-use crate::mutations::create_one;
 use constants::args;
+use input_types::objects::order_by_objects::OrderByOptions;
+use mutations::create_one;
 use objects::*;
 use prisma_models::{prelude::ParentContainer, CompositeFieldRef};
 

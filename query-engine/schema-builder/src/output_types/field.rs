@@ -1,5 +1,4 @@
 use super::*;
-use crate::enum_types::*;
 use input_types::fields::arguments;
 use prisma_models::{CompositeFieldRef, ScalarFieldRef};
 
