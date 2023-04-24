@@ -767,9 +767,6 @@ async fn re_intro_keeps_the_map(api: &mut TestApi) -> TestResult {
 
         These views were enriched with `@@map` information taken from the previous Prisma schema:
           - B
-
-        These views were enriched with `@@map` information taken from the previous Prisma schema:
-          - B
     "#]];
 
     api.expect_re_introspect_warnings(input, expected).await;
@@ -1145,9 +1142,6 @@ async fn reserved_name_docs_are_only_added_once(api: &mut TestApi) -> TestResult
 
     let expectation = expect![[r#"
         *** WARNING ***
-
-        These views were enriched with `@@map` information taken from the previous Prisma schema:
-          - Renamedif
 
         These views were enriched with `@@map` information taken from the previous Prisma schema:
           - Renamedif

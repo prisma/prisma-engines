@@ -231,12 +231,6 @@ impl fmt::Display for Warnings {
         )?;
 
         render_warnings(
-            "These views were enriched with `@@map` information taken from the previous Prisma schema:",
-            &self.remapped_views,
-            f,
-        )?;
-
-        render_warnings(
             "These enum values were enriched with `@map` information taken from the previous Prisma schema:",
             &self.remapped_values,
             f,
