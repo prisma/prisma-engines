@@ -357,7 +357,7 @@ pub struct Model {
 
 impl fmt::Display for Model {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(&self.model)
+        write!(f, r#""{}""#, self.model)
     }
 }
 
@@ -370,7 +370,7 @@ pub struct View {
 
 impl fmt::Display for View {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(&self.view)
+        write!(f, r#""{}""#, self.view)
     }
 }
 
@@ -383,7 +383,7 @@ pub struct Enum {
 
 impl fmt::Display for Enum {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(&self.r#enum)
+        write!(f, r#""{}""#, self.r#enum)
     }
 }
 
@@ -398,7 +398,7 @@ pub struct ModelAndField {
 
 impl fmt::Display for ModelAndField {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "model: {}, field: {}", self.model, self.field)
+        write!(f, r#"Model: "{}", field: "{}""#, self.model, self.field)
     }
 }
 
@@ -413,7 +413,11 @@ pub struct TypeAndField {
 
 impl fmt::Display for TypeAndField {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "composite type: {}, field: {}", self.composite_type, self.field)
+        write!(
+            f,
+            r#"Composite type: "{}", field: "{}""#,
+            self.composite_type, self.field
+        )
     }
 }
 
@@ -428,7 +432,7 @@ pub struct ViewAndField {
 
 impl fmt::Display for ViewAndField {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "view: {}, field: {}", self.view, self.field)
+        write!(f, r#"View: "{}", field: "{}""#, self.view, self.field)
     }
 }
 
@@ -443,7 +447,7 @@ pub struct ModelAndIndex {
 
 impl fmt::Display for ModelAndIndex {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "model: {}, index: {}", self.model, self.index_db_name)
+        write!(f, r#"Model: "{}", index: "{}""#, self.model, self.index_db_name)
     }
 }
 
@@ -458,7 +462,7 @@ pub struct ModelAndConstraint {
 
 impl fmt::Display for ModelAndConstraint {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "model: {}, constraint: {}", self.model, self.constraint)
+        write!(f, r#"Model: "{}", constraint: "{}""#, self.model, self.constraint)
     }
 }
 
@@ -475,7 +479,11 @@ pub struct ModelAndFieldAndType {
 
 impl fmt::Display for ModelAndFieldAndType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "model: {}, field: {}, type: {}", self.model, self.field, self.r#type)
+        write!(
+            f,
+            r#"Model: "{}", field: "{}", type: "{}""#,
+            self.model, self.field, self.r#type
+        )
     }
 }
 
@@ -492,7 +500,11 @@ pub struct ViewAndFieldAndType {
 
 impl fmt::Display for ViewAndFieldAndType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "view: {}, field: {}, type: {}", self.view, self.field, self.r#type)
+        write!(
+            f,
+            r#"View: "{}", field: "{}", type: "{}""#,
+            self.view, self.field, self.r#type
+        )
     }
 }
 
@@ -511,7 +523,7 @@ impl fmt::Display for TypeAndFieldAndType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "composite type: {}, field: {}, type: {}",
+            r#"Composite type: "{}", field: "{}", type: "{}""#,
             self.composite_type, self.field, self.r#type
         )
     }
@@ -528,7 +540,7 @@ pub struct EnumAndValue {
 
 impl fmt::Display for EnumAndValue {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "enum: {}, value: {}", self.r#enum, self.value)
+        write!(f, r#"Enum: "{}", value: "{}""#, self.r#enum, self.value)
     }
 }
 
@@ -570,7 +582,7 @@ pub struct TopLevelItem {
 
 impl fmt::Display for TopLevelItem {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "type: {}, name: {}", self.r#type, self.name)
+        write!(f, r#"Type: "{}", name: "{}""#, self.r#type, self.name)
     }
 }
 
@@ -585,7 +597,7 @@ pub struct Object {
 
 impl fmt::Display for Object {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "type: {}, name: {}", self.r#type, self.name)
+        write!(f, r#"Type: "{}", name: "{}""#, self.r#type, self.name)
     }
 }
 
@@ -600,6 +612,6 @@ pub struct IndexedColumn {
 
 impl fmt::Display for IndexedColumn {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "index: {}, column: {}", self.index_name, self.column_name)
+        write!(f, r#"Index: "{}", column: "{}""#, self.index_name, self.column_name)
     }
 }
