@@ -1,6 +1,6 @@
 use super::*;
-use crate::mutations::{create_many, create_one};
 use input_types::fields::{arguments, input_fields};
+use mutations::{create_many, create_one};
 use prisma_models::{DefaultKind, PrismaValue};
 use psl::datamodel_connector::ConnectorCapability;
 

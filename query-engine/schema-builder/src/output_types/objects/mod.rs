@@ -2,7 +2,7 @@ pub mod composite;
 pub mod model;
 
 use super::*;
-use crate::constants::output_fields::*;
+use constants::output_fields::*;
 
 /// Initializes output object type caches on the context.
 /// This is a critical first step to ensure that all model and composite output
