@@ -1083,7 +1083,7 @@ async fn dupes_are_renamed(api: &mut TestApi) -> TestResult {
           },
           {
             "code": 20,
-            "message": "These models and views were renamed due to their names being duplicates in the Prisma Schema Language.",
+            "message": "These models and views were renamed due to their names being duplicates in this Prisma schema.",
             "affected": [
               {
                 "type": "Model",
