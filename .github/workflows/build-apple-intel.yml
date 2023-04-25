@@ -26,10 +26,7 @@ jobs:
         with:
           ref: ${{ github.event.inputs.commit }}
 
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          default: true
+      - uses: dtolnay/rust-toolchain@stable
 
       - uses: actions/cache@v3
         with:

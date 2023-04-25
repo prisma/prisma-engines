@@ -14,11 +14,10 @@ jobs:
       RUSTFLAGS: "-Dwarnings"
     steps:
       - uses: actions/checkout@v1
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@stable
         with:
-            components: clippy
-            override: true
-            toolchain: stable
+          components: clippy
+
       - name: Install dependencies
         run: sudo apt install -y openssl libkrb5-dev
       - uses: actions-rs/clippy-check@v1
