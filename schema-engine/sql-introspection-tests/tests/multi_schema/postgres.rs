@@ -196,7 +196,7 @@ async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut Tes
         [
           {
             "code": 20,
-            "message": "These models were renamed due to their names being duplicates in the Prisma Schema Language.",
+            "message": "These models were renamed due to their names being duplicates in this Prisma schema.",
             "affected": [
               {
                 "type": "Model",
@@ -268,7 +268,7 @@ async fn multiple_schemas_w_duplicate_sanitized_table_names_are_introspected(api
         [
           {
             "code": 20,
-            "message": "These models were renamed due to their names being duplicates in the Prisma Schema Language.",
+            "message": "These models were renamed due to their names being duplicates in this Prisma schema.",
             "affected": [
               {
                 "type": "Model",
@@ -560,7 +560,7 @@ async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &mut TestApi) 
         [
           {
             "code": 20,
-            "message": "These models and enums were renamed due to their names being duplicates in the Prisma Schema Language.",
+            "message": "These models and enums were renamed due to their names being duplicates in this Prisma schema.",
             "affected": [
               {
                 "type": "Enum",
@@ -710,7 +710,7 @@ async fn multiple_schemas_w_duplicate_models_are_reintrospected_never_renamed(ap
         [
           {
             "code": 20,
-            "message": "These models were renamed due to their names being duplicates in the Prisma Schema Language.",
+            "message": "These models were renamed due to their names being duplicates in this Prisma schema.",
             "affected": [
               {
                 "type": "Model",
