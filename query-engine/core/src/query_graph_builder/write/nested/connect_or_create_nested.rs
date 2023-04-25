@@ -6,7 +6,7 @@ use crate::{
 };
 use connector::{Filter, IntoFilter};
 use prisma_models::{ModelRef, RelationFieldRef, SelectionResult};
-use schema_builder::constants::args;
+use schema::constants::args;
 use std::convert::TryInto;
 
 /// Handles nested connect or create cases.

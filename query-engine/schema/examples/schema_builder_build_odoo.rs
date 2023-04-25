@@ -5,7 +5,7 @@ fn main() {
     let idm = prisma_models::convert(validated_schema);
 
     let now = std::time::Instant::now();
-    let _ = schema_builder::build(idm, true);
+    let _ = schema::build(idm, true);
     let elapsed = now.elapsed();
 
     println!("Elapsed: {:.2?}", elapsed);

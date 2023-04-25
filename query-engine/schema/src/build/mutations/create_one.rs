@@ -1,11 +1,11 @@
 use super::*;
+use crate::{
+    Identifier, IdentifierType, InputField, InputObjectTypeId, InputType, OutputField, OutputType, QueryInfo, QueryTag,
+};
 use constants::*;
 use input_types::fields::data_input_mapper::*;
 use output_types::objects;
 use prisma_models::{ModelRef, RelationFieldRef};
-use schema::{
-    Identifier, IdentifierType, InputField, InputObjectTypeId, InputType, OutputField, OutputType, QueryInfo, QueryTag,
-};
 
 /// Builds a create mutation field (e.g. createUser) for given model.
 pub(crate) fn create_one(ctx: &mut BuilderContext<'_>, model: &ModelRef) -> OutputField {

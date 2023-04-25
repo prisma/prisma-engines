@@ -4,7 +4,9 @@ use napi::{Env, JsFunction, JsUnknown};
 use napi_derive::napi;
 use psl::PreviewFeature;
 use query_core::{
-    protocol::EngineProtocol, schema::QuerySchema, schema_builder, telemetry, QueryExecutor, TransactionOptions, TxId,
+    protocol::EngineProtocol,
+    schema::{self, QuerySchema},
+    telemetry, QueryExecutor, TransactionOptions, TxId,
 };
 use query_engine_metrics::{MetricFormat, MetricRegistry};
 use request_handlers::{dmmf, load_executor, render_graphql_schema, RequestBody, RequestHandler};
@@ -265,7 +267,7 @@ impl QueryEngine {
                     let internal_data_model = prisma_models::convert(arced_schema_2);
 
                     let enable_raw_queries = true;
-                    schema_builder::build(internal_data_model, enable_raw_queries)
+                    schema::build(internal_data_model, enable_raw_queries)
                 });
 
                 let (query_schema, executor) = tokio::join!(query_schema_fut, executor_fut);

@@ -3,8 +3,10 @@ use itertools::Itertools;
 use prisma_models::PrismaValue;
 use query_core::{
     constants::custom_types,
-    schema::{InputField, InputObjectType, InputType, OutputField, QuerySchema, QuerySchemaRef},
-    schema_builder::constants::{self, json_null},
+    schema::{
+        constants::{self, json_null},
+        InputField, InputObjectType, InputType, OutputField, QuerySchema, QuerySchemaRef,
+    },
     ArgumentValue, ArgumentValueObject, Selection,
 };
 use request_handlers::{Action, FieldQuery, GraphQLProtocolAdapter, JsonSingleQuery, SelectionSet, SelectionSetValue};

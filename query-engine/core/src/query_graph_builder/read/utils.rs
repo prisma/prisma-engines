@@ -2,7 +2,7 @@ use super::*;
 use crate::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
 use connector::RelAggregationSelection;
 use prisma_models::prelude::*;
-use schema_builder::constants::{aggregations::*, args};
+use schema::constants::{aggregations::*, args};
 
 pub fn collect_selection_order(from: &[FieldPair]) -> Vec<String> {
     from.iter()

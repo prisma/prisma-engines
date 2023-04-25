@@ -1,4 +1,4 @@
-# schema-builder
+# schema
 
 This crate contains the logic responsible for building a query schema from a Prisma datamodel (presented as a `prisma_models::InternalDataModel`).
 

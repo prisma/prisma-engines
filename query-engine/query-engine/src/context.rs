@@ -2,7 +2,11 @@ use crate::features::{EnabledFeatures, Feature};
 use crate::{logger::Logger, opt::PrismaOpt};
 use crate::{PrismaError, PrismaResult};
 use psl::PreviewFeature;
-use query_core::{protocol::EngineProtocol, schema::QuerySchemaRef, schema_builder, QueryExecutor};
+use query_core::{
+    protocol::EngineProtocol,
+    schema::{self, QuerySchemaRef},
+    QueryExecutor,
+};
 use query_engine_metrics::setup as metric_setup;
 use query_engine_metrics::MetricRegistry;
 use request_handlers::load_executor;
@@ -45,7 +49,7 @@ impl PrismaContext {
             let internal_data_model = prisma_models::convert(arced_schema);
 
             // Construct query schema
-            Arc::new(schema_builder::build(
+            Arc::new(schema::build(
                 internal_data_model,
                 enabled_features.contains(Feature::RawQueries),
             ))

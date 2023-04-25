@@ -4,7 +4,7 @@ use connector::{
     ScalarListCompare,
 };
 use prisma_models::{Field, PrismaValue, ScalarFieldRef, TypeIdentifier};
-use schema_builder::constants::{aggregations, filters, json_null};
+use schema::constants::{aggregations, filters, json_null};
 use std::convert::TryInto;
 
 pub struct ScalarFilterParser<'a> {
