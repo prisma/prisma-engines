@@ -57,11 +57,7 @@ features = [
   "expose-drivers",
   "fmt-sql",
   "json",
-  "mssql",
-  "mysql",
   "pooled",
-  "postgresql",
-  "sqlite",
   "uuid",
 ]
 

@@ -3,6 +3,12 @@ edition = "2021"
 name = "query-core"
 version = "0.1.0"
 
+[features]
+mssql = ["user-facing-errors/mssql"]
+mysql = ["user-facing-errors/mysql"]
+postgresql = ["user-facing-errors/postgresql"]
+sqlite = ["user-facing-errors/sqlite"]
+
 [dependencies]
 async-trait = "0.1"
 bigdecimal = "0.3"

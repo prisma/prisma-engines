@@ -1,14 +1,22 @@
+#[cfg(feature = "mysql")]
 mod mysql;
+#[cfg(feature = "postgresql")]
 mod postgresql;
+#[cfg(feature = "sqlite")]
 mod sqlite;
+#[cfg(feature = "mssql")]
 mod sqlserver;
 
 use sql::{ForeignKeyWalker, IndexColumnWalker, IndexWalker, TableWalker};
 use sql_schema_describer as sql;
 
+#[cfg(feature = "mysql")]
 pub(super) use mysql::MysqlIntrospectionFlavour;
+#[cfg(feature = "postgresql")]
 pub(super) use postgresql::PostgresIntrospectionFlavour;
+#[cfg(feature = "sqlite")]
 pub(super) use sqlite::SqliteIntrospectionFlavour;
+#[cfg(feature = "mssql")]
 pub(super) use sqlserver::SqlServerIntrospectionFlavour;
 
 use schema_connector::Warnings;

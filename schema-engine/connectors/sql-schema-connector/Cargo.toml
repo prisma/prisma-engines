@@ -5,6 +5,10 @@ version = "0.1.0"
 
 [features]
 vendored-openssl = ["quaint/vendored-openssl"]
+mssql = ["user-facing-errors/mssql", "quaint/mssql", "sql-schema-describer/mssql"]
+mysql = ["user-facing-errors/mysql", "quaint/mysql", "sql-schema-describer/mysql"]
+postgresql = ["user-facing-errors/postgresql", "quaint/postgresql", "sql-schema-describer/postgresql"]
+sqlite = ["user-facing-errors/sqlite", "quaint/sqlite", "sql-schema-describer/sqlite"]
 
 [dependencies]
 psl.workspace = true

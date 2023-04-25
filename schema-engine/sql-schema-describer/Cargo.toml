@@ -3,6 +3,12 @@ edition = "2021"
 name = "sql-schema-describer"
 version = "0.1.0"
 
+[features]
+mssql = ["quaint/mssql"]
+mysql = ["quaint/mysql"]
+postgresql = ["quaint/postgresql"]
+sqlite = ["quaint/sqlite"]
+
 [dependencies]
 prisma-value = { path = "../../libs/prisma-value" }
 psl.workspace = true

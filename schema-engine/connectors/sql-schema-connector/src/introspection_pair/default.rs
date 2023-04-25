@@ -5,7 +5,6 @@ use psl::{
     datamodel_connector::constraint_names::ConstraintNames,
     parser_database::walkers,
 };
-use sql::postgres::PostgresSchemaExt;
 use sql_schema_describer as sql;
 use std::{borrow::Cow, fmt};
 
@@ -15,6 +14,7 @@ pub(crate) type DefaultValuePair<'a> =
     IntrospectionPair<'a, Option<walkers::DefaultValueWalker<'a>>, sql::ColumnWalker<'a>>;
 
 pub(crate) enum DefaultKind<'a> {
+    #[cfg(feature = "postgresql")]
     Sequence(&'a sql::postgres::Sequence),
     DbGenerated(Option<&'a str>),
     Autoincrement,
@@ -40,8 +40,10 @@ impl<'a> DefaultValuePair<'a> {
         let family = self.next.column_type_family();
 
         match (sql_kind, family) {
+            #[cfg(feature = "postgresql")]
             (Some(sql::DefaultKind::Sequence(name)), _) if self.context.is_cockroach() => {
-                let connector_data: &PostgresSchemaExt = self.context.sql_schema.downcast_connector_data();
+                let connector_data: &sql::postgres::PostgresSchemaExt =
+                    self.context.sql_schema.downcast_connector_data();
 
                 let sequence_idx = connector_data
                     .sequences

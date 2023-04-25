@@ -4,7 +4,6 @@ use psl::{
     schema_ast::ast,
     PreviewFeature,
 };
-use sql::{mssql::MssqlSchemaExt, postgres::PostgresSchemaExt};
 use sql_schema_describer as sql;
 
 use super::{IndexFieldPair, IntrospectionPair};
@@ -75,6 +74,7 @@ impl<'a> IndexPair<'a> {
 
     /// SQL Server specific clustering setting. A value is returned if
     /// non-default.
+    #[cfg(feature = "mssql")]
     pub(crate) fn clustered(self) -> Option<bool> {
         if !self.context.sql_family.is_mssql() {
             return None;
@@ -82,7 +82,7 @@ impl<'a> IndexPair<'a> {
 
         let clustered = match self.next {
             Some(next) => {
-                let ext: &MssqlSchemaExt = self.context.sql_schema.downcast_connector_data();
+                let ext: &sql::mssql::MssqlSchemaExt = self.context.sql_schema.downcast_connector_data();
                 ext.index_is_clustered(next.id)
             }
             None => self.previous.and_then(|prev| prev.clustered()).unwrap_or(false),
@@ -97,6 +97,7 @@ impl<'a> IndexPair<'a> {
 
     /// A PostgreSQL specific algorithm. Defines the data structure
     /// that defines the index.
+    #[cfg(feature = "postgresql")]
     pub(crate) fn algorithm(self) -> Option<&'static str> {
         if !self.context.sql_family().is_postgres() {
             return None;
@@ -105,7 +106,7 @@ impl<'a> IndexPair<'a> {
         match (self.next, self.previous.and_then(|i| i.algorithm())) {
             // Index is defined in a table to the database.
             (Some(next), _) => {
-                let data: &PostgresSchemaExt = self.context.sql_schema.downcast_connector_data();
+                let data: &sql::postgres::PostgresSchemaExt = self.context.sql_schema.downcast_connector_data();
 
                 match data.index_algorithm(next.id) {
                     sql::postgres::SqlIndexAlgorithm::BTree => None,

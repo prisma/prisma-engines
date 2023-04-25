@@ -2,7 +2,7 @@ use crate::{
     column_metadata,
     filter_conversion::AliasedCondition,
     model_extensions::AsColumns,
-    query_builder::write::{build_update_and_set_query, create_record},
+    query_builder::write::{self, build_update_and_set_query},
     query_ext::QueryExt,
     row::ToSqlRow,
     Context,
@@ -11,6 +11,7 @@ use connector_interface::NativeUpsert;
 use prisma_models::{ModelProjection, Record, SingleRecord};
 use quaint::prelude::{OnConflict, Query};
 
+#[cfg(any(feature = "postgresql", feature = "mssql", feature = "sqlite"))]
 pub(crate) async fn native_upsert(
     conn: &dyn QueryExt,
     upsert: NativeUpsert,
@@ -25,7 +26,7 @@ pub(crate) async fn native_upsert(
     let where_condition = upsert.filter().aliased_condition_from(None, false, ctx);
     let update = build_update_and_set_query(upsert.model(), upsert.update().clone(), ctx).so_that(where_condition);
 
-    let insert = create_record(&upsert.model(), upsert.create().clone(), ctx);
+    let insert = write::create_record(&upsert.model(), upsert.create().clone(), ctx);
 
     let constraints: Vec<_> = upsert.unique_constraints().as_columns(ctx).collect();
     let query: Query = insert

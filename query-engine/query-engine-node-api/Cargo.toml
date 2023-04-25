@@ -19,14 +19,19 @@ request-handlers = { path = "../request-handlers" }
 query-connector = { path = "../connectors/query-connector" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 psl.workspace = true
-sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector" }
+sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector", features = [
+	"postgresql",
+	"sqlite",
+	"mssql",
+	"mysql"
+] }
 prisma-models = { path = "../prisma-models" }
 
 napi = { version = "2.12.4", default-features = false, features = ["napi8", "tokio_rt", "serde-json"] }
 napi-derive = "2.12.3"
 
 thiserror = "1"
-connection-string.workspace = true 
+connection-string.workspace = true
 url = "2"
 serde_json.workspace = true
 serde.workspace = true

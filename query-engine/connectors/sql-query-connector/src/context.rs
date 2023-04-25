@@ -14,10 +14,14 @@ pub(super) struct Context<'a> {
 impl<'a> Context<'a> {
     pub(crate) fn new(connection_info: &'a ConnectionInfo, trace_id: Option<&'a str>) -> Self {
         let (max_rows, default_batch_size) = match connection_info {
+            #[cfg(feature = "postgresql")]
             ConnectionInfo::Postgres(_) => (None, 32766),
+            #[cfg(feature = "mysql")]
             // See https://stackoverflow.com/a/11131824/788562
             ConnectionInfo::Mysql(_) => (None, 65535),
+            #[cfg(feature = "mssql")]
             ConnectionInfo::Mssql(_) => (Some(1000), 2099),
+            #[cfg(feature = "sqlite")]
             ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } => (Some(999), 999),
         };
         Context {

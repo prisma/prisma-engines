@@ -153,12 +153,14 @@ mod manager;
 pub use manager::*;
 
 use crate::{
-    connector::{ConnectionInfo, PostgresFlavour},
+    connector::ConnectionInfo,
     error::{Error, ErrorKind},
 };
 use mobc::Pool;
 use std::{sync::Arc, time::Duration};
 
+#[cfg(feature = "postgresql")]
+use crate::connector::PostgresFlavour;
 #[cfg(feature = "sqlite")]
 use std::convert::TryFrom;
 
@@ -302,6 +304,7 @@ impl Builder {
     /// - Unknown: Always add a network roundtrip by setting the search path through a database query.
     ///
     /// - Defaults to `PostgresFlavour::Unknown`.
+    #[cfg(feature = "postgresql")]
     pub fn set_postgres_flavour(&mut self, flavour: PostgresFlavour) {
         if let ConnectionInfo::Postgres(ref mut url) = self.connection_info {
             url.set_flavour(flavour);

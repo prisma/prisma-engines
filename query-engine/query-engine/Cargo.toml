@@ -8,6 +8,10 @@ default = ["sql", "mongodb"]
 mongodb = ["mongodb-connector"]
 sql = ["sql-connector"]
 vendored-openssl = ["quaint/vendored-openssl"]
+mssql = ["sql-connector/mssql", "request-handlers/mssql"]
+mysql = ["sql-connector/mysql", "request-handlers/mysql"]
+postgresql = ["sql-connector/postgresql", "request-handlers/postgresql"]
+sqlite = ["sql-connector/sqlite", "request-handlers/sqlite"]
 
 [dependencies]
 tokio.workspace = true

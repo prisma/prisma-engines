@@ -108,16 +108,27 @@ pub(crate) fn check_prisma_version(input: &DatamodelCalculatorContext<'_>) -> Ve
 
     match version_checker.sql_family {
         _ if input.sql_schema.is_empty() => Version::NonPrisma,
+        #[cfg(feature = "sqlite")]
         SqlFamily::Sqlite if version_checker.is_prisma_2() => Version::Prisma2,
+        #[cfg(feature = "sqlite")]
         SqlFamily::Sqlite => Version::NonPrisma,
+        #[cfg(feature = "mysql")]
         SqlFamily::Mysql if version_checker.is_prisma_2() => Version::Prisma2,
+        #[cfg(feature = "mysql")]
         SqlFamily::Mysql if version_checker.is_prisma_1() => Version::Prisma1,
+        #[cfg(feature = "mysql")]
         SqlFamily::Mysql if version_checker.is_prisma_1_1() => Version::Prisma11,
+        #[cfg(feature = "mysql")]
         SqlFamily::Mysql => Version::NonPrisma,
+        #[cfg(feature = "postgresql")]
         SqlFamily::Postgres if version_checker.is_prisma_2() => Version::Prisma2,
+        #[cfg(feature = "postgresql")]
         SqlFamily::Postgres if version_checker.is_prisma_1() => Version::Prisma1,
+        #[cfg(feature = "postgresql")]
         SqlFamily::Postgres if version_checker.is_prisma_1_1() => Version::Prisma11,
+        #[cfg(feature = "postgresql")]
         SqlFamily::Postgres => Version::NonPrisma,
+        #[cfg(feature = "mssql")]
         SqlFamily::Mssql => Version::NonPrisma,
     }
 }
@@ -126,9 +137,11 @@ impl VersionChecker {
     /// Check if using only types supported by a legacy version of Prisma.
     fn check_column_for_type_and_default_value(&mut self, column: TableColumnWalker<'_>) {
         match self.sql_family {
+            #[cfg(feature = "postgresql")]
             SqlFamily::Postgres if self.is_cockroachdb => {
                 self.uses_non_prisma_types = true; // we can be sure it's not prisma 1
             }
+            #[cfg(feature = "postgresql")]
             SqlFamily::Postgres => {
                 if let Some(native_type) = &column.column_type().native_type {
                     let native_type: &PostgresType = native_type.downcast_ref();
@@ -138,6 +151,7 @@ impl VersionChecker {
                     }
                 }
             }
+            #[cfg(feature = "mysql")]
             SqlFamily::Mysql => {
                 if let Some(native_type) = &column.column_type().native_type {
                     let native_type: &MySqlType = native_type.downcast_ref();
@@ -147,6 +161,7 @@ impl VersionChecker {
                     }
                 }
             }
+            #[cfg(feature = "sqlite")]
             SqlFamily::Sqlite if !SQLITE_TYPES.contains(&&*column.column_type().full_data_type) => {
                 self.uses_non_prisma_types = true
             }
@@ -198,28 +213,34 @@ impl VersionChecker {
                     let col = pk.columns().next().unwrap();
                     let tpe = col.as_column().column_type();
 
-                    if self.sql_family == SqlFamily::Postgres {
-                        if let Some(native_type) = &tpe.native_type {
-                            let native_type: &PostgresType = native_type.downcast_ref();
+                    match self.sql_family {
+                        #[cfg(feature = "postgresql")]
+                        SqlFamily::Postgres => {
+                            if let Some(native_type) = &tpe.native_type {
+                                let native_type: &PostgresType = native_type.downcast_ref();
 
-                            if native_type != &PostgresType::VarChar(Some(25))
-                                && native_type != &PostgresType::VarChar(Some(36))
-                                && native_type != &PostgresType::Integer
-                            {
-                                self.always_has_p1_or_p_1_1_compatible_id = false
+                                if native_type != &PostgresType::VarChar(Some(25))
+                                    && native_type != &PostgresType::VarChar(Some(36))
+                                    && native_type != &PostgresType::Integer
+                                {
+                                    self.always_has_p1_or_p_1_1_compatible_id = false
+                                }
                             }
                         }
-                    } else if self.sql_family == SqlFamily::Mysql {
-                        if let Some(native_type) = &tpe.native_type {
-                            let native_type: &MySqlType = native_type.downcast_ref();
+                        #[cfg(feature = "mysql")]
+                        SqlFamily::Mysql => {
+                            if let Some(native_type) = &tpe.native_type {
+                                let native_type: &MySqlType = native_type.downcast_ref();
 
-                            if native_type != &MySqlType::Char(25)
-                                && native_type != &MySqlType::Char(36)
-                                && native_type != &MySqlType::Int
-                            {
-                                self.always_has_p1_or_p_1_1_compatible_id = false
+                                if native_type != &MySqlType::Char(25)
+                                    && native_type != &MySqlType::Char(36)
+                                    && native_type != &MySqlType::Int
+                                {
+                                    self.always_has_p1_or_p_1_1_compatible_id = false
+                                }
                             }
                         }
+                        _ => {}
                     };
                 }
             }

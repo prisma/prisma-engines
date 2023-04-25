@@ -6,8 +6,8 @@ version = "0.1.0"
 [dependencies]
 psl.workspace = true
 schema-connector = { path = "../connectors/schema-connector" }
-mongodb-schema-connector = { path = "../connectors/mongodb-schema-connector" }
-sql-schema-connector = { path = "../connectors/sql-schema-connector" }
+mongodb-schema-connector = { path = "../connectors/mongodb-schema-connector", optional = true }
+sql-schema-connector = { path = "../connectors/sql-schema-connector", optional = true }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 
 async-trait = "0.1.17"
@@ -27,3 +27,9 @@ json-rpc-api-build = { path = "../json-rpc-api-build" }
 
 [features]
 vendored-openssl = ["sql-schema-connector/vendored-openssl"]
+sql = ["sql-schema-connector"]
+postgresql = ["sql", "sql-schema-connector/postgresql"]
+sqlite = ["sql", "sql-schema-connector/sqlite"]
+mysql = ["sql", "sql-schema-connector/mysql"]
+mssql = ["sql", "sql-schema-connector/mssql"]
+mongodb = ["sql", "mongodb-schema-connector"]

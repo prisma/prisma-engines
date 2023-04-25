@@ -32,3 +32,7 @@ schema = { path = "../schema" }
 default = ["mongodb", "sql"]
 mongodb = ["mongodb-query-connector"]
 sql = ["sql-query-connector"]
+mssql = ["sql-query-connector/mssql"]
+mysql = ["sql-query-connector/mysql"]
+postgresql = ["sql-query-connector/postgresql"]
+sqlite = ["sql-query-connector/sqlite"]

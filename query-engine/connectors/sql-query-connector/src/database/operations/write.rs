@@ -8,7 +8,7 @@ use itertools::Itertools;
 use prisma_models::*;
 use quaint::{
     error::ErrorKind,
-    prelude::{native_uuid, uuid_to_bin, uuid_to_bin_swapped, Aliasable, Select, SqlFamily},
+    prelude::{Aliasable, Select, SqlFamily},
 };
 use std::{
     collections::{HashMap, HashSet},
@@ -18,12 +18,15 @@ use std::{
 use tracing::log::trace;
 use user_facing_errors::query_engine::DatabaseConstraint;
 
+#[cfg(feature = "mysql")]
 async fn generate_id(
     conn: &dyn QueryExt,
     primary_key: &FieldSelection,
     args: &WriteArgs,
     ctx: &Context<'_>,
 ) -> crate::Result<Option<SelectionResult>> {
+    use quaint::prelude::{native_uuid, uuid_to_bin, uuid_to_bin_swapped};
+
     // Go through all the values and generate a select statement with the correct MySQL function
     let (pk_select, need_select) = primary_key
         .selections()
@@ -61,6 +64,7 @@ async fn generate_id(
 
 /// Create a single record to the database defined in `conn`, resulting into a
 /// `RecordProjection` as an identifier pointing to the just-created record.
+#[cfg(any(feature = "postgresql", feature = "mssql", feature = "sqlite"))]
 pub(crate) async fn create_record(
     conn: &dyn QueryExt,
     sql_family: &SqlFamily,
@@ -70,15 +74,16 @@ pub(crate) async fn create_record(
 ) -> crate::Result<SelectionResult> {
     let pk = model.primary_identifier();
 
-    let returned_id = if *sql_family == SqlFamily::Mysql {
-        generate_id(conn, &pk, &args, ctx).await?
-    } else {
-        args.as_record_projection(pk.clone().into())
+    let returned_id = match sql_family {
+        #[cfg(feature = "mysql")]
+        SqlFamily::Mysql => generate_id(conn, &pk, &args, ctx).await?,
+        _ => args.as_record_projection(pk.clone().into()),
     };
 
     let returned_id = returned_id.or_else(|| args.as_record_projection(pk.clone().into()));
 
     let args = match returned_id {
+        #[cfg(feature = "mysql")]
         Some(ref pk) if *sql_family == SqlFamily::Mysql => {
             for (field, value) in pk.pairs.iter() {
                 let field = DatasourceFieldName(field.db_name().into());
