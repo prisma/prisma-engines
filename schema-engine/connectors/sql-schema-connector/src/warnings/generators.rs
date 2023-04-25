@@ -490,19 +490,19 @@ pub(super) fn warning_top_level_item_name_is_a_dupe(affected: &[TopLevelItem]) -
     let has_views = affected.iter().any(|i| matches!(i.r#type, TopLevelType::View));
 
     let message = if has_models && has_enums && has_views {
-        "These models, views and enums were renamed due to their names being duplicates in the Prisma Schema Language."
+        "These models, views and enums were renamed due to their names being duplicates in this Prisma schema."
     } else if has_models && has_enums {
-        "These models and enums were renamed due to their names being duplicates in the Prisma Schema Language."
+        "These models and enums were renamed due to their names being duplicates in this Prisma schema."
     } else if has_models && has_views {
-        "These models and views were renamed due to their names being duplicates in the Prisma Schema Language."
+        "These models and views were renamed due to their names being duplicates in this Prisma schema."
     } else if has_enums && has_views {
-        "These enums and views were renamed due to their names being duplicates in the Prisma Schema Language."
+        "These enums and views were renamed due to their names being duplicates in this Prisma schema."
     } else if has_models {
-        "These models were renamed due to their names being duplicates in the Prisma Schema Language."
+        "These models were renamed due to their names being duplicates in this Prisma schema."
     } else if has_views {
-        "These views were renamed due to their names being duplicates in the Prisma Schema Language."
+        "These views were renamed due to their names being duplicates in this Prisma schema."
     } else {
-        "These enums were renamed due to their names being duplicates in the Prisma Schema Language."
+        "These enums were renamed due to their names being duplicates in this Prisma schema."
     };
 
     Warning {
