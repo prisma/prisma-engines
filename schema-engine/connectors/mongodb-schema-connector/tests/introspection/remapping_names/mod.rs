@@ -1,6 +1,5 @@
 use crate::introspection::test_api::*;
 use mongodb::bson::doc;
-use serde_json::json;
 
 #[test]
 fn remapping_fields_with_invalid_characters() {
@@ -102,14 +101,14 @@ fn remapping_composite_fields_with_numbers() {
 
     expected.assert_eq(res.datamodel());
 
-    res.assert_warning_code(104);
+    let expect = expect![[r#"
+        *** WARNING ***
 
-    res.assert_warning("These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute.");
+        These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:
+          - Composite type: "OuterInner", field: "1"
+    "#]];
 
-    res.assert_warning_affected(&json!([{
-        "compositeType": "OuterInner",
-        "field": "1",
-    }]));
+    res.expect_warnings(&expect);
 }
 
 #[test]
@@ -137,14 +136,14 @@ fn remapping_model_fields_with_numbers() {
 
     expected.assert_eq(res.datamodel());
 
-    res.assert_warning_code(104);
+    let expect = expect![[r#"
+        *** WARNING ***
 
-    res.assert_warning("These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute.");
+        These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:
+          - Model: "Outer", field: "1"
+    "#]];
 
-    res.assert_warning_affected(&json!([{
-        "model": "Outer",
-        "field": "1",
-    }]));
+    res.expect_warnings(&expect);
 }
 
 #[test]

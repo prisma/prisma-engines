@@ -1,7 +1,6 @@
 use crate::introspection::test_api::*;
 use mongodb::bson::{doc, oid::ObjectId, Bson};
 use schema_connector::CompositeTypeDepth;
-use serde_json::json;
 
 #[test]
 fn singular() {
@@ -63,11 +62,14 @@ fn dirty_data() {
 
     expected.assert_eq(res.datamodel());
 
-    res.assert_warning_affected(&json!([{
-        "compositeType": "CatAddress",
-        "field": "number",
-        "tpe": "Json",
-    }]));
+    let expect = expect![[r#"
+        *** WARNING ***
+
+        The following fields had data stored in multiple types. Either use Json or normalize data to the wanted type:
+          - Composite type: "CatAddress", field: "number", type: "Json"
+    "#]];
+
+    res.expect_warnings(&expect);
 }
 
 #[test]
@@ -476,13 +478,14 @@ fn do_not_create_empty_types() {
 
     expected.assert_eq(res.datamodel());
 
-    res.assert_warning_code(102);
-    res.assert_warning("The following fields point to nested objects without any data.");
+    let expect = expect![[r#"
+        *** WARNING ***
 
-    res.assert_warning_affected(&json!([{
-        "model": "Test",
-        "field": "data",
-    }]));
+        The following fields point to nested objects without any data:
+          - Model: "Test", field: "data"
+    "#]];
+
+    res.expect_warnings(&expect);
 }
 
 #[test]
@@ -504,21 +507,14 @@ fn do_not_spam_empty_type_warnings() {
 
     expected.assert_eq(res.datamodel());
 
-    let expected = expect![[r#"
-        [
-          {
-            "code": 102,
-            "message": "The following fields point to nested objects without any data.",
-            "affected": [
-              {
-                "model": "Test",
-                "field": "data"
-              }
-            ]
-          }
-        ]"#]];
+    let expect = expect![[r#"
+        *** WARNING ***
 
-    res.expect_warnings(&expected);
+        The following fields point to nested objects without any data:
+          - Model: "Test", field: "data"
+    "#]];
+
+    res.expect_warnings(&expect);
 }
 
 #[test]
@@ -544,13 +540,15 @@ fn do_not_create_empty_types_in_types() {
     "#]];
 
     expected.assert_eq(res.datamodel());
-    res.assert_warning_code(102);
-    res.assert_warning("The following fields point to nested objects without any data.");
 
-    res.assert_warning_affected(&json!([{
-        "compositeType": "TestTost",
-        "field": "data",
-    }]));
+    let expect = expect![[r#"
+        *** WARNING ***
+
+        The following fields point to nested objects without any data:
+          - Composite type: "TestTost", field: "data"
+    "#]];
+
+    res.expect_warnings(&expect);
 }
 
 #[test]
@@ -572,7 +570,10 @@ fn no_empty_type_warnings_when_depth_is_reached() {
     "#]];
 
     expected.assert_eq(res.datamodel());
-    res.assert_no_warnings();
+
+    let expect = expect![""];
+
+    res.expect_warnings(&expect);
 }
 
 #[test]

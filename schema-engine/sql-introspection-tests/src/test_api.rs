@@ -229,7 +229,9 @@ impl TestApi {
         let data_model = parse_datamodel(&format!("{}{}", self.pure_config(), data_model_string));
         let introspection_result = self.test_introspect_internal(data_model, false).await?;
 
-        Ok(serde_json::to_string(&introspection_result.warnings)?)
+        let warnings = introspection_result.warnings.unwrap_or_default();
+
+        Ok(warnings)
     }
 
     pub async fn introspect_version(&mut self) -> Result<Version> {
@@ -243,7 +245,9 @@ impl TestApi {
         let previous_schema = psl::validate(self.pure_config().into());
         let introspection_result = self.test_introspect_internal(previous_schema, false).await?;
 
-        Ok(serde_json::to_string(&introspection_result.warnings)?)
+        let warnings = introspection_result.warnings.unwrap_or_default();
+
+        Ok(warnings)
     }
 
     pub fn sql_family(&self) -> SqlFamily {
@@ -362,7 +366,9 @@ impl TestApi {
         let previous_schema = psl::validate(self.pure_config().into());
         let introspection_result = self.test_introspect_internal(previous_schema, true).await.unwrap();
 
-        expectation.assert_eq(&serde_json::to_string_pretty(&introspection_result.warnings).unwrap());
+        let warnings = introspection_result.warnings.unwrap_or_default();
+
+        expectation.assert_eq(&warnings);
     }
 
     pub async fn expect_no_warnings(&mut self) {
@@ -370,7 +376,7 @@ impl TestApi {
         let introspection_result = self.test_introspect_internal(previous_schema, true).await.unwrap();
 
         dbg!(&introspection_result.warnings);
-        assert!(introspection_result.warnings.is_empty())
+        assert!(introspection_result.warnings.is_none())
     }
 
     pub async fn expect_re_introspected_datamodel(&mut self, schema: &str, expectation: expect_test::Expect) {
@@ -384,7 +390,9 @@ impl TestApi {
         let data_model = parse_datamodel(&format!("{}{}", self.pure_config(), schema));
         let introspection_result = self.test_introspect_internal(data_model, false).await.unwrap();
 
-        expectation.assert_eq(&serde_json::to_string_pretty(&introspection_result.warnings).unwrap());
+        let warnings = introspection_result.warnings.unwrap_or_default();
+
+        expectation.assert_eq(&warnings);
     }
 
     pub fn assert_eq_datamodels(&self, expected_without_header: &str, result_with_header: &str) {

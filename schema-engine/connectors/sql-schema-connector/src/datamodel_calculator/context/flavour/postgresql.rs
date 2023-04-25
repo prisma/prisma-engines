@@ -1,10 +1,11 @@
+use schema_connector::{
+    warnings::{IndexedColumn, Model, ModelAndConstraint},
+    Warnings,
+};
 use sql::{postgres::PostgresSchemaExt, ForeignKeyWalker, IndexWalker, TableWalker};
 use sql_schema_describer as sql;
 
-use crate::{
-    datamodel_calculator::DatamodelCalculatorContext,
-    warnings::generators::{IndexedColumn, Model, ModelAndConstraint, Warnings},
-};
+use crate::datamodel_calculator::DatamodelCalculatorContext;
 
 pub(crate) struct PostgresIntrospectionFlavour;
 

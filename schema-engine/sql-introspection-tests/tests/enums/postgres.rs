@@ -209,22 +209,12 @@ async fn invalid_enum_variants_regression(api: &mut TestApi) -> TestResult {
     api.expect_datamodel(&expectation).await;
 
     let expectation = expect![[r#"
-        [
-          {
-            "code": 4,
-            "message": "These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute.",
-            "affected": [
-              {
-                "enm": "invalid_enum",
-                "value": "123"
-              },
-              {
-                "enm": "invalid_enum",
-                "value": "$§!"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:
+          - Enum: "invalid_enum", value: "123"
+          - Enum: "invalid_enum", value: "$§!"
+    "#]];
 
     api.expect_warnings(&expectation).await;
 

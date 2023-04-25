@@ -16,8 +16,9 @@ pub fn calculate(schema: &sql::SqlSchema, ctx: &IntrospectionContext, search_pat
     let (schema_string, is_empty, views) = rendering::to_psl_string(&ctx);
     let warnings = warnings::generate(&ctx);
 
-    // Warning codes 5 and 6 are for Prisma 1 default reintrospection.
-    let version = if warnings.iter().any(|w| ![5, 6].contains(&w.code)) {
+    let empty_warnings = warnings.is_empty();
+
+    let version = if !empty_warnings && !warnings.uses_prisma_1_defaults() {
         Version::NonPrisma
     } else {
         ctx.version
@@ -27,6 +28,12 @@ pub fn calculate(schema: &sql::SqlSchema, ctx: &IntrospectionContext, search_pat
         Some(views)
     } else {
         None
+    };
+
+    let warnings = if empty_warnings {
+        None
+    } else {
+        Some(warnings.to_string())
     };
 
     IntrospectionResult {
