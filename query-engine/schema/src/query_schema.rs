@@ -1,4 +1,4 @@
-use crate::{EnumType, IdentifierType, ObjectType, OutputField, OutputObjectTypeId, QuerySchemaDatabase};
+use crate::{db::QuerySchemaDatabase, EnumType, IdentifierType, ObjectType, OutputField, OutputObjectTypeId};
 use prisma_models::{InternalDataModelRef, ModelRef};
 use psl::{
     datamodel_connector::{ConnectorCapabilities, ConnectorCapability, RelationMode},
@@ -64,7 +64,7 @@ impl ConnectorContext {
 
 impl QuerySchema {
     #[allow(clippy::too_many_arguments)]
-    pub fn new(
+    pub(crate) fn new(
         query: OutputObjectTypeId,
         mutation: OutputObjectTypeId,
         db: QuerySchemaDatabase,
