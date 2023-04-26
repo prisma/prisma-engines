@@ -1,6 +1,143 @@
 //! Warnings generator for Introspection
 
-use std::fmt;
+use std::{collections::BTreeMap, fmt};
+
+trait Groupable<K, V> {
+    /// Groups the items in the collection by a key, specified by the concrete implementation.
+    /// For any key, the value is a **non-empty** vector.
+    fn group_by(&self) -> BTreeMap<K, Vec<&V>>;
+
+    /// Formats the grouped items in a compact, human-readable way.
+    fn fmt_group(&self, f: &mut fmt::Formatter<'_>, key: &K, value: &[&V]) -> fmt::Result;
+}
+
+/// Basic wrapper around a Vec<T>.
+pub trait WriteOnlyVec<T> {
+    /// Appends an element to the back of a collection.
+    fn push(&mut self, item: T);
+
+    /// Returns `true` if the vector contains no elements.
+    fn is_empty(&self) -> bool;
+}
+
+/// A group of warnings that can be grouped by a key, which depends on the concretely
+/// instantiated type T.
+#[derive(Debug, PartialEq)]
+pub struct GroupBy<T>(Vec<T>);
+
+impl<T> Default for GroupBy<T> {
+    fn default() -> Self {
+        Self(Vec::new())
+    }
+}
+
+impl<T> WriteOnlyVec<T> for GroupBy<T> {
+    fn push(&mut self, value: T) {
+        self.0.push(value)
+    }
+
+    fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+}
+
+impl Groupable<String, ModelAndField> for GroupBy<ModelAndField> {
+    fn group_by(&self) -> BTreeMap<String, Vec<&ModelAndField>> {
+        let mut result: BTreeMap<String, Vec<&ModelAndField>> = BTreeMap::new();
+
+        for item in &self.0 {
+            result.entry(item.model.clone()).or_default().push(item);
+        }
+
+        result
+    }
+
+    fn fmt_group(&self, f: &mut fmt::Formatter<'_>, model: &String, vec: &[&ModelAndField]) -> fmt::Result {
+        write!(f, r#"Model: "{}""#, &model)?;
+        write!(f, ", field(s): [")?;
+
+        let (last, vec_but_last) = vec.split_last().unwrap();
+        for entry in vec_but_last {
+            write!(f, r#""{}", "#, entry.field)?;
+        }
+
+        writeln!(f, r#""{}"]"#, last.field)?;
+
+        Ok(())
+    }
+}
+
+impl Groupable<String, ViewAndField> for GroupBy<ViewAndField> {
+    fn group_by(&self) -> BTreeMap<String, Vec<&ViewAndField>> {
+        let mut result: BTreeMap<String, Vec<&ViewAndField>> = BTreeMap::new();
+
+        for item in &self.0 {
+            result.entry(item.view.clone()).or_default().push(item);
+        }
+
+        result
+    }
+
+    fn fmt_group(&self, f: &mut fmt::Formatter<'_>, view: &String, vec: &[&ViewAndField]) -> fmt::Result {
+        write!(f, r#"View: "{}""#, &view)?;
+        write!(f, ", field(s): [")?;
+
+        let (last, vec_but_last) = vec.split_last().unwrap();
+        for entry in vec_but_last {
+            write!(f, r#""{}", "#, entry.field)?;
+        }
+
+        writeln!(f, r#""{}"]"#, last.field)?;
+
+        Ok(())
+    }
+}
+
+impl Groupable<String, TypeAndField> for GroupBy<TypeAndField> {
+    fn group_by(&self) -> BTreeMap<String, Vec<&TypeAndField>> {
+        let mut result: BTreeMap<String, Vec<&TypeAndField>> = BTreeMap::new();
+
+        for item in &self.0 {
+            result.entry(item.composite_type.clone()).or_default().push(item);
+        }
+
+        result
+    }
+
+    fn fmt_group(&self, f: &mut fmt::Formatter<'_>, r#type: &String, vec: &[&TypeAndField]) -> fmt::Result {
+        write!(f, r#"Type: "{}""#, &r#type)?;
+        write!(f, ", field(s): [")?;
+
+        let (last, vec_but_last) = vec.split_last().unwrap();
+        for entry in vec_but_last {
+            write!(f, r#""{}", "#, entry.field)?;
+        }
+
+        writeln!(f, r#""{}"]"#, last.field)?;
+
+        Ok(())
+    }
+
+    /*
+    fn grouped_fmt(&self, f: &mut fmt::Formatter<'_>, key: &str, value: &[TypeAndField]) -> fmt::Result {
+        let grouped = self.group_by();
+
+        for (r#type, vec) in grouped {
+            write!(f, r#"Type: "{}""#, &r#type)?;
+            write!(f, ", field(s): [")?;
+
+            let (last, vec_but_last) = vec.split_last().unwrap();
+            for entry in vec_but_last {
+                write!(f, r#""{}", "#, entry.field)?;
+            }
+
+            writeln!(f, r#""{}"]"#, last.field)?;
+        }
+
+        Ok(())
+    }
+     */
+}
 
 /// Collections used for warning generation. These should be preferred
 /// over directly creating warnings from the code, to prevent spamming
@@ -12,11 +149,11 @@ pub struct Warnings {
     /// Fields that are using Prisma 1 CUID defaults.
     pub prisma_1_cuid_defaults: Vec<ModelAndField>,
     /// Fields having an empty name.
-    pub fields_with_empty_names_in_model: Vec<ModelAndField>,
+    pub fields_with_empty_names_in_model: GroupBy<ModelAndField>,
     /// Fields having an empty name.
-    pub fields_with_empty_names_in_view: Vec<ViewAndField>,
+    pub fields_with_empty_names_in_view: GroupBy<ViewAndField>,
     /// Fields having an empty name.
-    pub fields_with_empty_names_in_type: Vec<TypeAndField>,
+    pub fields_with_empty_names_in_type: GroupBy<TypeAndField>,
     /// Field names in models we remapped during introspection.
     pub remapped_fields_in_model: Vec<ModelAndField>,
     /// Field names in views we remapped during introspection.
@@ -122,6 +259,26 @@ impl fmt::Display for Warnings {
             Ok(())
         }
 
+        fn render_warnings_grouped<T, G>(msg: &str, items: &G, f: &mut fmt::Formatter<'_>) -> fmt::Result
+        where
+            T: fmt::Display,
+            G: WriteOnlyVec<T> + Groupable<String, T>,
+        {
+            if !items.is_empty() {
+                writeln!(f)?;
+                f.write_str(msg)?;
+                writeln!(f)?;
+
+                let grouped = items.group_by();
+                for (key, value) in grouped {
+                    write!(f, "  - ")?;
+                    items.fmt_group(f, &key, &value)?;
+                }
+            }
+
+            Ok(())
+        }
+
         render_warnings(
             "These id fields had a `@default(uuid())` added because we believe the schema was created by Prisma 1:",
             &self.prisma_1_uuid_defaults,
@@ -134,19 +291,19 @@ impl fmt::Display for Warnings {
             f,
         )?;
 
-        render_warnings(
+        render_warnings_grouped(
             "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:",
             &self.fields_with_empty_names_in_model,
             f
         )?;
 
-        render_warnings(
+        render_warnings_grouped(
             "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:",
             &self.fields_with_empty_names_in_view,
             f
         )?;
 
-        render_warnings(
+        render_warnings_grouped(
             "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:",
             &self.fields_with_empty_names_in_type,
             f

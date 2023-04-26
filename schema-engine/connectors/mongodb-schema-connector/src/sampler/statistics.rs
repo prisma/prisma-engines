@@ -7,7 +7,7 @@ use renderer::{
     value::Function,
 };
 use schema_connector::{
-    warnings::{ModelAndField, ModelAndFieldAndType, TypeAndField, TypeAndFieldAndType},
+    warnings::{ModelAndField, ModelAndFieldAndType, TypeAndField, TypeAndFieldAndType, WriteOnlyVec},
     CompositeTypeDepth, Warnings,
 };
 
