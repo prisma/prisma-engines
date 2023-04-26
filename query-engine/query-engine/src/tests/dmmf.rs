@@ -29,7 +29,7 @@ fn must_not_fail_on_missing_env_vars_in_a_datasource() {
         }
     "#;
     let query_schema = get_query_schema(dm);
-    let dmmf = request_handlers::dmmf::render_dmmf(Arc::new(query_schema));
+    let dmmf = request_handlers::dmmf::render_dmmf(&query_schema);
     let inputs = &dmmf.schema.input_object_types;
 
     assert!(!inputs.is_empty());

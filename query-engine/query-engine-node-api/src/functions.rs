@@ -1,7 +1,6 @@
 use crate::error::ApiError;
 use napi::{bindgen_prelude::*, JsUnknown};
 use napi_derive::napi;
-use query_core::schema::{self, QuerySchemaRef};
 use request_handlers::dmmf;
 use std::{
     collections::{BTreeMap, HashMap},
@@ -33,8 +32,8 @@ pub fn dmmf(datamodel_string: String) -> napi::Result<String> {
         .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
 
     let internal_data_model = prisma_models::convert(Arc::new(schema));
-    let query_schema: QuerySchemaRef = Arc::new(schema::build(internal_data_model, true));
-    let dmmf = dmmf::render_dmmf(query_schema);
+    let query_schema = query_core::schema::build(internal_data_model, true);
+    let dmmf = dmmf::render_dmmf(&query_schema);
 
     Ok(serde_json::to_string(&dmmf)?)
 }
