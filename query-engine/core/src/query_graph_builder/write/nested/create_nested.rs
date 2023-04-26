@@ -7,7 +7,7 @@ use crate::{
 };
 use connector::{Filter, IntoFilter};
 use prisma_models::{ModelRef, RelationFieldRef};
-use schema_builder::constants::args;
+use schema::constants::args;
 use std::convert::TryInto;
 
 /// Handles nested create one cases.

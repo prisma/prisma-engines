@@ -576,7 +576,6 @@ dependencies = [
  "query-core",
  "request-handlers",
  "schema",
- "schema-builder",
  "serde_json",
  "user-facing-errors",
 ]
@@ -878,7 +877,6 @@ dependencies = [
  "prisma-models",
  "psl",
  "schema",
- "schema-builder",
  "serde",
  "serde_json",
  "similar",
@@ -2601,9 +2599,9 @@ dependencies = [
 
 [[package]]
 name = "os_str_bytes"
-version = "6.4.1"
+version = "6.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9b7820b9daea5457c9f21c69448905d723fbd21136ccf521748f23fd49e723ee"
+checksum = "ceedf44fb00f2d1984b0bc98102627ce622e083e49a5bacdb3e514fa4238e267"
 
 [[package]]
 name = "output_vt100"
@@ -3144,7 +3142,6 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#5103129655cc10afcffcc08a4b0200f5262d7766"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -3239,7 +3236,6 @@ dependencies = [
  "query-connector",
  "query-engine-metrics",
  "schema",
- "schema-builder",
  "serde",
  "serde_json",
  "thiserror",
@@ -3593,7 +3589,7 @@ dependencies = [
  "prisma-models",
  "psl",
  "query-core",
- "schema-builder",
+ "schema",
  "serde",
  "serde_json",
  "sql-query-connector",
@@ -3817,9 +3813,11 @@ dependencies = [
 name = "schema"
 version = "0.1.0"
 dependencies = [
+ "codspeed-criterion-compat",
  "once_cell",
  "prisma-models",
  "psl",
+ "rustc-hash",
 ]
 
 [[package]]
@@ -3829,18 +3827,6 @@ dependencies = [
  "diagnostics",
  "pest",
  "pest_derive",
-]
-
-[[package]]
-name = "schema-builder"
-version = "0.1.0"
-dependencies = [
- "codspeed-criterion-compat",
- "once_cell",
- "prisma-models",
- "psl",
- "rustc-hash",
- "schema",
 ]
 
 [[package]]
@@ -4232,7 +4218,6 @@ dependencies = [
  "psl",
  "quaint",
  "schema-connector",
- "serde_json",
  "sql-schema-connector",
  "sql-schema-describer",
  "test-macros",
@@ -5282,12 +5267,11 @@ dependencies = [
 
 [[package]]
 name = "walkdir"
-version = "2.3.2"
+version = "2.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "808cf2735cd4b6866113f648b791c6adc5714537bc222d9347bb203386ffda56"
+checksum = "36df944cda56c7d8d8b7496af378e6b16de9284591917d307c9b4d313c44e698"
 dependencies = [
  "same-file",
- "winapi",
  "winapi-util",
 ]
 

@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 
 /// Defines a view in the database.
 #[derive(Debug, Deserialize, Serialize)]
@@ -20,23 +19,12 @@ pub struct IntrospectionResult {
     /// The introspected data model is empty
     pub is_empty: bool,
     /// Introspection warnings
-    pub warnings: Vec<Warning>,
+    pub warnings: Option<String>,
     /// Inferred Prisma version
     pub version: Version,
     /// The database view definitions. None if preview feature
     /// is not enabled.
     pub views: Option<Vec<ViewDefinition>>,
-}
-
-/// A warning, spawned from an introspection run.
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Warning {
-    /// A unique indentifying code for the warning.
-    pub code: u32,
-    /// The warning message.
-    pub message: String,
-    /// The affected items that triggered this warning.
-    pub affected: Value,
 }
 
 /// The output type from introspection.
@@ -45,7 +33,7 @@ pub struct IntrospectionResultOutput {
     /// Datamodel
     pub datamodel: String,
     /// warnings
-    pub warnings: Vec<Warning>,
+    pub warnings: Option<String>,
     /// version
     pub version: Version,
     /// views

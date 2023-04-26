@@ -30,8 +30,8 @@ pub(crate) use parser::*;
 
 use crate::query_graph_builder::resolve_compound_field;
 use prisma_models::ModelRef;
+use schema::constants::*;
 use schema::QuerySchemaRef;
-use schema_builder::constants::*;
 use std::collections::HashMap;
 use user_facing_errors::query_engine::validation::ValidationError;
 

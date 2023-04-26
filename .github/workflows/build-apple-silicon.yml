@@ -23,10 +23,7 @@ jobs:
         with:
           ref: ${{ github.event.inputs.commit }}
 
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          default: true
+      - uses: dtolnay/rust-toolchain@stable
 
       - name: Install aarch64 toolchain
         run: rustup target add aarch64-apple-darwin

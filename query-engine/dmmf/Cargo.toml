@@ -9,7 +9,6 @@ psl.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 schema = { path = "../schema" }
-schema-builder = { path = "../schema-builder" }
 indexmap = { version = "1.7", features = ["serde-1"] }
 prisma-models = { path = "../prisma-models" }
 

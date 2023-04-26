@@ -1,6 +1,5 @@
 use crate::introspection_pair::{DefaultKind, ModelPair};
-
-use super::generators::{self, Warnings};
+use schema_connector::{warnings as generators, Warnings};
 
 /// Analyze and generate warnigs from a model.
 pub(super) fn generate_warnings(model: ModelPair<'_>, warnings: &mut Warnings) {
@@ -97,7 +96,7 @@ pub(super) fn generate_warnings(model: ModelPair<'_>, warnings: &mut Warnings) {
             let mf = generators::ModelAndFieldAndType {
                 model: model.name().to_string(),
                 field: field.name().to_string(),
-                tpe: field.prisma_type().to_string(),
+                r#type: field.prisma_type().to_string(),
             };
 
             warnings.unsupported_types_in_model.push(mf)

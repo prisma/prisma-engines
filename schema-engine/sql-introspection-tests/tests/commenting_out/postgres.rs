@@ -1,6 +1,5 @@
 use barrel::types;
-use serde_json::json;
-use sql_introspection_tests::{assert_eq_json, test_api::*};
+use sql_introspection_tests::test_api::*;
 
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn relations_between_ignored_models_should_not_have_field_level_ignores(api: &mut TestApi) -> TestResult {
@@ -72,18 +71,11 @@ async fn fields_we_cannot_sanitize_are_commented_out_and_warned(api: &mut TestAp
     api.expect_datamodel(&expected).await;
 
     let expected = expect![[r#"
-        [
-          {
-            "code": 2,
-            "message": "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute.",
-            "affected": [
-              {
-                "model": "Test",
-                "field": "12"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:
+          - Model: "Test", field: "12"
+    "#]];
 
     api.expect_warnings(&expected).await;
 
@@ -105,21 +97,25 @@ async fn unsupported_type_keeps_its_usages(api: &mut TestApi) -> TestResult {
         })
         .await?;
 
-    let expected = json!([{
-        "code": 3,
-        "message": "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.",
-        "affected": [
-            {
-                "model": "Test",
-                "field": "broken",
-                "tpe": "macaddr"
-            }
-        ]
-    }]);
+    let expected = expect![[r#"
+        *** WARNING ***
 
-    assert_eq_json!(expected, api.introspection_warnings().await?);
+        These fields are not supported by the Prisma Client, because Prisma currently does not support their types:
+          - Model: "Test", field: "broken", type: "macaddr"
+    "#]];
+
+    api.expect_warnings(&expected).await;
 
     let dm = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
         model Test {
           id     Int                    @unique
           dummy  Int
@@ -131,9 +127,7 @@ async fn unsupported_type_keeps_its_usages(api: &mut TestApi) -> TestResult {
         }
     "#]];
 
-    let result = api.introspect_dml().await?;
-
-    dm.assert_eq(&result);
+    api.expect_datamodel(&dm).await;
 
     Ok(())
 }
@@ -152,28 +146,28 @@ async fn a_table_with_only_an_unsupported_id(api: &mut TestApi) -> TestResult {
         })
         .await?;
 
-    let expected = json!([
-        {
-            "code": 1,
-            "message": "The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.",
-            "affected": [{
-                "model": "Test"
-            }]
-        },
-        {
-            "code": 3,
-            "message": "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.",
-            "affected": [{
-                "model": "Test",
-                "field": "network_mac",
-                "tpe": "macaddr"
-            }]
+    let expected = expect![[r#"
+        *** WARNING ***
+
+        The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client:
+          - "Test"
+
+        These fields are not supported by the Prisma Client, because Prisma currently does not support their types:
+          - Model: "Test", field: "network_mac", type: "macaddr"
+    "#]];
+
+    api.expect_warnings(&expected).await;
+
+    let expected = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
         }
-    ]);
 
-    assert_eq_json!(expected, api.introspection_warnings().await?);
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
 
-    let dm = indoc! {r#"
         /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
         model Test {
           dummy       Int
@@ -181,10 +175,9 @@ async fn a_table_with_only_an_unsupported_id(api: &mut TestApi) -> TestResult {
 
           @@ignore
         }
-    "#};
+    "#]];
 
-    let result = api.introspect().await?;
-    api.assert_eq_datamodels(dm, &result);
+    api.expect_datamodel(&expected).await;
 
     Ok(())
 }
@@ -264,17 +257,14 @@ async fn dbgenerated_in_unsupported(api: &mut TestApi) -> TestResult {
 async fn commenting_out_a_table_without_columns(api: &mut TestApi) -> TestResult {
     api.raw_cmd("CREATE TABLE \"Test\" ();").await;
 
-    let expected = json!([{
-        "code": 14,
-        "message": "The following models were commented out as we could not retrieve columns for them. Please check your privileges.",
-        "affected": [
-            {
-                "model": "Test"
-            }
-        ]
-    }]);
+    let expected = expect![[r#"
+        *** WARNING ***
 
-    assert_eq_json!(expected, api.introspection_warnings().await?);
+        The following models were commented out as we could not retrieve columns for them. Please check your privileges:
+          - "Test"
+    "#]];
+
+    api.expect_warnings(&expected).await;
 
     let expected = expect![[r#"
         generator client {
@@ -290,7 +280,9 @@ async fn commenting_out_a_table_without_columns(api: &mut TestApi) -> TestResult
         // model Test {
         // }
     "#]];
+
     api.expect_datamodel(&expected).await;
+
     Ok(())
 }
 
@@ -364,17 +356,14 @@ ALTER TABLE blocks
     )
     .await;
 
-    let expected = json!([{
-        "code": 27,
-        "message": "These tables are partition tables, which are not yet fully supported.",
-        "affected": [
-            {
-                "model": "blocks"
-            }
-        ]
-    }]);
+    let expected = expect![[r#"
+        *** WARNING ***
 
-    assert_eq_json!(expected, api.introspection_warnings().await?);
+        These tables are partition tables, which are not yet fully supported:
+          - "blocks"
+    "#]];
+
+    api.expect_warnings(&expected).await;
 
     let expected = expect![[r#"
         generator client {
@@ -397,7 +386,9 @@ ALTER TABLE blocks
           @@id([account, id])
         }
     "#]];
+
     api.expect_datamodel(&expected).await;
+
     Ok(())
 }
 
@@ -426,26 +417,17 @@ ALTER TABLE blocks_p2_0 ADD CONSTRAINT b2_unique UNIQUE (id);
     )
     .await;
 
-    let expected = json!([{
-        "code": 1,
-        "message": "The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.",
-        "affected": [
-            {
-                "model": "blocks"
-            }
-        ]
-    }, {
-        "code": 27,
-        "message": "These tables are partition tables, which are not yet fully supported.",
-        "affected": [
-            {
-                "model": "blocks"
-            }
-        ]
+    let expected = expect![[r#"
+        *** WARNING ***
 
-    }]);
+        The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client:
+          - "blocks"
 
-    assert_eq_json!(expected, api.introspection_warnings().await?);
+        These tables are partition tables, which are not yet fully supported:
+          - "blocks"
+    "#]];
+
+    api.expect_warnings(&expected).await;
 
     let expected = expect![[r#"
         generator client {
@@ -485,17 +467,14 @@ ALTER TABLE foo ENABLE ROW LEVEL SECURITY; "#,
     )
     .await;
 
-    let expected = json!([{
-        "code": 30,
-        "message": "These tables contain row level security, which is not yet fully supported. Read more: https://pris.ly/d/row-level-security",
-        "affected": [
-            {
-                "model": "foo"
-            }
-        ]
-    }]);
+    let expected = expect![[r#"
+        *** WARNING ***
 
-    assert_eq_json!(expected, api.introspection_warnings().await?);
+        These tables contain row level security, which is not yet fully supported. Read more: https://pris.ly/d/row-level-security
+          - "foo"
+    "#]];
+
+    api.expect_warnings(&expected).await;
 
     let expected = expect![[r#"
         generator client {
@@ -513,6 +492,8 @@ ALTER TABLE foo ENABLE ROW LEVEL SECURITY; "#,
           owner String @db.VarChar(30)
         }
     "#]];
+
     api.expect_datamodel(&expected).await;
+
     Ok(())
 }

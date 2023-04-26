@@ -85,10 +85,7 @@ jobs:
       - name: "Start ${{ matrix.database.name }} (${{ matrix.engine_protocol }})"
         run: make start-${{ matrix.database.name }}
 
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          default: true
+      - uses: dtolnay/rust-toolchain@stable
 
       - run: export WORKSPACE_ROOT=$(pwd) && cargo test --package query-engine-tests -- --test-threads=1
         if: ${{ matrix.database.single_threaded }}

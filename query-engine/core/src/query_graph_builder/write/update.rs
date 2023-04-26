@@ -7,8 +7,7 @@ use crate::{
 };
 use connector::{Filter, IntoFilter};
 use prisma_models::ModelRef;
-use schema::ConnectorContext;
-use schema_builder::constants::args;
+use schema::{constants::args, ConnectorContext};
 use std::convert::TryInto;
 
 /// Creates an update record query and adds it to the query graph, together with it's nested queries and companion read query.

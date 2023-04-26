@@ -217,9 +217,16 @@ async fn mapped_model_and_field_name(api: &mut TestApi) -> TestResult {
 
     expected.assert_eq(&api.re_introspect_dml(input_dm).await?);
 
-    let expected = expect![[
-        r#"[{"code":7,"message":"These models were enriched with `@@map` information taken from the previous Prisma schema.","affected":[{"model":"Custom_User"}]},{"code":8,"message":"These fields were enriched with `@map` information taken from the previous Prisma schema.","affected":[{"model":"Post","field":"c_user_id"},{"model":"Custom_User","field":"c_id"}]}]"#
-    ]];
+    let expected = expect![[r#"
+        *** WARNING ***
+
+        These fields were enriched with `@map` information taken from the previous Prisma schema:
+          - Model: "Post", field: "c_user_id"
+          - Model: "Custom_User", field: "c_id"
+
+        These models were enriched with `@@map` information taken from the previous Prisma schema:
+          - "Custom_User"
+    "#]];
 
     expected.assert_eq(&api.re_introspect_warnings(input_dm).await?);
 
@@ -335,20 +342,12 @@ async fn re_introspecting_custom_compound_id_names(api: &mut TestApi) -> TestRes
     api.expect_re_introspected_datamodel(input_dm, expectation).await;
 
     let expected = expect![[r#"
-        [
-          {
-            "code": 18,
-            "message": "These models were enriched with custom compound id names taken from the previous Prisma schema.",
-            "affected": [
-              {
-                "model": "User"
-              },
-              {
-                "model": "User2"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These models were enriched with custom compound id names taken from the previous Prisma schema:
+          - "User"
+          - "User2"
+    "#]];
 
     api.expect_re_introspect_warnings(input_dm, expected).await;
 
