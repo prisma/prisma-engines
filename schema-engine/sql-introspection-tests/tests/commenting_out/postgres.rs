@@ -101,7 +101,7 @@ async fn unsupported_type_keeps_its_usages(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These fields are not supported by the Prisma Client, because Prisma currently does not support their types:
-          - Model: "Test", field: "broken", type: "macaddr"
+          - Model: "Test", field: "broken", original data type: "macaddr"
     "#]];
 
     api.expect_warnings(&expected).await;
@@ -153,7 +153,7 @@ async fn a_table_with_only_an_unsupported_id(api: &mut TestApi) -> TestResult {
           - "Test"
 
         These fields are not supported by the Prisma Client, because Prisma currently does not support their types:
-          - Model: "Test", field: "network_mac", type: "macaddr"
+          - Model: "Test", field: "network_mac", original data type: "macaddr"
     "#]];
 
     api.expect_warnings(&expected).await;

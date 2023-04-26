@@ -728,7 +728,7 @@ async fn unsupported_types_trigger_a_warning(api: &mut TestApi) -> TestResult {
           - "A"
 
         These fields are not supported by the Prisma Client, because Prisma currently does not support their types:
-          - View: "A", field: "vector", type: "tsvector"
+          - View: "A", field: "vector", original data type: "tsvector"
     "#]];
 
     api.expect_warnings(&expected).await;

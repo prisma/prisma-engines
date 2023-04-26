@@ -481,7 +481,7 @@ impl fmt::Display for ModelAndFieldAndType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            r#"Model: "{}", field: "{}", type: "{}""#,
+            r#"Model: "{}", field: "{}", original data type: "{}""#,
             self.model, self.field, self.r#type
         )
     }
@@ -502,7 +502,7 @@ impl fmt::Display for ViewAndFieldAndType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            r#"View: "{}", field: "{}", type: "{}""#,
+            r#"View: "{}", field: "{}", original data type: "{}""#,
             self.view, self.field, self.r#type
         )
     }
@@ -523,7 +523,7 @@ impl fmt::Display for TypeAndFieldAndType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            r#"Composite type: "{}", field: "{}", type: "{}""#,
+            r#"Composite type: "{}", field: "{}", chosen data type: "{}""#,
             self.composite_type, self.field, self.r#type
         )
     }
