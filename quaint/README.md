@@ -1,6 +1,6 @@
 # Quaint
 
-[![crates.io](https://meritbadge.herokuapp.com/quaint)](https://crates.io/crates/quaint)
+[![crates.io](https://img.shields.io/crates/v/quaint)](https://crates.io/crates/quaint)
 [![docs.rs](https://docs.rs/quaint/badge.svg)](https://docs.rs/quaint)
 [![Cargo tests](https://github.com/prisma/quaint/actions/workflows/test.yml/badge.svg)](https://github.com/prisma/quaint/actions/workflows/test.yml)
 [![Discord](https://img.shields.io/discord/664092374359605268)](https://discord.gg/r4CPY4B)
