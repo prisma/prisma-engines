@@ -41,7 +41,7 @@ type ErasedConnectorRequest = Box<
 >;
 
 impl EngineState {
-    pub(crate) fn new(initial_datamodel: Option<String>, host: Option<Arc<dyn ConnectorHost>>) -> Self {
+    pub fn new(initial_datamodel: Option<String>, host: Option<Arc<dyn ConnectorHost>>) -> Self {
         EngineState {
             initial_datamodel: initial_datamodel.map(|s| psl::validate(s.into())),
             host: host.unwrap_or_else(|| Arc::new(schema_connector::EmptyHost)),
