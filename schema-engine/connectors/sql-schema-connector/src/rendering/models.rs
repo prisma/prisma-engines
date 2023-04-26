@@ -71,6 +71,12 @@ fn render_model(model: ModelPair<'_>, sql_family: SqlFamily) -> renderer::Model<
         rendered.documentation(docs);
     }
 
+    if model.has_mysql_multi_value_indes() {
+        let docs = "This table contains multi-value indices, which are not yet fully supported. Visit https://pris.ly/d/mysql-multi-row-index for more info.";
+
+        rendered.documentation(docs);
+    }
+
     if let Some(namespace) = model.namespace() {
         rendered.schema(namespace);
     }

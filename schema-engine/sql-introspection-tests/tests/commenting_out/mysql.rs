@@ -148,7 +148,7 @@ PARTITIONS 2; "#,
     Ok(())
 }
 
-#[test_connector(tags(Mysql8))]
+#[test_connector(tags(Mysql8), exclude(Vitess))]
 async fn mysql_multi_row_index_warning(api: &mut TestApi) -> TestResult {
     api.raw_cmd(
         r#"
@@ -180,6 +180,7 @@ CREATE TABLE customers (
           url      = "env(TEST_DATABASE_URL)"
         }
 
+        /// This table contains multi-value indices, which are not yet fully supported. Visit https://pris.ly/d/mysql-multi-row-index for more info.
         model customers {
           id       BigInt    @id @default(autoincrement())
           modified DateTime? @default(now()) @db.DateTime(0)
