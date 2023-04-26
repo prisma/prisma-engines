@@ -105,7 +105,7 @@ pub async fn create_records<'conn>(
                     .try_into()
                     .expect("Create calls can only use PrismaValue write expressions (right now).");
 
-                let bson = (field, value).into_bson().decorate_with_field_info(&field)?;
+                let bson = (field, value).into_bson().decorate_with_field_info(field)?;
 
                 doc.insert(field_name.to_string(), bson);
             }
@@ -342,7 +342,7 @@ pub async fn m2m_connect<'conn>(
 
             (selection, value.clone())
                 .into_bson()
-                .decorate_with_selected_field_info(&selection)
+                .decorate_with_selected_field_info(selection)
         })
         .collect::<crate::Result<Vec<_>>>()?;
 
@@ -408,7 +408,7 @@ pub async fn m2m_disconnect<'conn>(
 
             (field, value.clone())
                 .into_bson()
-                .decorate_with_selected_field_info(&field)
+                .decorate_with_selected_field_info(field)
         })
         .collect::<crate::Result<Vec<_>>>()?;
 
