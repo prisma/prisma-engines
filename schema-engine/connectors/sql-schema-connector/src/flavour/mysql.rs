@@ -443,7 +443,7 @@ pub(crate) enum Circumstances {
     IsMysql56,
     IsMariadb,
     IsVitess,
-    IsTiDB
+    IsTiDB,
 }
 
 fn check_datamodel_for_mysql_5_6(datamodel: &ValidatedSchema, errors: &mut Vec<String>) {
