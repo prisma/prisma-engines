@@ -206,6 +206,7 @@ impl<'a> ModelPair<'a> {
         self.next
             .indexes()
             .filter(|idx| idx.is_primary_key() || idx.is_unique())
+            .filter(|idx| !idx.is_mysql_multi_value_index())
             .any(|idx| {
                 idx.columns().all(|c| {
                     !matches!(

@@ -381,6 +381,7 @@ fn forward_relation_field_is_unique(fk: sql::ForeignKeyWalker<'_>) -> bool {
     fk.table()
         .indexes()
         .filter(|idx| idx.is_primary_key() || idx.is_unique())
+        .filter(|idx| !idx.is_mysql_multi_value_index())
         .any(|idx| {
             idx.columns().all(|idx_col| {
                 fk.constrained_columns()
@@ -393,6 +394,7 @@ fn table_has_usable_identifier(table: sql::TableWalker<'_>) -> bool {
     table
         .indexes()
         .filter(|idx| idx.is_primary_key() || idx.is_unique())
+        .filter(|idx| !idx.is_mysql_multi_value_index())
         .any(|idx| {
             idx.columns().all(|c| {
                 !matches!(

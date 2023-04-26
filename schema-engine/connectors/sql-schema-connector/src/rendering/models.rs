@@ -8,6 +8,7 @@ use crate::{
 };
 use datamodel_renderer::datamodel as renderer;
 use quaint::prelude::SqlFamily;
+use sql_schema_describer::IndexType;
 
 /// Render all model blocks to the PSL.
 pub(super) fn render<'a>(ctx: &'a DatamodelCalculatorContext<'a>, rendered: &mut renderer::Datamodel<'a>) {
@@ -137,6 +138,7 @@ fn render_model(model: ModelPair<'_>, sql_family: SqlFamily) -> renderer::Model<
 
     let mut ordered_indexes: Vec<_> = model
         .indexes()
+        .filter(|idx| idx.index_type() != IndexType::MySQLMultiValueIndex)
         .map(|idx| (idx.previous_position(), indexes::render(idx)))
         .collect();
 
