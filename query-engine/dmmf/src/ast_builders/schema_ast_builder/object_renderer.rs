@@ -1,7 +1,7 @@
 use super::*;
 
 #[derive(Debug)]
-pub enum DmmfObjectRenderer {
+pub(crate) enum DmmfObjectRenderer {
     Input(InputObjectTypeId),
     Output(OutputObjectTypeId),
 }

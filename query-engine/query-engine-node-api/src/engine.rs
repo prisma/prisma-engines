@@ -416,7 +416,7 @@ impl QueryEngine {
         async_panic_to_js_error(async {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
-            let dmmf = dmmf::render_dmmf(engine.query_schema.clone());
+            let dmmf = dmmf::render_dmmf(&engine.query_schema);
 
             Ok(serde_json::to_string(&dmmf)?)
         })

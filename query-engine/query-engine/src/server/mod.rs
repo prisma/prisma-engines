@@ -72,7 +72,7 @@ pub async fn routes(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Respon
         }
 
         (&Method::GET, "/dmmf") => {
-            let schema = dmmf::render_dmmf(Arc::clone(cx.query_schema()));
+            let schema = dmmf::render_dmmf(cx.query_schema());
 
             Response::builder()
                 .status(StatusCode::OK)
