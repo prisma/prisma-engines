@@ -434,7 +434,7 @@ async fn views_are_rendered_with_enums(api: &mut TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Mysql8), preview_features("views"))]
+#[test_connector(tags(Mysql8), exclude(Vitess), preview_features("views"))]
 async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
     let setup = indoc! {r#"
       CREATE TABLE `table_w_invalid_names_one` (
