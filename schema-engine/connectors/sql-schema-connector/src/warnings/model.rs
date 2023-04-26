@@ -37,6 +37,12 @@ pub(super) fn generate_warnings(model: ModelPair<'_>, warnings: &mut Warnings) {
         });
     }
 
+    if model.has_mysql_multi_value_indes() {
+        warnings.mysql_multi_value_indices.push(generators::Model {
+            model: model.name().to_string(),
+        });
+    }
+
     if model.uses_duplicate_name() {
         warnings.duplicate_names.push(generators::TopLevelItem {
             r#type: generators::TopLevelType::Model,

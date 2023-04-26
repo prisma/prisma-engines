@@ -47,6 +47,13 @@ impl<'a> ModelPair<'a> {
         self.next.has_subclass()
     }
 
+    /// Whether the model has MySQL multi value indices.
+    pub(crate) fn has_mysql_multi_value_indes(self) -> bool {
+        self.next
+            .indexes()
+            .any(|i| i.index_type() == sql::IndexType::MySQLMultiValueIndex)
+    }
+
     /// True, if we add a new model with a subclass.
     pub(crate) fn new_with_subclass(self) -> bool {
         self.previous.is_none() && self.has_subclass()
