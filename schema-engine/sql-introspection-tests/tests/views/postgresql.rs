@@ -961,7 +961,7 @@ async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:
-          - View: "A", field: "1"
+          - View: "A", field(s): ["1"]
 
         The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
           - "A"

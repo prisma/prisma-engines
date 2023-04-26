@@ -74,7 +74,7 @@ async fn fields_we_cannot_sanitize_are_commented_out_and_warned(api: &mut TestAp
         *** WARNING ***
 
         These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:
-          - Model: "Test", field: "12"
+          - Model: "Test", field(s): ["12"]
     "#]];
 
     api.expect_warnings(&expected).await;

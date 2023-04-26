@@ -433,3 +433,152 @@ async fn views_are_rendered_with_enums(api: &mut TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(tags(Mysql8), preview_features("views"))]
+async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
+    let setup = indoc! {r#"
+      CREATE TABLE `table_w_invalid_names_one` (
+        `oa11cd` varchar(10) DEFAULT NULL,
+        `lsoa11cd` varchar(10) DEFAULT NULL,
+        `all_ages` int(11) DEFAULT NULL,
+        `0` int(11) DEFAULT NULL,
+        `1` int(11) DEFAULT NULL,
+        `2` int(11) DEFAULT NULL,
+        `3` int(11) DEFAULT NULL,
+        `4` int(11) DEFAULT NULL,
+        `5` int(11) DEFAULT NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+      CREATE TABLE `table_w_invalid_names_two` (
+        `oa11cd` varchar(10) DEFAULT NULL,
+        `lsoa11cd` varchar(10) DEFAULT NULL,
+        `all_ages` int(11) DEFAULT NULL,
+        `0` int(11) DEFAULT NULL,
+        `1` int(11) DEFAULT NULL,
+        `2` int(11) DEFAULT NULL,
+        `3` int(11) DEFAULT NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+      CREATE VIEW `view_w_invalid_names_one` AS (
+        SELECT `all_ages`, `0`, `1`, `2`, `3`, `4`, `5`
+        FROM `table_w_invalid_names_one`
+      );
+
+      CREATE VIEW `view_w_invalid_names_two` AS (
+        SELECT `all_ages`, `0`, `1`, `2`, `3`
+        FROM `table_w_invalid_names_two`
+      );
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expected = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["views"]
+        }
+
+        datasource db {
+          provider = "mysql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        model table_w_invalid_names_one {
+          oa11cd   String? @db.VarChar(10)
+          lsoa11cd String? @db.VarChar(10)
+          all_ages Int?
+
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 0 Int? @map("0")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 1 Int? @map("1")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 2 Int? @map("2")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 3 Int? @map("3")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 4 Int? @map("4")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 5 Int? @map("5")
+          @@ignore
+        }
+
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        model table_w_invalid_names_two {
+          oa11cd   String? @db.VarChar(10)
+          lsoa11cd String? @db.VarChar(10)
+          all_ages Int?
+
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 0 Int? @map("0")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 1 Int? @map("1")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 2 Int? @map("2")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 3 Int? @map("3")
+          @@ignore
+        }
+
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        view view_w_invalid_names_one {
+          all_ages Int?
+
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 0 Int? @map("0")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 1 Int? @map("1")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 2 Int? @map("2")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 3 Int? @map("3")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 4 Int? @map("4")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 5 Int? @map("5")
+          @@ignore
+        }
+
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        view view_w_invalid_names_two {
+          all_ages Int?
+
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 0 Int? @map("0")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 1 Int? @map("1")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 2 Int? @map("2")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 3 Int? @map("3")
+          @@ignore
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
+
+    let expected = expect![[r#"
+        *** WARNING ***
+
+        These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:
+          - Model: "table_w_invalid_names_one", field(s): ["0", "1", "2", "3", "4", "5"]
+          - Model: "table_w_invalid_names_two", field(s): ["0", "1", "2", "3"]
+
+        These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:
+          - View: "view_w_invalid_names_one", field(s): ["0", "1", "2", "3", "4", "5"]
+          - View: "view_w_invalid_names_two", field(s): ["0", "1", "2", "3"]
+
+        The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client:
+          - "table_w_invalid_names_one"
+          - "table_w_invalid_names_two"
+
+        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
+          - "view_w_invalid_names_one"
+          - "view_w_invalid_names_two"
+    "#]];
+
+    api.expect_warnings(&expected).await;
+
+    Ok(())
+}
