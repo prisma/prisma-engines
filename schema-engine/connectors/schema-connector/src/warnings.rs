@@ -105,7 +105,7 @@ impl Groupable<String, TypeAndField> for GroupBy<TypeAndField> {
     }
 
     fn fmt_group(&self, f: &mut fmt::Formatter<'_>, r#type: &String, vec: &[&TypeAndField]) -> fmt::Result {
-        write!(f, r#"Type: "{}""#, &r#type)?;
+        write!(f, r#"Composite type: "{}""#, &r#type)?;
         write!(f, ", field(s): [")?;
 
         let (last, vec_but_last) = vec.split_last().unwrap();
@@ -117,26 +117,6 @@ impl Groupable<String, TypeAndField> for GroupBy<TypeAndField> {
 
         Ok(())
     }
-
-    /*
-    fn grouped_fmt(&self, f: &mut fmt::Formatter<'_>, key: &str, value: &[TypeAndField]) -> fmt::Result {
-        let grouped = self.group_by();
-
-        for (r#type, vec) in grouped {
-            write!(f, r#"Type: "{}""#, &r#type)?;
-            write!(f, ", field(s): [")?;
-
-            let (last, vec_but_last) = vec.split_last().unwrap();
-            for entry in vec_but_last {
-                write!(f, r#""{}", "#, entry.field)?;
-            }
-
-            writeln!(f, r#""{}"]"#, last.field)?;
-        }
-
-        Ok(())
-    }
-     */
 }
 
 /// Collections used for warning generation. These should be preferred

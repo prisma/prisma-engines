@@ -28,7 +28,13 @@ fn single_column_normal_index() {
     });
 
     let expected = expect![[r#"
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          age  Int
+          name String
 
+          @@index([age], map: "age_1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -56,7 +62,17 @@ fn single_column_composite_index() {
     });
 
     let expected = expect![[r#"
+        type CatAddress {
+          number Int
+        }
 
+        model Cat {
+          id      String     @id @default(auto()) @map("_id") @db.ObjectId
+          address CatAddress
+          name    String
+
+          @@index([address.number], map: "address.number_1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -84,7 +100,17 @@ fn single_column_composite_array_index() {
     });
 
     let expected = expect![[r#"
+        type CatAddresses {
+          number Int
+        }
 
+        model Cat {
+          id        String         @id @default(auto()) @map("_id") @db.ObjectId
+          addresses CatAddresses[]
+          name      String
+
+          @@index([addresses.number], map: "addresses.number_1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -112,7 +138,21 @@ fn single_column_deep_composite_index() {
     });
 
     let expected = expect![[r#"
+        type CatAddress {
+          special CatAddressSpecial
+        }
 
+        type CatAddressSpecial {
+          number Int
+        }
+
+        model Cat {
+          id      String     @id @default(auto()) @map("_id") @db.ObjectId
+          address CatAddress
+          name    String
+
+          @@index([address.special.number], map: "address.special.number_1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -140,7 +180,13 @@ fn single_column_descending_index() {
     });
 
     let expected = expect![[r#"
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          age  Int
+          name String
 
+          @@index([age(sort: Desc)], map: "age_-1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -168,7 +214,17 @@ fn single_column_descending_composite_index() {
     });
 
     let expected = expect![[r#"
+        type CatAddress {
+          number Int
+        }
 
+        model Cat {
+          id      String     @id @default(auto()) @map("_id") @db.ObjectId
+          address CatAddress
+          name    String
+
+          @@index([address.number(sort: Desc)], map: "address.number_-1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -196,7 +252,13 @@ fn single_column_fulltext_index() {
     });
 
     let expected = expect![[r#"
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          age  Int
+          name String
 
+          @@fulltext([name], map: "name_\"text\"")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -224,7 +286,17 @@ fn single_column_fulltext_composite_index() {
     });
 
     let expected = expect![[r#"
+        type CatAddress {
+          street String
+        }
 
+        model Cat {
+          id      String     @id @default(auto()) @map("_id") @db.ObjectId
+          address CatAddress
+          name    String
+
+          @@fulltext([address.street], map: "address.street_\"text\"")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -253,7 +325,17 @@ fn single_array_column_fulltext_composite_index() {
     });
 
     let expected = expect![[r#"
+        type CatAddresses {
+          street String
+        }
 
+        model Cat {
+          id        String         @id @default(auto()) @map("_id") @db.ObjectId
+          addresses CatAddresses[]
+          name      String
+
+          @@fulltext([addresses.street], map: "addresses.street_\"text\"")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -281,7 +363,14 @@ fn multi_column_fulltext_index() {
     });
 
     let expected = expect![[r#"
+        model A {
+          id    String @id @default(auto()) @map("_id") @db.ObjectId
+          age   Int
+          name  String
+          title String
 
+          @@fulltext([name, title], map: "name_\"text\"_title_\"text\"")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -309,7 +398,18 @@ fn multi_column_fulltext_composite_index() {
     });
 
     let expected = expect![[r#"
+        type CatAddress {
+          city   String
+          street String
+        }
 
+        model Cat {
+          id      String     @id @default(auto()) @map("_id") @db.ObjectId
+          address CatAddress
+          name    String
+
+          @@fulltext([address.city, address.street], map: "address.street_\"text\"_address.city_\"text\"")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -337,7 +437,14 @@ fn multi_column_fulltext_index_with_desc_in_end() {
     });
 
     let expected = expect![[r#"
+        model A {
+          id    String @id @default(auto()) @map("_id") @db.ObjectId
+          age   Int
+          name  String
+          title String
 
+          @@fulltext([name, title, age(sort: Desc)], map: "name_\"text\"_title_\"text\"_age_-1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -365,7 +472,18 @@ fn multi_column_fulltext_composite_index_with_desc_in_end() {
     });
 
     let expected = expect![[r#"
+        type CatAddress {
+          number Int
+          street String
+        }
 
+        model Cat {
+          id      String     @id @default(auto()) @map("_id") @db.ObjectId
+          address CatAddress
+          name    String
+
+          @@fulltext([address.street, name, address.number(sort: Desc)], map: "name_\"text\"_address.street_\"text\"_address.number_-1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -393,7 +511,14 @@ fn multi_column_fulltext_index_with_desc_in_beginning() {
     });
 
     let expected = expect![[r#"
+        model A {
+          id    String @id @default(auto()) @map("_id") @db.ObjectId
+          age   Int
+          name  String
+          title String
 
+          @@fulltext([age(sort: Desc), name, title], map: "age_-1_name_\"text\"_title_\"text\"")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -421,7 +546,18 @@ fn multi_column_fulltext_composite_index_with_desc_in_beginning() {
     });
 
     let expected = expect![[r#"
+        type CatAddress {
+          number Int
+          street String
+        }
 
+        model Cat {
+          id      String     @id @default(auto()) @map("_id") @db.ObjectId
+          address CatAddress
+          name    String
+
+          @@fulltext([address.number(sort: Desc), address.street, name], map: "address.number_-1_address.street_\"text\"_name_\"text\"")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -449,7 +585,14 @@ fn multi_column_fulltext_index_with_asc_in_end() {
     });
 
     let expected = expect![[r#"
+        model A {
+          id    String @id @default(auto()) @map("_id") @db.ObjectId
+          age   Int
+          name  String
+          title String
 
+          @@fulltext([name, title, age(sort: Asc)], map: "name_\"text\"_title_\"text\"_age_1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -477,7 +620,14 @@ fn multi_column_fulltext_index_with_asc_in_beginning() {
     });
 
     let expected = expect![[r#"
+        model A {
+          id    String @id @default(auto()) @map("_id") @db.ObjectId
+          age   Int
+          name  String
+          title String
 
+          @@fulltext([age(sort: Asc), name, title], map: "age_1_name_\"text\"_title_\"text\"")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -509,7 +659,15 @@ fn multi_column_fulltext_index_with_asc_in_beginning_desc_in_end() {
     });
 
     let expected = expect![[r#"
+        model A {
+          id     String @id @default(auto()) @map("_id") @db.ObjectId
+          age    Int
+          name   String
+          title  String
+          weight Int
 
+          @@fulltext([age(sort: Asc), name, title, weight(sort: Desc)], map: "long_name")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -539,7 +697,11 @@ fn fultext_index_without_preview_flag() {
     });
 
     let expected = expect![[r#"
-
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          age  Int
+          name String
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -569,7 +731,15 @@ fn fultext_composite_index_without_preview_flag() {
     });
 
     let expected = expect![[r#"
+        type CatAddress {
+          street String
+        }
 
+        model Cat {
+          id      String     @id @default(auto()) @map("_id") @db.ObjectId
+          address CatAddress
+          name    String
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -597,7 +767,13 @@ fn index_pointing_to_a_renamed_field() {
     });
 
     let expected = expect![[r#"
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          age  Int    @map("_age")
+          name String
 
+          @@index([age], map: "_age_1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -625,7 +801,17 @@ fn composite_index_pointing_to_a_renamed_field() {
     });
 
     let expected = expect![[r#"
+        type CatInfo {
+          age Int @map("_age")
+        }
 
+        model Cat {
+          id   String  @id @default(auto()) @map("_id") @db.ObjectId
+          info CatInfo
+          name String
+
+          @@index([info.age], map: "info._age_1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -656,7 +842,13 @@ fn single_column_normal_index_default_name() {
     });
 
     let expected = expect![[r#"
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          age  Int
+          name String
 
+          @@index([age])
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -687,7 +879,17 @@ fn single_column_normal_composite_index_default_name() {
     });
 
     let expected = expect![[r#"
+        type AInfo {
+          age Int
+        }
 
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          info AInfo
+          name String
+
+          @@index([info.age])
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -715,7 +917,13 @@ fn multi_column_normal_index() {
     });
 
     let expected = expect![[r#"
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          age  Int
+          name String
 
+          @@index([age, name(sort: Desc)], map: "age_1_name_-1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -743,7 +951,11 @@ fn single_column_unique_index() {
     });
 
     let expected = expect![[r#"
-
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          age  Int    @unique(map: "age_1")
+          name String
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -771,7 +983,17 @@ fn single_column_unique_composite_index() {
     });
 
     let expected = expect![[r#"
+        type CatInfo {
+          age Int
+        }
 
+        model Cat {
+          id   String  @id @default(auto()) @map("_id") @db.ObjectId
+          info CatInfo
+          name String
+
+          @@unique([info.age], map: "info.age_1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -799,7 +1021,17 @@ fn single_array_column_unique_composite_index() {
     });
 
     let expected = expect![[r#"
+        type CatInfos {
+          age Int
+        }
 
+        model Cat {
+          id    String     @id @default(auto()) @map("_id") @db.ObjectId
+          infos CatInfos[]
+          name  String
+
+          @@unique([infos.age], map: "infos.age_1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -830,7 +1062,11 @@ fn single_column_unique_index_default_name() {
     });
 
     let expected = expect![[r#"
-
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          age  Int    @unique
+          name String
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -861,7 +1097,17 @@ fn single_column_unique_composite_index_default_name() {
     });
 
     let expected = expect![[r#"
+        type CatInfo {
+          age Int
+        }
 
+        model Cat {
+          id   String  @id @default(auto()) @map("_id") @db.ObjectId
+          info CatInfo
+          name String
+
+          @@unique([info.age])
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -889,7 +1135,13 @@ fn multi_column_unique_index() {
     });
 
     let expected = expect![[r#"
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          age  Int
+          name String
 
+          @@unique([age, name(sort: Desc)], map: "age_1_name_-1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -917,7 +1169,17 @@ fn multi_column_unique_composite_index() {
     });
 
     let expected = expect![[r#"
+        type CatInfo {
+          age Int
+        }
 
+        model Cat {
+          id   String  @id @default(auto()) @map("_id") @db.ObjectId
+          info CatInfo
+          name String
+
+          @@unique([name, info.age(sort: Desc)], map: "name_1_info.age_-1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -945,7 +1207,10 @@ fn unsupported_types_in_a_unique_index() {
     });
 
     let expected = expect![[r#"
-
+        model A {
+          id   String                        @id @default(auto()) @map("_id") @db.ObjectId
+          data Unsupported("JavaScriptCode") @unique(map: "data_1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -973,12 +1238,22 @@ fn unsupported_types_in_an_index() {
     });
 
     let expected = expect![[r#"
+        model A {
+          id   String                        @id @default(auto()) @map("_id") @db.ObjectId
+          data Unsupported("JavaScriptCode")
 
+          @@index([data], map: "data_1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
 
-    let expect = expect![""];
+    let expect = expect![[r#"
+        *** WARNING ***
+
+        These fields are not supported by the Prisma Client, because Prisma currently does not support their types:
+          - Model: "A", field: "data", type: "JavaScriptCode"
+    "#]];
 
     res.expect_warnings(&expect);
 }
@@ -1008,7 +1283,11 @@ fn partial_indices_should_be_ignored() {
     });
 
     let expected = expect![[r#"
-
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          age  Int
+          name String
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -1039,7 +1318,15 @@ fn partial_composite_indices_should_be_ignored() {
     });
 
     let expected = expect![[r#"
+        type CatInfo {
+          age Int
+        }
 
+        model Cat {
+          id   String  @id @default(auto()) @map("_id") @db.ObjectId
+          info CatInfo
+          name String
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -1067,12 +1354,24 @@ fn index_pointing_to_non_existing_field_should_add_the_field() {
     });
 
     let expected = expect![[r#"
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          /// Field referred in an index, but found no data to define the type.
+          age  Json?
+          name String
 
+          @@index([age], map: "age_1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
 
-    let expect = expect![""];
+    let expect = expect![[r#"
+        *** WARNING ***
+
+        Could not determine the types for the following fields:
+          - Model: "A", field: "age"
+    "#]];
 
     res.expect_warnings(&expect);
 }
@@ -1099,12 +1398,32 @@ fn index_pointing_to_non_existing_composite_field_should_add_the_field_and_type(
     });
 
     let expected = expect![[r#"
+        type CatInfo {
+          /// Field referred in an index, but found no data to define the type.
+          age Json?
+        }
 
+        model Cat {
+          id   String   @id @default(auto()) @map("_id") @db.ObjectId
+          /// Field referred in an index, but found no data to define the type.
+          info CatInfo?
+          name String
+
+          @@index([info.age], map: "info.age_1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
 
-    let expect = expect![""];
+    let expect = expect![[r#"
+        *** WARNING ***
+
+        Could not determine the types for the following fields:
+          - Model: "Cat", field: "info"
+
+        Could not determine the types for the following fields:
+          - Composite type: "CatInfo", field: "age"
+    "#]];
 
     res.expect_warnings(&expect);
 }
@@ -1131,12 +1450,38 @@ fn deep_index_pointing_to_non_existing_composite_field_should_add_the_field_and_
     });
 
     let expected = expect![[r#"
+        type CatInfo {
+          /// Field referred in an index, but found no data to define the type.
+          specific CatInfoSpecific?
+        }
 
+        type CatInfoSpecific {
+          /// Field referred in an index, but found no data to define the type.
+          age Json?
+        }
+
+        model Cat {
+          id   String   @id @default(auto()) @map("_id") @db.ObjectId
+          /// Field referred in an index, but found no data to define the type.
+          info CatInfo?
+          name String
+
+          @@index([info.specific.age], map: "info.specific.age_1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
 
-    let expect = expect![""];
+    let expect = expect![[r#"
+        *** WARNING ***
+
+        Could not determine the types for the following fields:
+          - Model: "Cat", field: "info"
+
+        Could not determine the types for the following fields:
+          - Composite type: "CatInfo", field: "specific"
+          - Composite type: "CatInfoSpecific", field: "age"
+    "#]];
 
     res.expect_warnings(&expect);
 }
@@ -1163,12 +1508,24 @@ fn index_pointing_to_mapped_non_existing_field_should_add_the_mapped_field() {
     });
 
     let expected = expect![[r#"
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          /// Field referred in an index, but found no data to define the type.
+          age  Json?  @map("_age")
+          name String
 
+          @@index([age], map: "_age_1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
 
-    let expect = expect![""];
+    let expect = expect![[r#"
+        *** WARNING ***
+
+        Could not determine the types for the following fields:
+          - Model: "A", field: "_age"
+    "#]];
 
     res.expect_warnings(&expect);
 }
@@ -1195,12 +1552,32 @@ fn composite_index_pointing_to_mapped_non_existing_field_should_add_the_mapped_f
     });
 
     let expected = expect![[r#"
+        type AInfo {
+          /// Field referred in an index, but found no data to define the type.
+          age Json? @map("_age")
+        }
 
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          /// Field referred in an index, but found no data to define the type.
+          info AInfo?
+          name String
+
+          @@index([info.age], map: "info._age_1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
 
-    let expected = expect![""];
+    let expected = expect![[r#"
+        *** WARNING ***
+
+        Could not determine the types for the following fields:
+          - Model: "A", field: "info"
+
+        Could not determine the types for the following fields:
+          - Composite type: "AInfo", field: "_age"
+    "#]];
 
     res.expect_warnings(&expected);
 }
@@ -1227,12 +1604,27 @@ fn compound_index_pointing_to_non_existing_field_should_add_the_field() {
     });
 
     let expected = expect![[r#"
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          /// Field referred in an index, but found no data to define the type.
+          age  Json?
+          name String
+          /// Field referred in an index, but found no data to define the type.
+          play Json?
 
+          @@index([age, play], map: "age_1_play_1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
 
-    let expect = expect![""];
+    let expect = expect![[r#"
+        *** WARNING ***
+
+        Could not determine the types for the following fields:
+          - Model: "A", field: "age"
+          - Model: "A", field: "play"
+    "#]];
 
     res.expect_warnings(&expect);
 }
@@ -1259,12 +1651,29 @@ fn composite_index_with_one_existing_field_should_add_missing_stuff_only() {
     });
 
     let expected = expect![[r#"
+        type AInfo {
+          age  Int
+          /// Field referred in an index, but found no data to define the type.
+          play Json?
+        }
 
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          info AInfo
+          name String
+
+          @@index([info.age, info.play], map: "info.age_1_info.play_1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
 
-    let expect = expect![""];
+    let expect = expect![[r#"
+        *** WARNING ***
+
+        Could not determine the types for the following fields:
+          - Composite type: "AInfo", field: "play"
+    "#]];
 
     res.expect_warnings(&expect);
 }
@@ -1291,12 +1700,35 @@ fn deep_composite_index_with_one_existing_field_should_add_missing_stuff_only() 
     });
 
     let expected = expect![[r#"
+        type AInfo {
+          age     Int
+          /// Field referred in an index, but found no data to define the type.
+          special AInfoSpecial?
+        }
 
+        type AInfoSpecial {
+          /// Field referred in an index, but found no data to define the type.
+          play Json?
+        }
+
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          info AInfo
+          name String
+
+          @@index([info.age, info.special.play], map: "info.age_1_info.special.play_1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
 
-    let expect = expect![""];
+    let expect = expect![[r#"
+        *** WARNING ***
+
+        Could not determine the types for the following fields:
+          - Composite type: "AInfo", field: "special"
+          - Composite type: "AInfoSpecial", field: "play"
+    "#]];
 
     res.expect_warnings(&expect);
 }
@@ -1323,12 +1755,33 @@ fn deep_composite_index_with_one_existing_field_should_add_missing_stuff_only_2(
     });
 
     let expected = expect![[r#"
+        type AInfo {
+          special AInfoSpecial
+        }
 
+        type AInfoSpecial {
+          age  Int
+          /// Field referred in an index, but found no data to define the type.
+          play Json?
+        }
+
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          info AInfo
+          name String
+
+          @@index([info.special.age, info.special.play], map: "info.special.age_1_info.special.play_1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
 
-    let expect = expect![""];
+    let expect = expect![[r#"
+        *** WARNING ***
+
+        Could not determine the types for the following fields:
+          - Composite type: "AInfoSpecial", field: "play"
+    "#]];
 
     res.expect_warnings(&expect);
 }
@@ -1355,12 +1808,41 @@ fn deep_composite_index_should_add_missing_stuff_in_different_layers() {
     });
 
     let expected = expect![[r#"
+        type AInfo {
+          /// Field referred in an index, but found no data to define the type.
+          play    Json?
+          /// Field referred in an index, but found no data to define the type.
+          special AInfoSpecial?
+        }
 
+        type AInfoSpecial {
+          /// Field referred in an index, but found no data to define the type.
+          age Json?
+        }
+
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          /// Field referred in an index, but found no data to define the type.
+          info AInfo?
+          name String
+
+          @@index([info.special.age, info.play], map: "info.special.age_1_info.play_1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
 
-    let expect = expect![""];
+    let expect = expect![[r#"
+        *** WARNING ***
+
+        Could not determine the types for the following fields:
+          - Model: "A", field: "info"
+
+        Could not determine the types for the following fields:
+          - Composite type: "AInfo", field: "play"
+          - Composite type: "AInfo", field: "special"
+          - Composite type: "AInfoSpecial", field: "age"
+    "#]];
 
     res.expect_warnings(&expect);
 }
@@ -1387,12 +1869,25 @@ fn compound_index_with_one_existing_field_pointing_to_non_existing_field_should_
     });
 
     let expected = expect![[r#"
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          age  Int
+          name String
+          /// Field referred in an index, but found no data to define the type.
+          play Json?
 
+          @@index([age, play], map: "age_1_play_1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
 
-    let expect = expect![""];
+    let expect = expect![[r#"
+        *** WARNING ***
+
+        Could not determine the types for the following fields:
+          - Model: "A", field: "play"
+    "#]];
 
     res.expect_warnings(&expect);
 }
@@ -1419,12 +1914,22 @@ fn unique_index_pointing_to_non_existing_field_should_add_the_field() {
     });
 
     let expected = expect![[r#"
-
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          /// Field referred in an index, but found no data to define the type.
+          age  Json?  @unique(map: "age_1")
+          name String
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
 
-    let expect = expect![""];
+    let expect = expect![[r#"
+        *** WARNING ***
+
+        Could not determine the types for the following fields:
+          - Model: "A", field: "age"
+    "#]];
 
     res.expect_warnings(&expect);
 }
@@ -1451,12 +1956,22 @@ fn fulltext_index_pointing_to_non_existing_field_should_add_the_field() {
     });
 
     let expected = expect![[r#"
-
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          /// Field referred in an index, but found no data to define the type.
+          age  Json?  @unique(map: "age_1")
+          name String
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
 
-    let expect = expect![""];
+    let expect = expect![[r#"
+        *** WARNING ***
+
+        Could not determine the types for the following fields:
+          - Model: "A", field: "age"
+    "#]];
 
     res.expect_warnings(&expect);
 }
@@ -1483,7 +1998,27 @@ fn composite_type_index_without_corresponding_data_should_not_crash() {
     });
 
     let expected = expect![[r#"
+        type AFoo {
+          /// Field referred in an index, but found no data to define the type.
+          bar Json?
+          /// Field referred in an index, but found no data to define the type.
+          baz AFooBaz?
+        }
 
+        type AFooBaz {
+          /// Field referred in an index, but found no data to define the type.
+          quux Json?
+        }
+
+        model A {
+          id  String @id @default(auto()) @map("_id") @db.ObjectId
+          /// Field referred in an index, but found no data to define the type.
+          foo Json?
+
+          @@index([foo], map: "foo_1")
+          @@index([foo.bar], map: "foo.bar_1")
+          @@index([foo.baz.quux], map: "foo.baz.quux_1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
@@ -1505,7 +2040,28 @@ fn composite_type_index_with_non_composite_fields_in_the_middle_should_not_crash
     });
 
     let expected = expect![[r#"
+        type AA {
+          /// Nested objects had no data in the sample dataset to introspect a nested type.
+          /// Multiple data types found: Int: 50%, AaB: 50% out of 1 sampled entries
+          b Json
+          d AaD
+        }
 
+        type AaB {
+          /// Field referred in an index, but found no data to define the type.
+          c Json?
+        }
+
+        type AaD {
+          c Int
+        }
+
+        model A {
+          id String @id @default(auto()) @map("_id") @db.ObjectId
+          a  AA
+
+          @@index([a.b.c], map: "a.b.c_1")
+        }
     "#]];
 
     expected.assert_eq(res.datamodel());
