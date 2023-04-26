@@ -944,7 +944,7 @@ fn adding_mutual_references_on_existing_tables_works(api: TestApi) {
 
     let dm2 = r#"
         model A {
-            id Int @id
+            id Int
             name String @unique
             b_email String
             brel B @relation("AtoB", fields: [b_email], references: [email], onDelete: NoAction, onUpdate: NoAction)
@@ -952,7 +952,7 @@ fn adding_mutual_references_on_existing_tables_works(api: TestApi) {
         }
 
         model B {
-            id Int @id
+            id Int
             email String @unique
             a_name String
             arel A @relation("BtoA", fields: [a_name], references: [name], onDelete: NoAction, onUpdate: NoAction)

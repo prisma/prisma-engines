@@ -185,7 +185,8 @@ fn models_with_an_autoincrement_field_as_part_of_a_multi_field_id_can_be_created
 }
 
 // Ignoring sqlite is OK, because sqlite integer primary keys are always auto-incrementing.
-// Exclude TiDB, cannot set auto_increment through alter table, doc: https://docs.pingcap.com/tidb/dev/auto-increment#restrictions
+// Exclude TiDB, cannot set auto_increment through alter table
+// Doc: https://docs.pingcap.com/tidb/dev/auto-increment#restrictions
 #[test_connector(exclude(Sqlite, CockroachDb, TiDB))]
 fn making_an_existing_id_field_autoincrement_works(api: TestApi) {
     use quaint::ast::{Insert, Select};

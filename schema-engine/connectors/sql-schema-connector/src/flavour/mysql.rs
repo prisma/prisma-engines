@@ -51,6 +51,10 @@ impl MysqlFlavour {
         self.circumstances().contains(Circumstances::IsMysql56)
     }
 
+    pub(crate) fn is_tidb(&self) -> bool {
+        self.circumstances().contains(Circumstances::IsTiDB)
+    }
+
     pub(crate) fn lower_cases_table_names(&self) -> bool {
         self.circumstances().contains(Circumstances::LowerCasesTableNames)
     }
@@ -69,7 +73,7 @@ impl MysqlFlavour {
 
 impl SqlFlavour for MysqlFlavour {
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        with_connection(&mut self.state, |params, _, connection| async move {
+        with_connection(&mut self.state, |params, circumstances, connection| async move {
             // We do not acquire advisory locks on PlanetScale instances.
             //
             // Advisory locking is supported on vitess (docs:
@@ -78,6 +82,16 @@ impl SqlFlavour for MysqlFlavour {
             // impractical. The recommended planetscale workflow with branching should open
             // fewer chances for race conditions to happen — that's the reasoning.
             if is_planetscale(&params.connector_params.connection_string) {
+                return Ok(());
+            }
+
+            // Do not acquire advisory locks on TiDB instances.
+            //
+            // As the TiDB Docker image used for testing does not contain the underlying storage
+            // engine TiKV, frequent write conflicts may occur in mock-kv, resulting in test failure.
+            //
+            // Issue: https://github.com/pingcap/tidb/issues/35155#issuecomment-1520428765
+            if circumstances.contains(Circumstances::IsTiDB) {
                 return Ok(());
             }
 
@@ -150,7 +164,7 @@ impl SqlFlavour for MysqlFlavour {
         &self,
         datamodel: &ValidatedSchema,
     ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
-        if self.is_mysql_5_6() {
+        if self.is_mysql_5_6() | self.is_tidb() {
             let mut errors = Vec::new();
 
             check_datamodel_for_mysql_5_6(datamodel, &mut errors);
@@ -429,6 +443,7 @@ pub(crate) enum Circumstances {
     IsMysql56,
     IsMariadb,
     IsVitess,
+    IsTiDB
 }
 
 fn check_datamodel_for_mysql_5_6(datamodel: &ValidatedSchema, errors: &mut Vec<String>) {
@@ -542,6 +557,10 @@ where
 
                             if global_version.contains("MariaDB") {
                                 circumstances |= Circumstances::IsMariadb;
+                            }
+
+                            if version.contains("TiDB") {
+                                circumstances |= Circumstances::IsTiDB;
                             }
                         }
 

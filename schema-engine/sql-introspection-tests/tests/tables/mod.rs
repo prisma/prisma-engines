@@ -724,7 +724,7 @@ async fn expression_indexes_should_be_ignored_on_sqlite(api: &mut TestApi) -> Te
     Ok(())
 }
 
-// Exclude TiDB,because tidb's table names are not case sensitive.
+// Exclude TiDB, because tidb's table names are not case sensitive.
 #[test_connector(tags(Mysql), exclude(Vitess, TiDB))]
 async fn casing_should_not_lead_to_mix_ups(api: &mut TestApi) -> TestResult {
     api.barrel()
