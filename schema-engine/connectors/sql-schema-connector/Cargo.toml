@@ -4,6 +4,7 @@ name = "sql-schema-connector"
 version = "0.1.0"
 
 [features]
+default = ["mssql", "mysql", "postgresql", "sqlite"]
 vendored-openssl = ["quaint/vendored-openssl"]
 mssql = ["user-facing-errors/mssql", "sql-schema-describer/mssql", "sql-ddl/mssql"]
 mysql = ["user-facing-errors/mysql", "sql-schema-describer/mysql", "sql-ddl/mysql"]

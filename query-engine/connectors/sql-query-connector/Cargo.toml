@@ -4,6 +4,7 @@ name = "sql-query-connector"
 version = "0.1.0"
 
 [features]
+default = ["mssql", "mysql", "postgresql", "sqlite"]
 vendored-openssl = ["quaint/vendored-openssl"]
 mssql = ["user-facing-errors/mssql", "quaint/mssql"]
 mysql = ["user-facing-errors/mysql", "quaint/mysql"]

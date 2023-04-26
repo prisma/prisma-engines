@@ -26,10 +26,11 @@ url = "2.1.1"
 json-rpc-api-build = { path = "../json-rpc-api-build" }
 
 [features]
+default = ["mongodb", "postgresql", "sqlite", "mysql" ,"mssql"]
 vendored-openssl = ["sql-schema-connector/vendored-openssl"]
 sql = ["sql-schema-connector"]
 postgresql = ["sql", "sql-schema-connector/postgresql"]
 sqlite = ["sql", "sql-schema-connector/sqlite"]
 mysql = ["sql", "sql-schema-connector/mysql"]
 mssql = ["sql", "sql-schema-connector/mssql"]
-mongodb = ["sql", "mongodb-schema-connector"]
+mongodb = ["mongodb-schema-connector"]
