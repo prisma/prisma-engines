@@ -113,7 +113,12 @@ impl EngineState {
         response_receiver.await.expect("receiver boomed")
     }
 
-    async fn with_connector_for_url<O: Send + 'static>(&self, url: String, f: ConnectorRequest<O>) -> CoreResult<O> {
+    /// Executes a request with a custom connector URL
+    pub async fn with_connector_for_url<O: Send + 'static>(
+        &self,
+        url: String,
+        f: ConnectorRequest<O>,
+    ) -> CoreResult<O> {
         let (response_sender, response_receiver) = tokio::sync::oneshot::channel::<CoreResult<O>>();
         let erased: ErasedConnectorRequest = Box::new(move |connector| {
             Box::pin(async move {
