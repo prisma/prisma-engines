@@ -18,7 +18,7 @@ use tracing_futures::Instrument;
 /// `connectors`. Each connector has its own async task, and communicates with the core through
 /// channels. That ensures that each connector is handling requests one at a time to avoid
 /// synchronization issues. You can think of it in terms of the actor model.
-pub(crate) struct EngineState {
+pub struct EngineState {
     initial_datamodel: Option<psl::ValidatedSchema>,
     host: Arc<dyn ConnectorHost>,
     // A map from either:

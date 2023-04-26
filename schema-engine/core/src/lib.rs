@@ -16,7 +16,7 @@ mod rpc;
 mod state;
 mod timings;
 
-pub use self::{api::GenericApi, core_error::*, rpc::rpc_api, timings::TimingsLayer};
+pub use self::{api::GenericApi, core_error::*, rpc::rpc_api, state::EngineState, timings::TimingsLayer};
 pub use schema_connector;
 
 use enumflags2::BitFlags;
