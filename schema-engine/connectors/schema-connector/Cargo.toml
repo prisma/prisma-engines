@@ -3,6 +3,13 @@ name = "schema-connector"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+default = ["mssql", "mysql", "postgresql", "sqlite"]
+mssql = ["user-facing-errors/mssql"]
+mysql = ["user-facing-errors/mysql"]
+postgresql = ["user-facing-errors/postgresql"]
+sqlite = ["user-facing-errors/sqlite"]
+
 [dependencies]
 psl.workspace = true
 quaint.workspace = true
