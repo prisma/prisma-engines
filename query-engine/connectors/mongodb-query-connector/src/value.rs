@@ -129,7 +129,7 @@ impl IntoBson for (&MongoDbType, PrismaValue) {
     fn into_bson(self) -> crate::Result<Bson> {
         Ok(match self {
             // ObjectId
-            (MongoDbType::ObjectId, PrismaValue::String(s)) => Bson::ObjectId(ObjectId::parse_str(&s)?),
+            (MongoDbType::ObjectId, PrismaValue::String(s)) => Bson::ObjectId(ObjectId::parse_str(s)?),
             (MongoDbType::ObjectId, PrismaValue::Bytes(b)) => {
                 if b.len() != 12 {
                     return Err(MongoError::MalformedObjectId(format!(
