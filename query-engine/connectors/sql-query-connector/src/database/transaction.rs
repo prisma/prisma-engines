@@ -147,17 +147,11 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         args: WriteArgs,
         trace_id: Option<String>,
     ) -> connector::Result<SelectionResult> {
-        // this could be simplified by cfg-ing the trait itself
-        #[cfg(any(feature = "postgresql", feature = "mssql", feature = "sqlite"))]
-        {
-            catch(self.connection_info.clone(), async move {
-                let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-                write::create_record(&self.inner, &self.connection_info.sql_family(), model, args, &ctx).await
-            })
-            .await
-        }
-        #[cfg(not(any(feature = "postgresql", feature = "mssql", feature = "sqlite")))]
-        unreachable!()
+        catch(self.connection_info.clone(), async move {
+            let ctx = Context::new(&self.connection_info, trace_id.as_deref());
+            write::create_record(&self.inner, &self.connection_info.sql_family(), model, args, &ctx).await
+        })
+        .await
     }
 
     async fn create_records(

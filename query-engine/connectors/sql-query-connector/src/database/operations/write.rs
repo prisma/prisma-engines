@@ -64,7 +64,6 @@ async fn generate_id(
 
 /// Create a single record to the database defined in `conn`, resulting into a
 /// `RecordProjection` as an identifier pointing to the just-created record.
-#[cfg(any(feature = "postgresql", feature = "mssql", feature = "sqlite"))]
 pub(crate) async fn create_record(
     conn: &dyn QueryExt,
     sql_family: &SqlFamily,
