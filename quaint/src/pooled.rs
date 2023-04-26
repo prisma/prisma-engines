@@ -159,8 +159,6 @@ use crate::{
 use mobc::Pool;
 use std::{sync::Arc, time::Duration};
 
-#[cfg(feature = "postgresql")]
-use crate::connector::PostgresFlavour;
 #[cfg(feature = "sqlite")]
 use std::convert::TryFrom;
 
@@ -305,7 +303,7 @@ impl Builder {
     ///
     /// - Defaults to `PostgresFlavour::Unknown`.
     #[cfg(feature = "postgresql")]
-    pub fn set_postgres_flavour(&mut self, flavour: PostgresFlavour) {
+    pub fn set_postgres_flavour(&mut self, flavour: crate::connector::PostgresFlavour) {
         if let ConnectionInfo::Postgres(ref mut url) = self.connection_info {
             url.set_flavour(flavour);
         }
