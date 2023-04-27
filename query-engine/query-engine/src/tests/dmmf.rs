@@ -9,8 +9,7 @@ use std::sync::Arc;
 
 pub fn get_query_schema(datamodel_string: &str) -> QuerySchema {
     let dm = psl::parse_schema(datamodel_string).unwrap();
-    let internal_ref = prisma_models::convert(Arc::new(dm));
-    schema::build(internal_ref, false)
+    schema::build(Arc::new(dm), false)
 }
 
 // Tests in this file run serially because the function `get_query_schema` depends on setting an env var.
