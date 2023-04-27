@@ -45,12 +45,9 @@ impl PrismaContext {
         let arced_schema_2 = Arc::clone(&arced_schema);
 
         let query_schema_fut = tokio::runtime::Handle::current().spawn_blocking(move || {
-            // Build internal data model
-            let internal_data_model = prisma_models::convert(arced_schema);
-
             // Construct query schema
             Arc::new(schema::build(
-                internal_data_model,
+                arced_schema,
                 enabled_features.contains(Feature::RawQueries),
             ))
         });

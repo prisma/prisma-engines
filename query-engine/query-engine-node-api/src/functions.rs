@@ -27,8 +27,7 @@ pub fn dmmf(datamodel_string: String) -> napi::Result<String> {
         .to_result()
         .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
 
-    let internal_data_model = prisma_models::convert(Arc::new(schema));
-    let query_schema = query_core::schema::build(internal_data_model, true);
+    let query_schema = query_core::schema::build(Arc::new(schema), true);
     let dmmf = dmmf::render_dmmf(&query_schema);
 
     Ok(serde_json::to_string(&dmmf)?)
