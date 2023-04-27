@@ -1,6 +1,6 @@
 use crate::introspection_pair::ViewPair;
 use schema_connector::{
-    warnings::{self as generators, WriteOnlyVec},
+    warnings::{self as generators},
     Warnings,
 };
 

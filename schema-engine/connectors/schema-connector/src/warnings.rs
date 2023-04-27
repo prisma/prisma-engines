@@ -11,41 +11,16 @@ trait Groupable<K, V> {
     fn fmt_group(&self, f: &mut fmt::Formatter<'_>, key: &K, value: &[&V]) -> fmt::Result;
 }
 
-/// Basic wrapper around a Vec<T>.
-pub trait WriteOnlyVec<T> {
-    /// Appends an element to the back of a collection.
-    fn push(&mut self, item: T);
-
-    /// Returns `true` if the vector contains no elements.
-    fn is_empty(&self) -> bool;
-}
-
 /// A group of warnings that can be grouped by a key, which depends on the concretely
 /// instantiated type T.
 #[derive(Debug, PartialEq)]
-pub struct GroupBy<T>(Vec<T>);
+pub struct GroupBy<'a, T>(&'a Vec<T>);
 
-impl<T> Default for GroupBy<T> {
-    fn default() -> Self {
-        Self(Vec::new())
-    }
-}
-
-impl<T> WriteOnlyVec<T> for GroupBy<T> {
-    fn push(&mut self, value: T) {
-        self.0.push(value)
-    }
-
-    fn is_empty(&self) -> bool {
-        self.0.is_empty()
-    }
-}
-
-impl Groupable<String, ModelAndField> for GroupBy<ModelAndField> {
+impl Groupable<String, ModelAndField> for GroupBy<'_, ModelAndField> {
     fn group_by(&self) -> BTreeMap<String, Vec<&ModelAndField>> {
         let mut result: BTreeMap<String, Vec<&ModelAndField>> = BTreeMap::new();
 
-        for item in &self.0 {
+        for item in self.0 {
             result.entry(item.model.clone()).or_default().push(item);
         }
 
@@ -67,11 +42,11 @@ impl Groupable<String, ModelAndField> for GroupBy<ModelAndField> {
     }
 }
 
-impl Groupable<String, ViewAndField> for GroupBy<ViewAndField> {
+impl Groupable<String, ViewAndField> for GroupBy<'_, ViewAndField> {
     fn group_by(&self) -> BTreeMap<String, Vec<&ViewAndField>> {
         let mut result: BTreeMap<String, Vec<&ViewAndField>> = BTreeMap::new();
 
-        for item in &self.0 {
+        for item in self.0 {
             result.entry(item.view.clone()).or_default().push(item);
         }
 
@@ -93,11 +68,11 @@ impl Groupable<String, ViewAndField> for GroupBy<ViewAndField> {
     }
 }
 
-impl Groupable<String, TypeAndField> for GroupBy<TypeAndField> {
+impl Groupable<String, TypeAndField> for GroupBy<'_, TypeAndField> {
     fn group_by(&self) -> BTreeMap<String, Vec<&TypeAndField>> {
         let mut result: BTreeMap<String, Vec<&TypeAndField>> = BTreeMap::new();
 
-        for item in &self.0 {
+        for item in self.0 {
             result.entry(item.composite_type.clone()).or_default().push(item);
         }
 
@@ -129,11 +104,11 @@ pub struct Warnings {
     /// Fields that are using Prisma 1 CUID defaults.
     pub prisma_1_cuid_defaults: Vec<ModelAndField>,
     /// Fields having an empty name.
-    pub fields_with_empty_names_in_model: GroupBy<ModelAndField>,
+    pub fields_with_empty_names_in_model: Vec<ModelAndField>,
     /// Fields having an empty name.
-    pub fields_with_empty_names_in_view: GroupBy<ViewAndField>,
+    pub fields_with_empty_names_in_view: Vec<ViewAndField>,
     /// Fields having an empty name.
-    pub fields_with_empty_names_in_type: GroupBy<TypeAndField>,
+    pub fields_with_empty_names_in_type: Vec<TypeAndField>,
     /// Field names in models we remapped during introspection.
     pub remapped_fields_in_model: Vec<ModelAndField>,
     /// Field names in views we remapped during introspection.
@@ -239,16 +214,17 @@ impl fmt::Display for Warnings {
             Ok(())
         }
 
-        fn render_warnings_grouped<T, G>(msg: &str, items: &G, f: &mut fmt::Formatter<'_>) -> fmt::Result
+        fn render_warnings_grouped<'a, T>(msg: &str, items: &'a Vec<T>, f: &mut fmt::Formatter<'_>) -> fmt::Result
         where
             T: fmt::Display,
-            G: WriteOnlyVec<T> + Groupable<String, T>,
+            GroupBy<'a, T>: Groupable<String, T>,
         {
             if !items.is_empty() {
                 writeln!(f)?;
                 f.write_str(msg)?;
                 writeln!(f)?;
 
+                let items = GroupBy(items);
                 let grouped = items.group_by();
                 for (key, value) in grouped {
                     write!(f, "  - ")?;
