@@ -7,7 +7,7 @@ version = "0.1.0"
 default = ["sql", "mongodb"]
 mongodb = ["mongodb-connector"]
 sql = ["sql-connector"]
-vendored-openssl = ["quaint/vendored-openssl"]
+vendored-openssl = ["sql-connector/vendored-openssl"]
 
 [dependencies]
 tokio.workspace = true
