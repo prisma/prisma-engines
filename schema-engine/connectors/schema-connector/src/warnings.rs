@@ -6,9 +6,6 @@ trait Groupable<K, V> {
     /// Groups the items in the collection by a key, specified by the concrete implementation.
     /// For any key, the value is a **non-empty** vector.
     fn group_by(&self) -> BTreeMap<K, Vec<&V>>;
-
-    /// Formats the grouped items in a compact, human-readable way.
-    fn fmt_group(&self, f: &mut fmt::Formatter<'_>, key: &K, value: &[&V]) -> fmt::Result;
 }
 
 /// A group of warnings that can be grouped by a key, which depends on the concretely
@@ -26,17 +23,29 @@ impl Groupable<String, ModelAndField> for GroupBy<'_, ModelAndField> {
 
         result
     }
+}
 
-    fn fmt_group(&self, f: &mut fmt::Formatter<'_>, model: &String, vec: &[&ModelAndField]) -> fmt::Result {
-        write!(f, r#"Model: "{}""#, &model)?;
-        write!(f, ", field(s): [")?;
+fn fmt_group_model_and_field(f: &mut fmt::Formatter<'_>, model: &String, vec: &[&ModelAndField]) -> fmt::Result {
+    write!(f, r#"Model: "{}""#, &model)?;
+    write!(f, ", field(s): [")?;
 
-        let (last, vec_but_last) = vec.split_last().unwrap();
-        for entry in vec_but_last {
-            write!(f, r#""{}", "#, entry.field)?;
+    let (last, vec_but_last) = vec.split_last().unwrap();
+    for entry in vec_but_last {
+        write!(f, r#""{}", "#, entry.field)?;
+    }
+
+    writeln!(f, r#""{}"]"#, last.field)?;
+
+    Ok(())
+}
+
+impl fmt::Display for GroupBy<'_, ModelAndField> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let grouped = self.group_by();
+        for (key, value) in grouped {
+            write!(f, "  - ")?;
+            fmt_group_model_and_field(f, &key, &value)?;
         }
-
-        writeln!(f, r#""{}"]"#, last.field)?;
 
         Ok(())
     }
@@ -52,17 +61,29 @@ impl Groupable<String, ViewAndField> for GroupBy<'_, ViewAndField> {
 
         result
     }
+}
 
-    fn fmt_group(&self, f: &mut fmt::Formatter<'_>, view: &String, vec: &[&ViewAndField]) -> fmt::Result {
-        write!(f, r#"View: "{}""#, &view)?;
-        write!(f, ", field(s): [")?;
+fn fmt_group_view_and_field(f: &mut fmt::Formatter<'_>, view: &String, vec: &[&ViewAndField]) -> fmt::Result {
+    write!(f, r#"View: "{}""#, &view)?;
+    write!(f, ", field(s): [")?;
 
-        let (last, vec_but_last) = vec.split_last().unwrap();
-        for entry in vec_but_last {
-            write!(f, r#""{}", "#, entry.field)?;
+    let (last, vec_but_last) = vec.split_last().unwrap();
+    for entry in vec_but_last {
+        write!(f, r#""{}", "#, entry.field)?;
+    }
+
+    writeln!(f, r#""{}"]"#, last.field)?;
+
+    Ok(())
+}
+
+impl fmt::Display for GroupBy<'_, ViewAndField> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let grouped = self.group_by();
+        for (key, value) in grouped {
+            write!(f, "  - ")?;
+            fmt_group_view_and_field(f, &key, &value)?;
         }
-
-        writeln!(f, r#""{}"]"#, last.field)?;
 
         Ok(())
     }
@@ -78,17 +99,29 @@ impl Groupable<String, TypeAndField> for GroupBy<'_, TypeAndField> {
 
         result
     }
+}
 
-    fn fmt_group(&self, f: &mut fmt::Formatter<'_>, r#type: &String, vec: &[&TypeAndField]) -> fmt::Result {
-        write!(f, r#"Composite type: "{}""#, &r#type)?;
-        write!(f, ", field(s): [")?;
+fn fmt_group_type_and_field(f: &mut fmt::Formatter<'_>, r#type: &String, vec: &[&TypeAndField]) -> fmt::Result {
+    write!(f, r#"Composite type: "{}""#, &r#type)?;
+    write!(f, ", field(s): [")?;
 
-        let (last, vec_but_last) = vec.split_last().unwrap();
-        for entry in vec_but_last {
-            write!(f, r#""{}", "#, entry.field)?;
+    let (last, vec_but_last) = vec.split_last().unwrap();
+    for entry in vec_but_last {
+        write!(f, r#""{}", "#, entry.field)?;
+    }
+
+    writeln!(f, r#""{}"]"#, last.field)?;
+
+    Ok(())
+}
+
+impl fmt::Display for GroupBy<'_, TypeAndField> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let grouped = self.group_by();
+        for (key, value) in grouped {
+            write!(f, "  - ")?;
+            fmt_group_type_and_field(f, &key, &value)?;
         }
-
-        writeln!(f, r#""{}"]"#, last.field)?;
 
         Ok(())
     }
@@ -217,7 +250,7 @@ impl fmt::Display for Warnings {
         fn render_warnings_grouped<'a, T>(msg: &str, items: &'a Vec<T>, f: &mut fmt::Formatter<'_>) -> fmt::Result
         where
             T: fmt::Display,
-            GroupBy<'a, T>: Groupable<String, T>,
+            GroupBy<'a, T>: Groupable<String, T> + fmt::Display,
         {
             if !items.is_empty() {
                 writeln!(f)?;
@@ -225,11 +258,7 @@ impl fmt::Display for Warnings {
                 writeln!(f)?;
 
                 let items = GroupBy(items);
-                let grouped = items.group_by();
-                for (key, value) in grouped {
-                    write!(f, "  - ")?;
-                    items.fmt_group(f, &key, &value)?;
-                }
+                write!(f, "{}", items)?;
             }
 
             Ok(())
