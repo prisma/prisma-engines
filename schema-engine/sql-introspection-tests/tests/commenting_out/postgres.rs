@@ -74,7 +74,7 @@ async fn fields_we_cannot_sanitize_are_commented_out_and_warned(api: &mut TestAp
         *** WARNING ***
 
         These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:
-          - Model: "Test", field: "12"
+          - Model: "Test", field(s): ["12"]
     "#]];
 
     api.expect_warnings(&expected).await;
@@ -101,7 +101,7 @@ async fn unsupported_type_keeps_its_usages(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These fields are not supported by the Prisma Client, because Prisma currently does not support their types:
-          - Model: "Test", field: "broken", type: "macaddr"
+          - Model: "Test", field: "broken", original data type: "macaddr"
     "#]];
 
     api.expect_warnings(&expected).await;
@@ -153,7 +153,7 @@ async fn a_table_with_only_an_unsupported_id(api: &mut TestApi) -> TestResult {
           - "Test"
 
         These fields are not supported by the Prisma Client, because Prisma currently does not support their types:
-          - Model: "Test", field: "network_mac", type: "macaddr"
+          - Model: "Test", field: "network_mac", original data type: "macaddr"
     "#]];
 
     api.expect_warnings(&expected).await;
