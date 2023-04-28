@@ -4,12 +4,11 @@ name = "sql-query-connector"
 version = "0.1.0"
 
 [features]
-default = ["mssql", "mysql", "postgresql", "sqlite"]
 vendored-openssl = ["quaint/vendored-openssl"]
-mssql = ["user-facing-errors/mssql", "quaint/mssql"]
-mysql = ["user-facing-errors/mysql", "quaint/mysql"]
-postgresql = ["user-facing-errors/postgresql", "quaint/postgresql"]
-sqlite = ["user-facing-errors/sqlite", "quaint/sqlite"]
+mssql = ["user-facing-errors/mssql"]
+mysql = ["user-facing-errors/mysql"]
+postgresql = ["user-facing-errors/postgresql"]
+sqlite = ["user-facing-errors/sqlite"]
 
 [dependencies]
 psl.workspace = true

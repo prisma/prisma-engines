@@ -29,7 +29,6 @@ insta = "1.7.1"
 schema = { path = "../schema" }
 
 [features]
-default = ["mongodb", "mssql", "mysql", "postgresql", "sqlite"]
 mongodb = ["mongodb-query-connector"]
 sql = ["sql-query-connector"]
 mssql = ["sql", "sql-query-connector/mssql"]

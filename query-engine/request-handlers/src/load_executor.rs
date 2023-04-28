@@ -1,12 +1,13 @@
 use psl::{builtin_connectors::*, Datasource, PreviewFeatures};
 use query_core::{executor::InterpretingExecutor, Connector, QueryExecutor};
-use sql_query_connector::*;
 use std::collections::HashMap;
 use tracing::trace;
 use url::Url;
 
 #[cfg(feature = "mongodb")]
 use mongodb_query_connector::MongoDb;
+#[cfg(feature = "sql")]
+use sql_query_connector::*;
 
 /// Loads a query executor based on the parsed Prisma schema (datasource).
 pub async fn load(

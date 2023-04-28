@@ -4,7 +4,6 @@ name = "sql-schema-describer"
 version = "0.1.0"
 
 [features]
-default = ["mssql", "mysql", "postgresql", "sqlite"]
 mssql = ["quaint/mssql"]
 mysql = ["quaint/mysql"]
 postgresql = ["quaint/postgresql"]
