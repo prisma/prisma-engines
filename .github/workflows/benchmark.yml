@@ -4,9 +4,8 @@ on:
     branches:
       - main
   pull_request:
-    # skip this CI workflow for integration PRs
     branches-ignore:
-      - 'integration/**'
+      - 'integration/**/*' # skip this CI workflow for any PR targeting an integration branch
     paths-ignore:
       - '.buildkite/**'
       - '*.md'
