@@ -571,7 +571,6 @@ name = "core-tests"
 version = "0.1.0"
 dependencies = [
  "dissimilar",
- "prisma-models",
  "psl",
  "query-core",
  "request-handlers",
@@ -2862,6 +2861,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "postgres"
+version = "0.19.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "960c214283ef8f0027974c03e9014517ced5db12f021a9abb66185a5751fab0a"
+dependencies = [
+ "bytes",
+ "fallible-iterator",
+ "futures-util",
+ "log",
+ "tokio",
+ "tokio-postgres 0.7.7 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "postgres-native-tls"
 version = "0.5.0"
 source = "git+https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#00d4815e58859261bdfca71c75be7dc657303f7d"
@@ -2869,7 +2882,7 @@ dependencies = [
  "native-tls",
  "tokio",
  "tokio-native-tls",
- "tokio-postgres",
+ "tokio-postgres 0.7.7 (git+https://github.com/prisma/rust-postgres?branch=pgbouncer-mode)",
 ]
 
 [[package]]
@@ -2890,6 +2903,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "postgres-protocol"
+version = "0.6.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "78b7fa9f396f51dffd61546fd8573ee20592287996568e6175ceb0f8699ad75d"
+dependencies = [
+ "base64 0.21.0",
+ "byteorder",
+ "bytes",
+ "fallible-iterator",
+ "hmac",
+ "md-5",
+ "memchr",
+ "rand 0.8.5",
+ "sha2 0.10.5",
+ "stringprep",
+]
+
+[[package]]
 name = "postgres-types"
 version = "0.2.4"
 source = "git+https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#00d4815e58859261bdfca71c75be7dc657303f7d"
@@ -2898,10 +2929,21 @@ dependencies = [
  "bytes",
  "chrono",
  "fallible-iterator",
- "postgres-protocol",
+ "postgres-protocol 0.6.4",
  "serde",
  "serde_json",
  "uuid 1.1.2",
+]
+
+[[package]]
+name = "postgres-types"
+version = "0.2.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f028f05971fe20f512bcc679e2c10227e57809a3af86a7606304435bc8896cd6"
+dependencies = [
+ "bytes",
+ "fallible-iterator",
+ "postgres-protocol 0.6.5",
 ]
 
 [[package]]
@@ -3163,14 +3205,14 @@ dependencies = [
  "num_cpus",
  "percent-encoding",
  "postgres-native-tls",
- "postgres-types",
+ "postgres-types 0.2.4",
  "rusqlite",
  "serde_json",
  "sqlformat",
  "thiserror",
  "tiberius",
  "tokio",
- "tokio-postgres",
+ "tokio-postgres 0.7.7 (git+https://github.com/prisma/rust-postgres?branch=pgbouncer-mode)",
  "tokio-util 0.6.10",
  "tracing",
  "tracing-core",
@@ -3263,7 +3305,6 @@ dependencies = [
  "mongodb-query-connector",
  "opentelemetry",
  "opentelemetry-otlp",
- "prisma-models",
  "psl",
  "quaint",
  "query-connector",
@@ -4272,8 +4313,10 @@ dependencies = [
  "cuid",
  "futures",
  "itertools",
+ "mysql_async",
  "once_cell",
  "opentelemetry",
+ "postgres",
  "prisma-models",
  "prisma-value",
  "psl",
@@ -4284,6 +4327,7 @@ dependencies = [
  "serde_json",
  "thiserror",
  "tokio",
+ "tokio-postgres 0.7.7 (registry+https://github.com/rust-lang/crates.io-index)",
  "tracing",
  "tracing-futures",
  "tracing-opentelemetry",
@@ -4729,6 +4773,30 @@ dependencies = [
 [[package]]
 name = "tokio-postgres"
 version = "0.7.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "29a12c1b3e0704ae7dfc25562629798b29c72e6b1d0a681b6f29ab4ae5e7f7bf"
+dependencies = [
+ "async-trait",
+ "byteorder",
+ "bytes",
+ "fallible-iterator",
+ "futures-channel",
+ "futures-util",
+ "log",
+ "parking_lot 0.12.1",
+ "percent-encoding",
+ "phf",
+ "pin-project-lite",
+ "postgres-protocol 0.6.5",
+ "postgres-types 0.2.5",
+ "socket2",
+ "tokio",
+ "tokio-util 0.7.3",
+]
+
+[[package]]
+name = "tokio-postgres"
+version = "0.7.7"
 source = "git+https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#00d4815e58859261bdfca71c75be7dc657303f7d"
 dependencies = [
  "async-trait",
@@ -4742,8 +4810,8 @@ dependencies = [
  "percent-encoding",
  "phf",
  "pin-project-lite",
- "postgres-protocol",
- "postgres-types",
+ "postgres-protocol 0.6.4",
+ "postgres-types 0.2.4",
  "socket2",
  "tokio",
  "tokio-util 0.7.3",

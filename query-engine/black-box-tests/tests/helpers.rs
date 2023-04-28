@@ -47,7 +47,7 @@ pub(crate) fn query_engine_cmd(dml: &str, port: &str) -> process::Command {
 pub(crate) fn query_engine_bin_path() -> path::PathBuf {
     let name = "query-engine";
     let env_var = format!("CARGO_BIN_EXE_{}", name);
-    std::env::var_os(&env_var)
+    std::env::var_os(env_var)
         .map(|p| p.into())
         .unwrap_or_else(|| target_dir().join(format!("{}{}", name, env::consts::EXE_SUFFIX)))
 }

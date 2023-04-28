@@ -1,10 +1,10 @@
 use super::*;
 
-pub struct DmmfSchemaRenderer {
-    query_schema: QuerySchemaRef,
+pub(crate) struct DmmfSchemaRenderer<'a> {
+    query_schema: &'a QuerySchema,
 }
 
-impl Renderer for DmmfSchemaRenderer {
+impl<'a> Renderer for DmmfSchemaRenderer<'a> {
     fn render(&self, ctx: &mut RenderContext) {
         // This ensures that all enums are rendered, even if not reached by the output and input types.
         render_enum_types(ctx, self.query_schema.enum_types());
@@ -13,8 +13,8 @@ impl Renderer for DmmfSchemaRenderer {
     }
 }
 
-impl DmmfSchemaRenderer {
-    pub fn new(query_schema: QuerySchemaRef) -> DmmfSchemaRenderer {
+impl<'a> DmmfSchemaRenderer<'a> {
+    pub(crate) fn new(query_schema: &'a QuerySchema) -> DmmfSchemaRenderer<'a> {
         DmmfSchemaRenderer { query_schema }
     }
 }

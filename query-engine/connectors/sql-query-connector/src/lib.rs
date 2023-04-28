@@ -1,9 +1,4 @@
-#![allow(
-    clippy::wrong_self_convention,
-    clippy::branches_sharing_code,
-    clippy::needless_borrow,
-    clippy::needless_collect
-)]
+#![allow(clippy::wrong_self_convention)]
 #![deny(unsafe_code)]
 
 mod column_metadata;

@@ -1,4 +1,4 @@
-#![allow(clippy::wrong_self_convention, clippy::upper_case_acronyms, clippy::needless_borrow)]
+#![allow(clippy::upper_case_acronyms)]
 
 #[macro_use]
 extern crate tracing;

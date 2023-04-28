@@ -7,9 +7,9 @@ set -e
 cd "$(dirname "$0")/.."
 
 rust_version=$(rustc --version | cut -d ' ' -f 2)
-CMD="docker build -t prisma-engines-profile:latest --build-arg RUST_VERSION=$rust_version -f script/.profile/Dockerfile ."
-echo "==> Running command: $CMD"
-eval "$CMD"
-CMD="docker run -it -v $PWD:/rustrepo -v $HOME/.cargo:/.cargo -w /rustrepo prisma-engines-profile:latest $*"
-echo "==> Running command: $CMD"
-exec $CMD
+DOCKER_CMD="docker build -t prisma-engines-profile:latest --build-arg RUST_VERSION=$rust_version -f script/.profile-shell/Dockerfile ."
+echo "==> Running command: $DOCKER_CMD"
+eval "$DOCKER_CMD"
+DOCKER_CMD="docker run -it --rm -v $PWD:/prisma-engines -v $HOME/.cargo:/.cargo -w /prisma-engines prisma-engines-profile:latest"
+echo "==> Running command: $DOCKER_CMD"
+exec $DOCKER_CMD

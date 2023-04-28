@@ -137,16 +137,17 @@ impl<'a> BuilderContext<'a> {
     }
 }
 
-pub fn build(internal_data_model: InternalDataModel, enable_raw_queries: bool) -> QuerySchema {
-    let preview_features = internal_data_model.schema.configuration.preview_features();
-    build_with_features(internal_data_model, preview_features, enable_raw_queries)
+pub fn build(schema: Arc<psl::ValidatedSchema>, enable_raw_queries: bool) -> QuerySchema {
+    let preview_features = schema.configuration.preview_features();
+    build_with_features(schema, preview_features, enable_raw_queries)
 }
 
 pub fn build_with_features(
-    internal_data_model: InternalDataModel,
+    schema: Arc<psl::ValidatedSchema>,
     preview_features: PreviewFeatures,
     enable_raw_queries: bool,
 ) -> QuerySchema {
+    let internal_data_model = prisma_models::convert(schema);
     let mut ctx = BuilderContext::new(&internal_data_model, enable_raw_queries, preview_features);
 
     output_types::objects::initialize_caches(&mut ctx);
