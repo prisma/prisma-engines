@@ -29,7 +29,14 @@ pub async fn listen(cx: Arc<PrismaContext>, opts: &PrismaOpt) -> PrismaResult<()
 
     let server = Server::bind(&addr).tcp_nodelay(true).serve(query_engine);
 
-    info!("Started query engine http server on http://{}", addr);
+    // Note: we call `server.local_addr()` instead of reusing original `addr` because it may contain port 0 to request
+    // the OS to assign a free port automatically, and we want to print the address which is actually in use.
+    info!(
+        ip = %server.local_addr().ip(),
+        port = %server.local_addr().port(),
+        "Started query engine http server on http://{}",
+        server.local_addr()
+    );
 
     if let Err(e) = server.await {
         eprintln!("server error: {e}");
