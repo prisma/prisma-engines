@@ -718,7 +718,7 @@ impl QueryDocumentParser {
             .map(|(field_name, value)| {
                 let field = schema_object.find_field(field_name.as_str()).ok_or_else(|| {
                     ValidationError::unknown_input_field(
-                        selection_path.add(field_name.clone()).segments(),
+                        selection_path.segments(),
                         argument_path.add(field_name.clone()).segments(),
                         conversions::schema_input_object_type_to_input_type_description(schema_object, query_schema),
                     )

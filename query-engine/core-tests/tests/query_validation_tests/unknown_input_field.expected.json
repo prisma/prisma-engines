@@ -1,6 +1,6 @@
 {
   "is_panic": false,
-  "message": "`findManyUser.foo`: Field does not exist in enclosing type.",
+  "message": "`findManyUser.where.foo`: Field does not exist in enclosing type.",
   "meta": {
     "kind": "UnknownInputField",
     "inputType": {
@@ -62,8 +62,7 @@
       "foo"
     ],
     "selectionPath": [
-      "findManyUser",
-      "foo"
+      "findManyUser"
     ]
   },
   "error_code": "P2009"
