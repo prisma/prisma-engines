@@ -58,11 +58,6 @@ async fn aragon_test_postgres(api: &mut TestApi) -> TestResult {
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn noalyss_folder_test_postgres(api: &mut TestApi) -> TestResult {
     let raw_sql = indoc! {r#"
-        CREATE TABLE todo_list (
-            tl_id BIGSERIAL PRIMARY KEY,
-            is_public CHAR(1) NOT NULL DEFAULT 'N' CHECK (is_public IN ('Y', 'N'))
-        );
-    
         CREATE TABLE user_active_security (
             id BIGSERIAL NOT NULL,
             us_login TEXT NOT NULL,
@@ -80,7 +75,12 @@ async fn noalyss_folder_test_postgres(api: &mut TestApi) -> TestResult {
         CREATE TABLE user_sec_action_profile (
           ua_id BIGSERIAL PRIMARY KEY,
           ua_right CHAR(1) CHECK (ua_right IN ('R', 'W'))
-        );        
+        );
+
+        CREATE TABLE todo_list (
+          tl_id BIGSERIAL PRIMARY KEY,
+          is_public CHAR(1) NOT NULL DEFAULT 'N' CHECK (is_public IN ('Y', 'N'))
+      );
     "#};
 
     api.raw_cmd(raw_sql).await;

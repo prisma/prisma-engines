@@ -58,12 +58,6 @@ async fn aragon_test_cockroachdb(api: &mut TestApi) -> TestResult {
 #[test_connector(tags(CockroachDb))]
 async fn noalyss_folder_test_cockroachdb(api: &mut TestApi) -> TestResult {
     let raw_sql = indoc! {r#"
-        CREATE TABLE todo_list (
-          tl_id BIGSERIAL PRIMARY KEY,
-          is_public CHAR(1) NOT NULL DEFAULT 'N',
-          CONSTRAINT ck_is_public CHECK (is_public = ANY ARRAY['Y':::STRING::CHAR, 'N':::STRING::CHAR]:::CHAR[])
-        );
-
         CREATE TABLE user_active_security (
             id BIGSERIAL NOT NULL,
             us_login STRING NOT NULL,
@@ -82,6 +76,12 @@ async fn noalyss_folder_test_cockroachdb(api: &mut TestApi) -> TestResult {
           ua_id BIGSERIAL PRIMARY KEY,
           ua_right CHAR NULL,
           CONSTRAINT user_sec_action_profile_ua_right_check CHECK (ua_right = ANY ARRAY['R':::STRING::CHAR, 'W':::STRING::CHAR]:::CHAR[])
+        );
+
+        CREATE TABLE todo_list (
+          tl_id BIGSERIAL PRIMARY KEY,
+          is_public CHAR(1) NOT NULL DEFAULT 'N',
+          CONSTRAINT ck_is_public CHECK (is_public = ANY ARRAY['Y':::STRING::CHAR, 'N':::STRING::CHAR]:::CHAR[])
         );
     "#};
 
