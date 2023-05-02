@@ -13,4 +13,4 @@ JOIN pg_namespace AS schemainfo
 	ON schemainfo.oid = tableinfo.relnamespace
 WHERE schemainfo.nspname = ANY ( $1 )
 	AND contype NOT IN ('p', 'u', 'f')
-ORDER BY constr.contype;
+ORDER BY namespace, table_name, constr.contype, constraint_name;
