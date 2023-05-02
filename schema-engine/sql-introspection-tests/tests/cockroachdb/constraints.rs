@@ -58,10 +58,14 @@ async fn aragon_test_cockroachdb(api: &mut TestApi) -> TestResult {
 #[test_connector(tags(CockroachDb))]
 async fn noalyss_folder_test_cockroachdb(api: &mut TestApi) -> TestResult {
     let raw_sql = indoc! {r#"
-        CREATE SEQUENCE user_active_security_id_seq MINVALUE 1 MAXVALUE 2147483647 INCREMENT 1 START 1;
+        CREATE TABLE todo_list (
+          tl_id BIGSERIAL PRIMARY KEY,
+          is_public CHAR(1) NOT NULL DEFAULT 'N',
+          CONSTRAINT ck_is_public CHECK (is_public = ANY ARRAY['Y':::STRING::CHAR, 'N':::STRING::CHAR]:::CHAR[])
+        );
 
         CREATE TABLE user_active_security (
-            id INT8 NOT NULL DEFAULT nextval('user_active_security_id_seq'::REGCLASS),
+            id BIGSERIAL NOT NULL,
             us_login STRING NOT NULL,
             us_ledger VARCHAR(1) NOT NULL,
             us_action VARCHAR(1) NOT NULL,
@@ -73,6 +77,12 @@ async fn noalyss_folder_test_cockroachdb(api: &mut TestApi) -> TestResult {
         COMMENT ON COLUMN user_active_security.us_login IS e'user\'s login';
         COMMENT ON COLUMN user_active_security.us_ledger IS 'Flag Security for ledger';
         COMMENT ON COLUMN user_active_security.us_action IS 'Security for action';
+
+        CREATE TABLE user_sec_action_profile (
+          ua_id BIGSERIAL PRIMARY KEY,
+          ua_right CHAR NULL,
+          CONSTRAINT user_sec_action_profile_ua_right_check CHECK (ua_right = ANY ARRAY['R':::STRING::CHAR, 'W':::STRING::CHAR]:::CHAR[])
+        );
     "#};
 
     api.raw_cmd(raw_sql).await;
@@ -88,12 +98,24 @@ async fn noalyss_folder_test_cockroachdb(api: &mut TestApi) -> TestResult {
         }
 
         /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.
+        model todo_list {
+          tl_id     BigInt @id @default(autoincrement())
+          is_public String @default("N") @db.Char(1)
+        }
+
+        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.
         /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
         model user_active_security {
-          id        BigInt @id(map: "user_active_security_pk") @default(sequence(maxValue: 2147483647))
+          id        BigInt @id(map: "user_active_security_pk") @default(autoincrement())
           us_login  String
           us_ledger String @db.String(1)
           us_action String @db.String(1)
+        }
+
+        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.
+        model user_sec_action_profile {
+          ua_id    BigInt  @id @default(autoincrement())
+          ua_right String? @db.Char(1)
         }
     "#]];
 
@@ -103,8 +125,10 @@ async fn noalyss_folder_test_cockroachdb(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints
+          - Model: "todo_list", constraint: "ck_is_public"
           - Model: "user_active_security", constraint: "user_active_security_action_check"
           - Model: "user_active_security", constraint: "user_active_security_ledger_check"
+          - Model: "user_sec_action_profile", constraint: "user_sec_action_profile_ua_right_check"
 
         These objects have comments defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/database-comments
           - Type: "field", name: "user_active_security.us_login"
