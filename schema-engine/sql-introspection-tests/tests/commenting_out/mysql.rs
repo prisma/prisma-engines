@@ -107,14 +107,15 @@ async fn remapping_field_names_to_empty_mysql(api: &mut TestApi) -> TestResult {
 async fn partition_table_gets_comment(api: &mut TestApi) -> TestResult {
     api.raw_cmd(
         r#"
-CREATE TABLE `blocks` (
-    id INT NOT NULL AUTO_INCREMENT,
-    PRIMARY KEY (id)
-);
+        CREATE TABLE `blocks` (
+            id INT NOT NULL AUTO_INCREMENT,
+            PRIMARY KEY (id)
+        );
 
-ALTER TABLE blocks
-PARTITION BY HASH (id)
-PARTITIONS 2; "#,
+        ALTER TABLE blocks
+        PARTITION BY HASH (id)
+        PARTITIONS 2;
+    "#,
     )
     .await;
 
