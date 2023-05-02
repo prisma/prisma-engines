@@ -1,6 +1,6 @@
 {
   "is_panic": false,
-  "message": "`findManyUser`: Field does not exist in enclosing type.",
+  "message": "`findManyUser.where.foo`: Field does not exist in enclosing type.",
   "meta": {
     "kind": "UnknownInputField",
     "inputType": {
