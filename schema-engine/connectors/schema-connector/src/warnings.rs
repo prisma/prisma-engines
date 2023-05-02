@@ -1,130 +1,55 @@
 //! Warnings generator for Introspection
 
-use std::{collections::BTreeMap, fmt};
-
-trait Groupable<K, V> {
-    /// Groups the items in the collection by a key, specified by the concrete implementation.
-    /// For any key, the value is a **non-empty** vector.
-    fn group_by(&self) -> BTreeMap<K, Vec<&V>>;
-}
+use std::{collections::BTreeSet, fmt};
 
 /// A group of warnings that can be grouped by a key, which depends on the concretely
 /// instantiated type T.
-#[derive(Debug, PartialEq)]
-pub struct GroupBy<'a, T>(&'a Vec<T>);
-
-impl Groupable<String, ModelAndField> for GroupBy<'_, ModelAndField> {
-    fn group_by(&self) -> BTreeMap<String, Vec<&ModelAndField>> {
-        let mut result: BTreeMap<String, Vec<&ModelAndField>> = BTreeMap::new();
-
-        for item in self.0 {
-            result.entry(item.model.clone()).or_default().push(item);
-        }
-
-        result
-    }
-}
-
-fn fmt_group_model_and_field(f: &mut fmt::Formatter<'_>, model: &String, vec: &[&ModelAndField]) -> fmt::Result {
-    write!(f, r#"Model: "{}""#, &model)?;
-    write!(f, ", field(s): [")?;
-
-    let (last, vec_but_last) = vec.split_last().unwrap();
-    for entry in vec_but_last {
-        write!(f, r#""{}", "#, entry.field)?;
-    }
-
-    writeln!(f, r#""{}"]"#, last.field)?;
-
-    Ok(())
-}
+struct GroupBy<'a, T>(&'a Vec<T>);
 
 impl fmt::Display for GroupBy<'_, ModelAndField> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let grouped = self.group_by();
-        for (key, value) in grouped {
-            write!(f, "  - ")?;
-            fmt_group_model_and_field(f, &key, &value)?;
-        }
-
-        Ok(())
+        display_list(self.0, "Model", |mf| &mf.model, |mf| &mf.field, f)
     }
-}
-
-impl Groupable<String, ViewAndField> for GroupBy<'_, ViewAndField> {
-    fn group_by(&self) -> BTreeMap<String, Vec<&ViewAndField>> {
-        let mut result: BTreeMap<String, Vec<&ViewAndField>> = BTreeMap::new();
-
-        for item in self.0 {
-            result.entry(item.view.clone()).or_default().push(item);
-        }
-
-        result
-    }
-}
-
-fn fmt_group_view_and_field(f: &mut fmt::Formatter<'_>, view: &String, vec: &[&ViewAndField]) -> fmt::Result {
-    write!(f, r#"View: "{}""#, &view)?;
-    write!(f, ", field(s): [")?;
-
-    let (last, vec_but_last) = vec.split_last().unwrap();
-    for entry in vec_but_last {
-        write!(f, r#""{}", "#, entry.field)?;
-    }
-
-    writeln!(f, r#""{}"]"#, last.field)?;
-
-    Ok(())
 }
 
 impl fmt::Display for GroupBy<'_, ViewAndField> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let grouped = self.group_by();
-        for (key, value) in grouped {
-            write!(f, "  - ")?;
-            fmt_group_view_and_field(f, &key, &value)?;
-        }
-
-        Ok(())
+        display_list(self.0, "View", |vf| &vf.view, |vf| &vf.field, f)
     }
-}
-
-impl Groupable<String, TypeAndField> for GroupBy<'_, TypeAndField> {
-    fn group_by(&self) -> BTreeMap<String, Vec<&TypeAndField>> {
-        let mut result: BTreeMap<String, Vec<&TypeAndField>> = BTreeMap::new();
-
-        for item in self.0 {
-            result.entry(item.composite_type.clone()).or_default().push(item);
-        }
-
-        result
-    }
-}
-
-fn fmt_group_type_and_field(f: &mut fmt::Formatter<'_>, r#type: &String, vec: &[&TypeAndField]) -> fmt::Result {
-    write!(f, r#"Composite type: "{}""#, &r#type)?;
-    write!(f, ", field(s): [")?;
-
-    let (last, vec_but_last) = vec.split_last().unwrap();
-    for entry in vec_but_last {
-        write!(f, r#""{}", "#, entry.field)?;
-    }
-
-    writeln!(f, r#""{}"]"#, last.field)?;
-
-    Ok(())
 }
 
 impl fmt::Display for GroupBy<'_, TypeAndField> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let grouped = self.group_by();
-        for (key, value) in grouped {
-            write!(f, "  - ")?;
-            fmt_group_type_and_field(f, &key, &value)?;
+        display_list(self.0, "Composite type", |cf| &cf.composite_type, |cf| &cf.field, f)
+    }
+}
+
+fn display_list<T: Ord>(
+    items: &[T],
+    group_name: &str,
+    project_key: fn(&T) -> &str,
+    project_field: fn(&T) -> &str,
+    f: &mut fmt::Formatter<'_>,
+) -> fmt::Result {
+    let sorted: BTreeSet<_> = items.iter().collect();
+    let mut sorted = sorted.into_iter().peekable();
+    let mut key = None;
+    let close = |f: &mut fmt::Formatter<'_>| f.write_str("]\n");
+
+    while let Some(next) = sorted.next() {
+        if Some(project_key(next)) != key {
+            write!(f, r#"  - {group_name}: "{}", field(s): ["#, project_key(next))?;
+            key = Some(project_key(next));
         }
 
-        Ok(())
+        write!(f, r#""{}""#, project_field(next))?;
+        match sorted.peek() {
+            Some(vf) if Some(project_key(vf)) != key => close(f)?,
+            None => close(f)?,
+            Some(_) => f.write_str(", ")?,
+        }
     }
+    Ok(())
 }
 
 /// Collections used for warning generation. These should be preferred
@@ -249,19 +174,16 @@ impl fmt::Display for Warnings {
 
         fn render_warnings_grouped<'a, T>(msg: &str, items: &'a Vec<T>, f: &mut fmt::Formatter<'_>) -> fmt::Result
         where
-            T: fmt::Display,
-            GroupBy<'a, T>: Groupable<String, T> + fmt::Display,
+            GroupBy<'a, T>: fmt::Display,
         {
-            if !items.is_empty() {
-                writeln!(f)?;
-                f.write_str(msg)?;
-                writeln!(f)?;
-
-                let items = GroupBy(items);
-                write!(f, "{}", items)?;
+            if items.is_empty() {
+                return Ok(());
             }
 
-            Ok(())
+            f.write_str("\n")?;
+            f.write_str(msg)?;
+            f.write_str("\n")?;
+            fmt::Display::fmt(&GroupBy(items), f)
         }
 
         render_warnings(
@@ -530,7 +452,7 @@ impl fmt::Display for Enum {
 }
 
 /// A field in a model that triggered a warning.
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Debug, PartialOrd, Ord, Eq)]
 pub struct ModelAndField {
     /// The name of the model
     pub model: String,
@@ -545,7 +467,7 @@ impl fmt::Display for ModelAndField {
 }
 
 /// A field in a type that triggered a warning.
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Debug, PartialOrd, Eq, Ord)]
 pub struct TypeAndField {
     /// The name of the model
     pub composite_type: String,
@@ -564,7 +486,7 @@ impl fmt::Display for TypeAndField {
 }
 
 /// A field in a view that triggered a warning.
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Debug, PartialOrd, Ord, Eq)]
 pub struct ViewAndField {
     /// The name of the view
     pub view: String,

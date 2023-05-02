@@ -355,8 +355,9 @@ impl ValidationError {
         input_type_description: InputTypeDescription,
     ) -> Self {
         let message = format!(
-            "`{}`: Field does not exist in enclosing type.",
-            selection_path.join(".")
+            "`{}.{}`: Field does not exist in enclosing type.",
+            selection_path.join("."),
+            argument_path.join("."),
         );
         ValidationError {
             kind: ValidationErrorKind::UnknownInputField,
