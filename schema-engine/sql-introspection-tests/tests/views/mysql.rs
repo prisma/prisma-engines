@@ -444,9 +444,11 @@ async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
         `0` int(11) DEFAULT NULL,
         `1` int(11) DEFAULT NULL,
         `2` int(11) DEFAULT NULL,
-        `3` int(11) DEFAULT NULL,
-        `4` int(11) DEFAULT NULL,
-        `5` int(11) DEFAULT NULL
+        `5` int(11) DEFAULT NULL,
+        `10` int(11) DEFAULT NULL,
+        `11` int(11) DEFAULT NULL,
+        `20` int(11) DEFAULT NULL,
+        `21` int(11) DEFAULT NULL
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
       CREATE TABLE `table_w_invalid_names_two` (
@@ -456,16 +458,20 @@ async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
         `0` int(11) DEFAULT NULL,
         `1` int(11) DEFAULT NULL,
         `2` int(11) DEFAULT NULL,
-        `3` int(11) DEFAULT NULL
+        `5` int(11) DEFAULT NULL,
+        `10` int(11) DEFAULT NULL,
+        `11` int(11) DEFAULT NULL,
+        `20` int(11) DEFAULT NULL,
+        `21` int(11) DEFAULT NULL
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
       CREATE VIEW `view_w_invalid_names_one` AS (
-        SELECT `all_ages`, `0`, `1`, `2`, `3`, `4`, `5`
+        SELECT `all_ages`, `0`, `1`, `2`, `5`, `10`, `11`, `20`
         FROM `table_w_invalid_names_one`
       );
 
       CREATE VIEW `view_w_invalid_names_two` AS (
-        SELECT `all_ages`, `0`, `1`, `2`, `3`
+        SELECT `all_ages`, `0`, `1`, `2`, `10`, `20`
         FROM `table_w_invalid_names_two`
       );
     "#};
@@ -496,11 +502,15 @@ async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
           /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
           // 2 Int? @map("2")
           /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
-          // 3 Int? @map("3")
-          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
-          // 4 Int? @map("4")
-          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
           // 5 Int? @map("5")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 10 Int? @map("10")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 11 Int? @map("11")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 20 Int? @map("20")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 21 Int? @map("21")
           @@ignore
         }
 
@@ -517,7 +527,15 @@ async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
           /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
           // 2 Int? @map("2")
           /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
-          // 3 Int? @map("3")
+          // 5 Int? @map("5")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 10 Int? @map("10")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 11 Int? @map("11")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 20 Int? @map("20")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 21 Int? @map("21")
           @@ignore
         }
 
@@ -532,11 +550,13 @@ async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
           /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
           // 2 Int? @map("2")
           /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
-          // 3 Int? @map("3")
-          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
-          // 4 Int? @map("4")
-          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
           // 5 Int? @map("5")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 10 Int? @map("10")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 11 Int? @map("11")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 20 Int? @map("20")
           @@ignore
         }
 
@@ -551,7 +571,9 @@ async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
           /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
           // 2 Int? @map("2")
           /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
-          // 3 Int? @map("3")
+          // 10 Int? @map("10")
+          /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*
+          // 20 Int? @map("20")
           @@ignore
         }
     "#]];
@@ -562,12 +584,12 @@ async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
         *** WARNING ***
 
         These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:
-          - Model: "table_w_invalid_names_one", field(s): ["0", "1", "2", "3", "4", "5"]
-          - Model: "table_w_invalid_names_two", field(s): ["0", "1", "2", "3"]
+          - Model: "table_w_invalid_names_one", field(s): ["0", "1", "10", "11", "2", "20", "21", "5"]
+          - Model: "table_w_invalid_names_two", field(s): ["0", "1", "10", "11", "2", "20", "21", "5"]
 
         These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:
-          - View: "view_w_invalid_names_one", field(s): ["0", "1", "2", "3", "4", "5"]
-          - View: "view_w_invalid_names_two", field(s): ["0", "1", "2", "3"]
+          - View: "view_w_invalid_names_one", field(s): ["0", "1", "10", "11", "2", "20", "5"]
+          - View: "view_w_invalid_names_two", field(s): ["0", "1", "10", "2", "20"]
 
         The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client:
           - "table_w_invalid_names_one"
