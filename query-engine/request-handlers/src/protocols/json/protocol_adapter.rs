@@ -457,9 +457,7 @@ mod tests {
 
         schema.diagnostics.to_result().unwrap();
 
-        let internal_data_model = prisma_models::convert(Arc::new(schema));
-
-        Arc::new(schema::build(internal_data_model, true))
+        Arc::new(schema::build(Arc::new(schema), true))
     }
 
     #[test]
@@ -1446,9 +1444,7 @@ mod tests {
 
         schema.diagnostics.to_result().unwrap();
 
-        let internal_data_model = prisma_models::convert(Arc::new(schema));
-
-        Arc::new(schema::build(internal_data_model, true))
+        Arc::new(schema::build(Arc::new(schema), true))
     }
 
     #[test]
@@ -1580,9 +1576,7 @@ mod tests {
 
         schema.diagnostics.to_result().unwrap();
 
-        let internal_data_model = prisma_models::convert(Arc::new(schema));
-
-        Arc::new(schema::build(internal_data_model, true))
+        Arc::new(schema::build(Arc::new(schema), true))
     }
 
     #[test]
@@ -1639,9 +1633,7 @@ mod tests {
 
         schema.diagnostics.to_result().unwrap();
 
-        let internal_data_model = prisma_models::convert(Arc::new(schema));
-
-        Arc::new(schema::build(internal_data_model, true))
+        Arc::new(schema::build(Arc::new(schema), true))
     }
 
     #[test]

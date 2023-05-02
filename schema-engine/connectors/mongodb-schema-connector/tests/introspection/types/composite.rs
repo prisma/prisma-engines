@@ -66,7 +66,7 @@ fn dirty_data() {
         *** WARNING ***
 
         The following fields had data stored in multiple types. Either use Json or normalize data to the wanted type:
-          - Composite type: "CatAddress", field: "number", type: "Json"
+          - Composite type: "CatAddress", field: "number", chosen data type: "Json"
     "#]];
 
     res.expect_warnings(&expect);

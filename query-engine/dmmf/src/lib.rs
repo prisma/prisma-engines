@@ -17,8 +17,7 @@ pub fn dmmf_json_from_schema(schema: &str) -> String {
 
 pub fn dmmf_from_schema(schema: &str) -> DataModelMetaFormat {
     let schema = Arc::new(psl::parse_schema(schema).unwrap());
-    let internal_data_model = prisma_models::convert(schema);
-    from_precomputed_parts(&schema::build(internal_data_model, true))
+    from_precomputed_parts(&schema::build(schema, true))
 }
 
 pub fn from_precomputed_parts(query_schema: &QuerySchema) -> DataModelMetaFormat {

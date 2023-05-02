@@ -1252,7 +1252,7 @@ fn unsupported_types_in_an_index() {
         *** WARNING ***
 
         These fields are not supported by the Prisma Client, because Prisma currently does not support their types:
-          - Model: "A", field: "data", type: "JavaScriptCode"
+          - Model: "A", field: "data", original data type: "JavaScriptCode"
     "#]];
 
     res.expect_warnings(&expect);

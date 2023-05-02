@@ -571,7 +571,6 @@ name = "core-tests"
 version = "0.1.0"
 dependencies = [
  "dissimilar",
- "prisma-models",
  "psl",
  "query-core",
  "request-handlers",
@@ -3306,7 +3305,6 @@ dependencies = [
  "mongodb-query-connector",
  "opentelemetry",
  "opentelemetry-otlp",
- "prisma-models",
  "psl",
  "quaint",
  "query-connector",

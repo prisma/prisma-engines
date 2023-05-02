@@ -89,8 +89,7 @@ impl CliCommand {
     }
 
     async fn dmmf(request: DmmfRequest) -> PrismaResult<()> {
-        let internal_data_model = prisma_models::convert(Arc::new(request.schema));
-        let query_schema = schema::build(internal_data_model, request.enable_raw_queries);
+        let query_schema = schema::build(Arc::new(request.schema), request.enable_raw_queries);
         let dmmf = dmmf::render_dmmf(&query_schema);
         let serialized = serde_json::to_string_pretty(&dmmf)?;
 

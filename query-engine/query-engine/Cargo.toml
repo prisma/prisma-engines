@@ -7,7 +7,7 @@ version = "0.1.0"
 default = ["sql", "mongodb"]
 mongodb = ["mongodb-connector"]
 sql = ["sql-connector"]
-vendored-openssl = ["quaint/vendored-openssl"]
+vendored-openssl = ["sql-connector/vendored-openssl"]
 
 [dependencies]
 tokio.workspace = true
@@ -20,7 +20,6 @@ enumflags2 = { version = "0.7"}
 psl.workspace = true
 graphql-parser = { git = "https://github.com/prisma/graphql-parser" }
 mongodb-connector = { path = "../connectors/mongodb-query-connector", optional = true, package = "mongodb-query-connector" }
-prisma-models = { path = "../prisma-models" }
 query-core = { path = "../core" }
 request-handlers = { path = "../request-handlers" }
 serde.workspace = true
