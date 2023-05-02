@@ -1,6 +1,6 @@
 //! Warnings generator for Introspection
 
-use std::{collections::BTreeSet, fmt};
+use std::fmt;
 
 /// A group of warnings that can be grouped by a key, which depends on the concretely
 /// instantiated type T.
@@ -31,8 +31,7 @@ fn display_list<T: Ord>(
     project_field: fn(&T) -> &str,
     f: &mut fmt::Formatter<'_>,
 ) -> fmt::Result {
-    let sorted: BTreeSet<_> = items.iter().collect();
-    let mut sorted = sorted.into_iter().peekable();
+    let mut sorted = items.into_iter().peekable();
     let mut key = None;
     let close = |f: &mut fmt::Formatter<'_>| f.write_str("]\n");
 
