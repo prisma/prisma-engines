@@ -152,12 +152,23 @@ PARTITIONS 2; "#,
 async fn mysql_multi_row_index_warning(api: &mut TestApi) -> TestResult {
     api.raw_cmd(
         r#"
-CREATE TABLE customers (
-    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    modified DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    custinfo JSON,
-    INDEX zips( (CAST(custinfo->'$.zipcode' AS UNSIGNED ARRAY)) )
-    ); "#,
+        CREATE TABLE customers (
+            id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            modified DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            custinfo JSON,
+            INDEX zips( (CAST(custinfo->'$.zipcode' AS UNSIGNED ARRAY)) )
+        );
+
+        CREATE TABLE my_table (
+            id INT NOT NULL AUTO_INCREMENT,
+            name VARCHAR(50) NOT NULL,
+            email VARCHAR(50) NOT NULL,
+            age INT NOT NULL,
+            PRIMARY KEY (id),
+            INDEX name_age (name, age),
+            CONSTRAINT unique_name_email UNIQUE (name, email)
+      );
+    "#,
     )
     .await;
 
@@ -185,6 +196,16 @@ CREATE TABLE customers (
           id       BigInt    @id @default(autoincrement())
           modified DateTime? @default(now()) @db.DateTime(0)
           custinfo Json?
+        }
+
+        model my_table {
+          id    Int    @id @default(autoincrement())
+          name  String @db.VarChar(50)
+          email String @db.VarChar(50)
+          age   Int
+
+          @@unique([name, email], map: "unique_name_email")
+          @@index([name, age], map: "name_age")
         }
     "#]];
 
