@@ -3,3 +3,5 @@
 Cargo.lock
 .direnv/
 .vscode/
+
+docker-compose.override.yml
