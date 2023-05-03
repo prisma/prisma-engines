@@ -263,6 +263,7 @@ impl TakeRow for my::Row {
                     [0] => Value::boolean(false),
                     _ => Value::boolean(true),
                 },
+                my::Value::Bytes(c) if c.len() == 1 => Value::character(c[0] as char),
                 // https://dev.mysql.com/doc/internals/en/character-set.html
                 my::Value::Bytes(b) if column.character_set() == 63 => Value::bytes(b),
                 my::Value::Bytes(s) => Value::text(String::from_utf8(s)?),
