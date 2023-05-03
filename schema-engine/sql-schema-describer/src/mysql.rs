@@ -740,11 +740,8 @@ impl<'a> SqlSchemaDescriber<'a> {
                 None => continue,
             };
 
-            match constraint_type.as_str() {
-                "c" => {
-                    sql_schema.check_constraints.push((table_id, constraint_name));
-                }
-                _ => (),
+            if constraint_type.as_str() == "c" {
+                sql_schema.check_constraints.push((table_id, constraint_name));
             }
         }
 
