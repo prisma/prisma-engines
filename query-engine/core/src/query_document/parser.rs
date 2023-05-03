@@ -223,7 +223,7 @@ impl QueryDocumentParser {
                 // We do not get into this catch-all _if_ the value is already Json, if it's a FieldRef or if it's an Enum.
                 // We don't because they've already been desambiguified at the procotol adapter level.
                 (value, InputType::Scalar(ScalarType::Json))
-                    if value.can_be_parsed_as_json() && get_engine_protocol().is_json() =>
+                    if value.should_be_parsed_as_json() && get_engine_protocol().is_json() =>
                 {
                     Ok(ParsedInputValue::Single(self.to_json(
                         &selection_path,
