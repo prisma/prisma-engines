@@ -158,7 +158,13 @@ test_type!(bit64(
     Value::bytes(vec![0, 0, 0, 0, 0, 6, 107, 58])
 ));
 
-test_type!(char(mysql, "char(255)", Value::Text(None), Value::text("foobar")));
+test_type!(char(
+    mysql,
+    "char",
+    (Value::Char(None), Value::Text(None)),
+    (Value::character('c'), Value::character('c'))
+));
+test_type!(char_255(mysql, "char(255)", Value::Text(None), Value::text("foobar")));
 test_type!(float(mysql, "float", Value::Float(None), Value::float(1.12345),));
 test_type!(double(mysql, "double", Value::Double(None), Value::double(1.12314124)));
 test_type!(varchar(mysql, "varchar(255)", Value::Text(None), Value::text("foobar")));
