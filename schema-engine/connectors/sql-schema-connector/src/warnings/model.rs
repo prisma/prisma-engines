@@ -40,7 +40,7 @@ pub(super) fn generate_warnings(model: ModelPair<'_>, warnings: &mut Warnings) {
         });
     }
 
-    if model.has_mysql_multi_value_indes() {
+    if model.has_mysql_multi_value_index() {
         warnings.mysql_multi_value_indices.push(generators::Model {
             model: model.name().to_string(),
         });
