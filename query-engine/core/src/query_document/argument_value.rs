@@ -76,7 +76,7 @@ impl ArgumentValue {
     pub fn can_be_parsed_as_json(&self) -> bool {
         match self {
             ArgumentValue::Object(_) => true,
-            ArgumentValue::List(_) => true,
+            ArgumentValue::List(l) => l.iter().all(|v| v.can_be_parsed_as_json()),
             ArgumentValue::Scalar(pv) => !matches!(pv, PrismaValue::Enum(_) | PrismaValue::Json(_)),
             ArgumentValue::FieldRef(_) => false,
         }
