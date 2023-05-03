@@ -77,6 +77,8 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         sql_schema.tables.reserve(table_names.len());
         sql_schema.table_columns.reserve(table_names.len());
 
+        self.get_constraints(&table_names, &mut sql_schema).await?;
+
         Self::get_all_columns(&table_names, self.conn, schema, &mut sql_schema, &flavour).await?;
         push_foreign_keys(schema, &table_names, &mut sql_schema, self.conn).await?;
         push_indexes(&table_names, schema, &mut sql_schema, self.conn).await?;
@@ -714,6 +716,41 @@ impl<'a> SqlSchemaDescriber<'a> {
             arity,
             native_type: native_type.map(NativeTypeInstance::new::<MySqlType>),
         }
+    }
+
+    /// Return the constraints that are not primary keys, foreign keys, or unique keys, fulltext, or spacial.
+    /// Namely, this currently just returns CHECK constraints.
+    async fn get_constraints(
+        &self,
+        table_names: &IndexMap<String, TableId>,
+        sql_schema: &mut SqlSchema,
+    ) -> DescriberResult<()> {
+        // Note: in MySQL, columns must be re-aliased, otherwise their casing would be inconsistent (and uppercased).
+        let sql = include_str!("mysql/constraints_query.sql");
+
+        let rows = self.conn.query_raw(sql, &[]).await?;
+
+        for row in rows {
+            let table_name = row.get_expect_string("table_name");
+            let constraint_name = row.get_expect_string("constraint_name");
+            let constraint_type = row.get_expect_string("constraint_type");
+
+            let table_id = match table_names.get(&table_name) {
+                Some(id) => *id,
+                None => continue,
+            };
+
+            match constraint_type.as_str() {
+                "c" => {
+                    sql_schema.check_constraints.push((table_id, constraint_name));
+                }
+                _ => (),
+            }
+        }
+
+        sql_schema.check_constraints.sort_by_key(|(id, _)| *id);
+
+        Ok(())
     }
 
     fn extract_precision(input: &str) -> Option<u32> {
