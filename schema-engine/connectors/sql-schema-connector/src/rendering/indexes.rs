@@ -16,6 +16,7 @@ pub(super) fn render(index: IndexPair<'_>) -> renderer::IndexDefinition<'_> {
             definition.length(length);
         }
 
+        #[cfg(feature = "postgresql")]
         if let Some(ops) = field.opclass() {
             let ops = match ops {
                 IndexOps::Managed(ops) => renderer::IndexOps::managed(ops),
@@ -44,10 +45,12 @@ pub(super) fn render(index: IndexPair<'_>) -> renderer::IndexDefinition<'_> {
         definition.map(map);
     }
 
+    #[cfg(feature = "mssql")]
     if let Some(clustered) = index.clustered() {
         definition.clustered(clustered);
     }
 
+    #[cfg(feature = "postgresql")]
     if let Some(algo) = index.algorithm() {
         definition.index_type(algo);
     }

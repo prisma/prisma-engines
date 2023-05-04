@@ -177,12 +177,15 @@ fn render_raw_sql(
             let fks = schemas.walk(*foreign_key_id);
             vec![renderer.render_rename_foreign_key(fks)]
         }
+        #[cfg(feature = "postgresql")]
         SqlMigrationStep::CreateExtension(create_extension) => {
             renderer.render_create_extension(create_extension, schemas.next)
         }
+        #[cfg(feature = "postgresql")]
         SqlMigrationStep::AlterExtension(alter_extension) => {
             renderer.render_alter_extension(alter_extension, MigrationPair::new(schemas.previous, schemas.next))
         }
+        #[cfg(feature = "postgresql")]
         SqlMigrationStep::DropExtension(drop_extension) => {
             renderer.render_drop_extension(drop_extension, schemas.previous)
         }

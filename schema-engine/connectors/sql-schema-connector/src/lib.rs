@@ -25,7 +25,7 @@ mod warnings;
 
 use database_schema::SqlDatabaseSchema;
 use enumflags2::BitFlags;
-use flavour::{MssqlFlavour, MysqlFlavour, PostgresFlavour, SqlFlavour, SqliteFlavour};
+use flavour::SqlFlavour;
 use migration_pair::MigrationPair;
 use psl::ValidatedSchema;
 use schema_connector::{migrations_directory::MigrationDirectory, *};
@@ -43,41 +43,46 @@ pub struct SqlSchemaConnector {
 
 impl SqlSchemaConnector {
     /// Initialize a PostgreSQL migration connector.
+    #[cfg(feature = "postgresql")]
     pub fn new_postgres() -> Self {
         SqlSchemaConnector {
-            flavour: Box::<PostgresFlavour>::default(),
+            flavour: Box::<flavour::PostgresFlavour>::default(),
             host: Arc::new(EmptyHost),
         }
     }
 
     /// Initialize a CockroachDb migration connector.
+    #[cfg(feature = "postgresql")]
     pub fn new_cockroach() -> Self {
         SqlSchemaConnector {
-            flavour: Box::new(PostgresFlavour::new_cockroach()),
+            flavour: Box::new(flavour::PostgresFlavour::new_cockroach()),
             host: Arc::new(EmptyHost),
         }
     }
 
     /// Initialize a SQLite migration connector.
+    #[cfg(feature = "sqlite")]
     pub fn new_sqlite() -> Self {
         SqlSchemaConnector {
-            flavour: Box::<SqliteFlavour>::default(),
+            flavour: Box::<flavour::SqliteFlavour>::default(),
             host: Arc::new(EmptyHost),
         }
     }
 
     /// Initialize a MySQL migration connector.
+    #[cfg(feature = "mysql")]
     pub fn new_mysql() -> Self {
         SqlSchemaConnector {
-            flavour: Box::<MysqlFlavour>::default(),
+            flavour: Box::<flavour::MysqlFlavour>::default(),
             host: Arc::new(EmptyHost),
         }
     }
 
     /// Initialize a MSSQL migration connector.
+    #[cfg(feature = "mssql")]
     pub fn new_mssql() -> Self {
         SqlSchemaConnector {
-            flavour: Box::<MssqlFlavour>::default(),
+            flavour: Box::<flavour::MssqlFlavour>::default(),
             host: Arc::new(EmptyHost),
         }
     }

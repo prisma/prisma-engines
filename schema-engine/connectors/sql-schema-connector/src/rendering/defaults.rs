@@ -10,6 +10,7 @@ use datamodel_renderer::{
 pub(crate) fn render(default: DefaultValuePair<'_>) -> Option<renderer::DefaultValue<'_>> {
     let mut rendered = match default.kind() {
         Some(kind) => match kind {
+            #[cfg(feature = "postgresql")]
             DefaultKind::Sequence(sequence) => {
                 let mut fun = Function::new("sequence");
 

@@ -6,6 +6,7 @@ mod enums;
 mod id;
 mod indexes;
 mod models;
+#[cfg(feature = "postgresql")]
 mod postgres;
 mod relation_field;
 mod scalar_field;

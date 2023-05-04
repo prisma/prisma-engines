@@ -14,5 +14,8 @@ itertools = "0.10"
 quaint = { workspace = true, optional = true }
 
 [features]
-default = []
 sql = ["quaint"]
+mssql = ["sql", "quaint/mssql"]
+mysql = ["sql", "quaint/mysql"]
+postgresql = ["sql", "quaint/postgresql"]
+sqlite = ["sql", "quaint/sqlite"]

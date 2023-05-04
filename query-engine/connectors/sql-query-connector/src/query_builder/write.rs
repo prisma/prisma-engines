@@ -7,6 +7,7 @@ use tracing::Span;
 
 /// `INSERT` a new record to the database. Resulting an `INSERT` ast and an
 /// optional `RecordProjection` if available from the arguments or model.
+#[cfg(any(feature = "postgresql", feature = "mssql", feature = "sqlite"))]
 pub(crate) fn create_record(model: &ModelRef, mut args: WriteArgs, ctx: &Context<'_>) -> Insert<'static> {
     let fields: Vec<_> = model
         .fields()

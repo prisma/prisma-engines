@@ -68,6 +68,7 @@ fn render_id(pk: IdPair<'_>) -> renderer::IdFieldDefinition<'_> {
     let field = pk.field().unwrap();
     let mut definition = renderer::IdFieldDefinition::default();
 
+    #[cfg(feature = "mssql")]
     if let Some(clustered) = pk.clustered() {
         definition.clustered(clustered);
     }
@@ -96,6 +97,7 @@ fn render_unique(unique: IndexPair<'_>) -> renderer::UniqueFieldAttribute<'_> {
         opts.map(map);
     }
 
+    #[cfg(feature = "mssql")]
     if let Some(clustered) = unique.clustered() {
         opts.clustered(clustered);
     }

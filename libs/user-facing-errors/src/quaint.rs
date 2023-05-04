@@ -25,23 +25,14 @@ impl From<quaint::error::DatabaseConstraint> for query_engine::DatabaseConstrain
     }
 }
 
-pub fn invalid_connection_string_description(error_details: &str) -> String {
-    let docs = r#"https://www.prisma.io/docs/reference/database-reference/connection-urls"#;
-
-    let details = formatdoc! {r#"
-            {} in database URL. Please refer to the documentation in {} for constructing a correct
-            connection string. In some cases, certain characters must be escaped. Please
-            check the string for any illegal characters."#, error_details, docs};
-
-    details.replace('\n', " ")
-}
-
 pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -> Option<KnownError> {
     match (kind, connection_info) {
+        #[cfg(feature = "sqlite")]
         (ErrorKind::DatabaseDoesNotExist { .. }, ConnectionInfo::Sqlite { .. }) => {
             unreachable!(); // quaint implicitly creates sqlite databases
         }
 
+        #[cfg(feature = "postgresql")]
         (ErrorKind::DatabaseDoesNotExist { db_name }, ConnectionInfo::Postgres(url)) => {
             Some(KnownError::new(common::DatabaseDoesNotExist::Postgres {
                 database_name: db_name.to_string(),
@@ -50,6 +41,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             }))
         }
 
+        #[cfg(feature = "mysql")]
         (ErrorKind::DatabaseDoesNotExist { .. }, ConnectionInfo::Mysql(url)) => {
             Some(KnownError::new(common::DatabaseDoesNotExist::Mysql {
                 database_name: url.dbname().to_owned(),
@@ -57,6 +49,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
                 database_port: url.port(),
             }))
         }
+        #[cfg(feature = "mssql")]
         (ErrorKind::DatabaseDoesNotExist { .. }, ConnectionInfo::Mssql(url)) => {
             Some(KnownError::new(common::DatabaseDoesNotExist::Mssql {
                 database_name: url.dbname().to_owned(),
@@ -65,6 +58,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             }))
         }
 
+        #[cfg(feature = "postgresql")]
         (ErrorKind::DatabaseAccessDenied { .. }, ConnectionInfo::Postgres(url)) => {
             Some(KnownError::new(common::DatabaseAccessDenied {
                 database_user: url.username().into_owned(),
@@ -72,6 +66,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             }))
         }
 
+        #[cfg(feature = "mysql")]
         (ErrorKind::DatabaseAccessDenied { .. }, ConnectionInfo::Mysql(url)) => {
             Some(KnownError::new(common::DatabaseAccessDenied {
                 database_user: url.username().into_owned(),
@@ -79,6 +74,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             }))
         }
 
+        #[cfg(feature = "postgresql")]
         (ErrorKind::DatabaseAlreadyExists { db_name }, ConnectionInfo::Postgres(url)) => {
             Some(KnownError::new(common::DatabaseAlreadyExists {
                 database_name: format!("{db_name}"),
@@ -87,6 +83,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             }))
         }
 
+        #[cfg(feature = "mysql")]
         (ErrorKind::DatabaseAlreadyExists { db_name }, ConnectionInfo::Mysql(url)) => {
             Some(KnownError::new(common::DatabaseAlreadyExists {
                 database_name: format!("{db_name}"),
@@ -95,6 +92,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             }))
         }
 
+        #[cfg(feature = "postgresql")]
         (ErrorKind::AuthenticationFailed { user }, ConnectionInfo::Postgres(url)) => {
             Some(KnownError::new(common::IncorrectDatabaseCredentials {
                 database_user: format!("{user}"),
@@ -102,6 +100,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             }))
         }
 
+        #[cfg(feature = "mysql")]
         (ErrorKind::AuthenticationFailed { user }, ConnectionInfo::Mysql(url)) => {
             Some(KnownError::new(common::IncorrectDatabaseCredentials {
                 database_user: format!("{user}"),
@@ -109,6 +108,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             }))
         }
 
+        #[cfg(feature = "postgresql")]
         (ErrorKind::ConnectionError(_), ConnectionInfo::Postgres(url)) => {
             Some(KnownError::new(common::DatabaseNotReachable {
                 database_port: url.port(),
@@ -116,6 +116,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             }))
         }
 
+        #[cfg(feature = "mysql")]
         (ErrorKind::ConnectionError(_), ConnectionInfo::Mysql(url)) => {
             Some(KnownError::new(common::DatabaseNotReachable {
                 database_port: url.port(),
@@ -133,6 +134,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             message: message.into(),
         })),
 
+        #[cfg(feature = "mysql")]
         (ErrorKind::ConnectTimeout, ConnectionInfo::Mysql(url)) => {
             Some(KnownError::new(common::DatabaseNotReachable {
                 database_host: url.host().to_owned(),
@@ -140,6 +142,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             }))
         }
 
+        #[cfg(feature = "postgresql")]
         (ErrorKind::ConnectTimeout, ConnectionInfo::Postgres(url)) => {
             Some(KnownError::new(common::DatabaseNotReachable {
                 database_host: url.host().to_owned(),
@@ -147,6 +150,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             }))
         }
 
+        #[cfg(feature = "mssql")]
         (ErrorKind::ConnectTimeout, ConnectionInfo::Mssql(url)) => {
             Some(KnownError::new(common::DatabaseNotReachable {
                 database_host: url.host().to_owned(),
@@ -154,6 +158,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             }))
         }
 
+        #[cfg(feature = "mysql")]
         (ErrorKind::SocketTimeout, ConnectionInfo::Mysql(url)) => {
             let time = match url.socket_timeout() {
                 Some(dur) => format!("{}s", dur.as_secs()),
@@ -167,6 +172,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             }))
         }
 
+        #[cfg(feature = "postgresql")]
         (ErrorKind::SocketTimeout, ConnectionInfo::Postgres(url)) => {
             let time = match url.socket_timeout() {
                 Some(dur) => format!("{}s", dur.as_secs()),
@@ -180,6 +186,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             }))
         }
 
+        #[cfg(feature = "mssql")]
         (ErrorKind::SocketTimeout, ConnectionInfo::Mssql(url)) => {
             let time = match url.socket_timeout() {
                 Some(dur) => format!("{}s", dur.as_secs()),
@@ -216,6 +223,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             }))
         }
 
+        #[cfg(feature = "mysql")]
         (ErrorKind::TableDoesNotExist { table: model }, ConnectionInfo::Mysql(_)) => {
             Some(KnownError::new(common::InvalidModel {
                 model: format!("{model}"),
@@ -223,6 +231,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             }))
         }
 
+        #[cfg(feature = "postgresql")]
         (ErrorKind::TableDoesNotExist { table: model }, ConnectionInfo::Postgres(_)) => {
             Some(KnownError::new(common::InvalidModel {
                 model: format!("{model}"),
@@ -230,6 +239,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             }))
         }
 
+        #[cfg(feature = "sqlite")]
         (ErrorKind::TableDoesNotExist { table: model }, ConnectionInfo::Sqlite { .. }) => {
             Some(KnownError::new(common::InvalidModel {
                 model: format!("{model}"),
@@ -237,6 +247,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             }))
         }
 
+        #[cfg(feature = "mssql")]
         (ErrorKind::TableDoesNotExist { table: model }, ConnectionInfo::Mssql(_)) => {
             Some(KnownError::new(common::InvalidModel {
                 model: format!("{model}"),
@@ -244,6 +255,7 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             }))
         }
 
+        #[cfg(feature = "mssql")]
         (ErrorKind::IncorrectNumberOfParameters { expected, actual }, ConnectionInfo::Mssql(_)) => {
             Some(KnownError::new(common::IncorrectNumberOfParameters {
                 expected: *expected,
