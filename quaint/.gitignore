@@ -5,3 +5,5 @@ Cargo.lock
 .vscode/
 
 docker-compose.override.yml
+db/
+!db/.gitkeep
