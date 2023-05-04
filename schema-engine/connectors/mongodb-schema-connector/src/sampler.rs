@@ -28,7 +28,7 @@ pub(super) async fn sample(
     let mut warnings = Warnings::new();
 
     for collection in schema.walk_collections() {
-        statistics.track_model(collection.name());
+        statistics.track_model(collection.name(), collection);
 
         if collection.has_schema() {
             warnings.json_schema_defined.push(Model {

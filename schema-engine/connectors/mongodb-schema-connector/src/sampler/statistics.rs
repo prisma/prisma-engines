@@ -15,7 +15,7 @@ use super::field_type::FieldType;
 use convert_case::{Case, Casing};
 use datamodel_renderer as renderer;
 use mongodb::bson::{Bson, Document};
-use mongodb_schema_describer::IndexWalker;
+use mongodb_schema_describer::{CollectionWalker, IndexWalker};
 use once_cell::sync::Lazy;
 use psl::datamodel_connector::constraint_names::ConstraintNames;
 use regex::Regex;
@@ -30,10 +30,11 @@ pub(super) const SAMPLE_SIZE: i32 = 1000;
 static RESERVED_NAMES: &[&str] = &["PrismaClient"];
 static COMMENTED_OUT_FIELD: &str = "This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*";
 
-#[derive(Default, Debug, Clone, Copy)]
-struct ModelData {
+#[derive(Default, Clone, Copy)]
+struct ModelData<'a> {
     document_count: usize,
     has_id: bool,
+    collection_walker: Option<CollectionWalker<'a>>,
 }
 
 /// Statistical data from a MongoDB database for determining a Prisma data
@@ -45,7 +46,7 @@ pub(super) struct Statistics<'a> {
     /// Container for composite types that are not empty
     types_with_fields: HashSet<String>,
     /// model_name -> document count
-    models: HashMap<Name, ModelData>,
+    models: HashMap<Name, ModelData<'a>>,
     /// model_name -> indices
     indices: BTreeMap<String, Vec<IndexWalker<'a>>>,
     /// How deep we travel in nested composite types until switching to Json. None will always use
@@ -146,6 +147,12 @@ impl<'a> Statistics<'a> {
                     }
                     None => renderer::datamodel::Model::new(name),
                 };
+
+                if let Some(walker) = doc_count.collection_walker {
+                    if walker.has_schema() {
+                        model.documentation("json schema msg")
+                    }
+                }
 
                 if !doc_count.has_id {
                     let mut field = renderer::datamodel::Field::new("id", "String");
@@ -555,8 +562,9 @@ impl<'a> Statistics<'a> {
     }
 
     /// Track a collection as prisma model.
-    pub(super) fn track_model(&mut self, model: &str) {
-        self.models.entry(Name::Model(model.to_string())).or_default();
+    pub(super) fn track_model(&mut self, model: &str, collection: CollectionWalker<'a>) {
+        let mut model = self.models.entry(Name::Model(model.to_string())).or_default();
+        model.collection_walker = Some(collection);
     }
 
     pub(super) fn track_model_fields(&mut self, model: &str, document: Document) {

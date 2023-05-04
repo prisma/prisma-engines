@@ -101,12 +101,20 @@ fn collection_with_json_schema() {
         Ok(())
     });
 
-    let expected = expect![[r#"
+    let expected_warning = expect![[r#"
         *** WARNING ***
 
         The following models have a JSON Schema defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/todo
           - "A"
     "#]];
 
-    res.expect_warnings(&expected)
+    res.expect_warnings(&expected_warning);
+
+    let expected_doc = expect![[r#"
+        /// json schema msg
+        model A {
+          id String @id @default(auto()) @map("_id") @db.ObjectId
+        }
+    "#]];
+    expected_doc.assert_eq(res.datamodel());
 }
