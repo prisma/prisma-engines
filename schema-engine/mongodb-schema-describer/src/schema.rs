@@ -20,6 +20,7 @@ pub struct IndexId(usize);
 /// All the information we can fetch per collection.
 pub struct CollectionData {
     pub(crate) name: String,
+    pub(crate) has_schema: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -70,8 +71,8 @@ pub struct MongoSchema {
 
 impl MongoSchema {
     /// Add a collection to the schema.
-    pub fn push_collection(&mut self, name: String) -> CollectionId {
-        self.collections.push(CollectionData { name });
+    pub fn push_collection(&mut self, name: String, has_schema: bool) -> CollectionId {
+        self.collections.push(CollectionData { name, has_schema });
         CollectionId(self.collections.len() - 1)
     }
 
