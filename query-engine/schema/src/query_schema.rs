@@ -308,7 +308,6 @@ pub enum ScalarType {
     Json,
     JsonList,
     UUID,
-    Xml,
     Bytes,
 }
 
@@ -326,7 +325,6 @@ impl fmt::Display for ScalarType {
             ScalarType::Json => "Json",
             ScalarType::UUID => "UUID",
             ScalarType::JsonList => "Json",
-            ScalarType::Xml => "Xml",
             ScalarType::Bytes => "Bytes",
         };
 

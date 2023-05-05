@@ -48,7 +48,6 @@ pub(super) fn render_output_type<'a>(output_type: &OutputType<'a>, ctx: &mut Ren
                 ScalarType::Json => "Json",
                 ScalarType::UUID => "UUID",
                 ScalarType::JsonList => "Json",
-                ScalarType::Xml => "Xml",
                 ScalarType::Bytes => "Bytes",
             };
 

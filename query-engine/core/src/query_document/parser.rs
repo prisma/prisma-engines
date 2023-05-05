@@ -361,7 +361,6 @@ impl QueryDocumentParser {
             (PrismaValue::String(s), ScalarType::String) => Ok(PrismaValue::String(s)),
             (PrismaValue::Boolean(b), ScalarType::Boolean) => Ok(PrismaValue::Boolean(b)),
             (PrismaValue::Json(json), ScalarType::Json) => Ok(PrismaValue::Json(json)),
-            (PrismaValue::Xml(xml), ScalarType::Xml) => Ok(PrismaValue::Xml(xml)),
             (PrismaValue::Uuid(uuid), ScalarType::UUID) => Ok(PrismaValue::Uuid(uuid)),
             (PrismaValue::Bytes(bytes), ScalarType::Bytes) => Ok(PrismaValue::Bytes(bytes)),
             (PrismaValue::BigInt(b_int), ScalarType::BigInt) => Ok(PrismaValue::BigInt(b_int)),
@@ -369,7 +368,6 @@ impl QueryDocumentParser {
             (PrismaValue::Null, ScalarType::Null) => Ok(PrismaValue::Null),
 
             // String coercion matchers
-            (PrismaValue::String(s), ScalarType::Xml) => Ok(PrismaValue::Xml(s)),
             (PrismaValue::String(s), ScalarType::JsonList) => {
                 self.parse_json_list_from_str(selection_path, argument_path, &s)
             }
@@ -892,7 +890,6 @@ pub(crate) mod conversions {
                 format!("({})", itertools::join(v.iter().map(prisma_value_to_type_name), ", "))
             }
             PrismaValue::Json(_) => "JSON".to_string(),
-            PrismaValue::Xml(_) => "XML".to_string(),
             PrismaValue::Object(_) => "Object".to_string(),
             PrismaValue::Null => "Null".to_string(),
             PrismaValue::DateTime(_) => "DateTime".to_string(),
