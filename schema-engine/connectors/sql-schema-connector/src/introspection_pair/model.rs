@@ -48,7 +48,7 @@ impl<'a> ModelPair<'a> {
     }
 
     /// Whether the model has MySQL multi value indices.
-    pub(crate) fn has_mysql_multi_value_indes(self) -> bool {
+    pub(crate) fn has_mysql_multi_value_index(self) -> bool {
         self.next
             .indexes()
             .any(|i| i.index_type() == sql::IndexType::MySQLMultiValueIndex)
