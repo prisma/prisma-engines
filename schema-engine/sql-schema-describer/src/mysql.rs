@@ -757,7 +757,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 None => continue,
             };
 
-            if constraint_type.as_str() == "c" {
+            if constraint_type.as_str() == "check" {
                 sql_schema.check_constraints.push((table_id, constraint_name));
             }
         }
