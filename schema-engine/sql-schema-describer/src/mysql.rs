@@ -40,18 +40,8 @@ impl Flavour {
     }
 }
 
-#[enumflags2::bitflags]
-#[derive(Clone, Copy, Debug)]
-#[repr(u8)]
-pub enum Circumstances {
-    MariaDb,
-    MySql56,
-    MySql57,
-}
-
 pub struct SqlSchemaDescriber<'a> {
     conn: &'a dyn Queryable,
-    circumstances: BitFlags<Circumstances>,
 }
 
 #[async_trait::async_trait]
@@ -214,8 +204,8 @@ impl Parser for SqlSchemaDescriber<'_> {}
 
 impl<'a> SqlSchemaDescriber<'a> {
     /// Constructor.
-    pub fn new(conn: &'a dyn Queryable, circumstances: BitFlags<Circumstances>) -> SqlSchemaDescriber<'a> {
-        SqlSchemaDescriber { conn, circumstances }
+    pub fn new(conn: &'a dyn Queryable) -> SqlSchemaDescriber<'a> {
+        SqlSchemaDescriber { conn }
     }
 
     #[tracing::instrument(skip(self))]

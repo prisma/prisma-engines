@@ -6,7 +6,7 @@ pub use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Ca
 
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::{
-    mysql, postgres,
+    postgres::Circumstances,
     walkers::{ForeignKeyWalker, IndexWalker, TableColumnWalker, TableWalker},
     ColumnTypeFamily, DescriberError, ForeignKeyAction, SqlSchema, SqlSchemaDescriberBackend,
 };
@@ -84,7 +84,7 @@ impl TestApi {
                 sql_schema_describer::postgres::SqlSchemaDescriber::new(
                     &self.database,
                     if self.tags.contains(Tags::CockroachDb) {
-                        postgres::Circumstances::Cockroach.into()
+                        Circumstances::Cockroach.into()
                     } else {
                         Default::default()
                     },
@@ -98,20 +98,9 @@ impl TestApi {
                     .await
             }
             SqlFamily::Mysql => {
-                sql_schema_describer::mysql::SqlSchemaDescriber::new(
-                    &self.database,
-                    if self.tags.contains(Tags::Mariadb) {
-                        mysql::Circumstances::MariaDb.into()
-                    } else if self.tags.contains(Tags::Mysql56) {
-                        mysql::Circumstances::MySql56.into()
-                    } else if self.tags.contains(Tags::Mysql57) {
-                        mysql::Circumstances::MySql57.into()
-                    } else {
-                        Default::default()
-                    },
-                )
-                .describe(schemas)
-                .await
+                sql_schema_describer::mysql::SqlSchemaDescriber::new(&self.database)
+                    .describe(schemas)
+                    .await
             }
             SqlFamily::Mssql => {
                 sql_schema_describer::mssql::SqlSchemaDescriber::new(&self.database)
