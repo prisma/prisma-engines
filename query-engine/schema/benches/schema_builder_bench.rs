@@ -4,7 +4,7 @@ const SMALL: (&str, &str) = ("small", include_str!("../test-schemas/standupbot.p
 const MEDIUM: (&str, &str) = ("medium", include_str!("../test-schemas/noalyss_folder.prisma"));
 const LARGE: (&str, &str) = ("large", include_str!("../test-schemas/odoo.prisma"));
 
-pub fn criterion_benchmark(c: &mut Criterion) {
+fn criterion_benchmark(c: &mut Criterion) {
     for (name, prisma_schema) in [SMALL, MEDIUM, LARGE] {
         let source_file: psl::SourceFile = prisma_schema.into();
 

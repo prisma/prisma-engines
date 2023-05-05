@@ -86,7 +86,7 @@ fn format_chunks(chunks: Vec<dissimilar::Chunk<'_>>) -> String {
 fn validate(query: &str, schema: schema::QuerySchemaRef) -> Result<(), request_handlers::HandlerError> {
     let json_request: JsonSingleQuery = serde_json::from_str(query).unwrap();
     let operation = request_handlers::JsonProtocolAdapter::convert_single(json_request, &schema)?;
-    QueryGraphBuilder::new(schema)
+    QueryGraphBuilder::new(&schema)
         .build(operation)
         .map_err(query_core::CoreError::from)?;
     Ok(())
