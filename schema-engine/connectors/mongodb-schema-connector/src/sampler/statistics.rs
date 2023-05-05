@@ -150,7 +150,7 @@ impl<'a> Statistics<'a> {
 
                 if let Some(walker) = doc_count.collection_walker {
                     if walker.has_schema() {
-                        let comment = "This table uses a JSON Schema defined in the database, which requires additional setup for migrations. Visit https://pris.ly/d/mongodb-json-schema for more info.";
+                        let comment = "This collection uses a JSON Schema defined in the database, which requires additional setup for migrations. Visit https://pris.ly/d/mongodb-json-schema for more info.";
                         model.documentation(comment)
                     }
                 }

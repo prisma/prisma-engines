@@ -111,7 +111,7 @@ fn collection_with_json_schema() {
     res.expect_warnings(&expected_warning);
 
     let expected_doc = expect![[r#"
-        /// This table uses a JSON Schema defined in the database, which requires additional setup for migrations. Visit https://pris.ly/d/mongodb-json-schema for more info.
+        /// This collection uses a JSON Schema defined in the database, which requires additional setup for migrations. Visit https://pris.ly/d/mongodb-json-schema for more info.
         model A {
           id String @id @default(auto()) @map("_id") @db.ObjectId
         }
