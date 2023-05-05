@@ -9,7 +9,7 @@ use mongodb::{
     Database,
 };
 use mongodb_schema_describer::MongoSchema;
-use schema_connector::{IntrospectionContext, IntrospectionResult, Version, Warnings};
+use schema_connector::{warnings::Model, IntrospectionContext, IntrospectionResult, Version, Warnings};
 use statistics::*;
 
 /// From the given database, lists all collections as models, and samples
@@ -28,7 +28,13 @@ pub(super) async fn sample(
     let mut warnings = Warnings::new();
 
     for collection in schema.walk_collections() {
-        statistics.track_model(collection.name());
+        statistics.track_model(collection.name(), collection);
+
+        if collection.has_schema() {
+            warnings.json_schema_defined.push(Model {
+                model: collection.name().to_owned(),
+            })
+        }
     }
 
     for collection in schema.walk_collections() {
