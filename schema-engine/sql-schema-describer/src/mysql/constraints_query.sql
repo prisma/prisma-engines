@@ -2,7 +2,7 @@ SELECT
 	tc.table_schema AS namespace,
 	tc.table_name AS table_name,
 	tc.constraint_name AS constraint_name,
-	LOWER(LEFT(tc.constraint_type, 1)) AS constraint_type,
+	LOWER(tc.constraint_type) AS constraint_type,
 	cc.check_clause AS constraint_definition
 FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc
 LEFT JOIN INFORMATION_SCHEMA.CHECK_CONSTRAINTS cc
