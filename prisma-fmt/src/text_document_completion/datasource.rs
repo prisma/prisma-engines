@@ -10,7 +10,7 @@ use super::{add_quotes, CompletionContext};
 pub(super) fn relation_mode_completion(completion_list: &mut CompletionList) {
     completion_list.items.push(CompletionItem {
         label: "relationMode".to_owned(),
-        insert_text: Some(r#"relationmode = $0"#.to_owned()),
+        insert_text: Some(r#"relationMode = $0"#.to_owned()),
         insert_text_format: Some(InsertTextFormat::SNIPPET),
         kind: Some(CompletionItemKind::FIELD),
         documentation: Some(Documentation::MarkupContent(MarkupContent {
