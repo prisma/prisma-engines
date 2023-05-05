@@ -153,7 +153,7 @@ impl AggregationSelection {
             .map(|f| {
                 (
                     f.db_name().to_owned(),
-                    fixed_type.clone().unwrap_or_else(|| f.type_identifier()),
+                    fixed_type.unwrap_or_else(|| f.type_identifier()),
                     FieldArity::Required,
                 )
             })

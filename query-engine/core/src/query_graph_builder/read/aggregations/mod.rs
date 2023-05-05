@@ -13,11 +13,11 @@ use schema::constants::aggregations::*;
 
 /// Resolves the given field as a aggregation query.
 fn resolve_query(
-    field: FieldPair,
+    field: FieldPair<'_>,
     model: &ModelRef,
     allow_deprecated: bool,
 ) -> QueryGraphBuilderResult<AggregationSelection> {
-    let count_resolver = |mut field: FieldPair, model: &ModelRef| {
+    let count_resolver = |mut field: FieldPair<'_>, model: &ModelRef| {
         let nested_fields = field
             .parsed_field
             .nested_fields
@@ -64,7 +64,7 @@ fn resolve_query(
     Ok(query)
 }
 
-fn resolve_fields(model: &ModelRef, field: FieldPair) -> Vec<ScalarFieldRef> {
+fn resolve_fields(model: &ModelRef, field: FieldPair<'_>) -> Vec<ScalarFieldRef> {
     let scalars = model.fields().scalar();
     let fields = field
         .parsed_field
@@ -78,9 +78,9 @@ fn resolve_fields(model: &ModelRef, field: FieldPair) -> Vec<ScalarFieldRef> {
             if f.parsed_field.name == "_all" {
                 None
             } else {
-                scalars.iter().find_map(|sf| {
+                scalars.clone().find_map(|sf| {
                     if sf.name() == f.parsed_field.name {
-                        Some(sf.clone())
+                        Some(sf)
                     } else {
                         None
                     }
@@ -90,7 +90,7 @@ fn resolve_fields(model: &ModelRef, field: FieldPair) -> Vec<ScalarFieldRef> {
         .collect()
 }
 
-fn collect_selection_tree(fields: &[FieldPair]) -> Vec<(String, Option<Vec<String>>)> {
+fn collect_selection_tree(fields: &[FieldPair<'_>]) -> Vec<(String, Option<Vec<String>>)> {
     fields
         .iter()
         .map(|field| {

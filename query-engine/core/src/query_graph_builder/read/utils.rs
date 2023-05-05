@@ -4,7 +4,7 @@ use connector::RelAggregationSelection;
 use prisma_models::prelude::*;
 use schema::constants::{aggregations::*, args};
 
-pub fn collect_selection_order(from: &[FieldPair]) -> Vec<String> {
+pub(crate) fn collect_selection_order(from: &[FieldPair<'_>]) -> Vec<String> {
     from.iter()
         .map(|pair| {
             pair.parsed_field
@@ -18,8 +18,8 @@ pub fn collect_selection_order(from: &[FieldPair]) -> Vec<String> {
 /// Creates a `FieldSelection` from a query selection.
 /// Automatically adds model IDs to the selected fields as well.
 /// Unwraps are safe due to query validation.
-pub fn collect_selected_fields(
-    from_pairs: &[FieldPair],
+pub(crate) fn collect_selected_fields(
+    from_pairs: &[FieldPair<'_>],
     distinct: Option<FieldSelection>,
     model: &ModelRef,
 ) -> FieldSelection {
@@ -37,7 +37,7 @@ pub fn collect_selected_fields(
     }
 }
 
-fn pairs_to_selections<T>(parent: T, pairs: &[FieldPair]) -> Vec<SelectedField>
+fn pairs_to_selections<T>(parent: T, pairs: &[FieldPair<'_>]) -> Vec<SelectedField>
 where
     T: Into<ParentContainer>,
 {
@@ -57,7 +57,7 @@ where
         .collect()
 }
 
-fn extract_composite_selection(pf: ParsedField, cf: CompositeFieldRef) -> SelectedField {
+fn extract_composite_selection(pf: ParsedField<'_>, cf: CompositeFieldRef) -> SelectedField {
     let object = pf
         .nested_fields
         .expect("Invalid composite query shape: Composite field selected without sub-selection.");
@@ -71,7 +71,7 @@ fn extract_composite_selection(pf: ParsedField, cf: CompositeFieldRef) -> Select
 }
 
 pub(crate) fn collect_nested_queries(
-    from: Vec<FieldPair>,
+    from: Vec<FieldPair<'_>>,
     model: &ModelRef,
 ) -> QueryGraphBuilderResult<Vec<ReadQuery>> {
     from.into_iter()
@@ -137,7 +137,7 @@ pub fn merge_cursor_fields(selected_fields: FieldSelection, cursor: &Option<Sele
 }
 
 pub fn collect_relation_aggr_selections(
-    from: Vec<FieldPair>,
+    from: Vec<FieldPair<'_>>,
     model: &ModelRef,
 ) -> QueryGraphBuilderResult<Vec<RelAggregationSelection>> {
     let mut selections = vec![];

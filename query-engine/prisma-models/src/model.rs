@@ -30,8 +30,8 @@ impl Model {
         FieldSelection::from(fields)
     }
 
-    pub fn fields(&self) -> Fields {
-        Fields::new(self.clone())
+    pub fn fields(&self) -> Fields<'_> {
+        Fields::new(self)
     }
 
     pub fn supports_create_operation(&self) -> bool {

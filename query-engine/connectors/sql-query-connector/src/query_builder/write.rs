@@ -11,7 +11,6 @@ pub(crate) fn create_record(model: &ModelRef, mut args: WriteArgs, ctx: &Context
     let fields: Vec<_> = model
         .fields()
         .scalar()
-        .into_iter()
         .filter(|field| args.has_arg_for(field.db_name()))
         .collect();
 
@@ -109,7 +108,7 @@ pub(crate) fn build_update_and_set_query(model: &ModelRef, args: WriteArgs, ctx:
         .fold(Update::table(table.clone()), |acc, (field_name, val)| {
             let DatasourceFieldName(name) = field_name;
             let field = scalar_fields
-                .iter()
+                .clone()
                 .find(|f| f.db_name() == name)
                 .expect("Expected field to be valid");
 

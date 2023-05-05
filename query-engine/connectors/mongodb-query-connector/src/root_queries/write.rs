@@ -186,8 +186,7 @@ pub async fn update_records<'conn>(
     let filter = doc! { id_field.db_name(): { "$in": ids.clone() } };
     let fields: Vec<_> = model
         .fields()
-        .filter_all(|_| true)
-        .into_iter()
+        .all()
         .filter_map(|field| {
             args.take_field_value(field.db_name())
                 .map(|write_op| (field.clone(), write_op))

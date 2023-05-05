@@ -18,6 +18,14 @@ pub enum Field {
 }
 
 impl Field {
+    pub fn borrowed_name<'a>(&self, schema: &'a psl::ValidatedSchema) -> &'a str {
+        match self {
+            Field::Relation(rf) => schema.db.walk(rf.id).name(),
+            Field::Scalar(sf) => sf.borrowed_name(schema),
+            Field::Composite(cf) => cf.borrowed_name(schema),
+        }
+    }
+
     pub fn name(&self) -> &str {
         match self {
             Field::Scalar(ref sf) => sf.name(),
@@ -133,7 +141,7 @@ impl Field {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Copy)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum TypeIdentifier {
     String,

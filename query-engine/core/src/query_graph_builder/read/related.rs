@@ -3,7 +3,7 @@ use crate::{query_document::ParsedField, ReadQuery, RelatedRecordsQuery};
 use prisma_models::{ModelRef, RelationFieldRef};
 
 pub(crate) fn find_related(
-    field: ParsedField,
+    field: ParsedField<'_>,
     parent: RelationFieldRef,
     model: ModelRef,
 ) -> QueryGraphBuilderResult<ReadQuery> {

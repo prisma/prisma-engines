@@ -40,7 +40,7 @@ impl ParentContainer {
 
     pub fn fields(&self) -> Vec<Field> {
         match self {
-            ParentContainer::Model(model) => model.fields().filter_all(|_| true),
+            ParentContainer::Model(model) => model.fields().all().collect(),
             ParentContainer::CompositeType(composite) => composite.fields().collect(),
         }
     }

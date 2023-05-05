@@ -8,7 +8,7 @@ use psl::{
     schema_ast::ast::WithDocumentation,
 };
 
-pub fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
+pub(crate) fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
     let mut datamodel = Datamodel {
         models: Vec::with_capacity(schema.db.models_count()),
         enums: Vec::with_capacity(schema.db.enums_count()),

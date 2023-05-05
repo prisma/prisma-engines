@@ -17,7 +17,7 @@ pub fn nested_connect(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    value: ParsedInputValue,
+    value: ParsedInputValue<'_>,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
@@ -25,8 +25,8 @@ pub fn nested_connect(
     // Build all filters upfront.
     let filters: Vec<Filter> = utils::coerce_vec(value)
         .into_iter()
-        .map(|value: ParsedInputValue| {
-            let value: ParsedInputMap = value.try_into()?;
+        .map(|value: ParsedInputValue<'_>| {
+            let value: ParsedInputMap<'_> = value.try_into()?;
             extract_unique_filter(value, child_model)
         })
         .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?

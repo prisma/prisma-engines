@@ -16,7 +16,7 @@ pub fn resolve_compound_id(name: &str, model: &ModelRef) -> Option<Vec<ScalarFie
 pub fn resolve_index_fields(name: &str, model: &ModelRef) -> Option<Vec<ScalarFieldRef>> {
     model
         .unique_indexes()
-        .find(|index| schema::compound_index_field_name(index) == name)
+        .find(|index| schema::compound_index_field_name(*index) == name)
         .map(|index| {
             index
                 .fields()

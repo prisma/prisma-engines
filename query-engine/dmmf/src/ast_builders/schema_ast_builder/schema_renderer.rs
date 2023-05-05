@@ -4,12 +4,12 @@ pub(crate) struct DmmfSchemaRenderer<'a> {
     query_schema: &'a QuerySchema,
 }
 
-impl<'a> Renderer for DmmfSchemaRenderer<'a> {
-    fn render(&self, ctx: &mut RenderContext) {
+impl<'a> Renderer<'a> for DmmfSchemaRenderer<'a> {
+    fn render(&self, ctx: &mut RenderContext<'a>) {
         // This ensures that all enums are rendered, even if not reached by the output and input types.
-        render_enum_types(ctx, self.query_schema.enum_types());
-        render_output_type(&OutputType::Object(self.query_schema.query), ctx);
-        render_output_type(&OutputType::Object(self.query_schema.mutation), ctx);
+        render_enum_types(ctx, itx_isolation_levels(ctx.query_schema).into_iter());
+        render_output_type(&OutputType::object(self.query_schema.query()), ctx);
+        render_output_type(&OutputType::object(self.query_schema.mutation()), ctx);
     }
 }
 

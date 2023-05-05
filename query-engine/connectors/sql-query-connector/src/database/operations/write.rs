@@ -170,14 +170,7 @@ pub(crate) async fn create_records(
     #[allow(clippy::mutable_key_type)]
     let affected_fields: HashSet<ScalarFieldRef> = fields
         .into_iter()
-        .map(|dsfn| {
-            model
-                .fields()
-                .scalar()
-                .into_iter()
-                .find(|sf| sf.db_name() == dsfn.deref())
-                .unwrap()
-        })
+        .map(|dsfn| model.fields().scalar().find(|sf| sf.db_name() == dsfn.deref()).unwrap())
         .collect();
 
     if affected_fields.is_empty() {

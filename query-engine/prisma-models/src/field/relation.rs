@@ -9,6 +9,10 @@ pub type RelationField = crate::Zipper<RelationFieldId>;
 pub type RelationFieldRef = RelationField;
 
 impl RelationField {
+    pub fn borrowed_name<'a>(&self, schema: &'a psl::ValidatedSchema) -> &'a str {
+        schema.db.walk(self.id).name()
+    }
+
     pub fn name(&self) -> &str {
         self.walker().name()
     }

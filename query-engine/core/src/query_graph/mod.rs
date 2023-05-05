@@ -210,7 +210,7 @@ impl QueryGraph {
         }
     }
 
-    pub fn root<F>(f: F) -> QueryGraphBuilderResult<QueryGraph>
+    pub(crate) fn root<F>(f: F) -> QueryGraphBuilderResult<QueryGraph>
     where
         F: FnOnce(&mut QueryGraph) -> QueryGraphBuilderResult<()>,
     {

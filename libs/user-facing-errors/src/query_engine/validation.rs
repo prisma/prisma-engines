@@ -108,7 +108,7 @@ impl ValidationError {
     ///         "selection": {}
     ///     }
     /// }
-    pub fn empty_selection(selection_path: Vec<String>, output_type_description: OutputTypeDescription) -> Self {
+    pub fn empty_selection(selection_path: Vec<&str>, output_type_description: OutputTypeDescription) -> Self {
         let message = String::from("Expected a minimum of 1 field to be present, got 0");
         ValidationError {
             kind: ValidationErrorKind::EmptySelection,
@@ -139,9 +139,9 @@ impl ValidationError {
     ///     }
     /// }
     pub fn invalid_argument_type(
-        selection_path: Vec<String>,
-        argument_path: Vec<String>,
-        argument_description: ArgumentDescription,
+        selection_path: Vec<&str>,
+        argument_path: Vec<&str>,
+        argument_description: ArgumentDescription<'_>,
         inferred_argument_type: String,
     ) -> Self {
         let message = format!(
@@ -182,10 +182,10 @@ impl ValidationError {
     ///     }
     /// }
     pub fn invalid_argument_value(
-        selection_path: Vec<String>,
-        argument_path: Vec<String>,
+        selection_path: Vec<&str>,
+        argument_path: Vec<&str>,
         value: String,
-        expected_argument_type: String,
+        expected_argument_type: &str,
         underlying_err: Option<Box<dyn error::Error>>,
     ) -> Self {
         let argument_name = argument_path.last().expect("Argument path cannot not be empty");
@@ -195,7 +195,7 @@ impl ValidationError {
                 "Invalid argument agument value. `{}` is not a valid `{}`. Underlying error: {}",
                 value, expected_argument_type, &err_msg
             );
-            let argument = ArgumentDescription::new(argument_name.to_owned(), vec![expected_argument_type]);
+            let argument = ArgumentDescription::new(*argument_name, vec![Cow::Borrowed(expected_argument_type)]);
             let meta = json!({"argumentPath": argument_path, "argument": argument, "selectionPath": selection_path, "underlyingError": &err_msg});
             (message, Some(meta))
         } else {
@@ -203,7 +203,7 @@ impl ValidationError {
                 "Invalid argument agument value. `{}` is not a valid `{}`",
                 value, &expected_argument_type
             );
-            let argument = ArgumentDescription::new(argument_name.to_owned(), vec![expected_argument_type]);
+            let argument = ArgumentDescription::new(*argument_name, vec![Cow::Borrowed(expected_argument_type)]);
             let meta = json!({"argumentPath": argument_path, "argument": argument, "selectionPath": selection_path, "underlyingError": serde_json::Value::Null});
             (message, Some(meta))
         };
@@ -217,11 +217,11 @@ impl ValidationError {
     /// Creates an [`ValidationErrorKind::SomeFieldsMissing`] kind of error, which happens when
     /// there are some fields missing from a query
     pub fn some_fields_missing(
-        selection_path: Vec<String>,
-        argument_path: Vec<String>,
+        selection_path: Vec<&str>,
+        argument_path: Vec<&str>,
         min_field_count: Option<usize>,
         max_field_count: Option<usize>,
-        required_fields: Option<Vec<String>>,
+        required_fields: Option<Vec<Cow<'_, str>>>,
         provided_field_count: usize,
         input_type_description: &InputTypeDescription,
     ) -> Self {
@@ -240,11 +240,11 @@ impl ValidationError {
     /// Creates an [`ValidationErrorKind::SomeFieldsMissing`] kind of error, which happens when
     /// there are more fields given than the ones a type accept
     pub fn too_many_fields_given(
-        selection_path: Vec<String>,
-        argument_path: Vec<String>,
+        selection_path: Vec<&str>,
+        argument_path: Vec<&str>,
         min_field_count: Option<usize>,
         max_field_count: Option<usize>,
-        required_fields: Option<Vec<String>>,
+        required_fields: Option<Vec<Cow<'_, str>>>,
         provided_field_count: usize,
         input_type_description: &InputTypeDescription,
     ) -> Self {
@@ -274,8 +274,8 @@ impl ValidationError {
     /// }
     ///
     pub fn required_argument_missing(
-        selection_path: Vec<String>,
-        argument_path: Vec<String>,
+        selection_path: Vec<&str>,
+        argument_path: Vec<&str>,
         input_type_descriptions: &[InputTypeDescription],
     ) -> Self {
         let message = format!("`{}`: A value is required but not set", argument_path.join("."));
@@ -307,9 +307,9 @@ impl ValidationError {
     /// }
     /// Todo: add the `given` type to the meta
     pub fn unknown_argument(
-        selection_path: Vec<String>,
-        argument_path: Vec<String>,
-        valid_argument_descriptions: Vec<ArgumentDescription>,
+        selection_path: Vec<&str>,
+        argument_path: Vec<&str>,
+        valid_argument_descriptions: Vec<ArgumentDescription<'_>>,
     ) -> Self {
         let message = String::from("Argument does not exist in enclosing type");
         ValidationError {
@@ -350,8 +350,8 @@ impl ValidationError {
     /// }
     ///
     pub fn unknown_input_field(
-        selection_path: Vec<String>,
-        argument_path: Vec<String>,
+        selection_path: Vec<&str>,
+        argument_path: Vec<&str>,
         input_type_description: InputTypeDescription,
     ) -> Self {
         let message = format!(
@@ -383,10 +383,7 @@ impl ValidationError {
     ///         }
     ///     }
     // }
-    pub fn unknown_selection_field(
-        selection_path: Vec<String>,
-        output_type_description: OutputTypeDescription,
-    ) -> Self {
+    pub fn unknown_selection_field(selection_path: Vec<&str>, output_type_description: OutputTypeDescription) -> Self {
         let message = format!(
             "Field '{}' not found in enclosing type '{}'",
             selection_path.last().expect("Selection path must not be empty"),
@@ -417,7 +414,7 @@ impl ValidationError {
     ///         }
     ///     }
     /// }
-    pub fn selection_set_on_scalar(field_name: String, selection_path: Vec<String>) -> Self {
+    pub fn selection_set_on_scalar(field_name: String, selection_path: Vec<&str>) -> Self {
         let message = format!("Cannot select over scalar field '{}'", &field_name);
         ValidationError {
             kind: ValidationErrorKind::SelectionSetOnScalar,
@@ -460,12 +457,12 @@ impl ValidationError {
     ///     }
     /// }
     ///
-    pub fn value_too_large(selection_path: Vec<String>, argument_path: Vec<String>, value: String) -> Self {
+    pub fn value_too_large(selection_path: Vec<&str>, argument_path: Vec<&str>, value: String) -> Self {
         let argument_name = argument_path.last().expect("Argument path cannot not be empty");
         let message = format!(
             "Unable to fit float value (or large JS integer serialized in exponent notation) '{value}' into a 64 Bit signed integer for field '{argument_name}'. If you're trying to store large integers, consider using `BigInt`",
         );
-        let argument = ArgumentDescription::new(argument_name.to_owned(), vec!["BigInt".to_owned()]);
+        let argument = ArgumentDescription::new(*argument_name, vec![Cow::Borrowed("BigInt")]);
         ValidationError {
             kind: ValidationErrorKind::ValueTooLarge,
             message,
@@ -547,26 +544,26 @@ impl InputTypeDescriptionField {
 }
 
 #[derive(Debug, Serialize, Clone)]
-pub struct InputTypeConstraints {
+pub struct InputTypeConstraints<'a> {
     #[serde(rename = "minFieldCount")]
     min: Option<usize>,
     #[serde(rename = "maxFieldCount")]
     max: Option<usize>,
     #[serde(rename = "requiredFields")]
-    fields: Option<Vec<String>>,
+    fields: Option<Vec<Cow<'a, str>>>,
     #[serde(skip)]
     got: usize,
 }
 
-impl InputTypeConstraints {
-    fn new(min: Option<usize>, max: Option<usize>, fields: Option<Vec<String>>, got: usize) -> Self {
+impl<'a> InputTypeConstraints<'a> {
+    fn new(min: Option<usize>, max: Option<usize>, fields: Option<Vec<Cow<'a, str>>>, got: usize) -> Self {
         Self { min, max, fields, got }
     }
 }
 
 // Todo: we might not need this, having only the two kind of error types related to cardinality
 // TooManyFieldsGiven, SomeFieldsMissing
-impl fmt::Display for InputTypeConstraints {
+impl fmt::Display for InputTypeConstraints<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match &self.fields {
             None => match (self.min, self.max) {
@@ -625,13 +622,16 @@ impl fmt::Display for InputTypeConstraints {
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ArgumentDescription {
-    name: String,
-    type_names: Vec<String>,
+pub struct ArgumentDescription<'a> {
+    name: Cow<'a, str>,
+    type_names: Vec<Cow<'a, str>>,
 }
 
-impl ArgumentDescription {
-    pub fn new(name: String, type_names: Vec<String>) -> Self {
-        Self { name, type_names }
+impl<'a> ArgumentDescription<'a> {
+    pub fn new(name: impl Into<Cow<'a, str>>, type_names: Vec<Cow<'a, str>>) -> Self {
+        Self {
+            name: name.into(),
+            type_names,
+        }
     }
 }

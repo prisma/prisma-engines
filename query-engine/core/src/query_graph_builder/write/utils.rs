@@ -7,11 +7,11 @@ use connector::{DatasourceFieldName, Filter, RecordFilter, WriteArgs, WriteOpera
 use indexmap::IndexMap;
 use prisma_models::{FieldSelection, ModelRef, PrismaValue, RelationFieldRef, SelectionResult};
 use psl::parser_database::ReferentialAction;
-use schema::ConnectorContext;
+use schema::QuerySchema;
 
 /// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.
 /// Simply unpacks `ParsedInputValue::List`.
-pub(crate) fn coerce_vec(val: ParsedInputValue) -> Vec<ParsedInputValue> {
+pub(crate) fn coerce_vec(val: ParsedInputValue<'_>) -> Vec<ParsedInputValue<'_>> {
     match val {
         ParsedInputValue::List(l) => l,
         m @ ParsedInputValue::Map(_) => vec![m],
@@ -381,15 +381,15 @@ pub fn insert_existing_1to1_related_model_checks(
 ///               │                                                         │                                        │
 ///               └─────────────────────────────────────────────────────────┴────────────────────────────────────────┘
 /// ```
-pub fn insert_emulated_on_delete(
+pub(crate) fn insert_emulated_on_delete(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
+    query_schema: &QuerySchema,
     model_to_delete: &ModelRef,
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
     // If the connector uses the `RelationMode::ForeignKeys` mode, we do not do any checks / emulation.
-    if connector_ctx.relation_mode.uses_foreign_keys() {
+    if query_schema.relation_mode().uses_foreign_keys() {
         return Ok(());
     }
 
@@ -403,11 +403,9 @@ pub fn insert_emulated_on_delete(
                 emulate_on_delete_restrict(graph, &rf, parent_node, child_node)?
             }
             ReferentialAction::SetNull => {
-                emulate_on_delete_set_null(graph, connector_ctx, &rf, parent_node, child_node)?
+                emulate_on_delete_set_null(graph, query_schema, &rf, parent_node, child_node)?
             }
-            ReferentialAction::Cascade => {
-                emulate_on_delete_cascade(graph, &rf, connector_ctx, parent_node, child_node)?
-            }
+            ReferentialAction::Cascade => emulate_on_delete_cascade(graph, &rf, query_schema, parent_node, child_node)?,
             x => panic!("Unsupported referential action emulation: {x}"),
         }
     }
@@ -515,7 +513,7 @@ pub fn emulate_on_delete_restrict(
 pub fn emulate_on_delete_cascade(
     graph: &mut QueryGraph,
     relation_field: &RelationFieldRef, // This is the field _on the other model_ for cascade.
-    connector_ctx: &ConnectorContext,
+    query_schema: &QuerySchema,
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
@@ -536,7 +534,7 @@ pub fn emulate_on_delete_cascade(
 
     insert_emulated_on_delete(
         graph,
-        connector_ctx,
+        query_schema,
         &dependent_model,
         &dependent_records_node,
         &delete_dependents_node,
@@ -606,7 +604,7 @@ pub fn emulate_on_delete_cascade(
 /// ```
 pub fn emulate_on_delete_set_null(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
+    query_schema: &QuerySchema,
     relation_field: &RelationFieldRef,
     parent_node: &NodeRef,
     child_node: &NodeRef,
@@ -678,14 +676,14 @@ pub fn emulate_on_delete_set_null(
             ReferentialAction::SetNull => emulate_on_update_set_null(
                 graph,
                 &rf,
-                connector_ctx,
+                query_schema,
                 &dependent_records_node,
                 &set_null_dependents_node,
             )?,
             ReferentialAction::Cascade => emulate_on_update_cascade(
                 graph,
                 &rf,
-                connector_ctx,
+                query_schema,
                 &dependent_records_node,
                 &set_null_dependents_node,
             )?,
@@ -737,7 +735,7 @@ pub fn emulate_on_delete_set_null(
 pub fn emulate_on_update_set_null(
     graph: &mut QueryGraph,
     relation_field: &RelationFieldRef,
-    connector_ctx: &ConnectorContext,
+    query_schema: &QuerySchema,
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
@@ -822,14 +820,14 @@ pub fn emulate_on_update_set_null(
             ReferentialAction::SetNull => emulate_on_update_set_null(
                 graph,
                 &rf,
-                connector_ctx,
+                query_schema,
                 &dependent_records_node,
                 &set_null_dependents_node,
             )?,
             ReferentialAction::Cascade => emulate_on_update_cascade(
                 graph,
                 &rf,
-                connector_ctx,
+                query_schema,
                 &dependent_records_node,
                 &set_null_dependents_node,
             )?,
@@ -931,13 +929,13 @@ pub fn emulate_on_update_restrict(
 /// ```
 pub fn insert_emulated_on_update_with_intermediary_node(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
+    query_schema: &QuerySchema,
     model_to_update: &ModelRef,
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<Option<NodeRef>> {
     // If the connector uses the `RelationMode::ForeignKeys` mode, we do not do any checks / emulation.
-    if connector_ctx.relation_mode.uses_foreign_keys() {
+    if query_schema.relation_mode().uses_foreign_keys() {
         return Ok(None);
     }
 
@@ -967,10 +965,8 @@ pub fn insert_emulated_on_update_with_intermediary_node(
             ReferentialAction::NoAction | ReferentialAction::Restrict => {
                 emulate_on_update_restrict(graph, &rf, &join_node, child_node)?
             }
-            ReferentialAction::SetNull => {
-                emulate_on_update_set_null(graph, &rf, connector_ctx, &join_node, child_node)?
-            }
-            ReferentialAction::Cascade => emulate_on_update_cascade(graph, &rf, connector_ctx, &join_node, child_node)?,
+            ReferentialAction::SetNull => emulate_on_update_set_null(graph, &rf, query_schema, &join_node, child_node)?,
+            ReferentialAction::Cascade => emulate_on_update_cascade(graph, &rf, query_schema, &join_node, child_node)?,
             x => panic!("Unsupported referential action emulation: {x}"),
         }
     }
@@ -980,13 +976,13 @@ pub fn insert_emulated_on_update_with_intermediary_node(
 
 pub fn insert_emulated_on_update(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
+    query_schema: &QuerySchema,
     model_to_update: &ModelRef,
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
     // If the connector uses the `RelationMode::ForeignKeys` mode, we do not do any checks / emulation.
-    if connector_ctx.relation_mode.uses_foreign_keys() {
+    if query_schema.relation_mode().uses_foreign_keys() {
         return Ok(());
     }
 
@@ -1000,11 +996,9 @@ pub fn insert_emulated_on_update(
                 emulate_on_update_restrict(graph, &rf, parent_node, child_node)?
             }
             ReferentialAction::SetNull => {
-                emulate_on_update_set_null(graph, &rf, connector_ctx, parent_node, child_node)?
+                emulate_on_update_set_null(graph, &rf, query_schema, parent_node, child_node)?
             }
-            ReferentialAction::Cascade => {
-                emulate_on_update_cascade(graph, &rf, connector_ctx, parent_node, child_node)?
-            }
+            ReferentialAction::Cascade => emulate_on_update_cascade(graph, &rf, query_schema, parent_node, child_node)?,
             x => panic!("Unsupported referential action emulation: {x}"),
         }
     }
@@ -1065,7 +1059,7 @@ fn extract_update_args(parent_node: &Node) -> &WriteArgs {
 pub fn emulate_on_update_cascade(
     graph: &mut QueryGraph,
     relation_field: &RelationFieldRef, // This is the field _on the other model_ for cascade.
-    connector_ctx: &ConnectorContext,
+    query_schema: &QuerySchema,
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
@@ -1117,7 +1111,7 @@ pub fn emulate_on_update_cascade(
 
     insert_emulated_on_update(
         graph,
-        connector_ctx,
+        query_schema,
         &dependent_model,
         &dependent_records_node,
         &update_dependents_node,
@@ -1154,7 +1148,6 @@ fn collect_overlapping_relation_fields(model: ModelRef, relation_field: &Relatio
     let dependent_relation_fields: Vec<_> = model
         .fields()
         .relation()
-        .into_iter()
         .filter(|rf| rf != relation_field)
         .filter(|rf| {
             let fks = rf.left_scalars();

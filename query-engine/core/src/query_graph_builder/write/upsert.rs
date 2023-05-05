@@ -6,7 +6,7 @@ use crate::{
 };
 use connector::IntoFilter;
 use prisma_models::ModelRef;
-use schema::ConnectorContext;
+use schema::QuerySchema;
 
 /// Handles a top-level upsert
 ///
@@ -52,9 +52,9 @@ use schema::ConnectorContext;
 /// ```
 pub(crate) fn upsert_record(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
+    query_schema: &QuerySchema,
     model: ModelRef,
-    mut field: ParsedField,
+    mut field: ParsedField<'_>,
 ) -> QueryGraphBuilderResult<()> {
     let where_argument = field.where_arg()?.unwrap();
     let create_argument = field.create_arg()?.unwrap();
@@ -67,7 +67,7 @@ pub(crate) fn upsert_record(
         &create_argument,
         &update_argument,
         selection,
-        connector_ctx,
+        query_schema,
     );
 
     let filter = extract_unique_filter(where_argument, &model)?;
@@ -101,9 +101,9 @@ pub(crate) fn upsert_record(
     let read_parent_records = utils::read_ids_infallible(model.clone(), model_id.clone(), filter.clone());
     let read_parent_records_node = graph.create_node(read_parent_records);
 
-    let create_node = create::create_record_node(graph, connector_ctx, model.clone(), create_argument)?;
+    let create_node = create::create_record_node(graph, query_schema, model.clone(), create_argument)?;
 
-    let update_node = update::update_record_node(graph, connector_ctx, filter, model.clone(), update_argument)?;
+    let update_node = update::update_record_node(graph, query_schema, filter, model.clone(), update_argument)?;
 
     let read_node_create = graph.create_node(Query::Read(read_query.clone()));
     let read_node_update = graph.create_node(Query::Read(read_query));
@@ -137,7 +137,7 @@ pub(crate) fn upsert_record(
     // the emulation node and the update node.
     if let Some(emulation_node) = utils::insert_emulated_on_update_with_intermediary_node(
         graph,
-        connector_ctx,
+        query_schema,
         &model,
         &read_parent_records_node,
         &update_node,
@@ -202,13 +202,13 @@ pub(crate) fn upsert_record(
 // 2. The create and update arguments do not have any nested queries
 // 3. There is only 1 unique field in the where clause
 // 4. The unique field defined in where clause has the same value as defined in the create arguments
-fn can_use_connector_native_upsert(
+fn can_use_connector_native_upsert<'a>(
     model: &ModelRef,
-    where_field: &ParsedInputMap,
-    create_argument: &ParsedInputMap,
-    update_argument: &ParsedInputMap,
-    selection: &Option<ParsedObject>,
-    connector_ctx: &ConnectorContext,
+    where_field: &ParsedInputMap<'a>,
+    create_argument: &ParsedInputMap<'a>,
+    update_argument: &ParsedInputMap<'a>,
+    selection: &Option<ParsedObject<'_>>,
+    query_schema: &QuerySchema,
 ) -> bool {
     let has_nested_selects = has_nested_selects(selection);
 
@@ -232,14 +232,14 @@ fn can_use_connector_native_upsert(
         .iter()
         .all(|(field_name, input)| where_and_create_equal(field_name, input, create_argument));
 
-    connector_ctx.can_native_upsert()
+    query_schema.can_native_upsert()
         && has_one_unique
         && !has_nested_create
         && !has_nested_update
         && !empty_update
         && !has_nested_selects
         && where_values_same_as_create
-        && !connector_ctx.relation_mode.is_prisma()
+        && !query_schema.relation_mode().is_prisma()
 }
 
 fn is_unique_field(field_name: &str, model: &ModelRef) -> bool {
@@ -249,7 +249,7 @@ fn is_unique_field(field_name: &str, model: &ModelRef) -> bool {
     }
 }
 
-fn has_nested_selects(selection: &Option<ParsedObject>) -> bool {
+fn has_nested_selects(selection: &Option<ParsedObject<'_>>) -> bool {
     if let Some(parsed_object) = selection {
         parsed_object
             .fields
@@ -262,7 +262,11 @@ fn has_nested_selects(selection: &Option<ParsedObject>) -> bool {
 
 /// Make sure the unique fields defined in the where clause have the same values
 /// as in the create of the upsert.
-fn where_and_create_equal(field_name: &str, where_value: &ParsedInputValue, create_map: &ParsedInputMap) -> bool {
+fn where_and_create_equal<'a>(
+    field_name: &str,
+    where_value: &ParsedInputValue<'a>,
+    create_map: &ParsedInputMap<'a>,
+) -> bool {
     match where_value {
         ParsedInputValue::Map(inner_map) => inner_map
             .iter()

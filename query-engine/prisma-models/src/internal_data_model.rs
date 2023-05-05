@@ -2,7 +2,7 @@ use crate::{prelude::*, CompositeType, InternalEnum};
 use psl::schema_ast::ast;
 use std::sync::Arc;
 
-pub type InternalDataModelRef = InternalDataModel;
+pub(crate) type InternalDataModelRef = InternalDataModel;
 
 #[derive(Debug, Clone)]
 pub struct InternalDataModel {
