@@ -12,8 +12,9 @@ jobs:
     env:
       SQLITE_MAX_VARIABLE_NUMBER: 250000
       SQLITE_MAX_EXPR_DEPTH: 10000
+      RUSTFLAGS: "-C target-feature=+crt-static"
     runs-on: windows-latest
-    
+
     steps:
       - name: Output link to real commit
         run: echo ${{ github.repository }}/commit/${{ github.event.inputs.commit }}
