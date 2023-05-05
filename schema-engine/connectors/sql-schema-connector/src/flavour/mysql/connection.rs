@@ -10,7 +10,7 @@ use quaint::{
     prelude::{ConnectionInfo, Queryable},
 };
 use schema_connector::{ConnectorError, ConnectorResult};
-use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
+use sql_schema_describer::{DescriberErrorKind, SqlSchema};
 use user_facing_errors::{
     schema_engine::DatabaseSchemaInconsistent,
     schema_engine::{ApplyMigrationError, DirectDdlNotAllowed, ForeignKeyCreationNotAllowed},
@@ -32,8 +32,27 @@ impl Connection {
     }
 
     #[tracing::instrument(skip(self, params))]
-    pub(super) async fn describe_schema(&mut self, params: &super::Params) -> ConnectorResult<SqlSchema> {
-        let mut schema = sql_schema_describer::mysql::SqlSchemaDescriber::new(&self.0)
+    pub(super) async fn describe_schema(
+        &mut self,
+        circumstances: BitFlags<super::Circumstances>,
+        params: &super::Params,
+    ) -> ConnectorResult<SqlSchema> {
+        use sql_schema_describer::{mysql as describer, SqlSchemaDescriberBackend};
+        let mut describer_circumstances: BitFlags<describer::Circumstances> = Default::default();
+
+        if circumstances.contains(super::Circumstances::IsMariadb) {
+            describer_circumstances |= describer::Circumstances::MariaDb;
+        }
+
+        if circumstances.contains(super::Circumstances::IsMysql56) {
+            describer_circumstances |= describer::Circumstances::MySql56;
+        }
+
+        if circumstances.contains(super::Circumstances::IsMysql57) {
+            describer_circumstances |= describer::Circumstances::MySql57;
+        }
+
+        let mut schema = sql_schema_describer::mysql::SqlSchemaDescriber::new(&self.0, describer_circumstances)
             .describe(&[params.url.dbname()])
             .await
             .map_err(|err| match err.into_kind() {
