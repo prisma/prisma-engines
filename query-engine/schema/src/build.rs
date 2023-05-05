@@ -138,6 +138,7 @@ impl<'a> BuilderContext<'a> {
 }
 
 pub fn build(schema: Arc<psl::ValidatedSchema>, enable_raw_queries: bool) -> QuerySchema {
+    let _span = tracing::info_span!("prisma:engine:schema").entered();
     let preview_features = schema.configuration.preview_features();
     build_with_features(schema, preview_features, enable_raw_queries)
 }

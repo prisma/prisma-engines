@@ -3619,6 +3619,7 @@ name = "request-handlers"
 version = "0.1.0"
 dependencies = [
  "bigdecimal",
+ "codspeed-criterion-compat",
  "connection-string",
  "dmmf",
  "futures",
@@ -3859,6 +3860,7 @@ dependencies = [
  "prisma-models",
  "psl",
  "rustc-hash",
+ "tracing",
 ]
 
 [[package]]

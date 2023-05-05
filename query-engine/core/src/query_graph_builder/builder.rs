@@ -9,18 +9,18 @@ pub static PRISMA_RENDER_DOT_FILE: Lazy<bool> = Lazy::new(|| match std::env::var
     Err(_) => false,
 });
 
-pub struct QueryGraphBuilder {
-    query_schema: QuerySchemaRef,
+pub struct QueryGraphBuilder<'a> {
+    query_schema: &'a QuerySchema,
 }
 
-impl fmt::Debug for QueryGraphBuilder {
+impl fmt::Debug for QueryGraphBuilder<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("QueryGraphBuilder").finish()
     }
 }
 
-impl QueryGraphBuilder {
-    pub fn new(query_schema: QuerySchemaRef) -> Self {
+impl<'a> QueryGraphBuilder<'a> {
+    pub fn new(query_schema: &'a QuerySchema) -> Self {
         Self { query_schema }
     }
 
@@ -46,7 +46,7 @@ impl QueryGraphBuilder {
         let mut parsed_object = QueryDocumentParser::new(crate::executor::get_request_now()).parse(
             &selections,
             root_object,
-            &self.query_schema,
+            self.query_schema,
         )?;
 
         // Because we're processing root objects, there can only be one query / mutation.
