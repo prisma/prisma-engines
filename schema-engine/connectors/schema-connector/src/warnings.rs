@@ -411,7 +411,7 @@ impl fmt::Display for Warnings {
         )?;
 
         render_warnings(
-            "The following models have a JSON Schema defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/todo",
+            "The following models have a JSON Schema defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/mongodb-json-schema",
             &self.json_schema_defined,
             f
         )?;

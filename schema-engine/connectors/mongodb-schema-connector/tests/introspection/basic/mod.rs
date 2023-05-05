@@ -104,14 +104,14 @@ fn collection_with_json_schema() {
     let expected_warning = expect![[r#"
         *** WARNING ***
 
-        The following models have a JSON Schema defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/todo
+        The following models have a JSON Schema defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/mongodb-json-schema
           - "A"
     "#]];
 
     res.expect_warnings(&expected_warning);
 
     let expected_doc = expect![[r#"
-        /// json schema msg
+        /// This table uses a JSON Schema defined in the database, which requires additional setup for migrations. Visit https://pris.ly/d/mongodb-json-schema for more info.
         model A {
           id String @id @default(auto()) @map("_id") @db.ObjectId
         }
