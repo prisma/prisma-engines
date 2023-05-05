@@ -4,7 +4,8 @@ use indoc::indoc;
 use sql_introspection_tests::test_api::*;
 use test_macros::test_connector;
 
-#[test_connector(tags(Mysql), exclude(Vitess))]
+// Note: MySQL 5.6 ad 5.7 do not support check constraints, so this test is only run on MySQL 8.0.
+#[test_connector(tags(Mysql8), exclude(Vitess))]
 async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
     let raw_sql = indoc! {r#"
         CREATE TABLE t1(

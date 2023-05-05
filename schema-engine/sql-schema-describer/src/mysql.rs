@@ -737,6 +737,11 @@ impl<'a> SqlSchemaDescriber<'a> {
         table_names: &IndexMap<String, TableId>,
         sql_schema: &mut SqlSchema,
     ) -> DescriberResult<()> {
+        // Only MySQL 8 and above supports check constraints and has the CHECK_CONSTRAINTS table we can query.
+        if !self.supports_check_constraints() {
+            return Ok(());
+        }
+
         // Note: in MySQL, columns must be re-aliased, otherwise their casing would be inconsistent (and uppercased).
         let sql = include_str!("mysql/constraints_query.sql");
 
@@ -797,6 +802,12 @@ impl<'a> SqlSchemaDescriber<'a> {
             Lazy::new(|| Regex::new(r#"(?i)^current_timestamp(\([0-9]*\))?$"#).unwrap());
 
         MYSQL_CURRENT_TIMESTAMP_RE.is_match(default_str)
+    }
+
+    fn supports_check_constraints(&self) -> bool {
+        !self
+            .circumstances
+            .intersects(Circumstances::MySql56 | Circumstances::MySql57)
     }
 }
 
