@@ -160,6 +160,15 @@ async fn mysql_multi_row_index_warning(api: &mut TestApi) -> TestResult {
             INDEX zips( (CAST(custinfo->'$.zipcode' AS UNSIGNED ARRAY)) )
         );
 
+        CREATE TABLE customers_2 (
+            id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            created DATETIME DEFAULT CURRENT_TIMESTAMP,
+            modified DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            custinfo JSON,
+            INDEX customers_2_created_idx (created, (CAST(custinfo->'$.zipcode' AS UNSIGNED ARRAY))),
+            UNIQUE comp(modified, (CAST(custinfo->'$.zipcode' AS UNSIGNED ARRAY)))
+        );
+
         CREATE TABLE my_table (
             id INT NOT NULL AUTO_INCREMENT,
             name VARCHAR(50) NOT NULL,
@@ -168,7 +177,7 @@ async fn mysql_multi_row_index_warning(api: &mut TestApi) -> TestResult {
             PRIMARY KEY (id),
             INDEX name_age (name, age),
             CONSTRAINT unique_name_email UNIQUE (name, email)
-      );
+        );
     "#,
     )
     .await;
@@ -178,6 +187,7 @@ async fn mysql_multi_row_index_warning(api: &mut TestApi) -> TestResult {
 
         These tables contain multi-value indices, which are not yet fully supported. Read more: https://pris.ly/d/mysql-multi-row-index
           - "customers"
+          - "customers_2"
     "#]];
 
     api.expect_warnings(&expected).await;
@@ -197,6 +207,16 @@ async fn mysql_multi_row_index_warning(api: &mut TestApi) -> TestResult {
           id       BigInt    @id @default(autoincrement())
           modified DateTime? @default(now()) @db.DateTime(0)
           custinfo Json?
+        }
+
+        /// This table contains multi-value indices, which are not yet fully supported. Visit https://pris.ly/d/mysql-multi-row-index for more info.
+        model customers_2 {
+          id       BigInt    @id @default(autoincrement())
+          created  DateTime? @default(now()) @db.DateTime(0)
+          modified DateTime? @default(now()) @db.DateTime(0)
+          custinfo Json?
+
+          @@index([created])
         }
 
         model my_table {
