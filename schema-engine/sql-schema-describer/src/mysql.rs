@@ -804,10 +804,16 @@ impl<'a> SqlSchemaDescriber<'a> {
         MYSQL_CURRENT_TIMESTAMP_RE.is_match(default_str)
     }
 
+    /// Tests whether the current database supports check constraints
     fn supports_check_constraints(&self) -> bool {
+        // MySQL 8 and above supports check constraints.
+        // MySQL 5.6 and 5.7 do not have a CHECK_CONSTRAINTS table we can query.
+        // MariaDB, although it supports check constraints, adds them unexpectedly.
+        // E.g., MariaDB 10 adds the `json_valid(\`Priv\`)` check constraint on every JSON column;
+        // this creates a noisy, unexpected diff when comparing the introspected schema with the prisma schema.
         !self
             .circumstances
-            .intersects(Circumstances::MySql56 | Circumstances::MySql57)
+            .intersects(Circumstances::MySql56 | Circumstances::MySql57 | Circumstances::MariaDb)
     }
 }
 
