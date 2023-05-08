@@ -21,6 +21,7 @@ pub struct IndexId(usize);
 pub struct CollectionData {
     pub(crate) name: String,
     pub(crate) has_schema: bool,
+    pub(crate) is_capped: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -71,8 +72,12 @@ pub struct MongoSchema {
 
 impl MongoSchema {
     /// Add a collection to the schema.
-    pub fn push_collection(&mut self, name: String, has_schema: bool) -> CollectionId {
-        self.collections.push(CollectionData { name, has_schema });
+    pub fn push_collection(&mut self, name: String, has_schema: bool, is_capped: bool) -> CollectionId {
+        self.collections.push(CollectionData {
+            name,
+            has_schema,
+            is_capped,
+        });
         CollectionId(self.collections.len() - 1)
     }
 
