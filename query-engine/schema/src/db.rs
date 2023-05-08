@@ -57,11 +57,23 @@ impl ops::Index<InputObjectTypeId> for QuerySchemaDatabase {
     }
 }
 
+impl ops::IndexMut<InputObjectTypeId> for QuerySchemaDatabase {
+    fn index_mut(&mut self, index: InputObjectTypeId) -> &mut Self::Output {
+        &mut self.input_object_types[index.0]
+    }
+}
+
 impl ops::Index<OutputObjectTypeId> for QuerySchemaDatabase {
     type Output = ObjectType;
 
     fn index(&self, index: OutputObjectTypeId) -> &Self::Output {
         &self.output_object_types[index.0]
+    }
+}
+
+impl ops::IndexMut<OutputObjectTypeId> for QuerySchemaDatabase {
+    fn index_mut(&mut self, index: OutputObjectTypeId) -> &mut Self::Output {
+        &mut self.output_object_types[index.0]
     }
 }
 

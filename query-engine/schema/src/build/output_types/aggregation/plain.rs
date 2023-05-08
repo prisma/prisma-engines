@@ -7,7 +7,7 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext<'_>, model: &Mode
     let ident = Identifier::new_prisma(format!("Aggregate{}", capitalize(model.name())));
     return_cached_output!(ctx, &ident);
 
-    let object = ObjectType::new(ident.clone(), Some(model.id));
+    let mut object = ObjectType::new(ident.clone(), Some(model.id));
     let mut object_fields = vec![];
 
     let non_list_nor_json_fields = collect_non_list_nor_json_fields(&model.into());
