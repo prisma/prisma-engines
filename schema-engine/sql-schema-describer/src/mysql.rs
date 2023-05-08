@@ -51,7 +51,6 @@ pub enum Circumstances {
 
 pub struct SqlSchemaDescriber<'a> {
     conn: &'a dyn Queryable,
-    #[allow(dead_code)]
     circumstances: BitFlags<Circumstances>,
 }
 
