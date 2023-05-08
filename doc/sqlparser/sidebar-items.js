@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["ast","SQL Abstract Syntax Tree (AST) types"],["dialect",""],["keywords","This module defines"],["parser","SQL Parser"],["tokenizer","SQL Tokenizer"]]};
+window.SIDEBAR_ITEMS = {"mod":["ast","dialect","keywords","parser","tokenizer"]};

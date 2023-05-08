@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["Count","Represents the number of currently-pending requests to a given service."],["Handle","Tracks an in-flight request by reference count."],["PendingRequests","Measures the load of the underlying service using the number of currently-pending requests."],["PendingRequestsDiscover","Wraps a `D`-typed stream of discovered services with [`PendingRequests`]."]]};
+window.SIDEBAR_ITEMS = {"struct":["Count","Handle","PendingRequests","PendingRequestsDiscover"]};

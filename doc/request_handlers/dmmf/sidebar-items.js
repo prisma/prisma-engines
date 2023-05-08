@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["render_dmmf",""]]};
+window.SIDEBAR_ITEMS = {"fn":["render_dmmf"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["SqlSchemaDescriber",""]],"trait":[["Connection",""]]};
+window.SIDEBAR_ITEMS = {"struct":["SqlSchemaDescriber"],"trait":["Connection"]};

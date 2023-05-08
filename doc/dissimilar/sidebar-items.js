@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["Chunk",""]],"fn":[["diff",""]]};
+window.SIDEBAR_ITEMS = {"enum":["Chunk"],"fn":["diff"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"trait":[["Bitflags","Trait for types generated using `bitflags::bitflags!` macro."]]};
+window.SIDEBAR_ITEMS = {"trait":["Bitflags"]};

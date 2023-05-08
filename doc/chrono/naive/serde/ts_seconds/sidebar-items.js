@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["deserialize","Deserialize a `NaiveDateTime` from a seconds timestamp"],["serialize","Serialize a datetime into an integer number of seconds since the epoch"]]};
+window.SIDEBAR_ITEMS = {"fn":["deserialize","serialize"]};

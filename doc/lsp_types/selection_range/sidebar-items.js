@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["SelectionRangeProviderCapability",""]],"struct":[["SelectionRange","Represents a selection range."],["SelectionRangeClientCapabilities",""],["SelectionRangeOptions",""],["SelectionRangeParams","A parameter literal used in selection range requests."],["SelectionRangeRegistrationOptions",""]]};
+window.SIDEBAR_ITEMS = {"enum":["SelectionRangeProviderCapability"],"struct":["SelectionRange","SelectionRangeClientCapabilities","SelectionRangeOptions","SelectionRangeParams","SelectionRangeRegistrationOptions"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["MessageType","Message types are either Query (also Update) or Response"]],"struct":[["Flags","All the flags of the request/response header"],["Header","Metadata for the `Message` struct."]]};
+window.SIDEBAR_ITEMS = {"enum":["MessageType"],"struct":["Flags","Header"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["bits_of","Counts the number of bits in a value of type `T`."],["elts","Bit Storage Calculator"]],"trait":[["BitRegister","Register Descriptions"]]};
+window.SIDEBAR_ITEMS = {"fn":["bits_of","elts"],"trait":["BitRegister"]};

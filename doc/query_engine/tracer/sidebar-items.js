@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["install",""]],"struct":[["ClientSpanExporter","A [`ClientSpanExporter`] that sends spans to stdout."]]};
+window.SIDEBAR_ITEMS = {"fn":["install"],"struct":["ClientSpanExporter"]};

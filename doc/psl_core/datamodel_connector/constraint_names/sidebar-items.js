@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["ConstraintNames",""]]};
+window.SIDEBAR_ITEMS = {"struct":["ConstraintNames"]};

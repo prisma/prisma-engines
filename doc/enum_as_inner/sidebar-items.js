@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"derive":[["EnumAsInner",""]]};
+window.SIDEBAR_ITEMS = {"derive":["EnumAsInner"]};

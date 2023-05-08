@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["ErrorKind",""]],"struct":[["ConnectorError",""],["MultiError",""]]};
+window.SIDEBAR_ITEMS = {"enum":["ErrorKind"],"struct":["ConnectorError","MultiError"]};

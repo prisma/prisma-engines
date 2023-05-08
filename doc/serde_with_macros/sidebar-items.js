@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"attr":[["serde_as","Convenience macro to use the `serde_as` system."],["skip_serializing_none","Add `skip_serializing_if` annotations to [`Option`] fields."]],"derive":[["DeserializeFromStr","Deserialize value by using its `FromStr` implementation"],["SerializeDisplay","Serialize value by using it’s `Display` implementation"]]};
+window.SIDEBAR_ITEMS = {"attr":["serde_as","skip_serializing_none"],"derive":["DeserializeFromStr","SerializeDisplay"]};

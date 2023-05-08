@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["ArrayQueue","A bounded multi-producer multi-consumer queue."],["SegQueue","An unbounded multi-producer multi-consumer queue."]]};
+window.SIDEBAR_ITEMS = {"struct":["ArrayQueue","SegQueue"]};

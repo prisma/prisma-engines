@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"macro":[["expect","Creates an instance of `Expect` from string literal:"],["expect_file","Creates an instance of `ExpectFile` from relative or absolute path:"]],"struct":[["Expect","Self-updating string literal."],["ExpectFile","Self-updating file."],["Position","Position of original `expect!` in the source file."]]};
+window.SIDEBAR_ITEMS = {"macro":["expect","expect_file"],"struct":["Expect","ExpectFile","Position"]};

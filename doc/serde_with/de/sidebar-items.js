@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["DeserializeAsWrap","Helper type to implement [`DeserializeAs`] for container-like types."]],"trait":[["DeserializeAs","A data structure that can be deserialized from any data format supported by Serde, analogue to [`Deserialize`]."]]};
+window.SIDEBAR_ITEMS = {"struct":["DeserializeAsWrap"],"trait":["DeserializeAs"]};

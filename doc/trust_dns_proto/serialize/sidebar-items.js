@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["binary","Binary serialization types"]]};
+window.SIDEBAR_ITEMS = {"mod":["binary"]};

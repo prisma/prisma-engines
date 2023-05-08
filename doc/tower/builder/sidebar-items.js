@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["ServiceBuilder","Declaratively construct `Service` values."]]};
+window.SIDEBAR_ITEMS = {"struct":["ServiceBuilder"]};

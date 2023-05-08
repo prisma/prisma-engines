@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"attr":[["bitflags_internal",""]]};
+window.SIDEBAR_ITEMS = {"attr":["bitflags_internal"]};

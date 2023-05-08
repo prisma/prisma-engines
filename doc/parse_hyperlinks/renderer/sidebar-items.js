@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["links2html","Hyperlink extractor"],["links2html_writer","Hyperlink extractor"],["text_links2html","Source code viewer with link renderer"],["text_links2html_writer","Source code viewer with link renderer"],["text_rawlinks2html","Markup source code viewer"],["text_rawlinks2html_writer","Markup source code viewer"]]};
+window.SIDEBAR_ITEMS = {"fn":["links2html","links2html_writer","text_links2html","text_links2html_writer","text_rawlinks2html","text_rawlinks2html_writer"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["PacketCodecError",""]]};
+window.SIDEBAR_ITEMS = {"enum":["PacketCodecError"]};

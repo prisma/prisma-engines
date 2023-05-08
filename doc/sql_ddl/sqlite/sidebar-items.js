@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["ForeignKeyAction","Foreign key action types (for ON DELETE|ON UPDATE)."]],"struct":[["Column",""],["CreateTable",""],["ForeignKey",""]]};
+window.SIDEBAR_ITEMS = {"enum":["ForeignKeyAction"],"struct":["Column","CreateTable","ForeignKey"]};

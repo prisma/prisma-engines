@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["custom_types",""]]};
+window.SIDEBAR_ITEMS = {"mod":["custom_types"]};

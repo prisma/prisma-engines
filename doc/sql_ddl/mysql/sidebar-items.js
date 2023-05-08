@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["AlterTableClause",""],["ForeignKeyAction",""],["IndexType",""]],"struct":[["AlterTable",""],["Column",""],["CreateIndex",""],["CreateTable",""],["DropIndex",""],["DropTable",""],["ForeignKey",""],["IndexClause",""]]};
+window.SIDEBAR_ITEMS = {"enum":["AlterTableClause","ForeignKeyAction","IndexType"],"struct":["AlterTable","Column","CreateIndex","CreateTable","DropIndex","DropTable","ForeignKey","IndexClause"]};

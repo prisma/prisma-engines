@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["deserialize","Deserializes a Uuid from a Binary."],["serialize","Serializes a Uuid as a Binary."]]};
+window.SIDEBAR_ITEMS = {"fn":["deserialize","serialize"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["SqlSchemaConnector","The top-level SQL migration connector."]]};
+window.SIDEBAR_ITEMS = {"struct":["SqlSchemaConnector"]};

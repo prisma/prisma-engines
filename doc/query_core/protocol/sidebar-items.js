@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["EngineProtocol",""]]};
+window.SIDEBAR_ITEMS = {"enum":["EngineProtocol"]};

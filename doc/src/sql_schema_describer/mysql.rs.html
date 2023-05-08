@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `schema-engine/sql-schema-describer/src/mysql.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mysql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-93196c7a1c3542a8.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../sql_schema_describer/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `schema-engine/sql-schema-describer/src/mysql.rs`."><title>mysql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c4dbdcde0fbd8430.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" disabled href="../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" disabled href="../../static.files/ayu-be46fdc453a55015.css"><script src="../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-98a684e84ae5b08b.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../sql_schema_describer/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -865,6 +865,69 @@
 <a href="#865" id="865">865</a>
 <a href="#866" id="866">866</a>
 <a href="#867" id="867">867</a>
+<a href="#868" id="868">868</a>
+<a href="#869" id="869">869</a>
+<a href="#870" id="870">870</a>
+<a href="#871" id="871">871</a>
+<a href="#872" id="872">872</a>
+<a href="#873" id="873">873</a>
+<a href="#874" id="874">874</a>
+<a href="#875" id="875">875</a>
+<a href="#876" id="876">876</a>
+<a href="#877" id="877">877</a>
+<a href="#878" id="878">878</a>
+<a href="#879" id="879">879</a>
+<a href="#880" id="880">880</a>
+<a href="#881" id="881">881</a>
+<a href="#882" id="882">882</a>
+<a href="#883" id="883">883</a>
+<a href="#884" id="884">884</a>
+<a href="#885" id="885">885</a>
+<a href="#886" id="886">886</a>
+<a href="#887" id="887">887</a>
+<a href="#888" id="888">888</a>
+<a href="#889" id="889">889</a>
+<a href="#890" id="890">890</a>
+<a href="#891" id="891">891</a>
+<a href="#892" id="892">892</a>
+<a href="#893" id="893">893</a>
+<a href="#894" id="894">894</a>
+<a href="#895" id="895">895</a>
+<a href="#896" id="896">896</a>
+<a href="#897" id="897">897</a>
+<a href="#898" id="898">898</a>
+<a href="#899" id="899">899</a>
+<a href="#900" id="900">900</a>
+<a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
+<a href="#904" id="904">904</a>
+<a href="#905" id="905">905</a>
+<a href="#906" id="906">906</a>
+<a href="#907" id="907">907</a>
+<a href="#908" id="908">908</a>
+<a href="#909" id="909">909</a>
+<a href="#910" id="910">910</a>
+<a href="#911" id="911">911</a>
+<a href="#912" id="912">912</a>
+<a href="#913" id="913">913</a>
+<a href="#914" id="914">914</a>
+<a href="#915" id="915">915</a>
+<a href="#916" id="916">916</a>
+<a href="#917" id="917">917</a>
+<a href="#918" id="918">918</a>
+<a href="#919" id="919">919</a>
+<a href="#920" id="920">920</a>
+<a href="#921" id="921">921</a>
+<a href="#922" id="922">922</a>
+<a href="#923" id="923">923</a>
+<a href="#924" id="924">924</a>
+<a href="#925" id="925">925</a>
+<a href="#926" id="926">926</a>
+<a href="#927" id="927">927</a>
+<a href="#928" id="928">928</a>
+<a href="#929" id="929">929</a>
+<a href="#930" id="930">930</a>
 </pre><pre class="rust"><code><span class="doccomment">//! MySQL schema description.
 
 </span><span class="kw">use crate</span>::{getters::Getter, parsers::Parser, <span class="kw-2">*</span>};
@@ -907,8 +970,18 @@
     }
 }
 
+<span class="attr">#[enumflags2::bitflags]
+#[derive(Clone, Copy, Debug)]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>Circumstances {
+    MariaDb,
+    MySql56,
+    MySql57,
+}
+
 <span class="kw">pub struct </span>SqlSchemaDescriber&lt;<span class="lifetime">&#39;a</span>&gt; {
     conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>Queryable,
+    circumstances: BitFlags&lt;Circumstances&gt;,
 }
 
 <span class="attr">#[async_trait::async_trait]
@@ -943,6 +1016,8 @@
         <span class="kw">let </span>table_names = <span class="self">self</span>.get_table_names(schema, <span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
         sql_schema.tables.reserve(table_names.len());
         sql_schema.table_columns.reserve(table_names.len());
+
+        <span class="self">self</span>.get_constraints(<span class="kw-2">&amp;</span>table_names, <span class="kw-2">&amp;mut </span>sql_schema).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="self">Self</span>::get_all_columns(<span class="kw-2">&amp;</span>table_names, <span class="self">self</span>.conn, schema, <span class="kw-2">&amp;mut </span>sql_schema, <span class="kw-2">&amp;</span>flavour).<span class="kw">await</span><span class="question-mark">?</span>;
         push_foreign_keys(schema, <span class="kw-2">&amp;</span>table_names, <span class="kw-2">&amp;mut </span>sql_schema, <span class="self">self</span>.conn).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1069,8 +1144,8 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; SqlSchemaDescriber&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="doccomment">/// Constructor.
-    </span><span class="kw">pub fn </span>new(conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>Queryable) -&gt; SqlSchemaDescriber&lt;<span class="lifetime">&#39;a</span>&gt; {
-        SqlSchemaDescriber { conn }
+    </span><span class="kw">pub fn </span>new(conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>Queryable, circumstances: BitFlags&lt;Circumstances&gt;) -&gt; SqlSchemaDescriber&lt;<span class="lifetime">&#39;a</span>&gt; {
+        SqlSchemaDescriber { conn, circumstances }
     }
 
     <span class="attr">#[tracing::instrument(skip(<span class="self">self</span>))]
@@ -1159,7 +1234,9 @@
         <span class="kw">let </span>names = rows.into_iter().map(|row| {
             (
                 row.get_expect_string(<span class="string">&quot;table_name&quot;</span>),
-                row.get_expect_string(<span class="string">&quot;create_options&quot;</span>) == <span class="string">&quot;partitioned&quot;</span>,
+                row.get_string(<span class="string">&quot;create_options&quot;</span>)
+                    .filter(|c| c.as_str() == <span class="string">&quot;partitioned&quot;</span>)
+                    .is_some(),
                 row.get_string(<span class="string">&quot;table_comment&quot;</span>).filter(|c| !c.is_empty()),
             )
         });
@@ -1583,6 +1660,43 @@
         }
     }
 
+    <span class="doccomment">/// Return the constraints that are not primary keys, foreign keys, or unique keys, fulltext, or spacial.
+    /// Namely, this currently just returns CHECK constraints.
+    </span><span class="kw">async fn </span>get_constraints(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        table_names: <span class="kw-2">&amp;</span>IndexMap&lt;String, TableId&gt;,
+        sql_schema: <span class="kw-2">&amp;mut </span>SqlSchema,
+    ) -&gt; DescriberResult&lt;()&gt; {
+        <span class="comment">// Only MySQL 8 and above supports check constraints and has the CHECK_CONSTRAINTS table we can query.
+        </span><span class="kw">if </span>!<span class="self">self</span>.supports_check_constraints() {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
+        }
+
+        <span class="comment">// Note: in MySQL, columns must be re-aliased, otherwise their casing would be inconsistent (and uppercased).
+        </span><span class="kw">let </span>sql = <span class="macro">include_str!</span>(<span class="string">&quot;mysql/constraints_query.sql&quot;</span>);
+
+        <span class="kw">let </span>rows = <span class="self">self</span>.conn.query_raw(sql, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="kw">for </span>row <span class="kw">in </span>rows {
+            <span class="kw">let </span>table_name = row.get_expect_string(<span class="string">&quot;table_name&quot;</span>);
+            <span class="kw">let </span>constraint_name = row.get_expect_string(<span class="string">&quot;constraint_name&quot;</span>);
+            <span class="kw">let </span>constraint_type = row.get_expect_string(<span class="string">&quot;constraint_type&quot;</span>);
+
+            <span class="kw">let </span>table_id = <span class="kw">match </span>table_names.get(<span class="kw-2">&amp;</span>table_name) {
+                <span class="prelude-val">Some</span>(id) =&gt; <span class="kw-2">*</span>id,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">continue</span>,
+            };
+
+            <span class="kw">if </span>constraint_type.as_str() == <span class="string">&quot;check&quot; </span>{
+                sql_schema.check_constraints.push((table_id, constraint_name));
+            }
+        }
+
+        sql_schema.check_constraints.sort_by_key(|(id, <span class="kw">_</span>)| <span class="kw-2">*</span>id);
+
+        <span class="prelude-val">Ok</span>(())
+    }
+
     <span class="kw">fn </span>extract_precision(input: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
         <span class="kw">static </span>RE: Lazy&lt;Regex&gt; = Lazy::new(|| Regex::new(<span class="string">r#&quot;.*\(([1-9])\)&quot;#</span>).unwrap());
         RE.captures(input)
@@ -1618,6 +1732,18 @@
             Lazy::new(|| Regex::new(<span class="string">r#&quot;(?i)^current_timestamp(\([0-9]*\))?$&quot;#</span>).unwrap());
 
         MYSQL_CURRENT_TIMESTAMP_RE.is_match(default_str)
+    }
+
+    <span class="doccomment">/// Tests whether the current database supports check constraints
+    </span><span class="kw">fn </span>supports_check_constraints(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="comment">// MySQL 8 and above supports check constraints.
+        // MySQL 5.6 and 5.7 do not have a CHECK_CONSTRAINTS table we can query.
+        // MariaDB, although it supports check constraints, adds them unexpectedly.
+        // E.g., MariaDB 10 adds the `json_valid(\`Priv\`)` check constraint on every JSON column;
+        // this creates a noisy, unexpected diff when comparing the introspected schema with the prisma schema.
+        </span>!<span class="self">self
+            </span>.circumstances
+            .intersects(Circumstances::MySql56 | Circumstances::MySql57 | Circumstances::MariaDb)
     }
 }
 
@@ -1733,4 +1859,4 @@
     }
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="sql_schema_describer" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="sql_schema_describer" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0 (84c898d65 2023-04-16)" data-search-js="search-8a59a8356673ec1f.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

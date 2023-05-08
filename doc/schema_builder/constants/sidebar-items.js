@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":[["aggregations",""],["args",""],["deprecation",""],["filters",""],["itx",""],["json_null",""],["operations",""],["ordering",""],["output_fields",""]]};

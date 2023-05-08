@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["ResponseFuture","Future that completes when the buffered service eventually services the submitted request."]]};
+window.SIDEBAR_ITEMS = {"struct":["ResponseFuture"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"macro":[["multi_byte_range_tests","Makes a common test suite for multi-byte range indices."],["multi_byte_tests","Makes a common test suite for multi-byte indices."],["single_byte_tests","Makes a common test suite for single-byte indices."]]};
+window.SIDEBAR_ITEMS = {"macro":["multi_byte_range_tests","multi_byte_tests","single_byte_tests"]};

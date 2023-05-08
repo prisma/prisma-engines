@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["Version","Protocol Version"]]};
+window.SIDEBAR_ITEMS = {"enum":["Version"]};

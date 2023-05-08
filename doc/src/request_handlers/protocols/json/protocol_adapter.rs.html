@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/request-handlers/src/protocols/json/protocol_adapter.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>protocol_adapter.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-93196c7a1c3542a8.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../request_handlers/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/request-handlers/src/protocols/json/protocol_adapter.rs`."><title>protocol_adapter.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c4dbdcde0fbd8430.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-be46fdc453a55015.css"><script src="../../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-98a684e84ae5b08b.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../request_handlers/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1718,21 +1718,13 @@
 <a href="#1718" id="1718">1718</a>
 <a href="#1719" id="1719">1719</a>
 <a href="#1720" id="1720">1720</a>
-<a href="#1721" id="1721">1721</a>
-<a href="#1722" id="1722">1722</a>
-<a href="#1723" id="1723">1723</a>
-<a href="#1724" id="1724">1724</a>
-<a href="#1725" id="1725">1725</a>
-<a href="#1726" id="1726">1726</a>
-<a href="#1727" id="1727">1727</a>
-<a href="#1728" id="1728">1728</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{FieldQuery, HandlerError, JsonSingleQuery, SelectionSet};
 <span class="kw">use </span>bigdecimal::{BigDecimal, FromPrimitive};
 <span class="kw">use </span>indexmap::IndexMap;
 <span class="kw">use </span>prisma_models::{decode_bytes, parse_datetime, prelude::ParentContainer, Field};
 <span class="kw">use </span>query_core::{
     constants::custom_types,
-    schema::{ObjectType, OutputField, QuerySchema, QuerySchemaRef},
+    schema::{ObjectType, OutputField, QuerySchema},
     ArgumentValue, Operation, Selection,
 };
 <span class="kw">use </span>serde_json::Value <span class="kw">as </span>JsonValue;
@@ -1746,7 +1738,7 @@
 <span class="kw">pub struct </span>JsonProtocolAdapter;
 
 <span class="kw">impl </span>JsonProtocolAdapter {
-    <span class="kw">pub fn </span>convert_single(query: JsonSingleQuery, query_schema: <span class="kw-2">&amp;</span>QuerySchemaRef) -&gt; <span class="kw">crate</span>::Result&lt;Operation&gt; {
+    <span class="kw">pub fn </span>convert_single(query: JsonSingleQuery, query_schema: <span class="kw-2">&amp;</span>QuerySchema) -&gt; <span class="kw">crate</span>::Result&lt;Operation&gt; {
         <span class="kw">let </span>JsonSingleQuery {
             model_name,
             action,
@@ -1768,7 +1760,7 @@
         field: <span class="kw-2">&amp;</span>OutputField,
         container: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ParentContainer&gt;,
         query: FieldQuery,
-        query_schema: <span class="kw-2">&amp;</span>QuerySchemaRef,
+        query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     ) -&gt; <span class="kw">crate</span>::Result&lt;Selection&gt; {
         <span class="kw">let </span>FieldQuery {
             arguments,
@@ -1976,7 +1968,7 @@
         parent_field: <span class="kw-2">&amp;</span>OutputField,
         nested_field_name: <span class="kw-2">&amp;</span>str,
         container: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ParentContainer&gt;,
-        query_schema: <span class="kw-2">&amp;</span>QuerySchemaRef,
+        query_schema: <span class="kw-2">&amp;</span>QuerySchema,
         all_scalars_set: bool,
     ) -&gt; <span class="kw">crate</span>::Result&lt;Selection&gt; {
         <span class="kw">let </span>nested_object_type = parent_field
@@ -2114,7 +2106,7 @@
     }
 
     <span class="kw">fn </span>find_schema_field(
-        query_schema: <span class="kw-2">&amp;</span>QuerySchemaRef,
+        query_schema: <span class="kw-2">&amp;</span>QuerySchema,
         model_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
         action: <span class="kw">crate</span>::Action,
     ) -&gt; <span class="kw">crate</span>::Result&lt;(OperationType, <span class="kw-2">&amp;</span>OutputField)&gt; {
@@ -2142,7 +2134,7 @@
     <span class="kw">use </span>query_core::schema;
     <span class="kw">use </span>std::sync::Arc;
 
-    <span class="kw">fn </span>schema() -&gt; schema::QuerySchemaRef {
+    <span class="kw">fn </span>schema() -&gt; schema::QuerySchema {
         <span class="kw">let </span>schema_str = <span class="string">r#&quot;
           generator client {
             provider        = &quot;prisma-client-js&quot;
@@ -2185,9 +2177,7 @@
 
         schema.diagnostics.to_result().unwrap();
 
-        <span class="kw">let </span>internal_data_model = prisma_models::convert(Arc::new(schema));
-
-        Arc::new(schema_builder::build(internal_data_model, <span class="bool-val">true</span>))
+        schema::build(Arc::new(schema), <span class="bool-val">true</span>)
     }
 
     <span class="attr">#[test]
@@ -3142,7 +3132,7 @@
         &quot;###</span>);
     }
 
-    <span class="kw">fn </span>composite_schema() -&gt; schema::QuerySchemaRef {
+    <span class="kw">fn </span>composite_schema() -&gt; schema::QuerySchema {
         <span class="kw">let </span>schema_str = <span class="string">r#&quot;
           generator client {
             provider        = &quot;prisma-client-js&quot;
@@ -3174,9 +3164,7 @@
 
         schema.diagnostics.to_result().unwrap();
 
-        <span class="kw">let </span>internal_data_model = prisma_models::convert(Arc::new(schema));
-
-        Arc::new(schema_builder::build(internal_data_model, <span class="bool-val">true</span>))
+        schema::build(Arc::new(schema), <span class="bool-val">true</span>)
     }
 
     <span class="attr">#[test]
@@ -3283,7 +3271,7 @@
         &quot;###</span>);
     }
 
-    <span class="kw">fn </span>recursive_composite_schema() -&gt; schema::QuerySchemaRef {
+    <span class="kw">fn </span>recursive_composite_schema() -&gt; schema::QuerySchema {
         <span class="kw">let </span>schema_str = <span class="string">r#&quot;
           generator client {
             provider        = &quot;prisma-client-js&quot;
@@ -3308,9 +3296,7 @@
 
         schema.diagnostics.to_result().unwrap();
 
-        <span class="kw">let </span>internal_data_model = prisma_models::convert(Arc::new(schema));
-
-        Arc::new(schema_builder::build(internal_data_model, <span class="bool-val">true</span>))
+        schema::build(Arc::new(schema), <span class="bool-val">true</span>)
     }
 
     <span class="attr">#[test]
@@ -3339,7 +3325,7 @@
         &quot;###</span>);
     }
 
-    <span class="kw">fn </span>sibling_composite_schema() -&gt; schema::QuerySchemaRef {
+    <span class="kw">fn </span>sibling_composite_schema() -&gt; schema::QuerySchema {
         <span class="kw">let </span>schema_str = <span class="string">r#&quot;
           generator client {
             provider        = &quot;prisma-client-js&quot;
@@ -3367,9 +3353,7 @@
 
         schema.diagnostics.to_result().unwrap();
 
-        <span class="kw">let </span>internal_data_model = prisma_models::convert(Arc::new(schema));
-
-        Arc::new(schema_builder::build(internal_data_model, <span class="bool-val">true</span>))
+        schema::build(Arc::new(schema), <span class="bool-val">true</span>)
     }
 
     <span class="attr">#[test]
@@ -3455,4 +3439,4 @@
     }
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="request_handlers" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="request_handlers" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0 (84c898d65 2023-04-16)" data-search-js="search-8a59a8356673ec1f.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

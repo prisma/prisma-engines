@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["md5","Not recommended, as MD5 is not considered to be secure."],["scram_sha_256","Hash password using SCRAM-SHA-256 with a randomly-generated salt."]]};
+window.SIDEBAR_ITEMS = {"fn":["md5","scram_sha_256"]};

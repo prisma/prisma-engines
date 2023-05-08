@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["BinarySubtype","The available binary subtypes, plus a user-defined slot."],["ElementType","All available BSON element types."]]};
+window.SIDEBAR_ITEMS = {"enum":["BinarySubtype","ElementType"]};

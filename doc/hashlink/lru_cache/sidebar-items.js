@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["LruCache",""]]};
+window.SIDEBAR_ITEMS = {"struct":["LruCache"]};

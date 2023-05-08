@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["Migration","Represents a schema migration on a database"]]};
+window.SIDEBAR_ITEMS = {"struct":["Migration"]};

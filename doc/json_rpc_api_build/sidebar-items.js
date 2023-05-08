@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["generate_rust_modules",""]]};
+window.SIDEBAR_ITEMS = {"fn":["generate_rust_modules"]};

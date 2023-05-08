@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["ConnectorCapability",""]],"type":[["ConnectorCapabilities","Contains all capabilities that the connector is able to serve."]]};
+window.SIDEBAR_ITEMS = {"enum":["ConnectorCapability"],"type":["ConnectorCapabilities"]};

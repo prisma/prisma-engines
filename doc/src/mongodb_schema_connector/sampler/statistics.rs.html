@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `schema-engine/connectors/mongodb-schema-connector/src/sampler/statistics.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>statistics.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-93196c7a1c3542a8.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-4743e13df3dfe8c4.css"><link rel="stylesheet" disabled href="../../../static.files/dark-0e1b889528bd466b.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-65289d5d067c7c66.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-ea63cb6500f71309.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-3367e395607fafc1.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../mongodb_schema_connector/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `schema-engine/connectors/mongodb-schema-connector/src/sampler/statistics.rs`."><title>statistics.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c4dbdcde0fbd8430.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" disabled href="../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-be46fdc453a55015.css"><script src="../../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-98a684e84ae5b08b.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../mongodb_schema_connector/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -613,6 +613,46 @@
 <a href="#613" id="613">613</a>
 <a href="#614" id="614">614</a>
 <a href="#615" id="615">615</a>
+<a href="#616" id="616">616</a>
+<a href="#617" id="617">617</a>
+<a href="#618" id="618">618</a>
+<a href="#619" id="619">619</a>
+<a href="#620" id="620">620</a>
+<a href="#621" id="621">621</a>
+<a href="#622" id="622">622</a>
+<a href="#623" id="623">623</a>
+<a href="#624" id="624">624</a>
+<a href="#625" id="625">625</a>
+<a href="#626" id="626">626</a>
+<a href="#627" id="627">627</a>
+<a href="#628" id="628">628</a>
+<a href="#629" id="629">629</a>
+<a href="#630" id="630">630</a>
+<a href="#631" id="631">631</a>
+<a href="#632" id="632">632</a>
+<a href="#633" id="633">633</a>
+<a href="#634" id="634">634</a>
+<a href="#635" id="635">635</a>
+<a href="#636" id="636">636</a>
+<a href="#637" id="637">637</a>
+<a href="#638" id="638">638</a>
+<a href="#639" id="639">639</a>
+<a href="#640" id="640">640</a>
+<a href="#641" id="641">641</a>
+<a href="#642" id="642">642</a>
+<a href="#643" id="643">643</a>
+<a href="#644" id="644">644</a>
+<a href="#645" id="645">645</a>
+<a href="#646" id="646">646</a>
+<a href="#647" id="647">647</a>
+<a href="#648" id="648">648</a>
+<a href="#649" id="649">649</a>
+<a href="#650" id="650">650</a>
+<a href="#651" id="651">651</a>
+<a href="#652" id="652">652</a>
+<a href="#653" id="653">653</a>
+<a href="#654" id="654">654</a>
+<a href="#655" id="655">655</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>indices;
 <span class="kw">mod </span>name;
 
@@ -621,13 +661,16 @@
     datamodel::{IdFieldDefinition, UniqueFieldAttribute},
     value::Function,
 };
-<span class="kw">use </span>schema_connector::{CompositeTypeDepth, Warning};
+<span class="kw">use </span>schema_connector::{
+    warnings::{ModelAndField, ModelAndFieldAndType, TypeAndField, TypeAndFieldAndType},
+    CompositeTypeDepth, Warnings,
+};
 
 <span class="kw">use </span><span class="kw">super</span>::field_type::FieldType;
 <span class="kw">use </span>convert_case::{Case, Casing};
 <span class="kw">use </span>datamodel_renderer <span class="kw">as </span>renderer;
 <span class="kw">use </span>mongodb::bson::{Bson, Document};
-<span class="kw">use </span>mongodb_schema_describer::IndexWalker;
+<span class="kw">use </span>mongodb_schema_describer::{CollectionWalker, IndexWalker};
 <span class="kw">use </span>once_cell::sync::Lazy;
 <span class="kw">use </span>psl::datamodel_connector::constraint_names::ConstraintNames;
 <span class="kw">use </span>regex::Regex;
@@ -642,10 +685,11 @@
 <span class="kw">static </span>RESERVED_NAMES: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str] = <span class="kw-2">&amp;</span>[<span class="string">&quot;PrismaClient&quot;</span>];
 <span class="kw">static </span>COMMENTED_OUT_FIELD: <span class="kw-2">&amp;</span>str = <span class="string">&quot;This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*&quot;</span>;
 
-<span class="attr">#[derive(Default, Debug, Clone, Copy)]
-</span><span class="kw">struct </span>ModelData {
+<span class="attr">#[derive(Default, Clone, Copy)]
+</span><span class="kw">struct </span>ModelData&lt;<span class="lifetime">&#39;a</span>&gt; {
     document_count: usize,
     has_id: bool,
+    collection_walker: <span class="prelude-ty">Option</span>&lt;CollectionWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
 
 <span class="doccomment">/// Statistical data from a MongoDB database for determining a Prisma data
@@ -657,7 +701,7 @@
     <span class="doccomment">/// Container for composite types that are not empty
     </span>types_with_fields: HashSet&lt;String&gt;,
     <span class="doccomment">/// model_name -&gt; document count
-    </span>models: HashMap&lt;Name, ModelData&gt;,
+    </span>models: HashMap&lt;Name, ModelData&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     <span class="doccomment">/// model_name -&gt; indices
     </span>indices: BTreeMap&lt;String, Vec&lt;IndexWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt;,
     <span class="doccomment">/// How deep we travel in nested composite types until switching to Json. None will always use
@@ -734,7 +778,7 @@
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
         datasource: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>psl::Datasource,
         rendered: <span class="kw-2">&amp;mut </span>renderer::Datamodel&lt;<span class="lifetime">&#39;a</span>&gt;,
-        warnings: <span class="kw-2">&amp;mut </span>Vec&lt;Warning&gt;,
+        warnings: <span class="kw-2">&amp;mut </span>Warnings,
     ) {
         <span class="kw">let </span><span class="kw-2">mut </span>models: BTreeMap&lt;<span class="kw-2">&amp;</span>str, renderer::datamodel::Model&lt;<span class="lifetime">&#39;_</span>&gt;&gt; = <span class="self">self
             </span>.models
@@ -759,6 +803,13 @@
                     <span class="prelude-val">None </span>=&gt; renderer::datamodel::Model::new(name),
                 };
 
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(walker) = doc_count.collection_walker {
+                    <span class="kw">if </span>walker.has_schema() {
+                        <span class="kw">let </span>comment = <span class="string">&quot;This collection uses a JSON Schema defined in the database, which requires additional setup for migrations. Visit https://pris.ly/d/mongodb-json-schema for more info.&quot;</span>;
+                        model.documentation(comment)
+                    }
+                }
+
                 <span class="kw">if </span>!doc_count.has_id {
                     <span class="kw">let </span><span class="kw-2">mut </span>field = renderer::datamodel::Field::new(<span class="string">&quot;id&quot;</span>, <span class="string">&quot;String&quot;</span>);
 
@@ -781,12 +832,6 @@
             .filter(|name| <span class="self">self</span>.types_with_fields.contains(<span class="kw-2">*</span>name))
             .map(|name| (name, renderer::datamodel::CompositeType::new(name)))
             .collect();
-
-        <span class="kw">let </span><span class="kw-2">mut </span>unsupported = Vec::new();
-        <span class="kw">let </span><span class="kw-2">mut </span>unknown_types = Vec::new();
-        <span class="kw">let </span><span class="kw-2">mut </span>undecided_types = Vec::new();
-        <span class="kw">let </span><span class="kw-2">mut </span>fields_with_empty_names = Vec::new();
-        <span class="kw">let </span><span class="kw-2">mut </span>fields_with_an_empty_type = Vec::new();
 
         <span class="kw">for </span>(model_name, indices) <span class="kw">in </span><span class="self">self</span>.indices.iter() {
             <span class="kw">let </span>model = models.get_mut(model_name.as_str()).unwrap();
@@ -832,7 +877,16 @@
 
             <span class="kw">let </span><span class="kw-2">mut </span>field = <span class="kw">match </span>sanitized {
                 <span class="prelude-val">Some</span>(sanitized) <span class="kw">if </span>sanitized.is_empty() =&gt; {
-                    fields_with_empty_names.push((container.clone(), field_name.clone()));
+                    <span class="kw">match </span>container {
+                        Name::Model(name) =&gt; warnings.fields_with_empty_names_in_model.push(ModelAndField {
+                            model: name.to_string(),
+                            field: field_name.to_string(),
+                        }),
+                        Name::CompositeType(name) =&gt; warnings.fields_with_empty_names_in_type.push(TypeAndField {
+                            composite_type: name.to_string(),
+                            field: field_name.to_string(),
+                        }),
+                    }
 
                     <span class="kw">let </span><span class="kw-2">mut </span>field = renderer::datamodel::Field::new(field_name, prisma_type.to_string());
                     field.map(field_name);
@@ -859,7 +913,17 @@
             <span class="kw">if </span>points_to_an_empty_type {
                 <span class="kw">let </span>docs = <span class="string">&quot;Nested objects had no data in the sample dataset to introspect a nested type.&quot;</span>;
                 field.documentation(docs);
-                fields_with_an_empty_type.push((container.clone(), field_name.clone()));
+
+                <span class="kw">match </span>container {
+                    Name::Model(name) =&gt; warnings.model_fields_pointing_to_an_empty_type.push(ModelAndField {
+                        model: name.to_string(),
+                        field: field_name.to_string(),
+                    }),
+                    Name::CompositeType(name) =&gt; warnings.type_fields_pointing_to_an_empty_type.push(TypeAndField {
+                        composite_type: name.to_string(),
+                        field: field_name.to_string(),
+                    }),
+                }
             }
 
             <span class="kw">if </span>field_name == <span class="string">&quot;_id&quot; </span>&amp;&amp; !container.is_composite_type() {
@@ -883,21 +947,49 @@
             <span class="kw">if </span>field_type.is_unsupported() {
                 field.unsupported();
 
-                unsupported.push((
-                    container.clone(),
-                    field_name.to_string(),
-                    field_type.prisma_type().to_string(),
-                ));
+                <span class="kw">match </span>container {
+                    Name::Model(name) =&gt; warnings.unsupported_types_in_model.push(ModelAndFieldAndType {
+                        model: name.to_string(),
+                        field: field_name.to_string(),
+                        r#type: field_type.prisma_type().to_string(),
+                    }),
+                    Name::CompositeType(name) =&gt; warnings.unsupported_types_in_type.push(TypeAndFieldAndType {
+                        composite_type: name.to_string(),
+                        field: field_name.to_string(),
+                        r#type: field_type.prisma_type().to_string(),
+                    }),
+                }
             }
 
             <span class="kw">if </span>percentages.data.len() &gt; <span class="number">1 </span>{
-                undecided_types.push((container.clone(), field_name.to_string(), field_type.to_string()));
+                <span class="kw">match </span>container {
+                    Name::Model(name) =&gt; warnings.undecided_types_in_models.push(ModelAndFieldAndType {
+                        model: name.to_string(),
+                        field: field_name.to_string(),
+                        r#type: field_type.to_string(),
+                    }),
+                    Name::CompositeType(name) =&gt; warnings.undecided_types_in_types.push(TypeAndFieldAndType {
+                        composite_type: name.to_string(),
+                        field: field_name.to_string(),
+                        r#type: field_type.to_string(),
+                    }),
+                }
             }
 
             <span class="kw">if </span>sampler.from_index {
                 <span class="kw">let </span>docs = <span class="string">&quot;Field referred in an index, but found no data to define the type.&quot;</span>;
                 field.documentation(docs);
-                unknown_types.push((container.clone(), field_name.to_string()));
+
+                <span class="kw">match </span>container {
+                    Name::Model(name) =&gt; warnings.model_fields_with_unknown_type.push(ModelAndField {
+                        model: name.to_string(),
+                        field: field_name.to_string(),
+                    }),
+                    Name::CompositeType(name) =&gt; warnings.type_fields_with_unknown_type.push(TypeAndField {
+                        composite_type: name.to_string(),
+                        field: field_name.to_string(),
+                    }),
+                }
             }
 
             <span class="kw">if </span>percentages.has_type_variety() {
@@ -909,7 +1001,16 @@
                 <span class="kw">let </span>doc = <span class="string">&quot;Could not determine type: the field only had null or empty values in the sample set.&quot;</span>;
                 field.documentation(doc);
 
-                unknown_types.push((container.clone(), field_name.to_string()));
+                <span class="kw">match </span>container {
+                    Name::Model(name) =&gt; warnings.model_fields_with_unknown_type.push(ModelAndField {
+                        model: name.to_string(),
+                        field: field_name.to_string(),
+                    }),
+                    Name::CompositeType(name) =&gt; warnings.type_fields_with_unknown_type.push(TypeAndField {
+                        composite_type: name.to_string(),
+                        field: field_name.to_string(),
+                    }),
+                }
             }
 
             <span class="kw">match </span>container {
@@ -965,28 +1066,6 @@
 
         <span class="kw">for </span>(<span class="kw">_</span>, model) <span class="kw">in </span>models.into_iter() {
             rendered.push_model(model);
-        }
-
-        <span class="kw">if </span>!fields_with_an_empty_type.is_empty() {
-            warnings.push(<span class="kw">crate</span>::warnings::fields_pointing_to_an_empty_type(
-                <span class="kw-2">&amp;</span>fields_with_an_empty_type,
-            ));
-        }
-
-        <span class="kw">if </span>!unsupported.is_empty() {
-            warnings.push(<span class="kw">crate</span>::warnings::unsupported_type(<span class="kw-2">&amp;</span>unsupported));
-        }
-
-        <span class="kw">if </span>!undecided_types.is_empty() {
-            warnings.push(<span class="kw">crate</span>::warnings::undecided_field_type(<span class="kw-2">&amp;</span>undecided_types));
-        }
-
-        <span class="kw">if </span>!fields_with_empty_names.is_empty() {
-            warnings.push(<span class="kw">crate</span>::warnings::fields_with_empty_names(<span class="kw-2">&amp;</span>fields_with_empty_names));
-        }
-
-        <span class="kw">if </span>!unknown_types.is_empty() {
-            warnings.push(<span class="kw">crate</span>::warnings::fields_with_unknown_types(<span class="kw-2">&amp;</span>unknown_types));
         }
     }
 
@@ -1139,8 +1218,9 @@
     }
 
     <span class="doccomment">/// Track a collection as prisma model.
-    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>track_model(<span class="kw-2">&amp;mut </span><span class="self">self</span>, model: <span class="kw-2">&amp;</span>str) {
-        <span class="self">self</span>.models.entry(Name::Model(model.to_string())).or_default();
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>track_model(<span class="kw-2">&amp;mut </span><span class="self">self</span>, model: <span class="kw-2">&amp;</span>str, collection: CollectionWalker&lt;<span class="lifetime">&#39;a</span>&gt;) {
+        <span class="kw">let </span><span class="kw-2">mut </span>model = <span class="self">self</span>.models.entry(Name::Model(model.to_string())).or_default();
+        model.collection_walker = <span class="prelude-val">Some</span>(collection);
     }
 
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>track_model_fields(<span class="kw-2">&amp;mut </span><span class="self">self</span>, model: <span class="kw-2">&amp;</span>str, document: Document) {
@@ -1229,4 +1309,4 @@
     </span>}
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mongodb_schema_connector" data-themes="" data-resource-suffix="" data-rustdoc-version="1.68.0 (2c8cc3432 2023-03-06)" data-search-js="search-98d53477a794af0b.js" data-settings-js="settings-c3c521c753752a1a.js" data-settings-css="settings-08ddfdda51b8ee2e.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mongodb_schema_connector" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0 (84c898d65 2023-04-16)" data-search-js="search-8a59a8356673ec1f.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

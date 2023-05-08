@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["ReadyCache","Drives readiness over a set of services."]],"trait":[["Equivalent","Key equivalence trait."]]};
+window.SIDEBAR_ITEMS = {"struct":["ReadyCache"],"trait":["Equivalent"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":[["SAFE","URL safe symbols."]]};
+window.SIDEBAR_ITEMS = {"constant":["SAFE"]};

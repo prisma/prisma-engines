@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["QueryGraphBuilderError",""]],"struct":[["QueryGraphBuilder",""],["RelationViolation",""]],"type":[["QueryGraphBuilderResult","Query graph builder sub-result type."]]};
+window.SIDEBAR_ITEMS = {"enum":["QueryGraphBuilderError"],"struct":["QueryGraphBuilder","RelationViolation"],"type":["QueryGraphBuilderResult"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"macro":[["if_atomic","Conditional compilation based on the presence of atomic instructions."]],"mod":[["marker","Marker traits used by [`Radium`]."],["types","Best-effort atomic types"]],"trait":[["Radium","A maybe-atomic shared mutable fundamental type `T`."]]};
+window.SIDEBAR_ITEMS = {"macro":["if_atomic"],"mod":["marker","types"],"trait":["Radium"]};

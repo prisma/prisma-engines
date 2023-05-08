@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["Params","Request parameters"]]};
+window.SIDEBAR_ITEMS = {"enum":["Params"]};

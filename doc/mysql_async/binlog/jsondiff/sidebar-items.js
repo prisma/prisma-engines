@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["JsonDiffOperation","An operation kind of a JsonDiff object."]],"struct":[["JsonDiff","A class that represents a logical change to a JSON document."],["UnknownJsonDiffOperation",""]]};
+window.SIDEBAR_ITEMS = {"enum":["JsonDiffOperation"],"struct":["JsonDiff","UnknownJsonDiffOperation"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["deserialize","Deserialize a [`Vec<u8>`] from either bytes or string"]]};
+window.SIDEBAR_ITEMS = {"fn":["deserialize"]};

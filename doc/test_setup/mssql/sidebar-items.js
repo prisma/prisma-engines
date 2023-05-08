@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["init_mssql_database",""],["reset_schema",""]]};
+window.SIDEBAR_ITEMS = {"fn":["init_mssql_database","reset_schema"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["CliCommand",""]],"struct":[["DebugPanicRequest",""],["DmmfRequest",""],["ExecuteRequest",""],["GetConfigRequest",""]]};
+window.SIDEBAR_ITEMS = {"enum":["CliCommand"],"struct":["DebugPanicRequest","DmmfRequest","ExecuteRequest","GetConfigRequest"]};

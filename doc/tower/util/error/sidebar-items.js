@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["optional","Error types for [`Optional`]."]]};
+window.SIDEBAR_ITEMS = {"mod":["optional"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["SslErrorStack","SslErrorStac stub"]]};
+window.SIDEBAR_ITEMS = {"struct":["SslErrorStack"]};

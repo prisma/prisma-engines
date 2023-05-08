@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["deserialize","Deserialize an `Option<T>` from a string using `FromStr`"],["serialize","Serialize a string from `Option<T>` using `AsRef<str>` or using the empty string if `None`."]]};
+window.SIDEBAR_ITEMS = {"fn":["deserialize","serialize"]};

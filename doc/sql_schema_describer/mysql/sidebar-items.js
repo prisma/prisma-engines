@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["SqlSchemaDescriber",""]]};
+window.SIDEBAR_ITEMS = {"enum":["Circumstances"],"struct":["SqlSchemaDescriber"]};

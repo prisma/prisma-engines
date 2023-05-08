@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["RenameRule","A casing rule for renaming Rust identifiers."]]};
+window.SIDEBAR_ITEMS = {"enum":["RenameRule"]};

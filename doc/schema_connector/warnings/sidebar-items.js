@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["TopLevelType"],"struct":["Enum","EnumAndValue","IndexedColumn","Model","ModelAndConstraint","ModelAndField","ModelAndFieldAndType","ModelAndIndex","Object","TopLevelItem","TypeAndField","TypeAndFieldAndType","View","ViewAndField","ViewAndFieldAndType","Warnings"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["BitSafeU16","Read-Only Shared-Mutable Handle"],["BitSafeU32","Read-Only Shared-Mutable Handle"],["BitSafeU64","Read-Only Shared-Mutable Handle"],["BitSafeU8","Read-Only Shared-Mutable Handle"],["BitSafeUsize","Read-Only Shared-Mutable Handle"]],"trait":[["BitAccess","Bit-Level Access Instructions"],["BitSafe","Read-Only Semivolatile Handle"]]};
+window.SIDEBAR_ITEMS = {"struct":["BitSafeU16","BitSafeU32","BitSafeU64","BitSafeU8","BitSafeUsize"],"trait":["BitAccess","BitSafe"]};

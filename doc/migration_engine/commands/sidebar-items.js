@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["CliCommand",""]],"fn":[["parse_base64_string",""]],"struct":[["Cli",""]]};
+window.SIDEBAR_ITEMS = {"enum":["CliCommand"],"fn":["parse_base64_string"],"static":["CALLSITE","META"],"struct":["Cli"]};

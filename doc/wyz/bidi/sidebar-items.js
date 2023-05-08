@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["Bidi","An iterator that conditionally reverses itself upon creation."]],"trait":[["BidiIterator","Extension trait that provides `.bidi()` for all double-ended iterators."]]};
+window.SIDEBAR_ITEMS = {"struct":["Bidi"],"trait":["BidiIterator"]};

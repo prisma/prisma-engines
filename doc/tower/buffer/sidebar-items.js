@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["error","Error types for the `Buffer` middleware."],["future","Future types for the `Buffer` middleware."]],"struct":[["Buffer","Adds an mpsc buffer in front of an inner service."],["BufferLayer","Adds an mpsc buffer in front of an inner service."]]};
+window.SIDEBAR_ITEMS = {"mod":["error","future"],"struct":["Buffer","BufferLayer"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"attr":[["proc_macro_hack",""]]};
+window.SIDEBAR_ITEMS = {"attr":["proc_macro_hack"]};

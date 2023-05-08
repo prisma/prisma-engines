@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["backend",""],["frontend","Frontend message serialization."]]};
+window.SIDEBAR_ITEMS = {"mod":["backend","frontend"]};

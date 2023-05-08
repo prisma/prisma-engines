@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["get","Return the system hostname."]]};
+window.SIDEBAR_ITEMS = {"fn":["get"]};

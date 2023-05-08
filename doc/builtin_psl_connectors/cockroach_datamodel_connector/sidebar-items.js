@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["CockroachType",""]],"struct":[["SequenceFunction","An `@default(sequence())` function."]]};
+window.SIDEBAR_ITEMS = {"enum":["CockroachType"],"struct":["SequenceFunction"]};

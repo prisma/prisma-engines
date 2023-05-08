@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["emit","RFC 4034, DNSSEC Resource Records, March 2005"],["read","Read the RData from the given Decoder"]],"struct":[["MX","RFC 1035, DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION, November 1987"]]};
+window.SIDEBAR_ITEMS = {"fn":["emit","read"],"struct":["MX"]};
