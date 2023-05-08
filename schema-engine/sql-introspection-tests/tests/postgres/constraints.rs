@@ -30,7 +30,7 @@ async fn aragon_test_postgres(api: &mut TestApi) -> TestResult {
           url      = "env(TEST_DATABASE_URL)"
         }
 
-        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.
+        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
         model tokens {
           token_id    Int     @id
           token_scope String?
@@ -46,7 +46,7 @@ async fn aragon_test_postgres(api: &mut TestApi) -> TestResult {
     let expectation = expect![[r#"
         *** WARNING ***
 
-        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints
+        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
           - Model: "tokens", constraint: "tokens_token_scope_check"
     "#]];
 
@@ -95,13 +95,13 @@ async fn noalyss_folder_test_postgres(api: &mut TestApi) -> TestResult {
           url      = "env(TEST_DATABASE_URL)"
         }
 
-        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.
+        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
         model todo_list {
           tl_id     BigInt @id @default(autoincrement())
           is_public String @default("N") @db.Char(1)
         }
 
-        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.
+        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
         /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
         model user_active_security {
           id        BigInt @id(map: "user_active_security_pk") @default(autoincrement())
@@ -110,7 +110,7 @@ async fn noalyss_folder_test_postgres(api: &mut TestApi) -> TestResult {
           us_action String @db.VarChar(1)
         }
 
-        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.
+        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
         model user_sec_action_profile {
           ua_id    BigInt  @id @default(autoincrement())
           ua_right String? @db.Char(1)
@@ -122,7 +122,7 @@ async fn noalyss_folder_test_postgres(api: &mut TestApi) -> TestResult {
     let expectation = expect![[r#"
         *** WARNING ***
 
-        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints
+        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
           - Model: "todo_list", constraint: "todo_list_is_public_check"
           - Model: "user_active_security", constraint: "user_active_security_action_check"
           - Model: "user_active_security", constraint: "user_active_security_ledger_check"
@@ -169,8 +169,8 @@ async fn check_and_exclusion_constraints_stopgap(api: &mut TestApi) -> TestResul
           url      = "env(TEST_DATABASE_URL)"
         }
 
-        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.
-        /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-exclusion-constraints for more info.
+        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+        /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/exclusion-constraints for more info.
         model room_reservation {
           room_reservation_id Int      @id @default(autoincrement())
           room_id             Int
@@ -189,18 +189,18 @@ async fn check_and_exclusion_constraints_stopgap(api: &mut TestApi) -> TestResul
     let expectation = expect![[r#"
         *** WARNING ***
 
-        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints
+        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
           - Model: "room_reservation", constraint: "room_reservation_price_check"
 
-        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints
+        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/exclusion-constraints
           - Model: "room_reservation", constraint: "room_reservation_room_id_tstzrange_excl"
     "#]];
 
     api.expect_warnings(&expectation).await;
 
     let input = indoc! { r#"
-        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.
-        /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-exclusion-constraints for more info.
+        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+        /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/exclusion-constraints for more info.
         model room_reservation {
           room_reservation_id Int      @id @default(autoincrement())
           room_id             Int
@@ -212,8 +212,8 @@ async fn check_and_exclusion_constraints_stopgap(api: &mut TestApi) -> TestResul
     "#};
 
     let expectation = expect![[r#"
-        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.
-        /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-exclusion-constraints for more info.
+        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+        /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/exclusion-constraints for more info.
         model room_reservation {
           room_reservation_id Int      @id @default(autoincrement())
           room_id             Int
@@ -258,7 +258,7 @@ async fn exclusion_constraints_stopgap(api: &mut TestApi) -> TestResult {
           url      = "env(TEST_DATABASE_URL)"
         }
 
-        /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-exclusion-constraints for more info.
+        /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/exclusion-constraints for more info.
         model room_reservation {
           room_reservation_id Int      @id @default(autoincrement())
           room_id             Int
@@ -276,14 +276,14 @@ async fn exclusion_constraints_stopgap(api: &mut TestApi) -> TestResult {
     let expectation = expect![[r#"
         *** WARNING ***
 
-        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints
+        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/exclusion-constraints
           - Model: "room_reservation", constraint: "room_reservation_room_id_tstzrange_excl"
     "#]];
 
     api.expect_warnings(&expectation).await;
 
     let input = indoc! { r#"
-        /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-exclusion-constraints for more info.
+        /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/exclusion-constraints for more info.
         model room_reservation {
           room_reservation_id Int      @id @default(autoincrement())
           room_id             Int
@@ -294,7 +294,7 @@ async fn exclusion_constraints_stopgap(api: &mut TestApi) -> TestResult {
     "#};
 
     let expectation = expect![[r#"
-        /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-exclusion-constraints for more info.
+        /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/exclusion-constraints for more info.
         model room_reservation {
           room_reservation_id Int      @id @default(autoincrement())
           room_id             Int
@@ -337,7 +337,7 @@ async fn exclusion_constraints_without_where_stopgap(api: &mut TestApi) -> TestR
           url      = "env(TEST_DATABASE_URL)"
         }
 
-        /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-exclusion-constraints for more info.
+        /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/exclusion-constraints for more info.
         model room_reservation {
           room_reservation_id Int      @id @default(autoincrement())
           room_id             Int
@@ -354,14 +354,14 @@ async fn exclusion_constraints_without_where_stopgap(api: &mut TestApi) -> TestR
     let expectation = expect![[r#"
         *** WARNING ***
 
-        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints
+        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/exclusion-constraints
           - Model: "room_reservation", constraint: "room_reservation_room_id_tstzrange_excl"
     "#]];
 
     api.expect_warnings(&expectation).await;
 
     let input = indoc! { r#"
-        /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-exclusion-constraints for more info.
+        /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/exclusion-constraints for more info.
         model room_reservation {
           room_reservation_id Int      @id @default(autoincrement())
           room_id             Int
@@ -371,7 +371,7 @@ async fn exclusion_constraints_without_where_stopgap(api: &mut TestApi) -> TestR
     "#};
 
     let expectation = expect![[r#"
-        /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-exclusion-constraints for more info.
+        /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/exclusion-constraints for more info.
         model room_reservation {
           room_reservation_id Int      @id @default(autoincrement())
           room_id             Int
@@ -411,7 +411,7 @@ async fn exclusion_constraints_without_where_and_expressions_stopgap(api: &mut T
           url      = "env(TEST_DATABASE_URL)"
         }
 
-        /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-exclusion-constraints for more info.
+        /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/exclusion-constraints for more info.
         model room_reservation {
           room_reservation_id Int @id @default(autoincrement())
           room_id             Int
@@ -426,14 +426,14 @@ async fn exclusion_constraints_without_where_and_expressions_stopgap(api: &mut T
     let expectation = expect![[r#"
         *** WARNING ***
 
-        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints
+        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/exclusion-constraints
           - Model: "room_reservation", constraint: "room_reservation_room_id_excl"
     "#]];
 
     api.expect_warnings(&expectation).await;
 
     let input = indoc! { r#"
-        /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-exclusion-constraints for more info.
+        /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/exclusion-constraints for more info.
         model room_reservation {
           room_reservation_id Int @id @default(autoincrement())
           room_id             Int
@@ -441,7 +441,7 @@ async fn exclusion_constraints_without_where_and_expressions_stopgap(api: &mut T
     "#};
 
     let expectation = expect![[r#"
-        /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-exclusion-constraints for more info.
+        /// This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/exclusion-constraints for more info.
         model room_reservation {
           room_reservation_id Int @id @default(autoincrement())
           room_id             Int
@@ -476,7 +476,7 @@ async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
             url      = "env(TEST_DATABASE_URL)"
           }
 
-          /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.
+          /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
           model products {
             product_id Int      @id @default(autoincrement())
             name       String?
@@ -492,14 +492,14 @@ async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
     let expectation = expect![[r#"
         *** WARNING ***
 
-        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints
+        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
           - Model: "products", constraint: "products_price_check"
     "#]];
 
     api.expect_warnings(&expectation).await;
 
     let input = indoc! { r#"
-        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.
+        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
         model products {
           product_id Int      @id @default(autoincrement())
           name       String?
@@ -509,7 +509,7 @@ async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
     };
 
     let expectation = expect![[r#"
-          /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.
+          /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
           model products {
             product_id Int      @id @default(autoincrement())
             name       String?
