@@ -31,7 +31,10 @@ fn display_list<T: Ord>(
     project_field: fn(&T) -> &str,
     f: &mut fmt::Formatter<'_>,
 ) -> fmt::Result {
+    let mut items: Vec<_> = items.iter().collect();
+    items.sort_by_key(|item| project_key(item));
     let mut items = items.iter().peekable();
+
     let mut key = None;
     let close = |f: &mut fmt::Formatter<'_>| f.write_str("]\n");
 
