@@ -132,6 +132,8 @@ pub struct Warnings {
     pub undecided_types_in_models: Vec<ModelAndFieldAndType>,
     /// Warn about undecided types in a composite type.
     pub undecided_types_in_types: Vec<TypeAndFieldAndType>,
+    /// Warning about JSONSchema on a model.
+    pub json_schema_defined: Vec<Model>,
 }
 
 impl Warnings {
@@ -406,6 +408,12 @@ impl fmt::Display for Warnings {
             "The following fields had data stored in multiple types. Either use Json or normalize data to the wanted type:",
             &self.undecided_types_in_types,
             f,
+        )?;
+
+        render_warnings(
+            "The following models have a JSON Schema defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/mongodb-json-schema",
+            &self.json_schema_defined,
+            f
         )?;
 
         Ok(())
