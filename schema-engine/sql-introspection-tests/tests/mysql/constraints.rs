@@ -5,7 +5,7 @@ use sql_introspection_tests::test_api::*;
 use test_macros::test_connector;
 
 // Note: MySQL 5.6 ad 5.7 do not support check constraints, so this test is only run on MySQL 8.0.
-#[test_connector(tags(Mysql8), exclude(Vitess))]
+#[test_connector(tags(Mysql8), exclude(Vitess, Mariadb))]
 async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
     let raw_sql = indoc! {r#"
         CREATE TABLE t1(
