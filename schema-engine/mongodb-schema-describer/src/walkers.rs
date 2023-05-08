@@ -34,6 +34,11 @@ impl<'schema> CollectionWalker<'schema> {
             None => [].iter().map(create_walker),
         }
     }
+
+    /// Checks whether JSONSchema is defined
+    pub fn has_schema(self) -> bool {
+        self.get().has_schema
+    }
 }
 
 #[derive(Clone, Copy)]

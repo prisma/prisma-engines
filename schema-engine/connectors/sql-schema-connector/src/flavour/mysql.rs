@@ -96,8 +96,8 @@ impl SqlFlavour for MysqlFlavour {
     }
 
     fn describe_schema(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
-        with_connection(&mut self.state, |params, _c, connection| async move {
-            connection.describe_schema(params).await
+        with_connection(&mut self.state, |params, circumstances, connection| async move {
+            connection.describe_schema(circumstances, params).await
         })
     }
 
@@ -427,6 +427,7 @@ impl SqlFlavour for MysqlFlavour {
 pub(crate) enum Circumstances {
     LowerCasesTableNames,
     IsMysql56,
+    IsMysql57,
     IsMariadb,
     IsVitess,
 }
@@ -538,6 +539,10 @@ where
 
                             if global_version.starts_with("5.6") {
                                 circumstances |= Circumstances::IsMysql56;
+                            }
+
+                            if global_version.starts_with("5.7") {
+                                circumstances |= Circumstances::IsMysql57;
                             }
 
                             if global_version.contains("MariaDB") {
