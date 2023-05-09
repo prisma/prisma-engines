@@ -1,6 +1,5 @@
 use super::*;
 use fmt::Debug;
-use once_cell::sync::OnceCell;
 use prisma_models::{ast::ModelId, ModelRef};
 use std::fmt;
 
@@ -113,7 +112,7 @@ impl OutputType {
 
 pub struct ObjectType {
     pub identifier: Identifier,
-    fields: OnceCell<Vec<OutputField>>,
+    fields: Vec<OutputField>,
 
     // Object types can directly map to models.
     model: Option<ModelId>,
@@ -133,7 +132,7 @@ impl ObjectType {
     pub(crate) fn new(ident: Identifier, model: Option<ModelId>) -> Self {
         Self {
             identifier: ident,
-            fields: OnceCell::new(),
+            fields: Vec::new(),
             model,
         }
     }
@@ -143,15 +142,15 @@ impl ObjectType {
     }
 
     pub(crate) fn add_field(&mut self, field: OutputField) {
-        self.fields.get_mut().unwrap().push(field)
+        self.fields.push(field)
     }
 
     pub fn get_fields(&self) -> &[OutputField] {
-        self.fields.get().unwrap()
+        &self.fields
     }
 
-    pub(crate) fn set_fields(&self, fields: Vec<OutputField>) {
-        self.fields.set(fields).unwrap();
+    pub(crate) fn set_fields(&mut self, fields: Vec<OutputField>) {
+        self.fields = fields;
     }
 
     pub fn find_field<'a>(&'a self, name: &str) -> Option<(usize, &'a OutputField)> {

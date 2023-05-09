@@ -1,7 +1,6 @@
 use super::*;
 use crate::db::QuerySchemaDatabase;
 use fmt::Debug;
-use once_cell::sync::OnceCell;
 use prisma_models::{prelude::ParentContainer, DefaultKind};
 use std::{boxed::Box, fmt};
 
@@ -9,7 +8,7 @@ use std::{boxed::Box, fmt};
 pub struct InputObjectType {
     pub identifier: Identifier,
     pub constraints: InputObjectTypeConstraints,
-    pub(crate) fields: OnceCell<Vec<InputField>>,
+    pub(crate) fields: Vec<InputField>,
     pub tag: Option<ObjectTag>,
 }
 
@@ -50,13 +49,11 @@ impl Debug for InputObjectType {
 
 impl InputObjectType {
     pub fn get_fields(&self) -> &Vec<InputField> {
-        self.fields.get().unwrap()
+        &self.fields
     }
 
-    pub(crate) fn set_fields(&self, fields: Vec<InputField>) {
-        self.fields
-            .set(fields)
-            .unwrap_or_else(|_| panic!("Fields of {:?} are already set", self.identifier));
+    pub(crate) fn set_fields(&mut self, fields: Vec<InputField>) {
+        self.fields = fields;
     }
 
     /// True if fields are empty, false otherwise.
