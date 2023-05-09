@@ -105,7 +105,7 @@ impl SqlFlavour for PostgresFlavour {
                         database_host: params.url.host().to_owned(),
                         database_port: params.url.port().to_string(),
                         context: format!(
-                            "Timed out trying to acquire a postgres advisory lock (SELECT pg_advisory_lock(72707369)). Elapsed: {}ms. See https://pris.ly/d/migrate-advisory-locking for details.", ADVISORY_LOCK_TIMEOUT.as_millis()
+                            "Timed out trying to acquire a postgres advisory lock (SELECT pg_advisory_lock(72707369)). Elapsed: {}ms. See https://prisma.io/docs/concepts/components/prisma-migrate/migrate-development-production#advisory-locking for details.", ADVISORY_LOCK_TIMEOUT.as_millis()
                             ),
                     })
                 })??;
