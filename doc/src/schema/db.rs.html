@@ -72,6 +72,18 @@
 <a href="#72" id="72">72</a>
 <a href="#73" id="73">73</a>
 <a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{EnumType, InputObjectType, InputType, ObjectType};
 <span class="kw">use </span>std::ops;
 
@@ -131,11 +143,23 @@
     }
 }
 
+<span class="kw">impl </span>ops::IndexMut&lt;InputObjectTypeId&gt; <span class="kw">for </span>QuerySchemaDatabase {
+    <span class="kw">fn </span>index_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: InputObjectTypeId) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Output {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.input_object_types[index.<span class="number">0</span>]
+    }
+}
+
 <span class="kw">impl </span>ops::Index&lt;OutputObjectTypeId&gt; <span class="kw">for </span>QuerySchemaDatabase {
     <span class="kw">type </span>Output = ObjectType;
 
     <span class="kw">fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: OutputObjectTypeId) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Output {
         <span class="kw-2">&amp;</span><span class="self">self</span>.output_object_types[index.<span class="number">0</span>]
+    }
+}
+
+<span class="kw">impl </span>ops::IndexMut&lt;OutputObjectTypeId&gt; <span class="kw">for </span>QuerySchemaDatabase {
+    <span class="kw">fn </span>index_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: OutputObjectTypeId) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Output {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.output_object_types[index.<span class="number">0</span>]
     }
 }
 

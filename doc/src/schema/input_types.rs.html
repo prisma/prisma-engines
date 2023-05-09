@@ -326,13 +326,9 @@
 <a href="#326" id="326">326</a>
 <a href="#327" id="327">327</a>
 <a href="#328" id="328">328</a>
-<a href="#329" id="329">329</a>
-<a href="#330" id="330">330</a>
-<a href="#331" id="331">331</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::db::QuerySchemaDatabase;
 <span class="kw">use </span>fmt::Debug;
-<span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>prisma_models::{prelude::ParentContainer, DefaultKind};
 <span class="kw">use </span>std::{boxed::Box, fmt};
 
@@ -340,7 +336,7 @@
 </span><span class="kw">pub struct </span>InputObjectType {
     <span class="kw">pub </span>identifier: Identifier,
     <span class="kw">pub </span>constraints: InputObjectTypeConstraints,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) fields: OnceCell&lt;Vec&lt;InputField&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) fields: Vec&lt;InputField&gt;,
     <span class="kw">pub </span>tag: <span class="prelude-ty">Option</span>&lt;ObjectTag&gt;,
 }
 
@@ -381,13 +377,11 @@
 
 <span class="kw">impl </span>InputObjectType {
     <span class="kw">pub fn </span>get_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Vec&lt;InputField&gt; {
-        <span class="self">self</span>.fields.get().unwrap()
+        <span class="kw-2">&amp;</span><span class="self">self</span>.fields
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_fields(<span class="kw-2">&amp;</span><span class="self">self</span>, fields: Vec&lt;InputField&gt;) {
-        <span class="self">self</span>.fields
-            .set(fields)
-            .unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;Fields of {:?} are already set&quot;</span>, <span class="self">self</span>.identifier));
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_fields(<span class="kw-2">&amp;mut </span><span class="self">self</span>, fields: Vec&lt;InputField&gt;) {
+        <span class="self">self</span>.fields = fields;
     }
 
     <span class="doccomment">/// True if fields are empty, false otherwise.
