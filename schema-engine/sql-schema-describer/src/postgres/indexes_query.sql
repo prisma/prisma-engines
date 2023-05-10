@@ -40,7 +40,7 @@ FROM
     INNER JOIN pg_class AS tableinfo ON tableinfo.oid = rawindex.indrelid
     INNER JOIN pg_class AS indexinfo ON indexinfo.oid = rawindex.indexrelid
     INNER JOIN pg_namespace AS schemainfo ON schemainfo.oid = tableinfo.relnamespace
-    INNER JOIN pg_attribute AS columninfo
+    LEFT JOIN pg_attribute AS columninfo
         ON columninfo.attrelid = tableinfo.oid AND columninfo.attnum = rawindex.indkeyid
     INNER JOIN pg_am AS indexaccess ON indexaccess.oid = indexinfo.relam
     LEFT JOIN pg_opclass AS opclass -- left join because crdb has no opclasses
