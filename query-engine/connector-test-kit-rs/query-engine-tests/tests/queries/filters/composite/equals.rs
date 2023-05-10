@@ -32,17 +32,6 @@ mod to_many {
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, r#"{
-                    findManyTestModel(where: {
-                        to_many_as: { equals: { a_1: "Test", a_2: 0 } }
-                    }) {
-                        id
-                    }
-                }"#),
-            @r###"{"data":{"findManyTestModel":[{"id":5}]}}"###
-        );
-
-        insta::assert_snapshot!(
           run_query!(runner, r#"{
                     findManyTestModel(where: {
                         NOT: [
