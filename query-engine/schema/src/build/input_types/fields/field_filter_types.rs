@@ -22,8 +22,8 @@ pub(crate) fn get_field_filter_types(
         }
 
         ModelField::Composite(cf) if cf.is_list() => vec![
-            InputType::object(to_many_composite_filter_object(ctx, cf)),
-            InputType::list(to_one_composite_filter_shorthand_types(ctx, cf)),
+            InputType::object(to_many_composite_filter_object(ctx, cf.clone())),
+            InputType::list(to_one_composite_filter_shorthand_types(ctx, cf.clone())),
         ],
 
         ModelField::Composite(cf) => vec![
@@ -147,29 +147,14 @@ fn to_many_composite_filter_object(ctx: &'_ QuerySchema, cf: CompositeFieldRef) 
         let composite_equals_object = filter_objects::composite_equality_object(ctx, cf.clone());
 
         let mut fields = vec![
-            input_field(
-                filters::EQUALS,
-                // The object (aka shorthand) syntax is only supported because the client used to expose all
-                // list input types as T | T[]. Consider removing it one day.
-                list_union_type(InputType::object(composite_equals_object), true),
-                None,
-            )
-            .optional(),
-            simple_input_field(filters::EVERY, InputType::object(composite_where_object.clone()), None).optional(),
-            simple_input_field(filters::SOME, InputType::object(composite_where_object.clone()), None).optional(),
-            simple_input_field(filters::NONE, InputType::object(composite_where_object), None).optional(),
-            simple_input_field(filters::IS_EMPTY, InputType::boolean(), None).optional(),
-        ];
-
-        let mut fields = vec![
             simple_input_field(
                 filters::EQUALS,
                 InputType::list(InputType::object(composite_equals_object)),
                 None,
             )
             .optional(),
-            simple_input_field(filters::EVERY, InputType::object(composite_where_object), None).optional(),
-            simple_input_field(filters::SOME, InputType::object(composite_where_object), None).optional(),
+            simple_input_field(filters::EVERY, InputType::object(composite_where_object.clone()), None).optional(),
+            simple_input_field(filters::SOME, InputType::object(composite_where_object.clone()), None).optional(),
             simple_input_field(filters::NONE, InputType::object(composite_where_object), None).optional(),
             simple_input_field(filters::IS_EMPTY, InputType::boolean(), None).optional(),
         ];
