@@ -22,6 +22,7 @@ use std::{
     any::type_name,
     collections::{BTreeMap, HashMap},
     convert::TryInto,
+    iter::Peekable,
 };
 use tracing::trace;
 
@@ -147,6 +148,7 @@ pub enum ConstraintOption {
 pub struct PostgresSchemaExt {
     pub opclasses: Vec<(IndexColumnId, SQLOperatorClass)>,
     pub indexes: Vec<(IndexId, SqlIndexAlgorithm)>,
+    pub expression_indexes: Vec<String>,
     pub index_null_position: HashMap<IndexColumnId, IndexNullPosition>,
     pub constraint_options: HashMap<Constraint, BitFlags<ConstraintOption>>,
     pub table_options: Vec<BTreeMap<String, String>>,
@@ -1304,123 +1306,25 @@ impl<'a> SqlSchemaDescriber<'a> {
                 &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
             )
             .await?;
-        let mut current_index: Option<IndexId> = None;
 
-        for row in rows {
-            let namespace = row.get_expect_string("namespace");
-            let table_name = row.get_expect_string("table_name");
-            let table_id: TableId = match table_ids.get(&(namespace, table_name)) {
-                Some(id) => *id,
-                None => continue,
-            };
+        let mut result_rows = Vec::new();
+        let mut index_rows = rows.into_iter().peekable();
 
-            let column_name = row.get_expect_string("column_name");
-            let column_id = match sql_schema.walk(table_id).column(&column_name) {
-                Some(col) => col.id,
-                _ => continue,
-            };
+        loop {
+            result_rows.clear();
+            group_next_index(&mut result_rows, &mut index_rows);
 
-            let index_name = row.get_expect_string("index_name");
-            let is_unique = row.get_expect_bool("is_unique");
-            let is_primary_key = row.get_expect_bool("is_primary_key");
-            let column_index = row.get_expect_i64("column_index");
-            let index_algo = row.get_expect_string("index_algo");
-
-            let sort_order = row.get_string("column_order").map(|v| match v.as_ref() {
-                "ASC" => SQLSortOrder::Asc,
-                "DESC" => SQLSortOrder::Desc,
-                misc => panic!("Unexpected sort order `{misc}`, collation should be ASC, DESC or Null"),
-            });
-
-            let algorithm = if self.is_cockroach() {
-                match index_algo.as_str() {
-                    "inverted" => SqlIndexAlgorithm::Gin,
-                    _ => SqlIndexAlgorithm::BTree,
-                }
-            } else {
-                match index_algo.as_str() {
-                    "btree" => SqlIndexAlgorithm::BTree,
-                    "hash" => SqlIndexAlgorithm::Hash,
-                    "gist" => SqlIndexAlgorithm::Gist,
-                    "gin" => SqlIndexAlgorithm::Gin,
-                    "spgist" => SqlIndexAlgorithm::SpGist,
-                    "brin" => SqlIndexAlgorithm::Brin,
-                    other => {
-                        tracing::warn!("Unknown index algorithm on {index_name}: {other}");
-                        SqlIndexAlgorithm::BTree
-                    }
-                }
-            };
-
-            if column_index == 0 {
-                // new index!
-                let index_id = if is_primary_key {
-                    sql_schema.push_primary_key(table_id, index_name)
-                } else if is_unique {
-                    sql_schema.push_unique_constraint(table_id, index_name)
-                } else {
-                    sql_schema.push_index(table_id, index_name)
-                };
-
-                if is_primary_key || is_unique {
-                    let mut constraint_options = BitFlags::empty();
-
-                    if let Some(true) = row.get_bool("condeferrable") {
-                        constraint_options |= ConstraintOption::Deferrable;
-                    }
-
-                    if let Some(true) = row.get_bool("condeferred") {
-                        constraint_options |= ConstraintOption::Deferred;
-                    }
-
-                    pg_ext
-                        .constraint_options
-                        .insert(Constraint::Index(index_id), constraint_options);
-                }
-
-                current_index = Some(index_id);
+            if result_rows.is_empty() {
+                return Ok(());
             }
 
-            let index_id = current_index.unwrap();
-            let operator_class = if !matches!(algorithm, SqlIndexAlgorithm::BTree | SqlIndexAlgorithm::Hash) {
-                row.get_string("opclass")
-                    .map(|c| (c, row.get_bool("opcdefault").unwrap_or_default()))
-                    .map(|(c, is_default)| SQLOperatorClass {
-                        kind: SQLOperatorClassKind::from(c.as_str()),
-                        is_default,
-                    })
-            } else {
-                None
-            };
-
-            let index_field_id = sql_schema.push_index_column(IndexColumn {
-                index_id,
-                column_id,
-                sort_order,
-                length: None,
-            });
-
-            pg_ext.indexes.push((index_id, algorithm));
-
-            // only enable nulls first/last on Postgres
-            if !self.is_cockroach() && algorithm == SqlIndexAlgorithm::BTree && !is_primary_key {
-                let nulls_first = row.get_expect_bool("nulls_first");
-
-                let position = if nulls_first {
-                    IndexNullPosition::First
-                } else {
-                    IndexNullPosition::Last
-                };
-
-                pg_ext.index_null_position.insert(index_field_id, position);
+            if result_rows.iter().any(|row| row.get_string("column_name").is_none()) {
+                // Todo expression idx
+                continue;
             }
 
-            if let Some(opclass) = operator_class {
-                pg_ext.opclasses.push((index_field_id, opclass));
-            }
+            index_from_row(result_rows.drain(..), table_ids, sql_schema, pg_ext, self.circumstances);
         }
-
-        Ok(())
     }
 
     async fn get_sequences(&self, sql_schema: &SqlSchema, postgres_ext: &mut PostgresSchemaExt) -> DescriberResult<()> {
@@ -1528,6 +1432,144 @@ impl<'a> SqlSchemaDescriber<'a> {
         }
 
         Ok(())
+    }
+}
+
+fn group_next_index<T>(rows: &mut Vec<ResultRow>, index_rows: &mut Peekable<T>)
+where
+    T: Iterator<Item = ResultRow>,
+{
+    let idx_name = match dbg!(index_rows.peek()) {
+        Some(idx_name) => idx_name.get_expect_string("index_name"),
+        None => return,
+    };
+
+    rows.extend(index_rows.take_while(|row| row.get_expect_string("index_name") == idx_name));
+}
+
+fn index_from_row(
+    rows: impl Iterator<Item = ResultRow>,
+    table_ids: &IndexMap<(String, String), TableId>,
+    sql_schema: &mut SqlSchema,
+    pg_ext: &mut PostgresSchemaExt,
+    circumstances: BitFlags<Circumstances>,
+) {
+    let mut current_index = None;
+
+    for row in rows {
+        let namespace = row.get_expect_string("namespace");
+        let table_name = row.get_expect_string("table_name");
+        let table_id: TableId = match table_ids.get(&(namespace, table_name)) {
+            Some(id) => *id,
+            None => continue,
+        };
+
+        let column_name = row.get_expect_string("column_name");
+
+        let column_id = match sql_schema.walk(table_id).column(&column_name) {
+            Some(col) => col.id,
+            _ => continue,
+        };
+
+        let index_name = row.get_expect_string("index_name");
+        let is_unique = row.get_expect_bool("is_unique");
+        let is_primary_key = row.get_expect_bool("is_primary_key");
+        let column_index = row.get_expect_i64("column_index");
+        let index_algo = row.get_expect_string("index_algo");
+
+        let sort_order = row.get_string("column_order").map(|v| match v.as_ref() {
+            "ASC" => SQLSortOrder::Asc,
+            "DESC" => SQLSortOrder::Desc,
+            misc => panic!("Unexpected sort order `{misc}`, collation should be ASC, DESC or Null"),
+        });
+
+        let algorithm = if circumstances.contains(Circumstances::Cockroach) {
+            match index_algo.as_str() {
+                "inverted" => SqlIndexAlgorithm::Gin,
+                _ => SqlIndexAlgorithm::BTree,
+            }
+        } else {
+            match index_algo.as_str() {
+                "btree" => SqlIndexAlgorithm::BTree,
+                "hash" => SqlIndexAlgorithm::Hash,
+                "gist" => SqlIndexAlgorithm::Gist,
+                "gin" => SqlIndexAlgorithm::Gin,
+                "spgist" => SqlIndexAlgorithm::SpGist,
+                "brin" => SqlIndexAlgorithm::Brin,
+                other => {
+                    tracing::warn!("Unknown index algorithm on {index_name}: {other}");
+                    SqlIndexAlgorithm::BTree
+                }
+            }
+        };
+
+        if column_index == 0 {
+            // new index!
+            let index_id = if is_primary_key {
+                sql_schema.push_primary_key(table_id, index_name)
+            } else if is_unique {
+                sql_schema.push_unique_constraint(table_id, index_name)
+            } else {
+                sql_schema.push_index(table_id, index_name)
+            };
+
+            if is_primary_key || is_unique {
+                let mut constraint_options = BitFlags::empty();
+
+                if let Some(true) = row.get_bool("condeferrable") {
+                    constraint_options |= ConstraintOption::Deferrable;
+                }
+
+                if let Some(true) = row.get_bool("condeferred") {
+                    constraint_options |= ConstraintOption::Deferred;
+                }
+
+                pg_ext
+                    .constraint_options
+                    .insert(Constraint::Index(index_id), constraint_options);
+            }
+
+            current_index = Some(index_id);
+        }
+
+        let index_id = current_index.unwrap();
+        let operator_class = if !matches!(algorithm, SqlIndexAlgorithm::BTree | SqlIndexAlgorithm::Hash) {
+            row.get_string("opclass")
+                .map(|c| (c, row.get_bool("opcdefault").unwrap_or_default()))
+                .map(|(c, is_default)| SQLOperatorClass {
+                    kind: SQLOperatorClassKind::from(c.as_str()),
+                    is_default,
+                })
+        } else {
+            None
+        };
+
+        let index_field_id = sql_schema.push_index_column(IndexColumn {
+            index_id,
+            column_id,
+            sort_order,
+            length: None,
+        });
+
+        pg_ext.indexes.push((index_id, algorithm));
+
+        // only enable nulls first/last on Postgres
+        if !circumstances.contains(Circumstances::Cockroach) && algorithm == SqlIndexAlgorithm::BTree && !is_primary_key
+        {
+            let nulls_first = row.get_expect_bool("nulls_first");
+
+            let position = if nulls_first {
+                IndexNullPosition::First
+            } else {
+                IndexNullPosition::Last
+            };
+
+            pg_ext.index_null_position.insert(index_field_id, position);
+        }
+
+        if let Some(opclass) = operator_class {
+            pg_ext.opclasses.push((index_field_id, opclass));
+        }
     }
 }
 
