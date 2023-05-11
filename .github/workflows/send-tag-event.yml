@@ -6,7 +6,7 @@ on:
       - '*'
 
 jobs:
-  build-and-push:
+  send-tag-event:
     runs-on: ubuntu-22.04
     steps:
       - run: echo "Sending event for tag ${{ github.ref_name }}"
