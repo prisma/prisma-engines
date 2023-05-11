@@ -7,7 +7,7 @@ pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext<'_>, model: &
     let ident = Identifier::new_prisma(format!("{}GroupByOutputType", capitalize(model.name())));
     return_cached_output!(ctx, &ident);
 
-    let object = ObjectType::new(ident.clone(), Some(model.id));
+    let mut object = ObjectType::new(ident.clone(), Some(model.id));
 
     // Model fields that can be grouped by value.
     let mut object_fields = scalar_output_fields(ctx, model);

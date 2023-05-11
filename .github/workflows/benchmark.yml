@@ -24,14 +24,14 @@ jobs:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@stable
 
-      - run: cargo bench --bench schema_builder_bench
-
       - name: Install cargo-codspeed
         run: cargo install cargo-codspeed
 
-      - name: Build the benchmark target(s)
-        run: cargo codspeed build
-        working-directory: ./query-engine/schema
+      - name: 'Build the benchmark targets: schema'
+        run: cargo codspeed build -p schema
+
+      - name: 'Build the benchmark targets: request-handlers'
+        run: cargo codspeed build -p request-handlers
 
       - name: Run the benchmarks
         uses: CodSpeedHQ/action@v1

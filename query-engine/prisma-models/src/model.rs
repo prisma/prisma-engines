@@ -54,6 +54,9 @@ impl Model {
     }
 
     pub fn unique_indexes(&self) -> impl Iterator<Item = walkers::IndexWalker<'_>> {
-        self.walker().indexes().filter(|idx| idx.is_unique())
+        self.walker()
+            .indexes()
+            .filter(|idx| idx.is_unique())
+            .filter(|index| !index.fields().any(|f| f.is_unsupported()))
     }
 }

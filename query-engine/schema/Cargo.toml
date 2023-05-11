@@ -5,9 +5,9 @@ edition = "2021"
 
 [dependencies]
 prisma-models = { path = "../prisma-models" }
-once_cell = "1.3"
 psl.workspace = true
 rustc-hash = "1.1.0"
+tracing = "0.1"
 
 [dev-dependencies]
 codspeed-criterion-compat = "1.1.0"

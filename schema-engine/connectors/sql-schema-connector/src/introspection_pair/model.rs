@@ -104,7 +104,7 @@ impl<'a> ModelPair<'a> {
         psl::is_reserved_type_name(self.next.name()) && self.previous.is_none()
     }
 
-    /// The documentation on top of the enum.
+    /// The documentation on top of the Model.
     pub(crate) fn documentation(self) -> Option<&'a str> {
         self.previous.and_then(|model| model.ast_model().documentation())
     }
