@@ -79,23 +79,23 @@ fn to_many_relation_filter_object(ctx: &'_ QuerySchema, rf: RelationFieldRef) ->
 }
 
 fn to_one_relation_filter_object(ctx: &'_ QuerySchema, rf: RelationFieldRef) -> InputObjectType<'_> {
-    // TODO: The ToOneRelationFilterInput is currently broken as it does not take nullability into account.
-    // TODO: This means that the first relation field to be traversed will set the nullability for all other relation field that points to the same related model.
-    let ident = Identifier::new_prisma(IdentifierType::ToOneRelationFilterInput(rf.related_model()));
+    let ident = Identifier::new_prisma(IdentifierType::ToOneRelationFilterInput(rf.related_model(), rf.arity()));
 
     let mut object = init_input_object_type(ident);
     object.set_tag(ObjectTag::RelationEnvelope);
     object.set_fields(move || {
         let related_input_type = filter_objects::where_object_type(ctx, rf.related_model().into());
+
         vec![
             simple_input_field(filters::IS, InputType::object(related_input_type.clone()), None)
                 .optional()
-                .nullable(),
+                .nullable_if(!rf.is_required()),
             simple_input_field(filters::IS_NOT, InputType::object(related_input_type), None)
                 .optional()
-                .nullable(),
+                .nullable_if(!rf.is_required()),
         ]
     });
+
     object
 }
 
