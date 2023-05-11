@@ -12,6 +12,7 @@ pub enum IdentifierType {
     Mutation,
     CheckedCreateInput(Model, Option<RelationField>),
     CheckedUpdateManyInput(Model),
+    UncheckedUpdateManyInput(Model, Option<RelationField>),
     CheckedUpdateOneInput(Model, Option<RelationField>),
     CompositeCreateEnvelopeInput(CompositeType, FieldArity),
     CompositeCreateInput(CompositeType),
@@ -293,6 +294,15 @@ impl std::fmt::Display for IdentifierType {
             IdentifierType::CreateManyInput(model, related_field) => match related_field {
                 Some(ref rf) => write!(f, "{}CreateMany{}Input", model.name(), capitalize(rf.name())),
                 _ => write!(f, "{}CreateManyInput", model.name()),
+            },
+            IdentifierType::UncheckedUpdateManyInput(model, related_field) => match related_field {
+                Some(rf) => write!(
+                    f,
+                    "{}UncheckedUpdateManyWithout{}Input",
+                    model.name(),
+                    capitalize(rf.name())
+                ),
+                _ => write!(f, "{}UncheckedUpdateManyInput", model.name()),
             },
         }
     }
