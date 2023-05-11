@@ -165,8 +165,9 @@
 <a href="#165" id="165">165</a>
 <a href="#166" id="166">166</a>
 <a href="#167" id="167">167</a>
-</pre><pre class="rust"><code><span class="kw">use </span>enumflags2::BitFlags;
-<span class="kw">use </span>serde::{Serialize, Serializer};
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+</pre><pre class="rust"><code><span class="kw">use </span>serde::{Serialize, Serializer};
 <span class="kw">use </span>std::fmt;
 
 <span class="doccomment">/// A set of preview features.
@@ -242,7 +243,8 @@
     Deno,
     ExtendedWhereUnique,
     Views,
-    JsonProtocol
+    JsonProtocol,
+    NodeDrivers,
 );
 
 <span class="doccomment">/// Generator preview features
@@ -290,7 +292,9 @@
         | DataProxy
         | InteractiveTransactions
     }),
-    hidden: BitFlags::EMPTY,
+    hidden: <span class="macro">enumflags2::make_bitflags!</span>(PreviewFeature::{
+        NodeDrivers
+    }),
 };
 
 <span class="attr">#[derive(Debug)]
