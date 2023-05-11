@@ -57,7 +57,7 @@ impl NodejsFunctionContext {
     }
 }
 
-fn read_nodejs_functions<'a>(env: Env, ctx: JsObject) -> napi::Result<NodejsFunctionContext> {
+fn read_nodejs_functions(env: Env, ctx: JsObject) -> napi::Result<NodejsFunctionContext> {
     let query_raw = ctx.get_named_property("queryRaw")?;
     let query_raw_typed = ctx.get_named_property("queryRawTyped")?;
     let execute_raw = ctx.get_named_property("executeRaw")?;
@@ -91,7 +91,7 @@ impl QueryEngineNodeDrivers {
     /// Wraps the `QueryEngine::new` constructor.
     #[napi(constructor)]
     pub fn new(napi_env: Env, options: JsUnknown, callback: JsFunction, fn_ctx: JsObject) -> napi::Result<Self> {
-        let fn_ctx = read_nodejs_functions(napi_env.clone(), fn_ctx)?;
+        let fn_ctx = read_nodejs_functions(napi_env, fn_ctx)?;
         let engine = QueryEngine::new(napi_env, options, callback)?;
 
         Ok(Self { engine, fn_ctx })
