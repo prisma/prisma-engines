@@ -164,7 +164,6 @@
 <a href="#164" id="164">164</a>
 <a href="#165" id="165">165</a>
 <a href="#166" id="166">166</a>
-<a href="#167" id="167">167</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Query schema builder. Root for query schema building.
 //!
 //! The schema builder creates all builders necessary for the process,
@@ -305,7 +304,6 @@
 }
 
 <span class="kw">pub fn </span>build(schema: Arc&lt;psl::ValidatedSchema&gt;, enable_raw_queries: bool) -&gt; QuerySchema {
-    <span class="kw">let </span>_span = <span class="macro">tracing::info_span!</span>(<span class="string">&quot;prisma:engine:schema&quot;</span>).entered();
     <span class="kw">let </span>preview_features = schema.configuration.preview_features();
     build_with_features(schema, preview_features, enable_raw_queries)
 }
