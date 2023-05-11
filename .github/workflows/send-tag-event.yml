@@ -17,7 +17,7 @@ jobs:
             await github.rest.repos.createDispatchEvent({
               owner: 'prisma',
               repo: 'pdp-cloudflare',
-              event_type: "orm_release",
+              event_type: "engines_release",
               client_payload: {
                 prisma_version: '${{ github.ref_name }}',
               },
