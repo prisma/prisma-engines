@@ -1,7 +1,7 @@
 use crate::helpers::*;
 use query_engine_tests::*;
 
-const JSON_QUERY: &'static str = r###"
+const JSON_QUERY: &str = r###"
 {
     "action": "findMany",
     "modelName": "Person",
@@ -15,7 +15,7 @@ const JSON_QUERY: &'static str = r###"
 }
 "###;
 
-const GRAPHQL_QUERY: &'static str = r###"
+const GRAPHQL_QUERY: &str = r###"
 {
   "operationName": null,
   "variables": {},

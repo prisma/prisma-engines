@@ -1,7 +1,6 @@
 use crate::{coerce_null_to_zero_value, Filter, NativeUpsert, QueryArguments, WriteArgs};
 use async_trait::async_trait;
-use dml::FieldArity;
-use prisma_models::*;
+use prisma_models::{ast::FieldArity, *};
 use prisma_value::PrismaValue;
 use std::collections::HashMap;
 

@@ -1,6 +1,5 @@
 use super::*;
 use fmt::Debug;
-use once_cell::sync::OnceCell;
 use prisma_models::{ast::ModelId, ModelRef};
 use std::fmt;
 
@@ -113,7 +112,7 @@ impl OutputType {
 
 pub struct ObjectType {
     pub identifier: Identifier,
-    fields: OnceCell<Vec<OutputField>>,
+    fields: Vec<OutputField>,
 
     // Object types can directly map to models.
     model: Option<ModelId>,
@@ -130,10 +129,10 @@ impl Debug for ObjectType {
 }
 
 impl ObjectType {
-    pub fn new(ident: Identifier, model: Option<ModelId>) -> Self {
+    pub(crate) fn new(ident: Identifier, model: Option<ModelId>) -> Self {
         Self {
             identifier: ident,
-            fields: OnceCell::new(),
+            fields: Vec::new(),
             model,
         }
     }
@@ -142,25 +141,20 @@ impl ObjectType {
         &self.identifier
     }
 
-    pub fn add_field(&mut self, field: OutputField) {
-        self.fields.get_mut().unwrap().push(field)
+    pub(crate) fn add_field(&mut self, field: OutputField) {
+        self.fields.push(field)
     }
 
     pub fn get_fields(&self) -> &[OutputField] {
-        self.fields.get().unwrap()
+        &self.fields
     }
 
-    pub fn set_fields(&self, fields: Vec<OutputField>) {
-        self.fields.set(fields).unwrap();
+    pub(crate) fn set_fields(&mut self, fields: Vec<OutputField>) {
+        self.fields = fields;
     }
 
     pub fn find_field<'a>(&'a self, name: &str) -> Option<(usize, &'a OutputField)> {
         self.get_fields().iter().enumerate().find(|(_, f)| f.name == name)
-    }
-
-    /// True if fields are empty, false otherwise.
-    pub fn is_empty(&self) -> bool {
-        self.get_fields().is_empty()
     }
 }
 
@@ -182,12 +176,12 @@ pub struct OutputField {
 }
 
 impl OutputField {
-    pub fn nullable(mut self) -> Self {
+    pub(crate) fn nullable(mut self) -> Self {
         self.is_nullable = true;
         self
     }
 
-    pub fn nullable_if(self, condition: bool) -> Self {
+    pub(crate) fn nullable_if(self, condition: bool) -> Self {
         if condition {
             self.nullable()
         } else {
@@ -203,7 +197,7 @@ impl OutputField {
         matches!(self.query_tag(), Some(&QueryTag::FindUnique))
     }
 
-    pub fn query_info(&self) -> Option<&QueryInfo> {
+    pub(crate) fn query_info(&self) -> Option<&QueryInfo> {
         self.query_info.as_ref()
     }
 

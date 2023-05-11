@@ -6,7 +6,7 @@ use crate::{
 };
 use connector::Filter;
 use prisma_models::{ModelRef, RelationFieldRef};
-use schema_builder::constants::args;
+use schema::constants::args;
 use std::convert::TryInto;
 
 /// Handles nested update (single record) cases.

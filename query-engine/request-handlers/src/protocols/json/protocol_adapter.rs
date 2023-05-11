@@ -4,7 +4,7 @@ use indexmap::IndexMap;
 use prisma_models::{decode_bytes, parse_datetime, prelude::ParentContainer, Field};
 use query_core::{
     constants::custom_types,
-    schema::{ObjectType, OutputField, QuerySchema, QuerySchemaRef},
+    schema::{ObjectType, OutputField, QuerySchema},
     ArgumentValue, Operation, Selection,
 };
 use serde_json::Value as JsonValue;
@@ -18,7 +18,7 @@ enum OperationType {
 pub struct JsonProtocolAdapter;
 
 impl JsonProtocolAdapter {
-    pub fn convert_single(query: JsonSingleQuery, query_schema: &QuerySchemaRef) -> crate::Result<Operation> {
+    pub fn convert_single(query: JsonSingleQuery, query_schema: &QuerySchema) -> crate::Result<Operation> {
         let JsonSingleQuery {
             model_name,
             action,
@@ -40,7 +40,7 @@ impl JsonProtocolAdapter {
         field: &OutputField,
         container: Option<&ParentContainer>,
         query: FieldQuery,
-        query_schema: &QuerySchemaRef,
+        query_schema: &QuerySchema,
     ) -> crate::Result<Selection> {
         let FieldQuery {
             arguments,
@@ -248,7 +248,7 @@ impl JsonProtocolAdapter {
         parent_field: &OutputField,
         nested_field_name: &str,
         container: Option<&ParentContainer>,
-        query_schema: &QuerySchemaRef,
+        query_schema: &QuerySchema,
         all_scalars_set: bool,
     ) -> crate::Result<Selection> {
         let nested_object_type = parent_field
@@ -386,7 +386,7 @@ impl JsonProtocolAdapter {
     }
 
     fn find_schema_field(
-        query_schema: &QuerySchemaRef,
+        query_schema: &QuerySchema,
         model_name: Option<String>,
         action: crate::Action,
     ) -> crate::Result<(OperationType, &OutputField)> {
@@ -414,7 +414,7 @@ mod tests {
     use query_core::schema;
     use std::sync::Arc;
 
-    fn schema() -> schema::QuerySchemaRef {
+    fn schema() -> schema::QuerySchema {
         let schema_str = r#"
           generator client {
             provider        = "prisma-client-js"
@@ -457,9 +457,7 @@ mod tests {
 
         schema.diagnostics.to_result().unwrap();
 
-        let internal_data_model = prisma_models::convert(Arc::new(schema));
-
-        Arc::new(schema_builder::build(internal_data_model, true))
+        schema::build(Arc::new(schema), true)
     }
 
     #[test]
@@ -1414,7 +1412,7 @@ mod tests {
         "###);
     }
 
-    fn composite_schema() -> schema::QuerySchemaRef {
+    fn composite_schema() -> schema::QuerySchema {
         let schema_str = r#"
           generator client {
             provider        = "prisma-client-js"
@@ -1446,9 +1444,7 @@ mod tests {
 
         schema.diagnostics.to_result().unwrap();
 
-        let internal_data_model = prisma_models::convert(Arc::new(schema));
-
-        Arc::new(schema_builder::build(internal_data_model, true))
+        schema::build(Arc::new(schema), true)
     }
 
     #[test]
@@ -1555,7 +1551,7 @@ mod tests {
         "###);
     }
 
-    fn recursive_composite_schema() -> schema::QuerySchemaRef {
+    fn recursive_composite_schema() -> schema::QuerySchema {
         let schema_str = r#"
           generator client {
             provider        = "prisma-client-js"
@@ -1580,9 +1576,7 @@ mod tests {
 
         schema.diagnostics.to_result().unwrap();
 
-        let internal_data_model = prisma_models::convert(Arc::new(schema));
-
-        Arc::new(schema_builder::build(internal_data_model, true))
+        schema::build(Arc::new(schema), true)
     }
 
     #[test]
@@ -1611,7 +1605,7 @@ mod tests {
         "###);
     }
 
-    fn sibling_composite_schema() -> schema::QuerySchemaRef {
+    fn sibling_composite_schema() -> schema::QuerySchema {
         let schema_str = r#"
           generator client {
             provider        = "prisma-client-js"
@@ -1639,9 +1633,7 @@ mod tests {
 
         schema.diagnostics.to_result().unwrap();
 
-        let internal_data_model = prisma_models::convert(Arc::new(schema));
-
-        Arc::new(schema_builder::build(internal_data_model, true))
+        schema::build(Arc::new(schema), true)
     }
 
     #[test]

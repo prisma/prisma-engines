@@ -29,7 +29,7 @@ impl GqlObjectRenderer {
         let mut rendered_fields = Vec::with_capacity(fields.len());
 
         for field in fields {
-            rendered_fields.push(field.into_renderer().render(ctx))
+            rendered_fields.push(field.as_renderer().render(ctx))
         }
 
         let indented: Vec<String> = rendered_fields
@@ -60,7 +60,7 @@ impl GqlObjectRenderer {
         let mut rendered_fields = Vec::with_capacity(fields.len());
 
         for field in fields {
-            rendered_fields.push(field.into_renderer().render(ctx))
+            rendered_fields.push(field.as_renderer().render(ctx))
         }
 
         let indented: Vec<String> = rendered_fields

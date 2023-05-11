@@ -19,14 +19,14 @@ impl Connector for EmptyDatamodelConnector {
         BitFlags::all()
     }
 
-    fn capabilities(&self) -> &'static [ConnectorCapability] {
-        &[
-            ConnectorCapability::AutoIncrement,
-            ConnectorCapability::CompoundIds,
-            ConnectorCapability::Enums,
-            ConnectorCapability::Json,
-            ConnectorCapability::ImplicitManyToManyRelation,
-        ]
+    fn capabilities(&self) -> ConnectorCapabilities {
+        enumflags2::make_bitflags!(ConnectorCapability::{
+            AutoIncrement |
+            CompoundIds |
+            Enums |
+            Json |
+            ImplicitManyToManyRelation
+        })
     }
 
     fn max_identifier_length(&self) -> usize {

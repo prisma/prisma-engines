@@ -11,7 +11,7 @@ pub(super) use postgresql::PostgresIntrospectionFlavour;
 pub(super) use sqlite::SqliteIntrospectionFlavour;
 pub(super) use sqlserver::SqlServerIntrospectionFlavour;
 
-use crate::warnings::generators::Warnings;
+use schema_connector::Warnings;
 
 use super::DatamodelCalculatorContext;
 
@@ -55,6 +55,10 @@ pub(crate) trait IntrospectionFlavour {
         _ctx: &DatamodelCalculatorContext<'_>,
         _column: IndexColumnWalker<'_>,
     ) -> bool {
+        false
+    }
+
+    fn uses_exclude_constraint(&self, _ctx: &DatamodelCalculatorContext<'_>, _table: TableWalker<'_>) -> bool {
         false
     }
 }

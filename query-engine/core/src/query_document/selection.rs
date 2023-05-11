@@ -1,8 +1,7 @@
 use crate::{ArgumentValue, ArgumentValueObject};
-
 use indexmap::IndexMap;
 use itertools::Itertools;
-use schema_builder::constants::filters;
+use schema::constants::filters;
 use std::borrow::Cow;
 
 pub type SelectionArgument = (String, ArgumentValue);

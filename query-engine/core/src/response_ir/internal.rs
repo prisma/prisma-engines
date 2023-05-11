@@ -6,8 +6,10 @@ use connector::{AggregationResult, RelAggregationResult, RelAggregationRow};
 use indexmap::IndexMap;
 use itertools::Itertools;
 use prisma_models::{CompositeFieldRef, Field, PrismaValue, SelectionResult};
-use schema::*;
-use schema_builder::constants::{aggregations::*, output_fields::*};
+use schema::{
+    constants::{aggregations::*, output_fields::*},
+    *,
+};
 use std::{borrow::Borrow, collections::HashMap};
 
 /// A grouping of items to their parent record.

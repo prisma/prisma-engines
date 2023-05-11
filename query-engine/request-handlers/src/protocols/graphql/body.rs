@@ -2,6 +2,7 @@ use super::GraphQLProtocolAdapter;
 use query_core::{BatchDocument, BatchDocumentTransaction, Operation, QueryDocument};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use tracing::info_span;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", untagged)]
@@ -55,6 +56,7 @@ impl From<&str> for SingleQuery {
 impl GraphqlBody {
     /// Convert a `GraphQlBody` into a `QueryDocument`.
     pub fn into_doc(self) -> crate::Result<QueryDocument> {
+        let _span = info_span!("prisma:engine:into_doc").entered();
         match self {
             GraphqlBody::Single(body) => {
                 let operation = GraphQLProtocolAdapter::convert_query_to_operation(&body.query, body.operation_name)?;

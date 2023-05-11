@@ -150,6 +150,7 @@ pub struct PostgresSchemaExt {
     pub index_null_position: HashMap<IndexColumnId, IndexNullPosition>,
     pub constraint_options: HashMap<Constraint, BitFlags<ConstraintOption>>,
     pub table_options: Vec<BTreeMap<String, String>>,
+    pub exclude_constraints: Vec<(TableId, String)>,
     /// The schema's sequences.
     pub sequences: Vec<Sequence>,
     /// The extensions included in the schema(s).
@@ -246,6 +247,21 @@ impl PostgresSchemaExt {
             Some(opts) => opts.contains(ConstraintOption::Deferrable) || opts.contains(ConstraintOption::Deferred),
             None => false,
         }
+    }
+
+    pub fn exclude_constraints(&self, table_id: TableId) -> impl ExactSizeIterator<Item = &str> {
+        let low = self.exclude_constraints.partition_point(|(id, _)| *id < table_id);
+        let high = self.exclude_constraints[low..].partition_point(|(id, _)| *id <= table_id);
+
+        self.exclude_constraints[low..low + high]
+            .iter()
+            .map(|(_, name)| name.as_str())
+    }
+
+    pub fn uses_exclude_constraint(&self, id: TableId) -> bool {
+        self.exclude_constraints
+            .binary_search_by_key(&id, |(id, _)| *id)
+            .is_ok()
     }
 }
 
@@ -542,6 +558,7 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
         let table_names = self.get_table_names(&mut sql_schema, &mut pg_ext).await?;
 
         // order matters
+        self.get_constraints(&table_names, &mut sql_schema, &mut pg_ext).await?;
         self.get_views(&mut sql_schema).await?;
         self.get_enums(&mut sql_schema).await?;
         self.get_columns(&mut sql_schema).await?;
@@ -757,6 +774,12 @@ impl<'a> SqlSchemaDescriber<'a> {
                 BitFlags::empty()
             };
 
+            let constraints_key = (namespace.clone(), cloned_name);
+
+            // TODO: we could build this without check and exclusion constraints.
+            // We could then mutate the tables by id to add these constraints as "properties".
+            // This would allow "get_constraints" to avoid using BTreeMaps in favor of mutating
+            // the map in place.
             let id = sql_schema.push_table_with_properties(
                 table_name,
                 sql_schema.get_namespace_id(&namespace).unwrap(),
@@ -764,7 +787,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 description,
             );
 
-            map.insert((namespace, cloned_name), id);
+            map.insert(constraints_key, id);
         }
 
         Ok(map)
@@ -1215,6 +1238,53 @@ impl<'a> SqlSchemaDescriber<'a> {
                 sql_schema.push_foreign_key_column(fkid, [column_id, referenced_column_id]);
             }
         }
+
+        Ok(())
+    }
+
+    /// Return the constraints that are not primary keys, foreign keys, or unique keys.
+    /// Namely, this returns CHECK and EXCLUDE constraints.
+    async fn get_constraints(
+        &self,
+        table_names: &IndexMap<(String, String), TableId>,
+        sql_schema: &mut SqlSchema,
+        pg_ext: &mut PostgresSchemaExt,
+    ) -> DescriberResult<()> {
+        let namespaces = &sql_schema.namespaces;
+        let sql = include_str!("postgres/constraints_query.sql");
+
+        let rows = self
+            .conn
+            .query_raw(
+                sql,
+                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
+            )
+            .await?;
+
+        for row in rows {
+            let namespace = row.get_expect_string("namespace");
+            let table_name = row.get_expect_string("table_name");
+            let constraint_name = row.get_expect_string("constraint_name");
+            let constraint_type = row.get_expect_char("constraint_type");
+
+            let table_id = match table_names.get(&(namespace, table_name)) {
+                Some(id) => *id,
+                None => continue,
+            };
+
+            match constraint_type {
+                'c' => {
+                    sql_schema.check_constraints.push((table_id, constraint_name));
+                }
+                'x' => {
+                    pg_ext.exclude_constraints.push((table_id, constraint_name));
+                }
+                _ => (),
+            }
+        }
+
+        sql_schema.check_constraints.sort_by_key(|(id, _)| *id);
+        pg_ext.exclude_constraints.sort_by_key(|(id, _)| *id);
 
         Ok(())
     }

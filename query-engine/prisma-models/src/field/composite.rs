@@ -1,6 +1,8 @@
 use crate::{parent_container::ParentContainer, CompositeType};
-use dml::FieldArity;
-use psl::{parser_database::ScalarFieldId, schema_ast::ast};
+use psl::{
+    parser_database::ScalarFieldId,
+    schema_ast::ast::{self, FieldArity},
+};
 use std::fmt::{Debug, Display};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

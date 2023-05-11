@@ -4,7 +4,7 @@ use crate::{
     opt::{CliOpt, PrismaOpt, Subcommand},
     PrismaResult,
 };
-use query_core::{protocol::EngineProtocol, schema::QuerySchemaRef, schema_builder};
+use query_core::{protocol::EngineProtocol, schema};
 use request_handlers::{dmmf, RequestBody, RequestHandler};
 use std::{env, sync::Arc};
 
@@ -89,10 +89,8 @@ impl CliCommand {
     }
 
     async fn dmmf(request: DmmfRequest) -> PrismaResult<()> {
-        let internal_data_model = prisma_models::convert(Arc::new(request.schema));
-        let query_schema: QuerySchemaRef =
-            Arc::new(schema_builder::build(internal_data_model, request.enable_raw_queries));
-        let dmmf = dmmf::render_dmmf(query_schema);
+        let query_schema = schema::build(Arc::new(request.schema), request.enable_raw_queries);
+        let dmmf = dmmf::render_dmmf(&query_schema);
         let serialized = serde_json::to_string_pretty(&dmmf)?;
 
         println!("{serialized}");

@@ -80,9 +80,7 @@ impl Datasource {
     }
 
     pub fn capabilities(&self) -> ConnectorCapabilities {
-        let capabilities = self.active_connector.capabilities().to_owned();
-
-        ConnectorCapabilities::new(capabilities)
+        self.active_connector.capabilities()
     }
 
     /// The applicable relation mode for this datasource.

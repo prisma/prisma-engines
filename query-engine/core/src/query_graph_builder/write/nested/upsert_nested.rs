@@ -7,7 +7,7 @@ use crate::{
 };
 use connector::Filter;
 use prisma_models::RelationFieldRef;
-use schema_builder::constants::args;
+use schema::constants::args;
 use std::convert::TryInto;
 
 /// Handles a nested upsert.

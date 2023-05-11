@@ -17,8 +17,8 @@ struct GqlSchemaRenderer {
 
 impl Renderer for GqlSchemaRenderer {
     fn render(&self, ctx: &mut RenderContext) -> String {
-        let _ = self.query_schema.query.into_renderer().render(ctx);
-        self.query_schema.mutation.into_renderer().render(ctx)
+        let _ = self.query_schema.query.as_renderer().render(ctx);
+        self.query_schema.mutation.as_renderer().render(ctx)
     }
 }
 
@@ -30,7 +30,7 @@ impl GqlSchemaRenderer {
 
 pub fn render_graphql_schema(query_schema: QuerySchemaRef) -> String {
     let mut context = RenderContext::new(&query_schema);
-    query_schema.into_renderer().render(&mut context);
+    query_schema.as_renderer().render(&mut context);
 
     // Add custom scalar types (required for graphql.js implementations)
     format!(
@@ -116,63 +116,54 @@ impl<'a> Renderer for GqlRenderer<'a> {
     }
 }
 
-trait IntoRenderer<'a> {
-    #[allow(clippy::wrong_self_convention)]
-    fn into_renderer(&'a self) -> GqlRenderer<'a>;
+trait AsRenderer<'a> {
+    fn as_renderer(&'a self) -> GqlRenderer<'a>;
 }
 
-impl<'a> IntoRenderer<'a> for QuerySchemaRef {
-    #[allow(clippy::wrong_self_convention)]
-    fn into_renderer(&self) -> GqlRenderer<'a> {
+impl<'a> AsRenderer<'a> for QuerySchemaRef {
+    fn as_renderer(&self) -> GqlRenderer<'a> {
         GqlRenderer::Schema(GqlSchemaRenderer::new(Arc::clone(self)))
     }
 }
 
-impl<'a> IntoRenderer<'a> for &'a InputType {
-    #[allow(clippy::wrong_self_convention)]
-    fn into_renderer(&self) -> GqlRenderer<'a> {
+impl<'a> AsRenderer<'a> for &'a InputType {
+    fn as_renderer(&self) -> GqlRenderer<'a> {
         GqlRenderer::Type(GqlTypeRenderer::Input(self))
     }
 }
 
-impl<'a> IntoRenderer<'a> for OutputType {
-    #[allow(clippy::wrong_self_convention)]
-    fn into_renderer(&'a self) -> GqlRenderer<'a> {
+impl<'a> AsRenderer<'a> for OutputType {
+    fn as_renderer(&'a self) -> GqlRenderer<'a> {
         GqlRenderer::Type(GqlTypeRenderer::Output(self))
     }
 }
 
-impl<'a> IntoRenderer<'a> for InputField {
-    #[allow(clippy::wrong_self_convention)]
-    fn into_renderer(&'a self) -> GqlRenderer<'a> {
+impl<'a> AsRenderer<'a> for InputField {
+    fn as_renderer(&'a self) -> GqlRenderer<'a> {
         GqlRenderer::Field(GqlFieldRenderer::Input(self))
     }
 }
 
-impl<'a> IntoRenderer<'a> for OutputField {
-    #[allow(clippy::wrong_self_convention)]
-    fn into_renderer(&'a self) -> GqlRenderer<'a> {
+impl<'a> AsRenderer<'a> for OutputField {
+    fn as_renderer(&'a self) -> GqlRenderer<'a> {
         GqlRenderer::Field(GqlFieldRenderer::Output(self))
     }
 }
 
-impl<'a> IntoRenderer<'a> for EnumType {
-    #[allow(clippy::wrong_self_convention)]
-    fn into_renderer(&'a self) -> GqlRenderer<'a> {
+impl<'a> AsRenderer<'a> for EnumType {
+    fn as_renderer(&'a self) -> GqlRenderer<'a> {
         GqlRenderer::Enum(GqlEnumRenderer::new(self))
     }
 }
 
-impl<'a> IntoRenderer<'a> for InputObjectTypeId {
-    #[allow(clippy::wrong_self_convention)]
-    fn into_renderer(&self) -> GqlRenderer<'a> {
+impl<'a> AsRenderer<'a> for InputObjectTypeId {
+    fn as_renderer(&self) -> GqlRenderer<'a> {
         GqlRenderer::Object(GqlObjectRenderer::Input(*self))
     }
 }
 
-impl<'a> IntoRenderer<'a> for OutputObjectTypeId {
-    #[allow(clippy::wrong_self_convention)]
-    fn into_renderer(&self) -> GqlRenderer<'a> {
+impl<'a> AsRenderer<'a> for OutputObjectTypeId {
+    fn as_renderer(&self) -> GqlRenderer<'a> {
         GqlRenderer::Object(GqlObjectRenderer::Output(*self))
     }
 }

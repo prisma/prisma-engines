@@ -1,6 +1,5 @@
 use crate::{capitalize, scalar_filter_name};
-
-use prisma_models::{dml::FieldArity, prelude::*, *};
+use prisma_models::{ast::FieldArity, prelude::*, *};
 
 /// Enum used to represent unique schema type names.
 /// It helps deferring the allocation + formatting of strings

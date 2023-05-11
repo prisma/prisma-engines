@@ -3,14 +3,15 @@ The test kit is a (currently incomplete) port of the Scala test kit, located in 
 It's fully focused on integration testing the query engine through request-response assertions.
 
 ## Test organization
-The test kit is a combination of three crates, from which two are "lower level" crates that are only required to make it work, whereas only one is important if you only want to author tests. The three-crate approach is required to prevent circular dependencies between the crates (arrow = depends-on):
+
+The test kit is a combination of three crates, from which two are "lower level" crates that are only required to make it work, whereas only one is important if you only want to author tests.
 ```
                ┌────────────────────┐
            ┌───│ query-engine-tests │───┐
            │   └────────────────────┘   │
            ▼                            ▼
 ┌────────────────────┐       ┌────────────────────┐
-│ query-test-macros  │──────▶│ query-tests-setup  │
+│ query-test-macros  │       │ query-tests-setup  │
 └────────────────────┘       └────────────────────┘
 ```
 
@@ -67,7 +68,8 @@ Note that by default tests run concurrently.
 - VSCode should automatically detect tests and display `run test`.
 - Use `make test-qe` (minimal log output) or `make test-qe-verbose` (all log output) in `$WORKSPACE_ROOT`.
 - `cargo test` in the `query-engine-tests` crate.
-- A single test can be tested with the normal cargo rust facilitied from command line, eg. `cargo test --package query-engine-tests --test query_engine_tests --all-features -- queries::filters::where_unique::where_unique::no_unique_fields --exact --nocapture` where `queries::filters::where_unique::where_unique::no_unique_fields` can be substituted for the path you want to test.
+- A single test can be tested with the normal cargo rust facilities from command line, e.g. `cargo test --package query-engine-tests --test query_engine_tests --all-features -- queries::filters::where_unique::where_unique::no_unique_fields --exact --nocapture` where `queries::filters::where_unique::where_unique::no_unique_fields` can be substituted for the path you want to test.
+- If you want to test a single relation test, define the `RELATION_TEST_IDX` env var with its index.
 
 ## Authoring tests
 The following is an example on how to write a new test suite, as extending or changing an existing one follows the same rules and considerations.

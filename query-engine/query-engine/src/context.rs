@@ -2,7 +2,11 @@ use crate::features::{EnabledFeatures, Feature};
 use crate::{logger::Logger, opt::PrismaOpt};
 use crate::{PrismaError, PrismaResult};
 use psl::PreviewFeature;
-use query_core::{protocol::EngineProtocol, schema::QuerySchemaRef, schema_builder, QueryExecutor};
+use query_core::{
+    protocol::EngineProtocol,
+    schema::{self, QuerySchemaRef},
+    QueryExecutor,
+};
 use query_engine_metrics::setup as metric_setup;
 use query_engine_metrics::MetricRegistry;
 use request_handlers::load_executor;
@@ -37,36 +41,42 @@ impl PrismaContext {
         enabled_features: EnabledFeatures,
         metrics: Option<MetricRegistry>,
     ) -> PrismaResult<PrismaContext> {
-        let config = &schema.configuration;
-        // We only support one data source at the moment, so take the first one (default not exposed yet).
-        let data_source = config
-            .datasources
-            .first()
-            .ok_or_else(|| PrismaError::ConfigurationError("No valid data source found".into()))?;
+        let arced_schema = Arc::new(schema);
+        let arced_schema_2 = Arc::clone(&arced_schema);
 
-        let url = data_source.load_url(|key| env::var(key).ok())?;
+        let query_schema_fut = tokio::runtime::Handle::current().spawn_blocking(move || {
+            // Construct query schema
+            Arc::new(schema::build(
+                arced_schema,
+                enabled_features.contains(Feature::RawQueries),
+            ))
+        });
+        let executor_fut = tokio::spawn(async move {
+            let config = &arced_schema_2.configuration;
+            let preview_features = config.preview_features();
 
-        // Load executor
-        let executor = load_executor(data_source, config.preview_features(), &url).await?;
+            // We only support one data source at the moment, so take the first one (default not exposed yet).
+            let data_source = config
+                .datasources
+                .first()
+                .ok_or_else(|| PrismaError::ConfigurationError("No valid data source found".into()))?;
 
-        // Build internal data model
-        let internal_data_model = prisma_models::convert(Arc::new(schema));
+            let url = data_source.load_url(|key| env::var(key).ok())?;
+            // Load executor
+            let executor = load_executor(data_source, preview_features, &url).await?;
+            executor.primary_connector().get_connection().await?;
+            PrismaResult::<_>::Ok(executor)
+        });
 
-        // Construct query schema
-        let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
-            internal_data_model,
-            enabled_features.contains(Feature::RawQueries),
-        ));
+        let (query_schema, executor) = tokio::join!(query_schema_fut, executor_fut);
 
         let context = Self {
-            query_schema,
-            executor,
+            query_schema: query_schema.unwrap(),
+            executor: executor.unwrap()?,
             metrics: metrics.unwrap_or_default(),
             engine_protocol: protocol,
             enabled_features,
         };
-
-        context.verify_connection().await?;
 
         Ok(context)
     }
@@ -85,11 +95,6 @@ impl PrismaContext {
 
     pub fn engine_protocol(&self) -> EngineProtocol {
         self.engine_protocol
-    }
-
-    async fn verify_connection(&self) -> PrismaResult<()> {
-        self.executor.primary_connector().get_connection().await?;
-        Ok(())
     }
 }
 

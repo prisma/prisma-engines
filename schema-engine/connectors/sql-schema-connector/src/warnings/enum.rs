@@ -1,12 +1,12 @@
 use crate::{introspection_pair::EnumPair, sanitize_datamodel_names};
-
-use super::generators::{self, Warnings};
+use schema_connector::{warnings as generators, Warnings};
 
 /// Analyze and generate warnigs from an enum.
 pub(super) fn generate_warnings(r#enum: EnumPair<'_>, warnings: &mut Warnings) {
     if r#enum.name_from_psl() {
-        let warning = generators::warning_enriched_with_map_on_enum(&[generators::Enum::new(&r#enum.name())]);
-        warnings.push(warning);
+        warnings.remapped_enums.push(generators::Enum {
+            r#enum: r#enum.name().to_string(),
+        });
     }
 
     if r#enum.uses_duplicate_name() {
@@ -30,17 +30,15 @@ pub(super) fn generate_warnings(r#enum: EnumPair<'_>, warnings: &mut Warnings) {
                 .map(String::from)
                 .unwrap_or_else(|| variant.name().to_string());
 
-            let warning = generators::EnumAndValue {
-                enm: r#enum.name().to_string(),
+            warnings.enum_values_with_empty_names.push(generators::EnumAndValue {
+                r#enum: r#enum.name().to_string(),
                 value,
-            };
-
-            warnings.enum_values_with_empty_names.push(warning);
+            });
         }
 
         if variant.name().is_empty() || sanitize_datamodel_names::needs_sanitation(&variant.name()) {
             let warning = generators::EnumAndValue {
-                enm: r#enum.name().to_string(),
+                r#enum: r#enum.name().to_string(),
                 value: variant.name().to_string(),
             };
 
@@ -48,7 +46,7 @@ pub(super) fn generate_warnings(r#enum: EnumPair<'_>, warnings: &mut Warnings) {
         } else if variant.name_from_psl() {
             warnings.remapped_values.push(generators::EnumAndValue {
                 value: variant.name().to_string(),
-                enm: r#enum.name().to_string(),
+                r#enum: r#enum.name().to_string(),
             });
         }
     }

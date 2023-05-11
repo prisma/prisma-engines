@@ -1,5 +1,5 @@
 use crate::introspection::test_api::*;
-use mongodb::bson::doc;
+use mongodb::{bson::doc, options::CreateCollectionOptions};
 
 #[test]
 fn empty_collection() {
@@ -67,4 +67,54 @@ fn multiple_collections_with_data() {
     "#]];
 
     expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn collection_with_json_schema() {
+    let res = introspect(|db| async move {
+        db.create_collection(
+            "A",
+            Some(
+                CreateCollectionOptions::builder()
+                    .validator(Some(mongodb::bson::doc! {
+                        "$jsonSchema": {
+                            "bsonType": "object",
+                            "title": "Student Object Validation",
+                            "required": [ "address", "major", "name" ],
+                            "properties": {
+                               "name": {
+                                  "bsonType": "string",
+                                  "description": "'name' must be a string and is required"
+                               },
+                               "gpa": {
+                                  "bsonType": [ "double" ],
+                                  "description": "'gpa' must be a double if the field exists"
+                               }
+                            }
+                         }
+                    }))
+                    .build(),
+            ),
+        )
+        .await?;
+
+        Ok(())
+    });
+
+    let expected_warning = expect![[r#"
+        *** WARNING ***
+
+        The following models have a JSON Schema defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/mongodb-json-schema
+          - "A"
+    "#]];
+
+    res.expect_warnings(&expected_warning);
+
+    let expected_doc = expect![[r#"
+        /// This collection uses a JSON Schema defined in the database, which requires additional setup for migrations. Visit https://pris.ly/d/mongodb-json-schema for more info.
+        model A {
+          id String @id @default(auto()) @map("_id") @db.ObjectId
+        }
+    "#]];
+    expected_doc.assert_eq(res.datamodel());
 }

@@ -53,11 +53,11 @@ pub trait Connector: Send + Sync {
     fn name(&self) -> &str;
 
     /// The static list of capabilities for the connector.
-    fn capabilities(&self) -> &'static [ConnectorCapability];
+    fn capabilities(&self) -> ConnectorCapabilities;
 
     /// Does the connector have this capability?
     fn has_capability(&self, capability: ConnectorCapability) -> bool {
-        self.capabilities().contains(&capability)
+        self.capabilities().contains(capability)
     }
 
     /// The maximum length of constraint names in bytes. Connectors without a

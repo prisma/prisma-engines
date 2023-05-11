@@ -9,7 +9,7 @@ use crate::FieldPair;
 use connector::AggregationSelection;
 use itertools::Itertools;
 use prisma_models::{ModelRef, ScalarFieldRef};
-use schema_builder::constants::aggregations::*;
+use schema::constants::aggregations::*;
 
 /// Resolves the given field as a aggregation query.
 fn resolve_query(

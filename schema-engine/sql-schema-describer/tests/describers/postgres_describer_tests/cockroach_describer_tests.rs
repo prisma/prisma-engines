@@ -390,6 +390,7 @@ fn multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
                     length: None,
                 },
             ],
+            check_constraints: [],
             views: [],
             view_columns: [],
             procedures: [],
@@ -527,6 +528,7 @@ fn cockroachdb_22_2_sequences_must_work(api: TestApi) {
             index_null_position: {},
             constraint_options: {},
             table_options: [],
+            exclude_constraints: [],
             sequences: [
                 Sequence {
                     namespace_id: NamespaceId(

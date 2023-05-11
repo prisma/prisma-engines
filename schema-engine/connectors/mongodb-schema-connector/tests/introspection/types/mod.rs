@@ -2,7 +2,6 @@ mod composite;
 
 use crate::introspection::test_api::*;
 use mongodb::bson::{doc, oid::ObjectId, Binary, Bson, DateTime, Decimal128, Timestamp};
-use serde_json::json;
 
 #[test]
 fn string() {
@@ -442,13 +441,15 @@ fn empty_arrays() {
     "#]];
 
     expected.assert_eq(res.datamodel());
-    res.assert_warning_code(103);
-    res.assert_warning("Could not determine the types for the following fields.");
 
-    res.assert_warning_affected(&json!([{
-        "model": "A",
-        "field": "data",
-    }]));
+    let expect = expect![[r#"
+        *** WARNING ***
+
+        Could not determine the types for the following fields:
+          - Model: "A", field: "data"
+    "#]];
+
+    res.expect_warnings(&expect);
 }
 
 #[test]
@@ -471,11 +472,13 @@ fn unknown_types() {
     "#]];
 
     expected.assert_eq(res.datamodel());
-    res.assert_warning_code(103);
-    res.assert_warning("Could not determine the types for the following fields.");
 
-    res.assert_warning_affected(&json!([{
-        "model": "A",
-        "field": "data",
-    }]));
+    let expect = expect![[r#"
+        *** WARNING ***
+
+        Could not determine the types for the following fields:
+          - Model: "A", field: "data"
+    "#]];
+
+    res.expect_warnings(&expect);
 }

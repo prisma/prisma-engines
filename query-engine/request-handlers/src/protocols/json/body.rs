@@ -4,6 +4,7 @@ use query_core::{
     BatchDocument, BatchDocumentTransaction, Operation, QueryDocument,
 };
 use serde::{Deserialize, Serialize};
+use tracing::info_span;
 
 use super::protocol_adapter::JsonProtocolAdapter;
 
@@ -17,6 +18,7 @@ pub enum JsonBody {
 impl JsonBody {
     /// Convert a `JsonBody` into a `QueryDocument`.
     pub fn into_doc(self, query_schema: &QuerySchemaRef) -> crate::Result<QueryDocument> {
+        let _span = info_span!("prisma:engine:into_doc").entered();
         match self {
             JsonBody::Single(query) => {
                 let operation = JsonProtocolAdapter::convert_single(query, query_schema)?;

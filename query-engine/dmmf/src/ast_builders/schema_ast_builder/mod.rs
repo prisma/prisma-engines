@@ -11,11 +11,11 @@ use indexmap::map::Entry;
 use object_renderer::*;
 use schema::*;
 use schema_renderer::*;
-use std::{collections::HashSet, sync::Arc};
+use std::collections::HashSet;
 use type_renderer::*;
 
-pub(crate) fn render(query_schema: QuerySchemaRef) -> (DmmfSchema, DmmfOperationMappings) {
-    let mut ctx = RenderContext::new(&query_schema);
+pub(crate) fn render(query_schema: &QuerySchema) -> (DmmfSchema, DmmfOperationMappings) {
+    let mut ctx = RenderContext::new(query_schema);
     ctx.mark_to_be_rendered(&query_schema);
 
     while !ctx.next_pass.is_empty() {
@@ -44,7 +44,7 @@ pub(crate) struct RenderContext<'a> {
 
     /// The child objects to render next. Rendering is considered complete when
     /// this is empty.
-    next_pass: Vec<Box<dyn Renderer>>,
+    next_pass: Vec<Box<dyn Renderer + 'a>>,
 }
 
 impl<'a> RenderContext<'a> {
@@ -149,9 +149,9 @@ impl<'a> RenderContext<'a> {
         }
     }
 
-    fn mark_to_be_rendered(&mut self, into_renderer: &dyn IntoRenderer) {
+    fn mark_to_be_rendered(&mut self, into_renderer: &dyn AsRenderer<'a>) {
         if !into_renderer.is_already_rendered(self) {
-            let renderer: Box<dyn Renderer> = into_renderer.into_renderer();
+            let renderer: Box<dyn Renderer> = into_renderer.as_renderer();
             self.next_pass.push(renderer)
         }
     }
@@ -161,18 +161,16 @@ pub(crate) trait Renderer {
     fn render(&self, ctx: &mut RenderContext);
 }
 
-trait IntoRenderer {
-    #[allow(clippy::wrong_self_convention)]
-    fn into_renderer(&self) -> Box<dyn Renderer>;
+trait AsRenderer<'a> {
+    fn as_renderer(&self) -> Box<dyn Renderer + 'a>;
 
     /// Returns whether the item still needs to be rendered.
-    fn is_already_rendered(&self, ctx: &RenderContext) -> bool;
+    fn is_already_rendered(&self, ctx: &RenderContext<'_>) -> bool;
 }
 
-impl IntoRenderer for QuerySchemaRef {
-    #[allow(clippy::wrong_self_convention)]
-    fn into_renderer(&self) -> Box<dyn Renderer> {
-        Box::new(DmmfSchemaRenderer::new(Arc::clone(self)))
+impl<'a> AsRenderer<'a> for &'a QuerySchema {
+    fn as_renderer(&self) -> Box<dyn Renderer + 'a> {
+        Box::new(DmmfSchemaRenderer::new(self))
     }
 
     fn is_already_rendered(&self, _ctx: &RenderContext) -> bool {
@@ -180,9 +178,8 @@ impl IntoRenderer for QuerySchemaRef {
     }
 }
 
-impl<'a> IntoRenderer for &'a EnumType {
-    #[allow(clippy::wrong_self_convention)]
-    fn into_renderer(&self) -> Box<dyn Renderer> {
+impl<'a> AsRenderer<'a> for &'a EnumType {
+    fn as_renderer(&self) -> Box<dyn Renderer> {
         Box::new(DmmfEnumRenderer::new(self))
     }
 
@@ -191,8 +188,8 @@ impl<'a> IntoRenderer for &'a EnumType {
     }
 }
 
-impl IntoRenderer for InputObjectTypeId {
-    fn into_renderer(&self) -> Box<dyn Renderer> {
+impl AsRenderer<'_> for InputObjectTypeId {
+    fn as_renderer(&self) -> Box<dyn Renderer> {
         Box::new(DmmfObjectRenderer::Input(*self))
     }
 
@@ -201,8 +198,8 @@ impl IntoRenderer for InputObjectTypeId {
     }
 }
 
-impl IntoRenderer for OutputObjectTypeId {
-    fn into_renderer(&self) -> Box<dyn Renderer> {
+impl AsRenderer<'_> for OutputObjectTypeId {
+    fn as_renderer(&self) -> Box<dyn Renderer> {
         Box::new(DmmfObjectRenderer::Output(*self))
     }
 

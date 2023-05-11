@@ -115,6 +115,24 @@ impl<'a> TableWalker<'a> {
         self.table().properties.contains(TableProperties::HasRowLevelSecurity)
     }
 
+    /// Does the table have check constraints?
+    pub fn has_check_constraints(self) -> bool {
+        self.schema
+            .check_constraints
+            .binary_search_by_key(&self.id, |(id, _)| *id)
+            .is_ok()
+    }
+
+    /// The check constraint names for the table.
+    pub fn check_constraints(self) -> impl ExactSizeIterator<Item = &'a str> {
+        let low = self.schema.check_constraints.partition_point(|(id, _)| *id < self.id);
+        let high = self.schema.check_constraints[low..].partition_point(|(id, _)| *id <= self.id);
+
+        self.schema.check_constraints[low..low + high]
+            .iter()
+            .map(|(_, name)| name.as_str())
+    }
+
     /// Description (comment) of the table.
     pub fn description(self) -> Option<&'a str> {
         self.table().description.as_deref()

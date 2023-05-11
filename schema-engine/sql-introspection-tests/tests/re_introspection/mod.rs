@@ -8,8 +8,7 @@ mod vitess;
 use barrel::types;
 use indoc::{formatdoc, indoc};
 use quaint::prelude::Queryable;
-use serde_json::json;
-use sql_introspection_tests::{assert_eq_json, test_api::*};
+use sql_introspection_tests::test_api::*;
 
 #[test_connector(exclude(CockroachDb))]
 async fn mapped_model_name(api: &mut TestApi) -> TestResult {
@@ -35,30 +34,28 @@ async fn mapped_model_name(api: &mut TestApi) -> TestResult {
         }
     "#};
 
-    let final_dm = indoc! {r#"
+    let expected = expect![[r#"
         model Custom_User {
-            id               Int         @id @default(autoincrement())
+          id Int @id @default(autoincrement())
 
-            @@map("_User")
+          @@map("_User")
         }
 
         model Unrelated {
-            id               Int         @id @default(autoincrement())
+          id Int @id @default(autoincrement())
         }
-    "#};
+    "#]];
 
-    let result = api.re_introspect(input_dm).await?;
-    api.assert_eq_datamodels(final_dm, &result);
+    api.expect_re_introspected_datamodel(input_dm, expected).await;
 
-    let expected = json!([{
-        "code": 7,
-        "message": "These models were enriched with `@@map` information taken from the previous Prisma schema.",
-        "affected": [{
-            "model":"Custom_User"
-        }]
-    }]);
+    let expected = expect![[r#"
+        *** WARNING ***
 
-    assert_eq_json!(expected, api.re_introspect_warnings(input_dm).await?);
+        These models were enriched with `@@map` information taken from the previous Prisma schema:
+          - "Custom_User"
+    "#]];
+
+    api.expect_re_introspect_warnings(input_dm, expected).await;
 
     Ok(())
 }
@@ -88,30 +85,27 @@ async fn manually_overwritten_mapped_field_name(api: &mut TestApi) -> TestResult
         }
     "#};
 
-    let final_dm = indoc! {r#"
+    let expected = expect![[r#"
         model User {
-            id               Int         @id @default(autoincrement())
-            custom_test      Int         @map("_test")
+          id          Int @id @default(autoincrement())
+          custom_test Int @map("_test")
         }
 
         model Unrelated {
-            id               Int         @id @default(autoincrement())
+          id Int @id @default(autoincrement())
         }
-    "#};
+    "#]];
 
-    let result = api.re_introspect(input_dm).await?;
-    api.assert_eq_datamodels(final_dm, &result);
+    api.expect_re_introspected_datamodel(input_dm, expected).await;
 
-    let expected = json!([{
-        "code": 8,
-        "message": "These fields were enriched with `@map` information taken from the previous Prisma schema.",
-        "affected": [{
-            "model": "User",
-            "field": "custom_test"
-        }]
-    }]);
+    let expectation = expect![[r#"
+        *** WARNING ***
 
-    assert_eq_json!(expected, api.re_introspect_warnings(input_dm).await?);
+        These fields were enriched with `@map` information taken from the previous Prisma schema:
+          - Model: "User", field: "custom_test"
+    "#]];
+
+    api.expect_re_introspect_warnings(input_dm, expectation).await;
 
     Ok(())
 }
@@ -172,9 +166,16 @@ async fn mapped_model_and_field_name(api: &mut TestApi) -> TestResult {
 
     expected.assert_eq(&api.re_introspect_dml(input_dm).await?);
 
-    let expected = expect![[
-        r#"[{"code":7,"message":"These models were enriched with `@@map` information taken from the previous Prisma schema.","affected":[{"model":"Custom_User"}]},{"code":8,"message":"These fields were enriched with `@map` information taken from the previous Prisma schema.","affected":[{"model":"Post","field":"c_user_id"},{"model":"Custom_User","field":"c_id"}]}]"#
-    ]];
+    let expected = expect![[r#"
+        *** WARNING ***
+
+        These fields were enriched with `@map` information taken from the previous Prisma schema:
+          - Model: "Post", field: "c_user_id"
+          - Model: "Custom_User", field: "c_id"
+
+        These models were enriched with `@@map` information taken from the previous Prisma schema:
+          - "Custom_User"
+    "#]];
 
     expected.assert_eq(&api.re_introspect_warnings(input_dm).await?);
 
@@ -237,9 +238,16 @@ async fn manually_mapped_model_and_field_name(api: &mut TestApi) -> TestResult {
 
     expected.assert_eq(&api.re_introspect_dml(input_dm).await?);
 
-    let expected = expect![[
-        r#"[{"code":7,"message":"These models were enriched with `@@map` information taken from the previous Prisma schema.","affected":[{"model":"Custom_User"}]},{"code":8,"message":"These fields were enriched with `@map` information taken from the previous Prisma schema.","affected":[{"model":"Post","field":"c_user_id"},{"model":"Custom_User","field":"c_id"}]}]"#
-    ]];
+    let expected = expect![[r#"
+        *** WARNING ***
+
+        These fields were enriched with `@map` information taken from the previous Prisma schema:
+          - Model: "Post", field: "c_user_id"
+          - Model: "Custom_User", field: "c_id"
+
+        These models were enriched with `@@map` information taken from the previous Prisma schema:
+          - "Custom_User"
+    "#]];
 
     expected.assert_eq(&api.re_introspect_warnings(input_dm).await?);
 
@@ -288,46 +296,36 @@ async fn mapped_field_name(api: &mut TestApi) -> TestResult {
         }
     "#};
 
-    let final_dm = indoc! {r#"
+    let expected = expect![[r#"
         model User {
-            c_id_1      Int     @map("id_1")
-            id_2        Int
-            c_index     Int     @map("index")
-            c_unique_1  Int     @map("unique_1")
-            unique_2    Int
+          c_id_1     Int @map("id_1")
+          id_2       Int
+          c_index    Int @map("index")
+          c_unique_1 Int @map("unique_1")
+          unique_2   Int
 
-            @@id([c_id_1, id_2])
-            @@index([c_index], map: "test2")
-            @@unique([c_unique_1, unique_2], map: "sqlite_autoindex_User_1")
+          @@id([c_id_1, id_2])
+          @@unique([c_unique_1, unique_2], map: "sqlite_autoindex_User_1")
+          @@index([c_index], map: "test2")
         }
 
         model Unrelated {
-            id               Int @id @default(autoincrement())
+          id Int @id @default(autoincrement())
         }
-    "#};
+    "#]];
 
-    let result = api.re_introspect(input_dm).await?;
-    api.assert_eq_datamodels(final_dm, &result);
+    api.expect_re_introspected_datamodel(input_dm, expected).await;
 
-    let expected = json!([{
-        "code": 8,
-        "message": "These fields were enriched with `@map` information taken from the previous Prisma schema.",
-        "affected": [
-            {
-                "model": "User",
-                "field": "c_id_1"
-            },
-            {
-                "model": "User",
-                "field": "c_index"
-            },{
-                "model": "User",
-                "field": "c_unique_1"
-            }
-        ]
-    }]);
+    let expected = expect![[r#"
+        *** WARNING ***
 
-    assert_eq_json!(expected, api.re_introspect_warnings(input_dm).await?);
+        These fields were enriched with `@map` information taken from the previous Prisma schema:
+          - Model: "User", field: "c_id_1"
+          - Model: "User", field: "c_index"
+          - Model: "User", field: "c_unique_1"
+    "#]];
+
+    api.expect_re_introspect_warnings(input_dm, expected).await;
 
     Ok(())
 }
@@ -405,13 +403,14 @@ async fn mapped_enum_name(api: &mut TestApi) -> TestResult {
     let result = api.re_introspect(&input_dm).await?;
     api.assert_eq_datamodels(&final_dm, &result);
 
-    let expected = json!([{
-        "code": 9,
-        "message": "These enums were enriched with `@@map` information taken from the previous Prisma schema.",
-        "affected": [{ "enm": "BlackNWhite" }],
-    }]);
+    let expected = expect![[r#"
+        *** WARNING ***
 
-    assert_eq_json!(expected, api.re_introspect_warnings(&input_dm).await?);
+        These enums were enriched with `@@map` information taken from the previous Prisma schema:
+          - "BlackNWhite"
+    "#]];
+
+    api.expect_re_introspect_warnings(&input_dm, expected).await;
 
     Ok(())
 }
@@ -447,35 +446,32 @@ async fn manually_remapped_enum_value_name(api: &mut TestApi) -> TestResult {
     "#
     };
 
-    let final_dm = indoc! {r#"
+    let final_dm = expect![[r#"
         model User {
-            id               Int @id @default(autoincrement())
-            color            color @default(BLACK)
+          id    Int   @id @default(autoincrement())
+          color color @default(BLACK)
         }
 
         model Unrelated {
-            id               Int @id @default(autoincrement())
+          id Int @id @default(autoincrement())
         }
 
         enum color {
-            BLACK @map("_black")
-            white
+          BLACK @map("_black")
+          white
         }
-    "#};
+    "#]];
 
-    let result = api.re_introspect(input_dm).await?;
-    api.assert_eq_datamodels(final_dm, &result);
+    api.expect_re_introspected_datamodel(input_dm, final_dm).await;
 
-    let expected = json!([{
-        "code": 10,
-        "message": "These enum values were enriched with `@map` information taken from the previous Prisma schema.",
-        "affected" :[{
-            "enm": "color",
-            "value": "BLACK"
-        }]
-    }]);
+    let expectation = expect![[r#"
+        *** WARNING ***
 
-    assert_eq_json!(expected, api.re_introspect_warnings(input_dm).await?);
+        These enum values were enriched with `@map` information taken from the previous Prisma schema:
+          - Enum: "color", value: "BLACK"
+    "#]];
+
+    api.expect_re_introspect_warnings(input_dm, expectation).await;
 
     Ok(())
 }
@@ -512,36 +508,34 @@ async fn manually_re_mapped_enum_name(api: &mut TestApi) -> TestResult {
         }
     "#};
 
-    let final_dm = indoc! {r#"
+    let final_dm = expect![[r#"
         model User {
-            id               Int @id @default(autoincrement())
-            color            BlackNWhite
+          id    Int         @id @default(autoincrement())
+          color BlackNWhite
         }
 
         model Unrelated {
-            id               Int @id @default(autoincrement())
+          id Int @id @default(autoincrement())
         }
 
-        enum BlackNWhite{
-            black
-            white
+        enum BlackNWhite {
+          black
+          white
 
-            @@map("_color")
+          @@map("_color")
         }
-    "#};
+    "#]];
 
-    let result = api.re_introspect(input_dm).await?;
-    api.assert_eq_datamodels(final_dm, &result);
+    api.expect_re_introspected_datamodel(input_dm, final_dm).await;
 
-    let expected = json!([{
-        "code": 9,
-        "message": "These enums were enriched with `@@map` information taken from the previous Prisma schema.",
-        "affected": [{
-            "enm": "BlackNWhite"
-        }]
-    }]);
+    let expected = expect![[r#"
+        *** WARNING ***
 
-    assert_eq_json!(expected, api.re_introspect_warnings(input_dm).await?);
+        These enums were enriched with `@@map` information taken from the previous Prisma schema:
+          - "BlackNWhite"
+    "#]];
+
+    api.expect_re_introspect_warnings(input_dm, expected).await;
 
     Ok(())
 }
@@ -575,35 +569,33 @@ async fn manually_re_mapped_invalid_enum_values(api: &mut TestApi) -> TestResult
         }
     "#;
 
-    let final_dm = r#"
+    let final_dm = expect![[r#"
         model User {
-            id               Int @id @default(autoincrement())
-            sign             invalid
+          id   Int     @id @default(autoincrement())
+          sign invalid
         }
 
         model Unrelated {
-            id               Int @id @default(autoincrement())
+          id Int @id @default(autoincrement())
         }
 
         enum invalid {
-            at      @map("@")
-            dash    @map("-")
+          at   @map("@")
+          dash @map("-")
         }
-    "#;
+    "#]];
 
-    let result = api.re_introspect(input_dm).await?;
-    api.assert_eq_datamodels(final_dm, &result);
+    api.expect_re_introspected_datamodel(input_dm, final_dm).await;
 
-    let expected = json!([{
-        "code": 10,
-        "message": "These enum values were enriched with `@map` information taken from the previous Prisma schema.",
-        "affected" :[
-            {"enm": "invalid", "value": "at"},
-            {"enm": "invalid", "value": "dash"}
-        ]
-    }]);
+    let expected = expect![[r#"
+        *** WARNING ***
 
-    assert_eq_json!(expected, api.re_introspect_warnings(input_dm).await?);
+        These enum values were enriched with `@map` information taken from the previous Prisma schema:
+          - Enum: "invalid", value: "at"
+          - Enum: "invalid", value: "dash"
+    "#]];
+
+    api.expect_re_introspect_warnings(input_dm, expected).await;
 
     Ok(())
 }
@@ -1305,29 +1297,26 @@ async fn re_introspecting_mysql_enum_names(api: &mut TestApi) -> TestResult {
             }
         "#;
 
-    let final_dm = r#"
-             model User {
-               id               Int @id @default(autoincrement())
-               color            BlackNWhite
-            }
+    let expected = expect![[r#"
+        model User {
+          id    Int         @id @default(autoincrement())
+          color BlackNWhite
+        }
 
-            model Unrelated {
-               id               Int @id @default(autoincrement())
-            }
+        model Unrelated {
+          id Int @id @default(autoincrement())
+        }
 
-            enum BlackNWhite{
-                black
-                white
-            }
-        "#;
+        enum BlackNWhite {
+          black
+          white
+        }
+    "#]];
 
-    let result = api.re_introspect(input_dm).await.unwrap();
-    api.assert_eq_datamodels(final_dm, &result);
+    api.expect_re_introspected_datamodel(input_dm, expected).await;
 
-    assert_eq_json!(
-        serde_json::Value::Array(vec![]),
-        &api.re_introspect_warnings(input_dm).await?
-    );
+    let expected = expect![[r#""#]];
+    api.expect_re_introspect_warnings(input_dm, expected).await;
 
     Ok(())
 }

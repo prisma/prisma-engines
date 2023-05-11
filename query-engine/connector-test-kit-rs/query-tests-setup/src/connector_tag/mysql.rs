@@ -4,7 +4,6 @@ use crate::{datamodel_rendering::SqlDatamodelRenderer, TestError, TestResult};
 #[derive(Debug, Default, Clone)]
 pub struct MySqlConnectorTag {
     version: Option<MySqlVersion>,
-    capabilities: Vec<ConnectorCapability>,
 }
 
 impl MySqlConnectorTag {
@@ -48,8 +47,8 @@ impl ConnectorTagInterface for MySqlConnectorTag {
         }
     }
 
-    fn capabilities(&self) -> &[ConnectorCapability] {
-        &self.capabilities
+    fn capabilities(&self) -> ConnectorCapabilities {
+        psl::builtin_connectors::MYSQL.capabilities()
     }
 
     fn as_parse_pair(&self) -> (String, Option<String>) {
@@ -77,32 +76,23 @@ impl MySqlConnectorTag {
             None => None,
         };
 
-        Ok(Self {
-            version,
-            capabilities: mysql_capabilities(),
-        })
+        Ok(Self { version })
     }
 
     /// Returns all versions of this connector.
     pub fn all() -> Vec<Self> {
-        let capabilities = mysql_capabilities();
-
         vec![
             Self {
                 version: Some(MySqlVersion::V5_6),
-                capabilities: capabilities.clone(),
             },
             Self {
                 version: Some(MySqlVersion::V5_7),
-                capabilities: capabilities.clone(),
             },
             Self {
                 version: Some(MySqlVersion::V8),
-                capabilities: capabilities.clone(),
             },
             Self {
                 version: Some(MySqlVersion::MariaDb),
-                capabilities,
             },
         ]
     }
@@ -143,8 +133,4 @@ impl ToString for MySqlVersion {
         }
         .to_owned()
     }
-}
-
-fn mysql_capabilities() -> Vec<ConnectorCapability> {
-    psl::builtin_connectors::MYSQL.capabilities().to_owned()
 }
