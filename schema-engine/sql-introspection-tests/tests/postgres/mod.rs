@@ -3,6 +3,7 @@ mod constraints;
 mod extensions;
 mod gin;
 mod gist;
+mod index;
 mod spgist;
 
 use indoc::indoc;
