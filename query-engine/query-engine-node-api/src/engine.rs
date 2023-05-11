@@ -138,6 +138,9 @@ impl Inner {
 #[napi]
 impl QueryEngine {
     /// Parse a validated datamodel and configuration to allow connecting later on.
+    /// Note: any new method added to this struct should be added to
+    /// `query_engine_node_api::node_drivers::engine::QueryEngineNodeDrivers` as well.
+    /// Unfortunately the `#[napi]` macro does not support deriving traits.
     #[napi(constructor)]
     pub fn new(napi_env: Env, options: JsUnknown, callback: JsFunction) -> napi::Result<Self> {
         let log_callback = LogCallback::new(napi_env, callback)?;
