@@ -268,10 +268,13 @@ impl QueryEngine {
                     crate::Result::<_>::Ok(executor)
                 };
 
-                let query_schema_fut = tokio::runtime::Handle::current().spawn_blocking(move || {
-                    let enable_raw_queries = true;
-                    schema::build(arced_schema_2, enable_raw_queries)
-                });
+                let query_schema_span = tracing::info_span!("prisma:engine:schema");
+                let query_schema_fut = tokio::runtime::Handle::current()
+                    .spawn_blocking(move || {
+                        let enable_raw_queries = true;
+                        schema::build(arced_schema_2, enable_raw_queries)
+                    })
+                    .instrument(query_schema_span);
 
                 let (query_schema, executor) = tokio::join!(query_schema_fut, executor_fut);
 
