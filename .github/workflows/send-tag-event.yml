@@ -3,7 +3,7 @@ name: Send Tag Event
 on:
   push:
     tags:
-      - '*'
+      - '**'
 
 jobs:
   send-tag-event:
