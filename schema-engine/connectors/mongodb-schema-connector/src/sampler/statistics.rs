@@ -155,7 +155,7 @@ impl<'a> Statistics<'a> {
                     }
 
                     if walker.is_capped() {
-                        let comment = "This collection is marked as capped, which requires [a good message here]. Visit https://pris.ly/d/mongodb-capped-collections for more info";
+                        let comment = "This model is a capped collection, which requires manual setup when creating the collection in MongoDB: https://pris.ly/d/mongodb-capped-collections";
                         model.documentation(comment)
                     }
                 }
