@@ -243,13 +243,13 @@ impl fmt::Display for Warnings {
         )?;
 
         render_warnings(
-            "The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client:",
+            "The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client:",
             &self.models_without_identifiers,
             f
         )?;
 
         render_warnings(
-            "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers",
+            "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers",
             &self.views_without_identifiers,
             f
         )?;
@@ -267,19 +267,19 @@ impl fmt::Display for Warnings {
         )?;
 
         render_warnings(
-            "These fields are not supported by the Prisma Client, because Prisma currently does not support their types:",
+            "These fields are not supported by Prisma Client, because Prisma currently does not support their types:",
             &self.unsupported_types_in_model,
             f,
         )?;
 
         render_warnings(
-            "These fields are not supported by the Prisma Client, because Prisma currently does not support their types:",
+            "These fields are not supported by Prisma Client, because Prisma currently does not support their types:",
             &self.unsupported_types_in_view,
             f,
         )?;
 
         render_warnings(
-            "These fields are not supported by the Prisma Client, because Prisma currently does not support their types:",
+            "These fields are not supported by Prisma Client, because Prisma currently does not support their types:",
             &self.unsupported_types_in_type,
             f,
         )?;
@@ -345,13 +345,13 @@ impl fmt::Display for Warnings {
         )?;
 
         render_warnings(
-            "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints",
+            "These constraints are not supported by Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints",
             &self.check_constraints,
             f,
         )?;
 
         render_warnings(
-            "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/exclusion-constraints",
+            "These constraints are not supported by Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/exclusion-constraints",
             &self.exclusion_constraints,
             f,
         )?;

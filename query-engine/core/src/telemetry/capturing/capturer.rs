@@ -81,7 +81,7 @@ impl SpanProcessor for Processor {
     }
 
     /// Exports a spancontaining zero or more events that might represent
-    /// logs in the prisma client logging categories of logs (query, info, warn, error)
+    /// logs in Prisma Client logging categories of logs (query, info, warn, error)
     ///
     /// There's an impedance between the client categories of logs and the server (standard)
     /// hierarchical levels of logs (trace, debug, info, warn, error).

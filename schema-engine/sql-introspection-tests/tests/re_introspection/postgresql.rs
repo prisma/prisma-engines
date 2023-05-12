@@ -190,7 +190,7 @@ async fn ignore_docs_only_added_once(api: &mut TestApi) -> TestResult {
     api.raw_cmd(setup).await;
 
     let input_dm = indoc! {r#"
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model A {
           id Int?
 
@@ -199,7 +199,7 @@ async fn ignore_docs_only_added_once(api: &mut TestApi) -> TestResult {
     "#};
 
     let expectation = expect![[r#"
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model A {
           id Int?
 

@@ -93,7 +93,7 @@ fn render_model(model: ModelPair<'_>, sql_family: SqlFamily) -> renderer::Model<
         rendered.documentation(docs);
         rendered.comment_out();
     } else if !model.has_usable_identifier() && !model.ignored_in_psl() {
-        let docs = "The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.";
+        let docs = "The underlying table does not contain a valid unique identifier and can therefore currently not be handled Prisma Client.";
 
         rendered.documentation(docs);
     }

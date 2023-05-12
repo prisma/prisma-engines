@@ -46,7 +46,7 @@ async fn aragon_test_cockroachdb(api: &mut TestApi) -> TestResult {
     let expectation = expect![[r#"
         *** WARNING ***
 
-        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
+        These constraints are not supported by Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
           - Model: "tokens", constraint: "tokens_token_scope_check"
     "#]];
 
@@ -124,7 +124,7 @@ async fn noalyss_folder_test_cockroachdb(api: &mut TestApi) -> TestResult {
     let expectation = expect![[r#"
         *** WARNING ***
 
-        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
+        These constraints are not supported by Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
           - Model: "todo_list", constraint: "ck_is_public"
           - Model: "user_active_security", constraint: "user_active_security_action_check"
           - Model: "user_active_security", constraint: "user_active_security_ledger_check"
