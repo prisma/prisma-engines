@@ -3859,7 +3859,6 @@ dependencies = [
  "prisma-models",
  "psl",
  "rustc-hash",
- "tracing",
 ]
 
 [[package]]

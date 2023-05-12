@@ -1,4 +1,3 @@
-use enumflags2::BitFlags;
 use serde::{Serialize, Serializer};
 use std::fmt;
 
@@ -75,7 +74,8 @@ features!(
     Deno,
     ExtendedWhereUnique,
     Views,
-    JsonProtocol
+    JsonProtocol,
+    NodeDrivers,
 );
 
 /// Generator preview features
@@ -123,7 +123,9 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | DataProxy
         | InteractiveTransactions
     }),
-    hidden: BitFlags::EMPTY,
+    hidden: enumflags2::make_bitflags!(PreviewFeature::{
+        NodeDrivers
+    }),
 };
 
 #[derive(Debug)]
