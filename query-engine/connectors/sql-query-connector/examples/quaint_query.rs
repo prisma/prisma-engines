@@ -1,6 +1,5 @@
-use std::time::Instant;
-
 use quaint::{pooled::Quaint, prelude::Queryable};
+use std::time::Instant;
 
 #[tokio::main]
 async fn main() -> () {
