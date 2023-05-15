@@ -140,7 +140,6 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext<'_>, model: &Mod
 
     if ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {
         input_object.require_at_least_one_field();
-        input_object.apply_constraints_on_fields(constrained_fields);
     } else {
         input_object.require_exactly_one_field();
     }

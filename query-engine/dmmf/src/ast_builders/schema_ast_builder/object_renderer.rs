@@ -50,7 +50,7 @@ impl DmmfObjectRenderer {
             constraints: DmmfInputTypeConstraints {
                 max_num_fields: input_object.constraints.max_num_fields,
                 min_num_fields: input_object.constraints.min_num_fields,
-                fields: input_object.constraints.fields.as_ref().cloned(),
+                fields: None,
             },
             fields: rendered_fields,
             meta,

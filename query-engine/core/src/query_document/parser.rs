@@ -739,23 +739,7 @@ impl QueryDocumentParser {
 
         map.extend(defaults.into_iter());
 
-        // Ensure the constraints are upheld. If any `fields` are specified, then the constraints should be upheld against those only.
-        // If no `fields` are specified, then the constraints should be upheld against all fields of the object.
-        let num_fields = schema_object
-            .constraints
-            .fields
-            .as_ref()
-            .cloned()
-            .map(|fields| {
-                fields.iter().fold(0, |mut acc, field| {
-                    if map.contains_key(field) {
-                        acc += 1;
-                    }
-
-                    acc
-                })
-            })
-            .unwrap_or(map.len());
+        let num_fields = map.len();
 
         let too_many = schema_object
             .constraints
@@ -768,7 +752,7 @@ impl QueryDocumentParser {
                 argument_path.segments(),
                 schema_object.constraints.min_num_fields,
                 schema_object.constraints.max_num_fields,
-                schema_object.constraints.fields.as_ref().cloned(),
+                None,
                 num_fields,
                 &conversions::schema_input_object_type_to_input_type_description(schema_object, query_schema),
             ));
@@ -785,7 +769,7 @@ impl QueryDocumentParser {
                 argument_path.segments(),
                 schema_object.constraints.min_num_fields,
                 schema_object.constraints.max_num_fields,
-                schema_object.constraints.fields.as_ref().cloned(),
+                None,
                 num_fields,
                 &conversions::schema_input_object_type_to_input_type_description(schema_object, query_schema),
             ));

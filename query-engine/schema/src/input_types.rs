@@ -34,7 +34,7 @@ pub struct InputObjectTypeConstraints {
 
     /// The fields against which the constraints should be applied.
     /// If `None`, constraints should be applied on _all_ fields on the input object type.
-    pub fields: Option<Vec<String>>,
+    fields: Option<Vec<String>>,
 }
 
 impl Debug for InputObjectType {
@@ -94,10 +94,6 @@ impl InputObjectType {
     /// Require a minimum of `min` fields to be present in the input.
     pub(crate) fn set_min_fields(&mut self, min: usize) {
         self.constraints.min_num_fields = Some(min);
-    }
-
-    pub(crate) fn apply_constraints_on_fields(&mut self, fields: Vec<String>) {
-        self.constraints.fields = Some(fields);
     }
 
     pub(crate) fn set_tag(&mut self, tag: ObjectTag) {
