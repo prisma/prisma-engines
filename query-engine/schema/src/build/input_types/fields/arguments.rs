@@ -17,6 +17,7 @@ pub(crate) fn where_unique_argument(ctx: &mut BuilderContext<'_>, model: &ModelR
     let input_object_type = filter_objects::where_unique_object_type(ctx, model);
 
     if ctx.db[input_object_type].is_empty() {
+        panic!("THIS IS IT HERE");
         None
     } else {
         Some(input_field(
