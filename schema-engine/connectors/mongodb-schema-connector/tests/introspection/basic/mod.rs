@@ -139,13 +139,13 @@ fn capped_collection() {
     let expected_warning = expect![[r#"
         *** WARNING ***
 
-        The following models are marked as capped collections, which are not yet fully supported. Read more: https://pris.ly/d/mongodb-capped-collections
+        The following models are capped collections, which are not yet fully supported. Read more: https://pris.ly/d/mongodb-capped-collections
           - "A"
     "#]];
     res.expect_warnings(&expected_warning);
 
     let expected_doc = expect![[r#"
-        /// This collection is marked as capped, which requires [a good message here]. Visit https://pris.ly/d/mongodb-capped-collections for more info
+        /// This model is a capped collection, which requires manual setup when creating the collection in MongoDB: https://pris.ly/d/mongodb-capped-collections
         model A {
           id String @id @default(auto()) @map("_id") @db.ObjectId
         }

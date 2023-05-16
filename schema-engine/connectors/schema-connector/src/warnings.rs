@@ -419,7 +419,7 @@ impl fmt::Display for Warnings {
         )?;
 
         render_warnings(
-            "The following models are marked as capped collections, which are not yet fully supported. Read more: https://pris.ly/d/mongodb-capped-collections",
+            "The following models are capped collections, which are not yet fully supported. Read more: https://pris.ly/d/mongodb-capped-collections",
             &self.capped_collection,
             f
         )?;
