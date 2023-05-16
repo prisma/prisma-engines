@@ -5,7 +5,7 @@ When a prisma client requests to start a new transaction, the Transaction Actor 
 process and waits for messages to arrive via its receive channel to process.
 The Transaction Actor Manager will also create an ITXClient and add it to hashmap managed by an RwLock. The ITXClient is the only way to communicate
 with the ITXServer.
-Once the prisma client receives the iTx Id it can perform database operations using that iTx id. When an operation request is received by the
+Once Prisma Client receives the iTx Id it can perform database operations using that iTx id. When an operation request is received by the
 TransactionActorManager, it looks for the client in the hashmap and passes the operation to the client. The ITXClient sends a message to the
 ITXServer and waits for a response. The ITXServer will then perform the operation and return the result. The ITXServer will perform one
 operation at a time. All other operations will sit in the message queue waiting to be processed.</div></li></ul><h2 id="enums" class="small-section-header"><a href="#enums">Enums</a></h2><ul class="item-table"><li><div class="item-name"><a class="enum" href="enum.ArgumentValue.html" title="enum query_engine_tests::query_core::ArgumentValue">ArgumentValue</a></div><div class="desc docblock-short">Represents the input values in a Document.

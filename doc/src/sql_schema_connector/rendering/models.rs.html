@@ -243,7 +243,7 @@
         rendered.documentation(docs);
         rendered.comment_out();
     } <span class="kw">else if </span>!model.has_usable_identifier() &amp;&amp; !model.ignored_in_psl() {
-        <span class="kw">let </span>docs = <span class="string">&quot;The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.&quot;</span>;
+        <span class="kw">let </span>docs = <span class="string">&quot;The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.&quot;</span>;
 
         rendered.documentation(docs);
     }
