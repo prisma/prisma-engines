@@ -16,12 +16,20 @@ export type QueryEngineInstance = {
   metrics(options: string): Promise<string>
 }
 
-export type NodejsFunctionContext = {
-  queryRaw: () => Promise<unknown>
-  queryRawTyped: () => Promise<unknown>
-  executeRaw: () => Promise<unknown>
-  executeRawTyped: () => Promise<unknown>
+export type ResultSet = {
+  columns: string[]
+  rows: (string)[][] // Note: we're currently stringifying any result values
+}
+
+export type Queryable = {
+  queryRaw: (sql: string) => Promise<ResultSet>
+  executeRaw: (sql: string) => Promise<number>
   version: () => string
+  isHealthy: () => boolean
+}
+
+export type Closeable = {
+  close: () => Promise<void>
 }
 
 export interface QueryEngineConstructor {
@@ -29,7 +37,7 @@ export interface QueryEngineConstructor {
 }
 
 export interface QueryEngineNodeDriversConstructor {
-  new (config: QueryEngineConfig, logger: (log: string) => void, nodejsFnCtx: NodejsFunctionContext): QueryEngineInstance
+  new (config: QueryEngineConfig, logger: (log: string) => void, nodejsFnCtx: Queryable): QueryEngineInstance
 }
 
 export interface LibraryLoader {
