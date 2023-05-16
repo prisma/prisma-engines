@@ -24,7 +24,7 @@ let engineInstanceCount = 0
 const exitHooks = new ExitHooks()
 
 export class LibraryEngine {
-  private engine?: QueryEngineInstance
+  engine?: QueryEngineInstance
   private libraryInstantiationPromise?: Promise<void>
   private libraryStartingPromise?: Promise<void>
   private libraryStoppingPromise?: Promise<void>
