@@ -1,4 +1,4 @@
-use mysql_async::prelude::*;
+use quaint::connector::mysql_async::{self, prelude::*};
 use std::time::Instant;
 
 #[tokio::main]
