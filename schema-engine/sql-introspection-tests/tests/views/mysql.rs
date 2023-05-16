@@ -32,7 +32,7 @@ async fn simple_view_from_one_table(api: &mut TestApi) -> TestResult {
           last_name  String? @db.VarChar(255)
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view B {
           id         Int
           first_name String  @db.VarChar(255)
@@ -57,7 +57,7 @@ async fn simple_view_from_one_table(api: &mut TestApi) -> TestResult {
     let expected = expect![[r#"
         *** WARNING ***
 
-        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
+        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
           - "B"
     "#]];
 
@@ -116,7 +116,7 @@ async fn simple_view_from_two_tables(api: &mut TestApi) -> TestResult {
           Profile    Profile?
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view Schwuser {
           id           Int
           name         String? @db.VarChar(511)
@@ -367,7 +367,7 @@ async fn defaults_are_introspected(api: &mut TestApi) -> TestResult {
           val Int? @default(2)
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view B {
           id  Int
           val Int? @default(2)
@@ -410,7 +410,7 @@ async fn views_are_rendered_with_enums(api: &mut TestApi) -> TestResult {
           val A_val?
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view B {
           id  Int
           val B_val?
@@ -483,7 +483,7 @@ async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
           url      = "env(TEST_DATABASE_URL)"
         }
 
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model table_w_invalid_names_one {
           oa11cd   String? @db.VarChar(10)
           lsoa11cd String? @db.VarChar(10)
@@ -504,7 +504,7 @@ async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
           @@ignore
         }
 
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model table_w_invalid_names_two {
           oa11cd   String? @db.VarChar(10)
           lsoa11cd String? @db.VarChar(10)
@@ -521,7 +521,7 @@ async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
           @@ignore
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view view_w_invalid_names_one {
           all_ages Int?
 
@@ -540,7 +540,7 @@ async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
           @@ignore
         }
 
-        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         view view_w_invalid_names_two {
           all_ages Int?
 
@@ -569,11 +569,11 @@ async fn invalid_field_names_trigger_warnings(api: &mut TestApi) -> TestResult {
           - View: "view_w_invalid_names_one", field(s): ["0", "1", "2", "3", "4", "5"]
           - View: "view_w_invalid_names_two", field(s): ["0", "1", "2", "3"]
 
-        The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client:
+        The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client:
           - "table_w_invalid_names_one"
           - "table_w_invalid_names_two"
 
-        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
+        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
           - "view_w_invalid_names_one"
           - "view_w_invalid_names_two"
     "#]];
