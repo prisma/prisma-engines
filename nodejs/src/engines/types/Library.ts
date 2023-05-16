@@ -24,7 +24,7 @@ export type ResultSet = {
 export type Queryable = {
   queryRaw: (sql: string) => Promise<ResultSet>
   executeRaw: (sql: string) => Promise<number>
-  version: () => string
+  version: () => string | undefined
   isHealthy: () => boolean
 }
 
