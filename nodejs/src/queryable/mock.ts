@@ -73,8 +73,8 @@ class MockSQL implements Queryable, Closeable {
    * example. The version string is returned directly without any form of
    * parsing or normalization.
    */
-  version(): string {
-    return this.maybeVersion ?? 'UNINITIALIZED'
+  version(): string | undefined {
+    return this.maybeVersion
   }
 }
 
