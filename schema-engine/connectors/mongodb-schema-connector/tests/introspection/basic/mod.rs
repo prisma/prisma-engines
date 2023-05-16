@@ -145,7 +145,7 @@ fn capped_collection() {
     res.expect_warnings(&expected_warning);
 
     let expected_doc = expect![[r#"
-        /// This model is a capped collection, which requires manual setup when creating the collection in MongoDB: https://pris.ly/d/mongodb-capped-collections
+        /// This model is a capped collection, which requires further support to be used with Prisma: https://pris.ly/d/mongodb-capped-collections
         model A {
           id String @id @default(auto()) @map("_id") @db.ObjectId
         }
