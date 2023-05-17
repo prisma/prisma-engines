@@ -138,6 +138,15 @@
 <a href="#138" id="138">138</a>
 <a href="#139" id="139">139</a>
 <a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Convenient access to a datamodel as understood by ParserDatabase.
 //!
 //! The walkers:
@@ -198,6 +207,15 @@
             .and_then(|name_id| <span class="self">self</span>.names.tops.get(<span class="kw-2">&amp;</span>name_id))
             .and_then(|top_id| top_id.as_enum_id())
             .map(|enum_id| <span class="self">self</span>.walk(enum_id))
+    }
+
+    <span class="doccomment">/// Find a model by name.
+    </span><span class="kw">pub fn </span>find_model&lt;<span class="lifetime">&#39;db</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;ModelWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
+        <span class="self">self</span>.interner
+            .lookup(name)
+            .and_then(|name_id| <span class="self">self</span>.names.tops.get(<span class="kw-2">&amp;</span>name_id))
+            .and_then(|top_id| top_id.as_model_id())
+            .map(|model_id| <span class="self">self</span>.walk(model_id))
     }
 
     <span class="doccomment">/// Traverse a schema element by id.

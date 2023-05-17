@@ -1446,18 +1446,14 @@
 <a href="#1446" id="1446">1446</a>
 <a href="#1447" id="1447">1447</a>
 <a href="#1448" id="1448">1448</a>
-<a href="#1449" id="1449">1449</a>
-<a href="#1450" id="1450">1450</a>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>index_fields;
 
 <span class="kw">use crate</span>::{context::Context, interner::StringId, walkers::IndexFieldWalker, DatamodelError};
 <span class="kw">use </span>either::Either;
 <span class="kw">use </span>enumflags2::bitflags;
+<span class="kw">use </span>rustc_hash::FxHashMap <span class="kw">as </span>HashMap;
 <span class="kw">use </span>schema_ast::ast::{<span class="self">self</span>, WithName};
-<span class="kw">use </span>std::{
-    collections::{BTreeMap, HashMap},
-    fmt,
-};
+<span class="kw">use </span>std::{collections::BTreeMap, fmt};
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>resolve_types(ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
     <span class="kw">for </span>(top_id, top) <span class="kw">in </span>ctx.ast.iter_tops() {
@@ -1501,7 +1497,7 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>range_model_scalar_fields(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         model_id: ast::ModelId,
-    ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = (ScalarFieldId, <span class="kw-2">&amp;</span>ScalarField)&gt; {
+    ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = (ScalarFieldId, <span class="kw-2">&amp;</span>ScalarField)&gt; + Clone {
         <span class="kw">let </span>start = <span class="self">self</span>.scalar_fields.partition_point(|sf| sf.model_id &lt; model_id);
         <span class="self">self</span>.scalar_fields[start..]
             .iter()

@@ -381,7 +381,7 @@
     }
 
     <span class="doccomment">/// Iterate all the scalar fields in a given model in the order they were defined.
-    </span><span class="kw">pub fn </span>scalar_fields(<span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
+    </span><span class="kw">pub fn </span>scalar_fields(<span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; + Clone {
         <span class="self">self</span>.db
             .types
             .range_model_scalar_fields(<span class="self">self</span>.id)

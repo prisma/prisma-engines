@@ -530,8 +530,6 @@
 <a href="#530" id="530">530</a>
 <a href="#531" id="531">531</a>
 <a href="#532" id="532">532</a>
-<a href="#533" id="533">533</a>
-<a href="#534" id="534">534</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::{<span class="self">self</span>, WithName},
     interner::StringId,
@@ -540,10 +538,8 @@
     {context::Context, types::RelationField},
 };
 <span class="kw">use </span>enumflags2::bitflags;
-<span class="kw">use </span>std::{
-    collections::{BTreeSet, HashMap},
-    fmt,
-};
+<span class="kw">use </span>rustc_hash::FxHashMap <span class="kw">as </span>HashMap;
+<span class="kw">use </span>std::{collections::BTreeSet, fmt};
 
 <span class="doccomment">/// Detect relation types and construct relation objects to the database.
 </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>infer_relations(ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {

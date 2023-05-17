@@ -216,7 +216,7 @@
     Context, DatamodelError, StringId,
 };
 <span class="kw">use </span>reserved_model_names::{validate_enum_name, validate_model_name};
-<span class="kw">use </span>std::collections::{BTreeMap, HashMap, HashSet};
+<span class="kw">use </span>rustc_hash::{FxHashMap <span class="kw">as </span>HashMap, FxHashSet <span class="kw">as </span>HashSet};
 
 <span class="doccomment">/// Resolved names for use in the validation process.
 </span><span class="attr">#[derive(Default)]
@@ -227,7 +227,7 @@
     </span><span class="kw">pub</span>(<span class="kw">super</span>) generators: HashMap&lt;StringId, TopId&gt;,
     <span class="doccomment">/// Datasources have their own namespace.
     </span><span class="kw">pub</span>(<span class="kw">super</span>) datasources: HashMap&lt;StringId, TopId&gt;,
-    <span class="kw">pub</span>(<span class="kw">super</span>) model_fields: BTreeMap&lt;(ast::ModelId, StringId), ast::FieldId&gt;,
+    <span class="kw">pub</span>(<span class="kw">super</span>) model_fields: HashMap&lt;(ast::ModelId, StringId), ast::FieldId&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) composite_type_fields: HashMap&lt;(ast::CompositeTypeId, StringId), ast::FieldId&gt;,
 }
 
@@ -240,7 +240,7 @@
 /// - Model fields for each model
 /// - Enum variants for each enum
 </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>resolve_names(ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
-    <span class="kw">let </span><span class="kw-2">mut </span>tmp_names: HashSet&lt;<span class="kw-2">&amp;</span>str&gt; = HashSet::new(); <span class="comment">// throwaway container for duplicate checking
+    <span class="kw">let </span><span class="kw-2">mut </span>tmp_names: HashSet&lt;<span class="kw-2">&amp;</span>str&gt; = HashSet::default(); <span class="comment">// throwaway container for duplicate checking
     </span><span class="kw">let </span><span class="kw-2">mut </span>names = Names::default();
 
     <span class="kw">for </span>(top_id, top) <span class="kw">in </span>ctx.ast.iter_tops() {
