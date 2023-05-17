@@ -134,6 +134,8 @@ pub struct Warnings {
     pub undecided_types_in_types: Vec<TypeAndFieldAndType>,
     /// Warning about JSONSchema on a model.
     pub json_schema_defined: Vec<Model>,
+    /// Warning about JSONSchema on a model.
+    pub capped_collection: Vec<Model>,
 }
 
 impl Warnings {
@@ -413,6 +415,12 @@ impl fmt::Display for Warnings {
         render_warnings(
             "The following models have a JSON Schema defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/mongodb-json-schema",
             &self.json_schema_defined,
+            f
+        )?;
+
+        render_warnings(
+            "The following models are capped collections, which are not yet fully supported. Read more: https://pris.ly/d/mongodb-capped-collections",
+            &self.capped_collection,
             f
         )?;
 

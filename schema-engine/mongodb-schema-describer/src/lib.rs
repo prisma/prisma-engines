@@ -28,9 +28,10 @@ pub async fn describe(client: &mongodb::Client, db_name: &str) -> mongodb::error
         let collection_name = collection.name;
         let options = collection.options;
         let has_schema = options.validator.is_some();
+        let is_capped = options.capped.is_some();
 
         let collection = database.collection::<Document>(&collection_name);
-        let collection_id = schema.push_collection(collection_name, has_schema);
+        let collection_id = schema.push_collection(collection_name, has_schema, is_capped);
 
         let mut indexes_cursor = collection.list_indexes(None).await?;
 
