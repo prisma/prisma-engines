@@ -138,11 +138,6 @@
 <a href="#138" id="138">138</a>
 <a href="#139" id="139">139</a>
 <a href="#140" id="140">140</a>
-<a href="#141" id="141">141</a>
-<a href="#142" id="142">142</a>
-<a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::ops::Range;
 
 <span class="kw">use crate</span>::{
@@ -156,11 +151,6 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TableWalker&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="doccomment">/// Get a column in the table, by name.
     </span><span class="kw">pub fn </span>column(<span class="self">self</span>, column_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;TableColumnWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
-        <span class="self">self</span>.columns().find(|column| column.name() == column_name)
-    }
-
-    <span class="doccomment">/// Get a column in the table, by name.
-    </span><span class="kw">pub fn </span>column_case_insensitive(<span class="self">self</span>, column_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;TableColumnWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
         <span class="self">self</span>.columns().find(|column| column.name() == column_name)
     }
 

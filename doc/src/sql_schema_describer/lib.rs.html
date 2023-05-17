@@ -927,7 +927,6 @@
 <a href="#927" id="927">927</a>
 <a href="#928" id="928">928</a>
 <a href="#929" id="929">929</a>
-<a href="#930" id="930">930</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Database description. This crate is used heavily in the schema engine.
 
 </span><span class="attr">#![deny(rust_2018_idioms, unsafe_code)]
@@ -950,11 +949,10 @@
     ids::<span class="kw-2">*</span>,
     walkers::<span class="kw-2">*</span>,
 };
-<span class="kw">use </span>enumflags2::{BitFlag, BitFlags};
+<span class="kw">pub use </span>either::Either;
 <span class="kw">pub use </span>prisma_value::PrismaValue;
 
-<span class="kw">pub use </span>either::Either;
-
+<span class="kw">use </span>enumflags2::{BitFlag, BitFlags};
 <span class="kw">use </span>once_cell::sync::Lazy;
 <span class="kw">use </span>regex::Regex;
 <span class="kw">use </span>serde::{Deserialize, Serialize};

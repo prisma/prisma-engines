@@ -284,8 +284,8 @@
     }
 }
 
-<span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
-</span><span class="doccomment">/// All the information we can scrape per index.
+<span class="doccomment">/// All the information we can scrape per index.
+</span><span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
 </span><span class="kw">pub struct </span>IndexData {
     <span class="doccomment">/// The name of the index.
     </span><span class="kw">pub </span>name: String,
@@ -297,8 +297,8 @@
     </span><span class="kw">pub </span>collection_id: CollectionId,
 }
 
-<span class="attr">#[derive(Debug, Default, Clone, Serialize, Deserialize)]
-</span><span class="doccomment">/// All the possible information we should scrape out from a MongoDB database.
+<span class="doccomment">/// All the possible information we should scrape out from a MongoDB database.
+</span><span class="attr">#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 </span><span class="kw">pub struct </span>MongoSchema {
     collections: Vec&lt;CollectionData&gt;,
     indexes: Vec&lt;IndexData&gt;,
