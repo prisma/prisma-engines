@@ -6,10 +6,8 @@ use crate::{
     {context::Context, types::RelationField},
 };
 use enumflags2::bitflags;
-use std::{
-    collections::{BTreeSet, HashMap},
-    fmt,
-};
+use rustc_hash::FxHashMap as HashMap;
+use std::{collections::BTreeSet, fmt};
 
 /// Detect relation types and construct relation objects to the database.
 pub(super) fn infer_relations(ctx: &mut Context<'_>) {

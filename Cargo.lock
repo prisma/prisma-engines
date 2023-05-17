@@ -2679,6 +2679,7 @@ dependencies = [
  "either",
  "enumflags2",
  "indexmap",
+ "rustc-hash",
  "schema-ast",
 ]
 
