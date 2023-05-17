@@ -48,8 +48,8 @@ impl IndexData {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
 /// All the information we can scrape per index.
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IndexData {
     /// The name of the index.
     pub name: String,
@@ -61,8 +61,8 @@ pub struct IndexData {
     pub collection_id: CollectionId,
 }
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 /// All the possible information we should scrape out from a MongoDB database.
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct MongoSchema {
     collections: Vec<CollectionData>,
     indexes: Vec<IndexData>,

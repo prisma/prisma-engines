@@ -1,5 +1,3 @@
-use std::io::Write;
-
 use pretty_assertions::assert_eq;
 use schema_core::{
     commands::{DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic, HistoryDiagnostic},
@@ -7,6 +5,7 @@ use schema_core::{
     schema_api,
 };
 use sql_migration_tests::test_api::*;
+use std::io::Write;
 use user_facing_errors::{schema_engine::ShadowDbCreationError, UserFacingError};
 
 #[test_connector]
