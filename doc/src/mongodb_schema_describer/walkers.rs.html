@@ -91,6 +91,11 @@
 <a href="#91" id="91">91</a>
 <a href="#92" id="92">92</a>
 <a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{CollectionData, CollectionId, IndexData, IndexField, IndexId, IndexType, MongoSchema};
 
 <span class="attr">#[derive(Clone, Copy)]
@@ -128,9 +133,14 @@
         }
     }
 
-    <span class="doccomment">/// Checks whether JSONSchema is defined
+    <span class="doccomment">/// Checks whether JSONSchema is defined.
     </span><span class="kw">pub fn </span>has_schema(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.get().has_schema
+    }
+
+    <span class="doccomment">/// Checks whether the collection is capped.
+    </span><span class="kw">pub fn </span>is_capped(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.get().is_capped
     }
 }
 

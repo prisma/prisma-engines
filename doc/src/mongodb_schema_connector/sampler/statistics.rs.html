@@ -653,6 +653,11 @@
 <a href="#653" id="653">653</a>
 <a href="#654" id="654">654</a>
 <a href="#655" id="655">655</a>
+<a href="#656" id="656">656</a>
+<a href="#657" id="657">657</a>
+<a href="#658" id="658">658</a>
+<a href="#659" id="659">659</a>
+<a href="#660" id="660">660</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>indices;
 <span class="kw">mod </span>name;
 
@@ -806,6 +811,11 @@
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(walker) = doc_count.collection_walker {
                     <span class="kw">if </span>walker.has_schema() {
                         <span class="kw">let </span>comment = <span class="string">&quot;This collection uses a JSON Schema defined in the database, which requires additional setup for migrations. Visit https://pris.ly/d/mongodb-json-schema for more info.&quot;</span>;
+                        model.documentation(comment)
+                    }
+
+                    <span class="kw">if </span>walker.is_capped() {
+                        <span class="kw">let </span>comment = <span class="string">&quot;This model is a capped collection, which is not yet fully supported. Read more: https://pris.ly/d/mongodb-capped-collections&quot;</span>;
                         model.documentation(comment)
                     }
                 }

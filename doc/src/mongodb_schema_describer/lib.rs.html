@@ -124,6 +124,7 @@
 <a href="#124" id="124">124</a>
 <a href="#125" id="125">125</a>
 <a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
 </pre><pre class="rust"><code><span class="doccomment">//! The MongoDB Schema describer.
 //!
 //! A common place to query all the possible schema data we can from a MongoDB instance.
@@ -154,9 +155,10 @@
         <span class="kw">let </span>collection_name = collection.name;
         <span class="kw">let </span>options = collection.options;
         <span class="kw">let </span>has_schema = options.validator.is_some();
+        <span class="kw">let </span>is_capped = options.capped.is_some();
 
         <span class="kw">let </span>collection = database.collection::&lt;Document&gt;(<span class="kw-2">&amp;</span>collection_name);
-        <span class="kw">let </span>collection_id = schema.push_collection(collection_name, has_schema);
+        <span class="kw">let </span>collection_id = schema.push_collection(collection_name, has_schema, is_capped);
 
         <span class="kw">let </span><span class="kw-2">mut </span>indexes_cursor = collection.list_indexes(<span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 

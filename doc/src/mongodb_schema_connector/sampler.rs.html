@@ -78,6 +78,12 @@
 <a href="#78" id="78">78</a>
 <a href="#79" id="79">79</a>
 <a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>field_type;
 <span class="kw">mod </span>statistics;
 
@@ -112,6 +118,12 @@
 
         <span class="kw">if </span>collection.has_schema() {
             warnings.json_schema_defined.push(Model {
+                model: collection.name().to_owned(),
+            })
+        }
+
+        <span class="kw">if </span>collection.is_capped() {
+            warnings.capped_collection.push(Model {
                 model: collection.name().to_owned(),
             })
         }

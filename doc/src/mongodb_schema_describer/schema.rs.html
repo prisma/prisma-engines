@@ -228,6 +228,11 @@
 <a href="#228" id="228">228</a>
 <a href="#229" id="229">229</a>
 <a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
 </pre><pre class="rust"><code><span class="kw">use </span>mongodb::bson::Bson;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>std::{
@@ -251,6 +256,7 @@
 </span><span class="kw">pub struct </span>CollectionData {
     <span class="kw">pub</span>(<span class="kw">crate</span>) name: String,
     <span class="kw">pub</span>(<span class="kw">crate</span>) has_schema: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) is_capped: bool,
 }
 
 <span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -301,8 +307,12 @@
 
 <span class="kw">impl </span>MongoSchema {
     <span class="doccomment">/// Add a collection to the schema.
-    </span><span class="kw">pub fn </span>push_collection(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: String, has_schema: bool) -&gt; CollectionId {
-        <span class="self">self</span>.collections.push(CollectionData { name, has_schema });
+    </span><span class="kw">pub fn </span>push_collection(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: String, has_schema: bool, is_capped: bool) -&gt; CollectionId {
+        <span class="self">self</span>.collections.push(CollectionData {
+            name,
+            has_schema,
+            is_capped,
+        });
         CollectionId(<span class="self">self</span>.collections.len() - <span class="number">1</span>)
     }
 

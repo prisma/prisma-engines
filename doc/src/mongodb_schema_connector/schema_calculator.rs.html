@@ -64,7 +64,7 @@
     <span class="kw">let </span><span class="kw-2">mut </span>schema = MongoSchema::default();
 
     <span class="kw">for </span>model <span class="kw">in </span>datamodel.db.walk_models() {
-        <span class="kw">let </span>collection_id = schema.push_collection(model.database_name().to_owned(), <span class="bool-val">false</span>);
+        <span class="kw">let </span>collection_id = schema.push_collection(model.database_name().to_owned(), <span class="bool-val">false</span>, <span class="bool-val">false</span>);
 
         <span class="kw">for </span>index <span class="kw">in </span>model.indexes() {
             <span class="kw">let </span>name = index.constraint_name(MONGODB);
