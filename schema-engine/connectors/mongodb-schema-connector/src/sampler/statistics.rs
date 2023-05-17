@@ -155,7 +155,7 @@ impl<'a> Statistics<'a> {
                     }
 
                     if walker.is_capped() {
-                        let comment = "This model is a capped collection, which requires further support to be used with Prisma: https://pris.ly/d/mongodb-capped-collections";
+                        let comment = "This model is a capped collection, which is not yet fully supported. Read more: https://pris.ly/d/mongodb-capped-collections";
                         model.documentation(comment)
                     }
                 }
