@@ -118,3 +118,37 @@ fn collection_with_json_schema() {
     "#]];
     expected_doc.assert_eq(res.datamodel());
 }
+
+#[test]
+fn capped_collection() {
+    let res = introspect(|db| async move {
+        db.create_collection(
+            "A",
+            Some(
+                CreateCollectionOptions::builder()
+                    .capped(Some(true))
+                    .size(Some(1024))
+                    .build(),
+            ),
+        )
+        .await?;
+
+        Ok(())
+    });
+
+    let expected_warning = expect![[r#"
+        *** WARNING ***
+
+        The following models are capped collections, which are not yet fully supported. Read more: https://pris.ly/d/mongodb-capped-collections
+          - "A"
+    "#]];
+    res.expect_warnings(&expected_warning);
+
+    let expected_doc = expect![[r#"
+        /// This model is a capped collection, which is not yet fully supported. Read more: https://pris.ly/d/mongodb-capped-collections
+        model A {
+          id String @id @default(auto()) @map("_id") @db.ObjectId
+        }
+    "#]];
+    expected_doc.assert_eq(res.datamodel());
+}

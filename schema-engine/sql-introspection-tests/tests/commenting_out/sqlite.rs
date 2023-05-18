@@ -13,7 +13,7 @@ async fn a_table_without_required_uniques(api: &mut TestApi) -> TestResult {
     api.raw_cmd(setup).await;
 
     let expectation = expect![[r#"
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model Post {
           id         Int
           opt_unique Int? @unique(map: "sqlite_autoindex_Post_1")
@@ -49,14 +49,14 @@ async fn ignore_on_model_with_only_optional_id(api: &mut TestApi) -> TestResult 
         .await?;
 
     let expectation = expect![[r#"
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model OnlyOptionalId {
           id String? @id
 
           @@ignore
         }
 
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model OptionalIdAndOptionalUnique {
           id     String? @id
           unique Int?    @unique(map: "sqlite_autoindex_OptionalIdAndOptionalUnique_2")

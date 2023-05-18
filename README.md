@@ -68,11 +68,11 @@ Depending on how you invoked `cargo` in the previous step, you can find the
 compiled binaries inside the repository root in the `target/debug` (without
 `--release`) or `target/release` directories (with `--release`):
 
-| Prisma Component     | Path to Binary                                   |
-| -------------------- | ------------------------------------------------ |
-| Query Engine         | `./target/[debug\|release]/query-engine`         |
-| Schema Engine        | `./target/[debug\|release]/migration-engine`(*)  |
-| Prisma Format        | `./target/[debug\|release]/prisma-fmt`           |
+| Prisma Component | Path to Binary                                  |
+| ---------------- | ----------------------------------------------- |
+| Query Engine     | `./target/[debug\|release]/query-engine`        |
+| Schema Engine    | `./target/[debug\|release]/migration-engine`(*) |
+| Prisma Format    | `./target/[debug\|release]/prisma-fmt`          |
 
 (*) Will be renamed to schema-engine in Prisma 5.
 
@@ -99,7 +99,7 @@ description of what it does:
     returns GraphQL responses, and
 - handles all connections and communication with the native databases.
 
-When used through the Prisma Client, there are two ways for the Query Engine to
+When used through Prisma Client, there are two ways for the Query Engine to
 be executed:
 - as a binary, downloaded during installation, launched at runtime;
     communication happens via HTTP (`./query-engine/query-engine`)

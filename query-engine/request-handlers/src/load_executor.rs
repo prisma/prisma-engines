@@ -70,6 +70,15 @@ async fn mysql(
     features: PreviewFeatures,
 ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync>> {
     trace!("Loading MySQL query connector...");
+
+    if source.provider == "@prisma/mysql" {
+        // TODO: change this to a new PrismaMysql connector once
+        // https://github.com/prisma/client-planning/issues/326 is ready
+        let mysql = Mysql::from_source(source, url, features).await?;
+        trace!("Loaded @prisma/mysql query connector.");
+        return Ok(sql_executor(mysql, false));
+    }
+
     let mysql = Mysql::from_source(source, url, features).await?;
     trace!("Loaded MySQL query connector.");
     Ok(sql_executor(mysql, false))

@@ -109,7 +109,7 @@ impl<'db> ModelWalker<'db> {
     }
 
     /// Iterate all the scalar fields in a given model in the order they were defined.
-    pub fn scalar_fields(self) -> impl Iterator<Item = ScalarFieldWalker<'db>> {
+    pub fn scalar_fields(self) -> impl Iterator<Item = ScalarFieldWalker<'db>> + Clone {
         self.db
             .types
             .range_model_scalar_fields(self.id)

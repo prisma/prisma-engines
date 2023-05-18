@@ -46,7 +46,7 @@ async fn aragon_test_postgres(api: &mut TestApi) -> TestResult {
     let expectation = expect![[r#"
         *** WARNING ***
 
-        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
+        These constraints are not supported by Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
           - Model: "tokens", constraint: "tokens_token_scope_check"
     "#]];
 
@@ -122,7 +122,7 @@ async fn noalyss_folder_test_postgres(api: &mut TestApi) -> TestResult {
     let expectation = expect![[r#"
         *** WARNING ***
 
-        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
+        These constraints are not supported by Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
           - Model: "todo_list", constraint: "todo_list_is_public_check"
           - Model: "user_active_security", constraint: "user_active_security_action_check"
           - Model: "user_active_security", constraint: "user_active_security_ledger_check"
@@ -189,10 +189,10 @@ async fn check_and_exclusion_constraints_stopgap(api: &mut TestApi) -> TestResul
     let expectation = expect![[r#"
         *** WARNING ***
 
-        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
+        These constraints are not supported by Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
           - Model: "room_reservation", constraint: "room_reservation_price_check"
 
-        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/exclusion-constraints
+        These constraints are not supported by Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/exclusion-constraints
           - Model: "room_reservation", constraint: "room_reservation_room_id_tstzrange_excl"
     "#]];
 
@@ -276,7 +276,7 @@ async fn exclusion_constraints_stopgap(api: &mut TestApi) -> TestResult {
     let expectation = expect![[r#"
         *** WARNING ***
 
-        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/exclusion-constraints
+        These constraints are not supported by Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/exclusion-constraints
           - Model: "room_reservation", constraint: "room_reservation_room_id_tstzrange_excl"
     "#]];
 
@@ -354,7 +354,7 @@ async fn exclusion_constraints_without_where_stopgap(api: &mut TestApi) -> TestR
     let expectation = expect![[r#"
         *** WARNING ***
 
-        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/exclusion-constraints
+        These constraints are not supported by Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/exclusion-constraints
           - Model: "room_reservation", constraint: "room_reservation_room_id_tstzrange_excl"
     "#]];
 
@@ -426,7 +426,7 @@ async fn exclusion_constraints_without_where_and_expressions_stopgap(api: &mut T
     let expectation = expect![[r#"
         *** WARNING ***
 
-        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/exclusion-constraints
+        These constraints are not supported by Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/exclusion-constraints
           - Model: "room_reservation", constraint: "room_reservation_room_id_excl"
     "#]];
 
@@ -492,7 +492,7 @@ async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
     let expectation = expect![[r#"
         *** WARNING ***
 
-        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
+        These constraints are not supported by Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
           - Model: "products", constraint: "products_price_check"
     "#]];
 

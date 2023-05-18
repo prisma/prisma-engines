@@ -35,6 +35,12 @@ pub(super) async fn sample(
                 model: collection.name().to_owned(),
             })
         }
+
+        if collection.is_capped() {
+            warnings.capped_collection.push(Model {
+                model: collection.name().to_owned(),
+            })
+        }
     }
 
     for collection in schema.walk_collections() {

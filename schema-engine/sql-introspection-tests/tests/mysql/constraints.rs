@@ -56,7 +56,7 @@ async fn check_constraints_stopgap(api: &mut TestApi) -> TestResult {
     let expectation = expect![[r#"
         *** WARNING ***
 
-        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
+        These constraints are not supported by Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
           - Model: "t1", constraint: "c1_nonzero"
           - Model: "t1", constraint: "c2_positive"
           - Model: "t1", constraint: "t1_chk_1"

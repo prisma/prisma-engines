@@ -75,7 +75,7 @@ fn render_view(view: ViewPair<'_>) -> renderer::View<'_> {
     }
 
     if !view.has_usable_identifier() && !view.ignored_in_psl() {
-        let docs = "The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.";
+        let docs = "The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.";
         rendered.documentation(docs);
     }
 
