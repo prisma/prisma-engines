@@ -101,13 +101,12 @@ pub trait Queryable: Send + Sync {
 
 /// A thing that can start a new transaction.
 #[async_trait]
-pub trait TransactionCapable<C>: Queryable
+pub trait TransactionCapable: Queryable
 where
-    C: Send + Sync + 'static,
     Self: Sized,
 {
     /// Starts a new transaction
-    async fn start_transaction(&self, isolation: Option<IsolationLevel>) -> crate::Result<Transaction<'_>> {
+    async fn start_transaction(&self, isolation: Option<IsolationLevel>) -> crate::Result<super::Transaction<'_>> {
         let opts = TransactionOptions::new(isolation, self.requires_isolation_first());
         Transaction::new(self, self.begin_statement(), opts).await
     }

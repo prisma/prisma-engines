@@ -1,5 +1,5 @@
 use super::connection::SqlConnection;
-use crate::{query_ext::QueryExt, FromSource, SqlError};
+use crate::{query_ext::QueryExt, FromSource, Queryable, SqlError};
 use async_trait::async_trait;
 use connector_interface::{
     self as connector,
@@ -8,7 +8,7 @@ use connector_interface::{
 };
 use quaint::{
     pooled::{PooledConnection, Quaint},
-    prelude::{ConnectionInfo, Queryable, TransactionCapable},
+    prelude::{ConnectionInfo, TransactionCapable},
 };
 use std::time::Duration;
 
@@ -21,20 +21,11 @@ pub enum MysqlPool {
 
 impl MysqlPool {
     /// Reserve a connection from the pool
-    /// TODO: the resulting dyn trait should also be `TransactionCapable` with an automatic implementation.
-    /// Note: `TransactionCapable` requires `Self: Sized`, which is not possible with a trait object.
-    /// We could implement `TransactionCapable` for `Box<dyn Connection + Send + Sync + 'static>`,
-    /// but that would yield the error:
-    /// "only traits defined in the current crate can be implemented for types defined outside of the crate.
-    /// define and implement a trait or new type instead".
-    /// I've also already tried adding a generic constraint to `TransactionCapable`, but that didn't help solving
-    /// the problems above.
-    pub async fn check_out(&self) -> crate::Result<Box<dyn QueryExt + Send + Sync + 'static>> {
+    pub async fn check_out(&self) -> crate::Result<impl TransactionCapable + Send + Sync + 'static> {
         match self {
             MysqlPool::Rust(pool) => {
                 let conn: PooledConnection = pool.check_out().await.map_err(SqlError::from)?;
-                let obj = Box::new(conn);
-                Ok(obj)
+                Ok(conn)
             }
             MysqlPool::NodeJS(_) => unimplemented!("NodeJS connection pool"),
         }
