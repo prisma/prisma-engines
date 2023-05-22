@@ -1,6 +1,7 @@
 mod conversion;
 mod error;
 
+use super::IsolationLevel;
 use crate::{
     ast::{Query, Value},
     connector::{metrics, queryable::*, ResultSet, Transaction},
@@ -33,8 +34,6 @@ pub(crate) const DEFAULT_SCHEMA: &str = "public";
 /// Cargo feature.
 #[cfg(feature = "expose-drivers")]
 pub use tokio_postgres;
-
-use super::IsolationLevel;
 
 #[derive(Clone)]
 struct Hidden<T>(T);
@@ -757,7 +756,7 @@ impl Display for SetSearchPath<'_> {
     }
 }
 
-impl<C: Sync + Send + 'static> TransactionCapable<C> for PostgreSql {}
+impl TransactionCapable for PostgreSql {}
 
 #[async_trait]
 impl Queryable for PostgreSql {
