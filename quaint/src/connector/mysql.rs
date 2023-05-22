@@ -461,7 +461,7 @@ impl Mysql {
     }
 }
 
-impl TransactionCapable for Mysql {}
+impl<C: Sync + Send + 'static> TransactionCapable<C> for Mysql {}
 
 #[async_trait]
 impl Queryable for Mysql {

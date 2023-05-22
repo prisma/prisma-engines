@@ -95,7 +95,7 @@ pub(crate) struct MssqlQueryParams {
 static SQL_SERVER_DEFAULT_ISOLATION: IsolationLevel = IsolationLevel::ReadCommitted;
 
 #[async_trait]
-impl TransactionCapable for Mssql {
+impl<C: Sync + Send + 'static> TransactionCapable<C> for Mssql {
     async fn start_transaction(&self, isolation: Option<IsolationLevel>) -> crate::Result<Transaction<'_>> {
         // Isolation levels in SQL Server are set on the connection and live until they're changed.
         // Always explicitly setting the isolation level each time a tx is started (either to the given value

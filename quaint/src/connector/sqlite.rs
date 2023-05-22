@@ -167,7 +167,7 @@ impl Sqlite {
     }
 }
 
-impl TransactionCapable for Sqlite {}
+impl<C: Sync + Send + 'static> TransactionCapable<C> for Sqlite {}
 
 #[async_trait]
 impl Queryable for Sqlite {

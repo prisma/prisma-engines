@@ -18,7 +18,7 @@ pub struct PooledConnection {
     pub(crate) inner: MobcPooled<QuaintManager>,
 }
 
-impl TransactionCapable for PooledConnection {}
+impl<C: Queryable + 'static> TransactionCapable<C> for PooledConnection {}
 
 #[async_trait]
 impl Queryable for PooledConnection {
