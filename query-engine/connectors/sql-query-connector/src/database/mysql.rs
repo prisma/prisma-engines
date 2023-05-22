@@ -1,16 +1,48 @@
 use super::connection::SqlConnection;
-use crate::{FromSource, SqlError};
+use crate::{query_ext::QueryExt, FromSource, SqlError};
 use async_trait::async_trait;
 use connector_interface::{
     self as connector,
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-use quaint::{pooled::Quaint, prelude::ConnectionInfo};
+use quaint::{
+    pooled::{PooledConnection, Quaint},
+    prelude::{ConnectionInfo, Queryable, TransactionCapable},
+};
 use std::time::Duration;
 
+pub struct NodeJSPool;
+
+pub enum MysqlPool {
+    Rust(Quaint),
+    NodeJS(NodeJSPool),
+}
+
+impl MysqlPool {
+    /// Reserve a connection from the pool
+    /// TODO: the resulting dyn trait should also be `TransactionCapable` with an automatic implementation.
+    /// Note: `TransactionCapable` requires `Self: Sized`, which is not possible with a trait object.
+    /// We could implement `TransactionCapable` for `Box<dyn Connection + Send + Sync + 'static>`,
+    /// but that would yield the error:
+    /// "only traits defined in the current crate can be implemented for types defined outside of the crate.
+    /// define and implement a trait or new type instead".
+    /// I've also already tried adding a generic constraint to `TransactionCapable`, but that didn't help solving
+    /// the problems above.
+    pub async fn check_out(&self) -> crate::Result<Box<dyn QueryExt + Send + Sync + 'static>> {
+        match self {
+            MysqlPool::Rust(pool) => {
+                let conn: PooledConnection = pool.check_out().await.map_err(SqlError::from)?;
+                let obj = Box::new(conn);
+                Ok(obj)
+            }
+            MysqlPool::NodeJS(_) => unimplemented!("NodeJS connection pool"),
+        }
+    }
+}
+
 pub struct Mysql {
-    pool: Quaint,
+    pool: MysqlPool,
     connection_info: ConnectionInfo,
     features: psl::PreviewFeatures,
 }
@@ -49,20 +81,26 @@ impl FromSource for Mysql {
         let connection_info = pool.connection_info().to_owned();
 
         Ok(Mysql {
-            pool,
+            pool: MysqlPool::Rust(pool),
             connection_info,
             features: features.to_owned(),
         })
     }
 }
 
+// Note: implementing something like
+// `trait NewTrait: Connection + TransactionCapable<(dyn Connection + std::marker::Send + Sync + 'static)> {}`
+// and making `get_connection` return `Result<Box<dyn NewTrait>>`, would result in the error:
+// `the trait `NewTrait` cannot be made into an object`
+
 #[async_trait]
 impl Connector for Mysql {
     async fn get_connection<'a>(&'a self) -> connector::Result<Box<dyn Connection + Send + Sync + 'static>> {
         super::catch(self.connection_info.clone(), async move {
-            let conn = self.pool.check_out().await.map_err(SqlError::from)?;
+            let conn = self.pool.check_out().await?;
             let conn = SqlConnection::new(conn, &self.connection_info, self.features);
 
+            // TODO: this line fails due to reasons explained in the other comments in this file.
             Ok(Box::new(conn) as Box<dyn Connection + Send + Sync + 'static>)
         })
         .await

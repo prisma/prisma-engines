@@ -101,8 +101,9 @@ pub trait Queryable: Send + Sync {
 
 /// A thing that can start a new transaction.
 #[async_trait]
-pub trait TransactionCapable: Queryable
+pub trait TransactionCapable<C>: Queryable
 where
+    C: Send + Sync + 'static,
     Self: Sized,
 {
     /// Starts a new transaction

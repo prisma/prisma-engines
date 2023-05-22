@@ -757,7 +757,7 @@ impl Display for SetSearchPath<'_> {
     }
 }
 
-impl TransactionCapable for PostgreSql {}
+impl<C: Sync + Send + 'static> TransactionCapable<C> for PostgreSql {}
 
 #[async_trait]
 impl Queryable for PostgreSql {
