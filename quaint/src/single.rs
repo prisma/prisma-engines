@@ -25,7 +25,7 @@ impl fmt::Debug for Quaint {
     }
 }
 
-impl TransactionCapable for Quaint {}
+impl<C: Sync + Send + 'static> TransactionCapable<C> for Quaint {}
 
 impl Quaint {
     /// Create a new connection to the database. The connection string
