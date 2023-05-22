@@ -1,27 +1,19 @@
 //! The SQL migration connector.
 
 #![deny(rust_2018_idioms, unsafe_code, missing_docs)]
-#![allow(clippy::ptr_arg)] // remove after https://github.com/rust-lang/rust-clippy/issues/8482 is fixed and shipped
 
 mod apply_migration;
 mod database_schema;
-mod datamodel_calculator;
 mod error;
 mod flavour;
-mod introspection_helpers;
-mod introspection_map;
-mod introspection_pair;
+mod introspection;
 mod migration_pair;
-mod rendering;
-mod sanitize_datamodel_names;
 mod sql_destructive_change_checker;
 mod sql_migration;
 mod sql_migration_persistence;
 mod sql_renderer;
 mod sql_schema_calculator;
 mod sql_schema_differ;
-mod version_checker;
-mod warnings;
 
 use database_schema::SqlDatabaseSchema;
 use enumflags2::BitFlags;
@@ -253,7 +245,7 @@ impl SchemaConnector for SqlSchemaConnector {
             let namespaces = Namespaces::from_vec(&mut namespace_names);
             let sql_schema = self.flavour.introspect(namespaces, ctx).await?;
             let search_path = self.flavour.search_path();
-            let datamodel = datamodel_calculator::calculate(&sql_schema, ctx, search_path);
+            let datamodel = introspection::datamodel_calculator::calculate(&sql_schema, ctx, search_path);
 
             Ok(datamodel)
         })
