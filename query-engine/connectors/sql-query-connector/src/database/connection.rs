@@ -1,5 +1,5 @@
 use super::{catch, transaction::SqlConnectorTransaction};
-use crate::{database::operations::*, Context, QueryExt, SqlError};
+use crate::{database::operations::*, Context, SqlError};
 use async_trait::async_trait;
 use connector::{ConnectionLike, RelAggregationSelection};
 use connector_interface::{
@@ -10,21 +10,21 @@ use prisma_models::{prelude::*, SelectionResult};
 use prisma_value::PrismaValue;
 use quaint::{
     connector::{IsolationLevel, TransactionCapable},
-    prelude::ConnectionInfo,
+    prelude::{ConnectionInfo, Queryable},
 };
 use std::{collections::HashMap, str::FromStr};
 
-pub(crate) struct SqlConnection<C: ?Sized> {
-    inner: Box<C>,
+pub(crate) struct SqlConnection<C> {
+    inner: C,
     connection_info: ConnectionInfo,
     features: psl::PreviewFeatures,
 }
 
-impl<C: ?Sized> SqlConnection<C>
+impl<C> SqlConnection<C>
 where
-    C: QueryExt + Send + Sync + 'static,
+    C: Queryable + TransactionCapable + Send + Sync + 'static,
 {
-    pub fn new(inner: Box<C>, connection_info: &ConnectionInfo, features: psl::PreviewFeatures) -> Self {
+    pub fn new(inner: C, connection_info: &ConnectionInfo, features: psl::PreviewFeatures) -> Self {
         let connection_info = connection_info.clone();
 
         Self {
@@ -35,12 +35,12 @@ where
     }
 }
 
-impl<C> ConnectionLike for SqlConnection<C> where C: QueryExt + TransactionCapable<C> + Send + Sync + 'static {}
+impl<C> ConnectionLike for SqlConnection<C> where C: Queryable + TransactionCapable + Send + Sync + 'static {}
 
 #[async_trait]
 impl<C> Connection for SqlConnection<C>
 where
-    C: QueryExt + TransactionCapable<C> + Send + Sync + 'static,
+    C: Queryable + TransactionCapable + Send + Sync + 'static,
 {
     async fn start_transaction<'a>(
         &'a mut self,
@@ -77,7 +77,7 @@ where
 #[async_trait]
 impl<C> ReadOperations for SqlConnection<C>
 where
-    C: QueryExt + Send + Sync + 'static,
+    C: Queryable + Send + Sync + 'static,
 {
     async fn get_single_record(
         &mut self,
@@ -91,7 +91,7 @@ where
         catch(self.connection_info.clone(), async move {
             let ctx = Context::new(&self.connection_info, trace_id.as_deref());
             read::get_single_record(
-                self.inner.as_ref(),
+                &self.inner,
                 model,
                 filter,
                 &selected_fields.into(),
@@ -114,7 +114,7 @@ where
         catch(self.connection_info.clone(), async move {
             let ctx = Context::new(&self.connection_info, trace_id.as_deref());
             read::get_many_records(
-                self.inner.as_ref(),
+                &self.inner,
                 model,
                 query_arguments,
                 &selected_fields.into(),
@@ -134,7 +134,7 @@ where
     ) -> connector::Result<Vec<(SelectionResult, SelectionResult)>> {
         catch(self.connection_info.clone(), async move {
             let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            read::get_related_m2m_record_ids(self.inner.as_ref(), from_field, from_record_ids, &ctx).await
+            read::get_related_m2m_record_ids(&self.inner, from_field, from_record_ids, &ctx).await
         })
         .await
     }
@@ -150,16 +150,7 @@ where
     ) -> connector::Result<Vec<AggregationRow>> {
         catch(self.connection_info.clone(), async move {
             let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            read::aggregate(
-                self.inner.as_ref(),
-                model,
-                query_arguments,
-                selections,
-                group_by,
-                having,
-                &ctx,
-            )
-            .await
+            read::aggregate(&self.inner, model, query_arguments, selections, group_by, having, &ctx).await
         })
         .await
     }
@@ -168,7 +159,7 @@ where
 #[async_trait]
 impl<C> WriteOperations for SqlConnection<C>
 where
-    C: QueryExt + Send + Sync + 'static,
+    C: Queryable + Send + Sync + 'static,
 {
     async fn create_record(
         &mut self,
@@ -178,14 +169,7 @@ where
     ) -> connector::Result<SelectionResult> {
         catch(self.connection_info.clone(), async move {
             let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            write::create_record(
-                self.inner.as_ref(),
-                &self.connection_info.sql_family(),
-                model,
-                args,
-                &ctx,
-            )
-            .await
+            write::create_record(&self.inner, &self.connection_info.sql_family(), model, args, &ctx).await
         })
         .await
     }
@@ -199,7 +183,7 @@ where
     ) -> connector::Result<usize> {
         catch(self.connection_info.clone(), async move {
             let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            write::create_records(self.inner.as_ref(), model, args, skip_duplicates, &ctx).await
+            write::create_records(&self.inner, model, args, skip_duplicates, &ctx).await
         })
         .await
     }
@@ -213,7 +197,7 @@ where
     ) -> connector::Result<usize> {
         catch(self.connection_info.clone(), async move {
             let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            write::update_records(self.inner.as_ref(), model, record_filter, args, &ctx).await
+            write::update_records(&self.inner, model, record_filter, args, &ctx).await
         })
         .await
     }
@@ -227,7 +211,7 @@ where
     ) -> connector::Result<Option<SelectionResult>> {
         catch(self.connection_info.clone(), async move {
             let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            let mut res = write::update_record(self.inner.as_ref(), model, record_filter, args, &ctx).await?;
+            let mut res = write::update_record(&self.inner, model, record_filter, args, &ctx).await?;
             Ok(res.pop())
         })
         .await
@@ -241,7 +225,7 @@ where
     ) -> connector::Result<usize> {
         catch(self.connection_info.clone(), async move {
             let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            write::delete_records(self.inner.as_ref(), model, record_filter, &ctx).await
+            write::delete_records(&self.inner, model, record_filter, &ctx).await
         })
         .await
     }
@@ -253,7 +237,7 @@ where
     ) -> connector::Result<SingleRecord> {
         catch(self.connection_info.clone(), async move {
             let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            upsert::native_upsert(self.inner.as_ref(), upsert, &ctx).await
+            upsert::native_upsert(&self.inner, upsert, &ctx).await
         })
         .await
     }
@@ -267,7 +251,7 @@ where
     ) -> connector::Result<()> {
         catch(self.connection_info.clone(), async move {
             let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            write::m2m_connect(self.inner.as_ref(), field, parent_id, child_ids, &ctx).await
+            write::m2m_connect(&self.inner, field, parent_id, child_ids, &ctx).await
         })
         .await
     }
@@ -281,14 +265,14 @@ where
     ) -> connector::Result<()> {
         catch(self.connection_info.clone(), async move {
             let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            write::m2m_disconnect(self.inner.as_ref(), field, parent_id, child_ids, &ctx).await
+            write::m2m_disconnect(&self.inner, field, parent_id, child_ids, &ctx).await
         })
         .await
     }
 
     async fn execute_raw(&mut self, inputs: HashMap<String, PrismaValue>) -> connector::Result<usize> {
         catch(self.connection_info.clone(), async move {
-            write::execute_raw(self.inner.as_ref(), self.features, inputs).await
+            write::execute_raw(&self.inner, self.features, inputs).await
         })
         .await
     }
@@ -300,7 +284,7 @@ where
         _query_type: Option<String>,
     ) -> connector::Result<serde_json::Value> {
         catch(self.connection_info.clone(), async move {
-            write::query_raw(self.inner.as_ref(), inputs).await
+            write::query_raw(&self.inner, inputs).await
         })
         .await
     }

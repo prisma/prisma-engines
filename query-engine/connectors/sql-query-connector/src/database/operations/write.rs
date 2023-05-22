@@ -2,6 +2,7 @@ use crate::filter_conversion::AliasedCondition;
 use crate::query_builder::write::{build_update_and_set_query, chunk_update_with_ids};
 use crate::{
     error::SqlError, model_extensions::*, query_builder::write, sql_trace::SqlTraceComment, Context, QueryExt,
+    Queryable,
 };
 use connector_interface::*;
 use itertools::Itertools;
@@ -19,7 +20,7 @@ use tracing::log::trace;
 use user_facing_errors::query_engine::DatabaseConstraint;
 
 async fn generate_id(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     primary_key: &FieldSelection,
     args: &WriteArgs,
     ctx: &Context<'_>,
@@ -62,7 +63,7 @@ async fn generate_id(
 /// Create a single record to the database defined in `conn`, resulting into a
 /// `RecordProjection` as an identifier pointing to the just-created record.
 pub(crate) async fn create_record(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     sql_family: &SqlFamily,
     model: &ModelRef,
     mut args: WriteArgs,
@@ -153,7 +154,7 @@ pub(crate) async fn create_record(
 }
 
 pub(crate) async fn create_records(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     model: &ModelRef,
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
@@ -191,7 +192,7 @@ pub(crate) async fn create_records(
 /// Standard create many records, requires `affected_fields` to be non-empty.
 #[allow(clippy::mutable_key_type)]
 async fn create_many_nonempty(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     model: &ModelRef,
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
@@ -279,7 +280,7 @@ async fn create_many_nonempty(
 
 /// Creates many empty (all default values) rows.
 async fn create_many_empty(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     model: &ModelRef,
     num_records: usize,
     skip_duplicates: bool,
@@ -299,7 +300,7 @@ async fn create_many_empty(
 /// defined in `args`, resulting the identifiers that were modified in the
 /// operation.
 pub(crate) async fn update_record(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     model: &ModelRef,
     record_filter: RecordFilter,
     args: WriteArgs,
@@ -323,7 +324,7 @@ pub(crate) async fn update_record(
 // Generates a query like this:
 //  UPDATE "public"."User" SET "name" = $1 WHERE "public"."User"."id" IN ($2,$3,$4,$5,$6,$7,$8,$9,$10,$11) AND "public"."User"."age" > $1
 async fn update_records_from_ids_and_filter(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     model: &ModelRef,
     record_filter: RecordFilter,
     args: WriteArgs,
@@ -356,7 +357,7 @@ async fn update_records_from_ids_and_filter(
 // Generates a query like this:
 //  UPDATE "public"."User" SET "name" = $1 WHERE "public"."User"."age" > $1
 async fn update_records_from_filter(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     model: &ModelRef,
     record_filter: RecordFilter,
     args: WriteArgs,
@@ -376,7 +377,7 @@ async fn update_records_from_filter(
 /// This works via two ways, when there are ids in record_filter.selectors, it uses that to update
 /// Otherwise it used the passed down arguments to update.
 pub(crate) async fn update_records(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     model: &ModelRef,
     record_filter: RecordFilter,
     args: WriteArgs,
@@ -396,7 +397,7 @@ pub(crate) async fn update_records(
 
 /// Delete multiple records in `conn`, defined in the `Filter`. Result is the number of items deleted.
 pub(crate) async fn delete_records(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     model: &ModelRef,
     record_filter: RecordFilter,
     ctx: &Context<'_>,
@@ -424,7 +425,7 @@ pub(crate) async fn delete_records(
 /// Connect relations defined in `child_ids` to a parent defined in `parent_id`.
 /// The relation information is in the `RelationFieldRef`.
 pub(crate) async fn m2m_connect(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     field: &RelationFieldRef,
     parent_id: &SelectionResult,
     child_ids: &[SelectionResult],
@@ -439,7 +440,7 @@ pub(crate) async fn m2m_connect(
 /// Disconnect relations defined in `child_ids` to a parent defined in `parent_id`.
 /// The relation information is in the `RelationFieldRef`.
 pub(crate) async fn m2m_disconnect(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     field: &RelationFieldRef,
     parent_id: &SelectionResult,
     child_ids: &[SelectionResult],
@@ -454,7 +455,7 @@ pub(crate) async fn m2m_disconnect(
 /// Execute a plain SQL query with the given parameters, returning the number of
 /// affected rows.
 pub(crate) async fn execute_raw(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     features: psl::PreviewFeatures,
     inputs: HashMap<String, PrismaValue>,
 ) -> crate::Result<usize> {
@@ -466,7 +467,7 @@ pub(crate) async fn execute_raw(
 /// Execute a plain SQL query with the given parameters, returning the answer as
 /// a JSON `Value`.
 pub(crate) async fn query_raw(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     inputs: HashMap<String, PrismaValue>,
 ) -> crate::Result<serde_json::Value> {
     Ok(conn.raw_json(inputs).await?)

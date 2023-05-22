@@ -3,7 +3,7 @@ use crate::{
     model_extensions::*,
     query_arguments_ext::QueryArgumentsExt,
     query_builder::{self, read},
-    Context, QueryExt, SqlError,
+    Context, QueryExt, Queryable, SqlError,
 };
 use connector_interface::*;
 use futures::stream::{FuturesUnordered, StreamExt};
@@ -11,7 +11,7 @@ use prisma_models::*;
 use quaint::ast::*;
 
 pub(crate) async fn get_single_record(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     model: &ModelRef,
     filter: &Filter,
     selected_fields: &ModelProjection,
@@ -48,7 +48,7 @@ pub(crate) async fn get_single_record(
 }
 
 pub(crate) async fn get_many_records(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     model: &ModelRef,
     mut query_arguments: QueryArguments,
     selected_fields: &ModelProjection,
@@ -142,7 +142,7 @@ pub(crate) async fn get_many_records(
 }
 
 pub(crate) async fn get_related_m2m_record_ids(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     from_field: &RelationFieldRef,
     from_record_ids: &[SelectionResult],
     ctx: &Context<'_>,
@@ -211,7 +211,7 @@ pub(crate) async fn get_related_m2m_record_ids(
 }
 
 pub(crate) async fn aggregate(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     model: &ModelRef,
     query_arguments: QueryArguments,
     selections: Vec<AggregationSelection>,
@@ -229,7 +229,7 @@ pub(crate) async fn aggregate(
 }
 
 async fn plain_aggregate(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     model: &ModelRef,
     query_arguments: QueryArguments,
     selections: Vec<AggregationSelection>,
@@ -254,7 +254,7 @@ async fn plain_aggregate(
 }
 
 async fn group_by_aggregate(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     model: &ModelRef,
     query_arguments: QueryArguments,
     selections: Vec<AggregationSelection>,
