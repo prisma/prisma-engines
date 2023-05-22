@@ -147,7 +147,7 @@
             <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
         };
 
-    <span class="kw">let </span>formatted_attribute = <span class="kw">super</span>::format_attribute(
+    <span class="kw">let </span>formatted_attribute = <span class="kw">super</span>::format_block_attribute(
         <span class="string">&quot;schema()&quot;</span>,
         model.indentation(),
         model.newline(),
@@ -199,7 +199,7 @@
         <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
     };
 
-    <span class="kw">let </span>formatted_attribute = <span class="kw">super</span>::format_attribute(
+    <span class="kw">let </span>formatted_attribute = <span class="kw">super</span>::format_block_attribute(
         <span class="string">&quot;schema()&quot;</span>,
         enumerator.indentation(),
         enumerator.newline(),

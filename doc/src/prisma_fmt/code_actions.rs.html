@@ -220,7 +220,21 @@
 <a href="#220" id="220">220</a>
 <a href="#221" id="221">221</a>
 <a href="#222" id="222">222</a>
-</pre><pre class="rust"><code><span class="kw">mod </span>multi_schema;
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+</pre><pre class="rust"><code><span class="kw">mod </span>mongodb;
+<span class="kw">mod </span>multi_schema;
 <span class="kw">mod </span>relation_mode;
 <span class="kw">mod </span>relations;
 
@@ -250,11 +264,14 @@
 
     <span class="kw">let </span>config = <span class="kw-2">&amp;</span>validated_schema.configuration;
 
+    <span class="kw">let </span>datasource = config.datasources.first();
+
     <span class="kw">for </span>source <span class="kw">in </span>validated_schema.db.ast().sources() {
         relation_mode::edit_referential_integrity(<span class="kw-2">&amp;mut </span>actions, <span class="kw-2">&amp;</span>params, validated_schema.db.source(), source)
     }
 
-    <span class="kw">for </span>model <span class="kw">in </span>validated_schema
+    <span class="comment">// models AND views
+    </span><span class="kw">for </span>model <span class="kw">in </span>validated_schema
         .db
         .walk_models()
         .chain(validated_schema.db.walk_views())
@@ -267,6 +284,10 @@
                 config,
                 model,
             )
+        }
+
+        <span class="kw">if </span><span class="macro">matches!</span>(datasource, <span class="prelude-val">Some</span>(ds) <span class="kw">if </span>ds.active_provider == <span class="string">&quot;mongodb&quot;</span>) {
+            mongodb::add_at_map_for_id(<span class="kw-2">&amp;mut </span>actions, <span class="kw-2">&amp;</span>params, validated_schema.db.source(), model)
         }
     }
 
@@ -376,7 +397,7 @@
 
         <span class="kw">let </span>attribute = <span class="macro">format!</span>(<span class="string">&quot;{attribute_name}([{fields}])&quot;</span>);
 
-        <span class="kw">let </span>formatted_attribute = format_attribute(
+        <span class="kw">let </span>formatted_attribute = format_block_attribute(
             <span class="kw-2">&amp;</span>attribute,
             model.indentation(),
             model.newline(),
@@ -404,7 +425,12 @@
     Range { start, end }
 }
 
-<span class="kw">fn </span>format_attribute(
+<span class="kw">fn </span>format_field_attribute(attribute: <span class="kw-2">&amp;</span>str) -&gt; String {
+    <span class="comment">// ? (soph) rust doesn&#39;t recognise \s
+    </span><span class="macro">format!</span>(<span class="string">&quot; {attribute}\n&quot;</span>)
+}
+
+<span class="kw">fn </span>format_block_attribute(
     attribute: <span class="kw-2">&amp;</span>str,
     indentation: IndentationType,
     newline: NewlineType,

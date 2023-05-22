@@ -314,7 +314,7 @@
 };
 <span class="kw">use </span>std::collections::HashMap;
 
-<span class="kw">use </span><span class="kw">super</span>::format_attribute;
+<span class="kw">use </span><span class="kw">super</span>::format_block_attribute;
 
 <span class="doccomment">/// If the referencing side of the one-to-one relation does not point
 /// to a unique constraint, the action adds the attribute.
@@ -571,7 +571,7 @@
 
     <span class="kw">let </span>attribute_name = <span class="string">&quot;index&quot;</span>;
     <span class="kw">let </span>attribute = <span class="macro">format!</span>(<span class="string">&quot;{attribute_name}([{fields}])&quot;</span>);
-    <span class="kw">let </span>formatted_attribute = format_attribute(
+    <span class="kw">let </span>formatted_attribute = format_block_attribute(
         <span class="kw-2">&amp;</span>attribute,
         relation.model().indentation(),
         relation.model().newline(),

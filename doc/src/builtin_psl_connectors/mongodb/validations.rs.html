@@ -375,7 +375,7 @@
 
     <span class="kw">let </span>error = <span class="kw">match </span>field.mapped_name() {
         <span class="prelude-val">Some</span>(name) =&gt; {
-            <span class="kw">let </span>msg = <span class="macro">format!</span>(<span class="string">&quot;MongoDB model IDs must have a @map(\&quot;_id\&quot;) annotation, found @map(\&quot;{name}\&quot;).&quot;</span>,);
+            <span class="kw">let </span>msg = <span class="macro">format!</span>(<span class="string">&quot;MongoDB model IDs must have an @map(\&quot;_id\&quot;) annotation, found @map(\&quot;{name}\&quot;).&quot;</span>,);
 
             DatamodelError::new_field_validation_error(
                 <span class="kw-2">&amp;</span>msg,
@@ -386,7 +386,7 @@
             )
         }
         <span class="prelude-val">None </span>=&gt; DatamodelError::new_field_validation_error(
-            <span class="string">&quot;MongoDB model IDs must have a @map(\&quot;_id\&quot;) annotations.&quot;</span>,
+            <span class="string">&quot;MongoDB model IDs must have an @map(\&quot;_id\&quot;) annotation.&quot;</span>,
             container,
             field.model().name(),
             field.name(),
