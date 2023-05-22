@@ -137,6 +137,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext<'_>, model: &Mod
     };
 
     let mut input_object = init_input_object_type(ident.clone());
+    input_object.set_tag(ObjectTag::WhereInputType(ParentContainer::Model(model.clone())));
 
     if ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {
         input_object.require_at_least_one_field();
