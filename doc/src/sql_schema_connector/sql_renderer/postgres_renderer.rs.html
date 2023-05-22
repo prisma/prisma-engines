@@ -2198,7 +2198,7 @@
     <span class="kw">for </span>variant <span class="kw">in </span><span class="kw-2">&amp;</span>alter_enum.created_variants {
         renderer.render_statement(<span class="kw-2">&amp;mut </span>|stmt| {
             stmt.push_str(<span class="kw-2">&amp;</span>prefix);
-            stmt.push_str(<span class="string">&quot;ADD VALUE &#39;&quot;</span>);
+            stmt.push_str(<span class="string">&quot; ADD VALUE &#39;&quot;</span>);
             stmt.push_str(variant);
             stmt.push_str(<span class="string">&quot;&#39;&quot;</span>);
         });
