@@ -47,6 +47,13 @@ impl<'a> ModelPair<'a> {
         self.next.has_subclass()
     }
 
+    /// Whether the model has MySQL multi value indices.
+    pub(crate) fn has_mysql_multi_value_index(self) -> bool {
+        self.next
+            .indexes()
+            .any(|i| i.index_type() == sql::IndexType::MySQLMultiValueIndex)
+    }
+
     /// True, if we add a new model with a subclass.
     pub(crate) fn new_with_subclass(self) -> bool {
         self.previous.is_none() && self.has_subclass()
@@ -206,6 +213,7 @@ impl<'a> ModelPair<'a> {
         self.next
             .indexes()
             .filter(|idx| idx.is_primary_key() || idx.is_unique())
+            .filter(|idx| !idx.is_mysql_multi_value_index())
             .any(|idx| {
                 idx.columns().all(|c| {
                     !matches!(
@@ -248,6 +256,7 @@ impl<'a> ModelPair<'a> {
             .indexes()
             .filter(|i| !(i.is_unique() && i.columns().len() == 1))
             .filter(|i| !i.is_primary_key())
+            .filter(|i| !i.is_mysql_multi_value_index())
             .map(move |next| {
                 let previous = self.previous.and_then(|prev| {
                     prev.indexes().find(|idx| {

@@ -107,14 +107,15 @@ async fn remapping_field_names_to_empty_mysql(api: &mut TestApi) -> TestResult {
 async fn partition_table_gets_comment(api: &mut TestApi) -> TestResult {
     api.raw_cmd(
         r#"
-CREATE TABLE `blocks` (
-    id INT NOT NULL AUTO_INCREMENT,
-    PRIMARY KEY (id)
-);
+        CREATE TABLE `blocks` (
+            id INT NOT NULL AUTO_INCREMENT,
+            PRIMARY KEY (id)
+        );
 
-ALTER TABLE blocks
-PARTITION BY HASH (id)
-PARTITIONS 2; "#,
+        ALTER TABLE blocks
+        PARTITION BY HASH (id)
+        PARTITIONS 2;
+    "#,
     )
     .await;
 
@@ -140,6 +141,92 @@ PARTITIONS 2; "#,
         /// This table is a partition table and requires additional setup for migrations. Visit https://pris.ly/d/partition-tables for more info.
         model blocks {
           id Int @id @default(autoincrement())
+        }
+    "#]];
+
+    api.expect_datamodel(&expected).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(Mysql8), exclude(Vitess))]
+async fn mysql_multi_row_index_warning(api: &mut TestApi) -> TestResult {
+    api.raw_cmd(
+        r#"
+        CREATE TABLE customers (
+            id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            modified DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            custinfo JSON,
+            INDEX zips( (CAST(custinfo->'$.zipcode' AS UNSIGNED ARRAY)) )
+        );
+
+        CREATE TABLE customers_2 (
+            id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            created DATETIME DEFAULT CURRENT_TIMESTAMP,
+            modified DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            custinfo JSON,
+            INDEX customers_2_created_idx (created, (CAST(custinfo->'$.zipcode' AS UNSIGNED ARRAY))),
+            UNIQUE comp(modified, (CAST(custinfo->'$.zipcode' AS UNSIGNED ARRAY)))
+        );
+
+        CREATE TABLE my_table (
+            id INT NOT NULL AUTO_INCREMENT,
+            name VARCHAR(50) NOT NULL,
+            email VARCHAR(50) NOT NULL,
+            age INT NOT NULL,
+            PRIMARY KEY (id),
+            INDEX name_age (name, age),
+            CONSTRAINT unique_name_email UNIQUE (name, email)
+        );
+    "#,
+    )
+    .await;
+
+    let expected = expect![[r#"
+        *** WARNING ***
+
+        These tables contain multi-value indices, which are not yet fully supported. Read more: https://pris.ly/d/mysql-multi-row-index
+          - "customers"
+          - "customers_2"
+    "#]];
+
+    api.expect_warnings(&expected).await;
+
+    let expected = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "mysql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        /// This table contains multi-value indices, which are not yet fully supported. Visit https://pris.ly/d/mysql-multi-row-index for more info.
+        model customers {
+          id       BigInt    @id @default(autoincrement())
+          modified DateTime? @default(now()) @db.DateTime(0)
+          custinfo Json?
+        }
+
+        /// This table contains multi-value indices, which are not yet fully supported. Visit https://pris.ly/d/mysql-multi-row-index for more info.
+        model customers_2 {
+          id       BigInt    @id @default(autoincrement())
+          created  DateTime? @default(now()) @db.DateTime(0)
+          modified DateTime? @default(now()) @db.DateTime(0)
+          custinfo Json?
+
+          @@index([created])
+        }
+
+        model my_table {
+          id    Int    @id @default(autoincrement())
+          name  String @db.VarChar(50)
+          email String @db.VarChar(50)
+          age   Int
+
+          @@unique([name, email], map: "unique_name_email")
+          @@index([name, age], map: "name_age")
         }
     "#]];
 

@@ -151,8 +151,16 @@ async fn push_indexes(
 
         let seq_in_index = row.get_expect_i64("seq_in_index"); // starts at 1
 
+        let is_unique = !row.get_expect_bool("non_unique");
+        let is_pk = index_name.eq_ignore_ascii_case("primary");
+        let is_fulltext = row.get_string("index_type").as_deref() == Some("FULLTEXT");
+
         let column_name = if let Some(name) = row.get_string("column_name") {
             name
+        } else if !(is_unique || is_pk || is_fulltext) {
+            // we only want to catch "simple" INDEXes
+            sql_schema.push_mysql_multi_value_index(table_id, index_name);
+            continue;
         } else {
             // filter out indexes on expressions
             // if the sequence is 1 and we have an expression,
@@ -167,10 +175,6 @@ async fn push_indexes(
         } else {
             continue;
         };
-
-        let is_unique = !row.get_expect_bool("non_unique");
-        let is_pk = index_name.eq_ignore_ascii_case("primary");
-        let is_fulltext = row.get_string("index_type").as_deref() == Some("FULLTEXT");
 
         if seq_in_index == 1 {
             // new index!

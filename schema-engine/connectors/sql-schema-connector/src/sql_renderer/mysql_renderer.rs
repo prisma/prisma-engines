@@ -200,6 +200,7 @@ impl SqlRenderer for MysqlFlavour {
                 sql_schema_describer::IndexType::Normal => ddl::IndexType::Normal,
                 sql_schema_describer::IndexType::Fulltext => ddl::IndexType::Fulltext,
                 sql_schema_describer::IndexType::PrimaryKey => unreachable!(),
+                sql_schema_describer::IndexType::MySQLMultiValueIndex => unreachable!(),
             },
             index_name: index.name().into(),
             on: (
@@ -227,7 +228,7 @@ impl SqlRenderer for MysqlFlavour {
             columns: table.columns().map(|col| self.render_column(col)).collect(),
             indexes: table
                 .indexes()
-                .filter(|idx| !idx.is_primary_key())
+                .filter(|idx| !idx.is_primary_key() && !idx.is_mysql_multi_value_index())
                 .map(move |index| ddl::IndexClause {
                     index_name: Some(Cow::from(index.name())),
                     r#type: match index.index_type() {
@@ -235,6 +236,7 @@ impl SqlRenderer for MysqlFlavour {
                         sql_schema_describer::IndexType::Normal => ddl::IndexType::Normal,
                         sql_schema_describer::IndexType::Fulltext => ddl::IndexType::Fulltext,
                         sql_schema_describer::IndexType::PrimaryKey => unreachable!(),
+                        sql_schema_describer::IndexType::MySQLMultiValueIndex => unreachable!(),
                     },
                     columns: index
                         .columns()

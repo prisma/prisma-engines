@@ -110,6 +110,8 @@ pub struct Warnings {
     pub non_default_index_null_sort_order: Vec<IndexedColumn>,
     /// Warn about using row level security, which is currently unsupported.
     pub row_level_security_tables: Vec<Model>,
+    /// Warn about using MySQL multi value indices.
+    pub mysql_multi_value_indices: Vec<Model>,
     /// Warn about check constraints.
     pub check_constraints: Vec<ModelAndConstraint>,
     /// Warn about exclusion constraints.
@@ -343,6 +345,11 @@ impl fmt::Display for Warnings {
         render_warnings(
             "These tables contain row level security, which is not yet fully supported. Read more: https://pris.ly/d/row-level-security",
             &self.row_level_security_tables,
+            f,
+        )?;
+        render_warnings(
+            "These tables contain multi-value indices, which are not yet fully supported. Read more: https://pris.ly/d/mysql-multi-row-index",
+            &self.mysql_multi_value_indices,
             f,
         )?;
 

@@ -8,6 +8,7 @@ use crate::{
 };
 use datamodel_renderer::datamodel as renderer;
 use quaint::prelude::SqlFamily;
+use sql_schema_describer::IndexType;
 
 /// Render all model blocks to the PSL.
 pub(super) fn render<'a>(ctx: &'a DatamodelCalculatorContext<'a>, rendered: &mut renderer::Datamodel<'a>) {
@@ -66,6 +67,12 @@ fn render_model(model: ModelPair<'_>, sql_family: SqlFamily) -> renderer::Model<
 
     if model.adds_exclusion_constraints() {
         let docs = "This table contains exclusion constraints and requires additional setup for migrations. Visit https://pris.ly/d/exclusion-constraints for more info.";
+
+        rendered.documentation(docs);
+    }
+
+    if model.has_mysql_multi_value_index() {
+        let docs = "This table contains multi-value indices, which are not yet fully supported. Visit https://pris.ly/d/mysql-multi-row-index for more info.";
 
         rendered.documentation(docs);
     }
@@ -137,6 +144,7 @@ fn render_model(model: ModelPair<'_>, sql_family: SqlFamily) -> renderer::Model<
 
     let mut ordered_indexes: Vec<_> = model
         .indexes()
+        .filter(|idx| idx.index_type() != IndexType::MySQLMultiValueIndex)
         .map(|idx| (idx.previous_position(), indexes::render(idx)))
         .collect();
 
