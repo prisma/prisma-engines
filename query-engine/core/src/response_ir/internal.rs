@@ -79,7 +79,7 @@ fn serialize_aggregations(
             match result {
                 AggregationResult::Field(field, value) => {
                     let output_field = aggregate_object_type.find_field(field.name()).unwrap();
-                    flattened.insert(field.name().to_owned(), serialize_scalar(&output_field, value)?);
+                    flattened.insert(field.name().to_owned(), serialize_scalar(output_field, value)?);
                 }
 
                 AggregationResult::Count(field, count) => {
@@ -93,19 +93,13 @@ fn serialize_aggregations(
                 AggregationResult::Average(field, value) => {
                     let output_field =
                         find_nested_aggregate_output_field(aggregate_object_type, UNDERSCORE_AVG, field.name());
-                    flattened.insert(
-                        format!("_avg_{}", field.name()),
-                        serialize_scalar(&output_field, value)?,
-                    );
+                    flattened.insert(format!("_avg_{}", field.name()), serialize_scalar(output_field, value)?);
                 }
 
                 AggregationResult::Sum(field, value) => {
                     let output_field =
                         find_nested_aggregate_output_field(aggregate_object_type, UNDERSCORE_SUM, field.name());
-                    flattened.insert(
-                        format!("_sum_{}", field.name()),
-                        serialize_scalar(&output_field, value)?,
-                    );
+                    flattened.insert(format!("_sum_{}", field.name()), serialize_scalar(output_field, value)?);
                 }
 
                 AggregationResult::Min(field, value) => {
@@ -113,7 +107,7 @@ fn serialize_aggregations(
                         find_nested_aggregate_output_field(aggregate_object_type, UNDERSCORE_MIN, field.name());
                     flattened.insert(
                         format!("_min_{}", field.name()),
-                        serialize_scalar(&output_field, coerce_non_numeric(value, output_field.field_type()))?,
+                        serialize_scalar(output_field, coerce_non_numeric(value, output_field.field_type()))?,
                     );
                 }
 
@@ -122,7 +116,7 @@ fn serialize_aggregations(
                         find_nested_aggregate_output_field(aggregate_object_type, UNDERSCORE_MAX, field.name());
                     flattened.insert(
                         format!("_max_{}", field.name()),
-                        serialize_scalar(&output_field, coerce_non_numeric(value, output_field.field_type()))?,
+                        serialize_scalar(output_field, coerce_non_numeric(value, output_field.field_type()))?,
                     );
                 }
             }
@@ -201,11 +195,11 @@ fn extract_aggregate_object_type<'a, 'b>(output_type: &'b OutputType<'a>) -> &'b
 }
 
 // Workaround until we streamline serialization.
-fn find_nested_aggregate_output_field<'a>(
-    object_type: &ObjectType<'a>,
+fn find_nested_aggregate_output_field<'a, 'b>(
+    object_type: &'b ObjectType<'a>,
     nested_obj_name: &str,
     nested_field_name: &str,
-) -> OutputField<'a> {
+) -> &'b OutputField<'a> {
     let nested_field = object_type.find_field(nested_obj_name).unwrap();
     let nested_object_type = match &nested_field.field_type().inner {
         InnerOutputType::Object(obj) => obj,
@@ -338,11 +332,11 @@ fn serialize_objects(
 
             match field {
                 Field::Composite(cf) => {
-                    object.insert(field.name().to_owned(), serialize_composite(cf, &out_field, val)?);
+                    object.insert(field.name().to_owned(), serialize_composite(cf, out_field, val)?);
                 }
 
                 _ if !out_field.field_type().is_object() => {
-                    object.insert(field.name().to_owned(), serialize_scalar(&out_field, val)?);
+                    object.insert(field.name().to_owned(), serialize_scalar(out_field, val)?);
                 }
 
                 _ => (),
@@ -442,7 +436,7 @@ fn process_nested_results(
         if let QueryResult::RecordSelection(ref rs) = nested_result {
             let name = rs.name.clone();
             let field = enclosing_type.find_field(&name).unwrap();
-            let result = serialize_internal(nested_result, &field, false, query_schema)?;
+            let result = serialize_internal(nested_result, field, false, query_schema)?;
 
             nested_mapping.insert(name, result);
         }
@@ -489,15 +483,12 @@ fn serialize_composite(cf: &CompositeFieldRef, out_field: &OutputField<'_>, valu
                     Field::Composite(cf) => {
                         map.insert(
                             inner_field.name().to_owned(),
-                            serialize_composite(cf, &inner_out_field, value)?,
+                            serialize_composite(cf, inner_out_field, value)?,
                         );
                     }
 
                     _ if !inner_out_field.field_type().is_object() => {
-                        map.insert(
-                            inner_field.name().to_owned(),
-                            serialize_scalar(&inner_out_field, value)?,
-                        );
+                        map.insert(inner_field.name().to_owned(), serialize_scalar(inner_out_field, value)?);
                     }
 
                     _ => (),

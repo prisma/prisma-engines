@@ -13,46 +13,38 @@ pub(crate) fn where_argument<'a>(ctx: &'a QuerySchema, model: &Model) -> InputFi
 }
 
 /// Builds "where" argument which input type is the where unique type of the input builder.
-pub(crate) fn where_unique_argument(ctx: &'_ QuerySchema, model: Model) -> Option<InputField<'_>> {
+pub(crate) fn where_unique_argument(ctx: &QuerySchema, model: Model) -> InputField<'_> {
     let input_object_type = filter_objects::where_unique_object_type(ctx, model);
-
-    Some(input_field(
-        args::WHERE.to_owned(),
-        vec![InputType::object(input_object_type)],
-        None,
-    ))
+    input_field(args::WHERE.to_owned(), vec![InputType::object(input_object_type)], None)
 }
 
 /// Builds "where" (unique) argument intended for the delete field.
-pub(crate) fn delete_one_arguments(ctx: &'_ QuerySchema, model: Model) -> Option<Vec<InputField<'_>>> {
-    where_unique_argument(ctx, model).map(|arg| vec![arg])
+pub(crate) fn delete_one_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputField<'_>> {
+    vec![where_unique_argument(ctx, model)]
 }
 
 /// Builds "where" (unique) and "data" arguments intended for the update field.
-pub(crate) fn update_one_arguments(ctx: &'_ QuerySchema, model: Model) -> Option<Vec<InputField<'_>>> {
-    where_unique_argument(ctx, model.clone()).map(|unique_arg| {
-        let update_types = update_one_objects::update_one_input_types(ctx, model, None);
-
-        vec![input_field(args::DATA.to_owned(), update_types, None), unique_arg]
-    })
+pub(crate) fn update_one_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputField<'_>> {
+    let unique_arg = where_unique_argument(ctx, model.clone());
+    let update_types = update_one_objects::update_one_input_types(ctx, model, None);
+    vec![input_field(args::DATA.to_owned(), update_types, None), unique_arg]
 }
 
 /// Builds "where" (unique), "create", and "update" arguments intended for the upsert field.
-pub(crate) fn upsert_arguments(ctx: &'_ QuerySchema, model: Model) -> Option<Vec<InputField<'_>>> {
-    where_unique_argument(ctx, model.clone()).map(|where_unique_arg| {
-        let update_types = update_one_objects::update_one_input_types(ctx, model.clone(), None);
-        let create_types = create_one::create_one_input_types(ctx, model, None);
+pub(crate) fn upsert_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputField<'_>> {
+    let where_unique_arg = where_unique_argument(ctx, model.clone());
+    let update_types = update_one_objects::update_one_input_types(ctx, model.clone(), None);
+    let create_types = create_one::create_one_input_types(ctx, model, None);
 
-        vec![
-            where_unique_arg,
-            input_field(args::CREATE.to_owned(), create_types, None),
-            input_field(args::UPDATE.to_owned(), update_types, None),
-        ]
-    })
+    vec![
+        where_unique_arg,
+        input_field(args::CREATE.to_owned(), create_types, None),
+        input_field(args::UPDATE.to_owned(), update_types, None),
+    ]
 }
 
 /// Builds "where" and "data" arguments intended for the update many field.
-pub(crate) fn update_many_arguments(ctx: &'_ QuerySchema, model: Model) -> Vec<InputField<'_>> {
+pub(crate) fn update_many_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputField<'_>> {
     let update_many_types = update_many_objects::update_many_input_types(ctx, model.clone(), None);
     let where_arg = where_argument(ctx, &model);
 
@@ -60,14 +52,14 @@ pub(crate) fn update_many_arguments(ctx: &'_ QuerySchema, model: Model) -> Vec<I
 }
 
 /// Builds "where" argument intended for the delete many field.
-pub(crate) fn delete_many_arguments(ctx: &'_ QuerySchema, model: Model) -> Vec<InputField<'_>> {
+pub(crate) fn delete_many_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputField<'_>> {
     let where_arg = where_argument(ctx, &model);
 
     vec![where_arg]
 }
 
 /// Builds "many records where" arguments based on the given model and field.
-pub(crate) fn many_records_output_field_arguments(ctx: &'_ QuerySchema, field: ModelField) -> Vec<InputField<'_>> {
+pub(crate) fn many_records_output_field_arguments(ctx: &QuerySchema, field: ModelField) -> Vec<InputField<'_>> {
     match field {
         ModelField::Scalar(_) => vec![],
 
@@ -92,7 +84,7 @@ pub(crate) fn many_records_output_field_arguments(ctx: &'_ QuerySchema, field: M
 
 /// Builds "many records where" arguments for to-many relation selection sets.
 pub(crate) fn relation_to_many_selection_arguments(
-    ctx: &'_ QuerySchema,
+    ctx: &QuerySchema,
     model: Model,
     include_distinct: bool,
 ) -> Vec<InputField<'_>> {
@@ -120,18 +112,18 @@ pub(crate) fn relation_to_many_selection_arguments(
 }
 
 /// Builds "many records where" arguments for to-many relation selection sets.
-pub(crate) fn relation_to_one_selection_arguments(ctx: &'_ QuerySchema, model: Model) -> Vec<InputField<'_>> {
+pub(crate) fn relation_to_one_selection_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputField<'_>> {
     vec![where_argument(ctx, &model)]
 }
 
 /// Builds "many composite where" arguments for to-many composite selection sets.
-pub(crate) fn composite_selection_arguments(_ctx: &'_ QuerySchema, _cf: CompositeFieldRef) -> Vec<InputField<'_>> {
+pub(crate) fn composite_selection_arguments(_ctx: &QuerySchema, _cf: CompositeFieldRef) -> Vec<InputField<'_>> {
     vec![]
 }
 
 // Builds "orderBy" argument.
 pub(crate) fn order_by_argument(
-    ctx: &'_ QuerySchema,
+    ctx: &QuerySchema,
     container: ParentContainer,
     options: OrderByOptions,
 ) -> InputField<'_> {
@@ -145,7 +137,7 @@ pub(crate) fn order_by_argument(
     .optional()
 }
 
-pub(crate) fn group_by_arguments(ctx: &'_ QuerySchema, model: Model) -> Vec<InputField<'_>> {
+pub(crate) fn group_by_arguments(ctx: &QuerySchema, model: Model) -> Vec<InputField<'_>> {
     let field_enum_type = InputType::Enum(model_field_enum(&model));
     let filter_object = InputType::object(filter_objects::scalar_filter_object_type(ctx, model.clone(), true));
 

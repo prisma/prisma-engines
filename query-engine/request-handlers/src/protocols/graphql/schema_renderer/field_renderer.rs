@@ -48,11 +48,15 @@ impl<'a> GqlFieldRenderer<'a> {
         format!("{}{}: {}{}", field.name(), rendered_args, rendered_type, bang)
     }
 
-    fn render_arguments(&self, args: impl Iterator<Item = InputField<'a>>, ctx: &mut RenderContext) -> Vec<String> {
+    fn render_arguments<'b>(
+        &'b self,
+        args: impl Iterator<Item = &'b InputField<'a>>,
+        ctx: &mut RenderContext,
+    ) -> Vec<String> {
         let mut output = Vec::new();
 
         for arg in args {
-            output.push(self.render_argument(&arg, ctx))
+            output.push(self.render_argument(arg, ctx))
         }
 
         output

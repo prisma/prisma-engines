@@ -24,12 +24,15 @@ pub(crate) fn group_by_output_object_type(ctx: &'_ QuerySchema, model: Model) ->
                 model.fields().scalar().collect(),
                 |_, _| OutputType::non_list(OutputType::int()),
                 |mut obj| {
-                    obj.fields = Arc::new(move || {
-                        let fields = obj.fields.clone();
-                        let mut fields = fields();
-                        fields.push(field("_all", None, OutputType::non_list(OutputType::int()), None));
+                    obj.fields = Arc::new(once_cell::sync::Lazy::new(Box::new(move || {
+                        let mut fields = (*obj.fields).clone();
+                        fields.push(field_no_arguments(
+                            "_all",
+                            OutputType::non_list(OutputType::int()),
+                            None,
+                        ));
                         fields
-                    });
+                    })));
                     obj
                 },
                 true,
@@ -90,6 +93,7 @@ pub(crate) fn group_by_output_object_type(ctx: &'_ QuerySchema, model: Model) ->
 
         object_fields
     });
+
     obj.model = Some(model_id);
     obj
 }
@@ -99,9 +103,8 @@ fn scalar_output_fields<'a>(ctx: &'a QuerySchema, model: &Model) -> Vec<OutputFi
 
     fields
         .map(|f| {
-            field(
+            field_no_arguments(
                 f.borrowed_name(&ctx.internal_data_model.schema),
-                None,
                 field::map_scalar_output_type_for_field(ctx, f.clone()),
                 None,
             )

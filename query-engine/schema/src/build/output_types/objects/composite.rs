@@ -5,7 +5,7 @@ use prisma_models::CompositeType;
 
 pub(crate) fn composite_object_type(ctx: &'_ QuerySchema, composite: CompositeType) -> ObjectType<'_> {
     ObjectType::new(Identifier::new_model(composite.name().to_owned()), move || {
-        compute_composite_object_type_fields(ctx, &composite.clone())
+        compute_composite_object_type_fields(ctx, &composite)
     })
 }
 

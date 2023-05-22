@@ -57,7 +57,7 @@ fn nested_create_many_envelope(ctx: &'_ QuerySchema, parent_field: RelationField
     let name = format!("{}Envelope", create_type.identifier.name());
     let ident = Identifier::new_prisma(name);
     let mut input_object = init_input_object_type(ident);
-    input_object.fields = Arc::new(move || {
+    input_object.set_fields(move || {
         let create_many_type = InputType::object(create_type.clone());
         let data_arg = input_field(args::DATA, list_union_type(create_many_type, true), None);
 

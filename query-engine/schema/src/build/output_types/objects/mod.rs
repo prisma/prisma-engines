@@ -6,9 +6,8 @@ use constants::output_fields::*;
 
 pub(crate) fn affected_records_object_type<'a>() -> ObjectType<'a> {
     ObjectType::new(Identifier::new_prisma(IdentifierType::AffectedRowsOutput), || {
-        vec![field(
+        vec![field_no_arguments(
             AFFECTED_COUNT,
-            None,
             OutputType::non_list(OutputType::int()),
             None,
         )]

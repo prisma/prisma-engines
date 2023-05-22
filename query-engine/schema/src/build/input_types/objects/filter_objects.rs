@@ -11,7 +11,7 @@ pub(crate) fn scalar_filter_object_type(
 
     let mut input_object = init_input_object_type(ident);
     input_object.set_tag(ObjectTag::WhereInputType(ParentContainer::Model(model.clone())));
-    input_object.fields = Arc::new(move || {
+    input_object.set_fields(move || {
         let object_type = InputType::object(scalar_filter_object_type(ctx, model.clone(), include_aggregates));
 
         let mut input_fields = vec![
@@ -46,7 +46,7 @@ pub(crate) fn where_object_type(ctx: &'_ QuerySchema, container: ParentContainer
 
     let mut input_object = init_input_object_type(ident);
     input_object.set_tag(ObjectTag::WhereInputType(container.clone()));
-    input_object.fields = Arc::new(move || {
+    input_object.set_fields(move || {
         let object_type = InputType::object(where_object_type(ctx, container.clone()));
 
         let mut fields = vec![
@@ -106,7 +106,7 @@ pub(crate) fn where_unique_object_type(ctx: &'_ QuerySchema, model: Model) -> In
         input_object.require_exactly_one_field();
     }
 
-    input_object.fields = Arc::new(move || {
+    input_object.set_fields(move || {
         // Split unique & ID fields vs all the other fields
         let (unique_fields, rest_fields): (Vec<_>, Vec<_>) =
             model.fields().all().partition(|f| f.is_scalar() && f.is_unique());
@@ -214,7 +214,7 @@ fn compound_field_unique_object_type<'a>(
     ));
 
     let mut input_object = init_input_object_type(ident);
-    input_object.fields = Arc::new(move || {
+    input_object.set_fields(move || {
         from_fields
             .clone()
             .into_iter()
@@ -235,7 +235,7 @@ pub(crate) fn composite_equality_object(ctx: &'_ QuerySchema, cf: CompositeField
     let ident = Identifier::new_prisma(format!("{}ObjectEqualityInput", cf.typ().name()));
 
     let mut input_object = init_input_object_type(ident);
-    input_object.fields = Arc::new(move || {
+    input_object.set_fields(move || {
         let mut fields = vec![];
 
         let composite_type = cf.typ();

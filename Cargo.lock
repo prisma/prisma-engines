@@ -3802,6 +3802,7 @@ name = "schema"
 version = "0.1.0"
 dependencies = [
  "codspeed-criterion-compat",
+ "once_cell",
  "prisma-models",
  "psl",
  "rustc-hash",

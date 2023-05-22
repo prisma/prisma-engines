@@ -279,6 +279,6 @@ async fn re_introspecting_uuid_default_on_uuid_typed_pk_field(api: &mut TestApi)
         }
     "#]];
 
-    api.expect_re_introspected_datamodel(&prisma_schema, expected).await;
+    api.expect_re_introspected_datamodel(prisma_schema, expected).await;
     Ok(())
 }

@@ -70,7 +70,7 @@ fn to_many_relation_filter_object(ctx: &'_ QuerySchema, rf: RelationFieldRef) ->
     let mut object = init_input_object_type(ident);
     object.set_tag(ObjectTag::RelationEnvelope);
 
-    object.fields = Arc::new(move || {
+    object.set_fields(move || {
         let related_input_type = filter_objects::where_object_type(ctx, rf.related_model().into());
         vec![
             simple_input_field(filters::EVERY, InputType::object(related_input_type.clone()), None).optional(),
@@ -88,7 +88,7 @@ fn to_one_relation_filter_object(ctx: &'_ QuerySchema, rf: RelationFieldRef) -> 
 
     let mut object = init_input_object_type(ident);
     object.set_tag(ObjectTag::RelationEnvelope);
-    object.fields = Arc::new(move || {
+    object.set_fields(move || {
         let related_input_type = filter_objects::where_object_type(ctx, rf.related_model().into());
         vec![
             simple_input_field(filters::IS, InputType::object(related_input_type.clone()), None)
@@ -114,7 +114,7 @@ fn to_one_composite_filter_object(ctx: &'_ QuerySchema, cf: CompositeFieldRef) -
     object.require_exactly_one_field();
     object.set_tag(ObjectTag::CompositeEnvelope);
 
-    object.fields = Arc::new(move || {
+    object.set_fields(move || {
         let composite_where_object = filter_objects::where_object_type(ctx, cf.typ().into());
         let composite_equals_object = filter_objects::composite_equality_object(ctx, cf.clone());
 
@@ -145,7 +145,7 @@ fn to_many_composite_filter_object(ctx: &'_ QuerySchema, cf: CompositeFieldRef) 
     let mut object = init_input_object_type(ident);
     object.require_exactly_one_field();
     object.set_tag(ObjectTag::CompositeEnvelope);
-    object.fields = Arc::new(move || {
+    object.set_fields(move || {
         let composite_where_object = filter_objects::where_object_type(ctx, cf.typ().into());
         let composite_equals_object = filter_objects::composite_equality_object(ctx, cf.clone());
 
@@ -183,7 +183,7 @@ fn scalar_list_filter_type(ctx: &'_ QuerySchema, sf: ScalarFieldRef) -> InputObj
 
     let mut object = init_input_object_type(ident);
     object.require_exactly_one_field();
-    object.fields = Arc::new(move || {
+    object.set_fields(move || {
         let mapped_nonlist_type = map_scalar_input_type(ctx, sf.type_identifier(), false);
         let mapped_list_type = InputType::list(mapped_nonlist_type.clone());
         let mut fields: Vec<_> = equality_filters(ctx, mapped_list_type.clone(), !sf.is_required()).collect();
@@ -226,7 +226,7 @@ fn full_scalar_filter_type(
 
     let mut object = init_input_object_type(ident);
 
-    object.fields = Arc::new(move || {
+    object.set_fields(move || {
         let mapped_scalar_type = map_scalar_input_type(ctx, typ, list);
         let mut fields: Vec<_> = match typ {
             TypeIdentifier::String | TypeIdentifier::UUID => {

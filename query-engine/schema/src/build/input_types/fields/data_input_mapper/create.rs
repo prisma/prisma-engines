@@ -58,9 +58,9 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
             self.unchecked,
         ));
 
-        let mut input_object = init_input_object_type(ident);
         let cloned_rf = rf.clone();
-        input_object.fields = Arc::new(move || {
+        let mut input_object = init_input_object_type(ident);
+        input_object.set_fields(move || {
             let rf = &cloned_rf;
             let mut fields = vec![];
 
@@ -139,7 +139,7 @@ fn composite_create_envelope_object_type(ctx: &'_ QuerySchema, cf: CompositeFiel
     let mut input_object = init_input_object_type(ident);
     input_object.require_exactly_one_field();
     input_object.set_tag(ObjectTag::CompositeEnvelope);
-    input_object.fields = Arc::new(move || {
+    input_object.set_fields(move || {
         let create_input = InputType::Object(composite_create_object_type(ctx, cf.clone()));
         let mut input_types = vec![create_input.clone()];
 

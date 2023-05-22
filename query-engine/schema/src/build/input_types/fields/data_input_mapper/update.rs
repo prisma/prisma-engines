@@ -99,7 +99,7 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
         let rf_name = rf.name().to_owned();
 
         let mut input_object = init_input_object_type(ident);
-        input_object.fields = Arc::new(move || {
+        input_object.set_fields(move || {
             let mut fields = vec![];
 
             if rf.related_model().supports_create_operation() {
@@ -163,7 +163,7 @@ fn update_operations_object_type<'a>(
 
     let mut obj = init_input_object_type(ident);
     obj.require_exactly_one_field();
-    obj.fields = Arc::new(move || {
+    obj.set_fields(move || {
         let typ = map_scalar_input_type_for_field(ctx, &sf);
         let mut fields = vec![simple_input_field(operations::SET, typ.clone(), None)
             .optional()
@@ -200,7 +200,7 @@ fn composite_update_envelope_object_type(ctx: &'_ QuerySchema, cf: CompositeFiel
     let mut input_object = init_input_object_type(ident);
     input_object.require_exactly_one_field();
     input_object.set_tag(ObjectTag::CompositeEnvelope);
-    input_object.fields = Arc::new(move || {
+    input_object.set_fields(move || {
         let mut fields = vec![composite_set_update_input_field(ctx, &cf)];
 
         append_opt(&mut fields, composite_update_input_field(ctx, cf.clone()));
@@ -221,7 +221,7 @@ fn composite_update_object_type(ctx: &'_ QuerySchema, cf: CompositeFieldRef) -> 
 
     let mut input_object = init_input_object_type(ident);
     input_object.set_min_fields(1);
-    input_object.fields = Arc::new(move || {
+    input_object.set_fields(move || {
         let mapper = UpdateDataInputFieldMapper::new_checked();
         let typ = cf.typ();
         let mut fields = typ.fields();
@@ -283,7 +283,7 @@ fn composite_upsert_object_type(ctx: &'_ QuerySchema, cf: CompositeFieldRef) -> 
 
     let mut input_object = init_input_object_type(ident);
     input_object.set_tag(ObjectTag::CompositeEnvelope);
-    input_object.fields = Arc::new(move || {
+    input_object.set_fields(move || {
         let update_object_type = composite_update_object_type(ctx, cf.clone());
         let update_field = simple_input_field(operations::UPDATE, InputType::Object(update_object_type), None);
         let set_field = composite_set_update_input_field(ctx, &cf).required();
@@ -309,11 +309,11 @@ fn composite_update_many_object_type(ctx: &'_ QuerySchema, cf: CompositeFieldRef
 
     let mut input_object = init_input_object_type(ident);
     input_object.set_tag(ObjectTag::CompositeEnvelope);
-    input_object.fields = Arc::new(move || {
+    input_object.set_fields(move || {
         let where_object_type = objects::filter_objects::where_object_type(ctx, cf.typ().into());
         let where_field = simple_input_field(args::WHERE, InputType::object(where_object_type), None);
 
-        let update_object_type = composite_update_object_type(ctx, cf.clone());
+        let update_object_type = composite_update_object_type(ctx, cf);
         let data_field = simple_input_field(args::DATA, InputType::Object(update_object_type), None);
 
         vec![where_field, data_field]
@@ -327,7 +327,7 @@ fn composite_delete_many_object_type(ctx: &'_ QuerySchema, cf: CompositeFieldRef
 
     let mut input_object = init_input_object_type(ident);
     input_object.set_tag(ObjectTag::CompositeEnvelope);
-    input_object.fields = Arc::new(move || {
+    input_object.set_fields(move || {
         let where_object_type = objects::filter_objects::where_object_type(ctx, cf.typ().into());
         let where_field = simple_input_field(args::WHERE, InputType::object(where_object_type), None);
 
