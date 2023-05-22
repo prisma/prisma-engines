@@ -2,7 +2,6 @@ mod add_prisma1_defaults;
 mod cockroachdb;
 mod commenting_out;
 mod enums;
-mod identify_version;
 mod lists;
 mod model_renames;
 mod mssql;
