@@ -57,10 +57,6 @@ fn display_list<T: Ord>(
 /// the user.
 #[derive(Debug, Default, PartialEq)]
 pub struct Warnings {
-    /// Fields that are using Prisma 1 UUID defaults.
-    pub prisma_1_uuid_defaults: Vec<ModelAndField>,
-    /// Fields that are using Prisma 1 CUID defaults.
-    pub prisma_1_cuid_defaults: Vec<ModelAndField>,
     /// Fields having an empty name.
     pub fields_with_empty_names_in_model: Vec<ModelAndField>,
     /// Fields having an empty name.
@@ -148,11 +144,6 @@ impl Warnings {
     pub fn is_empty(&self) -> bool {
         self == &Self::default()
     }
-
-    /// True, if the datamodel has Prisma 1 style defaults
-    pub fn uses_prisma_1_defaults(&self) -> bool {
-        !self.prisma_1_uuid_defaults.is_empty() || !self.prisma_1_cuid_defaults.is_empty()
-    }
 }
 
 impl fmt::Display for Warnings {
@@ -189,18 +180,6 @@ impl fmt::Display for Warnings {
             f.write_str("\n")?;
             fmt::Display::fmt(&GroupBy(items), f)
         }
-
-        render_warnings(
-            "These id fields had a `@default(uuid())` added because we believe the schema was created by Prisma 1:",
-            &self.prisma_1_uuid_defaults,
-            f,
-        )?;
-
-        render_warnings(
-            "These id fields had a `@default(cuid())` added because we believe the schema was created by Prisma 1:",
-            &self.prisma_1_cuid_defaults,
-            f,
-        )?;
 
         render_warnings_grouped(
             "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:",

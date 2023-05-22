@@ -1,6 +1,10 @@
 use either::Either;
 use prisma_value::PrismaValue;
-use psl::{datamodel_connector::constraint_names::ConstraintNames, parser_database::walkers};
+use psl::{
+    builtin_connectors::{MySqlType, PostgresType},
+    datamodel_connector::constraint_names::ConstraintNames,
+    parser_database::walkers,
+};
 use sql::postgres::PostgresSchemaExt;
 use sql_schema_describer as sql;
 use std::{borrow::Cow, fmt};
