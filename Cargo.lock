@@ -1655,17 +1655,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "json-rpc-stdio"
-version = "0.1.0"
-dependencies = [
- "jsonrpc-core",
- "serde",
- "serde_json",
- "tokio",
- "tracing",
-]
-
-[[package]]
 name = "jsonrpc-core"
 version = "17.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3876,10 +3865,11 @@ dependencies = [
  "connection-string",
  "expect-test",
  "indoc",
- "json-rpc-stdio",
+ "jsonrpc-core",
  "quaint",
  "schema-connector",
  "schema-core",
+ "serde",
  "serde_json",
  "structopt",
  "tempfile",
