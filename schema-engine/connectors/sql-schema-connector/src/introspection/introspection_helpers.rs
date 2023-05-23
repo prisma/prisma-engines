@@ -56,7 +56,7 @@ pub(crate) fn is_relay_table(table: TableWalker<'_>) -> bool {
 }
 
 /// If a relation defines a Prisma many to many relation.
-pub fn is_prisma_m_to_n_relation(table: TableWalker<'_>) -> bool {
+pub(crate) fn is_prisma_m_to_n_relation(table: TableWalker<'_>) -> bool {
     fn is_a(column: &str) -> bool {
         column.eq_ignore_ascii_case("a")
     }
