@@ -74,20 +74,18 @@
 <a href="#74" id="74">74</a>
 <a href="#75" id="75">75</a>
 <a href="#76" id="76">76</a>
-<a href="#77" id="77">77</a>
-<a href="#78" id="78">78</a>
 </pre><pre class="rust"><code><span class="kw">use </span>once_cell::sync::OnceCell;
 <span class="kw">use </span>quaint::{connector::PostgresFlavour, prelude::<span class="kw-2">*</span>, single::Quaint};
 <span class="kw">use </span>schema_core::schema_connector::{ConnectorError, ConnectorResult};
 <span class="kw">use </span>url::Url;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>cockroach_setup(url: String, prisma_schema: <span class="kw-2">&amp;</span>str) -&gt; ConnectorResult&lt;()&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>url = Url::parse(<span class="kw-2">&amp;</span>url).map_err(ConnectorError::url_parse_error)<span class="question-mark">?</span>;
-    <span class="kw">let </span><span class="kw-2">mut </span>quaint_url = quaint::connector::PostgresUrl::new(url.clone()).unwrap();
+    <span class="kw">let </span><span class="kw-2">mut </span>parsed_url = Url::parse(<span class="kw-2">&amp;</span>url).map_err(ConnectorError::url_parse_error)<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>quaint_url = quaint::connector::PostgresUrl::new(parsed_url.clone()).unwrap();
     quaint_url.set_flavour(PostgresFlavour::Cockroach);
 
     <span class="kw">let </span>db_name = quaint_url.dbname();
-    <span class="kw">let </span>conn = create_admin_conn(<span class="kw-2">&amp;mut </span>url).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>conn = create_admin_conn(<span class="kw-2">&amp;mut </span>parsed_url).<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="kw">let </span>query = <span class="macro">format!</span>(
         <span class="string">r#&quot;
@@ -98,12 +96,10 @@
 
     conn.raw_cmd(<span class="kw-2">&amp;</span>query).<span class="kw">await</span>.unwrap();
 
-    <span class="kw">crate</span>::diff_and_apply(prisma_schema).<span class="kw">await</span>;
-
-    drop_db_when_thread_exits(url, db_name);
-
-    <span class="prelude-val">Ok</span>(())
-}
+    drop_db_when_thread_exits(parsed_url, db_name);
+    <span class="kw">let </span><span class="kw-2">mut </span>connector = sql_schema_connector::SqlSchemaConnector::new_cockroach();
+    <span class="kw">crate</span>::diff_and_apply(prisma_schema, url, <span class="kw-2">&amp;mut </span>connector).<span class="kw">await
+</span>}
 
 <span class="kw">async fn </span>create_admin_conn(url: <span class="kw-2">&amp;mut </span>Url) -&gt; ConnectorResult&lt;Quaint&gt; {
     url.set_path(<span class="string">&quot;/postgres&quot;</span>);

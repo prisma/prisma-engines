@@ -42,8 +42,6 @@
 <a href="#42" id="42">42</a>
 <a href="#43" id="43">43</a>
 <a href="#44" id="44">44</a>
-<a href="#45" id="45">45</a>
-<a href="#46" id="46">46</a>
 </pre><pre class="rust"><code><span class="kw">use </span>connection_string::JdbcString;
 <span class="kw">use </span>quaint::{prelude::<span class="kw-2">*</span>, single::Quaint};
 <span class="kw">use </span>schema_core::schema_connector::{ConnectorError, ConnectorResult};
@@ -65,7 +63,6 @@
             &quot;#
         </span>);
         conn.raw_cmd(<span class="kw-2">&amp;</span>sql).<span class="kw">await</span>.unwrap();
-        conn.raw_cmd(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;USE [{db_name}];&quot;</span>)).<span class="kw">await</span>.unwrap();
     } <span class="kw">else </span>{
         <span class="kw">let </span>api = schema_core::schema_api(<span class="prelude-val">Some</span>(prisma_schema.to_owned()), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
         api.reset().<span class="kw">await</span>.ok();
@@ -86,9 +83,8 @@
             </span>.unwrap();
     }
 
-    <span class="comment">// 2. create the database schema for given Prisma schema
-    </span><span class="kw">crate</span>::diff_and_apply(prisma_schema).<span class="kw">await</span>;
-    <span class="prelude-val">Ok</span>(())
-}
+    <span class="kw">let </span><span class="kw-2">mut </span>connector = sql_schema_connector::SqlSchemaConnector::new_mssql();
+    <span class="kw">crate</span>::diff_and_apply(prisma_schema, url, <span class="kw-2">&amp;mut </span>connector).<span class="kw">await
+</span>}
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="qe_setup" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0 (84c898d65 2023-04-16)" data-search-js="search-8a59a8356673ec1f.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

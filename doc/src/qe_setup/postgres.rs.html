@@ -76,15 +76,15 @@
 <span class="kw">use </span>url::Url;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>postgres_setup(url: String, prisma_schema: <span class="kw-2">&amp;</span>str, db_schemas: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; ConnectorResult&lt;()&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>url = Url::parse(<span class="kw-2">&amp;</span>url).map_err(ConnectorError::url_parse_error)<span class="question-mark">?</span>;
-    <span class="kw">let </span><span class="kw-2">mut </span>quaint_url = quaint::connector::PostgresUrl::new(url.clone()).unwrap();
+    <span class="kw">let </span><span class="kw-2">mut </span>parsed_url = Url::parse(<span class="kw-2">&amp;</span>url).map_err(ConnectorError::url_parse_error)<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>quaint_url = quaint::connector::PostgresUrl::new(parsed_url.clone()).unwrap();
     quaint_url.set_flavour(PostgresFlavour::Postgres);
 
     <span class="kw">let </span>(db_name, schema) = (quaint_url.dbname(), quaint_url.schema());
 
     <span class="kw">if </span>!db_schemas.is_empty() {
-        strip_schema_param_from_url(<span class="kw-2">&amp;mut </span>url);
-        <span class="kw">let </span>conn = create_postgres_admin_conn(url.clone()).<span class="kw">await</span><span class="question-mark">?</span>;
+        strip_schema_param_from_url(<span class="kw-2">&amp;mut </span>parsed_url);
+        <span class="kw">let </span>conn = create_postgres_admin_conn(parsed_url.clone()).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let </span>query = <span class="macro">format!</span>(<span class="string">&quot;DROP DATABASE \&quot;{db_name}\&quot;&quot;</span>);
         conn.raw_cmd(<span class="kw-2">&amp;</span>query).<span class="kw">await</span>.ok();
@@ -92,16 +92,16 @@
         <span class="kw">let </span>query = <span class="macro">format!</span>(<span class="string">&quot;CREATE DATABASE \&quot;{db_name}\&quot;&quot;</span>);
         conn.raw_cmd(<span class="kw-2">&amp;</span>query).<span class="kw">await</span>.ok();
     } <span class="kw">else </span>{
-        strip_schema_param_from_url(<span class="kw-2">&amp;mut </span>url);
-        <span class="kw">let </span>conn = create_postgres_admin_conn(url.clone()).<span class="kw">await</span><span class="question-mark">?</span>;
+        strip_schema_param_from_url(<span class="kw-2">&amp;mut </span>parsed_url);
+        <span class="kw">let </span>conn = create_postgres_admin_conn(parsed_url.clone()).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let </span>query = <span class="macro">format!</span>(<span class="string">&quot;CREATE DATABASE \&quot;{db_name}\&quot;&quot;</span>);
         conn.raw_cmd(<span class="kw-2">&amp;</span>query).<span class="kw">await</span>.ok();
 
         <span class="comment">// Now create the schema
-        </span>url.set_path(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;/{db_name}&quot;</span>));
+        </span>parsed_url.set_path(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;/{db_name}&quot;</span>));
 
-        <span class="kw">let </span>conn = Quaint::new(url.as_ref()).<span class="kw">await</span>.unwrap();
+        <span class="kw">let </span>conn = Quaint::new(parsed_url.as_ref()).<span class="kw">await</span>.unwrap();
 
         <span class="kw">let </span>drop_and_recreate_schema =
             <span class="macro">format!</span>(<span class="string">&quot;DROP SCHEMA IF EXISTS \&quot;{schema}\&quot; CASCADE;\nCREATE SCHEMA \&quot;{schema}\&quot;;&quot;</span>);
@@ -110,9 +110,9 @@
             </span>.map_err(|e| ConnectorError::from_source(e, <span class="string">&quot;&quot;</span>))<span class="question-mark">?</span>;
     }
 
-    <span class="kw">crate</span>::diff_and_apply(prisma_schema).<span class="kw">await</span>;
-    <span class="prelude-val">Ok</span>(())
-}
+    <span class="kw">let </span><span class="kw-2">mut </span>connector = sql_schema_connector::SqlSchemaConnector::new_postgres();
+    <span class="kw">crate</span>::diff_and_apply(prisma_schema, url, <span class="kw-2">&amp;mut </span>connector).<span class="kw">await
+</span>}
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>postgres_teardown(url: <span class="kw-2">&amp;</span>str, db_schemas: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; ConnectorResult&lt;()&gt; {
     <span class="comment">// only teardown if we doing multischema

@@ -103,38 +103,6 @@
 <a href="#103" id="103">103</a>
 <a href="#104" id="104">104</a>
 <a href="#105" id="105">105</a>
-<a href="#106" id="106">106</a>
-<a href="#107" id="107">107</a>
-<a href="#108" id="108">108</a>
-<a href="#109" id="109">109</a>
-<a href="#110" id="110">110</a>
-<a href="#111" id="111">111</a>
-<a href="#112" id="112">112</a>
-<a href="#113" id="113">113</a>
-<a href="#114" id="114">114</a>
-<a href="#115" id="115">115</a>
-<a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-<a href="#121" id="121">121</a>
-<a href="#122" id="122">122</a>
-<a href="#123" id="123">123</a>
-<a href="#124" id="124">124</a>
-<a href="#125" id="125">125</a>
-<a href="#126" id="126">126</a>
-<a href="#127" id="127">127</a>
-<a href="#128" id="128">128</a>
-<a href="#129" id="129">129</a>
-<a href="#130" id="130">130</a>
-<a href="#131" id="131">131</a>
-<a href="#132" id="132">132</a>
-<a href="#133" id="133">133</a>
-<a href="#134" id="134">134</a>
-<a href="#135" id="135">135</a>
-<a href="#136" id="136">136</a>
-<a href="#137" id="137">137</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Query Engine test setup.
 
 </span><span class="attr">#![allow(clippy::await_holding_lock)]
@@ -150,11 +118,8 @@
 <span class="kw">use </span><span class="self">self</span>::{cockroachdb::<span class="kw-2">*</span>, mongodb::<span class="kw-2">*</span>, mssql::<span class="kw-2">*</span>, mysql::<span class="kw-2">*</span>, postgres::<span class="kw-2">*</span>};
 <span class="kw">use </span>enumflags2::BitFlags;
 <span class="kw">use </span>psl::{builtin_connectors::<span class="kw-2">*</span>, Datasource};
-<span class="kw">use </span>schema_core::{
-    json_rpc::types::<span class="kw-2">*</span>,
-    schema_connector::{BoxFuture, ConnectorResult},
-};
-<span class="kw">use </span>std::{env, sync::Arc};
+<span class="kw">use </span>schema_core::schema_connector::{ConnectorResult, DiffTarget, SchemaConnector};
+<span class="kw">use </span>std::env;
 
 <span class="kw">fn </span>parse_configuration(datamodel: <span class="kw-2">&amp;</span>str) -&gt; ConnectorResult&lt;(Datasource, String, BitFlags&lt;psl::PreviewFeature&gt;)&gt; {
     <span class="kw">let </span>config = psl::parse_configuration(datamodel)
@@ -181,25 +146,25 @@
 
     <span class="kw">match </span><span class="kw-2">&amp;</span>source.active_provider {
         provider <span class="kw">if </span>[POSTGRES.provider_name()].contains(provider) =&gt; {
-            postgres_setup(url, prisma_schema, db_schemas).<span class="kw">await</span><span class="question-mark">?
+            postgres_setup(url, prisma_schema, db_schemas).<span class="kw">await
         </span>}
-        provider <span class="kw">if </span>COCKROACH.is_provider(provider) =&gt; cockroach_setup(url, prisma_schema).<span class="kw">await</span><span class="question-mark">?</span>,
-        provider <span class="kw">if </span>MSSQL.is_provider(provider) =&gt; mssql_setup(url, prisma_schema, db_schemas).<span class="kw">await</span><span class="question-mark">?</span>,
+        provider <span class="kw">if </span>COCKROACH.is_provider(provider) =&gt; cockroach_setup(url, prisma_schema).<span class="kw">await</span>,
+        provider <span class="kw">if </span>MSSQL.is_provider(provider) =&gt; mssql_setup(url, prisma_schema, db_schemas).<span class="kw">await</span>,
         provider <span class="kw">if </span>MYSQL.is_provider(provider) =&gt; {
             mysql_reset(<span class="kw-2">&amp;</span>url).<span class="kw">await</span><span class="question-mark">?</span>;
-            diff_and_apply(prisma_schema).<span class="kw">await</span>;
-        }
+            <span class="kw">let </span><span class="kw-2">mut </span>connector = sql_schema_connector::SqlSchemaConnector::new_mysql();
+            diff_and_apply(prisma_schema, url, <span class="kw-2">&amp;mut </span>connector).<span class="kw">await
+        </span>}
         provider <span class="kw">if </span>SQLITE.is_provider(provider) =&gt; {
             std::fs::remove_file(source.url.as_literal().unwrap().trim_start_matches(<span class="string">&quot;file:&quot;</span>)).ok();
-            diff_and_apply(prisma_schema).<span class="kw">await</span>;
-        }
+            <span class="kw">let </span><span class="kw-2">mut </span>connector = sql_schema_connector::SqlSchemaConnector::new_sqlite();
+            diff_and_apply(prisma_schema, url, <span class="kw-2">&amp;mut </span>connector).<span class="kw">await
+        </span>}
 
-        provider <span class="kw">if </span>MONGODB.is_provider(provider) =&gt; mongo_setup(prisma_schema, <span class="kw-2">&amp;</span>url).<span class="kw">await</span><span class="question-mark">?</span>,
+        provider <span class="kw">if </span>MONGODB.is_provider(provider) =&gt; mongo_setup(prisma_schema, <span class="kw-2">&amp;</span>url).<span class="kw">await</span>,
 
         x =&gt; <span class="macro">unimplemented!</span>(<span class="string">&quot;Connector {} is not supported yet&quot;</span>, x),
-    };
-
-    <span class="prelude-val">Ok</span>(())
+    }
 }
 
 <span class="doccomment">/// Database teardown for connector-test-kit-rs.
@@ -227,50 +192,21 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="attr">#[derive(Default)]
-</span><span class="kw">struct </span>LoggingHost {
-    printed: parking_lot::Mutex&lt;Vec&lt;String&gt;&gt;,
-}
-
-<span class="kw">impl </span>schema_core::schema_connector::ConnectorHost <span class="kw">for </span>LoggingHost {
-    <span class="kw">fn </span>print(<span class="kw-2">&amp;</span><span class="self">self</span>, text: <span class="kw-2">&amp;</span>str) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;()&gt;&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>msgs = <span class="self">self</span>.printed.lock();
-        msgs.push(text.to_owned());
-        Box::pin(std::future::ready(<span class="prelude-val">Ok</span>(())))
-    }
-}
-
-<span class="kw">async fn </span>diff_and_apply(schema: <span class="kw-2">&amp;</span>str) {
-    <span class="kw">let </span>tmpdir = tempfile::tempdir().unwrap();
-    <span class="kw">let </span>host = Arc::new(LoggingHost::default());
-    <span class="kw">let </span>api = schema_core::schema_api(<span class="prelude-val">Some</span>(schema.to_owned()), <span class="prelude-val">Some</span>(host.clone())).unwrap();
-    <span class="kw">let </span>schema_file_path = tmpdir.path().join(<span class="string">&quot;schema.prisma&quot;</span>);
-    std::fs::write(<span class="kw-2">&amp;</span>schema_file_path, schema).unwrap();
-
-    <span class="comment">// 2. create the database schema for given Prisma schema
-    </span>api.diff(DiffParams {
-        exit_code: <span class="prelude-val">None</span>,
-        from: DiffTarget::Empty,
-        to: DiffTarget::SchemaDatamodel(SchemaContainer {
-            schema: schema_file_path.to_string_lossy().into(),
-        }),
-        script: <span class="bool-val">true</span>,
-        shadow_database_url: <span class="prelude-val">None</span>,
-    })
-    .<span class="kw">await
-    </span>.unwrap();
-    <span class="kw">let </span>migrations = host.printed.lock();
-    <span class="kw">let </span>migration = migrations[<span class="number">0</span>].clone();
-    drop(migrations);
-
-    api.db_execute(DbExecuteParams {
-        datasource_type: DbExecuteDatasourceType::Schema(SchemaContainer {
-            schema: schema_file_path.to_string_lossy().into(),
-        }),
-        script: migration,
-    })
-    .<span class="kw">await
-    </span>.unwrap();
-}
+<span class="kw">async fn </span>diff_and_apply(schema: <span class="kw-2">&amp;</span>str, url: String, connector: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>SchemaConnector) -&gt; ConnectorResult&lt;()&gt; {
+    connector.set_params(schema_core::schema_connector::ConnectorParams {
+        connection_string: url,
+        preview_features: Default::default(),
+        shadow_database_connection_string: <span class="prelude-val">None</span>,
+    })<span class="question-mark">?</span>;
+    <span class="kw">let </span>from = connector
+        .database_schema_from_diff_target(DiffTarget::Empty, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
+        .<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>to = connector
+        .database_schema_from_diff_target(DiffTarget::Datamodel(schema.into()), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
+        .<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>migration = connector.diff(from, to);
+    <span class="kw">let </span>script = connector.render_script(<span class="kw-2">&amp;</span>migration, <span class="kw-2">&amp;</span>Default::default()).unwrap();
+    connector.db_execute(script).<span class="kw">await
+</span>}
 </code></pre></div>
 </section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="qe_setup" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0 (84c898d65 2023-04-16)" data-search-js="search-8a59a8356673ec1f.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>

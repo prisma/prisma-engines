@@ -279,6 +279,9 @@
 <a href="#279" id="279">279</a>
 <a href="#280" id="280">280</a>
 <a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>json_adapter;
 
 <span class="kw">pub use </span>json_adapter::<span class="kw-2">*</span>;
@@ -321,12 +324,15 @@
 
     <span class="kw">pub async fn </span>load(
         datamodel: String,
+        db_schemas: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
         connector_tag: ConnectorTag,
         metrics: MetricRegistry,
         log_capture: TestLogCapture,
     ) -&gt; TestResult&lt;<span class="self">Self</span>&gt; {
+        qe_setup::setup(<span class="kw-2">&amp;</span>datamodel, db_schemas).<span class="kw">await</span><span class="question-mark">?</span>;
+
         <span class="kw">let </span>protocol = EngineProtocol::from(<span class="kw-2">&amp;</span>ENGINE_PROTOCOL.to_string());
-        <span class="kw">let </span>schema = psl::parse_schema(datamodel.clone()).unwrap();
+        <span class="kw">let </span>schema = psl::parse_schema(datamodel).unwrap();
         <span class="kw">let </span>data_source = schema.configuration.datasources.first().unwrap();
         <span class="kw">let </span>url = data_source.load_url(|key| env::var(key).ok()).unwrap();
         <span class="kw">let </span>executor = load_executor(data_source, schema.configuration.preview_features(), <span class="kw-2">&amp;</span>url).<span class="kw">await</span><span class="question-mark">?</span>;

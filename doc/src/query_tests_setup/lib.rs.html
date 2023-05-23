@@ -301,15 +301,6 @@
 <a href="#301" id="301">301</a>
 <a href="#302" id="302">302</a>
 <a href="#303" id="303">303</a>
-<a href="#304" id="304">304</a>
-<a href="#305" id="305">305</a>
-<a href="#306" id="306">306</a>
-<a href="#307" id="307">307</a>
-<a href="#308" id="308">308</a>
-<a href="#309" id="309">309</a>
-<a href="#310" id="310">310</a>
-<a href="#311" id="311">311</a>
-<a href="#312" id="312">312</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>config;
 <span class="kw">mod </span>connector_tag;
 <span class="kw">mod </span>datamodel_rendering;
@@ -354,18 +345,13 @@
 </span><span class="kw">pub static </span>ENGINE_PROTOCOL: Lazy&lt;String&gt; =
     Lazy::new(|| std::env::var(<span class="string">&quot;PRISMA_ENGINE_PROTOCOL&quot;</span>).unwrap_or_else(|<span class="kw">_</span>| <span class="string">&quot;graphql&quot;</span>.to_owned()));
 
-<span class="doccomment">/// Setup of everything as defined in the passed datamodel.
-</span><span class="kw">pub async fn </span>setup_project(datamodel: <span class="kw-2">&amp;</span>str, db_schemas: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; TestResult&lt;()&gt; {
-    <span class="prelude-val">Ok</span>(qe_setup::setup(datamodel, db_schemas).<span class="kw">await</span><span class="question-mark">?</span>)
-}
-
 <span class="doccomment">/// Teardown of a test setup.
-</span><span class="kw">pub async fn </span>teardown_project(datamodel: <span class="kw-2">&amp;</span>str, db_schemas: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; TestResult&lt;()&gt; {
+</span><span class="kw">async fn </span>teardown_project(datamodel: <span class="kw-2">&amp;</span>str, db_schemas: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; TestResult&lt;()&gt; {
     <span class="prelude-val">Ok</span>(qe_setup::teardown(datamodel, db_schemas).<span class="kw">await</span><span class="question-mark">?</span>)
 }
 
 <span class="doccomment">/// Helper method to allow a sync shell function to run the async test blocks.
-</span><span class="kw">pub fn </span>run_with_tokio&lt;O, F: std::future::Future&lt;Output = O&gt;&gt;(fut: F) -&gt; O {
+</span><span class="kw">fn </span>run_with_tokio&lt;O, F: std::future::Future&lt;Output = O&gt;&gt;(fut: F) -&gt; O {
     Builder::new_current_thread()
         .enable_all()
         .build()
@@ -477,10 +463,8 @@
 
         run_with_tokio(
             <span class="kw">async move </span>{
-                <span class="macro">println!</span>(<span class="string">&quot;Used datamodel:\n {}&quot;</span>, datamodel.clone().yellow());
-                setup_project(<span class="kw-2">&amp;</span>datamodel, Default::default()).<span class="kw">await</span>.unwrap();
-
-                <span class="kw">let </span>runner = Runner::load(datamodel.clone(), connector, metrics, log_capture)
+                <span class="macro">println!</span>(<span class="string">&quot;Used datamodel:\n {}&quot;</span>, datamodel.yellow());
+                <span class="kw">let </span>runner = Runner::load(datamodel.clone(), <span class="kw-2">&amp;</span>[], connector, metrics, log_capture)
                     .<span class="kw">await
                     </span>.unwrap();
 
@@ -583,10 +567,8 @@
 
     <span class="kw">crate</span>::run_with_tokio(
         <span class="kw">async </span>{
-            <span class="macro">println!</span>(<span class="string">&quot;Used datamodel:\n {}&quot;</span>, datamodel.clone().yellow());
-            <span class="kw">crate</span>::setup_project(<span class="kw-2">&amp;</span>datamodel, db_schemas).<span class="kw">await</span>.unwrap();
-
-            <span class="kw">let </span>runner = Runner::load(datamodel.clone(), connector, metrics, log_capture)
+            <span class="macro">println!</span>(<span class="string">&quot;Used datamodel:\n {}&quot;</span>, datamodel.yellow());
+            <span class="kw">let </span>runner = Runner::load(datamodel.clone(), db_schemas, connector, metrics, log_capture)
                 .<span class="kw">await
                 </span>.unwrap();
 
