@@ -122,7 +122,6 @@ var sourcesIndex = JSON.parse('{\
 "itertools":["",[["adaptors",[],["coalesce.rs","map.rs","mod.rs","multi_product.rs"]]],["combinations.rs","combinations_with_replacement.rs","concat_impl.rs","cons_tuples_impl.rs","diff.rs","duplicates_impl.rs","either_or_both.rs","exactly_one_err.rs","extrema_set.rs","flatten_ok.rs","format.rs","free.rs","group_map.rs","groupbylazy.rs","grouping_map.rs","impl_macros.rs","intersperse.rs","k_smallest.rs","kmerge_impl.rs","lazy_buffer.rs","lib.rs","merge_join.rs","minmax.rs","multipeek_impl.rs","pad_tail.rs","peek_nth.rs","peeking_take_while.rs","permutations.rs","powerset.rs","process_results_impl.rs","put_back_n_impl.rs","rciter_impl.rs","repeatn.rs","size_hint.rs","sources.rs","tee.rs","tuple_impl.rs","unique_impl.rs","unziptuple.rs","with_position.rs","zip_eq_impl.rs","zip_longest.rs","ziptuple.rs"]],\
 "itoa":["",[],["lib.rs","udiv128.rs"]],\
 "json_rpc_api_build":["",[],["error.rs","lib.rs","rust_crate.rs"]],\
-"json_rpc_stdio":["",[],["lib.rs"]],\
 "jsonrpc_core":["",[["types",[],["error.rs","id.rs","mod.rs","params.rs","request.rs","response.rs","version.rs"]]],["calls.rs","delegates.rs","io.rs","lib.rs","middleware.rs"]],\
 "lazy_static":["",[],["inline_lazy.rs","lib.rs"]],\
 "lexical":["",[],["lib.rs"]],\
@@ -152,7 +151,7 @@ var sourcesIndex = JSON.parse('{\
 "metrics_exporter_prometheus":["",[],["builder.rs","common.rs","distribution.rs","formatting.rs","lib.rs","recorder.rs"]],\
 "metrics_macros":["",[],["lib.rs"]],\
 "metrics_util":["",[["layers",[],["fanout.rs","mod.rs","prefix.rs"]],["registry",[],["mod.rs","recency.rs","storage.rs"]]],["bucket.rs","common.rs","handles.rs","histogram.rs","key.rs","kind.rs","lib.rs","quantile.rs","summary.rs"]],\
-"migration_engine":["",[],["commands.rs","logger.rs","main.rs"]],\
+"migration_engine":["",[],["commands.rs","json_rpc_stdio.rs","logger.rs","main.rs"]],\
 "minimal_lexical":["",[],["bigint.rs","extended_float.rs","lemire.rs","lib.rs","mask.rs","num.rs","number.rs","parse.rs","rounding.rs","slow.rs","stackvec.rs","table.rs","table_lemire.rs","table_small.rs"]],\
 "miniz_oxide":["",[["deflate",[],["buffer.rs","core.rs","mod.rs","stream.rs"]],["inflate",[],["core.rs","mod.rs","output_buffer.rs","stream.rs"]]],["lib.rs","shared.rs"]],\
 "mio":["",[["event",[],["event.rs","events.rs","mod.rs","source.rs"]],["net",[["tcp",[],["listener.rs","mod.rs","stream.rs"]],["uds",[],["datagram.rs","listener.rs","mod.rs","stream.rs"]]],["mod.rs","udp.rs"]],["sys",[["unix",[["selector",[],["epoll.rs","mod.rs"]],["uds",[],["datagram.rs","listener.rs","mod.rs","socketaddr.rs","stream.rs"]]],["mod.rs","net.rs","pipe.rs","sourcefd.rs","tcp.rs","udp.rs","waker.rs"]]],["mod.rs"]]],["interest.rs","io_source.rs","lib.rs","macros.rs","poll.rs","token.rs","waker.rs"]],\

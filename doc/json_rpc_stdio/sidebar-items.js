@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["new_client","run","run_with_client"],"struct":["Client","ClientAdapter"]};

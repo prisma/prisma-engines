@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/json-rpc-stdio/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c4dbdcde0fbd8430.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" disabled href="../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" disabled href="../../static.files/ayu-be46fdc453a55015.css"><script src="../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-98a684e84ae5b08b.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../json_rpc_stdio/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `schema-engine/cli/src/json_rpc_stdio.rs`."><title>json_rpc_stdio.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c4dbdcde0fbd8430.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" disabled href="../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" disabled href="../../static.files/ayu-be46fdc453a55015.css"><script src="../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-98a684e84ae5b08b.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../migration_engine/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -162,67 +162,10 @@
 <a href="#162" id="162">162</a>
 <a href="#163" id="163">163</a>
 <a href="#164" id="164">164</a>
-<a href="#165" id="165">165</a>
-<a href="#166" id="166">166</a>
-<a href="#167" id="167">167</a>
-<a href="#168" id="168">168</a>
-<a href="#169" id="169">169</a>
-<a href="#170" id="170">170</a>
-<a href="#171" id="171">171</a>
-<a href="#172" id="172">172</a>
-<a href="#173" id="173">173</a>
-<a href="#174" id="174">174</a>
-<a href="#175" id="175">175</a>
-<a href="#176" id="176">176</a>
-<a href="#177" id="177">177</a>
-<a href="#178" id="178">178</a>
-<a href="#179" id="179">179</a>
-<a href="#180" id="180">180</a>
-<a href="#181" id="181">181</a>
-<a href="#182" id="182">182</a>
-<a href="#183" id="183">183</a>
-<a href="#184" id="184">184</a>
-<a href="#185" id="185">185</a>
-<a href="#186" id="186">186</a>
-<a href="#187" id="187">187</a>
-<a href="#188" id="188">188</a>
-<a href="#189" id="189">189</a>
-<a href="#190" id="190">190</a>
-<a href="#191" id="191">191</a>
-<a href="#192" id="192">192</a>
-<a href="#193" id="193">193</a>
-<a href="#194" id="194">194</a>
-<a href="#195" id="195">195</a>
-<a href="#196" id="196">196</a>
-<a href="#197" id="197">197</a>
-<a href="#198" id="198">198</a>
-<a href="#199" id="199">199</a>
-<a href="#200" id="200">200</a>
-<a href="#201" id="201">201</a>
-<a href="#202" id="202">202</a>
-<a href="#203" id="203">203</a>
-<a href="#204" id="204">204</a>
-<a href="#205" id="205">205</a>
-<a href="#206" id="206">206</a>
-<a href="#207" id="207">207</a>
-<a href="#208" id="208">208</a>
-<a href="#209" id="209">209</a>
-<a href="#210" id="210">210</a>
-<a href="#211" id="211">211</a>
-<a href="#212" id="212">212</a>
-<a href="#213" id="213">213</a>
-<a href="#214" id="214">214</a>
-<a href="#215" id="215">215</a>
-<a href="#216" id="216">216</a>
-<a href="#217" id="217">217</a>
-</pre><pre class="rust"><code><span class="attr">#![deny(rust_2018_idioms, unsafe_code, missing_docs)]
-
-</span><span class="doccomment">//! This crate implements JSON-RPC over standard IO. It uses tokio for async IO, and jsonrpc_core
+</pre><pre class="rust"><code><span class="doccomment">//! This module implements JSON-RPC over standard IO. It uses tokio for async IO, and jsonrpc_core
 //! for the JSON-RPC part.
-//!
-//! Notifications in the Client are not supported yet.
 
-</span><span class="kw">use </span>jsonrpc_core::{IoHandler, MethodCall, Notification, Request};
+</span><span class="kw">use </span>jsonrpc_core::{IoHandler, MethodCall, Request};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>std::{
     collections::HashMap,
@@ -238,52 +181,24 @@
 
 <span class="doccomment">/// A handle to a connected client you can use to send requests.
 </span><span class="attr">#[derive(Debug, Clone)]
-</span><span class="kw">pub struct </span>Client {
-    notification_sender: mpsc::Sender&lt;Notification&gt;,
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Client {
     request_sender: mpsc::Sender&lt;(MethodCall, oneshot::Sender&lt;jsonrpc_core::Output&gt;)&gt;,
 }
 
 <span class="doccomment">/// Constructor a JSON-RPC client. Returns a tuple: the client you can use to send requests, and
 /// the adapter you must pass to `run_with_client()` to connect the client to the proper IO.
-</span><span class="kw">pub fn </span>new_client() -&gt; (Client, ClientAdapter) {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_client() -&gt; (Client, ClientAdapter) {
     <span class="kw">let </span>(request_sender, request_receiver) = mpsc::channel(<span class="number">30</span>);
-    <span class="kw">let </span>(notification_sender, notification_receiver) = mpsc::channel(<span class="number">30</span>);
-    <span class="kw">let </span>client = Client {
-        request_sender,
-        notification_sender,
-    };
+    <span class="kw">let </span>client = Client { request_sender };
 
-    <span class="kw">let </span>adapter = ClientAdapter {
-        request_receiver,
-        notification_receiver,
-    };
+    <span class="kw">let </span>adapter = ClientAdapter { request_receiver };
 
     (client, adapter)
 }
 
 <span class="kw">impl </span>Client {
-    <span class="doccomment">/// Asynchronously send a JSON-RPC notification.
-    </span><span class="kw">pub async fn </span>notify&lt;Req&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, method: String, params: Req) -&gt; jsonrpc_core::Result&lt;()&gt;
-    <span class="kw">where
-        </span>Req: serde::Serialize,
-    {
-        <span class="kw">let </span>json_params = serde_json::to_value(params).map_err(|_err| jsonrpc_core::Error::invalid_request())<span class="question-mark">?</span>;
-        <span class="kw">let </span>params = <span class="kw">match </span>json_params {
-            jsonrpc_core::Value::Array(arr) =&gt; jsonrpc_core::Params::Array(arr),
-            jsonrpc_core::Value::Object(obj) =&gt; jsonrpc_core::Params::Map(obj),
-            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(jsonrpc_core::Error::invalid_request()),
-        };
-        <span class="kw">let </span>notification = jsonrpc_core::Notification {
-            jsonrpc: <span class="prelude-val">Some</span>(jsonrpc_core::Version::V2),
-            method,
-            params,
-        };
-        <span class="self">self</span>.notification_sender.send(notification).<span class="kw">await</span>.unwrap();
-        <span class="prelude-val">Ok</span>(())
-    }
-
     <span class="doccomment">/// Asynchronously send a JSON-RPC request.
-    </span><span class="kw">pub async fn </span>call&lt;Req, Res&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, method: String, params: Req) -&gt; jsonrpc_core::Result&lt;Res&gt;
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>call&lt;Req, Res&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, method: String, params: Req) -&gt; jsonrpc_core::Result&lt;Res&gt;
     <span class="kw">where
         </span>Req: serde::Serialize,
         Res: serde::de::DeserializeOwned,
@@ -314,9 +229,8 @@
 }
 
 <span class="doccomment">/// The other side of the channels. Only used as a handle to be passed into run_with_client().
-</span><span class="kw">pub struct </span>ClientAdapter {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ClientAdapter {
     request_receiver: mpsc::Receiver&lt;(MethodCall, oneshot::Sender&lt;jsonrpc_core::Output&gt;)&gt;,
-    notification_receiver: mpsc::Receiver&lt;Notification&gt;,
 }
 
 <span class="attr">#[derive(Serialize, Deserialize)]
@@ -328,15 +242,8 @@
 
 <span class="doccomment">/// Start doing JSON-RPC over stdio. The future will only return once stdin is closed or another
 /// IO error happens.
-</span><span class="kw">pub async fn </span>run_with_client(request_handler: <span class="kw-2">&amp;</span>IoHandler, adapter: ClientAdapter) -&gt; std::io::Result&lt;()&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>run_with_client(request_handler: <span class="kw-2">&amp;</span>IoHandler, adapter: ClientAdapter) -&gt; std::io::Result&lt;()&gt; {
     run_with_io(request_handler, tokio::io::stdin(), tokio::io::stdout(), adapter).<span class="kw">await
-</span>}
-
-<span class="doccomment">/// Start doing JSON-RPC over stdio, server-only. The future will only return once stdin is closed
-/// or another IO error happens.
-</span><span class="kw">pub async fn </span>run(request_handler: <span class="kw-2">&amp;</span>IoHandler) -&gt; std::io::Result&lt;()&gt; {
-    <span class="kw">let </span>(_client, client_adapter) = new_client();
-    run_with_io(request_handler, tokio::io::stdin(), tokio::io::stdout(), client_adapter).<span class="kw">await
 </span>}
 
 <span class="kw">async fn </span>run_with_io(
@@ -368,9 +275,6 @@
             next_request = client_adapter.request_receiver.recv() =&gt; {
                 handle_next_client_request(next_request, <span class="kw-2">&amp;mut </span>stdout_sender, <span class="kw-2">&amp;mut </span>in_flight).<span class="kw">await</span><span class="question-mark">?</span>;
             }
-            next_notification = client_adapter.notification_receiver.recv() =&gt; {
-                handle_next_client_notification(next_notification, <span class="kw-2">&amp;mut </span>stdout_sender).<span class="kw">await</span><span class="question-mark">?</span>;
-            }
         }
     }
 }
@@ -383,16 +287,6 @@
     <span class="kw">let </span>(next_request, channel) = next_request.unwrap();
     in_flight.insert(next_request.id.clone(), channel);
     <span class="kw">let </span>request_json = serde_json::to_vec(<span class="kw-2">&amp;</span>next_request)<span class="question-mark">?</span>;
-    stdout_sender.send(request_json).<span class="kw">await</span>.unwrap();
-    <span class="prelude-val">Ok</span>(())
-}
-
-<span class="kw">async fn </span>handle_next_client_notification(
-    next_notification: <span class="prelude-ty">Option</span>&lt;Notification&gt;,
-    stdout_sender: <span class="kw-2">&amp;mut </span>mpsc::Sender&lt;Vec&lt;u8&gt;&gt;,
-) -&gt; io::Result&lt;()&gt; {
-    <span class="kw">let </span>next_notification = next_notification.unwrap();
-    <span class="kw">let </span>request_json = serde_json::to_vec(<span class="kw-2">&amp;</span>next_notification)<span class="question-mark">?</span>;
     stdout_sender.send(request_json).<span class="kw">await</span>.unwrap();
     <span class="prelude-val">Ok</span>(())
 }
@@ -433,4 +327,4 @@
     serde_json::to_string(<span class="kw-2">&amp;</span>response).unwrap()
 }
 </code></pre></div>
-</section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="json_rpc_stdio" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0 (84c898d65 2023-04-16)" data-search-js="search-8a59a8356673ec1f.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>
+</section></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="migration_engine" data-themes="" data-resource-suffix="" data-rustdoc-version="1.69.0 (84c898d65 2023-04-16)" data-search-js="search-8a59a8356673ec1f.js" data-settings-js="settings-f0c5c39777a9a2f6.js" data-settings-css="settings-0bcba95ff279c1db.css" ></div></body></html>
