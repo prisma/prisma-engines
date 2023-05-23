@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/2g78rdf2shhpipzvha92jy48z98r2yd2-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/enumflags2_derive-0.7.4/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c4dbdcde0fbd8430.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" disabled href="../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" disabled href="../../static.files/ayu-be46fdc453a55015.css"><script src="../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-98a684e84ae5b08b.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../enumflags2_derive/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/9i1pw9hp8gwg4jjbkx16wpxz1v579ha3-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/enumflags2_derive-0.7.7/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c4dbdcde0fbd8430.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" disabled href="../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" disabled href="../../static.files/ayu-be46fdc453a55015.css"><script src="../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-98a684e84ae5b08b.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../enumflags2_derive/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -337,27 +337,6 @@
 <a href="#337" id="337">337</a>
 <a href="#338" id="338">338</a>
 <a href="#339" id="339">339</a>
-<a href="#340" id="340">340</a>
-<a href="#341" id="341">341</a>
-<a href="#342" id="342">342</a>
-<a href="#343" id="343">343</a>
-<a href="#344" id="344">344</a>
-<a href="#345" id="345">345</a>
-<a href="#346" id="346">346</a>
-<a href="#347" id="347">347</a>
-<a href="#348" id="348">348</a>
-<a href="#349" id="349">349</a>
-<a href="#350" id="350">350</a>
-<a href="#351" id="351">351</a>
-<a href="#352" id="352">352</a>
-<a href="#353" id="353">353</a>
-<a href="#354" id="354">354</a>
-<a href="#355" id="355">355</a>
-<a href="#356" id="356">356</a>
-<a href="#357" id="357">357</a>
-<a href="#358" id="358">358</a>
-<a href="#359" id="359">359</a>
-<a href="#360" id="360">360</a>
 </pre><pre class="rust"><code><span class="attr">#![recursion_limit = <span class="string">&quot;2048&quot;</span>]
 </span><span class="kw">extern crate </span>proc_macro;
 <span class="attr">#[macro_use]
@@ -385,13 +364,8 @@
 }
 
 <span class="kw">impl </span>FlagValue&lt;<span class="lifetime">&#39;_</span>&gt; {
-    <span class="comment">// matches! is beyond our MSRV
-    </span><span class="attr">#[allow(clippy::match_like_matches_macro)]
-    </span><span class="kw">fn </span>is_inferred(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="kw">match </span><span class="self">self </span>{
-            FlagValue::Inferred(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
-        }
+    <span class="kw">fn </span>is_inferred(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, FlagValue::Inferred(<span class="kw">_</span>))
     }
 }
 
@@ -470,15 +444,11 @@
 ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Flag&lt;<span class="lifetime">&#39;a</span>&gt;&gt;, syn::Error&gt; {
     variants
         .map(|variant| {
-            <span class="comment">// MSRV: Would this be cleaner with `matches!`?
-            </span><span class="kw">match </span>variant.fields {
-                syn::Fields::Unit =&gt; (),
-                <span class="kw">_ </span>=&gt; {
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new_spanned(
-                        <span class="kw-2">&amp;</span>variant.fields,
-                        <span class="string">&quot;Bitflag variants cannot contain additional data&quot;</span>,
-                    ))
-                }
+            <span class="kw">if </span>!<span class="macro">matches!</span>(variant.fields, syn::Fields::Unit) {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new_spanned(
+                    <span class="kw-2">&amp;</span>variant.fields,
+                    <span class="string">&quot;Bitflag variants cannot contain additional data&quot;</span>,
+                ));
             }
 
             <span class="kw">let </span>name = variant.ident.clone();
@@ -531,23 +501,18 @@
 <span class="doccomment">/// Given a list of attributes, find the `repr`, if any, and return the integer
 /// type specified.
 </span><span class="kw">fn </span>extract_repr(attrs: <span class="kw-2">&amp;</span>[syn::Attribute]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Ident&gt;, syn::Error&gt; {
-    <span class="kw">use </span>syn::{Meta, NestedMeta};
-    attrs
-        .iter()
-        .find_map(|attr| <span class="kw">match </span>attr.parse_meta() {
-            <span class="prelude-val">Err</span>(why) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(syn::Error::new_spanned(
-                attr,
-                <span class="macro">format!</span>(<span class="string">&quot;Couldn&#39;t parse attribute: {}&quot;</span>, why),
-            ))),
-            <span class="prelude-val">Ok</span>(Meta::List(<span class="kw-2">ref </span>meta)) <span class="kw">if </span>meta.path.is_ident(<span class="string">&quot;repr&quot;</span>) =&gt; {
-                meta.nested.iter().find_map(|mi| <span class="kw">match </span>mi {
-                    NestedMeta::Meta(Meta::Path(path)) =&gt; path.get_ident().cloned().map(<span class="prelude-val">Ok</span>),
-                    <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
-                })
-            }
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-        })
-        .transpose()
+    <span class="kw">let </span><span class="kw-2">mut </span>res = <span class="prelude-val">None</span>;
+    <span class="kw">for </span>attr <span class="kw">in </span>attrs {
+        <span class="kw">if </span>attr.path().is_ident(<span class="string">&quot;repr&quot;</span>) {
+            attr.parse_nested_meta(|meta| {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(ident) = meta.path.get_ident() {
+                    res = <span class="prelude-val">Some</span>(ident.clone());
+                }
+                <span class="prelude-val">Ok</span>(())
+            })<span class="question-mark">?</span>;
+        }
+    }
+    <span class="prelude-val">Ok</span>(res)
 }
 
 <span class="doccomment">/// Check the repr and return the number of bits available
@@ -609,15 +574,8 @@
         Inferred(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         Deferred =&gt; {
             <span class="kw">let </span>variant_name = <span class="kw-2">&amp;</span>flag.name;
-            <span class="comment">// MSRV: Use an unnamed constant (`const _: ...`).
-            </span><span class="kw">let </span>assertion_name = syn::Ident::new(
-                <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;__enumflags_assertion_{}_{}&quot;</span>, type_name, flag.name),
-                Span::call_site(),
-            ); <span class="comment">// call_site because def_site is unstable
-
-            </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="macro">quote_spanned!</span>(flag.span =&gt;
-                <span class="attr">#[doc(hidden)]
-                </span><span class="kw">const </span>#assertion_name:
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="macro">quote_spanned!</span>(flag.span =&gt;
+                <span class="kw">const _</span>:
                     &lt;&lt;[(); (
                         (#type_name::#variant_name <span class="kw">as </span>u128).is_power_of_two()
                     ) <span class="kw">as </span>usize] <span class="kw">as </span>enumflags2::_internal::AssertionHelper&gt;
@@ -634,7 +592,7 @@
     <span class="kw">let </span>span = Span::call_site();
 
     <span class="kw">let </span>repr = extract_repr(<span class="kw-2">&amp;</span>ast.attrs)<span class="question-mark">?
-        </span>.ok_or_else(|| syn::Error::new_spanned(<span class="kw-2">&amp;</span>ident,
+        </span>.ok_or_else(|| syn::Error::new_spanned(ident,
                         <span class="string">&quot;repr attribute missing. Add #[repr(u64)] or a similar attribute to specify the size of the bitfield.&quot;</span>))<span class="question-mark">?</span>;
     <span class="kw">let </span>bits = type_bits(<span class="kw-2">&amp;</span>repr)<span class="question-mark">?</span>;
 
