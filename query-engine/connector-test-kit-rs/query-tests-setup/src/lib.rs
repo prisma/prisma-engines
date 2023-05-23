@@ -42,18 +42,13 @@ pub static ENV_LOG_LEVEL: Lazy<String> = Lazy::new(|| std::env::var("LOG_LEVEL")
 pub static ENGINE_PROTOCOL: Lazy<String> =
     Lazy::new(|| std::env::var("PRISMA_ENGINE_PROTOCOL").unwrap_or_else(|_| "graphql".to_owned()));
 
-/// Setup of everything as defined in the passed datamodel.
-pub async fn setup_project(datamodel: &str, db_schemas: &[&str]) -> TestResult<()> {
-    Ok(qe_setup::setup(datamodel, db_schemas).await?)
-}
-
 /// Teardown of a test setup.
-pub async fn teardown_project(datamodel: &str, db_schemas: &[&str]) -> TestResult<()> {
+async fn teardown_project(datamodel: &str, db_schemas: &[&str]) -> TestResult<()> {
     Ok(qe_setup::teardown(datamodel, db_schemas).await?)
 }
 
 /// Helper method to allow a sync shell function to run the async test blocks.
-pub fn run_with_tokio<O, F: std::future::Future<Output = O>>(fut: F) -> O {
+fn run_with_tokio<O, F: std::future::Future<Output = O>>(fut: F) -> O {
     Builder::new_current_thread()
         .enable_all()
         .build()
@@ -165,10 +160,8 @@ fn run_relation_link_test_impl(
 
         run_with_tokio(
             async move {
-                println!("Used datamodel:\n {}", datamodel.clone().yellow());
-                setup_project(&datamodel, Default::default()).await.unwrap();
-
-                let runner = Runner::load(datamodel.clone(), connector, metrics, log_capture)
+                println!("Used datamodel:\n {}", datamodel.yellow());
+                let runner = Runner::load(datamodel.clone(), &[], connector, metrics, log_capture)
                     .await
                     .unwrap();
 
@@ -271,10 +264,8 @@ fn run_connector_test_impl(
 
     crate::run_with_tokio(
         async {
-            println!("Used datamodel:\n {}", datamodel.clone().yellow());
-            crate::setup_project(&datamodel, db_schemas).await.unwrap();
-
-            let runner = Runner::load(datamodel.clone(), connector, metrics, log_capture)
+            println!("Used datamodel:\n {}", datamodel.yellow());
+            let runner = Runner::load(datamodel.clone(), db_schemas, connector, metrics, log_capture)
                 .await
                 .unwrap();
 
