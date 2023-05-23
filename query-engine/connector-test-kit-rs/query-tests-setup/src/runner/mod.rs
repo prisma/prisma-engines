@@ -40,12 +40,15 @@ impl Runner {
 
     pub async fn load(
         datamodel: String,
+        db_schemas: &[&str],
         connector_tag: ConnectorTag,
         metrics: MetricRegistry,
         log_capture: TestLogCapture,
     ) -> TestResult<Self> {
+        qe_setup::setup(&datamodel, db_schemas).await?;
+
         let protocol = EngineProtocol::from(&ENGINE_PROTOCOL.to_string());
-        let schema = psl::parse_schema(datamodel.clone()).unwrap();
+        let schema = psl::parse_schema(datamodel).unwrap();
         let data_source = schema.configuration.datasources.first().unwrap();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
         let executor = load_executor(data_source, schema.configuration.preview_features(), &url).await?;

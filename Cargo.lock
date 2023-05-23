@@ -3119,11 +3119,10 @@ dependencies = [
  "mongodb",
  "mongodb-client",
  "once_cell",
- "parking_lot 0.12.1",
  "psl",
  "quaint",
  "schema-core",
- "tempfile",
+ "sql-schema-connector",
  "test-setup",
  "url",
 ]
