@@ -1,11 +1,7 @@
-#![deny(rust_2018_idioms, unsafe_code, missing_docs)]
-
-//! This crate implements JSON-RPC over standard IO. It uses tokio for async IO, and jsonrpc_core
+//! This module implements JSON-RPC over standard IO. It uses tokio for async IO, and jsonrpc_core
 //! for the JSON-RPC part.
-//!
-//! Notifications in the Client are not supported yet.
 
-use jsonrpc_core::{IoHandler, MethodCall, Notification, Request};
+use jsonrpc_core::{IoHandler, MethodCall, Request};
 use serde::{Deserialize, Serialize};
 use std::{
     collections::HashMap,
@@ -21,52 +17,24 @@ static REQUEST_ID_COUNTER: AtomicU64 = AtomicU64::new(0);
 
 /// A handle to a connected client you can use to send requests.
 #[derive(Debug, Clone)]
-pub struct Client {
-    notification_sender: mpsc::Sender<Notification>,
+pub(crate) struct Client {
     request_sender: mpsc::Sender<(MethodCall, oneshot::Sender<jsonrpc_core::Output>)>,
 }
 
 /// Constructor a JSON-RPC client. Returns a tuple: the client you can use to send requests, and
 /// the adapter you must pass to `run_with_client()` to connect the client to the proper IO.
-pub fn new_client() -> (Client, ClientAdapter) {
+pub(crate) fn new_client() -> (Client, ClientAdapter) {
     let (request_sender, request_receiver) = mpsc::channel(30);
-    let (notification_sender, notification_receiver) = mpsc::channel(30);
-    let client = Client {
-        request_sender,
-        notification_sender,
-    };
+    let client = Client { request_sender };
 
-    let adapter = ClientAdapter {
-        request_receiver,
-        notification_receiver,
-    };
+    let adapter = ClientAdapter { request_receiver };
 
     (client, adapter)
 }
 
 impl Client {
-    /// Asynchronously send a JSON-RPC notification.
-    pub async fn notify<Req>(&self, method: String, params: Req) -> jsonrpc_core::Result<()>
-    where
-        Req: serde::Serialize,
-    {
-        let json_params = serde_json::to_value(params).map_err(|_err| jsonrpc_core::Error::invalid_request())?;
-        let params = match json_params {
-            jsonrpc_core::Value::Array(arr) => jsonrpc_core::Params::Array(arr),
-            jsonrpc_core::Value::Object(obj) => jsonrpc_core::Params::Map(obj),
-            _ => return Err(jsonrpc_core::Error::invalid_request()),
-        };
-        let notification = jsonrpc_core::Notification {
-            jsonrpc: Some(jsonrpc_core::Version::V2),
-            method,
-            params,
-        };
-        self.notification_sender.send(notification).await.unwrap();
-        Ok(())
-    }
-
     /// Asynchronously send a JSON-RPC request.
-    pub async fn call<Req, Res>(&self, method: String, params: Req) -> jsonrpc_core::Result<Res>
+    pub(crate) async fn call<Req, Res>(&self, method: String, params: Req) -> jsonrpc_core::Result<Res>
     where
         Req: serde::Serialize,
         Res: serde::de::DeserializeOwned,
@@ -97,9 +65,8 @@ impl Client {
 }
 
 /// The other side of the channels. Only used as a handle to be passed into run_with_client().
-pub struct ClientAdapter {
+pub(crate) struct ClientAdapter {
     request_receiver: mpsc::Receiver<(MethodCall, oneshot::Sender<jsonrpc_core::Output>)>,
-    notification_receiver: mpsc::Receiver<Notification>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -111,15 +78,8 @@ enum Message {
 
 /// Start doing JSON-RPC over stdio. The future will only return once stdin is closed or another
 /// IO error happens.
-pub async fn run_with_client(request_handler: &IoHandler, adapter: ClientAdapter) -> std::io::Result<()> {
+pub(crate) async fn run_with_client(request_handler: &IoHandler, adapter: ClientAdapter) -> std::io::Result<()> {
     run_with_io(request_handler, tokio::io::stdin(), tokio::io::stdout(), adapter).await
-}
-
-/// Start doing JSON-RPC over stdio, server-only. The future will only return once stdin is closed
-/// or another IO error happens.
-pub async fn run(request_handler: &IoHandler) -> std::io::Result<()> {
-    let (_client, client_adapter) = new_client();
-    run_with_io(request_handler, tokio::io::stdin(), tokio::io::stdout(), client_adapter).await
 }
 
 async fn run_with_io(
@@ -151,9 +111,6 @@ async fn run_with_io(
             next_request = client_adapter.request_receiver.recv() => {
                 handle_next_client_request(next_request, &mut stdout_sender, &mut in_flight).await?;
             }
-            next_notification = client_adapter.notification_receiver.recv() => {
-                handle_next_client_notification(next_notification, &mut stdout_sender).await?;
-            }
         }
     }
 }
@@ -166,16 +123,6 @@ async fn handle_next_client_request(
     let (next_request, channel) = next_request.unwrap();
     in_flight.insert(next_request.id.clone(), channel);
     let request_json = serde_json::to_vec(&next_request)?;
-    stdout_sender.send(request_json).await.unwrap();
-    Ok(())
-}
-
-async fn handle_next_client_notification(
-    next_notification: Option<Notification>,
-    stdout_sender: &mut mpsc::Sender<Vec<u8>>,
-) -> io::Result<()> {
-    let next_notification = next_notification.unwrap();
-    let request_json = serde_json::to_vec(&next_notification)?;
     stdout_sender.send(request_json).await.unwrap();
     Ok(())
 }
