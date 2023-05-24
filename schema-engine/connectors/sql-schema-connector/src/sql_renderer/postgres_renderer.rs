@@ -1066,7 +1066,7 @@ fn render_cockroach_alter_enum(
     for variant in &alter_enum.created_variants {
         renderer.render_statement(&mut |stmt| {
             stmt.push_str(&prefix);
-            stmt.push_str("ADD VALUE '");
+            stmt.push_str(" ADD VALUE '");
             stmt.push_str(variant);
             stmt.push_str("'");
         });

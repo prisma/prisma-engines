@@ -1,8 +1,6 @@
 use super::*;
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
-use connector::{
-    self, error::ConnectorError, ConnectionLike, QueryArguments, RelAggregationRow, RelAggregationSelection,
-};
+use connector::{self, error::ConnectorError, ConnectionLike, RelAggregationRow, RelAggregationSelection};
 use futures::future::{BoxFuture, FutureExt};
 use inmemory_record_processor::InMemoryRecordProcessor;
 use prisma_models::ManyRecords;
@@ -58,7 +56,6 @@ fn read_one(
                     fields: query.selection_order,
                     scalars,
                     nested,
-                    query_arguments: QueryArguments::new(model.clone()),
                     model,
                     aggregation_rows,
                 }
@@ -72,7 +69,6 @@ fn read_one(
                 fields: query.selection_order,
                 scalars: ManyRecords::default(),
                 nested: vec![],
-                query_arguments: QueryArguments::new(model.clone()),
                 model,
                 aggregation_rows: None,
             }))),
@@ -127,7 +123,6 @@ fn read_many(
                 fields: query.selection_order,
                 scalars,
                 nested,
-                query_arguments: query.args,
                 model: query.model,
                 aggregation_rows,
             }
@@ -173,7 +168,6 @@ fn read_related<'conn>(
             fields: query.selection_order,
             scalars,
             nested,
-            query_arguments: query.args,
             model,
             aggregation_rows,
         }

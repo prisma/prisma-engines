@@ -9,7 +9,7 @@ pub enum Operation {
 }
 
 impl Operation {
-    pub fn is_find_unique(&self, schema: &QuerySchemaRef) -> bool {
+    pub(crate) fn is_find_unique(&self, schema: &QuerySchemaRef) -> bool {
         schema
             .find_query_field(self.name())
             .map(|field| field.is_find_unique())

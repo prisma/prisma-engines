@@ -1,7 +1,7 @@
 #![deny(rust_2018_idioms, unsafe_code)]
-#![allow(clippy::derive_partial_eq_without_eq)]
 
 mod commands;
+mod json_rpc_stdio;
 mod logger;
 
 use schema_connector::{BoxFuture, ConnectorHost, ConnectorResult};

@@ -5,9 +5,8 @@
 
 use indoc::indoc;
 use query_engine_tests::{
-    query_core::TxId, render_test_datamodel, setup_metrics, setup_project, test_tracing_subscriber, ConnectorTag,
-    LogEmit, QueryResult, Runner, TestError, TestLogCapture, TestResult, TryFrom, WithSubscriber, CONFIG,
-    ENV_LOG_LEVEL,
+    query_core::TxId, render_test_datamodel, setup_metrics, test_tracing_subscriber, ConnectorTag, LogEmit,
+    QueryResult, Runner, TestError, TestLogCapture, TestResult, TryFrom, WithSubscriber, CONFIG, ENV_LOG_LEVEL,
 };
 use std::future::Future;
 use tokio::sync::mpsc;
@@ -74,9 +73,7 @@ impl Actor {
             Some("READ COMMITTED"),
         );
 
-        setup_project(&datamodel, &[]).await?;
-
-        let mut runner = Runner::load(datamodel, tag, setup_metrics(), log_capture).await?;
+        let mut runner = Runner::load(datamodel, &[], tag, setup_metrics(), log_capture).await?;
 
         tokio::spawn(async move {
             while let Some(message) = query_receiver.recv().await {

@@ -10,7 +10,7 @@ use schema::{constants::args, ConnectorContext};
 use std::convert::TryInto;
 
 /// Creates a top level delete record query and adds it to the query graph.
-pub fn delete_record(
+pub(crate) fn delete_record(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
     model: ModelRef,
