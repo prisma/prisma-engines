@@ -1,6 +1,5 @@
-use std::{env, path, process};
-
 use query_engine_tests::TestResult;
+use std::{env, path, process};
 
 /// Runs the command in the background and performs the future given, then kills the process
 pub(crate) async fn with_child_process<F>(command: &mut process::Command, f: F) -> TestResult<()>

@@ -11,7 +11,7 @@ use schema::{constants::args, ConnectorContext};
 use std::convert::TryInto;
 
 /// Creates an update record query and adds it to the query graph, together with it's nested queries and companion read query.
-pub fn update_record(
+pub(crate) fn update_record(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
     model: ModelRef,

@@ -20,7 +20,7 @@ impl Deref for InMemoryRecordProcessor {
 impl InMemoryRecordProcessor {
     /// Creates a new processor from the given query args.
     /// The original args will be modified to prevent db level processing.
-    pub fn new_from_query_args(args: &mut QueryArguments) -> Self {
+    pub(crate) fn new_from_query_args(args: &mut QueryArguments) -> Self {
         let processor = Self { args: args.clone() };
 
         args.distinct = None;
@@ -40,7 +40,7 @@ impl InMemoryRecordProcessor {
         self.take.map(|t| t < 0).unwrap_or(false)
     }
 
-    pub fn apply(&self, mut records: ManyRecords) -> ManyRecords {
+    pub(crate) fn apply(&self, mut records: ManyRecords) -> ManyRecords {
         if self.needs_reversed_order() {
             records.reverse();
         }
