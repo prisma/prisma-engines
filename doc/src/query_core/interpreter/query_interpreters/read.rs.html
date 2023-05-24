@@ -294,17 +294,9 @@
 <a href="#294" id="294">294</a>
 <a href="#295" id="295">295</a>
 <a href="#296" id="296">296</a>
-<a href="#297" id="297">297</a>
-<a href="#298" id="298">298</a>
-<a href="#299" id="299">299</a>
-<a href="#300" id="300">300</a>
-<a href="#301" id="301">301</a>
-<a href="#302" id="302">302</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{interpreter::InterpretationResult, query_ast::<span class="kw-2">*</span>, result_ast::<span class="kw-2">*</span>};
-<span class="kw">use </span>connector::{
-    <span class="self">self</span>, error::ConnectorError, ConnectionLike, QueryArguments, RelAggregationRow, RelAggregationSelection,
-};
+<span class="kw">use </span>connector::{<span class="self">self</span>, error::ConnectorError, ConnectionLike, RelAggregationRow, RelAggregationSelection};
 <span class="kw">use </span>futures::future::{BoxFuture, FutureExt};
 <span class="kw">use </span>inmemory_record_processor::InMemoryRecordProcessor;
 <span class="kw">use </span>prisma_models::ManyRecords;
@@ -360,7 +352,6 @@
                     fields: query.selection_order,
                     scalars,
                     nested,
-                    query_arguments: QueryArguments::new(model.clone()),
                     model,
                     aggregation_rows,
                 }
@@ -374,7 +365,6 @@
                 fields: query.selection_order,
                 scalars: ManyRecords::default(),
                 nested: <span class="macro">vec!</span>[],
-                query_arguments: QueryArguments::new(model.clone()),
                 model,
                 aggregation_rows: <span class="prelude-val">None</span>,
             }))),
@@ -429,7 +419,6 @@
                 fields: query.selection_order,
                 scalars,
                 nested,
-                query_arguments: query.args,
                 model: query.model,
                 aggregation_rows,
             }
@@ -475,7 +464,6 @@
             fields: query.selection_order,
             scalars,
             nested,
-            query_arguments: query.args,
             model,
             aggregation_rows,
         }

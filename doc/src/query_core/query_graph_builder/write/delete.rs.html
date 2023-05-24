@@ -102,7 +102,7 @@
 <span class="kw">use </span>std::convert::TryInto;
 
 <span class="doccomment">/// Creates a top level delete record query and adds it to the query graph.
-</span><span class="kw">pub fn </span>delete_record(
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>delete_record(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
     connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
     model: ModelRef,

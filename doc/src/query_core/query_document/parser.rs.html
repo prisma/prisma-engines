@@ -990,7 +990,7 @@
 <span class="kw">use </span>user_facing_errors::query_engine::validation::ValidationError;
 <span class="kw">use </span>uuid::Uuid;
 
-<span class="kw">pub struct </span>QueryDocumentParser {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>QueryDocumentParser {
     <span class="doccomment">/// NOW() default value that&#39;s reused for all NOW() defaults on a single query
     </span>default_now: PrismaValue,
 }

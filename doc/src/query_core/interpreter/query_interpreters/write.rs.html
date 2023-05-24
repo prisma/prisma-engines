@@ -156,13 +156,12 @@
 <a href="#156" id="156">156</a>
 <a href="#157" id="157">157</a>
 <a href="#158" id="158">158</a>
-<a href="#159" id="159">159</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     interpreter::{InterpretationResult, InterpreterError},
     query_ast::<span class="kw-2">*</span>,
     QueryResult, RecordSelection,
 };
-<span class="kw">use </span>connector::{ConnectionLike, NativeUpsert, QueryArguments};
+<span class="kw">use </span>connector::{ConnectionLike, NativeUpsert};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>execute(
     tx: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>ConnectionLike,
@@ -239,7 +238,6 @@
         fields: query.selection_order().to_owned(),
         scalars: scalars.into(),
         nested: Vec::new(),
-        query_arguments: QueryArguments::new(query.model().clone()),
         model: query.model().clone(),
         aggregation_rows: <span class="prelude-val">None</span>,
     }

@@ -138,10 +138,6 @@
 <a href="#138" id="138">138</a>
 <a href="#139" id="139">139</a>
 <a href="#140" id="140">140</a>
-<a href="#141" id="141">141</a>
-<a href="#142" id="142">142</a>
-<a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Parsed query document tree. Naming is WIP.
 //! Structures represent parsed and validated parts of the query document, used by the query builders.
 </span><span class="kw">use </span><span class="kw">crate</span>::QueryParserResult;
@@ -154,28 +150,24 @@
 
 <span class="attr">#[derive(Debug, Clone, Default, PartialEq)]
 </span><span class="kw">pub struct </span>ParsedInputMap {
-    <span class="kw">pub </span>tag: <span class="prelude-ty">Option</span>&lt;ObjectTag&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) tag: <span class="prelude-ty">Option</span>&lt;ObjectTag&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) map: IndexMap&lt;String, ParsedInputValue&gt;,
 }
 
 <span class="kw">impl </span>ParsedInputMap {
-    <span class="kw">pub fn </span>set_tag(<span class="kw-2">&amp;mut </span><span class="self">self</span>, tag: <span class="prelude-ty">Option</span>&lt;ObjectTag&gt;) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_tag(<span class="kw-2">&amp;mut </span><span class="self">self</span>, tag: <span class="prelude-ty">Option</span>&lt;ObjectTag&gt;) {
         <span class="self">self</span>.tag = tag;
     }
 
-    <span class="kw">pub fn </span>is_relation_envelope(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_relation_envelope(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.tag, <span class="prelude-val">Some</span>(ObjectTag::RelationEnvelope))
     }
 
-    <span class="kw">pub fn </span>is_composite_envelope(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_composite_envelope(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.tag, <span class="prelude-val">Some</span>(ObjectTag::CompositeEnvelope))
     }
 
-    <span class="kw">pub fn </span>is_field_ref_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.tag, <span class="prelude-val">Some</span>(ObjectTag::FieldRefType(<span class="kw">_</span>)))
-    }
-
-    <span class="kw">pub fn </span>is_nested_to_one_update_envelope(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_nested_to_one_update_envelope(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.tag, <span class="prelude-val">Some</span>(ObjectTag::NestedToOneUpdateEnvelope))
     }
 }
@@ -220,24 +212,24 @@
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>ParsedObject {
-    <span class="kw">pub </span>fields: Vec&lt;FieldPair&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) fields: Vec&lt;FieldPair&gt;,
 }
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>FieldPair {
     <span class="doccomment">/// The field parsed from the incoming query.
-    </span><span class="kw">pub </span>parsed_field: ParsedField,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) parsed_field: ParsedField,
 
     <span class="doccomment">/// The schema field that the parsed field corresponds to.
-    </span><span class="kw">pub </span>schema_field: OutputFieldId,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) schema_field: OutputFieldId,
 }
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>ParsedField {
-    <span class="kw">pub </span>name: String,
-    <span class="kw">pub </span>alias: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="kw">pub </span>arguments: Vec&lt;ParsedArgument&gt;,
-    <span class="kw">pub </span>nested_fields: <span class="prelude-ty">Option</span>&lt;ParsedObject&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) name: String,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) alias: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) arguments: Vec&lt;ParsedArgument&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) nested_fields: <span class="prelude-ty">Option</span>&lt;ParsedObject&gt;,
 }
 
 <span class="kw">impl </span>ParsedField {
@@ -264,7 +256,7 @@
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>ParsedArgument {
-    <span class="kw">pub </span>name: String,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) name: String,
     <span class="kw">pub</span>(<span class="kw">crate</span>) value: ParsedInputValue,
 }
 

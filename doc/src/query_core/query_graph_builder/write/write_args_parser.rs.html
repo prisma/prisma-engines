@@ -248,15 +248,15 @@
 <span class="kw">use </span>std::convert::TryInto;
 
 <span class="attr">#[derive(Debug)]
-</span><span class="kw">pub struct </span>WriteArgsParser {
-    <span class="kw">pub </span>args: WriteArgs,
-    <span class="kw">pub </span>nested: Vec&lt;(RelationFieldRef, ParsedInputMap)&gt;,
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>WriteArgsParser {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) args: WriteArgs,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) nested: Vec&lt;(RelationFieldRef, ParsedInputMap)&gt;,
 }
 
 <span class="kw">impl </span>WriteArgsParser {
     <span class="doccomment">/// Creates a new set of WriteArgsParser. Expects the parsed input map from the respective data key, not the enclosing map.
     /// E.g.: { data: { THIS MAP } } from the `data` argument of a write query.
-    </span><span class="kw">pub fn </span>from(model: <span class="kw-2">&amp;</span>ModelRef, data_map: ParsedInputMap) -&gt; QueryGraphBuilderResult&lt;<span class="self">Self</span>&gt; {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from(model: <span class="kw-2">&amp;</span>ModelRef, data_map: ParsedInputMap) -&gt; QueryGraphBuilderResult&lt;<span class="self">Self</span>&gt; {
         data_map.into_iter().try_fold(
             WriteArgsParser {
                 args: WriteArgs::new_empty(<span class="kw">crate</span>::executor::get_request_now()),

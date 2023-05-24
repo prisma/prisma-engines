@@ -1257,7 +1257,7 @@
 /// - `parent_node` needs to return a blog ID during execution.
 /// - `parent_relation_field` is the field on the `Blog` model, e.g. `posts`.
 /// - `filter` narrows down posts, e.g. posts where their titles start with a given string.
-</span><span class="kw">pub fn </span>insert_find_children_by_parent_node&lt;T&gt;(
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>insert_find_children_by_parent_node&lt;T&gt;(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
     parent_node: <span class="kw-2">&amp;</span>NodeRef,
     parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,

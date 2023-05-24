@@ -508,7 +508,7 @@
         .<span class="kw">await
     </span>}
 
-    <span class="kw">pub async fn </span>commit(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>commit(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
         <span class="kw">if let </span>CachedTx::Open(<span class="kw">_</span>) = <span class="self">self</span>.cached_tx {
             <span class="kw">let </span>open_tx = <span class="self">self</span>.cached_tx.as_open()<span class="question-mark">?</span>;
             <span class="macro">trace!</span>(<span class="string">&quot;[{}] committing.&quot;</span>, <span class="self">self</span>.id.to_string());
@@ -519,7 +519,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub async fn </span>rollback(<span class="kw-2">&amp;mut </span><span class="self">self</span>, was_timeout: bool) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>rollback(<span class="kw-2">&amp;mut </span><span class="self">self</span>, was_timeout: bool) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
         <span class="macro">debug!</span>(<span class="string">&quot;[{}] rolling back, was timed out = {was_timeout}&quot;</span>, <span class="self">self</span>.name());
         <span class="kw">if let </span>CachedTx::Open(<span class="kw">_</span>) = <span class="self">self</span>.cached_tx {
             <span class="kw">let </span>open_tx = <span class="self">self</span>.cached_tx.as_open()<span class="question-mark">?</span>;
@@ -536,7 +536,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="macro">format!</span>(<span class="string">&quot;itx-{:?}&quot;</span>, <span class="self">self</span>.id.to_string())
     }
 }
@@ -548,7 +548,7 @@
 }
 
 <span class="kw">impl </span>ITXClient {
-    <span class="kw">pub async fn </span>commit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>commit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
         <span class="kw">let </span>msg = <span class="self">self</span>.send_and_receive(TxOpRequestMsg::Commit).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">if let </span>TxOpResponse::Committed(resp) = msg {
@@ -559,7 +559,7 @@
         }
     }
 
-    <span class="kw">pub async fn </span>rollback(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>rollback(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
         <span class="kw">let </span>msg = <span class="self">self</span>.send_and_receive(TxOpRequestMsg::Rollback).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">if let </span>TxOpResponse::RolledBack(resp) = msg {
@@ -580,7 +580,7 @@
         }
     }
 
-    <span class="kw">pub async fn </span>batch_execute(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>batch_execute(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         operations: Vec&lt;Operation&gt;,
         traceparent: <span class="prelude-ty">Option</span>&lt;String&gt;,

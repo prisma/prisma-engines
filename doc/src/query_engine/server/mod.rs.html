@@ -606,7 +606,7 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub async fn </span>routes(cx: Arc&lt;PrismaContext&gt;, req: Request&lt;Body&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;Body&gt;, hyper::Error&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>routes(cx: Arc&lt;PrismaContext&gt;, req: Request&lt;Body&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;Body&gt;, hyper::Error&gt; {
     <span class="kw">let </span>start = Instant::now();
 
     <span class="kw">if </span>req.method() == Method::POST &amp;&amp; req.uri().path().starts_with(<span class="string">&quot;/transaction&quot;</span>) {

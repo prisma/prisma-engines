@@ -156,13 +156,13 @@
     <span class="doccomment">/// The api query schema.
     </span>query_schema: QuerySchemaRef,
     <span class="doccomment">/// The metrics registry
-    </span><span class="kw">pub </span>metrics: MetricRegistry,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) metrics: MetricRegistry,
     <span class="doccomment">/// Central query executor.
-    </span><span class="kw">pub </span>executor: Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync + <span class="lifetime">&#39;static</span>&gt;,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) executor: Box&lt;<span class="kw">dyn </span>QueryExecutor + Send + Sync + <span class="lifetime">&#39;static</span>&gt;,
     <span class="doccomment">/// The engine protocol in use
-    </span><span class="kw">pub </span>engine_protocol: EngineProtocol,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) engine_protocol: EngineProtocol,
     <span class="doccomment">/// Enabled features
-    </span><span class="kw">pub </span>enabled_features: EnabledFeatures,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) enabled_features: EnabledFeatures,
 }
 
 <span class="kw">impl </span>fmt::Debug <span class="kw">for </span>PrismaContext {
@@ -172,7 +172,7 @@
 }
 
 <span class="kw">impl </span>PrismaContext {
-    <span class="kw">pub async fn </span>new(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>new(
         schema: psl::ValidatedSchema,
         protocol: EngineProtocol,
         enabled_features: EnabledFeatures,
@@ -218,19 +218,19 @@
         <span class="prelude-val">Ok</span>(context)
     }
 
-    <span class="kw">pub fn </span>query_schema(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>QuerySchemaRef {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>query_schema(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>QuerySchemaRef {
         <span class="kw-2">&amp;</span><span class="self">self</span>.query_schema
     }
 
-    <span class="kw">pub fn </span>executor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>(<span class="kw">dyn </span>QueryExecutor + Send + Sync + <span class="lifetime">&#39;static</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>executor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>(<span class="kw">dyn </span>QueryExecutor + Send + Sync + <span class="lifetime">&#39;static</span>) {
         <span class="self">self</span>.executor.as_ref()
     }
 
-    <span class="kw">pub fn </span>primary_connector(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>primary_connector(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="self">self</span>.executor.primary_connector().name()
     }
 
-    <span class="kw">pub fn </span>engine_protocol(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; EngineProtocol {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>engine_protocol(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; EngineProtocol {
         <span class="self">self</span>.engine_protocol
     }
 }

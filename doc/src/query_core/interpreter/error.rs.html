@@ -57,13 +57,7 @@
 <a href="#57" id="57">57</a>
 <a href="#58" id="58">58</a>
 <a href="#59" id="59">59</a>
-<a href="#60" id="60">60</a>
-<a href="#61" id="61">61</a>
-<a href="#62" id="62">62</a>
-<a href="#63" id="63">63</a>
-<a href="#64" id="64">64</a>
-<a href="#65" id="65">65</a>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{CoreError, QueryGraphBuilderError, QueryGraphError};
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{QueryGraphBuilderError, QueryGraphError};
 <span class="kw">use </span>connector::error::ConnectorError;
 <span class="kw">use </span>prisma_models::DomainError;
 <span class="kw">use </span>std::fmt;
@@ -96,12 +90,6 @@
             <span class="self">Self</span>::QueryGraphBuilderError(e) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{e:?}&quot;</span>),
             <span class="kw">_ </span>=&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Error occurred during query execution:\n{self:?}&quot;</span>),
         }
-    }
-}
-
-<span class="kw">impl </span>From&lt;CoreError&gt; <span class="kw">for </span>InterpreterError {
-    <span class="kw">fn </span>from(e: CoreError) -&gt; <span class="self">Self </span>{
-        InterpreterError::Generic(<span class="macro">format!</span>(<span class="string">&quot;{e:?}&quot;</span>))
     }
 }
 

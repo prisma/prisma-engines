@@ -139,7 +139,7 @@
 
 <span class="doccomment">/// An installer for a global logger.
 </span><span class="attr">#[derive(Debug, Clone)]
-</span><span class="kw">pub struct </span>Logger {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Logger {
     service_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
     log_format: LogFormat,
     log_queries: bool,

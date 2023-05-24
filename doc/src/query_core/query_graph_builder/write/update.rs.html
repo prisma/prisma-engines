@@ -211,7 +211,7 @@
 <span class="kw">use </span>std::convert::TryInto;
 
 <span class="doccomment">/// Creates an update record query and adds it to the query graph, together with it&#39;s nested queries and companion read query.
-</span><span class="kw">pub fn </span>update_record(
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update_record(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
     connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
     model: ModelRef,

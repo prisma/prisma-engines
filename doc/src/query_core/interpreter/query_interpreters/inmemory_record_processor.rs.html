@@ -211,7 +211,7 @@
 <span class="kw">impl </span>InMemoryRecordProcessor {
     <span class="doccomment">/// Creates a new processor from the given query args.
     /// The original args will be modified to prevent db level processing.
-    </span><span class="kw">pub fn </span>new_from_query_args(args: <span class="kw-2">&amp;mut </span>QueryArguments) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_from_query_args(args: <span class="kw-2">&amp;mut </span>QueryArguments) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>processor = <span class="self">Self </span>{ args: args.clone() };
 
         args.distinct = <span class="prelude-val">None</span>;
@@ -231,7 +231,7 @@
         <span class="self">self</span>.take.map(|t| t &lt; <span class="number">0</span>).unwrap_or(<span class="bool-val">false</span>)
     }
 
-    <span class="kw">pub fn </span>apply(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>records: ManyRecords) -&gt; ManyRecords {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>apply(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>records: ManyRecords) -&gt; ManyRecords {
         <span class="kw">if </span><span class="self">self</span>.needs_reversed_order() {
             records.reverse();
         }

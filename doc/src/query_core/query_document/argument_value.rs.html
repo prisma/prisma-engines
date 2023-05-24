@@ -169,7 +169,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>should_be_parsed_as_json(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>should_be_parsed_as_json(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">match </span><span class="self">self </span>{
             ArgumentValue::Object(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
             ArgumentValue::List(l) =&gt; l.iter().all(|v| v.should_be_parsed_as_json()),
