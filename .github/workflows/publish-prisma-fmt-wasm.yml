@@ -29,6 +29,8 @@ jobs:
         with:
           ref: ${{ github.event.inputs.enginesHash }}
       - uses: cachix/install-nix-action@v21
+      # Use cachix cache to speed up building
+      - uses: cachix/cachix-action@v12
 
       #
       # Build
