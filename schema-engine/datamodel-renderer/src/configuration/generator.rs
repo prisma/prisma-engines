@@ -179,7 +179,7 @@ mod tests {
             "afterGenerate",
             vec![
                 Value::from("lambda"),
-                Vec::<Value<'_>>::new().into(),
+                Vec::<Value>::new().into(),
                 vec![
                     Value::from("print"),
                     vec![Value::from("quote"), Value::from("done!")].into(),
