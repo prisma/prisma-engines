@@ -12,11 +12,11 @@ pub use constant::Constant;
 pub use documentation::Documentation;
 pub use env::Env;
 pub use function::{Function, FunctionParam};
-use psl::GeneratorConfigValue;
 pub use text::Text;
 
 use crate::{datamodel::IndexOps, Cow};
 use base64::display::Base64Display;
+use psl::GeneratorConfigValue;
 use std::fmt;
 
 /// A PSL value representation.
