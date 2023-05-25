@@ -175,6 +175,18 @@ mod tests {
         generator.push_config_value("otherValue", "purr");
 
         generator.push_config_value("customFeatures", vec![Value::from("enums"), Value::from("models")]);
+        generator.push_config_value(
+            "afterGenerate",
+            vec![
+                Value::from("lambda"),
+                Vec::<Value<'_>>::new().into(),
+                vec![
+                    Value::from("print"),
+                    vec![Value::from("quote"), Value::from("done!")].into(),
+                ]
+                .into(),
+            ],
+        );
 
         let expected = expect![[r#"
             /// Here comes the sun.
@@ -189,6 +201,7 @@ mod tests {
               customValue     = "meow"
               otherValue      = "purr"
               customFeatures  = ["enums", "models"]
+              afterGenerate   = ["lambda", [], ["print", ["quote", "done!"]]]
             }
         "#]];
 
