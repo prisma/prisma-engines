@@ -1,7 +1,7 @@
 import path from 'node:path'
 import os from 'node:os'
 import fs from 'node:fs'
-import { setImmediate } from 'node:timers/promises'
+import { setImmediate, setTimeout } from 'node:timers/promises'
 
 import { Closeable, Library, Queryable } from './engines/types/Library'
 import { createMySQLQueryable } from './queryable/mysql'
@@ -79,6 +79,16 @@ async function main() {
   console.log('[js] resultSet', resultSet)
 
   // Note: calling `engine.disconnect` won't actually close the database connection.
+  console.log('[js] disconnecting...')
+  await engine.disconnect('trace')
+  console.log('[js] disconnected')
+
+  console.log('[js] connecting...')
+  await engine.connect('trace')
+  console.log('[js] connecting')
+
+  await setTimeout(2000)
+
   console.log('[js] disconnecting...')
   await engine.disconnect('trace')
   console.log('[js] disconnected')
