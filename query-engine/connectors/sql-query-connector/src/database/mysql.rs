@@ -68,7 +68,7 @@ impl Mysql {
         let pool = RuntimePool::NodeJS(NodeJSPool { nodejs_queryable });
 
         Ok(Mysql {
-            pool: pool,
+            pool,
             connection_info,
             features: features.to_owned(),
         })
