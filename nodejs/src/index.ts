@@ -1,12 +1,9 @@
-import EventEmitter from 'node:events'
 import path from 'node:path'
 import os from 'node:os'
+import fs from 'node:fs'
 import { setImmediate } from 'node:timers/promises'
 
-import { DefaultLibraryLoader } from './engines/DefaultLibraryLoader'
-import { LibraryEngine } from './engines/LibraryEngine'
-import { disabledTracingHelper } from './engines/TracingHelper'
-import { Closeable, Queryable } from './engines/types/Library'
+import { Closeable, Library, Queryable } from './engines/types/Library'
 import { createMySQLQueryable } from './queryable/mysql'
 import { createMockQueryable } from './queryable/mock'
 
@@ -22,7 +19,7 @@ const binder = (queryable: Queryable & Closeable): Queryable & Closeable => ({
 })
 
 async function main() {
-  const connectionString = `${process.env.TEST_DATABASE_URL as string}/test`
+  const connectionString = `${process.env.TEST_DATABASE_URL as string}`
 
   /* Use `mock` if you want to test local promises with no database */
   const mock = createMockQueryable(connectionString)
@@ -33,49 +30,63 @@ async function main() {
   // `binder` is required to preserve the `this` context to the group of functions passed to libquery.
   const nodejsFnCtx = binder(db)
 
-  // I assume nobody will run this on Windows ¯\_(ツ)_/¯
-  const libExt = os.platform() === 'darwin' ? 'dylib' : 'so'
-  const libQueryEnginePath = path.join(__dirname, `../../target/debug/libquery_engine.${libExt}`)
-
-  const schemaPath = path.join(__dirname, `../prisma/schema.prisma`)
-
-  const logEmitter = new EventEmitter().on('error', () => {})
-
-  const engineConfig = {
-    nodejsFnCtx,
-    cwd: process.cwd(),
-    dirname: __dirname,
-    enableDebugLogs: true,
-    allowTriggerPanic: false,
-    datamodelPath: schemaPath,
-    prismaPath: libQueryEnginePath,
-    showColors: false,
-    logLevel: 'info' as const,
-    logQueries: false,
-    env: {},
-    flags: [],
-    clientVersion: 'x.y.z',
-    previewFeatures: ['node-drivers'],
-    activeProvider: 'mysql',
-    tracingHelper: disabledTracingHelper,
-    logEmitter: logEmitter,
-    engineProtocol: 'json' as const,
-    isBundled: false,
-  }
-
-  const libraryLoader = new DefaultLibraryLoader(engineConfig, libQueryEnginePath)
-  const engine = new LibraryEngine(engineConfig, libraryLoader)
-
   // wait for the database pool to be initialized
   await setImmediate(0)
 
-  // call the `engine.engine?.testAsync` function if you want to quickly test the async/await functionality.
-  console.log('calling test_async')
-  // @ts-ignore: 
-  const result = await engine.engine?.testAsync('SELECT id, firstname, company_id FROM some_user');
-  console.log('called test_async', result)
+  // I assume nobody will run this on Windows ¯\_(ツ)_/¯
+  const libExt = os.platform() === 'darwin' ? 'dylib' : 'so'
+  const libQueryEnginePath = path.join(__dirname, `../../target/debug/libquery_engine.${libExt}`)
+  
+  const schemaPath = path.join(__dirname, `../prisma/schema.prisma`)
 
+  const libqueryEngine = { exports: {} as unknown as Library} 
+  // @ts-ignore
+  process.dlopen(libqueryEngine, libQueryEnginePath)
+
+  const QueryEngine = libqueryEngine.exports.QueryEngine
+
+  const queryEngineOptions = {
+    datamodel: fs.readFileSync(schemaPath, 'utf-8'),
+    configDir: '.',
+    engineProtocol: 'json' as const,
+    logLevel: 'info' as const,
+    logQueries: false,
+    env: process.env,
+    ignoreEnvVarErrors: true
+  }
+
+  const logCallback = (...args) => console.log(args)
+  const engine = new QueryEngine(queryEngineOptions, logCallback, nodejsFnCtx)
+
+  console.log(engine)
+
+  console.log('[js] connecting...')
+  await engine.connect('trace')
+  console.log('[js] connected')
+
+  const resultSet = await engine.query(`{
+    "modelName": "some_user",
+    "action": "findMany",
+    "query": {
+        "selection": {
+          "id": true,
+          "firstname": true,
+          "company_id": true
+        }
+      } 
+    }`, 'trace', undefined)
+
+  console.log('[js] resultSet', resultSet)
+
+  // Note: calling `engine.disconnect` won't actually close the database connection.
+  console.log('[js] disconnecting...')
+  await engine.disconnect('trace')
+  console.log('[js] disconnected')
+
+  // Close the database connection. This is required to prevent the process from hanging.
+  console.log('[js] closing database connection...')
   await nodejsFnCtx.close()
+  console.log('[js] closed database connection')
 }
 
 main().catch((e) => {
