@@ -3,7 +3,6 @@ pub mod error;
 pub mod functions;
 pub mod log_callback;
 pub mod logger;
-pub mod node_drivers;
 
 mod tracer;
 

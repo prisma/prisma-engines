@@ -21,6 +21,7 @@ pub struct NodeJSFunctionContext {
     version: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
 
     /// Return true iff the underlying database connection is healthy.
+    #[allow(dead_code)]
     is_healthy: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
 }
 
