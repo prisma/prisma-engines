@@ -77,8 +77,9 @@ async fn mysql(
 
     if source.provider == "@prisma/mysql" {
         // write nodejs_queryable extracting the value of Option<NodeJSQueryable> and then take it:
-        let mut nodejs_queryable_guard = nodejs_queryable_lock.write().await;
-        let nodejs_queryable = (*nodejs_queryable_guard).take().unwrap();
+        let nodejs_queryable_guard = nodejs_queryable_lock.read().await;
+        let nodejs_queryable_option = (*nodejs_queryable_guard).clone();
+        let nodejs_queryable = nodejs_queryable_option.unwrap();
 
         let mysql = Mysql::from_source_and_nodejs_driver(url, features, nodejs_queryable).await?;
         trace!("Loaded @prisma/mysql query connector.");
