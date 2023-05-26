@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 prisma-models = { path = "../prisma-models" }
+nodejs-drivers = { path = "../nodejs-drivers" }
 query-core = { path = "../core" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 psl.workspace = true
@@ -20,6 +21,8 @@ thiserror = "1"
 tracing = "0.1"
 url = "2"
 connection-string.workspace = true 
+quaint.workspace = true
+tokio.workspace = true
 
 mongodb-query-connector = { path = "../connectors/mongodb-query-connector", optional = true }
 sql-query-connector = { path = "../connectors/sql-query-connector", optional = true }
