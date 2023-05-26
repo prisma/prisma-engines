@@ -13,7 +13,7 @@ use psl_core::{
     },
     diagnostics::{DatamodelError, Diagnostics, Span},
     parser_database::{walkers, ReferentialAction, ScalarType},
-    PreviewFeature,
+    Datasource, PreviewFeature,
 };
 use MySqlType::*;
 
@@ -234,6 +234,20 @@ impl Connector for MySqlDatamodelConnector {
             for field in model.relation_fields() {
                 validations::uses_native_referential_action_set_default(self, field, errors);
             }
+        }
+    }
+
+    fn validate_datasource(
+        &self,
+        preview_features: BitFlags<PreviewFeature>,
+        ds: &Datasource,
+        errors: &mut Diagnostics,
+    ) {
+        if ds.provider == "@prisma/mysql" && !preview_features.contains(PreviewFeature::NodeDrivers) {
+            errors.push_error(DatamodelError::new_validation_error(
+                "The provider \"@prisma/mysql\" is currently in preview and must be explicitly enabled. Please add the preview feature flag \"nodeDrivers\" to the generator block in your schema.prisma file.",
+                Span::empty(),
+            ));
         }
     }
 

@@ -1,0 +1,10 @@
+generator client {
+    provider = "prisma-client-js"
+    previewFeatures = ["nodeDrivers"]
+}
+
+datasource db {
+    provider = "@prisma/mysql"
+    url = "mysql://"
+    relationMode = "prisma"
+}
