@@ -2366,6 +2366,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "nodejs-drivers"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "expect-test",
+ "napi",
+ "napi-derive",
+ "quaint",
+ "serde",
+ "tokio",
+]
+
+[[package]]
 name = "nom"
 version = "7.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3300,9 +3313,11 @@ dependencies = [
  "napi",
  "napi-build",
  "napi-derive",
+ "nodejs-drivers",
  "opentelemetry",
  "prisma-models",
  "psl",
+ "quaint",
  "query-connector",
  "query-core",
  "query-engine-metrics",
@@ -3574,14 +3589,17 @@ dependencies = [
  "insta",
  "itertools",
  "mongodb-query-connector",
+ "nodejs-drivers",
  "prisma-models",
  "psl",
+ "quaint",
  "query-core",
  "schema",
  "serde",
  "serde_json",
  "sql-query-connector",
  "thiserror",
+ "tokio",
  "tracing",
  "url",
  "user-facing-errors",
@@ -4261,6 +4279,7 @@ dependencies = [
  "cuid",
  "futures",
  "itertools",
+ "nodejs-drivers",
  "once_cell",
  "opentelemetry",
  "prisma-models",
