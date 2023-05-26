@@ -1,39 +1,39 @@
-use super::connection::SqlConnection;
-use crate::{query_ext::QueryExt, FromSource, Queryable, SqlError};
+use super::{
+    connection::SqlConnection,
+    nodejs::{RuntimeConnection, RuntimePool},
+};
+use crate::{FromSource, SqlError};
 use async_trait::async_trait;
 use connector_interface::{
     self as connector,
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
+use nodejs_drivers::{pool::NodeJSPool, queryable::NodeJSQueryable};
 use quaint::{
     pooled::{PooledConnection, Quaint},
-    prelude::{ConnectionInfo, TransactionCapable},
+    prelude::ConnectionInfo,
 };
 use std::time::Duration;
 
-pub struct NodeJSPool;
-
-pub enum MysqlPool {
-    Rust(Quaint),
-    NodeJS(NodeJSPool),
-}
-
-impl MysqlPool {
+impl RuntimePool {
     /// Reserve a connection from the pool
-    pub async fn check_out(&self) -> crate::Result<impl TransactionCapable + Send + Sync + 'static> {
+    pub async fn check_out(&self) -> crate::Result<RuntimeConnection> {
         match self {
-            MysqlPool::Rust(pool) => {
+            Self::Rust(pool) => {
                 let conn: PooledConnection = pool.check_out().await.map_err(SqlError::from)?;
-                Ok(conn)
+                Ok(RuntimeConnection::Rust(conn))
             }
-            MysqlPool::NodeJS(_) => unimplemented!("NodeJS connection pool"),
+            Self::NodeJS(pool) => {
+                let conn: NodeJSQueryable = pool.nodejs_queryable.clone();
+                Ok(RuntimeConnection::NodeJS(conn))
+            }
         }
     }
 }
 
 pub struct Mysql {
-    pool: MysqlPool,
+    pool: RuntimePool,
     connection_info: ConnectionInfo,
     features: psl::PreviewFeatures,
 }
@@ -45,6 +45,36 @@ impl Mysql {
     }
 }
 
+fn get_connection_info(url: &str) -> connector::Result<ConnectionInfo> {
+    let database_str = url;
+
+    let connection_info = ConnectionInfo::from_url(database_str).map_err(|err| {
+        ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl {
+            details: err.to_string(),
+            url: database_str.to_string(),
+        })
+    })?;
+
+    Ok(connection_info)
+}
+
+impl Mysql {
+    pub async fn from_source_and_nodejs_driver(
+        url: &str,
+        features: psl::PreviewFeatures,
+        nodejs_queryable: NodeJSQueryable,
+    ) -> connector_interface::Result<Mysql> {
+        let connection_info = get_connection_info(url)?;
+        let pool = RuntimePool::NodeJS(NodeJSPool { nodejs_queryable });
+
+        Ok(Mysql {
+            pool: pool,
+            connection_info,
+            features: features.to_owned(),
+        })
+    }
+}
+
 #[async_trait]
 impl FromSource for Mysql {
     async fn from_source(
@@ -52,14 +82,7 @@ impl FromSource for Mysql {
         url: &str,
         features: psl::PreviewFeatures,
     ) -> connector_interface::Result<Mysql> {
-        let database_str = url;
-
-        let connection_info = ConnectionInfo::from_url(database_str).map_err(|err| {
-            ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl {
-                details: err.to_string(),
-                url: database_str.to_string(),
-            })
-        })?;
+        let connection_info = get_connection_info(url)?;
 
         let mut builder = Quaint::builder(url)
             .map_err(SqlError::from)
@@ -72,33 +95,33 @@ impl FromSource for Mysql {
         let connection_info = pool.connection_info().to_owned();
 
         Ok(Mysql {
-            pool: MysqlPool::Rust(pool),
+            pool: RuntimePool::Rust(pool),
             connection_info,
             features: features.to_owned(),
         })
     }
 }
 
-// Note: implementing something like
-// `trait NewTrait: Connection + TransactionCapable<(dyn Connection + std::marker::Send + Sync + 'static)> {}`
-// and making `get_connection` return `Result<Box<dyn NewTrait>>`, would result in the error:
-// `the trait `NewTrait` cannot be made into an object`
-
 #[async_trait]
 impl Connector for Mysql {
     async fn get_connection<'a>(&'a self) -> connector::Result<Box<dyn Connection + Send + Sync + 'static>> {
         super::catch(self.connection_info.clone(), async move {
-            let conn = self.pool.check_out().await?;
-            let conn = SqlConnection::new(conn, &self.connection_info, self.features);
+            let runtime_conn = self.pool.check_out().await?;
 
-            // TODO: this line fails due to reasons explained in the other comments in this file.
-            Ok(Box::new(conn) as Box<dyn Connection + Send + Sync + 'static>)
+            // Note: `runtime_conn` must be `Sized`, as that's required by `TransactionCapable`
+            let sql_conn = SqlConnection::new(runtime_conn, &self.connection_info, self.features);
+
+            Ok(Box::new(sql_conn) as Box<dyn Connection + Send + Sync + 'static>)
         })
         .await
     }
 
     fn name(&self) -> &'static str {
-        "mysql"
+        if self.pool.is_nodejs() {
+            "@prisma/mysql"
+        } else {
+            "mysql"
+        }
     }
 
     fn should_retry_on_transient_error(&self) -> bool {
