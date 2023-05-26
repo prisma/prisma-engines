@@ -20,6 +20,7 @@ members = [
   "query-engine/black-box-tests",
   "query-engine/dmmf",
   "query-engine/metrics",
+  "query-engine/nodejs-drivers",
   "query-engine/prisma-models",
   "query-engine/query-engine",
   "query-engine/query-engine-node-api",
