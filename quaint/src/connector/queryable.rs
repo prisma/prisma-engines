@@ -106,7 +106,7 @@ where
     Self: Sized,
 {
     /// Starts a new transaction
-    async fn start_transaction(&self, isolation: Option<IsolationLevel>) -> crate::Result<super::Transaction<'_>> {
+    async fn start_transaction(&self, isolation: Option<IsolationLevel>) -> crate::Result<Transaction<'_>> {
         let opts = TransactionOptions::new(isolation, self.requires_isolation_first());
         Transaction::new(self, self.begin_statement(), opts).await
     }
