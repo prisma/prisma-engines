@@ -51,7 +51,7 @@ impl Runner {
         let schema = psl::parse_schema(datamodel).unwrap();
         let data_source = schema.configuration.datasources.first().unwrap();
         let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
-        let executor = load_executor(data_source, schema.configuration.preview_features(), &url).await?;
+        let executor = load_executor(data_source, schema.configuration.preview_features(), &url, None).await?;
         let query_schema: QuerySchemaRef = Arc::new(schema::build(Arc::new(schema), true));
 
         Ok(Self {
