@@ -14,7 +14,7 @@ pub async fn load(
     source: &Datasource,
     features: PreviewFeatures,
     url: &str,
-    nodejs_queryable_option: Option<&'static NodeJSQueryable>,
+    nodejs_queryable_option: Option<&NodeJSQueryable>,
 ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync + 'static>> {
     match source.active_provider {
         p if SQLITE.is_provider(p) => sqlite(source, url, features).await,
@@ -70,7 +70,7 @@ async fn mysql(
     source: &Datasource,
     url: &str,
     features: PreviewFeatures,
-    nodejs_queryable_option: Option<&'static NodeJSQueryable>,
+    nodejs_queryable_option: Option<&NodeJSQueryable>,
 ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync>> {
     trace!("Loading MySQL query connector...");
 
