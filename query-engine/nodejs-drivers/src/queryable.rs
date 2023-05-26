@@ -51,7 +51,7 @@ impl Queryable for NodeJSQueryable {
             result_set
                 .rows
                 .into_iter()
-                .map(|row| row.into_iter().map(|value| quaint::Value::text(value)).collect())
+                .map(|row| row.into_iter().map(quaint::Value::text).collect())
                 .collect(),
         ))
     }
