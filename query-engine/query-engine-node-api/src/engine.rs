@@ -1,7 +1,9 @@
 use crate::{error::ApiError, log_callback::LogCallback, logger::Logger};
 use futures::FutureExt;
-use napi::{Env, JsFunction, JsUnknown};
+use napi::{Env, JsFunction, JsObject, JsUnknown};
 use napi_derive::napi;
+use nodejs_drivers::ctx::read_nodejs_function_ctx;
+use nodejs_drivers::queryable::NodeJSQueryable;
 use psl::PreviewFeature;
 use query_core::{
     protocol::EngineProtocol,
@@ -29,6 +31,9 @@ use user_facing_errors::Error;
 pub struct QueryEngine {
     inner: RwLock<Inner>,
     logger: Logger,
+
+    // This Queryable implementation is only initialized when `Some(fn_ctx)` is passed to the constructor.
+    nodejs_queryable: RwLock<Option<NodeJSQueryable>>,
 }
 
 /// The state of the engine.
@@ -142,9 +147,23 @@ impl QueryEngine {
     /// `query_engine_node_api::node_drivers::engine::QueryEngineNodeDrivers` as well.
     /// Unfortunately the `#[napi]` macro does not support deriving traits.
     #[napi(constructor)]
-    pub fn new(napi_env: Env, options: JsUnknown, callback: JsFunction) -> napi::Result<Self> {
+    pub fn new(
+        napi_env: Env,
+        options: JsUnknown,
+        callback: JsFunction,
+        fn_ctx: Option<JsObject>,
+    ) -> napi::Result<Self> {
         let log_callback = LogCallback::new(napi_env, callback)?;
         log_callback.unref(&napi_env)?;
+
+        println!("fn_ctx: {:?}", fn_ctx.is_some());
+
+        let nodejs_queryable = fn_ctx.map(|ctx| {
+            let ctx = read_nodejs_function_ctx(ctx).unwrap();
+            NodeJSQueryable::new(ctx)
+        });
+
+        println!("nodejs_queryable: {:?}", nodejs_queryable.is_some());
 
         let ConstructorOptions {
             datamodel,
@@ -217,6 +236,7 @@ impl QueryEngine {
         Ok(Self {
             inner: RwLock::new(Inner::Builder(builder)),
             logger,
+            nodejs_queryable: RwLock::new(nodejs_queryable),
         })
     }
 
@@ -257,7 +277,7 @@ impl QueryEngine {
                 let preview_features = arced_schema.configuration.preview_features();
 
                 let executor_fut = async {
-                    let executor = load_executor(data_source, preview_features, &url).await?;
+                    let executor = load_executor(data_source, preview_features, &url, &self.nodejs_queryable).await?;
                     let connector = executor.primary_connector();
 
                     let conn_span = tracing::info_span!(
