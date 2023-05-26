@@ -33,11 +33,7 @@ export type Closeable = {
 }
 
 export interface QueryEngineConstructor {
-  new (config: QueryEngineConfig, logger: (log: string) => void): QueryEngineInstance
-}
-
-export interface QueryEngineNodeDriversConstructor {
-  new (config: QueryEngineConfig, logger: (log: string) => void, nodejsFnCtx: Queryable): QueryEngineInstance
+  new (config: QueryEngineConfig, logger: (log: string) => void, nodejsFnCtx?: Queryable): QueryEngineInstance
 }
 
 export interface LibraryLoader {
@@ -47,7 +43,6 @@ export interface LibraryLoader {
 // Main
 export type Library = {
   QueryEngine: QueryEngineConstructor
-  QueryEngineNodeDrivers: QueryEngineNodeDriversConstructor
 
   version: () => {
     // The commit hash of the engine
