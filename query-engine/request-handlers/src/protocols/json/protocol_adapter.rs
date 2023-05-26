@@ -8,7 +8,7 @@ use query_core::{
     ArgumentValue, Operation, Selection,
 };
 use serde_json::Value as JsonValue;
-use std::{collections::HashSet, str::FromStr};
+use std::str::FromStr;
 
 enum OperationType {
     Read,
@@ -75,7 +75,7 @@ impl JsonProtocolAdapter {
                                 &mut selection,
                                 container,
                                 schema_object,
-                                &mut HashSet::<(String, String)>::new(),
+                                &mut Vec::<String>::new(),
                                 query_schema,
                             )?;
                         }
@@ -300,7 +300,7 @@ impl JsonProtocolAdapter {
         selection: &mut Selection,
         container: &ParentContainer,
         schema_object: &ObjectType,
-        walked_fields: &mut HashSet<(String, String)>,
+        walked_types_stack: &mut Vec<String>,
         query_schema: &QuerySchema,
     ) -> crate::Result<()> {
         match container {
@@ -315,7 +315,7 @@ impl JsonProtocolAdapter {
                             &mut nested_selection,
                             &ParentContainer::from(cf.typ()),
                             schema_field.field_type.as_object_type(&query_schema.db).unwrap().1,
-                            walked_fields,
+                            walked_types_stack,
                             query_schema,
                         )?;
 
@@ -324,6 +324,13 @@ impl JsonProtocolAdapter {
                 }
             }
             ParentContainer::CompositeType(ct) => {
+                let composite_type_name = ct.name().to_owned();
+                if walked_types_stack.contains(&composite_type_name) {
+                    return Err(HandlerError::query_conversion(
+                        "$composites: true does not support recursive composite types.",
+                    ));
+                }
+                walked_types_stack.push(composite_type_name);
                 for f in ct.fields() {
                     let field_name = f.name().to_owned();
 
@@ -335,21 +342,13 @@ impl JsonProtocolAdapter {
                                 selection.push_nested_selection(Selection::with_name(s.name().to_owned()))
                             }
                             Field::Composite(cf) => {
-                                let walked_model_field = (ct.name().to_owned(), field_name);
-                                if walked_fields.contains(&walked_model_field) {
-                                    return Err(HandlerError::query_conversion(
-                                        "$composites: true does not support recursive composite types.",
-                                    ));
-                                }
-
-                                walked_fields.insert(walked_model_field);
                                 let mut nested_selection = Selection::with_name(cf.name().to_owned());
 
                                 Self::default_composite_selection(
                                     &mut nested_selection,
                                     &ParentContainer::from(cf.typ()),
                                     schema_field.field_type.as_object_type(&query_schema.db).unwrap().1,
-                                    walked_fields,
+                                    walked_types_stack,
                                     query_schema,
                                 )?;
 
@@ -359,6 +358,7 @@ impl JsonProtocolAdapter {
                         }
                     }
                 }
+                let _ = walked_types_stack.pop();
             }
         }
 
@@ -377,7 +377,7 @@ impl JsonProtocolAdapter {
                 selection,
                 container,
                 schema_object,
-                &mut HashSet::<(String, String)>::new(),
+                &mut Vec::<String>::new(),
                 query_schema,
             )?;
         }
@@ -1705,6 +1705,149 @@ mod tests {
                                 },
                                 Selection {
                                     name: "zipCode",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [],
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ),
+        )
+        "###);
+    }
+
+    fn nested_sibling_composite_schema() -> schema::QuerySchema {
+        let schema_str = r#"
+          generator client {
+            provider        = "prisma-client-js"
+          }
+          
+          datasource db {
+            provider = "mongodb"
+            url      = "mongodb://"
+          }
+          
+          model User {
+            id         String    @id @default(auto()) @map("_id") @db.ObjectId
+            billingAddress Address
+            shippingAddress Address
+          }
+          
+          type Address {
+            streetAddress StreetAddress
+            zipCode String
+            city String
+          }
+          
+          type StreetAddress {
+            streetName String
+            houseNumber String
+          }       
+        "#;
+        let mut schema = psl::validate(schema_str.into());
+
+        schema.diagnostics.to_result().unwrap();
+
+        schema::build(Arc::new(schema), true)
+    }
+
+    #[test]
+    pub fn nested_sibling_composites() {
+        let query: JsonSingleQuery = serde_json::from_str(
+            r#"{
+                "modelName": "User",
+                "action": "createOne",
+                "query": {
+                  "selection": {
+                    "$composites": true
+                  }
+                }
+              }"#,
+        )
+        .unwrap();
+
+        let operation = JsonProtocolAdapter::convert_single(query, &nested_sibling_composite_schema());
+
+        assert_debug_snapshot!(operation, @r###"
+        Ok(
+            Write(
+                Selection {
+                    name: "createOneUser",
+                    alias: None,
+                    arguments: [],
+                    nested_selections: [
+                        Selection {
+                            name: "billingAddress",
+                            alias: None,
+                            arguments: [],
+                            nested_selections: [
+                                Selection {
+                                    name: "streetAddress",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [
+                                        Selection {
+                                            name: "streetName",
+                                            alias: None,
+                                            arguments: [],
+                                            nested_selections: [],
+                                        },
+                                        Selection {
+                                            name: "houseNumber",
+                                            alias: None,
+                                            arguments: [],
+                                            nested_selections: [],
+                                        },
+                                    ],
+                                },
+                                Selection {
+                                    name: "zipCode",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [],
+                                },
+                                Selection {
+                                    name: "city",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [],
+                                },
+                            ],
+                        },
+                        Selection {
+                            name: "shippingAddress",
+                            alias: None,
+                            arguments: [],
+                            nested_selections: [
+                                Selection {
+                                    name: "streetAddress",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [
+                                        Selection {
+                                            name: "streetName",
+                                            alias: None,
+                                            arguments: [],
+                                            nested_selections: [],
+                                        },
+                                        Selection {
+                                            name: "houseNumber",
+                                            alias: None,
+                                            arguments: [],
+                                            nested_selections: [],
+                                        },
+                                    ],
+                                },
+                                Selection {
+                                    name: "zipCode",
+                                    alias: None,
+                                    arguments: [],
+                                    nested_selections: [],
+                                },
+                                Selection {
+                                    name: "city",
                                     alias: None,
                                     arguments: [],
                                     nested_selections: [],
