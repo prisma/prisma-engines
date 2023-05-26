@@ -22,6 +22,7 @@ psl.workspace = true
 sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector" }
 prisma-models = { path = "../prisma-models" }
 nodejs-drivers = { path = "../nodejs-drivers" }
+once_cell = "1.15"
 
 napi = { version = "2.12.4", default-features = false, features = ["napi8", "tokio_rt", "serde-json"] }
 napi-derive = "2.12.3"
