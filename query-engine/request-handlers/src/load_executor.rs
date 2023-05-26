@@ -3,7 +3,6 @@ use psl::{builtin_connectors::*, Datasource, PreviewFeatures};
 use query_core::{executor::InterpretingExecutor, Connector, QueryExecutor};
 use sql_query_connector::*;
 use std::collections::HashMap;
-use tokio::sync::RwLock;
 use tracing::trace;
 use url::Url;
 
@@ -15,11 +14,11 @@ pub async fn load(
     source: &Datasource,
     features: PreviewFeatures,
     url: &str,
-    nodejs_queryable_lock: &RwLock<Option<NodeJSQueryable>>,
+    nodejs_queryable_option: Option<&'static NodeJSQueryable>,
 ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync + 'static>> {
     match source.active_provider {
         p if SQLITE.is_provider(p) => sqlite(source, url, features).await,
-        p if MYSQL.is_provider(p) => mysql(source, url, features, nodejs_queryable_lock).await,
+        p if MYSQL.is_provider(p) => mysql(source, url, features, nodejs_queryable_option).await,
         p if POSTGRES.is_provider(p) => postgres(source, url, features).await,
         p if MSSQL.is_provider(p) => mssql(source, url, features).await,
         p if COCKROACH.is_provider(p) => postgres(source, url, features).await,
@@ -71,19 +70,15 @@ async fn mysql(
     source: &Datasource,
     url: &str,
     features: PreviewFeatures,
-    nodejs_queryable_lock: &RwLock<Option<NodeJSQueryable>>,
+    nodejs_queryable_option: Option<&'static NodeJSQueryable>,
 ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync>> {
     trace!("Loading MySQL query connector...");
 
     if source.provider == "@prisma/mysql" {
-        // write nodejs_queryable extracting the value of Option<NodeJSQueryable> and then take it:
-        let nodejs_queryable_guard = nodejs_queryable_lock.read().await;
-        let nodejs_queryable_option = (*nodejs_queryable_guard).clone();
-        let nodejs_queryable = nodejs_queryable_option.unwrap();
-
-        let mysql = Mysql::from_source_and_nodejs_driver(url, features, nodejs_queryable).await?;
+        let nodejs_queryable = nodejs_queryable_option.unwrap().clone();
+        let prisma_mysql = Mysql::from_source_and_nodejs_driver(url, features, nodejs_queryable).await?;
         trace!("Loaded @prisma/mysql query connector.");
-        return Ok(sql_executor(mysql, false));
+        return Ok(sql_executor(prisma_mysql, false));
     }
 
     let mysql = Mysql::from_source(source, url, features).await?;

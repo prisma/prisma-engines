@@ -4,6 +4,7 @@ use napi::{Env, JsFunction, JsObject, JsUnknown};
 use napi_derive::napi;
 use nodejs_drivers::ctx::read_nodejs_function_ctx;
 use nodejs_drivers::queryable::NodeJSQueryable;
+use once_cell::sync::OnceCell;
 use psl::PreviewFeature;
 use query_core::{
     protocol::EngineProtocol,
@@ -26,14 +27,13 @@ use tracing::{field, instrument::WithSubscriber, Instrument, Span};
 use tracing_subscriber::filter::LevelFilter;
 use user_facing_errors::Error;
 
+static NODEJS_QUERYABLE: OnceCell<NodeJSQueryable> = OnceCell::new();
+
 /// The main query engine used by JS
 #[napi]
 pub struct QueryEngine {
     inner: RwLock<Inner>,
     logger: Logger,
-
-    // This Queryable implementation is only initialized when `Some(fn_ctx)` is passed to the constructor.
-    nodejs_queryable: RwLock<Option<NodeJSQueryable>>,
 }
 
 /// The state of the engine.
@@ -158,12 +158,13 @@ impl QueryEngine {
 
         println!("fn_ctx: {:?}", fn_ctx.is_some());
 
-        let nodejs_queryable = fn_ctx.map(|ctx| {
+        // Initialize the global NODEJS_QUERYABLE from fn_ctx.
+        // This implies that there can only be one QueryEngine instance per process.
+        fn_ctx.map(|ctx| {
             let ctx = read_nodejs_function_ctx(ctx).unwrap();
-            NodeJSQueryable::new(ctx)
+            let nodejs_queryable = NodeJSQueryable::new(ctx);
+            NODEJS_QUERYABLE.set(nodejs_queryable).unwrap();
         });
-
-        println!("nodejs_queryable: {:?}", nodejs_queryable.is_some());
 
         let ConstructorOptions {
             datamodel,
@@ -236,7 +237,6 @@ impl QueryEngine {
         Ok(Self {
             inner: RwLock::new(Inner::Builder(builder)),
             logger,
-            nodejs_queryable: RwLock::new(nodejs_queryable),
         })
     }
 
@@ -277,11 +277,8 @@ impl QueryEngine {
                 let preview_features = arced_schema.configuration.preview_features();
 
                 let executor_fut = async {
-                    let executor = load_executor(data_source, preview_features, &url, &self.nodejs_queryable).await?;
-                    // Note: `self.nodejs_queryable` is now None, as it's been moved into the executor.
-                    // However, as the engine can be disconnected and reconnected, the second time `self.connect()`
-                    // is called, will cause a panic within `load_executor`.
-
+                    let nodejs_queryable = NODEJS_QUERYABLE.get();
+                    let executor = load_executor(data_source, preview_features, &url, nodejs_queryable).await?;
                     let connector = executor.primary_connector();
 
                     let conn_span = tracing::info_span!(

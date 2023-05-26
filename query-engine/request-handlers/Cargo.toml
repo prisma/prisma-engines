@@ -22,7 +22,6 @@ tracing = "0.1"
 url = "2"
 connection-string.workspace = true 
 quaint.workspace = true
-tokio.workspace = true
 
 mongodb-query-connector = { path = "../connectors/mongodb-query-connector", optional = true }
 sql-query-connector = { path = "../connectors/sql-query-connector", optional = true }
