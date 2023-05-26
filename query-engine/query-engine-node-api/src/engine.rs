@@ -278,6 +278,10 @@ impl QueryEngine {
 
                 let executor_fut = async {
                     let executor = load_executor(data_source, preview_features, &url, &self.nodejs_queryable).await?;
+                    // Note: `self.nodejs_queryable` is now None, as it's been moved into the executor.
+                    // However, as the engine can be disconnected and reconnected, the second time `self.connect()`
+                    // is called, will cause a panic within `load_executor`.
+
                     let connector = executor.primary_connector();
 
                     let conn_span = tracing::info_span!(
