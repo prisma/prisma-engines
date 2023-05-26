@@ -39,7 +39,7 @@ impl<'a> DefaultValuePair<'a> {
         let sql_kind = self.next.default().map(|d| d.kind());
         let family = self.next.column_type_family();
 
-        match dbg!((sql_kind, family)) {
+        match (sql_kind, family) {
             (Some(sql::DefaultKind::Sequence(name)), _) if self.context.is_cockroach() => {
                 let connector_data: &PostgresSchemaExt = self.context.sql_schema.downcast_connector_data();
 
