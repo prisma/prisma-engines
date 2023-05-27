@@ -150,6 +150,7 @@ pub struct PostgresSchemaExt {
     pub index_null_position: HashMap<IndexColumnId, IndexNullPosition>,
     pub constraint_options: HashMap<Constraint, BitFlags<ConstraintOption>>,
     pub table_options: Vec<BTreeMap<String, String>>,
+    pub exclude_constraints: Vec<(TableId, String)>,
     /// The schema's sequences.
     pub sequences: Vec<Sequence>,
     /// The extensions included in the schema(s).
@@ -246,6 +247,21 @@ impl PostgresSchemaExt {
             Some(opts) => opts.contains(ConstraintOption::Deferrable) || opts.contains(ConstraintOption::Deferred),
             None => false,
         }
+    }
+
+    pub fn exclude_constraints(&self, table_id: TableId) -> impl ExactSizeIterator<Item = &str> {
+        let low = self.exclude_constraints.partition_point(|(id, _)| *id < table_id);
+        let high = self.exclude_constraints[low..].partition_point(|(id, _)| *id <= table_id);
+
+        self.exclude_constraints[low..low + high]
+            .iter()
+            .map(|(_, name)| name.as_str())
+    }
+
+    pub fn uses_exclude_constraint(&self, id: TableId) -> bool {
+        self.exclude_constraints
+            .binary_search_by_key(&id, |(id, _)| *id)
+            .is_ok()
     }
 }
 
@@ -542,6 +558,7 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
         let table_names = self.get_table_names(&mut sql_schema, &mut pg_ext).await?;
 
         // order matters
+        self.get_constraints(&table_names, &mut sql_schema, &mut pg_ext).await?;
         self.get_views(&mut sql_schema).await?;
         self.get_enums(&mut sql_schema).await?;
         self.get_columns(&mut sql_schema).await?;
@@ -729,6 +746,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 row.get_expect_bool("is_partition"),
                 row.get_expect_bool("has_subclass"),
                 row.get_expect_bool("has_row_level_security"),
+                row.get_string("description"),
             ));
 
             pg_ext.table_options.push(options);
@@ -736,7 +754,7 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         let mut map = IndexMap::default();
 
-        for (table_name, namespace, is_partition, has_subclass, has_row_level_security) in names {
+        for (table_name, namespace, is_partition, has_subclass, has_row_level_security, description) in names {
             let cloned_name = table_name.clone();
 
             let partition = if is_partition {
@@ -756,13 +774,20 @@ impl<'a> SqlSchemaDescriber<'a> {
                 BitFlags::empty()
             };
 
+            let constraints_key = (namespace.clone(), cloned_name);
+
+            // TODO: we could build this without check and exclusion constraints.
+            // We could then mutate the tables by id to add these constraints as "properties".
+            // This would allow "get_constraints" to avoid using BTreeMaps in favor of mutating
+            // the map in place.
             let id = sql_schema.push_table_with_properties(
                 table_name,
                 sql_schema.get_namespace_id(&namespace).unwrap(),
                 partition | subclass | row_level_security,
+                description,
             );
 
-            map.insert((namespace, cloned_name), id);
+            map.insert(constraints_key, id);
         }
 
         Ok(map)
@@ -788,8 +813,15 @@ impl<'a> SqlSchemaDescriber<'a> {
     async fn get_views(&self, sql_schema: &mut SqlSchema) -> DescriberResult<()> {
         let namespaces = &sql_schema.namespaces;
         let sql = indoc! {r#"
-            SELECT viewname AS view_name, definition AS view_sql, schemaname as namespace
-            FROM pg_catalog.pg_views
+            SELECT
+                views.viewname AS view_name,
+                views.definition AS view_sql,
+                views.schemaname AS namespace,
+                description.description AS description
+            FROM pg_catalog.pg_views views
+            INNER JOIN pg_catalog.pg_namespace ns ON views.schemaname = ns.nspname
+            INNER JOIN pg_catalog.pg_class class ON class.relnamespace = ns.oid AND class.relname = views.viewname
+            LEFT JOIN pg_catalog.pg_description description ON description.objoid = class.oid AND description.objsubid = 0
             WHERE schemaname = ANY ( $1 )
         "#};
 
@@ -800,19 +832,18 @@ impl<'a> SqlSchemaDescriber<'a> {
                 &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
             )
             .await?;
-        let mut views = Vec::with_capacity(result_set.len());
 
         for row in result_set.into_iter() {
-            views.push(View {
-                namespace_id: sql_schema
-                    .get_namespace_id(&row.get_expect_string("namespace"))
-                    .unwrap(),
-                name: row.get_expect_string("view_name"),
-                definition: row.get_string("view_sql"),
-            })
-        }
+            let name = row.get_expect_string("view_name");
+            let definition = row.get_string("view_sql");
+            let description = row.get_string("description");
 
-        sql_schema.views = views;
+            let namespace_id = sql_schema
+                .get_namespace_id(&row.get_expect_string("namespace"))
+                .unwrap();
+
+            sql_schema.push_view(name, namespace_id, definition, description);
+        }
 
         Ok(())
     }
@@ -845,7 +876,8 @@ impl<'a> SqlSchemaDescriber<'a> {
                 pg_get_expr(attdef.adbin, attdef.adrelid) AS column_default,
                 info.is_nullable,
                 info.is_identity,
-                info.character_maximum_length
+                info.character_maximum_length,
+                description.description
             FROM information_schema.columns info
             JOIN pg_attribute att ON att.attname = info.column_name
             JOIN (
@@ -857,6 +889,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                   AND relname = info.table_name
                   AND namespace = info.table_schema
             LEFT OUTER JOIN pg_attrdef attdef ON attdef.adrelid = att.attrelid AND attdef.adnum = att.attnum AND table_schema = namespace
+            LEFT OUTER JOIN pg_description description ON description.objoid = att.attrelid AND description.objsubid = ordinal_position
             WHERE table_schema = ANY ( $1 ) {is_visible_clause}
             ORDER BY namespace, table_name, ordinal_position;
         "#
@@ -907,6 +940,8 @@ impl<'a> SqlSchemaDescriber<'a> {
                 .and_then(|raw_default_value| raw_default_value.to_string())
                 .and_then(|raw_default_value| get_default_value(&raw_default_value, &tpe));
 
+            let description = col.get_string("description");
+
             let auto_increment = is_identity
                 || matches!(default.as_ref().map(|d| &d.kind), Some(DefaultKind::Sequence(_)))
                 || (self.is_cockroach()
@@ -928,6 +963,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 name,
                 tpe,
                 auto_increment,
+                description,
             };
 
             match container_id {
@@ -1206,6 +1242,53 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(())
     }
 
+    /// Return the constraints that are not primary keys, foreign keys, or unique keys.
+    /// Namely, this returns CHECK and EXCLUDE constraints.
+    async fn get_constraints(
+        &self,
+        table_names: &IndexMap<(String, String), TableId>,
+        sql_schema: &mut SqlSchema,
+        pg_ext: &mut PostgresSchemaExt,
+    ) -> DescriberResult<()> {
+        let namespaces = &sql_schema.namespaces;
+        let sql = include_str!("postgres/constraints_query.sql");
+
+        let rows = self
+            .conn
+            .query_raw(
+                sql,
+                &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
+            )
+            .await?;
+
+        for row in rows {
+            let namespace = row.get_expect_string("namespace");
+            let table_name = row.get_expect_string("table_name");
+            let constraint_name = row.get_expect_string("constraint_name");
+            let constraint_type = row.get_expect_char("constraint_type");
+
+            let table_id = match table_names.get(&(namespace, table_name)) {
+                Some(id) => *id,
+                None => continue,
+            };
+
+            match constraint_type {
+                'c' => {
+                    sql_schema.check_constraints.push((table_id, constraint_name));
+                }
+                'x' => {
+                    pg_ext.exclude_constraints.push((table_id, constraint_name));
+                }
+                _ => (),
+            }
+        }
+
+        sql_schema.check_constraints.sort_by_key(|(id, _)| *id);
+        pg_ext.exclude_constraints.sort_by_key(|(id, _)| *id);
+
+        Ok(())
+    }
+
     async fn get_indices(
         &self,
         table_ids: &IndexMap<(String, String), TableId>,
@@ -1405,10 +1488,11 @@ impl<'a> SqlSchemaDescriber<'a> {
         let namespaces = &sql_schema.namespaces;
 
         let sql = "
-            SELECT t.typname as name, e.enumlabel as value, n.nspname as namespace
+            SELECT t.typname as name, e.enumlabel as value, n.nspname as namespace, d.description
             FROM pg_type t
             JOIN pg_enum e ON t.oid = e.enumtypid
             JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
+            LEFT OUTER JOIN pg_description d ON d.objoid = t.oid
             WHERE n.nspname = ANY ( $1 )
             ORDER BY e.enumsortorder";
 
@@ -1419,19 +1503,25 @@ impl<'a> SqlSchemaDescriber<'a> {
                 &[Array(Some(namespaces.iter().map(|v| v.as_str().into()).collect()))],
             )
             .await?;
-        let mut enum_values: BTreeMap<(NamespaceId, String), Vec<String>> = BTreeMap::new();
+        let mut enum_values: BTreeMap<(NamespaceId, String, Option<String>), Vec<String>> = BTreeMap::new();
 
         for row in rows.into_iter() {
             let name = row.get_expect_string("name");
             let value = row.get_expect_string("value");
             let namespace = row.get_expect_string("namespace");
+            let description = row.get_string("description");
             let namespace_id = sql_schema.get_namespace_id(&namespace).unwrap();
-            let values = enum_values.entry((namespace_id, name)).or_insert_with(Vec::new);
+
+            let values = enum_values
+                .entry((namespace_id, name, description))
+                .or_insert_with(Vec::new);
+
             values.push(value);
         }
 
-        for ((namespace_id, enum_name), variants) in enum_values {
-            let enum_id = sql_schema.push_enum(namespace_id, enum_name);
+        for ((namespace_id, enum_name, description), variants) in enum_values {
+            let enum_id = sql_schema.push_enum(namespace_id, enum_name, description);
+
             for variant in variants {
                 sql_schema.push_enum_variant(enum_id, variant);
             }

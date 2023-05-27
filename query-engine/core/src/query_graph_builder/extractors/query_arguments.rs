@@ -5,7 +5,7 @@ use crate::{
 };
 use connector::QueryArguments;
 use prisma_models::prelude::*;
-use schema_builder::constants::{aggregations, args, ordering};
+use schema::constants::{aggregations, args, ordering};
 use std::convert::TryInto;
 
 /// Expects the caller to know that it is structurally guaranteed that query arguments can be extracted,

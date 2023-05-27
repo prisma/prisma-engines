@@ -6,13 +6,12 @@ use crate::{
 };
 use connector::IntoFilter;
 use prisma_models::ModelRef;
-use schema::ConnectorContext;
-use schema_builder::constants::args;
+use schema::{constants::args, ConnectorContext};
 use std::convert::TryInto;
 use write_args_parser::*;
 
 /// Creates a create record query and adds it to the query graph, together with it's nested queries and companion read query.
-pub fn create_record(
+pub(crate) fn create_record(
     graph: &mut QueryGraph,
     connector_ctx: &ConnectorContext,
     model: ModelRef,

@@ -1,7 +1,7 @@
 use super::*;
 use crate::{query_document::*, QueryOption, QueryOptions, ReadQuery, RecordQuery};
 use prisma_models::ModelRef;
-use schema_builder::constants::args;
+use schema::constants::args;
 use std::convert::TryInto;
 
 pub(crate) fn find_unique(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {

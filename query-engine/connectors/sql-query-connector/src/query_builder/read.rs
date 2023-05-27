@@ -59,7 +59,7 @@ impl SelectDefinition for QueryArguments {
         ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
         let order_by_definitions = OrderByBuilder::default().build(&self, ctx);
-        let cursor_condition = cursor_condition::build(&self, &model, &order_by_definitions, ctx);
+        let cursor_condition = cursor_condition::build(&self, model, &order_by_definitions, ctx);
         let aggregation_joins = nested_aggregations::build(aggr_selections, ctx);
 
         let limit = if self.ignore_take { None } else { self.take_abs() };
@@ -157,7 +157,7 @@ pub(crate) fn aggregate(
     args: QueryArguments,
     ctx: &Context<'_>,
 ) -> Select<'static> {
-    let columns = extract_columns(model, &selections, ctx);
+    let columns = extract_columns(model, selections, ctx);
     let sub_query = get_records(model, columns.into_iter(), &[], args, ctx);
     let sub_table = Table::from(sub_query).alias("sub");
 

@@ -12,12 +12,15 @@ LIBRARY_EXT := $(shell                            \
 
 default: build
 
-#####################
-# Boostrap commands #
-#####################
+###################
+# script wrappers #
+###################
 
 bootstrap-darwin:
 	script/bootstrap-darwin
+
+profile-shell:
+	script/profile-shell
 
 ##################
 # Build commands #
@@ -25,6 +28,9 @@ bootstrap-darwin:
 
 build:
 	cargo build
+
+build-qe:
+	cargo build --package query-engine
 
 # Emulate pedantic CI compilation.
 pedantic:
@@ -50,6 +56,11 @@ test-qe-st:
 # Single threaded thread execution, verbose.
 test-qe-verbose-st:
 	cargo test --package query-engine-tests -- --nocapture --test-threads 1
+
+# Black-box tests, exercising the query engine HTTP apis (metrics, tracing, etc)
+test-qe-black-box: build-qe
+	cargo test --package black-box-tests -- --test-threads 1
+
 
 ###########################
 # Database setup commands #

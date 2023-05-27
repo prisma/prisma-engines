@@ -4,19 +4,19 @@ use connector::{DatasourceFieldName, WriteArgs, WriteOperation};
 use prisma_models::{
     CompositeFieldRef, Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef, TypeIdentifier,
 };
-use schema_builder::constants::{args, json_null, operations};
+use schema::constants::{args, json_null, operations};
 use std::convert::TryInto;
 
 #[derive(Debug)]
-pub struct WriteArgsParser {
-    pub args: WriteArgs,
-    pub nested: Vec<(RelationFieldRef, ParsedInputMap)>,
+pub(crate) struct WriteArgsParser {
+    pub(crate) args: WriteArgs,
+    pub(crate) nested: Vec<(RelationFieldRef, ParsedInputMap)>,
 }
 
 impl WriteArgsParser {
     /// Creates a new set of WriteArgsParser. Expects the parsed input map from the respective data key, not the enclosing map.
     /// E.g.: { data: { THIS MAP } } from the `data` argument of a write query.
-    pub fn from(model: &ModelRef, data_map: ParsedInputMap) -> QueryGraphBuilderResult<Self> {
+    pub(crate) fn from(model: &ModelRef, data_map: ParsedInputMap) -> QueryGraphBuilderResult<Self> {
         data_map.into_iter().try_fold(
             WriteArgsParser {
                 args: WriteArgs::new_empty(crate::executor::get_request_now()),

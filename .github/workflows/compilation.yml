@@ -17,14 +17,10 @@ jobs:
     name: "Compile top level crates on Linux"
     strategy:
       fail-fast: false
-    runs-on: buildjet-16vcpu-ubuntu-2004
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          default: true
+      - uses: dtolnay/rust-toolchain@stable
 
       - run: "cargo clean && cargo build --release -p schema-engine-cli"
         name: "Compile Migration Engine"

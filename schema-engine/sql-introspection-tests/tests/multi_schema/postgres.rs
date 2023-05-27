@@ -193,22 +193,12 @@ async fn multiple_schemas_w_duplicate_table_names_are_introspected(api: &mut Tes
     api.expect_datamodel(&expected).await;
 
     let expected = expect![[r#"
-        [
-          {
-            "code": 20,
-            "message": "These models were renamed due to their names being duplicates in the Prisma Schema Language.",
-            "affected": [
-              {
-                "type": "Model",
-                "name": "first_A"
-              },
-              {
-                "type": "Model",
-                "name": "second_A"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These items were renamed due to their names being duplicates in the Prisma Schema Language:
+          - Type: "model", name: "first_A"
+          - Type: "model", name: "second_A"
+    "#]];
 
     api.expect_warnings(&expected).await;
 
@@ -265,22 +255,12 @@ async fn multiple_schemas_w_duplicate_sanitized_table_names_are_introspected(api
     api.expect_datamodel(&expected).await;
 
     let expected = expect![[r#"
-        [
-          {
-            "code": 20,
-            "message": "These models were renamed due to their names being duplicates in the Prisma Schema Language.",
-            "affected": [
-              {
-                "type": "Model",
-                "name": "first_2A"
-              },
-              {
-                "type": "Model",
-                "name": "second_1A"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These items were renamed due to their names being duplicates in the Prisma Schema Language:
+          - Type: "model", name: "first_2A"
+          - Type: "model", name: "second_1A"
+    "#]];
 
     api.expect_warnings(&expected).await;
 
@@ -557,30 +537,14 @@ async fn multiple_schemas_w_duplicate_enums_are_introspected(api: &mut TestApi) 
     api.expect_datamodel(&expected).await;
 
     let expected = expect![[r#"
-        [
-          {
-            "code": 20,
-            "message": "These models and enums were renamed due to their names being duplicates in the Prisma Schema Language.",
-            "affected": [
-              {
-                "type": "Enum",
-                "name": "first_HappyMood"
-              },
-              {
-                "type": "Enum",
-                "name": "second_HappyMood"
-              },
-              {
-                "type": "Model",
-                "name": "first_HappyPerson"
-              },
-              {
-                "type": "Model",
-                "name": "second_HappyPerson"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These items were renamed due to their names being duplicates in the Prisma Schema Language:
+          - Type: "enum", name: "first_HappyMood"
+          - Type: "enum", name: "second_HappyMood"
+          - Type: "model", name: "first_HappyPerson"
+          - Type: "model", name: "second_HappyPerson"
+    "#]];
 
     api.expect_warnings(&expected).await;
 
@@ -642,17 +606,11 @@ async fn multiple_schemas_w_duplicate_models_are_reintrospected(api: &mut TestAp
     api.expect_re_introspected_datamodel(input, expected).await;
 
     let expected = expect![[r#"
-        [
-          {
-            "code": 7,
-            "message": "These models were enriched with `@@map` information taken from the previous Prisma schema.",
-            "affected": [
-              {
-                "model": "FooBar"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These models were enriched with `@@map` information taken from the previous Prisma schema:
+          - "FooBar"
+    "#]];
 
     api.expect_re_introspect_warnings(input, expected).await;
 
@@ -707,18 +665,11 @@ async fn multiple_schemas_w_duplicate_models_are_reintrospected_never_renamed(ap
     api.expect_re_introspected_datamodel(input, expected).await;
 
     let expected = expect![[r#"
-        [
-          {
-            "code": 20,
-            "message": "These models were renamed due to their names being duplicates in the Prisma Schema Language.",
-            "affected": [
-              {
-                "type": "Model",
-                "name": "second_HappyPerson"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These items were renamed due to their names being duplicates in the Prisma Schema Language:
+          - Type: "model", name: "second_HappyPerson"
+    "#]];
 
     api.expect_re_introspect_warnings(input, expected).await;
 
@@ -773,17 +724,11 @@ async fn multiple_schemas_w_duplicate_enums_are_reintrospected(api: &mut TestApi
     api.expect_re_introspected_datamodel(input, expected).await;
 
     let expected = expect![[r#"
-        [
-          {
-            "code": 9,
-            "message": "These enums were enriched with `@@map` information taken from the previous Prisma schema.",
-            "affected": [
-              {
-                "enm": "RenamedMood"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These enums were enriched with `@@map` information taken from the previous Prisma schema:
+          - "RenamedMood"
+    "#]];
 
     api.expect_re_introspect_warnings(input, expected).await;
 

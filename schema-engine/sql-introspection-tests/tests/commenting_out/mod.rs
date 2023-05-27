@@ -24,7 +24,7 @@ async fn a_table_without_uniques_should_ignore(api: &mut TestApi) -> TestResult 
         .await?;
 
     let expected = expect![[r#"
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model Post {
           id      Int
           user_id Int
@@ -59,7 +59,7 @@ async fn a_table_without_required_uniques(api: &mut TestApi) -> TestResult {
         .await?;
 
     let expected = expect![[r#"
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model Post {
           id         Int
           opt_unique Int? @unique(map: "sqlite_autoindex_Post_1")
@@ -91,7 +91,7 @@ async fn a_table_without_fully_required_compound_unique(api: &mut TestApi) -> Te
         .await?;
 
     let dm = expect![[r#"
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model Post {
           id         Int
           opt_unique Int?

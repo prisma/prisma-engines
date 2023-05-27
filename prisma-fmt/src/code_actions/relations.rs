@@ -5,7 +5,7 @@ use psl::parser_database::{
 };
 use std::collections::HashMap;
 
-use super::format_attribute;
+use super::format_block_attribute;
 
 /// If the referencing side of the one-to-one relation does not point
 /// to a unique constraint, the action adds the attribute.
@@ -262,7 +262,7 @@ pub(super) fn add_index_for_relation_fields(
 
     let attribute_name = "index";
     let attribute = format!("{attribute_name}([{fields}])");
-    let formatted_attribute = format_attribute(
+    let formatted_attribute = format_block_attribute(
         &attribute,
         relation.model().indentation(),
         relation.model().newline(),

@@ -72,6 +72,7 @@ fn sqlite_column_types_must_work(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
             ],
             enums: [],
@@ -90,6 +91,7 @@ fn sqlite_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -105,6 +107,7 @@ fn sqlite_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -120,6 +123,7 @@ fn sqlite_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -135,6 +139,7 @@ fn sqlite_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -150,6 +155,7 @@ fn sqlite_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: true,
+                        description: None,
                     },
                 ),
                 (
@@ -165,6 +171,7 @@ fn sqlite_column_types_must_work(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
             ],
@@ -193,6 +200,7 @@ fn sqlite_column_types_must_work(api: TestApi) {
                     length: None,
                 },
             ],
+            check_constraints: [],
             views: [],
             view_columns: [],
             procedures: [],
@@ -281,6 +289,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
             ],
             enums: [],
@@ -299,6 +308,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -314,6 +324,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
             ],
@@ -350,6 +361,7 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
             foreign_key_columns: [],
             indexes: [],
             index_columns: [],
+            check_constraints: [],
             views: [],
             view_columns: [],
             procedures: [],
@@ -382,6 +394,7 @@ fn backslashes_in_string_literals(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
             ],
             enums: [],
@@ -400,6 +413,7 @@ fn backslashes_in_string_literals(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
             ],
@@ -423,6 +437,7 @@ fn backslashes_in_string_literals(api: TestApi) {
             foreign_key_columns: [],
             indexes: [],
             index_columns: [],
+            check_constraints: [],
             views: [],
             view_columns: [],
             procedures: [],
@@ -467,6 +482,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
                 Table {
                     namespace_id: NamespaceId(
@@ -476,6 +492,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                     properties: BitFlags<TableProperties> {
                         bits: 0b0,
                     },
+                    description: None,
                 },
             ],
             enums: [],
@@ -494,6 +511,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: true,
+                        description: None,
                     },
                 ),
                 (
@@ -509,6 +527,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -524,6 +543,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -539,6 +559,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: false,
+                        description: None,
                     },
                 ),
                 (
@@ -554,6 +575,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                             native_type: None,
                         },
                         auto_increment: true,
+                        description: None,
                     },
                 ),
             ],
@@ -623,6 +645,7 @@ fn broken_relations_are_filtered_out(api: TestApi) {
                     length: None,
                 },
             ],
+            check_constraints: [],
             views: [],
             view_columns: [],
             procedures: [],

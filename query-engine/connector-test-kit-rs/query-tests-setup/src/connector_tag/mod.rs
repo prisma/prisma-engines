@@ -13,10 +13,10 @@ pub use sql_server::*;
 pub use sqlite::*;
 pub use vitess::*;
 
-use crate::{datamodel_rendering::DatamodelRenderer, TestConfig, TestError};
+use crate::{datamodel_rendering::DatamodelRenderer, TestError, CONFIG};
 use cockroachdb::*;
 use enum_dispatch::enum_dispatch;
-use psl::datamodel_connector::ConnectorCapability;
+use psl::datamodel_connector::ConnectorCapabilities;
 use std::{convert::TryFrom, fmt};
 
 #[enum_dispatch]
@@ -42,7 +42,7 @@ pub trait ConnectorTagInterface {
     ) -> String;
 
     /// Capabilities of the implementing connector.
-    fn capabilities(&self) -> &[ConnectorCapability];
+    fn capabilities(&self) -> ConnectorCapabilities;
 
     /// Serialization of the connector. Expected to return `(tag_name, version)`.
     /// Todo: Think of something better.
@@ -159,38 +159,35 @@ impl ConnectorTag {
 
     /// Determines whether or not a test should run for the given enabled connectors and capabilities
     /// a connector is required to have.
-    pub fn should_run(
-        config: &TestConfig,
-        enabled: &[ConnectorTag],
-        capabilities: &[ConnectorCapability],
-        test_name: &str,
+    pub(crate) fn should_run(
+        only: &[(&str, Option<&str>)],
+        exclude: &[(&str, Option<&str>)],
+        capabilities: ConnectorCapabilities,
     ) -> bool {
-        let current_connector = config.test_connector_tag().unwrap();
-        if !enabled.contains(&current_connector) {
-            println!("Skipping test '{test_name}', current test connector is not enabled.");
+        let connector = CONFIG.test_connector_tag().unwrap();
+
+        if !capabilities.is_empty() && !connector.capabilities().contains(capabilities) {
+            println!("Connector excluded. Missing required capability.");
             return false;
         }
 
-        if capabilities
+        if !only.is_empty() {
+            return only
+                .iter()
+                .any(|only| ConnectorTag::try_from(*only).unwrap() == connector);
+        }
+
+        if exclude
             .iter()
-            .any(|cap| !current_connector.capabilities().contains(cap))
+            .any(|excl| ConnectorTag::try_from(*excl).unwrap() == connector)
         {
-            println!(
-                "Skipping test '{test_name}', current test connector doesn't offer one or more capabilities that are required."
-            );
+            println!("Connector excluded. Skipping test.");
             return false;
         }
 
-        true
-    }
-}
-
-impl TryFrom<&str> for ConnectorTag {
-    type Error = TestError;
-
-    #[track_caller]
-    fn try_from(tag: &str) -> Result<Self, Self::Error> {
-        Self::try_from((tag, None))
+        // FIXME: This skips vitess unless explicitly opted in. Replace with `true` when fixing
+        // https://github.com/prisma/client-planning/issues/332
+        !matches!(connector, ConnectorTag::Vitess(_))
     }
 }
 

@@ -60,7 +60,7 @@ fn push_model_tables(ctx: &mut Context<'_>) {
         let table_id = ctx
             .schema
             .describer_schema
-            .push_table(model.database_name().to_owned(), namespace_id);
+            .push_table(model.database_name().to_owned(), namespace_id, None);
         ctx.model_id_to_table_id.insert(model.model_id(), table_id);
 
         for field in model.scalar_fields() {
@@ -219,7 +219,10 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
         };
 
         let namespace_id = ctx.walk(model_a_table_id).namespace_id(); // we put the join table in the schema of table A.
-        let table_id = ctx.schema.describer_schema.push_table(table_name.clone(), namespace_id);
+        let table_id = ctx
+            .schema
+            .describer_schema
+            .push_table(table_name.clone(), namespace_id, None);
         let column_a_type = ctx
             .walk(model_a_table_id)
             .primary_key_columns()
@@ -245,6 +248,7 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
                 name: model_a_column.into(),
                 tpe: column_a_type,
                 auto_increment: false,
+                description: None,
             },
         );
         let column_b_id = ctx.schema.describer_schema.push_table_column(
@@ -253,6 +257,7 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
                 name: model_b_column.into(),
                 tpe: column_b_type,
                 auto_increment: false,
+                description: None,
             },
         );
 
@@ -398,6 +403,7 @@ fn push_column_for_model_enum_scalar_field(
             column_arity(field.ast_field().arity),
         ),
         auto_increment: false,
+        description: None,
     };
 
     ctx.schema.describer_schema.push_table_column(table_id, column);
@@ -432,6 +438,7 @@ fn push_column_for_model_unsupported_scalar_field(
             field.ast_field().field_type.as_unsupported().unwrap().0.to_owned(),
         ),
         auto_increment: false,
+        description: None,
     };
 
     ctx.schema.describer_schema.push_table_column(table_id, column);
@@ -517,6 +524,7 @@ fn push_column_for_builtin_scalar_type(
             native_type: Some(native_type),
         },
         auto_increment: field.is_autoincrement() || ctx.flavour.field_is_implicit_autoincrement_primary_key(field),
+        description: None,
     };
 
     let column_id = ctx.schema.describer_schema.push_table_column(table_id, column);

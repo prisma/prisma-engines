@@ -4,13 +4,12 @@ use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
 use core::fmt;
 use indexmap::IndexSet;
-use prisma_models::dml::{self, ValueGeneratorFn};
-use prisma_value::PrismaValue;
+use prisma_models::{DefaultKind, PrismaValue, ValueGeneratorFn};
 use std::{convert::TryFrom, str::FromStr};
 use user_facing_errors::query_engine::validation::ValidationError;
 use uuid::Uuid;
 
-pub struct QueryDocumentParser {
+pub(crate) struct QueryDocumentParser {
     /// NOW() default value that's reused for all NOW() defaults on a single query
     default_now: PrismaValue,
 }
@@ -224,7 +223,7 @@ impl QueryDocumentParser {
                 // We do not get into this catch-all _if_ the value is already Json, if it's a FieldRef or if it's an Enum.
                 // We don't because they've already been desambiguified at the procotol adapter level.
                 (value, InputType::Scalar(ScalarType::Json))
-                    if value.can_be_parsed_as_json() && get_engine_protocol().is_json() =>
+                    if value.should_be_parsed_as_json() && get_engine_protocol().is_json() =>
                 {
                     Ok(ParsedInputValue::Single(self.to_json(
                         &selection_path,
@@ -433,7 +432,7 @@ impl QueryDocumentParser {
         argument_path: &Path,
         s: &str,
     ) -> QueryParserResult<DateTime<FixedOffset>> {
-        prisma_value::parse_datetime(s).map_err(|err| {
+        prisma_models::parse_datetime(s).map_err(|err| {
             ValidationError::invalid_argument_value(
                 selection_path.segments(),
                 argument_path.segments(),
@@ -445,7 +444,7 @@ impl QueryDocumentParser {
     }
 
     fn parse_bytes(&self, selection_path: &Path, argument_path: &Path, s: String) -> QueryParserResult<PrismaValue> {
-        prisma_value::decode_bytes(&s).map(PrismaValue::Bytes).map_err(|err| {
+        prisma_models::decode_bytes(&s).map(PrismaValue::Bytes).map_err(|err| {
             ValidationError::invalid_argument_value(
                 selection_path.segments(),
                 argument_path.segments(),
@@ -677,9 +676,7 @@ impl QueryDocumentParser {
                 match &field.default_value {
                     Some(default_value) => {
                         let default_pv = match &default_value {
-                            dml::DefaultKind::Expression(ref expr)
-                                if matches!(expr.generator(), ValueGeneratorFn::Now) =>
-                            {
+                            DefaultKind::Expression(ref expr) if matches!(expr.generator(), ValueGeneratorFn::Now) => {
                                 self.default_now.clone()
                             }
                             _ => default_value.get()?,

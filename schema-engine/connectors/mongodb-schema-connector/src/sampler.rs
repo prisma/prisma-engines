@@ -9,8 +9,7 @@ use mongodb::{
     Database,
 };
 use mongodb_schema_describer::MongoSchema;
-use schema_connector::{IntrospectionContext, IntrospectionResult, Version};
-pub(crate) use statistics::Name;
+use schema_connector::{warnings::Model, IntrospectionContext, IntrospectionResult, Version, Warnings};
 use statistics::*;
 
 /// From the given database, lists all collections as models, and samples
@@ -26,10 +25,22 @@ pub(super) async fn sample(
     ctx: &IntrospectionContext,
 ) -> Result<IntrospectionResult, mongodb::error::Error> {
     let mut statistics = Statistics::new(ctx.composite_type_depth);
-    let mut warnings = Vec::new();
+    let mut warnings = Warnings::new();
 
     for collection in schema.walk_collections() {
-        statistics.track_model(collection.name());
+        statistics.track_model(collection.name(), collection);
+
+        if collection.has_schema() {
+            warnings.json_schema_defined.push(Model {
+                model: collection.name().to_owned(),
+            })
+        }
+
+        if collection.is_capped() {
+            warnings.capped_collection.push(Model {
+                model: collection.name().to_owned(),
+            })
+        }
     }
 
     for collection in schema.walk_collections() {
@@ -57,6 +68,12 @@ pub(super) async fn sample(
         format!("{config}\n{data_model}")
     } else {
         data_model.to_string()
+    };
+
+    let warnings = if !warnings.is_empty() {
+        Some(warnings.to_string())
+    } else {
+        None
     };
 
     Ok(IntrospectionResult {

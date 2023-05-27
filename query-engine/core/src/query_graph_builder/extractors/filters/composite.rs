@@ -2,8 +2,7 @@ use super::extract_filter;
 use crate::{ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult};
 use connector::{CompositeCompare, Filter};
 use prisma_models::{CompositeFieldRef, PrismaValue};
-use schema::ObjectTag;
-use schema_builder::constants::filters;
+use schema::{constants::filters, ObjectTag};
 use std::convert::TryInto;
 
 pub fn parse(input_map: ParsedInputMap, field: &CompositeFieldRef, _reverse: bool) -> QueryGraphBuilderResult<Filter> {

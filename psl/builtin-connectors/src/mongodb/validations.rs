@@ -105,7 +105,7 @@ pub(super) fn id_field_must_have_a_correct_mapped_name(pk: PrimaryKeyWalker<'_>,
 
     let error = match field.mapped_name() {
         Some(name) => {
-            let msg = format!("MongoDB model IDs must have a @map(\"_id\") annotation, found @map(\"{name}\").",);
+            let msg = format!("MongoDB model IDs must have an @map(\"_id\") annotation, found @map(\"{name}\").",);
 
             DatamodelError::new_field_validation_error(
                 &msg,
@@ -116,7 +116,7 @@ pub(super) fn id_field_must_have_a_correct_mapped_name(pk: PrimaryKeyWalker<'_>,
             )
         }
         None => DatamodelError::new_field_validation_error(
-            "MongoDB model IDs must have a @map(\"_id\") annotations.",
+            "MongoDB model IDs must have an @map(\"_id\") annotation.",
             container,
             field.model().name(),
             field.name(),

@@ -1,14 +1,14 @@
 use super::*;
+use crate::db::QuerySchemaDatabase;
 use fmt::Debug;
-use once_cell::sync::OnceCell;
-use prisma_models::{dml, prelude::ParentContainer};
+use prisma_models::{prelude::ParentContainer, DefaultKind};
 use std::{boxed::Box, fmt};
 
 #[derive(PartialEq)]
 pub struct InputObjectType {
     pub identifier: Identifier,
     pub constraints: InputObjectTypeConstraints,
-    pub fields: OnceCell<Vec<InputField>>,
+    pub(crate) fields: Vec<InputField>,
     pub tag: Option<ObjectTag>,
 }
 
@@ -49,17 +49,15 @@ impl Debug for InputObjectType {
 
 impl InputObjectType {
     pub fn get_fields(&self) -> &Vec<InputField> {
-        self.fields.get().unwrap()
+        &self.fields
     }
 
-    pub fn set_fields(&self, fields: Vec<InputField>) {
-        self.fields
-            .set(fields)
-            .unwrap_or_else(|_| panic!("Fields of {:?} are already set", self.identifier));
+    pub(crate) fn set_fields(&mut self, fields: Vec<InputField>) {
+        self.fields = fields;
     }
 
     /// True if fields are empty, false otherwise.
-    pub fn is_empty(&self) -> bool {
+    pub(crate) fn is_empty(&self) -> bool {
         self.get_fields().is_empty()
     }
 
@@ -72,37 +70,37 @@ impl InputObjectType {
     }
 
     /// Require exactly one field of the possible ones to be in the input.
-    pub fn require_exactly_one_field(&mut self) {
+    pub(crate) fn require_exactly_one_field(&mut self) {
         self.set_max_fields(1);
         self.set_min_fields(1);
     }
 
     /// Require at least one field of the possible ones to be in the input.
-    pub fn require_at_least_one_field(&mut self) {
+    pub(crate) fn require_at_least_one_field(&mut self) {
         self.set_min_fields(1);
     }
 
     /// Require at most one field of the possible ones to be in the input.
-    pub fn require_at_most_one_field(&mut self) {
+    pub(crate) fn require_at_most_one_field(&mut self) {
         self.set_max_fields(1);
         self.set_min_fields(0);
     }
 
     /// Require a maximum of `max` fields to be present in the input.
-    pub fn set_max_fields(&mut self, max: usize) {
+    pub(crate) fn set_max_fields(&mut self, max: usize) {
         self.constraints.max_num_fields = Some(max);
     }
 
     /// Require a minimum of `min` fields to be present in the input.
-    pub fn set_min_fields(&mut self, min: usize) {
+    pub(crate) fn set_min_fields(&mut self, min: usize) {
         self.constraints.min_num_fields = Some(min);
     }
 
-    pub fn apply_constraints_on_fields(&mut self, fields: Vec<String>) {
+    pub(crate) fn apply_constraints_on_fields(&mut self, fields: Vec<String>) {
         self.constraints.fields = Some(fields);
     }
 
-    pub fn set_tag(&mut self, tag: ObjectTag) {
+    pub(crate) fn set_tag(&mut self, tag: ObjectTag) {
         self.tag = Some(tag);
     }
 }
@@ -110,8 +108,7 @@ impl InputObjectType {
 #[derive(Debug, PartialEq)]
 pub struct InputField {
     pub name: String,
-    pub default_value: Option<dml::DefaultKind>,
-    pub deprecation: Option<Deprecation>,
+    pub default_value: Option<DefaultKind>,
 
     /// Possible field types, represented as a union of input types, but only one can be provided at any time.
     /// Slice expressed as (start, len).
@@ -123,11 +120,10 @@ pub struct InputField {
 }
 
 impl InputField {
-    pub fn new(name: String, default_value: Option<dml::DefaultKind>, is_required: bool) -> InputField {
+    pub(crate) fn new(name: String, default_value: Option<DefaultKind>, is_required: bool) -> InputField {
         InputField {
             name,
             default_value,
-            deprecation: None,
             field_types: None,
             is_required,
         }
@@ -139,19 +135,19 @@ impl InputField {
     }
 
     /// Sets the field as optional (not required to be present on the input).
-    pub fn optional(mut self) -> Self {
+    pub(crate) fn optional(mut self) -> Self {
         self.is_required = false;
         self
     }
 
     /// Sets the field as optional (not required to be present on the input).
-    pub fn required(mut self) -> Self {
+    pub(crate) fn required(mut self) -> Self {
         self.is_required = true;
         self
     }
 
     /// Sets the field as optional if the condition is true.
-    pub fn optional_if(self, condition: bool) -> Self {
+    pub(crate) fn optional_if(self, condition: bool) -> Self {
         if condition {
             self.optional()
         } else {
@@ -160,12 +156,12 @@ impl InputField {
     }
 
     /// Sets the field as nullable (accepting null inputs).
-    pub fn nullable(self, db: &mut QuerySchemaDatabase) -> Self {
+    pub(crate) fn nullable(self, db: &mut QuerySchemaDatabase) -> Self {
         self.add_type(InputType::null(), db)
     }
 
     /// Sets the field as nullable if the condition is true.
-    pub fn nullable_if(self, condition: bool, db: &mut QuerySchemaDatabase) -> Self {
+    pub(crate) fn nullable_if(self, condition: bool, db: &mut QuerySchemaDatabase) -> Self {
         if condition {
             self.nullable(db)
         } else {
@@ -173,7 +169,7 @@ impl InputField {
         }
     }
 
-    pub fn push_type(&mut self, typ: InputType, db: &mut QuerySchemaDatabase) {
+    pub(crate) fn push_type(&mut self, typ: InputType, db: &mut QuerySchemaDatabase) {
         match &mut self.field_types {
             Some((_start, len)) => {
                 *len += 1;
@@ -187,22 +183,8 @@ impl InputField {
     }
 
     /// Adds possible input type to this input field's type union.
-    pub fn add_type(mut self, typ: InputType, db: &mut QuerySchemaDatabase) -> Self {
+    pub(crate) fn add_type(mut self, typ: InputType, db: &mut QuerySchemaDatabase) -> Self {
         self.push_type(typ, db);
-        self
-    }
-
-    pub fn deprecate<T, S>(mut self, reason: T, since_version: S, planned_removal_version: Option<S>) -> Self
-    where
-        T: Into<String>,
-        S: Into<String>,
-    {
-        self.deprecation = Some(Deprecation {
-            reason: reason.into(),
-            since_version: since_version.into(),
-            planned_removal_version: planned_removal_version.map(Into::into),
-        });
-
         self
     }
 }
@@ -239,71 +221,71 @@ impl Debug for InputType {
 }
 
 impl InputType {
-    pub fn list(containing: InputType) -> InputType {
+    pub(crate) fn list(containing: InputType) -> InputType {
         InputType::List(Box::new(containing))
     }
 
-    pub fn object(containing: InputObjectTypeId) -> InputType {
+    pub(crate) fn object(containing: InputObjectTypeId) -> InputType {
         InputType::Object(containing)
     }
 
-    pub fn string() -> InputType {
+    pub(crate) fn string() -> InputType {
         InputType::Scalar(ScalarType::String)
     }
 
-    pub fn int() -> InputType {
+    pub(crate) fn int() -> InputType {
         InputType::Scalar(ScalarType::Int)
     }
 
-    pub fn bigint() -> InputType {
+    pub(crate) fn bigint() -> InputType {
         InputType::Scalar(ScalarType::BigInt)
     }
 
-    pub fn float() -> InputType {
+    pub(crate) fn float() -> InputType {
         InputType::Scalar(ScalarType::Float)
     }
 
-    pub fn decimal() -> InputType {
+    pub(crate) fn decimal() -> InputType {
         InputType::Scalar(ScalarType::Decimal)
     }
 
-    pub fn boolean() -> InputType {
+    pub(crate) fn boolean() -> InputType {
         InputType::Scalar(ScalarType::Boolean)
     }
 
-    pub fn date_time() -> InputType {
+    pub(crate) fn date_time() -> InputType {
         InputType::Scalar(ScalarType::DateTime)
     }
 
-    pub fn json() -> InputType {
+    pub(crate) fn json() -> InputType {
         InputType::Scalar(ScalarType::Json)
     }
 
-    pub fn json_list() -> InputType {
+    pub(crate) fn json_list() -> InputType {
         InputType::Scalar(ScalarType::JsonList)
     }
 
-    pub fn uuid() -> InputType {
+    pub(crate) fn uuid() -> InputType {
         InputType::Scalar(ScalarType::UUID)
     }
 
-    pub fn xml() -> InputType {
+    pub(crate) fn xml() -> InputType {
         InputType::Scalar(ScalarType::Xml)
     }
 
-    pub fn bytes() -> InputType {
+    pub(crate) fn bytes() -> InputType {
         InputType::Scalar(ScalarType::Bytes)
     }
 
-    pub fn null() -> InputType {
+    pub(crate) fn null() -> InputType {
         InputType::Scalar(ScalarType::Null)
     }
 
-    pub fn enum_type(containing: EnumTypeId) -> InputType {
+    pub(crate) fn enum_type(containing: EnumTypeId) -> InputType {
         InputType::Enum(containing)
     }
 
-    pub fn is_empty(&self, query_schema: &QuerySchemaDatabase) -> bool {
+    pub(crate) fn is_empty(&self, query_schema: &QuerySchemaDatabase) -> bool {
         match self {
             Self::Scalar(_) => false,
             Self::Enum(_) => false,

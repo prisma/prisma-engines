@@ -20,13 +20,13 @@ impl<'a> GqlTypeRenderer<'a> {
     fn render_input_type(&self, i: &InputType, ctx: &mut RenderContext) -> String {
         match i {
             InputType::Object(ref obj) => {
-                let _ = obj.into_renderer().render(ctx);
+                let _ = obj.as_renderer().render(ctx);
                 ctx.query_schema.db[*obj].identifier.name()
             }
 
             InputType::Enum(et) => {
                 let et = &ctx.query_schema.db[*et];
-                et.into_renderer().render(ctx);
+                et.as_renderer().render(ctx);
                 et.identifier().name()
             }
 
@@ -60,13 +60,13 @@ impl<'a> GqlTypeRenderer<'a> {
     fn render_output_type(&self, o: &OutputType, ctx: &mut RenderContext) -> String {
         match o {
             OutputType::Object(obj) => {
-                let _ = obj.into_renderer().render(ctx);
+                let _ = obj.as_renderer().render(ctx);
                 ctx.query_schema.db[*obj].identifier.name()
             }
 
             OutputType::Enum(et) => {
                 let et = &ctx.query_schema.db[*et];
-                et.into_renderer().render(ctx);
+                et.as_renderer().render(ctx);
                 et.identifier().name()
             }
 

@@ -1,8 +1,12 @@
-use crate::{engine::executor::TransactionOptions, error::ApiError, log_callback::LogCallback, logger::Logger};
+use crate::{error::ApiError, log_callback::LogCallback, logger::Logger};
 use futures::FutureExt;
+use napi::{Env, JsFunction, JsUnknown};
+use napi_derive::napi;
 use psl::PreviewFeature;
 use query_core::{
-    executor, protocol::EngineProtocol, schema::QuerySchema, schema_builder, telemetry, QueryExecutor, TxId,
+    protocol::EngineProtocol,
+    schema::{self, QuerySchema},
+    telemetry, QueryExecutor, TransactionOptions, TxId,
 };
 use query_engine_metrics::{MetricFormat, MetricRegistry};
 use request_handlers::{dmmf, load_executor, render_graphql_schema, RequestBody, RequestHandler};
@@ -19,9 +23,6 @@ use tokio::sync::RwLock;
 use tracing::{field, instrument::WithSubscriber, Instrument, Span};
 use tracing_subscriber::filter::LevelFilter;
 use user_facing_errors::Error;
-
-use napi::{Env, JsFunction, JsUnknown};
-use napi_derive::napi;
 
 /// The main query engine used by JS
 #[napi]
@@ -227,35 +228,60 @@ impl QueryEngine {
 
             let mut inner = self.inner.write().await;
             let builder = inner.as_builder()?;
+            let arced_schema = Arc::clone(&builder.schema);
+            let arced_schema_2 = Arc::clone(&builder.schema);
 
-            let engine = async move {
-                // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
+            let url = {
                 let data_source = builder
                     .schema
                     .configuration
                     .datasources
                     .first()
                     .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
-
-                let preview_features = builder.schema.configuration.preview_features();
-                let url = data_source
+                data_source
                     .load_url_with_config_dir(&builder.config_dir, |key| builder.env.get(key).map(ToString::to_string))
-                    .map_err(|err| crate::error::ApiError::Conversion(err, builder.schema.db.source().to_owned()))?;
+                    .map_err(|err| crate::error::ApiError::Conversion(err, builder.schema.db.source().to_owned()))?
+            };
 
-                let executor = load_executor(data_source, preview_features, &url).await?;
-                let connector = executor.primary_connector();
-                connector.get_connection().await?;
+            let engine = async move {
+                // We only support one data source & generator at the moment, so take the first one (default not exposed yet).
+                let data_source = arced_schema
+                    .configuration
+                    .datasources
+                    .first()
+                    .ok_or_else(|| ApiError::configuration("No valid data source found"))?;
 
-                // Build internal data model
-                let internal_data_model = prisma_models::convert(Arc::clone(&builder.schema));
+                let preview_features = arced_schema.configuration.preview_features();
 
-                let enable_raw_queries = true;
-                let query_schema = schema_builder::build(internal_data_model, enable_raw_queries);
+                let executor_fut = async {
+                    let executor = load_executor(data_source, preview_features, &url).await?;
+                    let connector = executor.primary_connector();
+
+                    let conn_span = tracing::info_span!(
+                        "prisma:engine:connection",
+                        user_facing = true,
+                        "db.type" = connector.name(),
+                    );
+
+                    connector.get_connection().instrument(conn_span).await?;
+
+                    crate::Result::<_>::Ok(executor)
+                };
+
+                let query_schema_span = tracing::info_span!("prisma:engine:schema");
+                let query_schema_fut = tokio::runtime::Handle::current()
+                    .spawn_blocking(move || {
+                        let enable_raw_queries = true;
+                        schema::build(arced_schema_2, enable_raw_queries)
+                    })
+                    .instrument(query_schema_span);
+
+                let (query_schema, executor) = tokio::join!(query_schema_fut, executor_fut);
 
                 Ok(ConnectedEngine {
                     schema: builder.schema.clone(),
-                    query_schema: Arc::new(query_schema),
-                    executor,
+                    query_schema: Arc::new(query_schema.unwrap()),
+                    executor: executor?,
                     config_dir: builder.config_dir.clone(),
                     env: builder.env.clone(),
                     metrics: self.logger.metrics(),
@@ -392,13 +418,26 @@ impl QueryEngine {
     }
 
     #[napi]
-    pub async fn dmmf(&self) -> napi::Result<String> {
+    pub async fn dmmf(&self, trace: String) -> napi::Result<String> {
         async_panic_to_js_error(async {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
-            let dmmf = dmmf::render_dmmf(engine.query_schema.clone());
 
-            Ok(serde_json::to_string(&dmmf)?)
+            let dispatcher = self.logger.dispatcher();
+
+            tracing::dispatcher::with_default(&dispatcher, || {
+                let span = tracing::info_span!("prisma:engine:dmmf");
+                let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+                let _guard = span.enter();
+                let dmmf = dmmf::render_dmmf(&engine.query_schema);
+
+                let json = {
+                    let _span = tracing::info_span!("prisma:engine:dmmf_to_json").entered();
+                    serde_json::to_string(&dmmf)?
+                };
+
+                Ok(json)
+            })
         })
         .await
     }

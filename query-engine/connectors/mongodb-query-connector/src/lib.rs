@@ -1,4 +1,4 @@
-#![allow(clippy::vec_init_then_push, clippy::branches_sharing_code, clippy::needless_borrow)]
+#![allow(clippy::vec_init_then_push, clippy::branches_sharing_code)]
 
 mod constants;
 mod cursor;

@@ -1,4 +1,4 @@
-use connector::{AggregationRow, QueryArguments, RelAggregationRow};
+use connector::{AggregationRow, RelAggregationRow};
 use prisma_models::{ManyRecords, ModelRef, SelectionResult};
 
 #[derive(Debug, Clone)]
@@ -15,26 +15,23 @@ pub(crate) enum QueryResult {
 #[derive(Debug, Clone)]
 pub struct RecordSelection {
     /// Name of the query.
-    pub name: String,
+    pub(crate) name: String,
 
     /// Holds an ordered list of selected field names for each contained record.
-    pub fields: Vec<String>,
+    pub(crate) fields: Vec<String>,
 
     /// Scalar field results
-    pub scalars: ManyRecords,
+    pub(crate) scalars: ManyRecords,
 
     /// Nested query results
     // Todo this is only here because reads are still resolved in one go
     pub(crate) nested: Vec<QueryResult>,
 
-    /// Required for result processing
-    pub query_arguments: QueryArguments,
-
     /// The model of the contained records.
-    pub model: ModelRef,
+    pub(crate) model: ModelRef,
 
     /// Holds an ordered list of aggregation selections results for each contained record
-    pub aggregation_rows: Option<Vec<RelAggregationRow>>,
+    pub(crate) aggregation_rows: Option<Vec<RelAggregationRow>>,
 }
 
 impl From<RecordSelection> for QueryResult {

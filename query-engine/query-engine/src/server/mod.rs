@@ -8,7 +8,6 @@ use opentelemetry::{global, propagation::Extractor};
 use query_core::helpers::*;
 use query_core::telemetry::capturing::TxTraceExt;
 use query_core::{telemetry, ExtendedTransactionUserFacingError, TransactionOptions, TxId};
-use query_engine_metrics::MetricFormat;
 use request_handlers::{dmmf, render_graphql_schema, RequestBody, RequestHandler};
 use serde_json::json;
 use std::collections::HashMap;
@@ -30,7 +29,14 @@ pub async fn listen(cx: Arc<PrismaContext>, opts: &PrismaOpt) -> PrismaResult<()
 
     let server = Server::bind(&addr).tcp_nodelay(true).serve(query_engine);
 
-    info!("Started query engine http server on http://{}", addr);
+    // Note: we call `server.local_addr()` instead of reusing original `addr` because it may contain port 0 to request
+    // the OS to assign a free port automatically, and we want to print the address which is actually in use.
+    info!(
+        ip = %server.local_addr().ip(),
+        port = %server.local_addr().port(),
+        "Started query engine http server on http://{}",
+        server.local_addr()
+    );
 
     if let Err(e) = server.await {
         eprintln!("server error: {e}");
@@ -39,7 +45,7 @@ pub async fn listen(cx: Arc<PrismaContext>, opts: &PrismaOpt) -> PrismaResult<()
     Ok(())
 }
 
-pub async fn routes(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+pub(crate) async fn routes(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     let start = Instant::now();
 
     if req.method() == Method::POST && req.uri().path().starts_with("/transaction") {
@@ -73,7 +79,7 @@ pub async fn routes(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Respon
         }
 
         (&Method::GET, "/dmmf") => {
-            let schema = dmmf::render_dmmf(Arc::clone(cx.query_schema()));
+            let schema = dmmf::render_dmmf(cx.query_schema());
 
             Response::builder()
                 .status(StatusCode::OK)
@@ -239,16 +245,7 @@ fn playground_handler() -> Response<Body> {
 }
 
 async fn metrics_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
-    let format = if let Some(query) = req.uri().query() {
-        if query.contains("format=json") {
-            MetricFormat::Json
-        } else {
-            MetricFormat::Prometheus
-        }
-    } else {
-        MetricFormat::Prometheus
-    };
-
+    let requested_json = req.uri().query().map(|q| q.contains("format=json")).unwrap_or_default();
     let body_start = req.into_body();
     // block and buffer request until the request has completed
     let full_body = hyper::body::to_bytes(body_start).await?;
@@ -258,27 +255,25 @@ async fn metrics_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
         Err(_e) => HashMap::new(),
     };
 
-    if format == MetricFormat::Json {
+    let response = if requested_json {
         let metrics = cx.metrics.to_json(global_labels);
 
-        let res = Response::builder()
+        Response::builder()
             .status(StatusCode::OK)
             .header(CONTENT_TYPE, "application/json")
             .body(Body::from(metrics.to_string()))
-            .unwrap();
+            .unwrap()
+    } else {
+        let metrics = cx.metrics.to_prometheus(global_labels);
 
-        return Ok(res);
-    }
+        Response::builder()
+            .status(StatusCode::OK)
+            .header(CONTENT_TYPE, "text/plain; version=0.0.4")
+            .body(Body::from(metrics))
+            .unwrap()
+    };
 
-    let metrics = cx.metrics.to_prometheus(global_labels);
-
-    let res = Response::builder()
-        .status(StatusCode::OK)
-        .header(CONTENT_TYPE, "text/plain; version=0.0.4")
-        .body(Body::from(metrics))
-        .unwrap();
-
-    Ok(res)
+    Ok(response)
 }
 
 /// Sadly the routing doesn't make it obvious what the transaction routes are:

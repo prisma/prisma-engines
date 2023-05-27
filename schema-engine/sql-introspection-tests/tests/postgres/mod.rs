@@ -1,4 +1,5 @@
 mod brin;
+mod constraints;
 mod extensions;
 mod gin;
 mod gist;
@@ -188,6 +189,7 @@ async fn index_sort_order_stopgap(api: &mut TestApi) -> TestResult {
           url      = "env(TEST_DATABASE_URL)"
         }
 
+        /// This model contains an index with non-default null sort order and requires additional setup for migrations. Visit https://pris.ly/d/default-index-null-ordering for more info.
         model foo {
           id Int @id
           a  Int
@@ -203,24 +205,44 @@ async fn index_sort_order_stopgap(api: &mut TestApi) -> TestResult {
     api.expect_datamodel(&expectation).await;
 
     let expectation = expect![[r#"
-        [
-          {
-            "code": 29,
-            "message": "These index columns are having a non-default null sort order, which is not yet fully supported. Read more: https://pris.ly/d/non-default-index-null-ordering",
-            "affected": [
-              {
-                "indexName": "idx_a",
-                "columnName": "a"
-              },
-              {
-                "indexName": "idx_b",
-                "columnName": "b"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These index columns are having a non-default null sort order, which is not yet fully supported. Read more: https://pris.ly/d/non-default-index-null-ordering
+          - Index: "idx_a", column: "a"
+          - Index: "idx_b", column: "b"
+    "#]];
 
     api.expect_warnings(&expectation).await;
+
+    let input = indoc! {r#"
+        /// This model contains an index with non-default null sort order and requires additional setup for migrations. Visit https://pris.ly/d/default-index-null-ordering for more info.
+        model foo {
+          id Int @id
+          a  Int
+          b  Int @unique(map: "idx_b", sort: Desc)
+          c  Int
+          d  Int @unique(map: "idx_d")
+
+          @@index([a], map: "idx_a")
+          @@index([c(sort: Desc)], map: "idx_c")
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        /// This model contains an index with non-default null sort order and requires additional setup for migrations. Visit https://pris.ly/d/default-index-null-ordering for more info.
+        model foo {
+          id Int @id
+          a  Int
+          b  Int @unique(map: "idx_b", sort: Desc)
+          c  Int
+          d  Int @unique(map: "idx_d")
+
+          @@index([a], map: "idx_a")
+          @@index([c(sort: Desc)], map: "idx_c")
+        }
+    "#]];
+
+    api.expect_re_introspected_datamodel(input, expectation).await;
 
     Ok(())
 }
@@ -268,6 +290,7 @@ async fn deferrable_stopgap(api: &mut TestApi) -> TestResult {
           url      = "env(TEST_DATABASE_URL)"
         }
 
+        /// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
         model a {
           id  Int  @id(map: "foo_pkey")
           foo Int? @unique(map: "foo_key")
@@ -284,28 +307,173 @@ async fn deferrable_stopgap(api: &mut TestApi) -> TestResult {
     api.expect_datamodel(&expectation).await;
 
     let expectation = expect![[r#"
-        [
-          {
-            "code": 35,
-            "message": "These primary key, foreign key or unique constraints are using non-default deferring in the database, which is not yet fully supported. Read more: https://pris.ly/d/constraint-deferring",
-            "affected": [
-              {
-                "model": "a",
-                "constraint": "foo_key"
-              },
-              {
-                "model": "a",
-                "constraint": "foo_pkey"
-              },
-              {
-                "model": "a",
-                "constraint": "a_b_fk"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These primary key, foreign key or unique constraints are using non-default deferring in the database, which is not yet fully supported. Read more: https://pris.ly/d/constraint-deferring
+          - Model: "a", constraint: "foo_key"
+          - Model: "a", constraint: "foo_pkey"
+          - Model: "a", constraint: "a_b_fk"
+    "#]];
 
     api.expect_warnings(&expectation).await;
+
+    let input = indoc! {r#"
+        /// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+        model a {
+          id  Int  @id(map: "foo_pkey")
+          foo Int? @unique(map: "foo_key")
+          bar Int?
+          b   b?   @relation(fields: [foo], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "a_b_fk")
+        }
+
+        model b {
+          id Int @id
+          a  a?
+        }
+    "#};
+
+    let expectation = expect![[r#"
+        /// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+        model a {
+          id  Int  @id(map: "foo_pkey")
+          foo Int? @unique(map: "foo_key")
+          bar Int?
+          b   b?   @relation(fields: [foo], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "a_b_fk")
+        }
+
+        model b {
+          id Int @id
+          a  a?
+        }
+    "#]];
+
+    api.expect_re_introspected_datamodel(input, expectation).await;
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("views"))]
+async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
+    // https://www.notion.so/prismaio/Comments-ac89f872098e463183fd668a643f3ab8
+
+    let schema = indoc! {r#"
+        CREATE TABLE a (
+            id INT PRIMARY KEY,
+            val VARCHAR(20)
+        );
+
+        CREATE VIEW b AS SELECT val FROM a;
+
+        CREATE TYPE c AS ENUM ('a', 'b');
+
+        COMMENT ON TABLE a IS 'push';
+        COMMENT ON COLUMN a.val IS 'meow';
+        COMMENT ON VIEW b IS 'purr';
+        COMMENT ON TYPE c IS 'hiss';
+        COMMENT ON COLUMN b.val IS 'miu';
+    "#};
+
+    api.raw_cmd(schema).await;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["views"]
+        }
+
+        datasource db {
+          provider = "postgresql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+        model a {
+          id  Int     @id
+          val String? @db.VarChar(20)
+        }
+
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+        /// This view or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+        view b {
+          val String? @db.VarChar(20)
+
+          @@ignore
+        }
+
+        /// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+        enum c {
+          a
+          b
+        }
+    "#]];
+
+    api.expect_datamodel(&expectation).await;
+
+    let expectation = expect![[r#"
+        *** WARNING ***
+
+        The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers
+          - "b"
+
+        These objects have comments defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/database-comments
+          - Type: "enum", name: "c"
+          - Type: "model", name: "a"
+          - Type: "field", name: "a.val"
+          - Type: "view", name: "b"
+          - Type: "field", name: "b.val"
+    "#]];
+
+    api.expect_warnings(&expectation).await;
+
+    let input = indoc! {r#"
+        /// This model is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+        model a {
+          id  Int     @id
+          /// This field is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+          val String? @db.VarChar(20)
+        }
+
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+        /// This view is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+        view b {
+          /// This field is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+          val String? @db.VarChar(20)
+
+          @@ignore
+        }
+
+        /// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+        enum c {
+          a
+          b
+        }   
+    "#};
+
+    let expectation = expect![[r#"
+        /// This model is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+        model a {
+          id  Int     @id
+          /// This field is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+          val String? @db.VarChar(20)
+        }
+
+        /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+        /// This view is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+        view b {
+          /// This field is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+          val String? @db.VarChar(20)
+
+          @@ignore
+        }
+
+        /// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+        enum c {
+          a
+          b
+        }
+    "#]];
+
+    api.expect_re_introspected_datamodel(input, expectation).await;
 
     Ok(())
 }

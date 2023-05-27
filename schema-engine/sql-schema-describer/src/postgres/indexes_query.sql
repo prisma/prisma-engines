@@ -12,6 +12,7 @@ WITH rawindex AS (
     WHERE
         indpred IS NULL -- filter out partial indexes
         AND array_position(indkey::int2[], 0::int2) IS NULL -- filter out expression indexes
+        AND NOT indisexclusion -- filter out exclusion constraints
 )
 SELECT
     schemainfo.nspname AS namespace,

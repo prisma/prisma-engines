@@ -14,11 +14,6 @@ impl<'a> TableWalker<'a> {
         self.columns().find(|column| column.name() == column_name)
     }
 
-    /// Get a column in the table, by name.
-    pub fn column_case_insensitive(self, column_name: &str) -> Option<TableColumnWalker<'a>> {
-        self.columns().find(|column| column.name() == column_name)
-    }
-
     fn columns_range(self) -> Range<usize> {
         super::range_for_key(&self.schema.table_columns, self.id, |(tid, _)| *tid)
     }
@@ -113,6 +108,29 @@ impl<'a> TableWalker<'a> {
     /// Does the table have row level security enabled?
     pub fn has_row_level_security(self) -> bool {
         self.table().properties.contains(TableProperties::HasRowLevelSecurity)
+    }
+
+    /// Does the table have check constraints?
+    pub fn has_check_constraints(self) -> bool {
+        self.schema
+            .check_constraints
+            .binary_search_by_key(&self.id, |(id, _)| *id)
+            .is_ok()
+    }
+
+    /// The check constraint names for the table.
+    pub fn check_constraints(self) -> impl ExactSizeIterator<Item = &'a str> {
+        let low = self.schema.check_constraints.partition_point(|(id, _)| *id < self.id);
+        let high = self.schema.check_constraints[low..].partition_point(|(id, _)| *id <= self.id);
+
+        self.schema.check_constraints[low..low + high]
+            .iter()
+            .map(|(_, name)| name.as_str())
+    }
+
+    /// Description (comment) of the table.
+    pub fn description(self) -> Option<&'a str> {
+        self.table().description.as_deref()
     }
 
     /// Reference to the underlying `Table` struct.

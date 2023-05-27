@@ -5,7 +5,7 @@ use mongodb_schema_connector::MongoDbSchemaConnector;
 use names::Generator;
 use once_cell::sync::Lazy;
 use psl::PreviewFeature;
-use schema_connector::{CompositeTypeDepth, ConnectorParams, IntrospectionContext, SchemaConnector, Warning};
+use schema_connector::{CompositeTypeDepth, ConnectorParams, IntrospectionContext, SchemaConnector};
 use std::{future::Future, io::Write};
 use tokio::runtime::Runtime;
 
@@ -29,7 +29,7 @@ pub static RT: Lazy<Runtime> = Lazy::new(|| Runtime::new().unwrap());
 
 pub struct TestResult {
     datamodel: String,
-    warnings: Vec<Warning>,
+    warnings: String,
 }
 
 impl TestResult {
@@ -39,32 +39,7 @@ impl TestResult {
 
     #[track_caller]
     pub fn expect_warnings(&self, expect: &Expect) {
-        let warnings = serde_json::to_string_pretty(&self.warnings).unwrap();
-        expect.assert_eq(&warnings);
-    }
-
-    #[track_caller]
-    pub fn assert_warning_code(&self, code: u32) {
-        assert!(self.warnings.iter().any(|w| w.code == code), "{:#?}", self.warnings)
-    }
-
-    #[track_caller]
-    pub fn assert_warning(&self, warning: &str) {
-        assert!(
-            self.warnings.iter().any(|w| w.message == warning),
-            "{:#?}",
-            self.warnings
-        )
-    }
-
-    #[track_caller]
-    pub fn assert_no_warnings(&self) {
-        assert!(self.warnings.is_empty(), "{:#?}", self.warnings)
-    }
-
-    #[track_caller]
-    pub fn assert_warning_affected(&self, affected: &serde_json::Value) {
-        assert!(&self.warnings[0].affected == affected, "{:#?}", self.warnings);
+        expect.assert_eq(&self.warnings);
     }
 }
 
@@ -137,7 +112,7 @@ where
 
         TestResult {
             datamodel: res.data_model,
-            warnings: res.warnings,
+            warnings: res.warnings.unwrap_or_default(),
         }
     })
 }

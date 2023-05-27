@@ -808,3 +808,48 @@ async fn northwind(api: TestApi) {
     "#]];
     api.expect_datamodel(&expectation).await;
 }
+
+#[test_connector(tags(Mysql8), exclude(Vitess))]
+async fn commenting_stopgap(api: &mut TestApi) -> TestResult {
+    // https://www.notion.so/prismaio/Comments-ac89f872098e463183fd668a643f3ab8
+
+    let schema = indoc! {r#"
+        CREATE TABLE a (
+            id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+            a INT COMMENT 'meow'
+        ) comment 'purr';
+    "#};
+
+    api.raw_cmd(schema).await;
+
+    let expectation = expect![[r#"
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        datasource db {
+          provider = "mysql"
+          url      = "env(TEST_DATABASE_URL)"
+        }
+
+        /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+        model a {
+          id Int  @id @default(autoincrement())
+          a  Int?
+        }
+    "#]];
+
+    api.expect_datamodel(&expectation).await;
+
+    let expectation = expect![[r#"
+        *** WARNING ***
+
+        These objects have comments defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/database-comments
+          - Type: "model", name: "a"
+          - Type: "field", name: "a.a"
+    "#]];
+
+    api.expect_warnings(&expectation).await;
+
+    Ok(())
+}

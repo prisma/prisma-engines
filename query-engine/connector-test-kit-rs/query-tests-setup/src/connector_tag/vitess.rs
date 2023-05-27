@@ -4,7 +4,6 @@ use std::{fmt::Display, str::FromStr};
 
 #[derive(Debug, Default, Clone)]
 pub struct VitessConnectorTag {
-    capabilities: Vec<ConnectorCapability>,
     version: Option<VitessVersion>,
 }
 
@@ -31,8 +30,8 @@ impl ConnectorTagInterface for VitessConnectorTag {
         }
     }
 
-    fn capabilities(&self) -> &[ConnectorCapability] {
-        &self.capabilities
+    fn capabilities(&self) -> ConnectorCapabilities {
+        psl::builtin_connectors::MYSQL.capabilities()
     }
 
     fn as_parse_pair(&self) -> (String, Option<String>) {
@@ -62,24 +61,17 @@ impl VitessConnectorTag {
             None => None,
         };
 
-        Ok(Self {
-            version,
-            capabilities: vitess_capabilities(),
-        })
+        Ok(Self { version })
     }
 
     /// Returns all versions of this connector.
     pub fn all() -> Vec<Self> {
-        let capabilities = vitess_capabilities();
-
         vec![
             Self {
                 version: Some(VitessVersion::V5_7),
-                capabilities: capabilities.clone(),
             },
             Self {
                 version: Some(VitessVersion::V8_0),
-                capabilities,
             },
         ]
     }
@@ -120,8 +112,4 @@ impl Display for VitessVersion {
             Self::V8_0 => write!(f, "8.0"),
         }
     }
-}
-
-fn vitess_capabilities() -> Vec<ConnectorCapability> {
-    psl::builtin_connectors::MYSQL.capabilities().to_owned()
 }

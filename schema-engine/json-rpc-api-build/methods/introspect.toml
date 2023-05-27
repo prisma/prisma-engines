@@ -27,8 +27,8 @@ description = "Result type for the introspect method."
 shape = "string"
 
 [recordShapes.introspectResult.fields.warnings]
-shape = "introspectionWarning"
-isList = true
+shape = "string"
+isNullable = true
 
 [recordShapes.introspectResult.fields.version]
 shape = "string"
@@ -37,17 +37,6 @@ shape = "string"
 shape = "introspectionView"
 isNullable = true
 isList = true
-
-[recordShapes.introspectionWarning]
-
-[recordShapes.introspectionWarning.fields.code]
-shape = "u32"
-
-[recordShapes.introspectionWarning.fields.message]
-shape = "string"
-
-[recordShapes.introspectionWarning.fields.affected]
-shape = "serde_json::Value"
 
 [recordShapes.introspectionView]
 

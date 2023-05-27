@@ -1,8 +1,7 @@
 use connector_interface::{AggregationSelection, RelAggregationSelection};
 use indexmap::IndexMap;
 use prisma_models::{
-    dml::{self, FieldArity},
-    FieldSelection, PrismaValue, ScalarFieldRef, SelectedField, TypeIdentifier,
+    ast::FieldArity, DefaultKind, FieldSelection, PrismaValue, ScalarFieldRef, SelectedField, TypeIdentifier,
 };
 
 /// Maps field db field names to their meta information.
@@ -96,7 +95,7 @@ pub fn from_scalar_field(field: &ScalarFieldRef) -> OutputMeta {
 
     // Only add a possible default return if the field is required.
     let default = field.default_value().and_then(|dv| match dv {
-        dml::DefaultKind::Single(pv) if field.is_required() => Some(pv),
+        DefaultKind::Single(pv) if field.is_required() => Some(pv),
         _ => None,
     });
 

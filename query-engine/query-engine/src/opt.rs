@@ -144,7 +144,7 @@ impl PrismaOpt {
         Ok(res)
     }
 
-    pub fn schema(&self, ignore_env_errors: bool) -> PrismaResult<psl::ValidatedSchema> {
+    pub(crate) fn schema(&self, ignore_env_errors: bool) -> PrismaResult<psl::ValidatedSchema> {
         let datamodel_str = self.datamodel_str()?;
         let mut schema = psl::validate(datamodel_str.into());
 
@@ -172,7 +172,7 @@ impl PrismaOpt {
         Ok(schema)
     }
 
-    pub fn configuration(&self, ignore_env_errors: bool) -> PrismaResult<psl::Configuration> {
+    pub(crate) fn configuration(&self, ignore_env_errors: bool) -> PrismaResult<psl::Configuration> {
         let datamodel_str = self.datamodel_str()?;
 
         let datasource_url_overrides: Vec<(String, String)> = if let Some(ref json) = self.overwrite_datasources {
@@ -203,21 +203,9 @@ impl PrismaOpt {
         }
     }
 
-    /// The unix path to listen on.
-    pub fn unix_path(&self) -> Option<&String> {
-        self.unix_path.as_ref()
-    }
-
     /// Enable query logging
-    pub fn log_queries(&self) -> bool {
+    pub(crate) fn log_queries(&self) -> bool {
         std::env::var("LOG_QUERIES").map(|_| true).unwrap_or(self.log_queries)
-    }
-
-    // This is added it here to make it easier to create the options when using
-    // the http server in the tests
-    // Ok to unwrap here as this is only used in tests
-    pub fn from_list(list: &[&str]) -> Self {
-        PrismaOpt::from_iter_safe(list).unwrap()
     }
 
     /// The EngineProtocol to use for communication, it will be [EngineProtocol::Json] in case
@@ -234,7 +222,7 @@ impl PrismaOpt {
     /// for submitting the query, this is due to the fact that DMMF is no longer used by the client
     /// to understand which types certain values are. See [query_core::QueryDocumentParser]
     ///
-    pub fn engine_protocol(&self, preview_features: PreviewFeatures) -> EngineProtocol {
+    pub(crate) fn engine_protocol(&self, preview_features: PreviewFeatures) -> EngineProtocol {
         self.engine_protocol
             .as_ref()
             .map(EngineProtocol::from)

@@ -1,5 +1,5 @@
 use super::*;
-use schema_builder::constants::aggregations::*;
+use schema::constants::aggregations::*;
 
 pub(crate) fn extract_nested_rel_aggr_selections(field_pairs: Vec<FieldPair>) -> (Vec<FieldPair>, Vec<FieldPair>) {
     field_pairs.into_iter().partition(is_aggr_selection)

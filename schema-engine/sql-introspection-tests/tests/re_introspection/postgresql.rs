@@ -62,20 +62,12 @@ async fn re_introspecting_custom_compound_id_names(api: &mut TestApi) -> TestRes
     api.expect_re_introspected_datamodel(input_dm, expectation).await;
 
     let expected = expect![[r#"
-        [
-          {
-            "code": 18,
-            "message": "These models were enriched with custom compound id names taken from the previous Prisma schema.",
-            "affected": [
-              {
-                "model": "User"
-              },
-              {
-                "model": "User2"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These models were enriched with custom compound id names taken from the previous Prisma schema:
+          - "User"
+          - "User2"
+    "#]];
 
     api.expect_re_introspect_warnings(input_dm, expected).await;
 
@@ -176,18 +168,11 @@ async fn mapped_enum_value_name(api: &mut TestApi) -> TestResult {
     api.expect_re_introspected_datamodel(input_dm, expectation).await;
 
     let expectation = expect![[r#"
-        [
-          {
-            "code": 10,
-            "message": "These enum values were enriched with `@map` information taken from the previous Prisma schema.",
-            "affected": [
-              {
-                "enm": "color",
-                "value": "BLACK"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These enum values were enriched with `@map` information taken from the previous Prisma schema:
+          - Enum: "color", value: "BLACK"
+    "#]];
 
     api.expect_re_introspect_warnings(input_dm, expectation).await;
 
@@ -205,7 +190,7 @@ async fn ignore_docs_only_added_once(api: &mut TestApi) -> TestResult {
     api.raw_cmd(setup).await;
 
     let input_dm = indoc! {r#"
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model A {
           id Int?
 
@@ -214,7 +199,7 @@ async fn ignore_docs_only_added_once(api: &mut TestApi) -> TestResult {
     "#};
 
     let expectation = expect![[r#"
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model A {
           id Int?
 
@@ -224,7 +209,7 @@ async fn ignore_docs_only_added_once(api: &mut TestApi) -> TestResult {
 
     api.expect_re_introspected_datamodel(input_dm, expectation).await;
 
-    let expectation = expect!["[]"];
+    let expectation = expect![""];
     api.expect_re_introspect_warnings(input_dm, expectation).await;
 
     Ok(())
@@ -261,17 +246,11 @@ async fn reserved_name_docs_are_only_added_once(api: &mut TestApi) -> TestResult
     api.expect_re_introspected_datamodel(input_dm, expectation).await;
 
     let expectation = expect![[r#"
-        [
-          {
-            "code": 7,
-            "message": "These models were enriched with `@@map` information taken from the previous Prisma schema.",
-            "affected": [
-              {
-                "model": "Renamedif"
-              }
-            ]
-          }
-        ]"#]];
+        *** WARNING ***
+
+        These models were enriched with `@@map` information taken from the previous Prisma schema:
+          - "Renamedif"
+    "#]];
 
     api.expect_re_introspect_warnings(input_dm, expectation).await;
 

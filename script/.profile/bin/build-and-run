@@ -1,3 +1,0 @@
-#/bin/bash
-echo "==> Running: build && run-valgrind $@"
-build && run-valgrind $@
