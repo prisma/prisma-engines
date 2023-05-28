@@ -70,12 +70,13 @@ async fn mysql(
     source: &Datasource,
     url: &str,
     features: PreviewFeatures,
-    nodejs_queryable_option: Option<&NodeJSQueryable>,
+    _nodejs_queryable_option: Option<&NodeJSQueryable>,
 ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync>> {
     trace!("Loading MySQL query connector...");
 
+    #[cfg(feature = "nodejs-drivers")]
     if source.provider == "@prisma/mysql" {
-        let nodejs_queryable = nodejs_queryable_option.unwrap().clone();
+        let nodejs_queryable = _nodejs_queryable_option.unwrap().clone();
         let prisma_mysql = Mysql::from_source_and_nodejs_driver(url, features, nodejs_queryable).await?;
         trace!("Loaded @prisma/mysql query connector.");
         return Ok(sql_executor(prisma_mysql, false));

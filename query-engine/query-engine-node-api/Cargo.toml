@@ -9,7 +9,9 @@ crate-type = ["cdylib"]
 name = "query_engine"
 
 [features]
+default = ["nodejs-drivers"]
 vendored-openssl = ["sql-connector/vendored-openssl"]
+nodejs-drivers = ["sql-connector/nodejs-drivers", "nodejs-drivers/nodejs-drivers", "request-handlers/nodejs-drivers"]
 
 [dependencies]
 anyhow = "1"
