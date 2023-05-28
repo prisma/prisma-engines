@@ -3591,6 +3591,7 @@ dependencies = [
  "itertools",
  "mongodb-query-connector",
  "nodejs-drivers",
+ "once_cell",
  "prisma-models",
  "psl",
  "quaint",
