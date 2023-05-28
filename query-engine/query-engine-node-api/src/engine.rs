@@ -160,11 +160,11 @@ impl QueryEngine {
 
         // Initialize the global NODEJS_QUERYABLE from fn_ctx.
         // This implies that there can only be one QueryEngine instance per process.
-        fn_ctx.map(|ctx| {
+        if let Some(ctx) = fn_ctx {
             let ctx = read_nodejs_function_ctx(ctx).unwrap();
             let nodejs_queryable = NodeJSQueryable::new(ctx);
             NODEJS_QUERYABLE.set(nodejs_queryable).unwrap();
-        });
+        }
 
         let ConstructorOptions {
             datamodel,
