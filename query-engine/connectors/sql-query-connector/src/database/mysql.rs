@@ -1,7 +1,5 @@
-use super::{
-    connection::SqlConnection,
-    nodejs::{RuntimeConnection, RuntimePool},
-};
+use super::connection::SqlConnection;
+use super::nodejs::{RuntimeConnection, RuntimePool};
 use crate::{FromSource, SqlError};
 use async_trait::async_trait;
 use connector_interface::{
@@ -9,12 +7,14 @@ use connector_interface::{
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-use nodejs_drivers::{pool::NodeJSPool, queryable::NodeJSQueryable};
 use quaint::{
     pooled::{PooledConnection, Quaint},
     prelude::ConnectionInfo,
 };
 use std::time::Duration;
+
+#[cfg(feature = "nodejs-drivers")]
+use nodejs_drivers::{pool::NodeJSPool, queryable::NodeJSQueryable};
 
 impl RuntimePool {
     /// Reserve a connection from the pool
@@ -24,6 +24,7 @@ impl RuntimePool {
                 let conn: PooledConnection = pool.check_out().await.map_err(SqlError::from)?;
                 Ok(RuntimeConnection::Rust(conn))
             }
+            #[cfg(feature = "nodejs-drivers")]
             Self::NodeJS(pool) => {
                 let conn: NodeJSQueryable = pool.nodejs_queryable.clone();
                 Ok(RuntimeConnection::NodeJS(conn))
@@ -36,6 +37,24 @@ pub struct Mysql {
     pool: RuntimePool,
     connection_info: ConnectionInfo,
     features: psl::PreviewFeatures,
+}
+
+#[cfg(feature = "nodejs-drivers")]
+impl Mysql {
+    pub async fn from_source_and_nodejs_driver(
+        url: &str,
+        features: psl::PreviewFeatures,
+        nodejs_queryable: NodeJSQueryable,
+    ) -> connector_interface::Result<Mysql> {
+        let connection_info = get_connection_info(url)?;
+        let pool = RuntimePool::NodeJS(NodeJSPool { nodejs_queryable });
+
+        Ok(Mysql {
+            pool,
+            connection_info,
+            features: features.to_owned(),
+        })
+    }
 }
 
 impl Mysql {
@@ -56,23 +75,6 @@ fn get_connection_info(url: &str) -> connector::Result<ConnectionInfo> {
     })?;
 
     Ok(connection_info)
-}
-
-impl Mysql {
-    pub async fn from_source_and_nodejs_driver(
-        url: &str,
-        features: psl::PreviewFeatures,
-        nodejs_queryable: NodeJSQueryable,
-    ) -> connector_interface::Result<Mysql> {
-        let connection_info = get_connection_info(url)?;
-        let pool = RuntimePool::NodeJS(NodeJSPool { nodejs_queryable });
-
-        Ok(Mysql {
-            pool,
-            connection_info,
-            features: features.to_owned(),
-        })
-    }
 }
 
 #[async_trait]

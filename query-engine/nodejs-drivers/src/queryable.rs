@@ -1,21 +1,34 @@
+#[cfg(feature = "nodejs-drivers")]
 use async_trait::async_trait;
-use quaint::connector::IsolationLevel;
-use quaint::prelude::{Query, Queryable, TransactionCapable};
-use quaint::visitor::Visitor;
-use quaint::{visitor, Value};
 
+#[cfg(feature = "nodejs-drivers")]
 use crate::ctx::NodeJSFunctionContext;
 
+#[cfg(feature = "nodejs-drivers")]
+use quaint::{
+    connector::IsolationLevel,
+    prelude::{Query, Queryable, TransactionCapable},
+    visitor::{self, Visitor},
+    Value,
+};
+
+#[cfg(feature = "nodejs-drivers")]
 #[derive(Clone)]
 pub struct NodeJSQueryable {
     pub(crate) ctx: NodeJSFunctionContext,
 }
 
+#[cfg(feature = "nodejs-drivers")]
 impl NodeJSQueryable {
     pub fn new(ctx: NodeJSFunctionContext) -> Self {
         Self { ctx }
     }
 }
+
+#[cfg(not(feature = "nodejs-drivers"))]
+// This is a dummy struct that will only be used for structural type checking.
+#[derive(Clone)]
+pub struct NodeJSQueryable;
 
 impl std::fmt::Display for NodeJSQueryable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -29,6 +42,7 @@ impl std::fmt::Debug for NodeJSQueryable {
     }
 }
 
+#[cfg(feature = "nodejs-drivers")]
 #[async_trait]
 impl Queryable for NodeJSQueryable {
     /// Execute the given query.
@@ -133,4 +147,5 @@ impl Queryable for NodeJSQueryable {
     }
 }
 
+#[cfg(feature = "nodejs-drivers")]
 impl TransactionCapable for NodeJSQueryable {}
