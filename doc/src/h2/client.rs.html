@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/9i1pw9hp8gwg4jjbkx16wpxz1v579ha3-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/h2-0.3.15/src/client.rs`."><title>client.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c4dbdcde0fbd8430.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" disabled href="../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" disabled href="../../static.files/ayu-be46fdc453a55015.css"><script src="../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-98a684e84ae5b08b.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../h2/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/9rix5j2c6d1mgl7bm2gib6szdyfvbpfj-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/h2-0.3.17/src/client.rs`."><title>client.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c4dbdcde0fbd8430.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" disabled href="../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" disabled href="../../static.files/ayu-be46fdc453a55015.css"><script src="../../static.files/storage-3891ce972e3a2bf8.js"></script><script defer src="../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-98a684e84ae5b08b.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../h2/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1553,6 +1553,55 @@
 <a href="#1553" id="1553">1553</a>
 <a href="#1554" id="1554">1554</a>
 <a href="#1555" id="1555">1555</a>
+<a href="#1556" id="1556">1556</a>
+<a href="#1557" id="1557">1557</a>
+<a href="#1558" id="1558">1558</a>
+<a href="#1559" id="1559">1559</a>
+<a href="#1560" id="1560">1560</a>
+<a href="#1561" id="1561">1561</a>
+<a href="#1562" id="1562">1562</a>
+<a href="#1563" id="1563">1563</a>
+<a href="#1564" id="1564">1564</a>
+<a href="#1565" id="1565">1565</a>
+<a href="#1566" id="1566">1566</a>
+<a href="#1567" id="1567">1567</a>
+<a href="#1568" id="1568">1568</a>
+<a href="#1569" id="1569">1569</a>
+<a href="#1570" id="1570">1570</a>
+<a href="#1571" id="1571">1571</a>
+<a href="#1572" id="1572">1572</a>
+<a href="#1573" id="1573">1573</a>
+<a href="#1574" id="1574">1574</a>
+<a href="#1575" id="1575">1575</a>
+<a href="#1576" id="1576">1576</a>
+<a href="#1577" id="1577">1577</a>
+<a href="#1578" id="1578">1578</a>
+<a href="#1579" id="1579">1579</a>
+<a href="#1580" id="1580">1580</a>
+<a href="#1581" id="1581">1581</a>
+<a href="#1582" id="1582">1582</a>
+<a href="#1583" id="1583">1583</a>
+<a href="#1584" id="1584">1584</a>
+<a href="#1585" id="1585">1585</a>
+<a href="#1586" id="1586">1586</a>
+<a href="#1587" id="1587">1587</a>
+<a href="#1588" id="1588">1588</a>
+<a href="#1589" id="1589">1589</a>
+<a href="#1590" id="1590">1590</a>
+<a href="#1591" id="1591">1591</a>
+<a href="#1592" id="1592">1592</a>
+<a href="#1593" id="1593">1593</a>
+<a href="#1594" id="1594">1594</a>
+<a href="#1595" id="1595">1595</a>
+<a href="#1596" id="1596">1596</a>
+<a href="#1597" id="1597">1597</a>
+<a href="#1598" id="1598">1598</a>
+<a href="#1599" id="1599">1599</a>
+<a href="#1600" id="1600">1600</a>
+<a href="#1601" id="1601">1601</a>
+<a href="#1602" id="1602">1602</a>
+<a href="#1603" id="1603">1603</a>
+<a href="#1604" id="1604">1604</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Client implementation of the HTTP/2 protocol.
 //!
 //! # Getting started
@@ -1881,6 +1930,10 @@
     <span class="doccomment">/// Maximum number of locally reset streams to keep at a time.
     </span>reset_stream_max: usize,
 
+    <span class="doccomment">/// Maximum number of remotely reset streams to allow in the pending
+    /// accept queue.
+    </span>pending_accept_reset_stream_max: usize,
+
     <span class="doccomment">/// Initial `Settings` frame to send as part of the handshake.
     </span>settings: Settings,
 
@@ -1896,7 +1949,7 @@
 
 </span><span class="kw">impl</span>&lt;B&gt; SendRequest&lt;B&gt;
 <span class="kw">where
-    </span>B: Buf + <span class="lifetime">&#39;static</span>,
+    </span>B: Buf,
 {
     <span class="doccomment">/// Returns `Ready` when the connection can initialize a new HTTP/2
     /// stream.
@@ -2139,7 +2192,7 @@
 
 </span><span class="kw">impl</span>&lt;B&gt; Future <span class="kw">for </span>ReadySendRequest&lt;B&gt;
 <span class="kw">where
-    </span>B: Buf + <span class="lifetime">&#39;static</span>,
+    </span>B: Buf,
 {
     <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;SendRequest&lt;B&gt;, <span class="kw">crate</span>::Error&gt;;
 
@@ -2189,6 +2242,7 @@
             max_send_buffer_size: proto::DEFAULT_MAX_SEND_BUFFER_SIZE,
             reset_stream_duration: Duration::from_secs(proto::DEFAULT_RESET_STREAM_SECS),
             reset_stream_max: proto::DEFAULT_RESET_STREAM_MAX,
+            pending_accept_reset_stream_max: proto::DEFAULT_REMOTE_RESET_STREAM_MAX,
             initial_target_connection_window_size: <span class="prelude-val">None</span>,
             initial_max_send_streams: usize::MAX,
             settings: Default::default(),
@@ -2521,6 +2575,49 @@
         <span class="self">self
     </span>}
 
+    <span class="doccomment">/// Sets the maximum number of pending-accept remotely-reset streams.
+    ///
+    /// Streams that have been received by the peer, but not accepted by the
+    /// user, can also receive a RST_STREAM. This is a legitimate pattern: one
+    /// could send a request and then shortly after, realize it is not needed,
+    /// sending a CANCEL.
+    ///
+    /// However, since those streams are now &quot;closed&quot;, they don&#39;t count towards
+    /// the max concurrent streams. So, they will sit in the accept queue,
+    /// using memory.
+    ///
+    /// When the number of remotely-reset streams sitting in the pending-accept
+    /// queue reaches this maximum value, a connection error with the code of
+    /// `ENHANCE_YOUR_CALM` will be sent to the peer, and returned by the
+    /// `Future`.
+    ///
+    /// The default value is currently 20, but could change.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tokio::io::{AsyncRead, AsyncWrite};
+    /// # use h2::client::*;
+    /// # use bytes::Bytes;
+    /// #
+    /// # async fn doc&lt;T: AsyncRead + AsyncWrite + Unpin&gt;(my_io: T)
+    /// # -&gt; Result&lt;((SendRequest&lt;Bytes&gt;, Connection&lt;T, Bytes&gt;)), h2::Error&gt;
+    /// # {
+    /// // `client_fut` is a future representing the completion of the HTTP/2
+    /// // handshake.
+    /// let client_fut = Builder::new()
+    ///     .max_pending_accept_reset_streams(100)
+    ///     .handshake(my_io);
+    /// # client_fut.await
+    /// # }
+    /// #
+    /// # pub fn main() {}
+    /// ```
+    </span><span class="kw">pub fn </span>max_pending_accept_reset_streams(<span class="kw-2">&amp;mut </span><span class="self">self</span>, max: usize) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.pending_accept_reset_stream_max = max;
+        <span class="self">self
+    </span>}
+
     <span class="doccomment">/// Sets the maximum send buffer size per stream.
     ///
     /// Once a stream has buffered up to (or over) the maximum, the stream&#39;s
@@ -2541,8 +2638,8 @@
 
     <span class="doccomment">/// Enables or disables server push promises.
     ///
-    /// This value is included in the initial SETTINGS handshake. When set, the
-    /// server MUST NOT send a push promise. Setting this value to value to
+    /// This value is included in the initial SETTINGS handshake.
+    /// Setting this value to value to
     /// false in the initial SETTINGS handshake guarantees that the remote server
     /// will never send a push promise.
     ///
@@ -2655,7 +2752,7 @@
     ) -&gt; <span class="kw">impl </span>Future&lt;Output = <span class="prelude-ty">Result</span>&lt;(SendRequest&lt;B&gt;, Connection&lt;T, B&gt;), <span class="kw">crate</span>::Error&gt;&gt;
     <span class="kw">where
         </span>T: AsyncRead + AsyncWrite + Unpin,
-        B: Buf + <span class="lifetime">&#39;static</span>,
+        B: Buf,
     {
         Connection::handshake2(io, <span class="self">self</span>.clone())
     }
@@ -2732,7 +2829,7 @@
 <span class="kw">impl</span>&lt;T, B&gt; Connection&lt;T, B&gt;
 <span class="kw">where
     </span>T: AsyncRead + AsyncWrite + Unpin,
-    B: Buf + <span class="lifetime">&#39;static</span>,
+    B: Buf,
 {
     <span class="kw">async fn </span>handshake2(
         <span class="kw-2">mut </span>io: T,
@@ -2764,6 +2861,7 @@
                 max_send_buffer_size: builder.max_send_buffer_size,
                 reset_stream_duration: builder.reset_stream_duration,
                 reset_stream_max: builder.reset_stream_max,
+                remote_reset_stream_max: builder.pending_accept_reset_stream_max,
                 settings: builder.settings.clone(),
             },
         );
@@ -2861,7 +2959,7 @@
 <span class="kw">impl</span>&lt;T, B&gt; Future <span class="kw">for </span>Connection&lt;T, B&gt;
 <span class="kw">where
     </span>T: AsyncRead + AsyncWrite + Unpin,
-    B: Buf + <span class="lifetime">&#39;static</span>,
+    B: Buf,
 {
     <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;(), <span class="kw">crate</span>::Error&gt;;
 
