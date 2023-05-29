@@ -246,7 +246,7 @@ impl Connector for MySqlDatamodelConnector {
         if ds.provider == "@prisma/mysql" && !preview_features.contains(PreviewFeature::NodeDrivers) {
             errors.push_error(DatamodelError::new_validation_error(
                 "The provider \"@prisma/mysql\" is currently in preview and must be explicitly enabled. Please add the preview feature flag \"nodeDrivers\" to the generator block in your schema.prisma file.",
-                Span::empty(),
+                ds.provider_span,
             ));
         }
     }

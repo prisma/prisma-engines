@@ -8,9 +8,8 @@ datasource db {
     relationMode = "prisma"
 }
 // [1;91merror[0m: [1mError validating: The provider "@prisma/mysql" is currently in preview and must be explicitly enabled. Please add the preview feature flag "nodeDrivers" to the generator block in your schema.prisma file.[0m
-//   [1;94m-->[0m  [4mschema.prisma:1[0m
+//   [1;94m-->[0m  [4mschema.prisma:6[0m
 // [1;94m   | [0m
-// [1;94m   | [0m
-// [1;94m 1 | [0m[1;91m[0mgenerator client {
-// [1;94m   | [0m[1;91m^ Unexpected token.[0m
+// [1;94m 5 | [0mdatasource db {
+// [1;94m 6 | [0m    provider = [1;91m"@prisma/mysql"[0m
 // [1;94m   | [0m

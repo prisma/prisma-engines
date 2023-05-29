@@ -204,6 +204,7 @@ fn lift_datasource(
         schemas_span,
         name: source_name.to_owned(),
         provider: provider.to_owned(),
+        provider_span: provider_arg.span(),
         active_provider: active_connector.provider_name(),
         url,
         url_span,
