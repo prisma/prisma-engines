@@ -305,7 +305,7 @@
                 <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
             },
 
-            (<span class="prelude-val">None</span>, sql::ColumnTypeFamily::String) =&gt; <span class="kw">match </span><span class="self">self</span>.previous {
+            (<span class="prelude-val">None</span>, sql::ColumnTypeFamily::String | sql::ColumnTypeFamily::Uuid) =&gt; <span class="kw">match </span><span class="self">self</span>.previous {
                 <span class="prelude-val">Some</span>(previous) <span class="kw">if </span>previous.is_cuid() =&gt; <span class="prelude-val">Some</span>(DefaultKind::Cuid),
                 <span class="prelude-val">Some</span>(previous) <span class="kw">if </span>previous.is_uuid() =&gt; <span class="prelude-val">Some</span>(DefaultKind::Uuid),
                 <span class="prelude-val">Some</span>(previous) <span class="kw">if </span>previous.is_nanoid() =&gt; {
