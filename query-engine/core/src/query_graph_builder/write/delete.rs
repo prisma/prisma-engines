@@ -5,7 +5,7 @@ use crate::{
     ArgumentListLookup, FilteredQuery, ParsedField,
 };
 use connector::filter::Filter;
-use prisma_models::ModelRef;
+use prisma_models::Model;
 use schema::{constants::args, QuerySchema};
 use std::convert::TryInto;
 
@@ -13,7 +13,7 @@ use std::convert::TryInto;
 pub(crate) fn delete_record(
     graph: &mut QueryGraph,
     query_schema: &QuerySchema,
-    model: ModelRef,
+    model: Model,
     mut field: ParsedField<'_>,
 ) -> QueryGraphBuilderResult<()> {
     graph.flag_transactional();
@@ -59,7 +59,7 @@ pub(crate) fn delete_record(
 pub fn delete_many_records(
     graph: &mut QueryGraph,
     query_schema: &QuerySchema,
-    model: ModelRef,
+    model: Model,
     mut field: ParsedField<'_>,
 ) -> QueryGraphBuilderResult<()> {
     graph.flag_transactional();

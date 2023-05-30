@@ -6,7 +6,7 @@ pub use composite::*;
 pub use relation::*;
 pub use scalar::*;
 
-use crate::{ast, parent_container::ParentContainer, ModelRef};
+use crate::{ast, parent_container::ParentContainer, Model};
 use psl::parser_database::{walkers, ScalarType};
 use std::{borrow::Cow, hash::Hash};
 
@@ -100,7 +100,7 @@ impl Field {
         }
     }
 
-    pub fn model(&self) -> Option<ModelRef> {
+    pub fn model(&self) -> Option<Model> {
         match self {
             Self::Scalar(sf) => sf.container().as_model(),
             Self::Relation(rf) => Some(rf.model()),

@@ -6,7 +6,7 @@ use crate::{
     ArgumentListLookup, ParsedField, ParsedInputMap,
 };
 use connector::{Filter, IntoFilter};
-use prisma_models::ModelRef;
+use prisma_models::Model;
 use schema::{constants::args, QuerySchema};
 use std::convert::TryInto;
 
@@ -14,7 +14,7 @@ use std::convert::TryInto;
 pub(crate) fn update_record(
     graph: &mut QueryGraph,
     query_schema: &QuerySchema,
-    model: ModelRef,
+    model: Model,
     mut field: ParsedField<'_>,
 ) -> QueryGraphBuilderResult<()> {
     // "where"
@@ -85,7 +85,7 @@ pub(crate) fn update_record(
 pub fn update_many_records(
     graph: &mut QueryGraph,
     query_schema: &QuerySchema,
-    model: ModelRef,
+    model: Model,
     mut field: ParsedField<'_>,
 ) -> QueryGraphBuilderResult<()> {
     graph.flag_transactional();
@@ -136,7 +136,7 @@ pub fn update_record_node<T: Clone>(
     graph: &mut QueryGraph,
     query_schema: &QuerySchema,
     filter: T,
-    model: ModelRef,
+    model: Model,
     data_map: ParsedInputMap<'_>,
 ) -> QueryGraphBuilderResult<NodeRef>
 where
@@ -169,7 +169,7 @@ pub fn update_many_record_node<T>(
     graph: &mut QueryGraph,
     query_schema: &QuerySchema,
     filter: T,
-    model: ModelRef,
+    model: Model,
     data_map: ParsedInputMap<'_>,
 ) -> QueryGraphBuilderResult<NodeRef>
 where

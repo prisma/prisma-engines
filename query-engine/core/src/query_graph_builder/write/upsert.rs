@@ -5,7 +5,7 @@ use crate::{
     ParsedField, ParsedInputMap, ParsedInputValue, ParsedObject,
 };
 use connector::IntoFilter;
-use prisma_models::ModelRef;
+use prisma_models::Model;
 use schema::QuerySchema;
 
 /// Handles a top-level upsert
@@ -53,7 +53,7 @@ use schema::QuerySchema;
 pub(crate) fn upsert_record(
     graph: &mut QueryGraph,
     query_schema: &QuerySchema,
-    model: ModelRef,
+    model: Model,
     mut field: ParsedField<'_>,
 ) -> QueryGraphBuilderResult<()> {
     let where_argument = field.where_arg()?.unwrap();
@@ -203,7 +203,7 @@ pub(crate) fn upsert_record(
 // 3. There is only 1 unique field in the where clause
 // 4. The unique field defined in where clause has the same value as defined in the create arguments
 fn can_use_connector_native_upsert<'a>(
-    model: &ModelRef,
+    model: &Model,
     where_field: &ParsedInputMap<'a>,
     create_argument: &ParsedInputMap<'a>,
     update_argument: &ParsedInputMap<'a>,
@@ -242,7 +242,7 @@ fn can_use_connector_native_upsert<'a>(
         && !query_schema.relation_mode().is_prisma()
 }
 
-fn is_unique_field(field_name: &str, model: &ModelRef) -> bool {
+fn is_unique_field(field_name: &str, model: &Model) -> bool {
     match model.fields().find_from_scalar(field_name) {
         Ok(field) => field.unique(),
         Err(_) => resolve_compound_field(field_name, model).is_some(),

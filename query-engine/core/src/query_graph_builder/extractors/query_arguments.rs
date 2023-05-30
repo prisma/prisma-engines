@@ -13,7 +13,7 @@ use std::convert::TryInto;
 /// Errors occur if conversions fail.
 pub fn extract_query_args(
     arguments: Vec<ParsedArgument<'_>>,
-    model: &ModelRef,
+    model: &Model,
 ) -> QueryGraphBuilderResult<QueryArguments> {
     let query_args = arguments.into_iter().fold(
         Ok(QueryArguments::new(model.clone())),
@@ -280,7 +280,7 @@ fn extract_skip(value: ParsedInputValue<'_>) -> QueryGraphBuilderResult<Option<i
     }
 }
 
-fn extract_cursor(value: ParsedInputValue<'_>, model: &ModelRef) -> QueryGraphBuilderResult<Option<SelectionResult>> {
+fn extract_cursor(value: ParsedInputValue<'_>, model: &Model) -> QueryGraphBuilderResult<Option<SelectionResult>> {
     let input_map: ParsedInputMap<'_> = value.try_into()?;
     let mut pairs = vec![];
 
@@ -329,7 +329,7 @@ fn extract_compound_cursor_field(
 }
 
 /// Runs final transformations on the QueryArguments.
-fn finalize_arguments(mut args: QueryArguments, model: &ModelRef) -> QueryArguments {
+fn finalize_arguments(mut args: QueryArguments, model: &Model) -> QueryArguments {
     // Check if the query requires an implicit ordering added to the arguments.
     // An implicit ordering is convenient for deterministic results for take and skip, for cursor it's _required_
     // as a cursor needs a direction to page. We simply take the primary identifier as a default order-by.

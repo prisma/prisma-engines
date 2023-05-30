@@ -2,7 +2,7 @@ use super::*;
 use crate::{query_ast::*, query_graph::*, ParsedInputValue};
 use connector::Filter;
 use itertools::Itertools;
-use prisma_models::{ModelRef, RelationFieldRef, SelectionResult};
+use prisma_models::{Model, RelationFieldRef, SelectionResult};
 use std::convert::TryInto;
 
 /// Only for x-to-many relations.
@@ -15,7 +15,7 @@ pub fn nested_set(
     parent_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue<'_>,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
 

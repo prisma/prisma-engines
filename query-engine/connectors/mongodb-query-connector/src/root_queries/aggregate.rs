@@ -7,7 +7,7 @@ use prisma_models::prelude::*;
 pub async fn aggregate<'conn>(
     database: &Database,
     session: &mut ClientSession,
-    model: &ModelRef,
+    model: &Model,
     query_arguments: QueryArguments,
     selections: Vec<AggregationSelection>,
     group_by: Vec<ScalarFieldRef>,

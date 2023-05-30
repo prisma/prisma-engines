@@ -115,7 +115,7 @@ impl<'a> Fields<'a> {
             })
     }
 
-    fn model(&self) -> &ModelRef {
+    fn model(&self) -> &Model {
         self.model
     }
 

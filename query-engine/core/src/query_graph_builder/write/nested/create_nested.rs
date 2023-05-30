@@ -6,7 +6,7 @@ use crate::{
     ParsedInputList, ParsedInputValue,
 };
 use connector::{Filter, IntoFilter};
-use prisma_models::{ModelRef, RelationFieldRef};
+use prisma_models::{Model, RelationFieldRef};
 use schema::constants::args;
 use std::convert::TryInto;
 
@@ -19,7 +19,7 @@ pub fn nested_create(
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue<'_>,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
 
@@ -422,7 +422,7 @@ pub fn nested_create_many(
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue<'_>,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     // Nested input is an object of { data: [...], skipDuplicates: bool }
     let mut obj: ParsedInputMap<'_> = value.try_into()?;

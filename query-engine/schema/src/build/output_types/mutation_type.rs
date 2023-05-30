@@ -103,7 +103,7 @@ fn create_mongodb_run_command_raw<'a>() -> OutputField<'a> {
 }
 
 /// Builds a delete mutation field (e.g. deleteUser) for given model.
-fn delete_item_field(ctx: &'_ QuerySchema, model: ModelRef) -> OutputField<'_> {
+fn delete_item_field(ctx: &'_ QuerySchema, model: Model) -> OutputField<'_> {
     arguments::delete_one_arguments(ctx, model.clone())
         .map(|args| {
             let field_name = format!("deleteOne{}", model.name());
@@ -123,7 +123,7 @@ fn delete_item_field(ctx: &'_ QuerySchema, model: ModelRef) -> OutputField<'_> {
 }
 
 /// Builds a delete many mutation field (e.g. deleteManyUsers) for given model.
-fn delete_many_field(ctx: &'_ QuerySchema, model: ModelRef) -> OutputField<'_> {
+fn delete_many_field(ctx: &'_ QuerySchema, model: Model) -> OutputField<'_> {
     let field_name = format!("deleteMany{}", model.name());
     let cloned_model = model.clone();
 
@@ -141,7 +141,7 @@ fn delete_many_field(ctx: &'_ QuerySchema, model: ModelRef) -> OutputField<'_> {
 }
 
 /// Builds an update mutation field (e.g. updateUser) for given model.
-fn update_item_field(ctx: &'_ QuerySchema, model: ModelRef) -> OutputField<'_> {
+fn update_item_field(ctx: &'_ QuerySchema, model: Model) -> OutputField<'_> {
     arguments::update_one_arguments(ctx, model.clone())
         .map(|args| {
             let field_name = format!("updateOne{}", model.name());
@@ -161,7 +161,7 @@ fn update_item_field(ctx: &'_ QuerySchema, model: ModelRef) -> OutputField<'_> {
 }
 
 /// Builds an update many mutation field (e.g. updateManyUsers) for given model.
-fn update_many_field(ctx: &'_ QuerySchema, model: ModelRef) -> OutputField<'_> {
+fn update_many_field(ctx: &'_ QuerySchema, model: Model) -> OutputField<'_> {
     let field_name = format!("updateMany{}", model.name());
     let cloned_model = model.clone();
 
@@ -179,7 +179,7 @@ fn update_many_field(ctx: &'_ QuerySchema, model: ModelRef) -> OutputField<'_> {
 }
 
 /// Builds an upsert mutation field (e.g. upsertUser) for given model.
-fn upsert_item_field(ctx: &'_ QuerySchema, model: ModelRef) -> OutputField<'_> {
+fn upsert_item_field(ctx: &'_ QuerySchema, model: Model) -> OutputField<'_> {
     arguments::upsert_arguments(ctx, model.clone())
         .map(|args| {
             let field_name = format!("upsertOne{}", model.name());

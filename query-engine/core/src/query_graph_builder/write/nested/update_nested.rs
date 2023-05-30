@@ -5,7 +5,7 @@ use crate::{
     ParsedInputValue,
 };
 use connector::Filter;
-use prisma_models::{ModelRef, RelationFieldRef};
+use prisma_models::{Model, RelationFieldRef};
 use schema::constants::args;
 use std::convert::TryInto;
 
@@ -43,7 +43,7 @@ pub fn nested_update(
     parent: &NodeRef,
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue<'_>,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     for value in utils::coerce_vec(value) {
         let (data, filter) = if parent_relation_field.is_list() {
@@ -123,7 +123,7 @@ pub fn nested_update_many(
     parent: &NodeRef,
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue<'_>,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     for value in utils::coerce_vec(value) {
         let mut map: ParsedInputMap<'_> = value.try_into()?;

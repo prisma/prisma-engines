@@ -5,7 +5,7 @@ use crate::{
     ArgumentListLookup, ParsedField, ParsedInputList, ParsedInputMap,
 };
 use connector::IntoFilter;
-use prisma_models::ModelRef;
+use prisma_models::Model;
 use schema::{constants::args, QuerySchema};
 use std::convert::TryInto;
 use write_args_parser::*;
@@ -14,7 +14,7 @@ use write_args_parser::*;
 pub(crate) fn create_record(
     graph: &mut QueryGraph,
     query_schema: &QuerySchema,
-    model: ModelRef,
+    model: Model,
     mut field: ParsedField<'_>,
 ) -> QueryGraphBuilderResult<()> {
     graph.flag_transactional();
@@ -60,7 +60,7 @@ pub(crate) fn create_record(
 pub(crate) fn create_many_records(
     graph: &mut QueryGraph,
     _query_schema: &QuerySchema,
-    model: ModelRef,
+    model: Model,
     mut field: ParsedField<'_>,
 ) -> QueryGraphBuilderResult<()> {
     graph.flag_transactional();
@@ -99,7 +99,7 @@ pub(crate) fn create_many_records(
 pub fn create_record_node(
     graph: &mut QueryGraph,
     query_schema: &QuerySchema,
-    model: ModelRef,
+    model: Model,
     data_map: ParsedInputMap<'_>,
 ) -> QueryGraphBuilderResult<NodeRef> {
     let create_args = WriteArgsParser::from(&model, data_map)?;

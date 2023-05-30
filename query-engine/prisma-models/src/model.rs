@@ -2,7 +2,6 @@ use crate::prelude::*;
 use psl::{parser_database::walkers, schema_ast::ast};
 
 pub type Model = crate::Zipper<ast::ModelId>;
-pub type ModelRef = Model;
 
 impl Model {
     pub fn name(&self) -> &str {

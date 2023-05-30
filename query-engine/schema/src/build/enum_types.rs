@@ -23,7 +23,7 @@ pub(crate) fn map_schema_enum_type(ctx: &'_ QuerySchema, enum_id: ast::EnumId) -
     EnumType::database(ident, schema_enum)
 }
 
-pub(crate) fn model_field_enum(model: &ModelRef) -> EnumType {
+pub(crate) fn model_field_enum(model: &Model) -> EnumType {
     let ident = Identifier::new_prisma(IdentifierType::ScalarFieldEnum(model.clone()));
 
     let values = model

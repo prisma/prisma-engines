@@ -4,7 +4,7 @@ use constants::args;
 
 pub(crate) fn update_many_input_types(
     ctx: &'_ QuerySchema,
-    model: ModelRef,
+    model: Model,
     parent_field: Option<RelationFieldRef>,
 ) -> Vec<InputType<'_>> {
     let checked_input = InputType::object(checked_update_many_input_type(ctx, model.clone()));
@@ -14,7 +14,7 @@ pub(crate) fn update_many_input_types(
 }
 
 /// Builds "<x>UpdateManyMutationInput" input object type.
-pub(crate) fn checked_update_many_input_type(ctx: &'_ QuerySchema, model: ModelRef) -> InputObjectType<'_> {
+pub(crate) fn checked_update_many_input_type(ctx: &'_ QuerySchema, model: Model) -> InputObjectType<'_> {
     let ident = Identifier::new_prisma(IdentifierType::CheckedUpdateManyInput(model.clone()));
 
     let mut input_object = init_input_object_type(ident);
@@ -31,7 +31,7 @@ pub(crate) fn checked_update_many_input_type(ctx: &'_ QuerySchema, model: ModelR
 /// Builds "<x>UncheckedUpdateManyWithout<y>MutationInput" input object type
 pub(crate) fn unchecked_update_many_input_type(
     ctx: &'_ QuerySchema,
-    model: ModelRef,
+    model: Model,
     parent_field: Option<RelationFieldRef>,
 ) -> InputObjectType<'_> {
     // TODO: This leads to conflicting type names.

@@ -1,14 +1,14 @@
 use super::*;
 use crate::{query_document::*, QueryOption, QueryOptions, ReadQuery, RecordQuery};
-use prisma_models::ModelRef;
+use prisma_models::Model;
 use schema::constants::args;
 use std::convert::TryInto;
 
-pub(crate) fn find_unique(field: ParsedField<'_>, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
+pub(crate) fn find_unique(field: ParsedField<'_>, model: Model) -> QueryGraphBuilderResult<ReadQuery> {
     find_unique_with_options(field, model, QueryOptions::none())
 }
 
-pub(crate) fn find_unique_or_throw(field: ParsedField<'_>, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
+pub(crate) fn find_unique_or_throw(field: ParsedField<'_>, model: Model) -> QueryGraphBuilderResult<ReadQuery> {
     find_unique_with_options(field, model, QueryOption::ThrowOnEmpty.into())
 }
 
@@ -16,7 +16,7 @@ pub(crate) fn find_unique_or_throw(field: ParsedField<'_>, model: ModelRef) -> Q
 #[inline]
 fn find_unique_with_options(
     mut field: ParsedField<'_>,
-    model: ModelRef,
+    model: Model,
     options: QueryOptions,
 ) -> QueryGraphBuilderResult<ReadQuery> {
     let filter = match field.arguments.lookup(args::WHERE) {

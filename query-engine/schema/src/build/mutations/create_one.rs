@@ -5,10 +5,10 @@ use crate::{
 use constants::*;
 use input_types::fields::data_input_mapper::*;
 use output_types::objects;
-use prisma_models::{ModelRef, RelationFieldRef};
+use prisma_models::{Model, RelationFieldRef};
 
 /// Builds a create mutation field (e.g. createUser) for given model.
-pub(crate) fn create_one(ctx: &'_ QuerySchema, model: ModelRef) -> OutputField<'_> {
+pub(crate) fn create_one(ctx: &'_ QuerySchema, model: Model) -> OutputField<'_> {
     let field_name = format!("createOne{}", model.name());
     let cloned_model = model.clone();
     let model_id = model.id;
@@ -28,14 +28,14 @@ pub(crate) fn create_one(ctx: &'_ QuerySchema, model: ModelRef) -> OutputField<'
 
 /// Builds "data" argument intended for the create field.
 /// The data argument is not present if no data can be created.
-pub(crate) fn create_one_arguments(ctx: &'_ QuerySchema, model: ModelRef) -> Option<Vec<InputField<'_>>> {
+pub(crate) fn create_one_arguments(ctx: &'_ QuerySchema, model: Model) -> Option<Vec<InputField<'_>>> {
     let create_types = create_one_input_types(ctx, model, None);
     Some(vec![input_field(args::DATA, create_types, None).optional()])
 }
 
 pub(crate) fn create_one_input_types(
     ctx: &'_ QuerySchema,
-    model: ModelRef,
+    model: Model,
     parent_field: Option<RelationFieldRef>,
 ) -> Vec<InputType<'_>> {
     let checked_input = InputType::object(checked_create_input_type(ctx, model.clone(), parent_field.clone()));
@@ -50,7 +50,7 @@ pub(crate) fn create_one_input_types(
 /// data integrity violations if used incorrectly.
 fn checked_create_input_type(
     ctx: &'_ QuerySchema,
-    model: ModelRef,
+    model: Model,
     parent_field: Option<RelationFieldRef>,
 ) -> InputObjectType<'_> {
     // We allow creation from both sides of the relation - which would lead to an endless loop of input types
@@ -76,7 +76,7 @@ fn checked_create_input_type(
 /// lead to unintended data integrity violations if used incorrectly.
 fn unchecked_create_input_type(
     ctx: &'_ QuerySchema,
-    model: ModelRef,
+    model: Model,
     parent_field: Option<RelationFieldRef>,
 ) -> InputObjectType<'_> {
     // We allow creation from both sides of the relation - which would lead to an endless loop of input types
@@ -98,7 +98,7 @@ fn unchecked_create_input_type(
 
 /// Filters the given model's fields down to the allowed ones for checked create.
 fn filter_checked_create_fields(
-    model: &ModelRef,
+    model: &Model,
     parent_field: Option<RelationFieldRef>,
 ) -> impl Iterator<Item = ModelField> + '_ {
     model.fields().filter_all(move |field| {
@@ -125,7 +125,7 @@ fn filter_checked_create_fields(
 
 /// Filters the given model's fields down to the allowed ones for unchecked create.
 fn filter_unchecked_create_fields<'a>(
-    model: &'a ModelRef,
+    model: &'a Model,
     parent_field: Option<&'a RelationFieldRef>,
 ) -> impl Iterator<Item = ModelField> + 'a {
     let linking_fields = if let Some(parent_field) = parent_field {

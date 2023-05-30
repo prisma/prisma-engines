@@ -227,7 +227,7 @@ pub trait ReadOperations {
     /// - The `FieldSelection` defines the values to be returned.
     async fn get_single_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         filter: &Filter,
         selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
@@ -242,7 +242,7 @@ pub trait ReadOperations {
     ///   to be returned as a projection of fields of the model it queries.
     async fn get_many_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
@@ -270,7 +270,7 @@ pub trait ReadOperations {
     /// `having` can only be a scalar filter. Relation elements can be safely ignored.
     async fn aggregate_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         query_arguments: QueryArguments,
         selections: Vec<AggregationSelection>,
         group_by: Vec<ScalarFieldRef>,
@@ -284,7 +284,7 @@ pub trait WriteOperations {
     /// Insert a single record to the database.
     async fn create_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         args: WriteArgs,
         trace_id: Option<String>,
     ) -> crate::Result<SelectionResult>;
@@ -292,7 +292,7 @@ pub trait WriteOperations {
     /// Inserts many records at once into the database.
     async fn create_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         args: Vec<WriteArgs>,
         skip_duplicates: bool,
         trace_id: Option<String>,
@@ -302,7 +302,7 @@ pub trait WriteOperations {
     /// `Filter`.
     async fn update_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: RecordFilter,
         args: WriteArgs,
         trace_id: Option<String>,
@@ -312,7 +312,7 @@ pub trait WriteOperations {
     /// `Filter`.
     async fn update_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: RecordFilter,
         args: WriteArgs,
         trace_id: Option<String>,
@@ -329,7 +329,7 @@ pub trait WriteOperations {
     /// Delete records in the `Model` with the given `Filter`.
     async fn delete_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: RecordFilter,
         trace_id: Option<String>,
     ) -> crate::Result<usize>;
@@ -366,7 +366,7 @@ pub trait WriteOperations {
     /// Returns resulting rows as JSON.
     async fn query_raw(
         &mut self,
-        model: Option<&ModelRef>,
+        model: Option<&Model>,
         inputs: HashMap<String, PrismaValue>,
         query_type: Option<String>,
     ) -> crate::Result<serde_json::Value>;

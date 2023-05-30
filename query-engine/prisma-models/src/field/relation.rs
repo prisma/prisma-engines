@@ -45,7 +45,7 @@ impl RelationField {
         !self.is_required()
     }
 
-    pub fn model(&self) -> ModelRef {
+    pub fn model(&self) -> Model {
         self.dm.find_model_by_id(self.walker().model().id)
     }
 
@@ -80,7 +80,7 @@ impl RelationField {
         self.relation().is_inline_relation() && !self.relation_is_inlined_in_parent()
     }
 
-    pub fn related_model(&self) -> ModelRef {
+    pub fn related_model(&self) -> Model {
         self.dm.find_model_by_id(self.walker().related_model().id)
     }
 

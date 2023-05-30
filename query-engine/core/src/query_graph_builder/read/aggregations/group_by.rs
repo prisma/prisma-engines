@@ -1,11 +1,11 @@
 use super::*;
 use crate::{query_document::ParsedField, AggregateRecordsQuery, ArgumentListLookup, ParsedInputValue, ReadQuery};
 use connector::Filter;
-use prisma_models::{ModelRef, OrderBy, ScalarFieldRef};
+use prisma_models::{Model, OrderBy, ScalarFieldRef};
 use schema::constants::args;
 use std::convert::TryInto;
 
-pub(crate) fn group_by(mut field: ParsedField<'_>, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
+pub(crate) fn group_by(mut field: ParsedField<'_>, model: Model) -> QueryGraphBuilderResult<ReadQuery> {
     let name = field.name;
     let alias = field.alias;
     let model = model;

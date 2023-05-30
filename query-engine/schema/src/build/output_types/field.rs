@@ -78,7 +78,7 @@ fn map_composite_field_output_type(ctx: &'_ QuerySchema, cf: CompositeFieldRef) 
 pub(crate) fn aggregation_relation_field<'a, F, G>(
     ctx: &'a QuerySchema,
     name: &'a str,
-    model: &ModelRef,
+    model: &Model,
     fields: Vec<RelationFieldRef>,
     type_mapper: F,
     object_mapper: G,
@@ -105,7 +105,7 @@ where
 /// Maps the object type for aggregations that operate on a field level.
 fn map_field_aggration_relation<'a, F, G>(
     ctx: &'a QuerySchema,
-    model: &ModelRef,
+    model: &Model,
     fields: Vec<RelationFieldRef>,
     type_mapper: F,
     object_mapper: G,

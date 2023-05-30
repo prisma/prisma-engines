@@ -1,6 +1,6 @@
 use super::*;
 use crate::{query_ast::*, query_graph::QueryGraph, ParsedField};
-use prisma_models::{ModelRef, PrismaValue};
+use prisma_models::{Model, PrismaValue};
 use std::{collections::HashMap, convert::TryInto};
 
 pub(crate) fn execute_raw(graph: &mut QueryGraph, field: ParsedField<'_>) -> QueryGraphBuilderResult<()> {
@@ -12,7 +12,7 @@ pub(crate) fn execute_raw(graph: &mut QueryGraph, field: ParsedField<'_>) -> Que
 
 pub(crate) fn query_raw(
     graph: &mut QueryGraph,
-    model: Option<ModelRef>,
+    model: Option<Model>,
     query_type: Option<String>,
     field: ParsedField<'_>,
 ) -> QueryGraphBuilderResult<()> {
@@ -23,7 +23,7 @@ pub(crate) fn query_raw(
 }
 
 fn raw_query(
-    model: Option<ModelRef>,
+    model: Option<Model>,
     query_type: Option<String>,
     field: ParsedField<'_>,
 ) -> QueryGraphBuilderResult<RawQuery> {

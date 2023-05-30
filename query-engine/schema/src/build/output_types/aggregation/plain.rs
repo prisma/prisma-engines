@@ -3,7 +3,7 @@ use constants::aggregations::*;
 use std::convert::identity;
 
 /// Builds plain aggregation object type for given model (e.g. AggregateUser).
-pub(crate) fn aggregation_object_type(ctx: &'_ QuerySchema, model: ModelRef) -> ObjectType<'_> {
+pub(crate) fn aggregation_object_type(ctx: &'_ QuerySchema, model: Model) -> ObjectType<'_> {
     let ident = Identifier::new_prisma(format!("Aggregate{}", capitalize(model.name())));
     let model_id = model.id;
     let mut obj = ObjectType::new(ident, move || {

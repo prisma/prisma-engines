@@ -3,11 +3,11 @@ use crate::{Identifier, IdentifierType, InputField, InputType, OutputField, Outp
 use constants::*;
 use input_types::{fields::data_input_mapper::*, list_union_type};
 use output_types::objects;
-use prisma_models::{ModelRef, RelationFieldRef};
+use prisma_models::{Model, RelationFieldRef};
 use psl::datamodel_connector::ConnectorCapability;
 
 /// Builds a create many mutation field (e.g. createManyUsers) for given model.
-pub(crate) fn create_many(ctx: &'_ QuerySchema, model: ModelRef) -> OutputField<'_> {
+pub(crate) fn create_many(ctx: &'_ QuerySchema, model: Model) -> OutputField<'_> {
     let field_name = format!("createMany{}", model.name());
     let model_id = model.id;
 
@@ -23,7 +23,7 @@ pub(crate) fn create_many(ctx: &'_ QuerySchema, model: ModelRef) -> OutputField<
 }
 
 /// Builds "skip_duplicates" and "data" arguments intended for the create many field.
-pub(crate) fn create_many_arguments(ctx: &'_ QuerySchema, model: ModelRef) -> Vec<InputField<'_>> {
+pub(crate) fn create_many_arguments(ctx: &'_ QuerySchema, model: Model) -> Vec<InputField<'_>> {
     let create_many_type = InputType::object(create_many_object_type(ctx, model, None));
     let data_arg = input_field(args::DATA, list_union_type(create_many_type, true), None);
 
@@ -42,7 +42,7 @@ pub(crate) fn create_many_arguments(ctx: &'_ QuerySchema, model: ModelRef) -> Ve
 /// is inlined on the child).
 pub(crate) fn create_many_object_type(
     ctx: &'_ QuerySchema,
-    model: ModelRef,
+    model: Model,
     parent_field: Option<RelationFieldRef>,
 ) -> InputObjectType<'_> {
     let ident = Identifier::new_prisma(IdentifierType::CreateManyInput(
@@ -62,7 +62,7 @@ pub(crate) fn create_many_object_type(
 /// Filters the given model's fields down to the allowed ones for checked create.
 fn filter_create_many_fields<'a>(
     ctx: &'a QuerySchema,
-    model: &'a ModelRef,
+    model: &'a Model,
     parent_field: Option<RelationFieldRef>,
 ) -> impl Iterator<Item = ModelField> + 'a {
     let linking_fields = if let Some(parent_field) = parent_field {

@@ -29,7 +29,7 @@ pub(crate) use parse_ast::*;
 pub(crate) use parser::*;
 
 use crate::query_graph_builder::resolve_compound_field;
-use prisma_models::ModelRef;
+use prisma_models::Model;
 use schema::{constants::*, QuerySchema};
 use std::collections::HashMap;
 use user_facing_errors::query_engine::validation::ValidationError;
@@ -282,7 +282,7 @@ impl CompactedDocument {
 /// Furthermore, this list is used to match the results of the findMany query back to the original findUnique queries.
 /// Consequently, we only extract EQUALS filters or else we would have to manually implement other filters.
 /// This is a limitation that _could_ technically be lifted but that's not worth it for now.
-fn extract_filter(where_obj: ArgumentValueObject, model: &ModelRef) -> Vec<SelectionArgument> {
+fn extract_filter(where_obj: ArgumentValueObject, model: &Model) -> Vec<SelectionArgument> {
     where_obj
         .into_iter()
         .flat_map(|(key, val)| match val {

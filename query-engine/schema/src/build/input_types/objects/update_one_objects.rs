@@ -4,7 +4,7 @@ use psl::datamodel_connector::ConnectorCapability;
 
 pub(crate) fn update_one_input_types(
     ctx: &'_ QuerySchema,
-    model: ModelRef,
+    model: Model,
     parent_field: Option<RelationFieldRef>,
 ) -> Vec<InputType<'_>> {
     let checked_input = InputType::object(checked_update_one_input_type(ctx, model.clone(), parent_field.clone()));
@@ -16,7 +16,7 @@ pub(crate) fn update_one_input_types(
 /// Builds "<x>UpdateInput" input object type.
 fn checked_update_one_input_type(
     ctx: &'_ QuerySchema,
-    model: ModelRef,
+    model: Model,
     parent_field: Option<RelationFieldRef>,
 ) -> InputObjectType<'_> {
     let ident = Identifier::new_prisma(IdentifierType::CheckedUpdateOneInput(
@@ -36,7 +36,7 @@ fn checked_update_one_input_type(
 /// Builds "<x>UncheckedUpdateInput" input object type.
 fn unchecked_update_one_input_type(
     ctx: &'_ QuerySchema,
-    model: ModelRef,
+    model: Model,
     parent_field: Option<RelationFieldRef>,
 ) -> InputObjectType<'_> {
     let ident = Identifier::new_prisma(IdentifierType::UncheckedUpdateOneInput(
@@ -57,7 +57,7 @@ fn unchecked_update_one_input_type(
 /// Filters the given model's fields down to the allowed ones for checked update.
 pub(super) fn filter_checked_update_fields<'a>(
     ctx: &'a QuerySchema,
-    model: &'a ModelRef,
+    model: &'a Model,
     parent_field: Option<&'a RelationFieldRef>,
 ) -> impl Iterator<Item = ModelField> + 'a {
     model.fields().filter_all(move |field| {
@@ -100,7 +100,7 @@ pub(super) fn filter_checked_update_fields<'a>(
 /// Filters the given model's fields down to the allowed ones for unchecked update.
 pub(super) fn filter_unchecked_update_fields<'a>(
     ctx: &'a QuerySchema,
-    model: &'a ModelRef,
+    model: &'a Model,
     parent_field: Option<&'a RelationFieldRef>,
 ) -> impl Iterator<Item = ModelField> + 'a {
     let linking_fields = if let Some(parent_field) = parent_field {

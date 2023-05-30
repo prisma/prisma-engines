@@ -15,7 +15,7 @@ use mongodb::{
     options::InsertManyOptions,
     ClientSession, Collection, Database,
 };
-use prisma_models::{ModelRef, PrismaValue, SelectionResult};
+use prisma_models::{Model, PrismaValue, SelectionResult};
 use std::{collections::HashMap, convert::TryInto};
 use tracing::{info_span, Instrument};
 use update::IntoUpdateDocumentExtension;
@@ -25,7 +25,7 @@ use update::IntoUpdateDocumentExtension;
 pub async fn create_record<'conn>(
     database: &Database,
     session: &mut ClientSession,
-    model: &ModelRef,
+    model: &Model,
     mut args: WriteArgs,
 ) -> crate::Result<SelectionResult> {
     let coll = database.collection::<Document>(model.db_name());
@@ -78,7 +78,7 @@ pub async fn create_record<'conn>(
 pub async fn create_records<'conn>(
     database: &Database,
     session: &mut ClientSession,
-    model: &ModelRef,
+    model: &Model,
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
 ) -> crate::Result<usize> {
@@ -144,7 +144,7 @@ pub async fn create_records<'conn>(
 pub async fn update_records<'conn>(
     database: &Database,
     session: &mut ClientSession,
-    model: &ModelRef,
+    model: &Model,
     record_filter: RecordFilter,
     mut args: WriteArgs,
     update_type: UpdateType,
@@ -233,7 +233,7 @@ pub async fn update_records<'conn>(
 pub async fn delete_records<'conn>(
     database: &Database,
     session: &mut ClientSession,
-    model: &ModelRef,
+    model: &Model,
     record_filter: RecordFilter,
 ) -> crate::Result<usize> {
     let coll = database.collection::<Document>(model.db_name());
@@ -279,7 +279,7 @@ async fn find_ids(
     database: &Database,
     collection: Collection<Document>,
     session: &mut ClientSession,
-    model: &ModelRef,
+    model: &Model,
     filter: MongoFilter,
 ) -> crate::Result<Vec<Bson>> {
     let coll = database.collection::<Document>(model.db_name());
@@ -458,7 +458,7 @@ pub async fn execute_raw<'conn>(
 pub async fn query_raw<'conn>(
     database: &Database,
     session: &mut ClientSession,
-    model: Option<&ModelRef>,
+    model: Option<&Model>,
     inputs: HashMap<String, PrismaValue>,
     query_type: Option<String>,
 ) -> crate::Result<serde_json::Value> {
@@ -510,7 +510,7 @@ pub async fn query_raw<'conn>(
     .await
 }
 
-fn get_raw_db_statement(query_type: &Option<String>, model: &Option<&ModelRef>, database: &Database) -> String {
+fn get_raw_db_statement(query_type: &Option<String>, model: &Option<&Model>, database: &Database) -> String {
     match (query_type.as_deref(), model) {
         (Some("findRaw"), Some(m)) => format!("db.{}.findRaw(*)", database.collection::<Document>(m.db_name()).name()),
         (Some("aggregateRaw"), Some(m)) => format!(

@@ -4,7 +4,7 @@ use prisma_models::{prelude::ParentContainer, CompositeFieldRef};
 
 pub(crate) fn scalar_filter_object_type(
     ctx: &'_ QuerySchema,
-    model: ModelRef,
+    model: Model,
     include_aggregates: bool,
 ) -> InputObjectType<'_> {
     let ident = Identifier::new_prisma(IdentifierType::ScalarFilterInput(model.clone(), include_aggregates));
@@ -76,7 +76,7 @@ pub(crate) fn where_object_type(ctx: &'_ QuerySchema, container: ParentContainer
     input_object
 }
 
-pub(crate) fn where_unique_object_type(ctx: &'_ QuerySchema, model: ModelRef) -> InputObjectType<'_> {
+pub(crate) fn where_unique_object_type(ctx: &'_ QuerySchema, model: Model) -> InputObjectType<'_> {
     let ident = Identifier::new_prisma(IdentifierType::WhereUniqueInput(model.clone()));
 
     let mut input_object = init_input_object_type(ident);
@@ -203,7 +203,7 @@ pub(crate) fn where_unique_object_type(ctx: &'_ QuerySchema, model: ModelRef) ->
 /// Generates an input object type for a compound field.
 fn compound_field_unique_object_type<'a>(
     ctx: &'a QuerySchema,
-    model: &ModelRef,
+    model: &Model,
     alias: Option<&str>,
     from_fields: Vec<ScalarFieldRef>,
 ) -> InputObjectType<'a> {

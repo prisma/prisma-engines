@@ -5,7 +5,7 @@ use crate::{
 };
 use connector::{Filter, RelationCompare};
 use itertools::Itertools;
-use prisma_models::{ModelRef, PrismaValue, RelationFieldRef, SelectionResult};
+use prisma_models::{Model, PrismaValue, RelationFieldRef, SelectionResult};
 use std::convert::TryInto;
 
 /// Handles nested disconnect cases.
@@ -17,7 +17,7 @@ pub fn nested_disconnect(
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue<'_>,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
 

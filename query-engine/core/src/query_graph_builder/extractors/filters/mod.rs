@@ -16,13 +16,13 @@ use filter_fold::*;
 use filter_grouping::*;
 use indexmap::IndexMap;
 use prisma_models::{
-    prelude::ParentContainer, CompositeFieldRef, Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef,
+    prelude::ParentContainer, CompositeFieldRef, Field, Model, PrismaValue, RelationFieldRef, ScalarFieldRef,
 };
 use schema::constants::filters;
 use std::{borrow::Cow, collections::HashMap, convert::TryInto, str::FromStr};
 
 /// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.
-pub fn extract_unique_filter(value_map: ParsedInputMap<'_>, model: &ModelRef) -> QueryGraphBuilderResult<Filter> {
+pub fn extract_unique_filter(value_map: ParsedInputMap<'_>, model: &Model) -> QueryGraphBuilderResult<Filter> {
     let tag = value_map.tag.clone();
     // Partition the input into a map containing only the unique fields and one containing all the other filters
     // so that we can parse them separately and ensure we AND both filters
@@ -46,7 +46,7 @@ pub fn extract_unique_filter(value_map: ParsedInputMap<'_>, model: &ModelRef) ->
 
 /// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.
 /// The input map must only contain unique & compound unique fields.
-fn internal_extract_unique_filter(value_map: ParsedInputMap<'_>, model: &ModelRef) -> QueryGraphBuilderResult<Filter> {
+fn internal_extract_unique_filter(value_map: ParsedInputMap<'_>, model: &Model) -> QueryGraphBuilderResult<Filter> {
     let filters = value_map
         .into_iter()
         .map(|(field_name, value): (Cow<'_, str>, ParsedInputValue<'_>)| {

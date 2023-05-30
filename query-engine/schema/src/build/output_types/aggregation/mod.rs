@@ -41,7 +41,7 @@ pub(crate) fn collect_numeric_fields(container: &ParentContainer) -> Vec<ScalarF
 fn aggregation_field<'a, F, G>(
     ctx: &'a QuerySchema,
     name: &str,
-    model: &ModelRef,
+    model: &Model,
     fields: Vec<ScalarField>,
     type_mapper: F,
     object_mapper: G,
@@ -71,7 +71,7 @@ where
 /// Maps the object type for aggregations that operate on a field level.
 fn map_field_aggregation_object<'a, F, G>(
     ctx: &'a QuerySchema,
-    model: &ModelRef,
+    model: &Model,
     suffix: &str,
     fields: Vec<ScalarField>,
     type_mapper: F,

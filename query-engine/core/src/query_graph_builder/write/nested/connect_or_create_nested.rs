@@ -5,7 +5,7 @@ use crate::{
     Computation, ParsedInputMap, ParsedInputValue,
 };
 use connector::{Filter, IntoFilter};
-use prisma_models::{ModelRef, RelationFieldRef, SelectionResult};
+use prisma_models::{Model, RelationFieldRef, SelectionResult};
 use schema::constants::args;
 use std::convert::TryInto;
 
@@ -19,7 +19,7 @@ pub(crate) fn nested_connect_or_create(
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue<'_>,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
     let values = utils::coerce_vec(value);
@@ -94,7 +94,7 @@ fn handle_many_to_many(
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     values: Vec<ParsedInputValue<'_>>,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     for value in values {
         let mut value: ParsedInputMap<'_> = value.try_into()?;
@@ -151,7 +151,7 @@ fn handle_one_to_many(
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     values: Vec<ParsedInputValue<'_>>,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     if parent_relation_field.is_inlined_on_enclosing_model() {
         one_to_many_inlined_parent(
@@ -181,7 +181,7 @@ fn handle_one_to_one(
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     mut values: Vec<ParsedInputValue<'_>>,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let value = values.pop().unwrap();
     let mut value: ParsedInputMap<'_> = value.try_into()?;
@@ -252,7 +252,7 @@ fn one_to_many_inlined_child(
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     values: Vec<ParsedInputValue<'_>>,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     for value in values {
         let parent_link = parent_relation_field.linking_fields();
@@ -391,7 +391,7 @@ fn one_to_many_inlined_parent(
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     mut values: Vec<ParsedInputValue<'_>>,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let parent_link = parent_relation_field.linking_fields();
     let child_link = parent_relation_field.related_field().linking_fields();
@@ -563,7 +563,7 @@ fn one_to_one_inlined_parent(
     parent_relation_field: &RelationFieldRef,
     filter: Filter,
     create_data: ParsedInputMap<'_>,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let parent_link = parent_relation_field.linking_fields();
     let child_link = parent_relation_field.related_field().linking_fields();
@@ -780,7 +780,7 @@ fn one_to_one_inlined_child(
     parent_relation_field: &RelationFieldRef,
     filter: Filter,
     create_data: ParsedInputMap<'_>,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let child_model_identifier = child_model.primary_identifier();
     let parent_link = parent_relation_field.linking_fields();

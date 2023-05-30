@@ -5,7 +5,7 @@ use crate::{
 };
 use connector::{DatasourceFieldName, Filter, RecordFilter, WriteArgs, WriteOperation};
 use indexmap::IndexMap;
-use prisma_models::{FieldSelection, ModelRef, PrismaValue, RelationFieldRef, SelectionResult};
+use prisma_models::{FieldSelection, Model, PrismaValue, RelationFieldRef, SelectionResult};
 use psl::parser_database::ReferentialAction;
 use schema::QuerySchema;
 
@@ -27,7 +27,7 @@ pub(crate) fn node_is_create(graph: &QueryGraph, node: &NodeRef) -> bool {
 }
 
 /// Produces a non-failing read query that fetches the requested selection of records for a given filterable.
-pub(crate) fn read_ids_infallible<T>(model: ModelRef, selection: FieldSelection, filter: T) -> Query
+pub(crate) fn read_ids_infallible<T>(model: Model, selection: FieldSelection, filter: T) -> Query
 where
     T: Into<Filter>,
 {
@@ -49,7 +49,7 @@ where
     Query::Read(read_query)
 }
 
-fn get_selected_fields(model: &ModelRef, selection: FieldSelection) -> FieldSelection {
+fn get_selected_fields(model: &Model, selection: FieldSelection) -> FieldSelection {
     // Always fetch the primary identifier as well.
     let primary_model_id = model.primary_identifier();
 
@@ -216,7 +216,7 @@ pub fn insert_1to1_idempotent_connect_checks(
 /// on available information.
 ///
 /// No edges are created.
-pub fn update_records_node_placeholder<T>(graph: &mut QueryGraph, filter: T, model: ModelRef) -> NodeRef
+pub fn update_records_node_placeholder<T>(graph: &mut QueryGraph, filter: T, model: Model) -> NodeRef
 where
     T: Into<Filter>,
 {
@@ -384,7 +384,7 @@ pub fn insert_existing_1to1_related_model_checks(
 pub(crate) fn insert_emulated_on_delete(
     graph: &mut QueryGraph,
     query_schema: &QuerySchema,
-    model_to_delete: &ModelRef,
+    model_to_delete: &Model,
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
@@ -930,7 +930,7 @@ pub fn emulate_on_update_restrict(
 pub fn insert_emulated_on_update_with_intermediary_node(
     graph: &mut QueryGraph,
     query_schema: &QuerySchema,
-    model_to_update: &ModelRef,
+    model_to_update: &Model,
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<Option<NodeRef>> {
@@ -977,7 +977,7 @@ pub fn insert_emulated_on_update_with_intermediary_node(
 pub fn insert_emulated_on_update(
     graph: &mut QueryGraph,
     query_schema: &QuerySchema,
-    model_to_update: &ModelRef,
+    model_to_update: &Model,
     parent_node: &NodeRef,
     child_node: &NodeRef,
 ) -> QueryGraphBuilderResult<()> {
@@ -1142,7 +1142,7 @@ pub fn emulate_on_update_cascade(
 }
 
 /// Collect relation fields that share at least one common foreign key with `relation_field`.
-fn collect_overlapping_relation_fields(model: ModelRef, relation_field: &RelationFieldRef) -> Vec<RelationFieldRef> {
+fn collect_overlapping_relation_fields(model: Model, relation_field: &RelationFieldRef) -> Vec<RelationFieldRef> {
     let child_fks = relation_field.left_scalars();
 
     let dependent_relation_fields: Vec<_> = model

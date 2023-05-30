@@ -21,7 +21,7 @@ pub(crate) fn collect_selection_order(from: &[FieldPair<'_>]) -> Vec<String> {
 pub(crate) fn collect_selected_fields(
     from_pairs: &[FieldPair<'_>],
     distinct: Option<FieldSelection>,
-    model: &ModelRef,
+    model: &Model,
 ) -> FieldSelection {
     let model_id = model.primary_identifier();
     let selected_fields = pairs_to_selections(model, from_pairs);
@@ -72,7 +72,7 @@ fn extract_composite_selection(pf: ParsedField<'_>, cf: CompositeFieldRef) -> Se
 
 pub(crate) fn collect_nested_queries(
     from: Vec<FieldPair<'_>>,
-    model: &ModelRef,
+    model: &Model,
 ) -> QueryGraphBuilderResult<Vec<ReadQuery>> {
     from.into_iter()
         .filter_map(|pair| {
@@ -138,7 +138,7 @@ pub fn merge_cursor_fields(selected_fields: FieldSelection, cursor: &Option<Sele
 
 pub fn collect_relation_aggr_selections(
     from: Vec<FieldPair<'_>>,
-    model: &ModelRef,
+    model: &Model,
 ) -> QueryGraphBuilderResult<Vec<RelAggregationSelection>> {
     let mut selections = vec![];
 

@@ -10,7 +10,7 @@ pub struct InternalDataModel {
 }
 
 impl InternalDataModel {
-    pub fn models(&self) -> impl Iterator<Item = ModelRef> + '_ {
+    pub fn models(&self) -> impl Iterator<Item = Model> + '_ {
         self.schema
             .db
             .walk_models()
@@ -42,7 +42,7 @@ impl InternalDataModel {
             .ok_or_else(|| DomainError::EnumNotFound { name: name.to_string() })
     }
 
-    pub fn find_model(&self, name: &str) -> crate::Result<ModelRef> {
+    pub fn find_model(&self, name: &str) -> crate::Result<Model> {
         self.schema
             .db
             .walk_models()
@@ -56,12 +56,12 @@ impl InternalDataModel {
         self.clone().zip(ctid)
     }
 
-    pub fn find_model_by_id(&self, model_id: ast::ModelId) -> ModelRef {
+    pub fn find_model_by_id(&self, model_id: ast::ModelId) -> Model {
         self.clone().zip(model_id)
     }
 
     /// Finds all inline relation fields pointing to the given model.
-    pub fn fields_pointing_to_model(&self, model: &ModelRef) -> impl Iterator<Item = RelationFieldRef> + '_ {
+    pub fn fields_pointing_to_model(&self, model: &Model) -> impl Iterator<Item = RelationFieldRef> + '_ {
         self.walk(model.id)
             .relations_to()
             .filter_map(|rel| rel.refine().as_inline())

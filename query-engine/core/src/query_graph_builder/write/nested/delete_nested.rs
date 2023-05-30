@@ -5,7 +5,7 @@ use crate::{
     ParsedInputMap, ParsedInputValue,
 };
 use connector::{Filter, RecordFilter};
-use prisma_models::{ModelRef, PrismaValue, RelationFieldRef};
+use prisma_models::{Model, PrismaValue, RelationFieldRef};
 use std::convert::TryInto;
 
 /// Adds a delete (single) record node to the graph and connects it to the parent.
@@ -26,7 +26,7 @@ pub fn nested_delete(
     parent_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue<'_>,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
@@ -149,7 +149,7 @@ pub fn nested_delete_many(
     parent: &NodeRef,
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue<'_>,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 

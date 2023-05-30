@@ -8,16 +8,16 @@ use super::*;
 use crate::FieldPair;
 use connector::AggregationSelection;
 use itertools::Itertools;
-use prisma_models::{ModelRef, ScalarFieldRef};
+use prisma_models::{Model, ScalarFieldRef};
 use schema::constants::aggregations::*;
 
 /// Resolves the given field as a aggregation query.
 fn resolve_query(
     field: FieldPair<'_>,
-    model: &ModelRef,
+    model: &Model,
     allow_deprecated: bool,
 ) -> QueryGraphBuilderResult<AggregationSelection> {
-    let count_resolver = |mut field: FieldPair<'_>, model: &ModelRef| {
+    let count_resolver = |mut field: FieldPair<'_>, model: &Model| {
         let nested_fields = field
             .parsed_field
             .nested_fields
@@ -64,7 +64,7 @@ fn resolve_query(
     Ok(query)
 }
 
-fn resolve_fields(model: &ModelRef, field: FieldPair<'_>) -> Vec<ScalarFieldRef> {
+fn resolve_fields(model: &Model, field: FieldPair<'_>) -> Vec<ScalarFieldRef> {
     let scalars = model.fields().scalar();
     let fields = field
         .parsed_field

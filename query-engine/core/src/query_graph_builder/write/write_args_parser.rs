@@ -1,9 +1,7 @@
 use super::*;
 use crate::query_document::{ParsedInputMap, ParsedInputValue};
 use connector::{DatasourceFieldName, WriteArgs, WriteOperation};
-use prisma_models::{
-    CompositeFieldRef, Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef, TypeIdentifier,
-};
+use prisma_models::{CompositeFieldRef, Field, Model, PrismaValue, RelationFieldRef, ScalarFieldRef, TypeIdentifier};
 use schema::constants::{args, json_null, operations};
 use std::{borrow::Cow, convert::TryInto};
 
@@ -16,7 +14,7 @@ pub struct WriteArgsParser<'a> {
 impl<'a> WriteArgsParser<'a> {
     /// Creates a new set of WriteArgsParser. Expects the parsed input map from the respective data key, not the enclosing map.
     /// E.g.: { data: { THIS MAP } } from the `data` argument of a write query.
-    pub(crate) fn from(model: &ModelRef, data_map: ParsedInputMap<'a>) -> QueryGraphBuilderResult<Self> {
+    pub(crate) fn from(model: &Model, data_map: ParsedInputMap<'a>) -> QueryGraphBuilderResult<Self> {
         data_map.into_iter().try_fold(
             WriteArgsParser {
                 args: WriteArgs::new_empty(crate::executor::get_request_now()),
