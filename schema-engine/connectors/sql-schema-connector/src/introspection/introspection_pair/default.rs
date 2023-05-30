@@ -122,7 +122,7 @@ impl<'a> DefaultValuePair<'a> {
                 _ => unreachable!(),
             },
 
-            (None, sql::ColumnTypeFamily::String) => match self.previous {
+            (None, sql::ColumnTypeFamily::String | sql::ColumnTypeFamily::Uuid) => match self.previous {
                 Some(previous) if previous.is_cuid() => Some(DefaultKind::Cuid),
                 Some(previous) if previous.is_uuid() => Some(DefaultKind::Uuid),
                 Some(previous) if previous.is_nanoid() => {
