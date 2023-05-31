@@ -8,7 +8,7 @@ use output_types::objects;
 use prisma_models::{Model, RelationFieldRef};
 
 /// Builds a create mutation field (e.g. createUser) for given model.
-pub(crate) fn create_one(ctx: &'_ QuerySchema, model: Model) -> OutputField<'_> {
+pub(crate) fn create_one(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
     let field_name = format!("createOne{}", model.name());
     let cloned_model = model.clone();
     let model_id = model.id;
@@ -47,7 +47,7 @@ pub(crate) fn create_one_input_types(
 /// "Checked" input refers to disallowing writing relation scalars directly, as it can lead to unintended
 /// data integrity violations if used incorrectly.
 fn checked_create_input_type(
-    ctx: &'_ QuerySchema,
+    ctx: &QuerySchema,
     model: Model,
     parent_field: Option<RelationFieldRef>,
 ) -> InputObjectType<'_> {
@@ -73,7 +73,7 @@ fn checked_create_input_type(
 /// "Unchecked" input refers to allowing to write _all_ scalars on a model directly, which can
 /// lead to unintended data integrity violations if used incorrectly.
 fn unchecked_create_input_type(
-    ctx: &'_ QuerySchema,
+    ctx: &QuerySchema,
     model: Model,
     parent_field: Option<RelationFieldRef>,
 ) -> InputObjectType<'_> {
