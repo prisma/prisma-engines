@@ -26,19 +26,23 @@ pub(crate) fn create_one(ctx: &'_ QuerySchema, model: Model) -> OutputField<'_> 
 
 /// Builds "data" argument intended for the create field.
 /// The data argument is not present if no data can be created.
-pub(crate) fn create_one_arguments(ctx: &'_ QuerySchema, model: Model) -> Option<Vec<InputField<'_>>> {
+pub(crate) fn create_one_arguments(ctx: &QuerySchema, model: Model) -> Option<Vec<InputField<'_>>> {
+    let any_field_required = model
+        .fields()
+        .all()
+        .any(|f| f.is_required() && f.as_scalar().map(|f| f.default_value().is_none()).unwrap_or(true));
     let create_types = create_one_input_types(ctx, model, None);
-    Some(vec![input_field(args::DATA, create_types, None).optional()])
+    let field = input_field(args::DATA, create_types, None);
+    Some(vec![field.optional_if(!any_field_required)])
 }
 
 pub(crate) fn create_one_input_types(
-    ctx: &'_ QuerySchema,
+    ctx: &QuerySchema,
     model: Model,
     parent_field: Option<RelationFieldRef>,
 ) -> Vec<InputType<'_>> {
     let checked_input = InputType::object(checked_create_input_type(ctx, model.clone(), parent_field.clone()));
     let unchecked_input = InputType::object(unchecked_create_input_type(ctx, model, parent_field));
-
     vec![checked_input, unchecked_input]
 }
 
