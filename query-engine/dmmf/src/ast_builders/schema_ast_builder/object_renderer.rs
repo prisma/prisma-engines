@@ -31,7 +31,7 @@ impl<'a> DmmfObjectRenderer<'a> {
         let mut rendered_fields = Vec::with_capacity(fields.len());
 
         for field in fields {
-            rendered_fields.push(render_input_field(&field, ctx));
+            rendered_fields.push(render_input_field(field, ctx));
         }
 
         let meta = input_object.tag().and_then(|tag| match tag {
@@ -71,7 +71,7 @@ impl<'a> DmmfObjectRenderer<'a> {
         let mut rendered_fields = Vec::with_capacity(fields.len());
 
         for field in fields {
-            rendered_fields.push(render_input_field(&field, ctx));
+            rendered_fields.push(render_input_field(field, ctx));
         }
 
         let allow_type = match input_object.tag() {
@@ -100,7 +100,7 @@ impl<'a> DmmfObjectRenderer<'a> {
         let mut rendered_fields: Vec<DmmfOutputField> = Vec::with_capacity(fields.len());
 
         for field in fields {
-            rendered_fields.push(render_output_field(&field, ctx))
+            rendered_fields.push(render_output_field(field, ctx))
         }
 
         let output_type = DmmfOutputType {

@@ -22,12 +22,15 @@ pub(crate) fn aggregation_object_type(ctx: &'_ QuerySchema, model: Model) -> Obj
                 model.fields().scalar().collect(),
                 |_, _| OutputType::non_list(OutputType::int()),
                 |mut obj| {
-                    obj.fields = Arc::new(move || {
-                        let fields = obj.fields.clone();
-                        let mut fields = fields();
-                        fields.push(field("_all", None, OutputType::non_list(OutputType::int()), None));
+                    obj.fields = Arc::new(once_cell::sync::Lazy::new(Box::new(move || {
+                        let mut fields: Vec<_> = (*obj.fields.as_ref()).clone();
+                        fields.push(field_no_arguments(
+                            "_all",
+                            OutputType::non_list(OutputType::int()),
+                            None,
+                        ));
                         fields
-                    });
+                    })));
                     obj
                 },
                 true,
@@ -88,6 +91,7 @@ pub(crate) fn aggregation_object_type(ctx: &'_ QuerySchema, model: Model) -> Obj
 
         object_fields
     });
+
     obj.model = Some(model_id);
     obj
 }

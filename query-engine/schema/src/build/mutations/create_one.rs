@@ -15,9 +15,7 @@ pub(crate) fn create_one(ctx: &'_ QuerySchema, model: Model) -> OutputField<'_> 
 
     field(
         field_name,
-        Some(Arc::new(move || {
-            create_one_arguments(ctx, model.clone()).unwrap_or_default()
-        })),
+        move || create_one_arguments(ctx, model).unwrap_or_default(),
         OutputType::object(objects::model::model_object_type(ctx, cloned_model)),
         Some(QueryInfo {
             model: Some(model_id),
@@ -62,7 +60,7 @@ fn checked_create_input_type(
     ));
 
     let mut input_object = init_input_object_type(ident);
-    input_object.fields = Arc::new(move || {
+    input_object.set_fields(move || {
         let mut filtered_fields = filter_checked_create_fields(&model, parent_field.clone());
         let field_mapper = CreateDataInputFieldMapper::new_checked();
         field_mapper.map_all(ctx, &mut filtered_fields)
@@ -88,7 +86,7 @@ fn unchecked_create_input_type(
     ));
 
     let mut input_object = init_input_object_type(ident);
-    input_object.fields = Arc::new(move || {
+    input_object.set_fields(move || {
         let mut filtered_fields = filter_unchecked_create_fields(&model, parent_field.as_ref());
         let field_mapper = CreateDataInputFieldMapper::new_unchecked();
         field_mapper.map_all(ctx, &mut filtered_fields)

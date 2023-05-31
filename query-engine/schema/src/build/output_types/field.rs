@@ -7,9 +7,7 @@ pub(crate) fn map_output_field(ctx: &'_ QuerySchema, model_field: ModelField) ->
     let model_field_is_required = model_field.is_required();
     field(
         cloned_model_field.borrowed_name(&ctx.internal_data_model.schema),
-        Some(Arc::new(move || {
-            arguments::many_records_output_field_arguments(ctx, model_field.clone())
-        })),
+        move || arguments::many_records_output_field_arguments(ctx, model_field),
         map_field_output_type(ctx, cloned_model_field),
         None,
     )
@@ -97,7 +95,7 @@ where
             object_mapper,
         ));
 
-        Some(field(name, None, object_type, None))
+        Some(field_no_arguments(name, object_type, None))
     }
 }
 
@@ -123,13 +121,13 @@ where
                 let cloned_rf = rf.clone();
                 field(
                     cloned_rf.borrowed_name(&ctx.internal_data_model.schema),
-                    Some(Arc::new(move || {
+                    move || {
                         let mut args = vec![];
                         if ctx.has_feature(PreviewFeature::FilteredRelationCount) {
                             args.push(arguments::where_argument(ctx, &rf.related_model()))
                         }
                         args
-                    })),
+                    },
                     type_mapper(ctx, &cloned_rf),
                     None,
                 )

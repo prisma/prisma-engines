@@ -18,7 +18,7 @@ pub(crate) fn checked_update_many_input_type(ctx: &'_ QuerySchema, model: Model)
     let ident = Identifier::new_prisma(IdentifierType::CheckedUpdateManyInput(model.clone()));
 
     let mut input_object = init_input_object_type(ident);
-    input_object.fields = Arc::new(move || {
+    input_object.set_fields(move || {
         let mut filtered_fields = update_one_objects::filter_checked_update_fields(ctx, &model, None)
             .filter(|field| matches!(field, ModelField::Scalar(_) | ModelField::Composite(_)));
 
@@ -48,7 +48,7 @@ pub(crate) fn unchecked_update_many_input_type(
     let ident = Identifier::new_prisma(name);
 
     let mut input_object = init_input_object_type(ident);
-    input_object.fields = Arc::new(move || {
+    input_object.set_fields(move || {
         let mut filtered_fields =
             update_one_objects::filter_unchecked_update_fields(ctx, &model, parent_field.as_ref())
                 .filter(|field| matches!(field, ModelField::Scalar(_) | ModelField::Composite(_)));
@@ -70,10 +70,10 @@ pub(crate) fn update_many_where_combination_object(
     ));
 
     let mut input_object = init_input_object_type(ident);
-    input_object.fields = Arc::new(move || {
+    input_object.set_fields(move || {
         let related_model = parent_field.related_model();
         let where_input_object = filter_objects::scalar_filter_object_type(ctx, related_model.clone(), false);
-        let update_types = update_many_input_types(ctx, related_model, Some(parent_field.clone()));
+        let update_types = update_many_input_types(ctx, related_model, Some(parent_field));
 
         vec![
             input_field(args::WHERE, vec![InputType::object(where_input_object)], None),

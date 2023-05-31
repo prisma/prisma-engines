@@ -4,11 +4,11 @@ use indexmap::IndexMap;
 use prisma_models::{decode_bytes, parse_datetime, prelude::ParentContainer, Field};
 use query_core::{
     constants::custom_types,
-    schema::{Identifier, ObjectType, OutputField, QuerySchema},
+    schema::{ObjectType, OutputField, QuerySchema},
     ArgumentValue, Operation, Selection,
 };
 use serde_json::Value as JsonValue;
-use std::{collections::HashMap, str::FromStr};
+use std::str::FromStr;
 
 enum OperationType {
     Read,
@@ -17,15 +17,11 @@ enum OperationType {
 
 pub struct JsonProtocolAdapter<'a> {
     query_schema: &'a QuerySchema,
-    output_type_fields: HashMap<Identifier, Vec<OutputField<'a>>>,
 }
 
 impl<'a> JsonProtocolAdapter<'a> {
     pub fn new(query_schema: &'a QuerySchema) -> Self {
-        JsonProtocolAdapter {
-            query_schema,
-            output_type_fields: Default::default(),
-        }
+        JsonProtocolAdapter { query_schema }
     }
 
     pub fn convert_single(&mut self, query: JsonSingleQuery) -> crate::Result<Operation> {
@@ -67,11 +63,6 @@ impl<'a> JsonProtocolAdapter<'a> {
 
         let all_scalars_set = query_selection.all_scalars();
         let all_composites_set = query_selection.all_composites();
-        let fields: HashMap<std::borrow::Cow<str>, OutputField> = field
-            .field_type()
-            .as_object_type()
-            .map(|t| t.get_fields().map(|f| (f.name().clone(), f)).collect())
-            .unwrap_or_default();
 
         let mut selection = Selection::new(field.name().clone(), None, arguments, Vec::new());
 
@@ -110,13 +101,17 @@ impl<'a> JsonProtocolAdapter<'a> {
                 // <field_name>: { selection: { ... }, arguments: { ... } }
                 crate::SelectionSetValue::Nested(nested_query) => {
                     if field.field_type().as_object_type().is_some() {
-                        let schema_field = fields.get(selection_name.as_str()).ok_or_else(|| {
-                            HandlerError::query_conversion(format!(
-                                "Unknown nested field '{}' for operation {} does not match any query.",
-                                selection_name,
-                                field.name()
-                            ))
-                        })?;
+                        let schema_field = field
+                            .field_type()
+                            .as_object_type()
+                            .and_then(|t| t.find_field(selection_name.as_str()))
+                            .ok_or_else(|| {
+                                HandlerError::query_conversion(format!(
+                                    "Unknown nested field '{}' for operation {} does not match any query.",
+                                    selection_name,
+                                    field.name()
+                                ))
+                            })?;
 
                         let field = container.and_then(|container| container.find_field(schema_field.name()));
                         let is_composite_field = field.as_ref().map(|f| f.is_composite()).unwrap_or(false);
@@ -298,7 +293,7 @@ impl<'a> JsonProtocolAdapter<'a> {
     }
 
     fn default_scalar_selection(schema_object: &ObjectType, selection: &mut Selection) {
-        for scalar in schema_object.get_fields().filter(|f| {
+        for scalar in schema_object.get_fields().iter().filter(|f| {
             f.field_type().is_scalar()
                 || f.field_type().is_scalar_list()
                 || f.field_type().is_enum()
@@ -413,12 +408,8 @@ impl<'a> JsonProtocolAdapter<'a> {
         )))
     }
 
-    fn get_output_field(&mut self, ty: &ObjectType<'a>, name: &str) -> Option<&OutputField<'a>> {
-        let parent_object_fields = self
-            .output_type_fields
-            .entry(ty.identifier().clone())
-            .or_insert_with(|| ty.get_fields_vec());
-        parent_object_fields.iter().find(|f| f.name() == name)
+    fn get_output_field<'b>(&mut self, ty: &'b ObjectType<'a>, name: &str) -> Option<&'b OutputField<'a>> {
+        ty.find_field(name)
     }
 }
 

@@ -64,7 +64,7 @@ where
             is_count,
         ));
 
-        Some(field(name.to_owned(), None, object_type, None).nullable())
+        Some(field_no_arguments(name.to_owned(), object_type, None).nullable())
     }
 }
 
@@ -94,7 +94,7 @@ where
         fields
             .clone()
             .into_iter()
-            .map(|sf| field(sf.name().to_owned(), None, type_mapper(ctx, sf), None).nullable_if(!is_count))
+            .map(|sf| field_no_arguments(sf.name().to_owned(), type_mapper(ctx, sf), None).nullable_if(!is_count))
             .collect()
     }))
 }

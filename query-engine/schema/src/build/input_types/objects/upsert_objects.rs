@@ -27,7 +27,7 @@ fn nested_upsert_list_input_object(
     let ident = Identifier::new_prisma(IdentifierType::NestedUpsertManyInput(parent_field.related_field()));
 
     let mut input_object = init_input_object_type(ident);
-    input_object.fields = Arc::new(move || {
+    input_object.set_fields(move || {
         vec![
             input_field(args::WHERE, vec![InputType::object(where_object.clone())], None),
             input_field(args::UPDATE, update_types.clone(), None),
