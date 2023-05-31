@@ -55,7 +55,7 @@ mod disconnect_inside_update {
     #[relation_link_test(
         on_parent = "ToOneOpt",
         on_child = "ToOneOpt",
-        capabilities(FilteredInlineNestedToOneDisconnect)
+        capabilities(FilteredInlineChildNestedToOneDisconnect)
     )]
     async fn p1_c1_by_filters_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
@@ -106,7 +106,7 @@ mod disconnect_inside_update {
     #[relation_link_test(
         on_parent = "ToOneOpt",
         on_child = "ToOneOpt",
-        capabilities(FilteredInlineNestedToOneDisconnect)
+        capabilities(FilteredInlineChildNestedToOneDisconnect)
     )]
     async fn p1_c1_by_fails_if_filters_no_match(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(

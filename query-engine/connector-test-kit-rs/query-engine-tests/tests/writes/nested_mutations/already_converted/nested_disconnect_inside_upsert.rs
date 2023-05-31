@@ -61,7 +61,7 @@ mod disconnect_inside_upsert {
     #[relation_link_test(
         on_parent = "ToOneOpt",
         on_child = "ToOneOpt",
-        capabilities(FilteredInlineNestedToOneDisconnect)
+        capabilities(FilteredInlineChildNestedToOneDisconnect)
     )]
     async fn p1_c1_by_filters_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let res = run_query_json!(
