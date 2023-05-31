@@ -153,7 +153,6 @@ pub enum TypeIdentifier {
     Enum(ast::EnumId),
     UUID,
     Json,
-    Xml,
     DateTime,
     Bytes,
     Unsupported,
@@ -181,7 +180,6 @@ impl TypeIdentifier {
             }
             TypeIdentifier::UUID => "UUID".into(),
             TypeIdentifier::Json => "Json".into(),
-            TypeIdentifier::Xml => "Xml".into(),
             TypeIdentifier::DateTime => "DateTime".into(),
             TypeIdentifier::Bytes => "Bytes".into(),
             TypeIdentifier::Unsupported => "Unsupported".into(),

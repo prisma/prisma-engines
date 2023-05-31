@@ -582,15 +582,11 @@ fn convert_prisma_value_graphql_protocol(
         (ScalarType::DateTime, PrismaValue::DateTime(dt)) => PrismaValue::DateTime(dt),
         (ScalarType::UUID, PrismaValue::Uuid(u)) => PrismaValue::Uuid(u),
         (ScalarType::Bytes, PrismaValue::Bytes(b)) => PrismaValue::Bytes(b),
-        (ScalarType::Xml, PrismaValue::Xml(b)) => PrismaValue::Xml(b),
 
         // The Decimal type doesn't have a corresponding PrismaValue variant. We need to serialize it
         // to String so that client can deserialize it as Decimal again.
         (ScalarType::Decimal, PrismaValue::Int(i)) => PrismaValue::String(i.to_string()),
         (ScalarType::Decimal, PrismaValue::Float(f)) => PrismaValue::String(f.to_string()),
-        // TODO: Remove this, it is a hack. The Xml type no longer exists as a Prisma native type.
-        // TODO: It should not exist as a ScalarType, TypeIdentifier, or PrismaValue.
-        (ScalarType::String, PrismaValue::Xml(xml)) => PrismaValue::String(xml),
 
         (st, pv) => {
             return Err(crate::FieldConversionError::create(
@@ -636,11 +632,6 @@ fn convert_prisma_value_json_protocol(
         (ScalarType::Boolean, PrismaValue::Boolean(x)) => PrismaValue::Boolean(x),
         (ScalarType::Int, PrismaValue::Int(x)) => PrismaValue::Int(x),
         (ScalarType::Float, PrismaValue::Float(x)) => PrismaValue::Float(x),
-
-        // TODO: Xml is no longer a native Prisma type. It should not exist as special PrismaValue.
-        (ScalarType::String | ScalarType::Xml, PrismaValue::Xml(xml) | PrismaValue::String(xml)) => {
-            PrismaValue::String(xml)
-        }
 
         (st, pv) => {
             return Err(crate::FieldConversionError::create(

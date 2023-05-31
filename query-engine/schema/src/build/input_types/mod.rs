@@ -21,7 +21,6 @@ fn map_scalar_input_type(ctx: &'_ QuerySchema, typ: TypeIdentifier, list: bool) 
         TypeIdentifier::DateTime => InputType::date_time(),
         TypeIdentifier::Json => InputType::json(),
         TypeIdentifier::Enum(id) => InputType::enum_type(map_schema_enum_type(ctx, id)),
-        TypeIdentifier::Xml => InputType::xml(),
         TypeIdentifier::Bytes => InputType::bytes(),
         TypeIdentifier::BigInt => InputType::bigint(),
         TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),

@@ -72,10 +72,6 @@ impl<'a> OutputType<'a> {
         InnerOutputType::Scalar(ScalarType::UUID)
     }
 
-    pub(crate) fn xml() -> InnerOutputType<'a> {
-        InnerOutputType::Scalar(ScalarType::Xml)
-    }
-
     pub(crate) fn bytes() -> InnerOutputType<'a> {
         InnerOutputType::Scalar(ScalarType::Bytes)
     }

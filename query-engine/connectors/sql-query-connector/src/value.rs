@@ -84,7 +84,9 @@ pub fn to_prisma_value(quaint_value: Value<'_>) -> crate::Result<PrismaValue> {
             .map(|b| PrismaValue::Bytes(b.into_owned()))
             .unwrap_or(PrismaValue::Null),
 
-        Value::Xml(s) => s.map(|s| PrismaValue::Xml(s.into_owned())).unwrap_or(PrismaValue::Null),
+        Value::Xml(s) => s
+            .map(|s| PrismaValue::String(s.into_owned()))
+            .unwrap_or(PrismaValue::Null),
     };
 
     Ok(val)

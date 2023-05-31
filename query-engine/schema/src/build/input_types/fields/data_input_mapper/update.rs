@@ -43,7 +43,6 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
                 InputType::object(update_operations_object_type(ctx, "DateTime", sf.clone(), false))
             }
             TypeIdentifier::UUID => InputType::object(update_operations_object_type(ctx, "Uuid", sf.clone(), false)),
-            TypeIdentifier::Xml => InputType::object(update_operations_object_type(ctx, "Xml", sf.clone(), false)),
             TypeIdentifier::Bytes => InputType::object(update_operations_object_type(ctx, "Bytes", sf.clone(), false)),
 
             TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),

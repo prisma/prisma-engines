@@ -271,7 +271,6 @@ impl IntoBson for (&TypeIdentifier, PrismaValue) {
             ),
 
             // Unhandled mappings
-            (TypeIdentifier::Xml, _) => return Err(MongoError::Unsupported("Mongo doesn't support XML.".to_owned())),
             (TypeIdentifier::Unsupported, _) => unreachable!("Unsupported types should never hit the connector."),
 
             (ident, val) => {
