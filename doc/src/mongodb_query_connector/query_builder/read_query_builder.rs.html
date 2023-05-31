@@ -483,7 +483,7 @@
     options::AggregateOptions,
     ClientSession, Collection,
 };
-<span class="kw">use </span>prisma_models::{FieldSelection, ModelRef, ScalarFieldRef};
+<span class="kw">use </span>prisma_models::{FieldSelection, Model, ScalarFieldRef};
 <span class="kw">use </span>std::convert::TryFrom;
 
 <span class="comment">// Mongo Driver broke usage of the simple API, can&#39;t be used by us anymore.
@@ -514,7 +514,7 @@
 <span class="doccomment">/// Translated query arguments ready to use in mongo find or aggregation queries.
 </span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>MongoReadQueryBuilder {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) model: ModelRef,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) model: Model,
 
     <span class="doccomment">/// Pre-join, &quot;normal&quot; filters.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) query: <span class="prelude-ty">Option</span>&lt;Document&gt;,
@@ -568,7 +568,7 @@
 }
 
 <span class="kw">impl </span>MongoReadQueryBuilder {
-    <span class="kw">pub fn </span>new(model: ModelRef) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub fn </span>new(model: Model) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             model,
             query: <span class="prelude-val">None</span>,

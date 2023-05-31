@@ -23,17 +23,17 @@
 <a href="#23" id="23">23</a>
 <a href="#24" id="24">24</a>
 <a href="#25" id="25">25</a>
-</pre><pre class="rust"><code><span class="kw">use </span>prisma_models::ModelRef;
+</pre><pre class="rust"><code><span class="kw">use </span>prisma_models::Model;
 
 <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::ParsedField;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_first(field: ParsedField, model: ModelRef) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_first(field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;, model: Model) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
     <span class="kw">let </span>many_query = many::find_many(field, model)<span class="question-mark">?</span>;
     try_limit_to_one(many_query)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_first_or_throw(field: ParsedField, model: ModelRef) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_first_or_throw(field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;, model: Model) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
     <span class="kw">let </span>many_query = many::find_many_or_throw(field, model)<span class="question-mark">?</span>;
     try_limit_to_one(many_query)
 }

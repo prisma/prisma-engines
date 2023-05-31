@@ -77,7 +77,7 @@
 <a href="#77" id="77">77</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::Selection;
 <span class="kw">use </span><span class="kw">crate</span>::ArgumentValue;
-<span class="kw">use </span>schema::QuerySchemaRef;
+<span class="kw">use </span>schema::QuerySchema;
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub enum </span>Operation {
@@ -86,7 +86,7 @@
 }
 
 <span class="kw">impl </span>Operation {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_find_unique(<span class="kw-2">&amp;</span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span>QuerySchemaRef) -&gt; bool {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_find_unique(<span class="kw-2">&amp;</span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span>QuerySchema) -&gt; bool {
         schema
             .find_query_field(<span class="self">self</span>.name())
             .map(|field| field.is_find_unique())

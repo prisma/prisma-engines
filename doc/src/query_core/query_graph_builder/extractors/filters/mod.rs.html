@@ -350,6 +350,9 @@
 <a href="#350" id="350">350</a>
 <a href="#351" id="351">351</a>
 <a href="#352" id="352">352</a>
+<a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>composite;
 <span class="kw">mod </span>filter_fold;
 <span class="kw">mod </span>filter_grouping;
@@ -368,13 +371,13 @@
 <span class="kw">use </span>filter_grouping::<span class="kw-2">*</span>;
 <span class="kw">use </span>indexmap::IndexMap;
 <span class="kw">use </span>prisma_models::{
-    prelude::ParentContainer, CompositeFieldRef, Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef,
+    prelude::ParentContainer, CompositeFieldRef, Field, Model, PrismaValue, RelationFieldRef, ScalarFieldRef,
 };
 <span class="kw">use </span>schema::constants::filters;
-<span class="kw">use </span>std::{collections::HashMap, convert::TryInto, str::FromStr};
+<span class="kw">use </span>std::{borrow::Cow, collections::HashMap, convert::TryInto, str::FromStr};
 
 <span class="doccomment">/// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.
-</span><span class="kw">pub fn </span>extract_unique_filter(value_map: ParsedInputMap, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; QueryGraphBuilderResult&lt;Filter&gt; {
+</span><span class="kw">pub fn </span>extract_unique_filter(value_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>Model) -&gt; QueryGraphBuilderResult&lt;Filter&gt; {
     <span class="kw">let </span>tag = value_map.tag.clone();
     <span class="comment">// Partition the input into a map containing only the unique fields and one containing all the other filters
     // so that we can parse them separately and ensure we AND both filters
@@ -398,10 +401,10 @@
 
 <span class="doccomment">/// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.
 /// The input map must only contain unique &amp; compound unique fields.
-</span><span class="kw">fn </span>internal_extract_unique_filter(value_map: ParsedInputMap, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; QueryGraphBuilderResult&lt;Filter&gt; {
+</span><span class="kw">fn </span>internal_extract_unique_filter(value_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>Model) -&gt; QueryGraphBuilderResult&lt;Filter&gt; {
     <span class="kw">let </span>filters = value_map
         .into_iter()
-        .map(|(field_name, value): (String, ParsedInputValue)| {
+        .map(|(field_name, value): (Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;, ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;)| {
             <span class="comment">// Always try to resolve regular fields first. If that fails, try to resolve compound fields.
             </span><span class="kw">match </span>model.fields().find_from_scalar(<span class="kw-2">&amp;</span>field_name) {
                 <span class="prelude-val">Ok</span>(field) =&gt; {
@@ -424,8 +427,8 @@
     <span class="prelude-val">Ok</span>(Filter::and(filters))
 }
 
-<span class="kw">fn </span>handle_compound_field(fields: Vec&lt;ScalarFieldRef&gt;, value: ParsedInputValue) -&gt; QueryGraphBuilderResult&lt;Filter&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>input_map: ParsedInputMap = value.try_into()<span class="question-mark">?</span>;
+<span class="kw">fn </span>handle_compound_field(fields: Vec&lt;ScalarFieldRef&gt;, value: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; QueryGraphBuilderResult&lt;Filter&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>input_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = value.try_into()<span class="question-mark">?</span>;
 
     <span class="kw">let </span>filters: Vec&lt;Filter&gt; = fields
         .into_iter()
@@ -450,7 +453,7 @@
 /// | OR   | return empty list | validate single filter | validate all filters |
 /// | AND  | return all items  | validate single filter | validate all filters |
 /// | NOT  | return all items  | validate single filter | validate all filters |
-</span><span class="kw">pub fn </span>extract_filter&lt;T&gt;(value_map: ParsedInputMap, container: T) -&gt; QueryGraphBuilderResult&lt;Filter&gt;
+</span><span class="kw">pub fn </span>extract_filter&lt;T&gt;(value_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt;, container: T) -&gt; QueryGraphBuilderResult&lt;Filter&gt;
 <span class="kw">where
     </span>T: Into&lt;ParentContainer&gt;,
 {
@@ -459,7 +462,7 @@
     <span class="comment">// We define an internal function so we can track the recursion depth. Empty
     // filters at the root layer cannot always be removed.
     </span><span class="kw">fn </span>extract_filter(
-        value_map: ParsedInputMap,
+        value_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt;,
         container: <span class="kw-2">&amp;</span>ParentContainer,
         depth: usize,
     ) -&gt; QueryGraphBuilderResult&lt;Filter&gt; {
@@ -628,7 +631,7 @@
 
 <span class="doccomment">/// Field is the field the filter is refering to and `value` is the passed filter. E.g. `where: { &lt;field&gt;: &lt;value&gt; }.
 /// `value` can be either a flat scalar (for shorthand filter notation) or an object (full filter syntax).
-</span><span class="kw">fn </span>extract_scalar_filters(field: <span class="kw-2">&amp;</span>ScalarFieldRef, value: ParsedInputValue) -&gt; QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt; {
+</span><span class="kw">fn </span>extract_scalar_filters(field: <span class="kw-2">&amp;</span>ScalarFieldRef, value: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt; {
     <span class="kw">match </span>value {
         ParsedInputValue::Single(pv) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.equals(pv)]),
         ParsedInputValue::Map(<span class="kw-2">mut </span>filter_map) =&gt; {
@@ -650,7 +653,10 @@
 
 <span class="doccomment">/// Field is the field the filter is refering to and `value` is the passed filter. E.g. `where: { &lt;field&gt;: &lt;value&gt; }.
 /// `value` can be either a filter object (for shorthand filter notation) or an object (full filter syntax).
-</span><span class="kw">fn </span>extract_relation_filters(field: <span class="kw-2">&amp;</span>RelationFieldRef, value: ParsedInputValue) -&gt; QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt; {
+</span><span class="kw">fn </span>extract_relation_filters(
+    field: <span class="kw-2">&amp;</span>RelationFieldRef,
+    value: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;,
+) -&gt; QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt; {
     <span class="kw">match </span>value {
         <span class="comment">// Implicit is null filter (`where: { &lt;field&gt;: null }`)
         </span>ParsedInputValue::Single(PrismaValue::Null) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.one_relation_is_null()]),
@@ -672,7 +678,7 @@
     }
 }
 
-<span class="kw">fn </span>parse_query_mode(input: ParsedInputValue) -&gt; QueryGraphBuilderResult&lt;QueryMode&gt; {
+<span class="kw">fn </span>parse_query_mode(input: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; QueryGraphBuilderResult&lt;QueryMode&gt; {
     <span class="kw">let </span>value: PrismaValue = input.try_into()<span class="question-mark">?</span>;
     <span class="kw">let </span>s = <span class="kw">match </span>value {
         PrismaValue::Enum(s) =&gt; s,
@@ -691,7 +697,7 @@
 /// `value` can be either a flat scalar (for shorthand filter notation) or an object (full filter syntax).
 </span><span class="kw">fn </span>extract_composite_filters(
     field: <span class="kw-2">&amp;</span>CompositeFieldRef,
-    value: ParsedInputValue,
+    value: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt; {
     <span class="kw">match </span>value {
         ParsedInputValue::Single(val) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.equals(val)]), <span class="comment">// Todo: Do we want to do coercions here? (list, object)

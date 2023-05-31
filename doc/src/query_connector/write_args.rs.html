@@ -497,7 +497,7 @@
 };
 <span class="kw">use </span>indexmap::{map::Keys, IndexMap};
 <span class="kw">use </span>prisma_models::{
-    CompositeFieldRef, Field, ModelProjection, ModelRef, PrismaValue, ScalarFieldRef, SelectedField, SelectionResult,
+    CompositeFieldRef, Field, Model, ModelProjection, PrismaValue, ScalarFieldRef, SelectedField, SelectionResult,
 };
 <span class="kw">use </span>std::{borrow::Borrow, convert::TryInto, ops::Deref};
 
@@ -885,7 +885,7 @@
     }
 
     <span class="comment">// @updatedAt
-    </span><span class="kw">pub fn </span>add_datetimes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, model: <span class="kw-2">&amp;</span>ModelRef) {
+    </span><span class="kw">pub fn </span>add_datetimes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, model: <span class="kw-2">&amp;</span>Model) {
         <span class="kw">let </span>updated_at_fields = model.fields().updated_at();
         <span class="kw">let </span>value = <span class="kw-2">&amp;</span><span class="self">self</span>.request_now;
 
@@ -896,7 +896,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>update_datetimes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, model: <span class="kw-2">&amp;</span>ModelRef) {
+    <span class="kw">pub fn </span>update_datetimes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, model: <span class="kw-2">&amp;</span>Model) {
         <span class="kw">if </span>!<span class="self">self</span>.args.is_empty() {
             <span class="self">self</span>.add_datetimes(model)
         }

@@ -270,6 +270,10 @@
 <a href="#270" id="270">270</a>
 <a href="#271" id="271">271</a>
 <a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{write_args_parser::WriteArgsParser, <span class="kw-2">*</span>};
 <span class="kw">use crate</span>::{
     query_ast::<span class="kw-2">*</span>,
@@ -277,8 +281,8 @@
     ParsedField, ParsedInputMap, ParsedInputValue, ParsedObject,
 };
 <span class="kw">use </span>connector::IntoFilter;
-<span class="kw">use </span>prisma_models::ModelRef;
-<span class="kw">use </span>schema::ConnectorContext;
+<span class="kw">use </span>prisma_models::Model;
+<span class="kw">use </span>schema::QuerySchema;
 
 <span class="doccomment">/// Handles a top-level upsert
 ///
@@ -324,9 +328,9 @@
 /// ```
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>upsert_record(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
-    model: ModelRef,
-    <span class="kw-2">mut </span>field: ParsedField,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
+    model: Model,
+    <span class="kw-2">mut </span>field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="kw">let </span>where_argument = field.where_arg()<span class="question-mark">?</span>.unwrap();
     <span class="kw">let </span>create_argument = field.create_arg()<span class="question-mark">?</span>.unwrap();
@@ -339,7 +343,7 @@
         <span class="kw-2">&amp;</span>create_argument,
         <span class="kw-2">&amp;</span>update_argument,
         selection,
-        connector_ctx,
+        query_schema,
     );
 
     <span class="kw">let </span>filter = extract_unique_filter(where_argument, <span class="kw-2">&amp;</span>model)<span class="question-mark">?</span>;
@@ -373,9 +377,9 @@
     <span class="kw">let </span>read_parent_records = utils::read_ids_infallible(model.clone(), model_id.clone(), filter.clone());
     <span class="kw">let </span>read_parent_records_node = graph.create_node(read_parent_records);
 
-    <span class="kw">let </span>create_node = create::create_record_node(graph, connector_ctx, model.clone(), create_argument)<span class="question-mark">?</span>;
+    <span class="kw">let </span>create_node = create::create_record_node(graph, query_schema, model.clone(), create_argument)<span class="question-mark">?</span>;
 
-    <span class="kw">let </span>update_node = update::update_record_node(graph, connector_ctx, filter, model.clone(), update_argument)<span class="question-mark">?</span>;
+    <span class="kw">let </span>update_node = update::update_record_node(graph, query_schema, filter, model.clone(), update_argument)<span class="question-mark">?</span>;
 
     <span class="kw">let </span>read_node_create = graph.create_node(Query::Read(read_query.clone()));
     <span class="kw">let </span>read_node_update = graph.create_node(Query::Read(read_query));
@@ -409,7 +413,7 @@
     // the emulation node and the update node.
     </span><span class="kw">if let </span><span class="prelude-val">Some</span>(emulation_node) = utils::insert_emulated_on_update_with_intermediary_node(
         graph,
-        connector_ctx,
+        query_schema,
         <span class="kw-2">&amp;</span>model,
         <span class="kw-2">&amp;</span>read_parent_records_node,
         <span class="kw-2">&amp;</span>update_node,
@@ -474,13 +478,13 @@
 // 2. The create and update arguments do not have any nested queries
 // 3. There is only 1 unique field in the where clause
 // 4. The unique field defined in where clause has the same value as defined in the create arguments
-</span><span class="kw">fn </span>can_use_connector_native_upsert(
-    model: <span class="kw-2">&amp;</span>ModelRef,
-    where_field: <span class="kw-2">&amp;</span>ParsedInputMap,
-    create_argument: <span class="kw-2">&amp;</span>ParsedInputMap,
-    update_argument: <span class="kw-2">&amp;</span>ParsedInputMap,
-    selection: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;ParsedObject&gt;,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+</span><span class="kw">fn </span>can_use_connector_native_upsert&lt;<span class="lifetime">&#39;a</span>&gt;(
+    model: <span class="kw-2">&amp;</span>Model,
+    where_field: <span class="kw-2">&amp;</span>ParsedInputMap&lt;<span class="lifetime">&#39;a</span>&gt;,
+    create_argument: <span class="kw-2">&amp;</span>ParsedInputMap&lt;<span class="lifetime">&#39;a</span>&gt;,
+    update_argument: <span class="kw-2">&amp;</span>ParsedInputMap&lt;<span class="lifetime">&#39;a</span>&gt;,
+    selection: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;ParsedObject&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
 ) -&gt; bool {
     <span class="kw">let </span>has_nested_selects = has_nested_selects(selection);
 
@@ -504,24 +508,24 @@
         .iter()
         .all(|(field_name, input)| where_and_create_equal(field_name, input, create_argument));
 
-    connector_ctx.can_native_upsert()
+    query_schema.can_native_upsert()
         &amp;&amp; has_one_unique
         &amp;&amp; !has_nested_create
         &amp;&amp; !has_nested_update
         &amp;&amp; !empty_update
         &amp;&amp; !has_nested_selects
         &amp;&amp; where_values_same_as_create
-        &amp;&amp; !connector_ctx.relation_mode.is_prisma()
+        &amp;&amp; !query_schema.relation_mode().is_prisma()
 }
 
-<span class="kw">fn </span>is_unique_field(field_name: <span class="kw-2">&amp;</span>str, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; bool {
+<span class="kw">fn </span>is_unique_field(field_name: <span class="kw-2">&amp;</span>str, model: <span class="kw-2">&amp;</span>Model) -&gt; bool {
     <span class="kw">match </span>model.fields().find_from_scalar(field_name) {
         <span class="prelude-val">Ok</span>(field) =&gt; field.unique(),
         <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; resolve_compound_field(field_name, model).is_some(),
     }
 }
 
-<span class="kw">fn </span>has_nested_selects(selection: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;ParsedObject&gt;) -&gt; bool {
+<span class="kw">fn </span>has_nested_selects(selection: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;ParsedObject&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; bool {
     <span class="kw">if let </span><span class="prelude-val">Some</span>(parsed_object) = selection {
         parsed_object
             .fields
@@ -534,7 +538,11 @@
 
 <span class="doccomment">/// Make sure the unique fields defined in the where clause have the same values
 /// as in the create of the upsert.
-</span><span class="kw">fn </span>where_and_create_equal(field_name: <span class="kw-2">&amp;</span>str, where_value: <span class="kw-2">&amp;</span>ParsedInputValue, create_map: <span class="kw-2">&amp;</span>ParsedInputMap) -&gt; bool {
+</span><span class="kw">fn </span>where_and_create_equal&lt;<span class="lifetime">&#39;a</span>&gt;(
+    field_name: <span class="kw-2">&amp;</span>str,
+    where_value: <span class="kw-2">&amp;</span>ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;,
+    create_map: <span class="kw-2">&amp;</span>ParsedInputMap&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; bool {
     <span class="kw">match </span>where_value {
         ParsedInputValue::Map(inner_map) =&gt; inner_map
             .iter()

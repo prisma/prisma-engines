@@ -391,7 +391,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModelRef {
+    <span class="kw">pub fn </span>model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Model {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::CreateRecord(q) =&gt; q.model.clone(),
             <span class="self">Self</span>::CreateManyRecords(q) =&gt; q.model.clone(),
@@ -409,7 +409,7 @@
 
     <span class="kw">pub fn </span>native_upsert(
         name: String,
-        model: ModelRef,
+        model: Model,
         record_filter: RecordFilter,
         create: WriteArgs,
         update: WriteArgs,
@@ -500,13 +500,13 @@
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>CreateRecord {
-    <span class="kw">pub </span>model: ModelRef,
+    <span class="kw">pub </span>model: Model,
     <span class="kw">pub </span>args: WriteArgs,
 }
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>CreateManyRecords {
-    <span class="kw">pub </span>model: ModelRef,
+    <span class="kw">pub </span>model: Model,
     <span class="kw">pub </span>args: Vec&lt;WriteArgs&gt;,
     <span class="kw">pub </span>skip_duplicates: bool,
 }
@@ -526,27 +526,27 @@
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>UpdateRecord {
-    <span class="kw">pub </span>model: ModelRef,
+    <span class="kw">pub </span>model: Model,
     <span class="kw">pub </span>record_filter: RecordFilter,
     <span class="kw">pub </span>args: WriteArgs,
 }
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>UpdateManyRecords {
-    <span class="kw">pub </span>model: ModelRef,
+    <span class="kw">pub </span>model: Model,
     <span class="kw">pub </span>record_filter: RecordFilter,
     <span class="kw">pub </span>args: WriteArgs,
 }
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>DeleteRecord {
-    <span class="kw">pub </span>model: ModelRef,
+    <span class="kw">pub </span>model: Model,
     <span class="kw">pub </span>record_filter: <span class="prelude-ty">Option</span>&lt;RecordFilter&gt;,
 }
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>DeleteManyRecords {
-    <span class="kw">pub </span>model: ModelRef,
+    <span class="kw">pub </span>model: Model,
     <span class="kw">pub </span>record_filter: RecordFilter,
 }
 
@@ -567,7 +567,7 @@
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>RawQuery {
     <span class="doccomment">/// Model associated with the raw query, if one is necessary
-    </span><span class="kw">pub </span>model: <span class="prelude-ty">Option</span>&lt;ModelRef&gt;,
+    </span><span class="kw">pub </span>model: <span class="prelude-ty">Option</span>&lt;Model&gt;,
     <span class="doccomment">/// Map of query arguments and their values
     </span><span class="kw">pub </span>inputs: HashMap&lt;String, PrismaValue&gt;,
     <span class="doccomment">/// Hint as to what kind of query is being executed

@@ -372,7 +372,7 @@
 {
     <span class="kw">async fn </span>get_single_record(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        model: <span class="kw-2">&amp;</span>ModelRef,
+        model: <span class="kw-2">&amp;</span>Model,
         filter: <span class="kw-2">&amp;</span>Filter,
         selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
         aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
@@ -396,7 +396,7 @@
 
     <span class="kw">async fn </span>get_many_records(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        model: <span class="kw-2">&amp;</span>ModelRef,
+        model: <span class="kw-2">&amp;</span>Model,
         query_arguments: QueryArguments,
         selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
         aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
@@ -432,7 +432,7 @@
 
     <span class="kw">async fn </span>aggregate_records(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        model: <span class="kw-2">&amp;</span>ModelRef,
+        model: <span class="kw-2">&amp;</span>Model,
         query_arguments: QueryArguments,
         selections: Vec&lt;AggregationSelection&gt;,
         group_by: Vec&lt;ScalarFieldRef&gt;,
@@ -454,7 +454,7 @@
 {
     <span class="kw">async fn </span>create_record(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        model: <span class="kw-2">&amp;</span>ModelRef,
+        model: <span class="kw-2">&amp;</span>Model,
         args: WriteArgs,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;SelectionResult&gt; {
@@ -467,7 +467,7 @@
 
     <span class="kw">async fn </span>create_records(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        model: <span class="kw-2">&amp;</span>ModelRef,
+        model: <span class="kw-2">&amp;</span>Model,
         args: Vec&lt;WriteArgs&gt;,
         skip_duplicates: bool,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -481,7 +481,7 @@
 
     <span class="kw">async fn </span>update_records(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        model: <span class="kw-2">&amp;</span>ModelRef,
+        model: <span class="kw-2">&amp;</span>Model,
         record_filter: RecordFilter,
         args: WriteArgs,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -495,7 +495,7 @@
 
     <span class="kw">async fn </span>update_record(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        model: <span class="kw-2">&amp;</span>ModelRef,
+        model: <span class="kw-2">&amp;</span>Model,
         record_filter: RecordFilter,
         args: WriteArgs,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -510,7 +510,7 @@
 
     <span class="kw">async fn </span>delete_records(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        model: <span class="kw-2">&amp;</span>ModelRef,
+        model: <span class="kw-2">&amp;</span>Model,
         record_filter: RecordFilter,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;usize&gt; {
@@ -570,7 +570,7 @@
 
     <span class="kw">async fn </span>query_raw(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        _model: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ModelRef&gt;,
+        _model: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Model&gt;,
         inputs: HashMap&lt;String, PrismaValue&gt;,
         _query_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector::Result&lt;serde_json::Value&gt; {

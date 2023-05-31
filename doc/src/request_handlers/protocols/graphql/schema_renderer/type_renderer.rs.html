@@ -95,14 +95,12 @@
 <a href="#95" id="95">95</a>
 <a href="#96" id="96">96</a>
 <a href="#97" id="97">97</a>
-<a href="#98" id="98">98</a>
-<a href="#99" id="99">99</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub enum </span>GqlTypeRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
-    Input(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>InputType),
-    Output(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>OutputType),
+    Input(InputType&lt;<span class="lifetime">&#39;a</span>&gt;),
+    Output(OutputType&lt;<span class="lifetime">&#39;a</span>&gt;),
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Renderer <span class="kw">for </span>GqlTypeRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -116,15 +114,14 @@
 
 <span class="attr">#[allow(clippy::only_used_in_recursion)]
 </span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; GqlTypeRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>render_input_type(<span class="kw-2">&amp;</span><span class="self">self</span>, i: <span class="kw-2">&amp;</span>InputType, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
+    <span class="kw">fn </span>render_input_type(<span class="kw-2">&amp;</span><span class="self">self</span>, i: <span class="kw-2">&amp;</span>InputType&lt;<span class="lifetime">&#39;a</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
         <span class="kw">match </span>i {
-            InputType::Object(<span class="kw-2">ref </span>obj) =&gt; {
-                <span class="kw">let _ </span>= obj.as_renderer().render(ctx);
-                ctx.query_schema.db[<span class="kw-2">*</span>obj].identifier.name()
+            InputType::Object(obj) =&gt; {
+                obj.as_renderer().render(ctx);
+                obj.identifier.name()
             }
 
             InputType::Enum(et) =&gt; {
-                <span class="kw">let </span>et = <span class="kw-2">&amp;</span>ctx.query_schema.db[<span class="kw-2">*</span>et];
                 et.as_renderer().render(ctx);
                 et.identifier().name()
             }
@@ -156,25 +153,24 @@
         }
     }
 
-    <span class="kw">fn </span>render_output_type(<span class="kw-2">&amp;</span><span class="self">self</span>, o: <span class="kw-2">&amp;</span>OutputType, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
-        <span class="kw">match </span>o {
-            OutputType::Object(obj) =&gt; {
-                <span class="kw">let _ </span>= obj.as_renderer().render(ctx);
-                ctx.query_schema.db[<span class="kw-2">*</span>obj].identifier.name()
+    <span class="kw">fn </span>render_output_type(<span class="kw-2">&amp;</span><span class="self">self</span>, o: <span class="kw-2">&amp;</span>OutputType&lt;<span class="lifetime">&#39;a</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
+        <span class="kw">if </span>o.is_list() {
+            <span class="kw">let </span>substring = <span class="self">self</span>.render_output_type(<span class="kw-2">&amp;</span>OutputType::non_list(o.inner.clone()), ctx);
+            <span class="kw">return </span><span class="macro">format!</span>(<span class="string">&quot;[{substring}]&quot;</span>);
+        }
+
+        <span class="kw">match </span><span class="kw-2">&amp;</span>o.inner {
+            InnerOutputType::Object(obj) =&gt; {
+                obj.as_renderer().render(ctx);
+                obj.name()
             }
 
-            OutputType::Enum(et) =&gt; {
-                <span class="kw">let </span>et = <span class="kw-2">&amp;</span>ctx.query_schema.db[<span class="kw-2">*</span>et];
+            InnerOutputType::Enum(et) =&gt; {
                 et.as_renderer().render(ctx);
                 et.identifier().name()
             }
 
-            OutputType::List(l) =&gt; {
-                <span class="kw">let </span>substring = <span class="self">self</span>.render_output_type(l, ctx);
-                <span class="macro">format!</span>(<span class="string">&quot;[{substring}]&quot;</span>)
-            }
-
-            OutputType::Scalar(<span class="kw-2">ref </span>scalar) =&gt; {
+            InnerOutputType::Scalar(<span class="kw-2">ref </span>scalar) =&gt; {
                 <span class="kw">let </span>stringified = <span class="kw">match </span>scalar {
                     ScalarType::String =&gt; <span class="string">&quot;String&quot;</span>,
                     ScalarType::Int =&gt; <span class="string">&quot;Int&quot;</span>,

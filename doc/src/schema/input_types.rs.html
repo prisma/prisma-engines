@@ -305,55 +305,39 @@
 <a href="#305" id="305">305</a>
 <a href="#306" id="306">306</a>
 <a href="#307" id="307">307</a>
-<a href="#308" id="308">308</a>
-<a href="#309" id="309">309</a>
-<a href="#310" id="310">310</a>
-<a href="#311" id="311">311</a>
-<a href="#312" id="312">312</a>
-<a href="#313" id="313">313</a>
-<a href="#314" id="314">314</a>
-<a href="#315" id="315">315</a>
-<a href="#316" id="316">316</a>
-<a href="#317" id="317">317</a>
-<a href="#318" id="318">318</a>
-<a href="#319" id="319">319</a>
-<a href="#320" id="320">320</a>
-<a href="#321" id="321">321</a>
-<a href="#322" id="322">322</a>
-<a href="#323" id="323">323</a>
-<a href="#324" id="324">324</a>
-<a href="#325" id="325">325</a>
-<a href="#326" id="326">326</a>
-<a href="#327" id="327">327</a>
-<a href="#328" id="328">328</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">crate</span>::db::QuerySchemaDatabase;
 <span class="kw">use </span>fmt::Debug;
 <span class="kw">use </span>prisma_models::{prelude::ParentContainer, DefaultKind};
-<span class="kw">use </span>std::{boxed::Box, fmt};
+<span class="kw">use </span>std::{borrow::Cow, boxed::Box, fmt};
 
-<span class="attr">#[derive(PartialEq)]
-</span><span class="kw">pub struct </span>InputObjectType {
+<span class="attr">#[derive(Clone)]
+</span><span class="kw">pub struct </span>InputObjectType&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub </span>identifier: Identifier,
-    <span class="kw">pub </span>constraints: InputObjectTypeConstraints,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) fields: Vec&lt;InputField&gt;,
-    <span class="kw">pub </span>tag: <span class="prelude-ty">Option</span>&lt;ObjectTag&gt;,
+    <span class="kw">pub </span>constraints: InputObjectTypeConstraints&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) fields: Arc&lt;<span class="kw">dyn </span>Fn() -&gt; Vec&lt;InputField&lt;<span class="lifetime">&#39;a</span>&gt;&gt; + Send + Sync + <span class="lifetime">&#39;a</span>&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) tag: <span class="prelude-ty">Option</span>&lt;ObjectTag&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+}
+
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>InputObjectType&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.identifier.eq(<span class="kw-2">&amp;</span>other.identifier)
+    }
 }
 
 <span class="doccomment">/// Object tags help differentiating objects during parsing / raw input data processing,
 /// especially if complex object unions are present.
-</span><span class="attr">#[derive(Debug, PartialEq, Clone)]
-</span><span class="kw">pub enum </span>ObjectTag {
+</span><span class="attr">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub enum </span>ObjectTag&lt;<span class="lifetime">&#39;a</span>&gt; {
     CompositeEnvelope,
     RelationEnvelope,
     <span class="comment">// Holds the type against which a field can be compared
-    </span>FieldRefType(InputType),
+    </span>FieldRefType(Box&lt;InputType&lt;<span class="lifetime">&#39;a</span>&gt;&gt;),
     WhereInputType(ParentContainer),
     NestedToOneUpdateEnvelope,
 }
 
-<span class="attr">#[derive(Debug, Default, PartialEq)]
-</span><span class="kw">pub struct </span>InputObjectTypeConstraints {
+<span class="attr">#[derive(Debug, Default, PartialEq, Clone)]
+</span><span class="kw">pub struct </span>InputObjectTypeConstraints&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="doccomment">/// The maximum number of fields that can be provided.
     </span><span class="kw">pub </span>min_num_fields: <span class="prelude-ty">Option</span>&lt;usize&gt;,
 
@@ -362,10 +346,10 @@
 
     <span class="doccomment">/// The fields against which the constraints should be applied.
     /// If `None`, constraints should be applied on _all_ fields on the input object type.
-    </span><span class="kw">pub </span>fields: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
+    </span><span class="kw">pub </span>fields: <span class="prelude-ty">Option</span>&lt;Vec&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;&gt;,
 }
 
-<span class="kw">impl </span>Debug <span class="kw">for </span>InputObjectType {
+<span class="kw">impl </span>Debug <span class="kw">for </span>InputObjectType&lt;<span class="lifetime">&#39;_</span>&gt; {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         f.debug_struct(<span class="string">&quot;InputObjectType&quot;</span>)
             .field(<span class="string">&quot;identifier&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.identifier)
@@ -375,26 +359,18 @@
     }
 }
 
-<span class="kw">impl </span>InputObjectType {
-    <span class="kw">pub fn </span>get_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Vec&lt;InputField&gt; {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.fields
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; InputObjectType&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>get_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = InputField&lt;<span class="lifetime">&#39;a</span>&gt;&gt; + Clone {
+        <span class="kw">let </span>f = <span class="kw-2">&amp;</span><span class="self">self</span>.fields;
+        f().into_iter()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_fields(<span class="kw-2">&amp;mut </span><span class="self">self</span>, fields: Vec&lt;InputField&gt;) {
-        <span class="self">self</span>.fields = fields;
+    <span class="kw">pub fn </span>tag(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ObjectTag&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.tag.as_ref()
     }
 
-    <span class="doccomment">/// True if fields are empty, false otherwise.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.get_fields().is_empty()
-    }
-
-    <span class="kw">pub fn </span>find_field&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: T) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>InputField&gt;
-    <span class="kw">where
-        </span>T: Into&lt;String&gt;,
-    {
-        <span class="kw">let </span>name = name.into();
-        <span class="self">self</span>.get_fields().iter().find(|f| f.name == name)
+    <span class="kw">pub fn </span>find_field(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.get_fields().find(|f| f.name == name)
     }
 
     <span class="doccomment">/// Require exactly one field of the possible ones to be in the input.
@@ -424,42 +400,47 @@
         <span class="self">self</span>.constraints.min_num_fields = <span class="prelude-val">Some</span>(min);
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>apply_constraints_on_fields(<span class="kw-2">&amp;mut </span><span class="self">self</span>, fields: Vec&lt;String&gt;) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>apply_constraints_on_fields(<span class="kw-2">&amp;mut </span><span class="self">self</span>, fields: Vec&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) {
         <span class="self">self</span>.constraints.fields = <span class="prelude-val">Some</span>(fields);
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_tag(<span class="kw-2">&amp;mut </span><span class="self">self</span>, tag: ObjectTag) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_tag(<span class="kw-2">&amp;mut </span><span class="self">self</span>, tag: ObjectTag&lt;<span class="lifetime">&#39;a</span>&gt;) {
         <span class="self">self</span>.tag = <span class="prelude-val">Some</span>(tag);
     }
 }
 
-<span class="attr">#[derive(Debug, PartialEq)]
-</span><span class="kw">pub struct </span>InputField {
-    <span class="kw">pub </span>name: String,
+<span class="attr">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>InputField&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub </span>name: Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;,
     <span class="kw">pub </span>default_value: <span class="prelude-ty">Option</span>&lt;DefaultKind&gt;,
 
-    <span class="doccomment">/// Possible field types, represented as a union of input types, but only one can be provided at any time.
-    /// Slice expressed as (start, len).
-    </span>field_types: <span class="prelude-ty">Option</span>&lt;(usize, usize)&gt;,
-
-    <span class="doccomment">/// Indicates if the presence of the field on the higher input objects
-    /// is required, but doesn&#39;t state whether or not the input can be null.
-    </span><span class="kw">pub </span>is_required: bool,
+    field_types: Vec&lt;InputType&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    is_required: bool,
 }
 
-<span class="kw">impl </span>InputField {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(name: String, default_value: <span class="prelude-ty">Option</span>&lt;DefaultKind&gt;, is_required: bool) -&gt; InputField {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; InputField&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
+        name: Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;,
+        field_types: Vec&lt;InputType&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        default_value: <span class="prelude-ty">Option</span>&lt;DefaultKind&gt;,
+        is_required: bool,
+    ) -&gt; InputField&lt;<span class="lifetime">&#39;a</span>&gt; {
         InputField {
             name,
             default_value,
-            field_types: <span class="prelude-val">None</span>,
+            field_types,
             is_required,
         }
     }
 
-    <span class="kw">pub fn </span>field_types&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[InputType] {
-        <span class="kw">let </span>(start, len) = <span class="self">self</span>.field_types.unwrap_or_default();
-        <span class="kw-2">&amp;</span>query_schema.db.input_field_types[start..(start + len)]
+    <span class="kw">pub fn </span>field_types(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[InputType&lt;<span class="lifetime">&#39;a</span>&gt;] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.field_types
+    }
+
+    <span class="doccomment">/// Indicates if the presence of the field on the higher input objects
+    /// is required, but doesn&#39;t state whether or not the input can be null.
+    </span><span class="kw">pub fn </span>is_required(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_required
     }
 
     <span class="doccomment">/// Sets the field as optional (not required to be present on the input).
@@ -484,48 +465,36 @@
     }
 
     <span class="doccomment">/// Sets the field as nullable (accepting null inputs).
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nullable(<span class="self">self</span>, db: <span class="kw-2">&amp;mut </span>QuerySchemaDatabase) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.add_type(InputType::null(), db)
-    }
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nullable(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="comment">// self.field_types = Box::new(|| {
+        //     let f = &amp;self.field_types;
+        //     let mut fields = f();
+        //     fields.push(InputType::null());
+        //     fields
+        // });
+        </span><span class="self">self</span>.field_types.push(InputType::null());
+        <span class="self">self
+    </span>}
 
     <span class="doccomment">/// Sets the field as nullable if the condition is true.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nullable_if(<span class="self">self</span>, condition: bool, db: <span class="kw-2">&amp;mut </span>QuerySchemaDatabase) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nullable_if(<span class="self">self</span>, condition: bool) -&gt; <span class="self">Self </span>{
         <span class="kw">if </span>condition {
-            <span class="self">self</span>.nullable(db)
+            <span class="self">self</span>.nullable()
         } <span class="kw">else </span>{
             <span class="self">self
         </span>}
     }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>push_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, typ: InputType, db: <span class="kw-2">&amp;mut </span>QuerySchemaDatabase) {
-        <span class="kw">match </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.field_types {
-            <span class="prelude-val">Some</span>((_start, len)) =&gt; {
-                <span class="kw-2">*</span>len += <span class="number">1</span>;
-                db.input_field_types.push(typ);
-            }
-            <span class="prelude-val">None </span>=&gt; {
-                <span class="self">self</span>.field_types = <span class="prelude-val">Some</span>((db.input_field_types.len(), <span class="number">1</span>));
-                db.input_field_types.push(typ);
-            }
-        }
-    }
-
-    <span class="doccomment">/// Adds possible input type to this input field&#39;s type union.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>add_type(<span class="kw-2">mut </span><span class="self">self</span>, typ: InputType, db: <span class="kw-2">&amp;mut </span>QuerySchemaDatabase) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.push_type(typ, db);
-        <span class="self">self
-    </span>}
 }
 
 <span class="attr">#[derive(Clone)]
-</span><span class="kw">pub enum </span>InputType {
+</span><span class="kw">pub enum </span>InputType&lt;<span class="lifetime">&#39;a</span>&gt; {
     Scalar(ScalarType),
-    Enum(EnumTypeId),
-    List(Box&lt;InputType&gt;),
-    Object(InputObjectTypeId),
+    Enum(EnumType),
+    List(Box&lt;InputType&lt;<span class="lifetime">&#39;a</span>&gt;&gt;),
+    Object(InputObjectType&lt;<span class="lifetime">&#39;a</span>&gt;),
 }
 
-<span class="kw">impl </span>PartialEq <span class="kw">for </span>InputType {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; PartialEq <span class="kw">for </span>InputType&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
         <span class="kw">match </span>(<span class="self">self</span>, other) {
             (InputType::Scalar(st), InputType::Scalar(ost)) =&gt; st.eq(ost),
@@ -537,7 +506,7 @@
     }
 }
 
-<span class="kw">impl </span>Debug <span class="kw">for </span>InputType {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Debug <span class="kw">for </span>InputType&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Object(obj) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Object({obj:?})&quot;</span>),
@@ -548,78 +517,69 @@
     }
 }
 
-<span class="kw">impl </span>InputType {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>list(containing: InputType) -&gt; InputType {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; InputType&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>list(containing: InputType&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; InputType&lt;<span class="lifetime">&#39;a</span>&gt; {
         InputType::List(Box::new(containing))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>object(containing: InputObjectTypeId) -&gt; InputType {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>object(containing: InputObjectType&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; InputType&lt;<span class="lifetime">&#39;a</span>&gt; {
         InputType::Object(containing)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>string() -&gt; InputType {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>string() -&gt; InputType&lt;<span class="lifetime">&#39;a</span>&gt; {
         InputType::Scalar(ScalarType::String)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>int() -&gt; InputType {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>int() -&gt; InputType&lt;<span class="lifetime">&#39;a</span>&gt; {
         InputType::Scalar(ScalarType::Int)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>bigint() -&gt; InputType {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>bigint() -&gt; InputType&lt;<span class="lifetime">&#39;a</span>&gt; {
         InputType::Scalar(ScalarType::BigInt)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>float() -&gt; InputType {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>float() -&gt; InputType&lt;<span class="lifetime">&#39;a</span>&gt; {
         InputType::Scalar(ScalarType::Float)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>decimal() -&gt; InputType {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>decimal() -&gt; InputType&lt;<span class="lifetime">&#39;a</span>&gt; {
         InputType::Scalar(ScalarType::Decimal)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>boolean() -&gt; InputType {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>boolean() -&gt; InputType&lt;<span class="lifetime">&#39;a</span>&gt; {
         InputType::Scalar(ScalarType::Boolean)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>date_time() -&gt; InputType {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>date_time() -&gt; InputType&lt;<span class="lifetime">&#39;a</span>&gt; {
         InputType::Scalar(ScalarType::DateTime)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>json() -&gt; InputType {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>json() -&gt; InputType&lt;<span class="lifetime">&#39;a</span>&gt; {
         InputType::Scalar(ScalarType::Json)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>json_list() -&gt; InputType {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>json_list() -&gt; InputType&lt;<span class="lifetime">&#39;a</span>&gt; {
         InputType::Scalar(ScalarType::JsonList)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>uuid() -&gt; InputType {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>uuid() -&gt; InputType&lt;<span class="lifetime">&#39;a</span>&gt; {
         InputType::Scalar(ScalarType::UUID)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>xml() -&gt; InputType {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>xml() -&gt; InputType&lt;<span class="lifetime">&#39;a</span>&gt; {
         InputType::Scalar(ScalarType::Xml)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>bytes() -&gt; InputType {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>bytes() -&gt; InputType&lt;<span class="lifetime">&#39;a</span>&gt; {
         InputType::Scalar(ScalarType::Bytes)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>null() -&gt; InputType {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>null() -&gt; InputType&lt;<span class="lifetime">&#39;a</span>&gt; {
         InputType::Scalar(ScalarType::Null)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>enum_type(containing: EnumTypeId) -&gt; InputType {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>enum_type(containing: EnumType) -&gt; InputType&lt;<span class="lifetime">&#39;a</span>&gt; {
         InputType::Enum(containing)
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>, query_schema: <span class="kw-2">&amp;</span>QuerySchemaDatabase) -&gt; bool {
-        <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Scalar(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-            <span class="self">Self</span>::Enum(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-            <span class="self">Self</span>::List(inner) =&gt; inner.is_empty(query_schema),
-            <span class="self">Self</span>::Object(id) =&gt; query_schema[<span class="kw-2">*</span>id].is_empty(),
-        }
     }
 
     <span class="kw">pub fn </span>is_json(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
@@ -629,29 +589,27 @@
         )
     }
 
-    <span class="kw">pub fn </span>as_object&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchemaDatabase) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>InputObjectType&gt; {
+    <span class="kw">pub fn </span>as_object(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>InputObjectType&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
         <span class="kw">if let </span><span class="self">Self</span>::Object(v) = <span class="self">self </span>{
-            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>query_schema[<span class="kw-2">*</span>v])
+            <span class="prelude-val">Some</span>(v)
         } <span class="kw">else </span>{
             <span class="prelude-val">None
         </span>}
     }
 
-    <span class="kw">pub fn </span>as_list(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>InputType&gt; {
+    <span class="kw">pub fn </span>as_list(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>InputType&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
         <span class="kw">if let </span><span class="self">Self</span>::List(list) = <span class="self">self </span>{
             <span class="prelude-val">Some</span>(list)
         } <span class="kw">else </span>{
             <span class="prelude-val">None
         </span>}
     }
-}
 
-<span class="kw">impl </span>IntoIterator <span class="kw">for </span>InputType {
-    <span class="kw">type </span>Item = InputType;
-    <span class="kw">type </span>IntoIter = std::iter::Once&lt;InputType&gt;;
-
-    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
-        std::iter::once(<span class="self">self</span>)
+    <span class="kw">pub fn </span>into_object(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;InputObjectType&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            InputType::Object(obj) =&gt; <span class="prelude-val">Some</span>(obj),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
     }
 }
 </code></pre></div>

@@ -494,7 +494,7 @@
     ParsedInputList, ParsedInputValue,
 };
 <span class="kw">use </span>connector::{Filter, IntoFilter};
-<span class="kw">use </span>prisma_models::{ModelRef, RelationFieldRef};
+<span class="kw">use </span>prisma_models::{Model, RelationFieldRef};
 <span class="kw">use </span>schema::constants::args;
 <span class="kw">use </span>std::convert::TryInto;
 
@@ -503,18 +503,18 @@
 /// Information on the graph shapes can be found on the individual handlers.
 </span><span class="kw">pub fn </span>nested_create(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
-    value: ParsedInputValue,
-    child_model: <span class="kw-2">&amp;</span>ModelRef,
+    value: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;,
+    child_model: <span class="kw-2">&amp;</span>Model,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="kw">let </span>relation = parent_relation_field.relation();
 
     <span class="comment">// Build all create nodes upfront.
     </span><span class="kw">let </span>creates: Vec&lt;NodeRef&gt; = utils::coerce_vec(value)
         .into_iter()
-        .map(|value| create::create_record_node(graph, connector_ctx, child_model.clone(), value.try_into()<span class="question-mark">?</span>))
+        .map(|value| create::create_record_node(graph, query_schema, child_model.clone(), value.try_into()<span class="question-mark">?</span>))
         .collect::&lt;QueryGraphBuilderResult&lt;Vec&lt;NodeRef&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
     <span class="kw">if </span>relation.is_many_to_many() {
@@ -909,13 +909,13 @@
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
     parent_node: NodeRef,
     parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
-    value: ParsedInputValue,
-    child_model: <span class="kw-2">&amp;</span>ModelRef,
+    value: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;,
+    child_model: <span class="kw-2">&amp;</span>Model,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="comment">// Nested input is an object of { data: [...], skipDuplicates: bool }
-    </span><span class="kw">let </span><span class="kw-2">mut </span>obj: ParsedInputMap = value.try_into()<span class="question-mark">?</span>;
+    </span><span class="kw">let </span><span class="kw-2">mut </span>obj: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = value.try_into()<span class="question-mark">?</span>;
 
-    <span class="kw">let </span>data_list: ParsedInputList = utils::coerce_vec(obj.remove(args::DATA).unwrap());
+    <span class="kw">let </span>data_list: ParsedInputList&lt;<span class="lifetime">&#39;_</span>&gt; = utils::coerce_vec(obj.remove(args::DATA).unwrap());
     <span class="kw">let </span>skip_duplicates: bool = <span class="kw">match </span>obj.remove(args::SKIP_DUPLICATES) {
         <span class="prelude-val">Some</span>(val) =&gt; val.try_into()<span class="question-mark">?</span>,
         <span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,

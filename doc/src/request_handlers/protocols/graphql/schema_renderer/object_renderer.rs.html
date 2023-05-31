@@ -74,31 +74,25 @@
 <a href="#74" id="74">74</a>
 <a href="#75" id="75">75</a>
 <a href="#76" id="76">76</a>
-<a href="#77" id="77">77</a>
-<a href="#78" id="78">78</a>
-<a href="#79" id="79">79</a>
-<a href="#80" id="80">80</a>
-<a href="#81" id="81">81</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
 <span class="attr">#[derive(Debug)]
-</span><span class="kw">pub enum </span>GqlObjectRenderer {
-    Input(InputObjectTypeId),
-    Output(OutputObjectTypeId),
+</span><span class="kw">pub enum </span>GqlObjectRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Input(InputObjectType&lt;<span class="lifetime">&#39;a</span>&gt;),
+    Output(ObjectType&lt;<span class="lifetime">&#39;a</span>&gt;),
 }
 
-<span class="kw">impl </span>Renderer <span class="kw">for </span>GqlObjectRenderer {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Renderer <span class="kw">for </span>GqlObjectRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">fn </span>render(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
         <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self </span>{
-            GqlObjectRenderer::Input(input) =&gt; <span class="self">self</span>.render_input_object(<span class="kw-2">*</span>input, ctx),
-            GqlObjectRenderer::Output(output) =&gt; <span class="self">self</span>.render_output_object(<span class="kw-2">&amp;</span>ctx.query_schema.db[<span class="kw-2">*</span>output], ctx),
+            GqlObjectRenderer::Input(input) =&gt; <span class="self">self</span>.render_input_object(input, ctx),
+            GqlObjectRenderer::Output(output) =&gt; <span class="self">self</span>.render_output_object(output, ctx),
         }
     }
 }
 
-<span class="kw">impl </span>GqlObjectRenderer {
-    <span class="kw">fn </span>render_input_object(<span class="kw-2">&amp;</span><span class="self">self</span>, input_object: InputObjectTypeId, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
-        <span class="kw">let </span>input_object = <span class="kw-2">&amp;</span>ctx.query_schema.db[input_object];
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; GqlObjectRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>render_input_object(<span class="kw-2">&amp;</span><span class="self">self</span>, input_object: <span class="kw-2">&amp;</span>InputObjectType&lt;<span class="lifetime">&#39;a</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
         <span class="kw">if </span>ctx.already_rendered(<span class="kw-2">&amp;</span>input_object.identifier.name()) {
             <span class="kw">return </span><span class="string">&quot;&quot;</span>.into();
         } <span class="kw">else </span>{
@@ -129,12 +123,12 @@
         rendered
     }
 
-    <span class="kw">fn </span>render_output_object(<span class="kw-2">&amp;</span><span class="self">self</span>, output_object: <span class="kw-2">&amp;</span>ObjectType, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
-        <span class="kw">if </span>ctx.already_rendered(<span class="kw-2">&amp;</span>output_object.identifier.name()) {
+    <span class="kw">fn </span>render_output_object(<span class="kw-2">&amp;</span><span class="self">self</span>, output_object: <span class="kw-2">&amp;</span>ObjectType&lt;<span class="lifetime">&#39;a</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
+        <span class="kw">if </span>ctx.already_rendered(<span class="kw-2">&amp;</span>output_object.name()) {
             <span class="kw">return </span><span class="string">&quot;&quot;</span>.into();
         } <span class="kw">else </span>{
             <span class="comment">// This short circuits recursive processing for fields.
-            </span>ctx.mark_as_rendered(output_object.identifier.name())
+            </span>ctx.mark_as_rendered(output_object.name())
         }
 
         <span class="kw">let </span>fields = output_object.get_fields();
@@ -149,11 +143,7 @@
             .map(|f| <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, ctx.indent(), f))
             .collect();
 
-        <span class="kw">let </span>rendered = <span class="macro">format!</span>(
-            <span class="string">&quot;type {} {{\n{}\n}}&quot;</span>,
-            output_object.identifier.name(),
-            indented.join(<span class="string">&quot;\n&quot;</span>)
-        );
+        <span class="kw">let </span>rendered = <span class="macro">format!</span>(<span class="string">&quot;type {} {{\n{}\n}}&quot;</span>, output_object.name(), indented.join(<span class="string">&quot;\n&quot;</span>));
 
         ctx.add_output(rendered.clone());
 

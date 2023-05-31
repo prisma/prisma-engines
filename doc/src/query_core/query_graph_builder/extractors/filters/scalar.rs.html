@@ -632,7 +632,7 @@
         <span class="self">self
     </span>}
 
-    <span class="kw">pub fn </span>parse(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>filter_map: ParsedInputMap) -&gt; QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt; {
+    <span class="kw">pub fn </span>parse(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>filter_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt; {
         <span class="kw">let </span>json_path: <span class="prelude-ty">Option</span>&lt;JsonFilterPath&gt; = <span class="kw">match </span>filter_map.remove(filters::PATH) {
             <span class="prelude-val">Some</span>(v) =&gt; <span class="prelude-val">Some</span>(parse_json_path(v)<span class="question-mark">?</span>),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
@@ -658,7 +658,7 @@
         <span class="prelude-val">Ok</span>(filters)
     }
 
-    <span class="kw">fn </span>parse_scalar(<span class="kw-2">&amp;</span><span class="self">self</span>, filter_name: <span class="kw-2">&amp;</span>str, input: ParsedInputValue) -&gt; QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt; {
+    <span class="kw">fn </span>parse_scalar(<span class="kw-2">&amp;</span><span class="self">self</span>, filter_name: <span class="kw-2">&amp;</span>str, input: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt; {
         <span class="kw">let </span>field = <span class="self">self</span>.field();
 
         <span class="kw">match </span>filter_name {
@@ -667,7 +667,7 @@
                     <span class="comment">// Support for syntax `{ scalarField: { not: null } }` and `{ scalarField: { not: &lt;value&gt; } }`
                     </span>ParsedInputValue::Single(value) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.not_equals(value)]),
                     <span class="kw">_ </span>=&gt; {
-                        <span class="kw">let </span>inner_object: ParsedInputMap = input.try_into()<span class="question-mark">?</span>;
+                        <span class="kw">let </span>inner_object: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = input.try_into()<span class="question-mark">?</span>;
 
                         ScalarFilterParser::new(<span class="self">self</span>.field, !<span class="self">self</span>.reverse()).parse(inner_object)
                     }
@@ -783,7 +783,7 @@
     <span class="kw">fn </span>parse_json(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         filter_name: <span class="kw-2">&amp;</span>str,
-        input: ParsedInputValue,
+        input: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;,
         json_path: <span class="prelude-ty">Option</span>&lt;JsonFilterPath&gt;,
     ) -&gt; QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt; {
         <span class="kw">let </span>field = <span class="self">self</span>.field();
@@ -804,7 +804,7 @@
                         <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[filter])
                     }
                     <span class="kw">_ </span>=&gt; {
-                        <span class="kw">let </span>inner_object: ParsedInputMap = input.try_into()<span class="question-mark">?</span>;
+                        <span class="kw">let </span>inner_object: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = input.try_into()<span class="question-mark">?</span>;
 
                         ScalarFilterParser::new(<span class="self">self</span>.field(), !<span class="self">self</span>.reverse()).parse(inner_object)
                     }
@@ -991,7 +991,7 @@
 
     <span class="kw">fn </span>as_condition_value(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        input: ParsedInputValue,
+        input: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;,
         expect_list_ref: bool,
     ) -&gt; QueryGraphBuilderResult&lt;ConditionValue&gt; {
         <span class="comment">// If we&#39;re parsing a count filter, force the referenced field to be of TypeIdentifier::Int
@@ -1006,7 +1006,7 @@
 
     <span class="kw">fn </span>internal_as_condition_value(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        input: ParsedInputValue,
+        input: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;,
         expect_list_ref: bool,
         expected_type: <span class="kw-2">&amp;</span>TypeIdentifier,
     ) -&gt; QueryGraphBuilderResult&lt;ConditionValue&gt; {
@@ -1049,7 +1049,7 @@
         }
     }
 
-    <span class="kw">fn </span>as_condition_list_value(<span class="kw-2">&amp;</span><span class="self">self</span>, input: ParsedInputValue) -&gt; QueryGraphBuilderResult&lt;ConditionListValue&gt; {
+    <span class="kw">fn </span>as_condition_list_value(<span class="kw-2">&amp;</span><span class="self">self</span>, input: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; QueryGraphBuilderResult&lt;ConditionListValue&gt; {
         <span class="kw">let </span>field = <span class="self">self</span>.field();
 
         <span class="kw">match </span>input {
@@ -1095,14 +1095,14 @@
 
     <span class="kw">fn </span>aggregation_filter&lt;F&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        input: ParsedInputValue,
+        input: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;,
         func: F,
         is_count_filter: bool,
     ) -&gt; QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt;
     <span class="kw">where
         </span>F: Fn(Filter) -&gt; Filter,
     {
-        <span class="kw">let </span>inner_object: ParsedInputMap = input.try_into()<span class="question-mark">?</span>;
+        <span class="kw">let </span>inner_object: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = input.try_into()<span class="question-mark">?</span>;
         <span class="kw">let </span>filters: Vec&lt;Filter&gt; = ScalarFilterParser::new(<span class="self">self</span>.field, <span class="self">self</span>.reverse())
             .set_is_count_filter(is_count_filter)
             .parse(inner_object)<span class="question-mark">?</span>;
@@ -1146,7 +1146,7 @@
     filter
 }
 
-<span class="kw">fn </span>parse_json_path(input: ParsedInputValue) -&gt; QueryGraphBuilderResult&lt;JsonFilterPath&gt; {
+<span class="kw">fn </span>parse_json_path(input: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; QueryGraphBuilderResult&lt;JsonFilterPath&gt; {
     <span class="kw">let </span>path: PrismaValue = input.try_into()<span class="question-mark">?</span>;
 
     <span class="kw">match </span>path {

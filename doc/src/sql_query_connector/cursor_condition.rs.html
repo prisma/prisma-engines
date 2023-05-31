@@ -783,7 +783,7 @@
 /// ```
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build(
     query_arguments: <span class="kw-2">&amp;</span>QueryArguments,
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    model: <span class="kw-2">&amp;</span>Model,
     order_by_defs: <span class="kw-2">&amp;</span>[OrderByDefinition],
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; ConditionTree&lt;<span class="lifetime">&#39;static</span>&gt; {
@@ -996,7 +996,7 @@
 
 <span class="kw">fn </span>order_definitions(
     query_arguments: <span class="kw-2">&amp;</span>QueryArguments,
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    model: <span class="kw-2">&amp;</span>Model,
     order_by_defs: <span class="kw-2">&amp;</span>[OrderByDefinition],
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; Vec&lt;CursorOrderDefinition&gt; {

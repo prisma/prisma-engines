@@ -653,7 +653,7 @@
 };
 <span class="kw">use </span>connector::{Filter, IntoFilter};
 <span class="kw">use </span>itertools::Itertools;
-<span class="kw">use </span>prisma_models::{ModelRef, RelationFieldRef};
+<span class="kw">use </span>prisma_models::{Model, RelationFieldRef};
 <span class="kw">use </span>std::convert::TryInto;
 
 <span class="doccomment">/// Handles nested connect cases.
@@ -664,16 +664,16 @@
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
     parent_node: NodeRef,
     parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
-    value: ParsedInputValue,
-    child_model: <span class="kw-2">&amp;</span>ModelRef,
+    value: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;,
+    child_model: <span class="kw-2">&amp;</span>Model,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="kw">let </span>relation = parent_relation_field.relation();
 
     <span class="comment">// Build all filters upfront.
     </span><span class="kw">let </span>filters: Vec&lt;Filter&gt; = utils::coerce_vec(value)
         .into_iter()
-        .map(|value: ParsedInputValue| {
-            <span class="kw">let </span>value: ParsedInputMap = value.try_into()<span class="question-mark">?</span>;
+        .map(|value: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;| {
+            <span class="kw">let </span>value: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = value.try_into()<span class="question-mark">?</span>;
             extract_unique_filter(value, child_model)
         })
         .collect::&lt;QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt;&gt;()<span class="question-mark">?
@@ -724,7 +724,7 @@
     parent_node: NodeRef,
     parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
     filter: Filter,
-    child_model: <span class="kw-2">&amp;</span>ModelRef,
+    child_model: <span class="kw-2">&amp;</span>Model,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="kw">let </span>expected_connects = filter.size();
     <span class="kw">let </span>child_read_query = utils::read_ids_infallible(child_model.clone(), child_model.primary_identifier(), filter);
@@ -802,7 +802,7 @@
     parent_node: NodeRef,
     parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
     child_filter: Filter,
-    child_model: <span class="kw-2">&amp;</span>ModelRef,
+    child_model: <span class="kw-2">&amp;</span>Model,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="kw">let </span>parent_link = parent_relation_field.linking_fields();
     <span class="kw">let </span>child_link = parent_relation_field.related_field().linking_fields();
@@ -983,7 +983,7 @@
     parent_node: NodeRef,
     parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
     filter: Filter,
-    child_model: <span class="kw-2">&amp;</span>ModelRef,
+    child_model: <span class="kw-2">&amp;</span>Model,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="kw">let </span>parent_is_create = utils::node_is_create(graph, <span class="kw-2">&amp;</span>parent_node);
     <span class="kw">let </span>child_relation_field = parent_relation_field.related_field();
@@ -1011,7 +1011,7 @@
     parent_node: NodeRef,
     parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
     filter: Filter,
-    child_model: <span class="kw-2">&amp;</span>ModelRef,
+    child_model: <span class="kw-2">&amp;</span>Model,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="kw">let </span>child_linking_fields = parent_relation_field.related_field().linking_fields();
 
@@ -1182,7 +1182,7 @@
     parent_node: NodeRef,
     parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
     filter: Filter,
-    child_model: <span class="kw-2">&amp;</span>ModelRef,
+    child_model: <span class="kw-2">&amp;</span>Model,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="kw">let </span>parent_linking_fields = parent_relation_field.linking_fields();
     <span class="kw">let </span>child_linking_fields = parent_relation_field.related_field().linking_fields();

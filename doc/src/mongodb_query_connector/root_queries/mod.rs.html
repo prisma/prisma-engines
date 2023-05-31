@@ -121,7 +121,7 @@
 }
 
 <span class="doccomment">/// We currently only allow a singular ID for Mongo, this helps extracting it.
-</span><span class="kw">fn </span>pick_singular_id(model: <span class="kw-2">&amp;</span>ModelRef) -&gt; ScalarFieldRef {
+</span><span class="kw">fn </span>pick_singular_id(model: <span class="kw-2">&amp;</span>Model) -&gt; ScalarFieldRef {
     model
         .primary_identifier()
         .as_scalar_fields()

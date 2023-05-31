@@ -35,12 +35,12 @@
 <a href="#35" id="35">35</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{query_document::ParsedField, ReadQuery, RelatedRecordsQuery};
-<span class="kw">use </span>prisma_models::{ModelRef, RelationFieldRef};
+<span class="kw">use </span>prisma_models::{Model, RelationFieldRef};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_related(
-    field: ParsedField,
+    field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;,
     parent: RelationFieldRef,
-    model: ModelRef,
+    model: Model,
 ) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
     <span class="kw">let </span>args = extractors::extract_query_args(field.arguments, <span class="kw-2">&amp;</span>model)<span class="question-mark">?</span>;
     <span class="kw">let </span>name = field.name;

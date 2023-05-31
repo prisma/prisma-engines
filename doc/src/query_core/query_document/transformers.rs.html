@@ -226,10 +226,10 @@
 <span class="kw">use </span>std::convert::TryInto;
 <span class="kw">use </span>user_facing_errors::query_engine::validation::ValidationError;
 
-<span class="kw">impl </span>TryFrom&lt;ParsedInputValue&gt; <span class="kw">for </span>PrismaValue {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TryFrom&lt;ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>PrismaValue {
     <span class="kw">type </span>Error = ValidationError;
 
-    <span class="kw">fn </span>try_from(value: ParsedInputValue) -&gt; QueryParserResult&lt;PrismaValue&gt; {
+    <span class="kw">fn </span>try_from(value: ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; QueryParserResult&lt;PrismaValue&gt; {
         <span class="kw">match </span>value {
             ParsedInputValue::Single(val) =&gt; <span class="prelude-val">Ok</span>(val),
             ParsedInputValue::List(values) =&gt; values
@@ -240,7 +240,7 @@
 
             ParsedInputValue::Map(map) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::Object(
                 map.into_iter()
-                    .map(|(k, v)| <span class="prelude-val">Ok</span>((k, v.try_into()<span class="question-mark">?</span>)))
+                    .map(|(k, v)| <span class="prelude-val">Ok</span>((k.into_owned(), v.try_into()<span class="question-mark">?</span>)))
                     .collect::&lt;QueryParserResult&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>,
             )),
 
@@ -251,10 +251,10 @@
     }
 }
 
-<span class="kw">impl </span>TryFrom&lt;ParsedInputValue&gt; <span class="kw">for </span>ParsedInputMap {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TryFrom&lt;ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>ParsedInputMap&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">type </span>Error = ValidationError;
 
-    <span class="kw">fn </span>try_from(value: ParsedInputValue) -&gt; QueryParserResult&lt;ParsedInputMap&gt; {
+    <span class="kw">fn </span>try_from(value: ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; QueryParserResult&lt;ParsedInputMap&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
         <span class="kw">match </span>value {
             ParsedInputValue::Map(val) =&gt; <span class="prelude-val">Ok</span>(val),
             v =&gt; <span class="prelude-val">Err</span>(ValidationError::unexpected_runtime_error(<span class="macro">format!</span>(
@@ -264,10 +264,10 @@
     }
 }
 
-<span class="kw">impl </span>TryFrom&lt;ParsedInputValue&gt; <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;ParsedInputMap&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TryFrom&lt;ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;ParsedInputMap&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
     <span class="kw">type </span>Error = ValidationError;
 
-    <span class="kw">fn </span>try_from(value: ParsedInputValue) -&gt; QueryParserResult&lt;<span class="prelude-ty">Option</span>&lt;ParsedInputMap&gt;&gt; {
+    <span class="kw">fn </span>try_from(value: ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; QueryParserResult&lt;<span class="prelude-ty">Option</span>&lt;ParsedInputMap&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; {
         <span class="kw">match </span>value {
             ParsedInputValue::Single(PrismaValue::Null) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
             ParsedInputValue::Map(val) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(val)),
@@ -278,10 +278,10 @@
     }
 }
 
-<span class="kw">impl </span>TryFrom&lt;ParsedInputValue&gt; <span class="kw">for </span>ParsedInputList {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TryFrom&lt;ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>ParsedInputList&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">type </span>Error = ValidationError;
 
-    <span class="kw">fn </span>try_from(value: ParsedInputValue) -&gt; QueryParserResult&lt;Vec&lt;ParsedInputValue&gt;&gt; {
+    <span class="kw">fn </span>try_from(value: ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; QueryParserResult&lt;Vec&lt;ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; {
         <span class="kw">match </span>value {
             ParsedInputValue::List(vals) =&gt; <span class="prelude-val">Ok</span>(vals),
             v =&gt; <span class="prelude-val">Err</span>(ValidationError::unexpected_runtime_error(<span class="macro">format!</span>(
@@ -291,10 +291,10 @@
     }
 }
 
-<span class="kw">impl </span>TryFrom&lt;ParsedInputValue&gt; <span class="kw">for </span>Vec&lt;PrismaValue&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TryFrom&lt;ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>Vec&lt;PrismaValue&gt; {
     <span class="kw">type </span>Error = ValidationError;
 
-    <span class="kw">fn </span>try_from(value: ParsedInputValue) -&gt; QueryParserResult&lt;Vec&lt;PrismaValue&gt;&gt; {
+    <span class="kw">fn </span>try_from(value: ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; QueryParserResult&lt;Vec&lt;PrismaValue&gt;&gt; {
         <span class="kw">match </span>value {
             ParsedInputValue::List(vals) =&gt; vals
                 .into_iter()
@@ -307,10 +307,10 @@
     }
 }
 
-<span class="kw">impl </span>TryFrom&lt;ParsedInputValue&gt; <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;String&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TryFrom&lt;ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;String&gt; {
     <span class="kw">type </span>Error = ValidationError;
 
-    <span class="kw">fn </span>try_from(value: ParsedInputValue) -&gt; QueryParserResult&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt; {
+    <span class="kw">fn </span>try_from(value: ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; QueryParserResult&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt; {
         <span class="kw">let </span>prisma_value = PrismaValue::try_from(value)<span class="question-mark">?</span>;
 
         <span class="kw">match </span>prisma_value {
@@ -324,10 +324,10 @@
     }
 }
 
-<span class="kw">impl </span>TryFrom&lt;ParsedInputValue&gt; <span class="kw">for </span>OrderBy {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TryFrom&lt;ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>OrderBy {
     <span class="kw">type </span>Error = ValidationError;
 
-    <span class="kw">fn </span>try_from(value: ParsedInputValue) -&gt; QueryParserResult&lt;OrderBy&gt; {
+    <span class="kw">fn </span>try_from(value: ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; QueryParserResult&lt;OrderBy&gt; {
         <span class="kw">match </span>value {
             ParsedInputValue::OrderBy(ord) =&gt; <span class="prelude-val">Ok</span>(ord),
             v =&gt; <span class="prelude-val">Err</span>(ValidationError::unexpected_runtime_error(<span class="macro">format!</span>(
@@ -337,10 +337,10 @@
     }
 }
 
-<span class="kw">impl </span>TryFrom&lt;ParsedInputValue&gt; <span class="kw">for </span>ScalarFieldRef {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TryFrom&lt;ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>ScalarFieldRef {
     <span class="kw">type </span>Error = ValidationError;
 
-    <span class="kw">fn </span>try_from(value: ParsedInputValue) -&gt; QueryParserResult&lt;ScalarFieldRef&gt; {
+    <span class="kw">fn </span>try_from(value: ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; QueryParserResult&lt;ScalarFieldRef&gt; {
         <span class="kw">match </span>value {
             ParsedInputValue::ScalarField(f) =&gt; <span class="prelude-val">Ok</span>(f),
             v =&gt; <span class="prelude-val">Err</span>(ValidationError::unexpected_runtime_error(<span class="macro">format!</span>(
@@ -350,10 +350,10 @@
     }
 }
 
-<span class="kw">impl </span>TryFrom&lt;ParsedInputValue&gt; <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;f64&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TryFrom&lt;ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;f64&gt; {
     <span class="kw">type </span>Error = ValidationError;
 
-    <span class="kw">fn </span>try_from(value: ParsedInputValue) -&gt; QueryParserResult&lt;<span class="prelude-ty">Option</span>&lt;f64&gt;&gt; {
+    <span class="kw">fn </span>try_from(value: ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; QueryParserResult&lt;<span class="prelude-ty">Option</span>&lt;f64&gt;&gt; {
         <span class="kw">let </span>prisma_value = PrismaValue::try_from(value)<span class="question-mark">?</span>;
 
         <span class="kw">match </span>prisma_value {
@@ -366,10 +366,10 @@
     }
 }
 
-<span class="kw">impl </span>TryFrom&lt;ParsedInputValue&gt; <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;bool&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TryFrom&lt;ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;bool&gt; {
     <span class="kw">type </span>Error = ValidationError;
 
-    <span class="kw">fn </span>try_from(value: ParsedInputValue) -&gt; QueryParserResult&lt;<span class="prelude-ty">Option</span>&lt;bool&gt;&gt; {
+    <span class="kw">fn </span>try_from(value: ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; QueryParserResult&lt;<span class="prelude-ty">Option</span>&lt;bool&gt;&gt; {
         <span class="kw">let </span>prisma_value = PrismaValue::try_from(value)<span class="question-mark">?</span>;
 
         <span class="kw">match </span>prisma_value {
@@ -382,10 +382,10 @@
     }
 }
 
-<span class="kw">impl </span>TryFrom&lt;ParsedInputValue&gt; <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;DateTime&lt;FixedOffset&gt;&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TryFrom&lt;ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;DateTime&lt;FixedOffset&gt;&gt; {
     <span class="kw">type </span>Error = ValidationError;
 
-    <span class="kw">fn </span>try_from(value: ParsedInputValue) -&gt; QueryParserResult&lt;<span class="prelude-ty">Option</span>&lt;DateTime&lt;FixedOffset&gt;&gt;&gt; {
+    <span class="kw">fn </span>try_from(value: ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; QueryParserResult&lt;<span class="prelude-ty">Option</span>&lt;DateTime&lt;FixedOffset&gt;&gt;&gt; {
         <span class="kw">let </span>prisma_value = PrismaValue::try_from(value)<span class="question-mark">?</span>;
 
         <span class="kw">match </span>prisma_value {
@@ -398,10 +398,10 @@
     }
 }
 
-<span class="kw">impl </span>TryFrom&lt;ParsedInputValue&gt; <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;i64&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TryFrom&lt;ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;i64&gt; {
     <span class="kw">type </span>Error = ValidationError;
 
-    <span class="kw">fn </span>try_from(value: ParsedInputValue) -&gt; QueryParserResult&lt;<span class="prelude-ty">Option</span>&lt;i64&gt;&gt; {
+    <span class="kw">fn </span>try_from(value: ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; QueryParserResult&lt;<span class="prelude-ty">Option</span>&lt;i64&gt;&gt; {
         <span class="kw">let </span>prisma_value = PrismaValue::try_from(value)<span class="question-mark">?</span>;
 
         <span class="kw">match </span>prisma_value {
@@ -414,10 +414,10 @@
     }
 }
 
-<span class="kw">impl </span>TryFrom&lt;ParsedInputValue&gt; <span class="kw">for </span>bool {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TryFrom&lt;ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>bool {
     <span class="kw">type </span>Error = ValidationError;
 
-    <span class="kw">fn </span>try_from(value: ParsedInputValue) -&gt; QueryParserResult&lt;bool&gt; {
+    <span class="kw">fn </span>try_from(value: ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; QueryParserResult&lt;bool&gt; {
         <span class="kw">let </span>prisma_value = PrismaValue::try_from(value)<span class="question-mark">?</span>;
 
         <span class="kw">match </span>prisma_value {

@@ -207,6 +207,7 @@
 <a href="#207" id="207">207</a>
 <a href="#208" id="208">208</a>
 <a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>enum_renderer;
 <span class="kw">mod </span>field_renderer;
 <span class="kw">mod </span>object_renderer;
@@ -253,11 +254,11 @@
 
     <span class="doccomment">/// The child objects to render next. Rendering is considered complete when
     /// this is empty.
-    </span>next_pass: Vec&lt;Box&lt;<span class="kw">dyn </span>Renderer + <span class="lifetime">&#39;a</span>&gt;&gt;,
+    </span>next_pass: Vec&lt;Box&lt;<span class="kw">dyn </span>Renderer&lt;<span class="lifetime">&#39;a</span>&gt; + <span class="lifetime">&#39;a</span>&gt;&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; RenderContext&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub fn </span>new(query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema) -&gt; <span class="self">Self </span>{
+    <span class="kw">fn </span>new(query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema) -&gt; <span class="self">Self </span>{
         RenderContext {
             query_schema,
             schema: Default::default(),
@@ -267,19 +268,19 @@
         }
     }
 
-    <span class="kw">pub fn </span>finalize(<span class="self">self</span>) -&gt; (DmmfSchema, DmmfOperationMappings) {
+    <span class="kw">fn </span>finalize(<span class="self">self</span>) -&gt; (DmmfSchema, DmmfOperationMappings) {
         (<span class="self">self</span>.schema, <span class="self">self</span>.mappings)
     }
 
-    <span class="kw">pub fn </span>already_rendered(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_key: <span class="kw-2">&amp;</span>Identifier) -&gt; bool {
+    <span class="kw">fn </span>already_rendered(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_key: <span class="kw-2">&amp;</span>Identifier) -&gt; bool {
         <span class="self">self</span>.rendered.contains(cache_key)
     }
 
-    <span class="kw">pub fn </span>mark_as_rendered(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache_key: Identifier) {
+    <span class="kw">fn </span>mark_as_rendered(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache_key: Identifier) {
         <span class="self">self</span>.rendered.insert(cache_key);
     }
 
-    <span class="kw">pub fn </span>add_enum(<span class="kw-2">&amp;mut </span><span class="self">self</span>, identifier: Identifier, dmmf_enum: DmmfEnum) {
+    <span class="kw">fn </span>add_enum(<span class="kw-2">&amp;mut </span><span class="self">self</span>, identifier: Identifier, dmmf_enum: DmmfEnum) {
         <span class="comment">// Enums from the namespace
         </span><span class="kw">match </span><span class="self">self</span>.schema.enum_types.entry(identifier.namespace().to_owned()) {
             Entry::Occupied(<span class="kw-2">mut </span>v) =&gt; v.get_mut().push(dmmf_enum),
@@ -291,7 +292,7 @@
         <span class="self">self</span>.mark_as_rendered(identifier);
     }
 
-    <span class="kw">pub fn </span>add_input_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, identifier: Identifier, input_type: DmmfInputType) {
+    <span class="kw">fn </span>add_input_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, identifier: Identifier, input_type: DmmfInputType) {
         <span class="comment">// Input types from the namespace
         </span><span class="kw">match </span><span class="self">self</span>.schema.input_object_types.entry(identifier.namespace().to_owned()) {
             Entry::Occupied(<span class="kw-2">mut </span>v) =&gt; v.get_mut().push(input_type),
@@ -303,7 +304,7 @@
         <span class="self">self</span>.mark_as_rendered(identifier);
     }
 
-    <span class="kw">pub fn </span>add_output_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, identifier: Identifier, output_type: DmmfOutputType) {
+    <span class="kw">fn </span>add_output_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, identifier: Identifier, output_type: DmmfOutputType) {
         <span class="comment">// Output types from the namespace
         </span><span class="kw">match </span><span class="self">self</span>.schema.output_object_types.entry(identifier.namespace().to_owned()) {
             Entry::Occupied(<span class="kw-2">mut </span>v) =&gt; v.get_mut().push(output_type),
@@ -315,7 +316,7 @@
         <span class="self">self</span>.mark_as_rendered(identifier);
     }
 
-    <span class="kw">pub fn </span>add_field_ref_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, identifier: Identifier, ref_type: DmmfFieldRefType) {
+    <span class="kw">fn </span>add_field_ref_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, identifier: Identifier, ref_type: DmmfFieldRefType) {
         <span class="comment">// Field ref types from the namespace
         </span><span class="kw">match </span><span class="self">self</span>.schema.field_ref_types.entry(identifier.namespace().to_owned()) {
             Entry::Occupied(<span class="kw-2">mut </span>v) =&gt; v.get_mut().push(ref_type),
@@ -329,7 +330,8 @@
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>add_mapping(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: String, operation: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>QueryInfo&gt;) {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(info) = operation {
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>model) = info.model {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(model) = info.model {
+                <span class="kw">let </span>model = <span class="self">self</span>.query_schema.internal_data_model.walk(model);
                 <span class="kw">let </span>model_name = model.name();
                 <span class="kw">let </span>tag_str = info.tag.to_string();
                 <span class="kw">let </span>model_op = <span class="self">self
@@ -358,7 +360,7 @@
         }
     }
 
-    <span class="kw">fn </span>mark_to_be_rendered(<span class="kw-2">&amp;mut </span><span class="self">self</span>, into_renderer: <span class="kw-2">&amp;</span><span class="kw">dyn </span>AsRenderer&lt;<span class="lifetime">&#39;a</span>&gt;) {
+    <span class="kw">fn </span>mark_to_be_rendered(<span class="kw-2">&amp;mut </span><span class="self">self</span>, into_renderer: <span class="kw-2">&amp;</span>(<span class="kw">impl </span>AsRenderer&lt;<span class="lifetime">&#39;a</span>&gt; + <span class="lifetime">&#39;a</span>)) {
         <span class="kw">if </span>!into_renderer.is_already_rendered(<span class="self">self</span>) {
             <span class="kw">let </span>renderer: Box&lt;<span class="kw">dyn </span>Renderer&gt; = into_renderer.as_renderer();
             <span class="self">self</span>.next_pass.push(renderer)
@@ -366,19 +368,19 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>Renderer {
-    <span class="kw">fn </span>render(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>RenderContext);
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>Renderer&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>render(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>RenderContext&lt;<span class="lifetime">&#39;a</span>&gt;);
 }
 
 <span class="kw">trait </span>AsRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>as_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>Renderer + <span class="lifetime">&#39;a</span>&gt;;
+    <span class="kw">fn </span>as_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>Renderer&lt;<span class="lifetime">&#39;a</span>&gt; + <span class="lifetime">&#39;a</span>&gt;;
 
     <span class="doccomment">/// Returns whether the item still needs to be rendered.
     </span><span class="kw">fn </span>is_already_rendered(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>RenderContext&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool;
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AsRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema {
-    <span class="kw">fn </span>as_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>Renderer + <span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>as_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>Renderer&lt;<span class="lifetime">&#39;a</span>&gt; + <span class="lifetime">&#39;a</span>&gt; {
         Box::new(DmmfSchemaRenderer::new(<span class="self">self</span>))
     }
 
@@ -387,9 +389,9 @@
     </span>}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AsRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>EnumType {
-    <span class="kw">fn </span>as_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>Renderer&gt; {
-        Box::new(DmmfEnumRenderer::new(<span class="self">self</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AsRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>EnumType {
+    <span class="kw">fn </span>as_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>Renderer&lt;<span class="lifetime">&#39;a</span>&gt; + <span class="lifetime">&#39;a</span>&gt; {
+        Box::new(DmmfEnumRenderer::new(<span class="self">self</span>.clone()))
     }
 
     <span class="kw">fn </span>is_already_rendered(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>RenderContext) -&gt; bool {
@@ -397,23 +399,23 @@
     }
 }
 
-<span class="kw">impl </span>AsRenderer&lt;<span class="lifetime">&#39;_</span>&gt; <span class="kw">for </span>InputObjectTypeId {
-    <span class="kw">fn </span>as_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>Renderer&gt; {
-        Box::new(DmmfObjectRenderer::Input(<span class="kw-2">*</span><span class="self">self</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AsRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>InputObjectType&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>as_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>Renderer&lt;<span class="lifetime">&#39;a</span>&gt; + <span class="lifetime">&#39;a</span>&gt; {
+        Box::new(DmmfObjectRenderer::Input(<span class="self">self</span>.clone()))
     }
 
     <span class="kw">fn </span>is_already_rendered(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>RenderContext) -&gt; bool {
-        ctx.already_rendered(<span class="kw-2">&amp;</span>ctx.query_schema.db[<span class="kw-2">*</span><span class="self">self</span>].identifier)
+        ctx.already_rendered(<span class="kw-2">&amp;</span><span class="self">self</span>.identifier)
     }
 }
 
-<span class="kw">impl </span>AsRenderer&lt;<span class="lifetime">&#39;_</span>&gt; <span class="kw">for </span>OutputObjectTypeId {
-    <span class="kw">fn </span>as_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>Renderer&gt; {
-        Box::new(DmmfObjectRenderer::Output(<span class="kw-2">*</span><span class="self">self</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AsRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>ObjectType&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>as_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>Renderer&lt;<span class="lifetime">&#39;a</span>&gt; + <span class="lifetime">&#39;a</span>&gt; {
+        Box::new(DmmfObjectRenderer::Output(<span class="self">self</span>.clone()))
     }
 
     <span class="kw">fn </span>is_already_rendered(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>RenderContext) -&gt; bool {
-        ctx.already_rendered(<span class="kw-2">&amp;</span>ctx.query_schema.db[<span class="kw-2">*</span><span class="self">self</span>].identifier)
+        ctx.already_rendered(<span class="self">self</span>.identifier())
     }
 }
 </code></pre></div>

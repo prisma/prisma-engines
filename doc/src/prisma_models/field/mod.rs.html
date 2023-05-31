@@ -247,6 +247,14 @@
 <a href="#247" id="247">247</a>
 <a href="#248" id="248">248</a>
 <a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>composite;
 <span class="kw">mod </span>relation;
 <span class="kw">mod </span>scalar;
@@ -255,7 +263,7 @@
 <span class="kw">pub use </span>relation::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>scalar::<span class="kw-2">*</span>;
 
-<span class="kw">use crate</span>::{ast, parent_container::ParentContainer, ModelRef};
+<span class="kw">use crate</span>::{ast, parent_container::ParentContainer, Model};
 <span class="kw">use </span>psl::parser_database::{walkers, ScalarType};
 <span class="kw">use </span>std::{borrow::Cow, hash::Hash};
 
@@ -267,6 +275,14 @@
 }
 
 <span class="kw">impl </span>Field {
+    <span class="kw">pub fn </span>borrowed_name&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>psl::ValidatedSchema) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            Field::Relation(rf) =&gt; schema.db.walk(rf.id).name(),
+            Field::Scalar(sf) =&gt; sf.borrowed_name(schema),
+            Field::Composite(cf) =&gt; cf.borrowed_name(schema),
+        }
+    }
+
     <span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="kw">match </span><span class="self">self </span>{
             Field::Scalar(<span class="kw-2">ref </span>sf) =&gt; sf.name(),
@@ -341,7 +357,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ModelRef&gt; {
+    <span class="kw">pub fn </span>model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Model&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Scalar(sf) =&gt; sf.container().as_model(),
             <span class="self">Self</span>::Relation(rf) =&gt; <span class="prelude-val">Some</span>(rf.model()),
@@ -382,7 +398,7 @@
     }
 }
 
-<span class="attr">#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+<span class="attr">#[derive(Clone, Debug, PartialEq, Eq, Hash, Copy)]
 #[allow(clippy::upper_case_acronyms)]
 </span><span class="kw">pub enum </span>TypeIdentifier {
     String,

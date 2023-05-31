@@ -630,7 +630,7 @@
             .unwrap(),
 
         (<span class="kw-2">&amp;</span>Method::GET, <span class="string">&quot;/sdl&quot;</span>) =&gt; {
-            <span class="kw">let </span>schema = render_graphql_schema(cx.query_schema().clone());
+            <span class="kw">let </span>schema = render_graphql_schema(cx.query_schema());
 
             Response::builder()
                 .status(StatusCode::OK)

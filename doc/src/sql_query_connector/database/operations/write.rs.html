@@ -464,13 +464,6 @@
 <a href="#464" id="464">464</a>
 <a href="#465" id="465">465</a>
 <a href="#466" id="466">466</a>
-<a href="#467" id="467">467</a>
-<a href="#468" id="468">468</a>
-<a href="#469" id="469">469</a>
-<a href="#470" id="470">470</a>
-<a href="#471" id="471">471</a>
-<a href="#472" id="472">472</a>
-<a href="#473" id="473">473</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::filter_conversion::AliasedCondition;
 <span class="kw">use </span><span class="kw">crate</span>::query_builder::write::{build_update_and_set_query, chunk_update_with_ids};
 <span class="kw">use crate</span>::{
@@ -537,7 +530,7 @@
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>create_record(
     conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
     sql_family: <span class="kw-2">&amp;</span>SqlFamily,
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    model: <span class="kw-2">&amp;</span>Model,
     <span class="kw-2">mut </span>args: WriteArgs,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;SelectionResult&gt; {
@@ -627,7 +620,7 @@
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>create_records(
     conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    model: <span class="kw-2">&amp;</span>Model,
     args: Vec&lt;WriteArgs&gt;,
     skip_duplicates: bool,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
@@ -643,14 +636,7 @@
     <span class="attr">#[allow(clippy::mutable_key_type)]
     </span><span class="kw">let </span>affected_fields: HashSet&lt;ScalarFieldRef&gt; = fields
         .into_iter()
-        .map(|dsfn| {
-            model
-                .fields()
-                .scalar()
-                .into_iter()
-                .find(|sf| sf.db_name() == dsfn.deref())
-                .unwrap()
-        })
+        .map(|dsfn| model.fields().scalar().find(|sf| sf.db_name() == dsfn.deref()).unwrap())
         .collect();
 
     <span class="kw">if </span>affected_fields.is_empty() {
@@ -665,7 +651,7 @@
 </span><span class="attr">#[allow(clippy::mutable_key_type)]
 </span><span class="kw">async fn </span>create_many_nonempty(
     conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    model: <span class="kw-2">&amp;</span>Model,
     args: Vec&lt;WriteArgs&gt;,
     skip_duplicates: bool,
     affected_fields: HashSet&lt;ScalarFieldRef&gt;,
@@ -753,7 +739,7 @@
 <span class="doccomment">/// Creates many empty (all default values) rows.
 </span><span class="kw">async fn </span>create_many_empty(
     conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    model: <span class="kw-2">&amp;</span>Model,
     num_records: usize,
     skip_duplicates: bool,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
@@ -773,7 +759,7 @@
 /// operation.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>update_record(
     conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    model: <span class="kw-2">&amp;</span>Model,
     record_filter: RecordFilter,
     args: WriteArgs,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
@@ -797,7 +783,7 @@
 //  UPDATE &quot;public&quot;.&quot;User&quot; SET &quot;name&quot; = $1 WHERE &quot;public&quot;.&quot;User&quot;.&quot;id&quot; IN ($2,$3,$4,$5,$6,$7,$8,$9,$10,$11) AND &quot;public&quot;.&quot;User&quot;.&quot;age&quot; &gt; $1
 </span><span class="kw">async fn </span>update_records_from_ids_and_filter(
     conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    model: <span class="kw-2">&amp;</span>Model,
     record_filter: RecordFilter,
     args: WriteArgs,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
@@ -830,7 +816,7 @@
 //  UPDATE &quot;public&quot;.&quot;User&quot; SET &quot;name&quot; = $1 WHERE &quot;public&quot;.&quot;User&quot;.&quot;age&quot; &gt; $1
 </span><span class="kw">async fn </span>update_records_from_filter(
     conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    model: <span class="kw-2">&amp;</span>Model,
     record_filter: RecordFilter,
     args: WriteArgs,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
@@ -850,7 +836,7 @@
 /// Otherwise it used the passed down arguments to update.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>update_records(
     conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    model: <span class="kw-2">&amp;</span>Model,
     record_filter: RecordFilter,
     args: WriteArgs,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
@@ -870,7 +856,7 @@
 <span class="doccomment">/// Delete multiple records in `conn`, defined in the `Filter`. Result is the number of items deleted.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>delete_records(
     conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    model: <span class="kw-2">&amp;</span>Model,
     record_filter: RecordFilter,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;usize&gt; {

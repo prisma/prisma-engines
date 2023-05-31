@@ -138,24 +138,30 @@
 <a href="#138" id="138">138</a>
 <a href="#139" id="139">139</a>
 <a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Parsed query document tree. Naming is WIP.
 //! Structures represent parsed and validated parts of the query document, used by the query builders.
 </span><span class="kw">use </span><span class="kw">crate</span>::QueryParserResult;
 <span class="kw">use </span>indexmap::IndexMap;
 <span class="kw">use </span>prisma_models::{OrderBy, PrismaValue, ScalarFieldRef};
-<span class="kw">use </span>schema::{ObjectTag, OutputFieldId};
-<span class="kw">use </span>std::ops::{Deref, DerefMut};
+<span class="kw">use </span>schema::ObjectTag;
+<span class="kw">use </span>std::{
+    borrow::Cow,
+    ops::{Deref, DerefMut},
+};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>ParsedInputList = Vec&lt;ParsedInputValue&gt;;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>ParsedInputList&lt;<span class="lifetime">&#39;a</span>&gt; = Vec&lt;ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;&gt;;
 
 <span class="attr">#[derive(Debug, Clone, Default, PartialEq)]
-</span><span class="kw">pub struct </span>ParsedInputMap {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) tag: <span class="prelude-ty">Option</span>&lt;ObjectTag&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) map: IndexMap&lt;String, ParsedInputValue&gt;,
+</span><span class="kw">pub struct </span>ParsedInputMap&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) tag: <span class="prelude-ty">Option</span>&lt;ObjectTag&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) map: IndexMap&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
 
-<span class="kw">impl </span>ParsedInputMap {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_tag(<span class="kw-2">&amp;mut </span><span class="self">self</span>, tag: <span class="prelude-ty">Option</span>&lt;ObjectTag&gt;) {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ParsedInputMap&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_tag(<span class="kw-2">&amp;mut </span><span class="self">self</span>, tag: <span class="prelude-ty">Option</span>&lt;ObjectTag&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) {
         <span class="self">self</span>.tag = tag;
     }
 
@@ -172,14 +178,14 @@
     }
 }
 
-<span class="kw">impl </span>From&lt;IndexMap&lt;String, ParsedInputValue&gt;&gt; <span class="kw">for </span>ParsedInputMap {
-    <span class="kw">fn </span>from(map: IndexMap&lt;String, ParsedInputValue&gt;) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;IndexMap&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; <span class="kw">for </span>ParsedInputMap&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(map: IndexMap&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{ tag: <span class="prelude-val">None</span>, map }
     }
 }
 
-<span class="kw">impl </span>FromIterator&lt;(String, ParsedInputValue)&gt; <span class="kw">for </span>ParsedInputMap {
-    <span class="kw">fn </span>from_iter&lt;T: IntoIterator&lt;Item = (String, ParsedInputValue)&gt;&gt;(iter: T) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FromIterator&lt;(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;)&gt; <span class="kw">for </span>ParsedInputMap&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from_iter&lt;T: IntoIterator&lt;Item = (Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;)&gt;&gt;(iter: T) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             tag: <span class="prelude-val">None</span>,
             map: iter.into_iter().collect(),
@@ -187,65 +193,65 @@
     }
 }
 
-<span class="kw">impl </span>IntoIterator <span class="kw">for </span>ParsedInputMap {
-    <span class="kw">type </span>Item = (String, ParsedInputValue);
-    <span class="kw">type </span>IntoIter = indexmap::map::IntoIter&lt;String, ParsedInputValue&gt;;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoIterator <span class="kw">for </span>ParsedInputMap&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = (Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;);
+    <span class="kw">type </span>IntoIter = indexmap::map::IntoIter&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;&gt;;
 
     <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
         <span class="self">self</span>.map.into_iter()
     }
 }
 
-<span class="kw">impl </span>Deref <span class="kw">for </span>ParsedInputMap {
-    <span class="kw">type </span>Target = IndexMap&lt;String, ParsedInputValue&gt;;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Deref <span class="kw">for </span>ParsedInputMap&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Target = IndexMap&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;&gt;;
 
     <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
         <span class="kw-2">&amp;</span><span class="self">self</span>.map
     }
 }
 
-<span class="kw">impl </span>DerefMut <span class="kw">for </span>ParsedInputMap {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DerefMut <span class="kw">for </span>ParsedInputMap&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">fn </span>deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Target {
         <span class="kw-2">&amp;mut </span><span class="self">self</span>.map
     }
 }
 
 <span class="attr">#[derive(Debug, Clone)]
-</span><span class="kw">pub struct </span>ParsedObject {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) fields: Vec&lt;FieldPair&gt;,
+</span><span class="kw">pub struct </span>ParsedObject&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) fields: Vec&lt;FieldPair&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
 
 <span class="attr">#[derive(Debug, Clone)]
-</span><span class="kw">pub struct </span>FieldPair {
+</span><span class="kw">pub struct </span>FieldPair&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="doccomment">/// The field parsed from the incoming query.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) parsed_field: ParsedField,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) parsed_field: ParsedField&lt;<span class="lifetime">&#39;a</span>&gt;,
 
     <span class="doccomment">/// The schema field that the parsed field corresponds to.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) schema_field: OutputFieldId,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) schema_field: schema::OutputField&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="attr">#[derive(Debug, Clone)]
-</span><span class="kw">pub struct </span>ParsedField {
+<span class="attr">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>ParsedField&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) name: String,
     <span class="kw">pub</span>(<span class="kw">crate</span>) alias: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) arguments: Vec&lt;ParsedArgument&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) nested_fields: <span class="prelude-ty">Option</span>&lt;ParsedObject&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) arguments: Vec&lt;ParsedArgument&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) nested_fields: <span class="prelude-ty">Option</span>&lt;ParsedObject&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
 
-<span class="kw">impl </span>ParsedField {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>where_arg(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; QueryParserResult&lt;<span class="prelude-ty">Option</span>&lt;ParsedInputMap&gt;&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ParsedField&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>where_arg(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; QueryParserResult&lt;<span class="prelude-ty">Option</span>&lt;ParsedInputMap&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; {
         <span class="self">self</span>.look_arg(<span class="string">&quot;where&quot;</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_arg(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; QueryParserResult&lt;<span class="prelude-ty">Option</span>&lt;ParsedInputMap&gt;&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_arg(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; QueryParserResult&lt;<span class="prelude-ty">Option</span>&lt;ParsedInputMap&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; {
         <span class="self">self</span>.look_arg(<span class="string">&quot;create&quot;</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update_arg(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; QueryParserResult&lt;<span class="prelude-ty">Option</span>&lt;ParsedInputMap&gt;&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update_arg(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; QueryParserResult&lt;<span class="prelude-ty">Option</span>&lt;ParsedInputMap&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; {
         <span class="self">self</span>.look_arg(<span class="string">&quot;update&quot;</span>)
     }
 
-    <span class="kw">fn </span>look_arg(<span class="kw-2">&amp;mut </span><span class="self">self</span>, arg_name: <span class="kw-2">&amp;</span>str) -&gt; QueryParserResult&lt;<span class="prelude-ty">Option</span>&lt;ParsedInputMap&gt;&gt; {
+    <span class="kw">fn </span>look_arg(<span class="kw-2">&amp;mut </span><span class="self">self</span>, arg_name: <span class="kw-2">&amp;</span>str) -&gt; QueryParserResult&lt;<span class="prelude-ty">Option</span>&lt;ParsedInputMap&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; {
         <span class="self">self</span>.arguments
             .lookup(arg_name)
             .as_ref()
@@ -255,26 +261,26 @@
 }
 
 <span class="attr">#[derive(Debug, Clone)]
-</span><span class="kw">pub struct </span>ParsedArgument {
+</span><span class="kw">pub struct </span>ParsedArgument&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) name: String,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) value: ParsedInputValue,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) value: ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
 <span class="attr">#[derive(Debug, Clone, PartialEq)]
-</span><span class="kw">pub enum </span>ParsedInputValue {
+</span><span class="kw">pub enum </span>ParsedInputValue&lt;<span class="lifetime">&#39;a</span>&gt; {
     Single(PrismaValue),
     OrderBy(OrderBy),
     ScalarField(ScalarFieldRef),
-    List(ParsedInputList),
-    Map(ParsedInputMap),
+    List(ParsedInputList&lt;<span class="lifetime">&#39;a</span>&gt;),
+    Map(ParsedInputMap&lt;<span class="lifetime">&#39;a</span>&gt;),
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>ArgumentListLookup {
-    <span class="kw">fn </span>lookup(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedArgument&gt;;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>ArgumentListLookup&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>lookup(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedArgument&lt;<span class="lifetime">&#39;a</span>&gt;&gt;;
 }
 
-<span class="kw">impl </span>ArgumentListLookup <span class="kw">for </span>Vec&lt;ParsedArgument&gt; {
-    <span class="kw">fn </span>lookup(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedArgument&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ArgumentListLookup&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>Vec&lt;ParsedArgument&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">fn </span>lookup(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedArgument&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
         <span class="self">self</span>.iter().position(|arg| arg.name == name).map(|pos| <span class="self">self</span>.remove(pos))
     }
 }

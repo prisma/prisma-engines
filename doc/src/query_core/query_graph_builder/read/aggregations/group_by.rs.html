@@ -172,11 +172,11 @@
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{query_document::ParsedField, AggregateRecordsQuery, ArgumentListLookup, ParsedInputValue, ReadQuery};
 <span class="kw">use </span>connector::Filter;
-<span class="kw">use </span>prisma_models::{ModelRef, OrderBy, ScalarFieldRef};
+<span class="kw">use </span>prisma_models::{Model, OrderBy, ScalarFieldRef};
 <span class="kw">use </span>schema::constants::args;
 <span class="kw">use </span>std::convert::TryInto;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>group_by(<span class="kw-2">mut </span>field: ParsedField, model: ModelRef) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>group_by(<span class="kw-2">mut </span>field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;, model: Model) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
     <span class="kw">let </span>name = field.name;
     <span class="kw">let </span>alias = field.alias;
     <span class="kw">let </span>model = model;
@@ -321,7 +321,7 @@
     }
 }
 
-<span class="kw">fn </span>extract_grouping(value: ParsedInputValue) -&gt; QueryGraphBuilderResult&lt;Vec&lt;ScalarFieldRef&gt;&gt; {
+<span class="kw">fn </span>extract_grouping(value: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; QueryGraphBuilderResult&lt;Vec&lt;ScalarFieldRef&gt;&gt; {
     <span class="kw">match </span>value {
         ParsedInputValue::ScalarField(field) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field]),
 

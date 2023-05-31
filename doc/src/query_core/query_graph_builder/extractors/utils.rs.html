@@ -24,25 +24,25 @@
 <a href="#24" id="24">24</a>
 <a href="#25" id="25">25</a>
 <a href="#26" id="26">26</a>
-</pre><pre class="rust"><code><span class="kw">use </span>prisma_models::{ModelRef, ScalarFieldRef};
+</pre><pre class="rust"><code><span class="kw">use </span>prisma_models::{Model, ScalarFieldRef};
 
 <span class="doccomment">/// Attempts to resolve a field name to a compound field.
-</span><span class="kw">pub fn </span>resolve_compound_field(name: <span class="kw-2">&amp;</span>str, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;ScalarFieldRef&gt;&gt; {
+</span><span class="kw">pub fn </span>resolve_compound_field(name: <span class="kw-2">&amp;</span>str, model: <span class="kw-2">&amp;</span>Model) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;ScalarFieldRef&gt;&gt; {
     resolve_compound_id(name, model).or_else(|| resolve_index_fields(name, model))
 }
 
 <span class="doccomment">/// Attempts to match a given name to the (schema) name of a compound id field on the model.
-</span><span class="kw">pub fn </span>resolve_compound_id(name: <span class="kw-2">&amp;</span>str, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;ScalarFieldRef&gt;&gt; {
+</span><span class="kw">pub fn </span>resolve_compound_id(name: <span class="kw-2">&amp;</span>str, model: <span class="kw-2">&amp;</span>Model) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;ScalarFieldRef&gt;&gt; {
     model.fields().compound_id().and_then(|pk| {
         (name == schema::compound_id_field_name(model.walker().primary_key().unwrap())).then(|| pk.collect())
     })
 }
 
 <span class="doccomment">/// Attempts to match a given name to the (schema) name of a compound indexes on the model and returns the first match.
-</span><span class="kw">pub fn </span>resolve_index_fields(name: <span class="kw-2">&amp;</span>str, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;ScalarFieldRef&gt;&gt; {
+</span><span class="kw">pub fn </span>resolve_index_fields(name: <span class="kw-2">&amp;</span>str, model: <span class="kw-2">&amp;</span>Model) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;ScalarFieldRef&gt;&gt; {
     model
         .unique_indexes()
-        .find(|index| schema::compound_index_field_name(index) == name)
+        .find(|index| schema::compound_index_field_name(<span class="kw-2">*</span>index) == name)
         .map(|index| {
             index
                 .fields()

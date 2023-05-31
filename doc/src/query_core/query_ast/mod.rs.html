@@ -117,7 +117,7 @@
 
 <span class="kw">use </span><span class="kw">crate</span>::ToGraphviz;
 <span class="kw">use </span>connector::filter::Filter;
-<span class="kw">use </span>prisma_models::{FieldSelection, ModelRef, SelectionResult};
+<span class="kw">use </span>prisma_models::{FieldSelection, Model, SelectionResult};
 
 <span class="attr">#[derive(Debug, Clone)]
 #[allow(clippy::large_enum_variant)]
@@ -134,7 +134,7 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModelRef {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Model {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Read(rq) =&gt; rq.model(),
             <span class="self">Self</span>::Write(wq) =&gt; wq.model(),

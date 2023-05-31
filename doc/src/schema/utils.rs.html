@@ -33,11 +33,17 @@
 <a href="#33" id="33">33</a>
 <a href="#34" id="34">34</a>
 <a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
+<a href="#38" id="38">38</a>
+<a href="#39" id="39">39</a>
+<a href="#40" id="40">40</a>
+<a href="#41" id="41">41</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
 <span class="doccomment">/// Capitalizes first character.
 /// Assumes 1-byte characters.
-</span><span class="kw">pub fn </span>capitalize(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">impl </span>fmt::Display + <span class="lifetime">&#39;_ </span>{
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>capitalize(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">impl </span>fmt::Display + <span class="lifetime">&#39;_ </span>{
     <span class="kw">struct </span>Capitalized&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str);
 
     <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Capitalized&lt;<span class="lifetime">&#39;_</span>&gt; {
@@ -61,7 +67,13 @@
 }
 
 <span class="doccomment">/// Compute the name of a scalar filter input.
-</span><span class="kw">pub fn </span>scalar_filter_name(typ: <span class="kw-2">&amp;</span>str, list: bool, nullable: bool, nested: bool, include_aggregates: bool) -&gt; String {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>scalar_filter_name(
+    typ: <span class="kw-2">&amp;</span>str,
+    list: bool,
+    nullable: bool,
+    nested: bool,
+    include_aggregates: bool,
+) -&gt; String {
     <span class="kw">let </span>list = <span class="kw">if </span>list { <span class="string">&quot;List&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
     <span class="kw">let </span>nullable = <span class="kw">if </span>nullable { <span class="string">&quot;Nullable&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
     <span class="kw">let </span>nested = <span class="kw">if </span>nested { <span class="string">&quot;Nested&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};

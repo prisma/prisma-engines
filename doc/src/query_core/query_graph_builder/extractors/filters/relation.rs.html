@@ -25,6 +25,10 @@
 <a href="#25" id="25">25</a>
 <a href="#26" id="26">26</a>
 <a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::extract_filter;
 <span class="kw">use crate</span>::{ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult};
 <span class="kw">use </span>connector::{Filter, RelationCompare};
@@ -32,8 +36,12 @@
 <span class="kw">use </span>schema::constants::filters;
 <span class="kw">use </span>std::convert::TryInto;
 
-<span class="kw">pub fn </span>parse(filter_key: <span class="kw-2">&amp;</span>str, field: <span class="kw-2">&amp;</span>RelationFieldRef, input: ParsedInputValue) -&gt; QueryGraphBuilderResult&lt;Filter&gt; {
-    <span class="kw">let </span>value: <span class="prelude-ty">Option</span>&lt;ParsedInputMap&gt; = input.try_into()<span class="question-mark">?</span>;
+<span class="kw">pub fn </span>parse(
+    filter_key: <span class="kw-2">&amp;</span>str,
+    field: <span class="kw-2">&amp;</span>RelationFieldRef,
+    input: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;,
+) -&gt; QueryGraphBuilderResult&lt;Filter&gt; {
+    <span class="kw">let </span>value: <span class="prelude-ty">Option</span>&lt;ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt;&gt; = input.try_into()<span class="question-mark">?</span>;
 
     <span class="kw">match </span>(filter_key, value) {
         <span class="comment">// Relation list filters

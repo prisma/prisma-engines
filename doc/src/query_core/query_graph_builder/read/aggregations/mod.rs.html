@@ -124,16 +124,16 @@
 <span class="kw">use </span><span class="kw">crate</span>::FieldPair;
 <span class="kw">use </span>connector::AggregationSelection;
 <span class="kw">use </span>itertools::Itertools;
-<span class="kw">use </span>prisma_models::{ModelRef, ScalarFieldRef};
+<span class="kw">use </span>prisma_models::{Model, ScalarFieldRef};
 <span class="kw">use </span>schema::constants::aggregations::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Resolves the given field as a aggregation query.
 </span><span class="kw">fn </span>resolve_query(
-    field: FieldPair,
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    field: FieldPair&lt;<span class="lifetime">&#39;_</span>&gt;,
+    model: <span class="kw-2">&amp;</span>Model,
     allow_deprecated: bool,
 ) -&gt; QueryGraphBuilderResult&lt;AggregationSelection&gt; {
-    <span class="kw">let </span>count_resolver = |<span class="kw-2">mut </span>field: FieldPair, model: <span class="kw-2">&amp;</span>ModelRef| {
+    <span class="kw">let </span>count_resolver = |<span class="kw-2">mut </span>field: FieldPair&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>Model| {
         <span class="kw">let </span>nested_fields = field
             .parsed_field
             .nested_fields
@@ -180,7 +180,7 @@
     <span class="prelude-val">Ok</span>(query)
 }
 
-<span class="kw">fn </span>resolve_fields(model: <span class="kw-2">&amp;</span>ModelRef, field: FieldPair) -&gt; Vec&lt;ScalarFieldRef&gt; {
+<span class="kw">fn </span>resolve_fields(model: <span class="kw-2">&amp;</span>Model, field: FieldPair&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Vec&lt;ScalarFieldRef&gt; {
     <span class="kw">let </span>scalars = model.fields().scalar();
     <span class="kw">let </span>fields = field
         .parsed_field
@@ -194,9 +194,9 @@
             <span class="kw">if </span>f.parsed_field.name == <span class="string">&quot;_all&quot; </span>{
                 <span class="prelude-val">None
             </span>} <span class="kw">else </span>{
-                scalars.iter().find_map(|sf| {
+                scalars.clone().find_map(|sf| {
                     <span class="kw">if </span>sf.name() == f.parsed_field.name {
-                        <span class="prelude-val">Some</span>(sf.clone())
+                        <span class="prelude-val">Some</span>(sf)
                     } <span class="kw">else </span>{
                         <span class="prelude-val">None
                     </span>}
@@ -206,7 +206,7 @@
         .collect()
 }
 
-<span class="kw">fn </span>collect_selection_tree(fields: <span class="kw-2">&amp;</span>[FieldPair]) -&gt; Vec&lt;(String, <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;)&gt; {
+<span class="kw">fn </span>collect_selection_tree(fields: <span class="kw-2">&amp;</span>[FieldPair&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; Vec&lt;(String, <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;)&gt; {
     fields
         .iter()
         .map(|field| {

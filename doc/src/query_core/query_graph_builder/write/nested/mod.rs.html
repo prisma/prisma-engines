@@ -72,7 +72,7 @@
 <span class="kw">use </span>delete_nested::<span class="kw-2">*</span>;
 <span class="kw">use </span>disconnect_nested::<span class="kw-2">*</span>;
 <span class="kw">use </span>prisma_models::RelationFieldRef;
-<span class="kw">use </span>schema::{constants::operations, ConnectorContext};
+<span class="kw">use </span>schema::{constants::operations, QuerySchema};
 <span class="kw">use </span>set_nested::<span class="kw-2">*</span>;
 <span class="kw">use </span>update_nested::<span class="kw-2">*</span>;
 <span class="kw">use </span>upsert_nested::<span class="kw-2">*</span>;
@@ -80,26 +80,26 @@
 <span class="attr">#[rustfmt::skip]
 </span><span class="kw">pub fn </span>connect_nested_query(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     parent: NodeRef,
     parent_relation_field: RelationFieldRef,
-    data_map: ParsedInputMap,
+    data_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="kw">let </span>child_model = parent_relation_field.related_model();
 
     <span class="kw">for </span>(field_name, value) <span class="kw">in </span>data_map {
-        <span class="kw">match </span>field_name.as_str() {
-            operations::CREATE =&gt; nested_create(graph, connector_ctx,parent, <span class="kw-2">&amp;</span>parent_relation_field, value, <span class="kw-2">&amp;</span>child_model)<span class="question-mark">?</span>,
+        <span class="kw">match </span>field_name.as_ref() {
+            operations::CREATE =&gt; nested_create(graph, query_schema,parent, <span class="kw-2">&amp;</span>parent_relation_field, value, <span class="kw-2">&amp;</span>child_model)<span class="question-mark">?</span>,
             operations::CREATE_MANY =&gt; nested_create_many(graph, parent, <span class="kw-2">&amp;</span>parent_relation_field, value, <span class="kw-2">&amp;</span>child_model)<span class="question-mark">?</span>,
-            operations::UPDATE =&gt; nested_update(graph, connector_ctx, <span class="kw-2">&amp;</span>parent, <span class="kw-2">&amp;</span>parent_relation_field, value, <span class="kw-2">&amp;</span>child_model)<span class="question-mark">?</span>,
-            operations::UPSERT =&gt; nested_upsert(graph, connector_ctx, parent, <span class="kw-2">&amp;</span>parent_relation_field, value)<span class="question-mark">?</span>,
-            operations::DELETE =&gt; nested_delete(graph, connector_ctx, <span class="kw-2">&amp;</span>parent, <span class="kw-2">&amp;</span>parent_relation_field, value, <span class="kw-2">&amp;</span>child_model)<span class="question-mark">?</span>,
+            operations::UPDATE =&gt; nested_update(graph, query_schema, <span class="kw-2">&amp;</span>parent, <span class="kw-2">&amp;</span>parent_relation_field, value, <span class="kw-2">&amp;</span>child_model)<span class="question-mark">?</span>,
+            operations::UPSERT =&gt; nested_upsert(graph, query_schema, parent, <span class="kw-2">&amp;</span>parent_relation_field, value)<span class="question-mark">?</span>,
+            operations::DELETE =&gt; nested_delete(graph, query_schema, <span class="kw-2">&amp;</span>parent, <span class="kw-2">&amp;</span>parent_relation_field, value, <span class="kw-2">&amp;</span>child_model)<span class="question-mark">?</span>,
             operations::CONNECT =&gt; nested_connect(graph, parent, <span class="kw-2">&amp;</span>parent_relation_field, value, <span class="kw-2">&amp;</span>child_model)<span class="question-mark">?</span>,
             operations::DISCONNECT =&gt; nested_disconnect(graph, parent, <span class="kw-2">&amp;</span>parent_relation_field, value, <span class="kw-2">&amp;</span>child_model)<span class="question-mark">?</span>,
             operations::SET =&gt; nested_set(graph, <span class="kw-2">&amp;</span>parent, <span class="kw-2">&amp;</span>parent_relation_field, value, <span class="kw-2">&amp;</span>child_model)<span class="question-mark">?</span>,
-            operations::UPDATE_MANY =&gt; nested_update_many(graph, connector_ctx, <span class="kw-2">&amp;</span>parent, <span class="kw-2">&amp;</span>parent_relation_field, value, <span class="kw-2">&amp;</span>child_model)<span class="question-mark">?</span>,
-            operations::DELETE_MANY =&gt; nested_delete_many(graph, connector_ctx, <span class="kw-2">&amp;</span>parent, <span class="kw-2">&amp;</span>parent_relation_field, value, <span class="kw-2">&amp;</span>child_model)<span class="question-mark">?</span>,
-            operations::CONNECT_OR_CREATE =&gt; nested_connect_or_create(graph, connector_ctx, parent, <span class="kw-2">&amp;</span>parent_relation_field, value, <span class="kw-2">&amp;</span>child_model)<span class="question-mark">?</span>,
+            operations::UPDATE_MANY =&gt; nested_update_many(graph, query_schema, <span class="kw-2">&amp;</span>parent, <span class="kw-2">&amp;</span>parent_relation_field, value, <span class="kw-2">&amp;</span>child_model)<span class="question-mark">?</span>,
+            operations::DELETE_MANY =&gt; nested_delete_many(graph, query_schema, <span class="kw-2">&amp;</span>parent, <span class="kw-2">&amp;</span>parent_relation_field, value, <span class="kw-2">&amp;</span>child_model)<span class="question-mark">?</span>,
+            operations::CONNECT_OR_CREATE =&gt; nested_connect_or_create(graph, query_schema, parent, <span class="kw-2">&amp;</span>parent_relation_field, value, <span class="kw-2">&amp;</span>child_model)<span class="question-mark">?</span>,
             <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unhandled nested operation: {field_name}&quot;</span>),
         };
     }

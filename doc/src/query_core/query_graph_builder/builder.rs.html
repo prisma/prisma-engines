@@ -149,55 +149,55 @@
     }
 
     <span class="doccomment">/// Maps an operation to a query.
-    </span><span class="kw">pub fn </span>build(<span class="self">self</span>, operation: Operation) -&gt; QueryGraphBuilderResult&lt;(QueryGraph, IrSerializer)&gt; {
+    </span><span class="kw">pub fn </span>build(<span class="self">self</span>, operation: Operation) -&gt; QueryGraphBuilderResult&lt;(QueryGraph, IrSerializer&lt;<span class="lifetime">&#39;a</span>&gt;)&gt; {
         <span class="kw">let </span>_span = <span class="macro">info_span!</span>(<span class="string">&quot;prisma:engine:build_graph&quot;</span>);
         <span class="kw">match </span>operation {
-            Operation::Read(selection) =&gt; {
-                <span class="self">self</span>.build_internal(selection, (<span class="self">self</span>.query_schema.query, <span class="self">self</span>.query_schema.query()))
-            }
-            Operation::Write(selection) =&gt; {
-                <span class="self">self</span>.build_internal(selection, (<span class="self">self</span>.query_schema.mutation, <span class="self">self</span>.query_schema.mutation()))
-            }
+            Operation::Read(selection) =&gt; <span class="self">self</span>.build_internal(selection, <span class="self">self</span>.query_schema.query(), <span class="kw-2">&amp;</span>|name| {
+                <span class="self">self</span>.query_schema.find_query_field(name)
+            }),
+            Operation::Write(selection) =&gt; <span class="self">self</span>.build_internal(selection, <span class="self">self</span>.query_schema.mutation(), <span class="kw-2">&amp;</span>|name| {
+                <span class="self">self</span>.query_schema.find_mutation_field(name)
+            }),
         }
     }
 
     <span class="kw">fn </span>build_internal(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         selection: Selection,
-        root_object: (OutputObjectTypeId, <span class="kw-2">&amp;</span>ObjectType), <span class="comment">// Either the query or mutation object.
-    </span>) -&gt; QueryGraphBuilderResult&lt;(QueryGraph, IrSerializer)&gt; {
+        root_object: ObjectType&lt;<span class="lifetime">&#39;a</span>&gt;, <span class="comment">// Either the query or mutation object.
+        </span>root_object_fields: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;OutputField&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    ) -&gt; QueryGraphBuilderResult&lt;(QueryGraph, IrSerializer&lt;<span class="lifetime">&#39;a</span>&gt;)&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>selections = <span class="macro">vec!</span>[selection];
         <span class="kw">let </span><span class="kw-2">mut </span>parsed_object = QueryDocumentParser::new(<span class="kw">crate</span>::executor::get_request_now()).parse(
             <span class="kw-2">&amp;</span>selections,
-            root_object,
+            <span class="kw-2">&amp;</span>root_object,
+            root_object_fields,
             <span class="self">self</span>.query_schema,
         )<span class="question-mark">?</span>;
 
         <span class="comment">// Because we&#39;re processing root objects, there can only be one query / mutation.
         </span><span class="kw">let </span>field_pair = parsed_object.fields.pop().unwrap();
-        <span class="kw">let </span>serializer = <span class="self">Self</span>::derive_serializer(<span class="kw-2">&amp;</span>selections.pop().unwrap(), field_pair.schema_field);
-        <span class="kw">let </span>schema_field = <span class="kw-2">&amp;</span><span class="self">self</span>.query_schema.db[field_pair.schema_field.<span class="number">0</span>].get_fields()[field_pair.schema_field.<span class="number">1</span>];
+        <span class="kw">let </span>serializer = <span class="self">Self</span>::derive_serializer(<span class="kw-2">&amp;</span>selections.pop().unwrap(), field_pair.schema_field.clone());
 
-        <span class="kw">if </span>schema_field.query_info.is_some() {
+        <span class="kw">if </span>field_pair.schema_field.query_info().is_some() {
             <span class="kw">let </span>graph = <span class="self">self</span>.dispatch_build(field_pair)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>((graph, serializer))
         } <span class="kw">else </span>{
             <span class="prelude-val">Err</span>(QueryGraphBuilderError::SchemaError(<span class="macro">format!</span>(
                 <span class="string">&quot;Expected query information to be attached on schema object &#39;{}&#39;, field &#39;{}&#39;.&quot;</span>,
-                root_object.<span class="number">1</span>.identifier.name(),
+                root_object.name(),
                 field_pair.parsed_field.name
             )))
         }
     }
 
     <span class="attr">#[rustfmt::skip]
-    </span><span class="kw">fn </span>dispatch_build(<span class="kw-2">&amp;</span><span class="self">self</span>, field_pair: FieldPair) -&gt; QueryGraphBuilderResult&lt;QueryGraph&gt; {
-        <span class="kw">let </span>schema_field = <span class="kw-2">&amp;</span><span class="self">self</span>.query_schema.db[field_pair.schema_field.<span class="number">0</span>].get_fields()[field_pair.schema_field.<span class="number">1</span>];
-        <span class="kw">let </span>query_info = schema_field.query_info.as_ref().unwrap();
+    </span><span class="kw">fn </span>dispatch_build(<span class="kw-2">&amp;</span><span class="self">self</span>, field_pair: FieldPair&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; QueryGraphBuilderResult&lt;QueryGraph&gt; {
+        <span class="kw">let </span>query_info = field_pair.schema_field.query_info().unwrap();
         <span class="kw">let </span>parsed_field = field_pair.parsed_field;
-        <span class="kw">let </span>connector_ctx = <span class="self">self</span>.query_schema.context();
+        <span class="kw">let </span>query_schema = <span class="self">self</span>.query_schema;
 
-        <span class="kw">let </span><span class="kw-2">mut </span>graph = <span class="kw">match </span>(<span class="kw-2">&amp;</span>query_info.tag, query_info.model.clone()) {
+        <span class="kw">let </span><span class="kw-2">mut </span>graph = <span class="kw">match </span>(<span class="kw-2">&amp;</span>query_info.tag, query_info.model.map(|id| <span class="self">self</span>.query_schema.internal_data_model.clone().zip(id))) {
             (QueryTag::FindUnique, <span class="prelude-val">Some</span>(m)) =&gt; read::find_unique(parsed_field, m).map(Into::into),
             (QueryTag::FindUniqueOrThrow, <span class="prelude-val">Some</span>(m)) =&gt; read::find_unique_or_throw(parsed_field, m).map(Into::into),
             (QueryTag::FindFirst, <span class="prelude-val">Some</span>(m)) =&gt; read::find_first(parsed_field, m).map(Into::into),
@@ -205,13 +205,13 @@
             (QueryTag::FindMany, <span class="prelude-val">Some</span>(m)) =&gt; read::find_many(parsed_field, m).map(Into::into),
             (QueryTag::Aggregate, <span class="prelude-val">Some</span>(m)) =&gt; read::aggregate(parsed_field, m).map(Into::into),
             (QueryTag::GroupBy, <span class="prelude-val">Some</span>(m)) =&gt; read::group_by(parsed_field, m).map(Into::into),
-            (QueryTag::CreateOne, <span class="prelude-val">Some</span>(m)) =&gt; QueryGraph::root(|g| write::create_record(g, connector_ctx, m, parsed_field)),
-            (QueryTag::CreateMany, <span class="prelude-val">Some</span>(m)) =&gt; QueryGraph::root(|g| write::create_many_records(g,  connector_ctx,m, parsed_field)),
-            (QueryTag::UpdateOne, <span class="prelude-val">Some</span>(m)) =&gt; QueryGraph::root(|g| write::update_record(g, connector_ctx, m, parsed_field)),
-            (QueryTag::UpdateMany, <span class="prelude-val">Some</span>(m)) =&gt; QueryGraph::root(|g| write::update_many_records(g, connector_ctx, m, parsed_field)),
-            (QueryTag::UpsertOne, <span class="prelude-val">Some</span>(m)) =&gt; QueryGraph::root(|g| write::upsert_record(g, connector_ctx, m, parsed_field)),
-            (QueryTag::DeleteOne, <span class="prelude-val">Some</span>(m)) =&gt; QueryGraph::root(|g| write::delete_record(g, connector_ctx, m, parsed_field)),
-            (QueryTag::DeleteMany, <span class="prelude-val">Some</span>(m)) =&gt; QueryGraph::root(|g| write::delete_many_records(g, connector_ctx, m, parsed_field)),
+            (QueryTag::CreateOne, <span class="prelude-val">Some</span>(m)) =&gt; QueryGraph::root(|g| write::create_record(g, query_schema, m, parsed_field)),
+            (QueryTag::CreateMany, <span class="prelude-val">Some</span>(m)) =&gt; QueryGraph::root(|g| write::create_many_records(g, query_schema,m, parsed_field)),
+            (QueryTag::UpdateOne, <span class="prelude-val">Some</span>(m)) =&gt; QueryGraph::root(|g| write::update_record(g, query_schema, m, parsed_field)),
+            (QueryTag::UpdateMany, <span class="prelude-val">Some</span>(m)) =&gt; QueryGraph::root(|g| write::update_many_records(g, query_schema, m, parsed_field)),
+            (QueryTag::UpsertOne, <span class="prelude-val">Some</span>(m)) =&gt; QueryGraph::root(|g| write::upsert_record(g, query_schema, m, parsed_field)),
+            (QueryTag::DeleteOne, <span class="prelude-val">Some</span>(m)) =&gt; QueryGraph::root(|g| write::delete_record(g, query_schema, m, parsed_field)),
+            (QueryTag::DeleteMany, <span class="prelude-val">Some</span>(m)) =&gt; QueryGraph::root(|g| write::delete_many_records(g, query_schema, m, parsed_field)),
             (QueryTag::ExecuteRaw, <span class="kw">_</span>) =&gt; QueryGraph::root(|g| write::execute_raw(g, parsed_field)),
             (QueryTag::QueryRaw, m) =&gt; QueryGraph::root(|g| write::query_raw(g, m, <span class="prelude-val">None</span>, parsed_field)),
             <span class="comment">// MongoDB specific raw operations
@@ -236,7 +236,7 @@
         <span class="prelude-val">Ok</span>(graph)
     }
 
-    <span class="kw">fn </span>derive_serializer(selection: <span class="kw-2">&amp;</span>Selection, field: (OutputObjectTypeId, usize)) -&gt; IrSerializer {
+    <span class="kw">fn </span>derive_serializer(selection: <span class="kw-2">&amp;</span>Selection, field: OutputField&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; IrSerializer&lt;<span class="lifetime">&#39;a</span>&gt; {
         IrSerializer {
             key: selection
                 .alias()

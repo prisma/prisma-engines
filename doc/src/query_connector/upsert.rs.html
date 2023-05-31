@@ -91,12 +91,12 @@
 <a href="#91" id="91">91</a>
 <a href="#92" id="92">92</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{Filter, RecordFilter, WriteArgs};
-<span class="kw">use </span>prisma_models::{FieldSelection, ModelRef, ScalarFieldRef};
+<span class="kw">use </span>prisma_models::{FieldSelection, Model, ScalarFieldRef};
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>NativeUpsert {
     name: String,
-    model: ModelRef,
+    model: Model,
     record_filter: RecordFilter,
     create: WriteArgs,
     update: WriteArgs,
@@ -107,7 +107,7 @@
 <span class="kw">impl </span>NativeUpsert {
     <span class="kw">pub fn </span>new(
         name: String,
-        model: ModelRef,
+        model: Model,
         record_filter: RecordFilter,
         create: WriteArgs,
         update: WriteArgs,
@@ -129,7 +129,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>.name
     }
 
-    <span class="kw">pub fn </span>model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ModelRef {
+    <span class="kw">pub fn </span>model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Model {
         <span class="kw-2">&amp;</span><span class="self">self</span>.model
     }
 

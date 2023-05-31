@@ -240,7 +240,6 @@
 <a href="#240" id="240">240</a>
 <a href="#241" id="241">241</a>
 <a href="#242" id="242">242</a>
-<a href="#243" id="243">243</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{model_extensions::<span class="kw-2">*</span>, sql_trace::SqlTraceComment, Context};
 <span class="kw">use </span>connector_interface::{DatasourceFieldName, ScalarWriteOperation, WriteArgs};
 <span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
@@ -250,11 +249,10 @@
 
 <span class="doccomment">/// `INSERT` a new record to the database. Resulting an `INSERT` ast and an
 /// optional `RecordProjection` if available from the arguments or model.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_record(model: <span class="kw-2">&amp;</span>ModelRef, <span class="kw-2">mut </span>args: WriteArgs, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Insert&lt;<span class="lifetime">&#39;static</span>&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_record(model: <span class="kw-2">&amp;</span>Model, <span class="kw-2">mut </span>args: WriteArgs, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Insert&lt;<span class="lifetime">&#39;static</span>&gt; {
     <span class="kw">let </span>fields: Vec&lt;<span class="kw">_</span>&gt; = model
         .fields()
         .scalar()
-        .into_iter()
         .filter(|field| args.has_arg_for(field.db_name()))
         .collect();
 
@@ -281,7 +279,7 @@
 /// Requires `affected_fields` to be non-empty to produce valid SQL.
 </span><span class="attr">#[allow(clippy::mutable_key_type)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_records_nonempty(
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    model: <span class="kw-2">&amp;</span>Model,
     args: Vec&lt;WriteArgs&gt;,
     skip_duplicates: bool,
     affected_fields: <span class="kw-2">&amp;</span>HashSet&lt;ScalarFieldRef&gt;,
@@ -332,7 +330,7 @@
 }
 
 <span class="doccomment">/// `INSERT` empty records statement.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_records_empty(model: <span class="kw-2">&amp;</span>ModelRef, skip_duplicates: bool, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Insert&lt;<span class="lifetime">&#39;static</span>&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_records_empty(model: <span class="kw-2">&amp;</span>Model, skip_duplicates: bool, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Insert&lt;<span class="lifetime">&#39;static</span>&gt; {
     <span class="kw">let </span>insert: Insert&lt;<span class="lifetime">&#39;static</span>&gt; = Insert::single_into(model.as_table(ctx)).into();
     <span class="kw">let </span>insert = insert.append_trace(<span class="kw-2">&amp;</span>Span::current()).add_trace_id(ctx.trace_id);
 
@@ -343,7 +341,7 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build_update_and_set_query(model: <span class="kw-2">&amp;</span>ModelRef, args: WriteArgs, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Update&lt;<span class="lifetime">&#39;static</span>&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build_update_and_set_query(model: <span class="kw-2">&amp;</span>Model, args: WriteArgs, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Update&lt;<span class="lifetime">&#39;static</span>&gt; {
     <span class="kw">let </span>scalar_fields = model.fields().scalar();
     <span class="kw">let </span>table = model.as_table(ctx);
     <span class="kw">let </span>query = args
@@ -352,7 +350,7 @@
         .fold(Update::table(table.clone()), |acc, (field_name, val)| {
             <span class="kw">let </span>DatasourceFieldName(name) = field_name;
             <span class="kw">let </span>field = scalar_fields
-                .iter()
+                .clone()
                 .find(|f| f.db_name() == name)
                 .expect(<span class="string">&quot;Expected field to be valid&quot;</span>);
 
@@ -400,7 +398,7 @@
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>chunk_update_with_ids(
     update: Update&lt;<span class="lifetime">&#39;static</span>&gt;,
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    model: <span class="kw-2">&amp;</span>Model,
     ids: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>SelectionResult],
     filter_condition: ConditionTree&lt;<span class="lifetime">&#39;static</span>&gt;,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
@@ -417,7 +415,7 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>delete_many(
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    model: <span class="kw-2">&amp;</span>Model,
     ids: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>SelectionResult],
     filter_condition: ConditionTree&lt;<span class="lifetime">&#39;static</span>&gt;,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,

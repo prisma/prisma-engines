@@ -183,7 +183,7 @@
     bson::{from_bson, Bson, Document},
     options::<span class="kw-2">*</span>,
 };
-<span class="kw">use </span>prisma_models::{ModelRef, PrismaValue};
+<span class="kw">use </span>prisma_models::{Model, PrismaValue};
 <span class="kw">use </span>std::collections::HashMap;
 
 <span class="attr">#[allow(clippy::large_enum_variant)]
@@ -205,7 +205,7 @@
 
 <span class="kw">impl </span>MongoCommand {
     <span class="kw">pub fn </span>from_raw_query(
-        model: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ModelRef&gt;,
+        model: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Model&gt;,
         inputs: HashMap&lt;String, PrismaValue&gt;,
         query_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="kw">crate</span>::Result&lt;MongoCommand&gt; {
@@ -217,7 +217,7 @@
         }
     }
 
-    <span class="kw">fn </span>find(model: <span class="kw-2">&amp;</span>ModelRef, inputs: HashMap&lt;String, PrismaValue&gt;) -&gt; <span class="kw">crate</span>::Result&lt;MongoCommand&gt; {
+    <span class="kw">fn </span>find(model: <span class="kw-2">&amp;</span>Model, inputs: HashMap&lt;String, PrismaValue&gt;) -&gt; <span class="kw">crate</span>::Result&lt;MongoCommand&gt; {
         <span class="kw">let </span>filter = inputs.get_document(<span class="string">&quot;filter&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>options = inputs
             .get_document(<span class="string">&quot;options&quot;</span>)<span class="question-mark">?
@@ -231,7 +231,7 @@
         })
     }
 
-    <span class="kw">fn </span>aggregate(model: <span class="kw-2">&amp;</span>ModelRef, inputs: HashMap&lt;String, PrismaValue&gt;) -&gt; <span class="kw">crate</span>::Result&lt;MongoCommand&gt; {
+    <span class="kw">fn </span>aggregate(model: <span class="kw-2">&amp;</span>Model, inputs: HashMap&lt;String, PrismaValue&gt;) -&gt; <span class="kw">crate</span>::Result&lt;MongoCommand&gt; {
         <span class="kw">let </span>pipeline = inputs.get_array_document(<span class="string">&quot;pipeline&quot;</span>)<span class="question-mark">?</span>.unwrap_or_default();
         <span class="kw">let </span>options = inputs
             .get_document(<span class="string">&quot;options&quot;</span>)<span class="question-mark">?

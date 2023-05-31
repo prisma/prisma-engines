@@ -199,7 +199,7 @@
     ParsedInputMap, ParsedInputValue,
 };
 <span class="kw">use </span>connector::{Filter, RecordFilter};
-<span class="kw">use </span>prisma_models::{ModelRef, PrismaValue, RelationFieldRef};
+<span class="kw">use </span>prisma_models::{Model, PrismaValue, RelationFieldRef};
 <span class="kw">use </span>std::convert::TryInto;
 
 <span class="doccomment">/// Adds a delete (single) record node to the graph and connects it to the parent.
@@ -216,19 +216,19 @@
 /// We always need to make sure that the records are connected before deletion.
 </span><span class="kw">pub fn </span>nested_delete(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     parent_node: <span class="kw-2">&amp;</span>NodeRef,
     parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
-    value: ParsedInputValue,
-    child_model: <span class="kw-2">&amp;</span>ModelRef,
+    value: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;,
+    child_model: <span class="kw-2">&amp;</span>Model,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="kw">let </span>child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
     <span class="kw">if </span>parent_relation_field.is_list() {
         <span class="kw">let </span>filters: Vec&lt;Filter&gt; = utils::coerce_vec(value)
             .into_iter()
-            .map(|value: ParsedInputValue| {
-                <span class="kw">let </span>value: ParsedInputMap = value.try_into()<span class="question-mark">?</span>;
+            .map(|value: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;| {
+                <span class="kw">let </span>value: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = value.try_into()<span class="question-mark">?</span>;
                 extract_unique_filter(value, child_model)
             })
             .collect::&lt;QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt;&gt;()<span class="question-mark">?</span>;
@@ -246,7 +246,7 @@
 
         utils::insert_emulated_on_delete(
             graph,
-            connector_ctx,
+            query_schema,
             child_model,
             <span class="kw-2">&amp;</span>find_child_records_node,
             <span class="kw-2">&amp;</span>delete_many_node,
@@ -301,7 +301,7 @@
 
             utils::insert_emulated_on_delete(
                 graph,
-                connector_ctx,
+                query_schema,
                 child_model,
                 <span class="kw-2">&amp;</span>find_child_records_node,
                 <span class="kw-2">&amp;</span>delete_record_node,
@@ -339,16 +339,16 @@
 
 <span class="kw">pub fn </span>nested_delete_many(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     parent: <span class="kw-2">&amp;</span>NodeRef,
     parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
-    value: ParsedInputValue,
-    child_model: <span class="kw-2">&amp;</span>ModelRef,
+    value: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;,
+    child_model: <span class="kw-2">&amp;</span>Model,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="kw">let </span>child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
     <span class="kw">for </span>value <span class="kw">in </span>utils::coerce_vec(value) {
-        <span class="kw">let </span>as_map: ParsedInputMap = value.try_into()<span class="question-mark">?</span>;
+        <span class="kw">let </span>as_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = value.try_into()<span class="question-mark">?</span>;
         <span class="kw">let </span>filter = extract_filter(as_map, child_model)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>find_child_records_node =
@@ -362,7 +362,7 @@
         <span class="kw">let </span>delete_many_node = graph.create_node(Query::Write(delete_many));
         utils::insert_emulated_on_delete(
             graph,
-            connector_ctx,
+            query_schema,
             child_model,
             <span class="kw-2">&amp;</span>find_child_records_node,
             <span class="kw-2">&amp;</span>delete_many_node,

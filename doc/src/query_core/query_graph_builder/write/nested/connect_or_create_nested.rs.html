@@ -1013,7 +1013,7 @@
     Computation, ParsedInputMap, ParsedInputValue,
 };
 <span class="kw">use </span>connector::{Filter, IntoFilter};
-<span class="kw">use </span>prisma_models::{ModelRef, RelationFieldRef, SelectionResult};
+<span class="kw">use </span>prisma_models::{Model, RelationFieldRef, SelectionResult};
 <span class="kw">use </span>schema::constants::args;
 <span class="kw">use </span>std::convert::TryInto;
 
@@ -1023,11 +1023,11 @@
 /// Information on the graph shapes can be found on the individual handlers.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nested_connect_or_create(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
-    value: ParsedInputValue,
-    child_model: <span class="kw-2">&amp;</span>ModelRef,
+    value: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;,
+    child_model: <span class="kw-2">&amp;</span>Model,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="kw">let </span>relation = parent_relation_field.relation();
     <span class="kw">let </span>values = utils::coerce_vec(value);
@@ -1035,7 +1035,7 @@
     <span class="kw">if </span>relation.is_many_to_many() {
         handle_many_to_many(
             graph,
-            connector_ctx,
+            query_schema,
             parent_node,
             parent_relation_field,
             values,
@@ -1044,7 +1044,7 @@
     } <span class="kw">else if </span>relation.is_one_to_many() {
         handle_one_to_many(
             graph,
-            connector_ctx,
+            query_schema,
             parent_node,
             parent_relation_field,
             values,
@@ -1053,7 +1053,7 @@
     } <span class="kw">else </span>{
         handle_one_to_one(
             graph,
-            connector_ctx,
+            query_schema,
             parent_node,
             parent_relation_field,
             values,
@@ -1098,20 +1098,20 @@
 /// ```
 </span><span class="kw">fn </span>handle_many_to_many(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
-    values: Vec&lt;ParsedInputValue&gt;,
-    child_model: <span class="kw-2">&amp;</span>ModelRef,
+    values: Vec&lt;ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+    child_model: <span class="kw-2">&amp;</span>Model,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="kw">for </span>value <span class="kw">in </span>values {
-        <span class="kw">let </span><span class="kw-2">mut </span>value: ParsedInputMap = value.try_into()<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>value: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = value.try_into()<span class="question-mark">?</span>;
 
         <span class="kw">let </span>where_arg = value.remove(args::WHERE).unwrap();
-        <span class="kw">let </span>where_map: ParsedInputMap = where_arg.try_into()<span class="question-mark">?</span>;
+        <span class="kw">let </span>where_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = where_arg.try_into()<span class="question-mark">?</span>;
 
         <span class="kw">let </span>create_arg = value.remove(args::CREATE).unwrap();
-        <span class="kw">let </span>create_map: ParsedInputMap = create_arg.try_into()<span class="question-mark">?</span>;
+        <span class="kw">let </span>create_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = create_arg.try_into()<span class="question-mark">?</span>;
 
         <span class="kw">let </span>filter = extract_unique_filter(where_map, child_model)<span class="question-mark">?</span>;
         <span class="kw">let </span>read_node = graph.create_node(utils::read_ids_infallible(
@@ -1120,7 +1120,7 @@
             filter,
         ));
 
-        <span class="kw">let </span>create_node = create::create_record_node(graph, connector_ctx, child_model.clone(), create_map)<span class="question-mark">?</span>;
+        <span class="kw">let </span>create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_map)<span class="question-mark">?</span>;
         <span class="kw">let </span>if_node = graph.create_node(Flow::default_if());
 
         <span class="kw">let </span>connect_exists_node =
@@ -1155,16 +1155,16 @@
 <span class="doccomment">/// Dispatcher for one-to-many relations.
 </span><span class="kw">fn </span>handle_one_to_many(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
-    values: Vec&lt;ParsedInputValue&gt;,
-    child_model: <span class="kw-2">&amp;</span>ModelRef,
+    values: Vec&lt;ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+    child_model: <span class="kw-2">&amp;</span>Model,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="kw">if </span>parent_relation_field.is_inlined_on_enclosing_model() {
         one_to_many_inlined_parent(
             graph,
-            connector_ctx,
+            query_schema,
             parent_node,
             parent_relation_field,
             values,
@@ -1173,7 +1173,7 @@
     } <span class="kw">else </span>{
         one_to_many_inlined_child(
             graph,
-            connector_ctx,
+            query_schema,
             parent_node,
             parent_relation_field,
             values,
@@ -1185,27 +1185,27 @@
 <span class="doccomment">/// Dispatcher for one-to-one relations.
 </span><span class="kw">fn </span>handle_one_to_one(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
-    <span class="kw-2">mut </span>values: Vec&lt;ParsedInputValue&gt;,
-    child_model: <span class="kw-2">&amp;</span>ModelRef,
+    <span class="kw-2">mut </span>values: Vec&lt;ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+    child_model: <span class="kw-2">&amp;</span>Model,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="kw">let </span>value = values.pop().unwrap();
-    <span class="kw">let </span><span class="kw-2">mut </span>value: ParsedInputMap = value.try_into()<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>value: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = value.try_into()<span class="question-mark">?</span>;
 
     <span class="kw">let </span>where_arg = value.remove(args::WHERE).unwrap();
-    <span class="kw">let </span>where_map: ParsedInputMap = where_arg.try_into()<span class="question-mark">?</span>;
+    <span class="kw">let </span>where_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = where_arg.try_into()<span class="question-mark">?</span>;
 
     <span class="kw">let </span>create_arg = value.remove(args::CREATE).unwrap();
-    <span class="kw">let </span>create_data: ParsedInputMap = create_arg.try_into()<span class="question-mark">?</span>;
+    <span class="kw">let </span>create_data: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = create_arg.try_into()<span class="question-mark">?</span>;
 
     <span class="kw">let </span>filter = extract_unique_filter(where_map, child_model)<span class="question-mark">?</span>;
 
     <span class="kw">if </span>parent_relation_field.is_inlined_on_enclosing_model() {
         one_to_one_inlined_parent(
             graph,
-            connector_ctx,
+            query_schema,
             parent_node,
             parent_relation_field,
             filter,
@@ -1215,7 +1215,7 @@
     } <span class="kw">else </span>{
         one_to_one_inlined_child(
             graph,
-            connector_ctx,
+            query_schema,
             parent_node,
             parent_relation_field,
             filter,
@@ -1256,23 +1256,23 @@
 /// ```
 </span><span class="kw">fn </span>one_to_many_inlined_child(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
-    values: Vec&lt;ParsedInputValue&gt;,
-    child_model: <span class="kw-2">&amp;</span>ModelRef,
+    values: Vec&lt;ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+    child_model: <span class="kw-2">&amp;</span>Model,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="kw">for </span>value <span class="kw">in </span>values {
         <span class="kw">let </span>parent_link = parent_relation_field.linking_fields();
         <span class="kw">let </span>child_link = parent_relation_field.related_field().linking_fields();
 
-        <span class="kw">let </span><span class="kw-2">mut </span>value: ParsedInputMap = value.try_into()<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>value: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = value.try_into()<span class="question-mark">?</span>;
 
         <span class="kw">let </span>where_arg = value.remove(args::WHERE).unwrap();
-        <span class="kw">let </span>where_map: ParsedInputMap = where_arg.try_into()<span class="question-mark">?</span>;
+        <span class="kw">let </span>where_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = where_arg.try_into()<span class="question-mark">?</span>;
 
         <span class="kw">let </span>create_arg = value.remove(args::CREATE).unwrap();
-        <span class="kw">let </span>create_map: ParsedInputMap = create_arg.try_into()<span class="question-mark">?</span>;
+        <span class="kw">let </span>create_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = create_arg.try_into()<span class="question-mark">?</span>;
 
         <span class="kw">let </span>filter = extract_unique_filter(where_map, child_model)<span class="question-mark">?</span>;
         <span class="kw">let </span>read_node = graph.create_node(utils::read_ids_infallible(
@@ -1283,7 +1283,7 @@
 
         <span class="kw">let </span>if_node = graph.create_node(Flow::default_if());
         <span class="kw">let </span>update_child_node = utils::update_records_node_placeholder(graph, filter, child_model.clone());
-        <span class="kw">let </span>create_node = create::create_record_node(graph, connector_ctx, child_model.clone(), create_map)<span class="question-mark">?</span>;
+        <span class="kw">let </span>create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_map)<span class="question-mark">?</span>;
 
         graph.create_edge(<span class="kw-2">&amp;</span>parent_node, <span class="kw-2">&amp;</span>read_node, QueryGraphDependency::ExecutionOrder)<span class="question-mark">?</span>;
         graph.create_edge(<span class="kw-2">&amp;</span>if_node, <span class="kw-2">&amp;</span>update_child_node, QueryGraphDependency::Then)<span class="question-mark">?</span>;
@@ -1395,23 +1395,23 @@
 ///    └ ─ ─ ─ ─ ─ ─ ─ ─ ┘
 </span><span class="kw">fn </span>one_to_many_inlined_parent(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
-    <span class="kw-2">mut </span>values: Vec&lt;ParsedInputValue&gt;,
-    child_model: <span class="kw-2">&amp;</span>ModelRef,
+    <span class="kw-2">mut </span>values: Vec&lt;ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+    child_model: <span class="kw-2">&amp;</span>Model,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="kw">let </span>parent_link = parent_relation_field.linking_fields();
     <span class="kw">let </span>child_link = parent_relation_field.related_field().linking_fields();
 
     <span class="kw">let </span>value = values.pop().unwrap();
-    <span class="kw">let </span><span class="kw-2">mut </span>value: ParsedInputMap = value.try_into()<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>value: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = value.try_into()<span class="question-mark">?</span>;
 
     <span class="kw">let </span>where_arg = value.remove(args::WHERE).unwrap();
-    <span class="kw">let </span>where_map: ParsedInputMap = where_arg.try_into()<span class="question-mark">?</span>;
+    <span class="kw">let </span>where_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = where_arg.try_into()<span class="question-mark">?</span>;
 
     <span class="kw">let </span>create_arg = value.remove(args::CREATE).unwrap();
-    <span class="kw">let </span>create_map: ParsedInputMap = create_arg.try_into()<span class="question-mark">?</span>;
+    <span class="kw">let </span>create_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = create_arg.try_into()<span class="question-mark">?</span>;
 
     <span class="kw">let </span>filter = extract_unique_filter(where_map, child_model)<span class="question-mark">?</span>;
     <span class="kw">let </span>read_node = graph.create_node(utils::read_ids_infallible(
@@ -1424,7 +1424,7 @@
     graph.create_edge(<span class="kw-2">&amp;</span>parent_node, <span class="kw-2">&amp;</span>read_node, QueryGraphDependency::ExecutionOrder)<span class="question-mark">?</span>;
 
     <span class="kw">let </span>if_node = graph.create_node(Flow::default_if());
-    <span class="kw">let </span>create_node = create::create_record_node(graph, connector_ctx, child_model.clone(), create_map)<span class="question-mark">?</span>;
+    <span class="kw">let </span>create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_map)<span class="question-mark">?</span>;
     <span class="kw">let </span>return_existing = graph.create_node(Flow::Return(<span class="prelude-val">None</span>));
     <span class="kw">let </span>return_create = graph.create_node(Flow::Return(<span class="prelude-val">None</span>));
 
@@ -1566,12 +1566,12 @@
 /// and updating the record with the injection beforehand prevents that check. Instead, we need an additional update.
 </span><span class="kw">fn </span>one_to_one_inlined_parent(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
     filter: Filter,
-    create_data: ParsedInputMap,
-    child_model: <span class="kw-2">&amp;</span>ModelRef,
+    create_data: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt;,
+    child_model: <span class="kw-2">&amp;</span>Model,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="kw">let </span>parent_link = parent_relation_field.linking_fields();
     <span class="kw">let </span>child_link = parent_relation_field.related_field().linking_fields();
@@ -1586,7 +1586,7 @@
     graph.create_edge(<span class="kw-2">&amp;</span>parent_node, <span class="kw-2">&amp;</span>read_node, QueryGraphDependency::ExecutionOrder)<span class="question-mark">?</span>;
 
     <span class="kw">let </span>if_node = graph.create_node(Flow::default_if());
-    <span class="kw">let </span>create_node = create::create_record_node(graph, connector_ctx, child_model.clone(), create_data)<span class="question-mark">?</span>;
+    <span class="kw">let </span>create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_data)<span class="question-mark">?</span>;
     <span class="kw">let </span>return_existing = graph.create_node(Flow::Return(<span class="prelude-val">None</span>));
     <span class="kw">let </span>return_create = graph.create_node(Flow::Return(<span class="prelude-val">None</span>));
 
@@ -1783,12 +1783,12 @@
 /// but they&#39;re never build at the same time (denoted by the dashed boxes).
 </span><span class="kw">fn </span>one_to_one_inlined_child(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
     filter: Filter,
-    create_data: ParsedInputMap,
-    child_model: <span class="kw-2">&amp;</span>ModelRef,
+    create_data: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt;,
+    child_model: <span class="kw-2">&amp;</span>Model,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="kw">let </span>child_model_identifier = child_model.primary_identifier();
     <span class="kw">let </span>parent_link = parent_relation_field.linking_fields();
@@ -1805,7 +1805,7 @@
     </span>graph.create_edge(<span class="kw-2">&amp;</span>parent_node, <span class="kw-2">&amp;</span>read_new_child_node, QueryGraphDependency::ExecutionOrder)<span class="question-mark">?</span>;
 
     <span class="kw">let </span>if_node = graph.create_node(Flow::default_if());
-    <span class="kw">let </span>create_node = create::create_record_node(graph, connector_ctx, child_model.clone(), create_data)<span class="question-mark">?</span>;
+    <span class="kw">let </span>create_node = create::create_record_node(graph, query_schema, child_model.clone(), create_data)<span class="question-mark">?</span>;
 
     <span class="comment">// Edge: Read new child -&gt; if node
     </span>graph.create_edge(

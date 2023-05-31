@@ -41,6 +41,10 @@
 <a href="#41" id="41">41</a>
 <a href="#42" id="42">42</a>
 <a href="#43" id="43">43</a>
+<a href="#44" id="44">44</a>
+<a href="#45" id="45">45</a>
+<a href="#46" id="46">46</a>
+<a href="#47" id="47">47</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::extract_filter;
 <span class="kw">use crate</span>::{ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult};
 <span class="kw">use </span>connector::{CompositeCompare, Filter};
@@ -48,7 +52,11 @@
 <span class="kw">use </span>schema::{constants::filters, ObjectTag};
 <span class="kw">use </span>std::convert::TryInto;
 
-<span class="kw">pub fn </span>parse(input_map: ParsedInputMap, field: <span class="kw-2">&amp;</span>CompositeFieldRef, _reverse: bool) -&gt; QueryGraphBuilderResult&lt;Filter&gt; {
+<span class="kw">pub fn </span>parse(
+    input_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt;,
+    field: <span class="kw-2">&amp;</span>CompositeFieldRef,
+    _reverse: bool,
+) -&gt; QueryGraphBuilderResult&lt;Filter&gt; {
     <span class="kw">let </span>is_envelope = <span class="macro">matches!</span>(<span class="kw-2">&amp;</span>input_map.tag, <span class="prelude-val">Some</span>(ObjectTag::CompositeEnvelope));
 
     <span class="kw">if </span>is_envelope {

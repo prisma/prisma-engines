@@ -345,6 +345,11 @@
 <a href="#345" id="345">345</a>
 <a href="#346" id="346">346</a>
 <a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
+<a href="#352" id="352">352</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     query_document::{ParsedArgument, ParsedInputMap},
@@ -358,7 +363,10 @@
 <span class="doccomment">/// Expects the caller to know that it is structurally guaranteed that query arguments can be extracted,
 /// e.g. that the query schema guarantees that required fields are present.
 /// Errors occur if conversions fail.
-</span><span class="kw">pub fn </span>extract_query_args(arguments: Vec&lt;ParsedArgument&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; QueryGraphBuilderResult&lt;QueryArguments&gt; {
+</span><span class="kw">pub fn </span>extract_query_args(
+    arguments: Vec&lt;ParsedArgument&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+    model: <span class="kw-2">&amp;</span>Model,
+) -&gt; QueryGraphBuilderResult&lt;QueryArguments&gt; {
     <span class="kw">let </span>query_args = arguments.into_iter().fold(
         <span class="prelude-val">Ok</span>(QueryArguments::new(model.clone())),
         |result: QueryGraphBuilderResult&lt;QueryArguments&gt;, arg| {
@@ -390,7 +398,7 @@
                     }),
 
                     args::WHERE =&gt; {
-                        <span class="kw">let </span>val: <span class="prelude-ty">Option</span>&lt;ParsedInputMap&gt; = arg.value.try_into()<span class="question-mark">?</span>;
+                        <span class="kw">let </span>val: <span class="prelude-ty">Option</span>&lt;ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt;&gt; = arg.value.try_into()<span class="question-mark">?</span>;
                         <span class="kw">match </span>val {
                             <span class="prelude-val">Some</span>(m) =&gt; {
                                 <span class="kw">let </span>filter = <span class="prelude-val">Some</span>(extract_filter(m, model)<span class="question-mark">?</span>);
@@ -412,12 +420,12 @@
 }
 
 <span class="doccomment">/// Extracts order by conditions in order of appearance.
-</span><span class="kw">fn </span>extract_order_by(container: <span class="kw-2">&amp;</span>ParentContainer, value: ParsedInputValue) -&gt; QueryGraphBuilderResult&lt;Vec&lt;OrderBy&gt;&gt; {
+</span><span class="kw">fn </span>extract_order_by(container: <span class="kw-2">&amp;</span>ParentContainer, value: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; QueryGraphBuilderResult&lt;Vec&lt;OrderBy&gt;&gt; {
     <span class="kw">match </span>value {
         ParsedInputValue::List(list) =&gt; list
             .into_iter()
             .map(|list_value| {
-                <span class="kw">let </span>object: ParsedInputMap = list_value.try_into()<span class="question-mark">?</span>;
+                <span class="kw">let </span>object: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = list_value.try_into()<span class="question-mark">?</span>;
                 process_order_object(container, object, <span class="macro">vec!</span>[], <span class="prelude-val">None</span>)
             })
             .collect::&lt;QueryGraphBuilderResult&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()
@@ -434,21 +442,21 @@
 
 <span class="kw">fn </span>process_order_object(
     container: <span class="kw-2">&amp;</span>ParentContainer,
-    object: ParsedInputMap,
+    object: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt;,
     <span class="kw-2">mut </span>path: Vec&lt;OrderByHop&gt;,
     parent_sort_aggregation: <span class="prelude-ty">Option</span>&lt;SortAggregation&gt;,
 ) -&gt; QueryGraphBuilderResult&lt;<span class="prelude-ty">Option</span>&lt;OrderBy&gt;&gt; {
     <span class="kw">match </span>object.into_iter().next() {
         <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         <span class="prelude-val">Some</span>((field_name, field_value)) =&gt; {
-            <span class="kw">if </span>field_name.as_str() == ordering::UNDERSCORE_RELEVANCE {
-                <span class="kw">let </span>object: ParsedInputMap = field_value.try_into()<span class="question-mark">?</span>;
+            <span class="kw">if </span>field_name.as_ref() == ordering::UNDERSCORE_RELEVANCE {
+                <span class="kw">let </span>object: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = field_value.try_into()<span class="question-mark">?</span>;
 
                 <span class="kw">return </span>extract_order_by_relevance(container, object);
             }
 
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(sort_aggr) = extract_sort_aggregation(field_name.as_str()) {
-                <span class="kw">let </span>object: ParsedInputMap = field_value.try_into()<span class="question-mark">?</span>;
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(sort_aggr) = extract_sort_aggregation(field_name.as_ref()) {
+                <span class="kw">let </span>object: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = field_value.try_into()<span class="question-mark">?</span>;
 
                 <span class="kw">return </span>process_order_object(container, object, path, <span class="prelude-val">Some</span>(sort_aggr));
             }
@@ -459,12 +467,12 @@
 
             <span class="kw">match </span>field {
                 Field::Relation(rf) <span class="kw">if </span>rf.is_list() =&gt; {
-                    <span class="kw">let </span>object: ParsedInputMap = field_value.try_into()<span class="question-mark">?</span>;
+                    <span class="kw">let </span>object: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = field_value.try_into()<span class="question-mark">?</span>;
 
                     path.push(rf.into());
 
                     <span class="kw">let </span>(inner_field_name, inner_field_value) = object.into_iter().next().unwrap();
-                    <span class="kw">let </span>sort_aggregation = extract_sort_aggregation(inner_field_name.as_str())
+                    <span class="kw">let </span>sort_aggregation = extract_sort_aggregation(inner_field_name.as_ref())
                         .expect(<span class="string">&quot;To-many relation orderBy must be an aggregation ordering.&quot;</span>);
 
                     <span class="kw">let </span>(sort_order, <span class="kw">_</span>) = extract_order_by_args(inner_field_value)<span class="question-mark">?</span>;
@@ -472,7 +480,7 @@
                 }
 
                 Field::Relation(rf) =&gt; {
-                    <span class="kw">let </span>object: ParsedInputMap = field_value.try_into()<span class="question-mark">?</span>;
+                    <span class="kw">let </span>object: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = field_value.try_into()<span class="question-mark">?</span>;
                     path.push((<span class="kw-2">&amp;</span>rf).into());
 
                     process_order_object(<span class="kw-2">&amp;</span>rf.related_model().into(), object, path, <span class="prelude-val">None</span>)
@@ -490,12 +498,12 @@
                 }
 
                 Field::Composite(cf) <span class="kw">if </span>cf.is_list() =&gt; {
-                    <span class="kw">let </span>object: ParsedInputMap = field_value.try_into()<span class="question-mark">?</span>;
+                    <span class="kw">let </span>object: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = field_value.try_into()<span class="question-mark">?</span>;
 
                     path.push(cf.into());
 
                     <span class="kw">let </span>(inner_field_name, inner_field_value) = object.into_iter().next().unwrap();
-                    <span class="kw">let </span>sort_aggregation = extract_sort_aggregation(inner_field_name.as_str())
+                    <span class="kw">let </span>sort_aggregation = extract_sort_aggregation(inner_field_name.as_ref())
                         .expect(<span class="string">&quot;To-many composite orderBy must be an aggregation ordering.&quot;</span>);
 
                     <span class="kw">let </span>(sort_order, <span class="kw">_</span>) = extract_order_by_args(inner_field_value)<span class="question-mark">?</span>;
@@ -503,7 +511,7 @@
                 }
 
                 Field::Composite(cf) =&gt; {
-                    <span class="kw">let </span>object: ParsedInputMap = field_value.try_into()<span class="question-mark">?</span>;
+                    <span class="kw">let </span>object: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = field_value.try_into()<span class="question-mark">?</span>;
                     path.push((<span class="kw-2">&amp;</span>cf).into());
 
                     process_order_object(<span class="kw-2">&amp;</span>cf.typ().into(), object, path, <span class="prelude-val">None</span>)
@@ -515,7 +523,7 @@
 
 <span class="kw">fn </span>extract_order_by_relevance(
     container: <span class="kw-2">&amp;</span>ParentContainer,
-    object: ParsedInputMap,
+    object: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; QueryGraphBuilderResult&lt;<span class="prelude-ty">Option</span>&lt;OrderBy&gt;&gt; {
     <span class="kw">let </span>(sort_order, <span class="kw">_</span>) = extract_order_by_args(object.get(ordering::SORT).unwrap().clone())<span class="question-mark">?</span>;
     <span class="kw">let </span>search: PrismaValue = object.get(ordering::SEARCH).unwrap().clone().try_into()<span class="question-mark">?</span>;
@@ -556,7 +564,9 @@
     }
 }
 
-<span class="kw">fn </span>extract_order_by_args(field_value: ParsedInputValue) -&gt; QueryGraphBuilderResult&lt;(SortOrder, <span class="prelude-ty">Option</span>&lt;NullsOrder&gt;)&gt; {
+<span class="kw">fn </span>extract_order_by_args(
+    field_value: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;,
+) -&gt; QueryGraphBuilderResult&lt;(SortOrder, <span class="prelude-ty">Option</span>&lt;NullsOrder&gt;)&gt; {
     <span class="kw">match </span>field_value {
         ParsedInputValue::Map(<span class="kw-2">mut </span>map) =&gt; {
             <span class="kw">let </span>sort: PrismaValue = map.remove(ordering::SORT).unwrap().try_into()<span class="question-mark">?</span>;
@@ -595,7 +605,7 @@
     <span class="prelude-val">Ok</span>(nulls_order)
 }
 
-<span class="kw">fn </span>extract_distinct(value: ParsedInputValue) -&gt; QueryGraphBuilderResult&lt;FieldSelection&gt; {
+<span class="kw">fn </span>extract_distinct(value: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; QueryGraphBuilderResult&lt;FieldSelection&gt; {
     <span class="kw">let </span>selections = <span class="kw">match </span>value {
         ParsedInputValue::List(list) =&gt; list
             .into_iter()
@@ -610,7 +620,7 @@
     <span class="prelude-val">Ok</span>(FieldSelection::new(selections))
 }
 
-<span class="kw">fn </span>extract_skip(value: ParsedInputValue) -&gt; QueryGraphBuilderResult&lt;<span class="prelude-ty">Option</span>&lt;i64&gt;&gt; {
+<span class="kw">fn </span>extract_skip(value: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; QueryGraphBuilderResult&lt;<span class="prelude-ty">Option</span>&lt;i64&gt;&gt; {
     <span class="kw">let </span>val: <span class="prelude-ty">Option</span>&lt;i64&gt; = value.try_into()<span class="question-mark">?</span>;
 
     <span class="kw">match </span>val {
@@ -622,8 +632,8 @@
     }
 }
 
-<span class="kw">fn </span>extract_cursor(value: ParsedInputValue, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; QueryGraphBuilderResult&lt;<span class="prelude-ty">Option</span>&lt;SelectionResult&gt;&gt; {
-    <span class="kw">let </span>input_map: ParsedInputMap = value.try_into()<span class="question-mark">?</span>;
+<span class="kw">fn </span>extract_cursor(value: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;, model: <span class="kw-2">&amp;</span>Model) -&gt; QueryGraphBuilderResult&lt;<span class="prelude-ty">Option</span>&lt;SelectionResult&gt;&gt; {
+    <span class="kw">let </span>input_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = value.try_into()<span class="question-mark">?</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>pairs = <span class="macro">vec!</span>[];
 
     <span class="kw">for </span>(field_name, map_value) <span class="kw">in </span>input_map {
@@ -649,7 +659,7 @@
 
 <span class="kw">fn </span>extract_cursor_field(
     field: ScalarFieldRef,
-    input_value: ParsedInputValue,
+    input_value: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; QueryGraphBuilderResult&lt;Vec&lt;(ScalarFieldRef, PrismaValue)&gt;&gt; {
     <span class="kw">let </span>value = input_value.try_into()<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[(field, value)])
@@ -657,9 +667,9 @@
 
 <span class="kw">fn </span>extract_compound_cursor_field(
     fields: Vec&lt;ScalarFieldRef&gt;,
-    input_value: ParsedInputValue,
+    input_value: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; QueryGraphBuilderResult&lt;Vec&lt;(ScalarFieldRef, PrismaValue)&gt;&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>map: ParsedInputMap = input_value.try_into()<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = input_value.try_into()<span class="question-mark">?</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>pairs = <span class="macro">vec!</span>[];
 
     <span class="kw">for </span>field <span class="kw">in </span>fields {
@@ -671,7 +681,7 @@
 }
 
 <span class="doccomment">/// Runs final transformations on the QueryArguments.
-</span><span class="kw">fn </span>finalize_arguments(<span class="kw-2">mut </span>args: QueryArguments, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; QueryArguments {
+</span><span class="kw">fn </span>finalize_arguments(<span class="kw-2">mut </span>args: QueryArguments, model: <span class="kw-2">&amp;</span>Model) -&gt; QueryArguments {
     <span class="comment">// Check if the query requires an implicit ordering added to the arguments.
     // An implicit ordering is convenient for deterministic results for take and skip, for cursor it&#39;s _required_
     // as a cursor needs a direction to page. We simply take the primary identifier as a default order-by.

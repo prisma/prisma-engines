@@ -44,20 +44,20 @@
 <a href="#44" id="44">44</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{query_document::ParsedField, ManyRecordsQuery, QueryOption, QueryOptions, ReadQuery};
-<span class="kw">use </span>prisma_models::ModelRef;
+<span class="kw">use </span>prisma_models::Model;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_many(field: ParsedField, model: ModelRef) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_many(field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;, model: Model) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
     find_many_with_options(field, model, QueryOptions::none())
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_many_or_throw(field: ParsedField, model: ModelRef) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_many_or_throw(field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;, model: Model) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
     find_many_with_options(field, model, QueryOption::ThrowOnEmpty.into())
 }
 
 <span class="attr">#[inline]
 </span><span class="kw">fn </span>find_many_with_options(
-    field: ParsedField,
-    model: ModelRef,
+    field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;,
+    model: Model,
     options: QueryOptions,
 ) -&gt; QueryGraphBuilderResult&lt;ReadQuery&gt; {
     <span class="kw">let </span>args = extractors::extract_query_args(field.arguments, <span class="kw-2">&amp;</span>model)<span class="question-mark">?</span>;

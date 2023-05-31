@@ -241,7 +241,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModelRef {
+    <span class="kw">pub fn </span>model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Model {
         <span class="kw">match </span><span class="self">self </span>{
             ReadQuery::RecordQuery(x) =&gt; x.model.clone(),
             ReadQuery::ManyRecordsQuery(x) =&gt; x.model.clone(),
@@ -359,7 +359,7 @@
 </span><span class="kw">pub struct </span>RecordQuery {
     <span class="kw">pub </span>name: String,
     <span class="kw">pub </span>alias: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="kw">pub </span>model: ModelRef,
+    <span class="kw">pub </span>model: Model,
     <span class="kw">pub </span>filter: <span class="prelude-ty">Option</span>&lt;Filter&gt;,
     <span class="kw">pub </span>selected_fields: FieldSelection,
     <span class="kw">pub</span>(<span class="kw">crate</span>) nested: Vec&lt;ReadQuery&gt;,
@@ -372,7 +372,7 @@
 </span><span class="kw">pub struct </span>ManyRecordsQuery {
     <span class="kw">pub </span>name: String,
     <span class="kw">pub </span>alias: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="kw">pub </span>model: ModelRef,
+    <span class="kw">pub </span>model: Model,
     <span class="kw">pub </span>args: QueryArguments,
     <span class="kw">pub </span>selected_fields: FieldSelection,
     <span class="kw">pub</span>(<span class="kw">crate</span>) nested: Vec&lt;ReadQuery&gt;,
@@ -401,7 +401,7 @@
 </span><span class="kw">pub struct </span>AggregateRecordsQuery {
     <span class="kw">pub </span>name: String,
     <span class="kw">pub </span>alias: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="kw">pub </span>model: ModelRef,
+    <span class="kw">pub </span>model: Model,
     <span class="kw">pub </span>selection_order: Vec&lt;(String, <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;)&gt;,
     <span class="kw">pub </span>args: QueryArguments,
     <span class="kw">pub </span>selectors: Vec&lt;AggregationSelection&gt;,

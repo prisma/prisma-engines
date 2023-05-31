@@ -304,7 +304,7 @@
 </span><span class="kw">impl </span>WriteOperations <span class="kw">for </span>MongoDbConnection {
     <span class="kw">async fn </span>create_record(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        model: <span class="kw-2">&amp;</span>ModelRef,
+        model: <span class="kw-2">&amp;</span>Model,
         args: WriteArgs,
         _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector_interface::Result&lt;SelectionResult&gt; {
@@ -313,7 +313,7 @@
 
     <span class="kw">async fn </span>create_records(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        model: <span class="kw-2">&amp;</span>ModelRef,
+        model: <span class="kw-2">&amp;</span>Model,
         args: Vec&lt;WriteArgs&gt;,
         skip_duplicates: bool,
         _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -326,7 +326,7 @@
 
     <span class="kw">async fn </span>update_records(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        model: <span class="kw-2">&amp;</span>ModelRef,
+        model: <span class="kw-2">&amp;</span>Model,
         record_filter: connector_interface::RecordFilter,
         args: WriteArgs,
         _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -349,7 +349,7 @@
 
     <span class="kw">async fn </span>update_record(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        model: <span class="kw-2">&amp;</span>ModelRef,
+        model: <span class="kw-2">&amp;</span>Model,
         record_filter: connector_interface::RecordFilter,
         args: WriteArgs,
         _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -371,7 +371,7 @@
 
     <span class="kw">async fn </span>delete_records(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        model: <span class="kw-2">&amp;</span>ModelRef,
+        model: <span class="kw-2">&amp;</span>Model,
         record_filter: connector_interface::RecordFilter,
         _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector_interface::Result&lt;usize&gt; {
@@ -408,7 +408,7 @@
 
     <span class="kw">async fn </span>query_raw(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        model: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ModelRef&gt;,
+        model: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Model&gt;,
         inputs: HashMap&lt;String, PrismaValue&gt;,
         query_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; connector_interface::Result&lt;serde_json::Value&gt; {
@@ -428,7 +428,7 @@
 </span><span class="kw">impl </span>ReadOperations <span class="kw">for </span>MongoDbConnection {
     <span class="kw">async fn </span>get_single_record(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        model: <span class="kw-2">&amp;</span>ModelRef,
+        model: <span class="kw-2">&amp;</span>Model,
         filter: <span class="kw-2">&amp;</span>connector_interface::Filter,
         selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
         aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
@@ -450,7 +450,7 @@
 
     <span class="kw">async fn </span>get_many_records(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        model: <span class="kw-2">&amp;</span>ModelRef,
+        model: <span class="kw-2">&amp;</span>Model,
         query_arguments: connector_interface::QueryArguments,
         selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
         aggregation_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
@@ -484,7 +484,7 @@
 
     <span class="kw">async fn </span>aggregate_records(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        model: <span class="kw-2">&amp;</span>ModelRef,
+        model: <span class="kw-2">&amp;</span>Model,
         query_arguments: connector_interface::QueryArguments,
         selections: Vec&lt;connector_interface::AggregationSelection&gt;,
         group_by: Vec&lt;ScalarFieldRef&gt;,

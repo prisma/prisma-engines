@@ -290,7 +290,7 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>SelectDefinition {
     <span class="kw">fn </span>into_select(
         <span class="self">self</span>,
-        <span class="kw">_</span>: <span class="kw-2">&amp;</span>ModelRef,
+        <span class="kw">_</span>: <span class="kw-2">&amp;</span>Model,
         aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
         ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; (Select&lt;<span class="lifetime">&#39;static</span>&gt;, Vec&lt;Expression&lt;<span class="lifetime">&#39;static</span>&gt;&gt;);
@@ -299,7 +299,7 @@
 <span class="kw">impl </span>SelectDefinition <span class="kw">for </span>Filter {
     <span class="kw">fn </span>into_select(
         <span class="self">self</span>,
-        model: <span class="kw-2">&amp;</span>ModelRef,
+        model: <span class="kw-2">&amp;</span>Model,
         aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
         ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; (Select&lt;<span class="lifetime">&#39;static</span>&gt;, Vec&lt;Expression&lt;<span class="lifetime">&#39;static</span>&gt;&gt;) {
@@ -311,7 +311,7 @@
 <span class="kw">impl </span>SelectDefinition <span class="kw">for </span><span class="kw-2">&amp;</span>Filter {
     <span class="kw">fn </span>into_select(
         <span class="self">self</span>,
-        model: <span class="kw-2">&amp;</span>ModelRef,
+        model: <span class="kw-2">&amp;</span>Model,
         aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
         ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; (Select&lt;<span class="lifetime">&#39;static</span>&gt;, Vec&lt;Expression&lt;<span class="lifetime">&#39;static</span>&gt;&gt;) {
@@ -322,7 +322,7 @@
 <span class="kw">impl </span>SelectDefinition <span class="kw">for </span>Select&lt;<span class="lifetime">&#39;static</span>&gt; {
     <span class="kw">fn </span>into_select(
         <span class="self">self</span>,
-        <span class="kw">_</span>: <span class="kw-2">&amp;</span>ModelRef,
+        <span class="kw">_</span>: <span class="kw-2">&amp;</span>Model,
         <span class="kw">_</span>: <span class="kw-2">&amp;</span>[RelAggregationSelection],
         _ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; (Select&lt;<span class="lifetime">&#39;static</span>&gt;, Vec&lt;Expression&lt;<span class="lifetime">&#39;static</span>&gt;&gt;) {
@@ -333,7 +333,7 @@
 <span class="kw">impl </span>SelectDefinition <span class="kw">for </span>QueryArguments {
     <span class="kw">fn </span>into_select(
         <span class="self">self</span>,
-        model: <span class="kw-2">&amp;</span>ModelRef,
+        model: <span class="kw-2">&amp;</span>Model,
         aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
         ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; (Select&lt;<span class="lifetime">&#39;static</span>&gt;, Vec&lt;Expression&lt;<span class="lifetime">&#39;static</span>&gt;&gt;) {
@@ -385,7 +385,7 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_records&lt;T&gt;(
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    model: <span class="kw-2">&amp;</span>Model,
     columns: <span class="kw">impl </span>Iterator&lt;Item = Column&lt;<span class="lifetime">&#39;static</span>&gt;&gt;,
     aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
     query: T,
@@ -431,7 +431,7 @@
 /// Important note: Do not use the AsColumn trait here as we need to construct column references that are relative,
 /// not absolute - e.g. `SELECT &quot;field&quot; FROM (...)` NOT `SELECT &quot;full&quot;.&quot;path&quot;.&quot;to&quot;.&quot;field&quot; FROM (...)`.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>aggregate(
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    model: <span class="kw-2">&amp;</span>Model,
     selections: <span class="kw-2">&amp;</span>[AggregationSelection],
     args: QueryArguments,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
@@ -479,7 +479,7 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>group_by_aggregate(
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    model: <span class="kw-2">&amp;</span>Model,
     args: QueryArguments,
     selections: <span class="kw-2">&amp;</span>[AggregationSelection],
     group_by: Vec&lt;ScalarFieldRef&gt;,
@@ -531,7 +531,7 @@
     }
 }
 
-<span class="kw">fn </span>extract_columns(model: <span class="kw-2">&amp;</span>ModelRef, selections: <span class="kw-2">&amp;</span>[AggregationSelection], ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Vec&lt;Column&lt;<span class="lifetime">&#39;static</span>&gt;&gt; {
+<span class="kw">fn </span>extract_columns(model: <span class="kw-2">&amp;</span>Model, selections: <span class="kw-2">&amp;</span>[AggregationSelection], ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Vec&lt;Column&lt;<span class="lifetime">&#39;static</span>&gt;&gt; {
     <span class="kw">let </span>fields: Vec&lt;<span class="kw">_</span>&gt; = selections
         .iter()
         .flat_map(|selection| <span class="kw">match </span>selection {

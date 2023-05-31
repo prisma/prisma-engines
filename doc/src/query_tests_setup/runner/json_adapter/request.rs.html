@@ -272,20 +272,6 @@
 <a href="#272" id="272">272</a>
 <a href="#273" id="273">273</a>
 <a href="#274" id="274">274</a>
-<a href="#275" id="275">275</a>
-<a href="#276" id="276">276</a>
-<a href="#277" id="277">277</a>
-<a href="#278" id="278">278</a>
-<a href="#279" id="279">279</a>
-<a href="#280" id="280">280</a>
-<a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
-<a href="#283" id="283">283</a>
-<a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
-<a href="#286" id="286">286</a>
-<a href="#287" id="287">287</a>
-<a href="#288" id="288">288</a>
 </pre><pre class="rust"><code><span class="kw">use </span>indexmap::IndexMap;
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>prisma_models::PrismaValue;
@@ -293,7 +279,7 @@
     constants::custom_types,
     schema::{
         constants::{<span class="self">self</span>, json_null},
-        InputField, InputObjectType, InputType, OutputField, QuerySchema, QuerySchemaRef,
+        InputField, InputObjectType, InputType, OutputField, QuerySchema,
     },
     ArgumentValue, ArgumentValueObject, Selection,
 };
@@ -306,41 +292,39 @@
 
 <span class="kw">impl </span>JsonRequest {
     <span class="doccomment">/// Translates a GraphQL query to a JSON query. This is used to keep the same test-suite running on both protocols.
-    </span><span class="kw">pub fn </span>from_graphql(gql: <span class="kw-2">&amp;</span>str, query_schema: <span class="kw-2">&amp;</span>QuerySchemaRef) -&gt; TestResult&lt;JsonSingleQuery&gt; {
+    </span><span class="kw">pub fn </span>from_graphql(gql: <span class="kw-2">&amp;</span>str, query_schema: <span class="kw-2">&amp;</span>QuerySchema) -&gt; TestResult&lt;JsonSingleQuery&gt; {
         <span class="kw">let </span>operation = GraphQLProtocolAdapter::convert_query_to_operation(gql, <span class="prelude-val">None</span>).unwrap();
         <span class="kw">let </span>operation_name = operation.name();
         <span class="kw">let </span>schema_field = query_schema
             .find_query_field(operation_name)
             .unwrap_or_else(|| query_schema.find_mutation_field(operation_name).unwrap());
-        <span class="kw">let </span>model_name = schema_field.model().as_ref().map(|m| m.name().to_owned());
+        <span class="kw">let </span>model_name = schema_field
+            .model()
+            .map(|m| query_schema.internal_data_model.walk(m).name().to_owned());
         <span class="kw">let </span>query_tag = schema_field.query_tag().unwrap().to_owned();
         <span class="kw">let </span>selection = operation.into_selection();
 
         <span class="kw">let </span>output = JsonSingleQuery {
             model_name,
             action: Action::new(query_tag),
-            query: graphql_selection_to_json_field_query(selection, schema_field, query_schema.as_ref()),
+            query: graphql_selection_to_json_field_query(selection, <span class="kw-2">&amp;</span>schema_field),
         };
 
         <span class="prelude-val">Ok</span>(output)
     }
 }
 
-<span class="kw">fn </span>graphql_selection_to_json_field_query(
-    <span class="kw-2">mut </span>selection: Selection,
-    schema_field: <span class="kw-2">&amp;</span>OutputField,
-    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
-) -&gt; FieldQuery {
+<span class="kw">fn </span>graphql_selection_to_json_field_query(<span class="kw-2">mut </span>selection: Selection, schema_field: <span class="kw-2">&amp;</span>OutputField&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; FieldQuery {
+    <span class="kw">let </span>args = schema_field.arguments().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
     FieldQuery {
-        arguments: graphql_args_to_json_args(<span class="kw-2">&amp;mut </span>selection, <span class="kw-2">&amp;</span>schema_field.arguments, query_schema),
-        selection: graphql_selection_to_json_selection(selection, schema_field, query_schema),
+        arguments: graphql_args_to_json_args(<span class="kw-2">&amp;mut </span>selection, <span class="kw-2">&amp;</span>args),
+        selection: graphql_selection_to_json_selection(selection, schema_field),
     }
 }
 
 <span class="kw">fn </span>graphql_args_to_json_args(
     selection: <span class="kw-2">&amp;mut </span>Selection,
-    args_fields: <span class="kw-2">&amp;</span>[InputField],
-    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
+    args_fields: <span class="kw-2">&amp;</span>[InputField&lt;<span class="lifetime">&#39;_</span>&gt;],
 ) -&gt; <span class="prelude-ty">Option</span>&lt;IndexMap&lt;String, JsonValue&gt;&gt; {
     <span class="kw">if </span>selection.arguments().is_empty() {
         <span class="kw">return </span><span class="prelude-val">None</span>;
@@ -351,9 +335,9 @@
     <span class="kw">for </span>(arg_name, arg_value) <span class="kw">in </span>selection.arguments().iter().cloned() {
         <span class="kw">let </span>arg_field = args_fields.iter().find(|arg_field| arg_field.name == arg_name);
 
-        <span class="kw">let </span>inferrer = FieldTypeInferrer::from_field(arg_field, query_schema).infer(<span class="kw-2">&amp;</span>arg_value, query_schema);
+        <span class="kw">let </span>inferrer = FieldTypeInferrer::from_field(arg_field).infer(<span class="kw-2">&amp;</span>arg_value);
 
-        <span class="kw">let </span>json = arg_value_to_json(arg_value, inferrer, query_schema);
+        <span class="kw">let </span>json = arg_value_to_json(arg_value, inferrer);
 
         args.insert(arg_name, json);
     }
@@ -361,28 +345,28 @@
     <span class="prelude-val">Some</span>(args)
 }
 
-<span class="kw">fn </span>arg_value_to_json(value: ArgumentValue, typ: InferredType, query_schema: <span class="kw-2">&amp;</span>QuerySchema) -&gt; JsonValue {
+<span class="kw">fn </span>arg_value_to_json(value: ArgumentValue, typ: InferredType) -&gt; JsonValue {
     <span class="kw">match </span>(value, typ) {
         (ArgumentValue::Object(obj), InferredType::Object(typ)) =&gt; JsonValue::Object(
             obj.into_iter()
                 .map(|(k, v)| {
                     <span class="kw">let </span>field = typ.find_field(<span class="kw-2">&amp;</span>k);
-                    <span class="kw">let </span>inferrer = FieldTypeInferrer::from_field(field, query_schema);
-                    <span class="kw">let </span>inferred_type = inferrer.infer(<span class="kw-2">&amp;</span>v, query_schema);
+                    <span class="kw">let </span>inferrer = FieldTypeInferrer::from_field(field.as_ref());
+                    <span class="kw">let </span>inferred_type = inferrer.infer(<span class="kw-2">&amp;</span>v);
 
-                    (k, arg_value_to_json(v, inferred_type, query_schema))
+                    (k, arg_value_to_json(v, inferred_type))
                 })
                 .collect(),
         ),
         (obj @ ArgumentValue::Object(<span class="kw">_</span>), InferredType::FieldRef) =&gt; {
-            <span class="kw">let </span>val = arg_value_to_json(obj, InferredType::Unknown, query_schema);
+            <span class="kw">let </span>val = arg_value_to_json(obj, InferredType::Unknown);
 
             make_json_custom_type(custom_types::FIELD_REF, val)
         }
         (ArgumentValue::Object(obj), InferredType::Unknown) =&gt; {
             <span class="kw">let </span>obj = obj
                 .into_iter()
-                .map(|(k, v)| (k, arg_value_to_json(v, InferredType::Unknown, query_schema)))
+                .map(|(k, v)| (k, arg_value_to_json(v, InferredType::Unknown)))
                 .collect();
 
             JsonValue::Object(obj)
@@ -399,9 +383,9 @@
             <span class="kw">let </span>values = list
                 .into_iter()
                 .map(|val| {
-                    <span class="kw">let </span>inferred_typ = FieldTypeInferrer::new(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[typ.clone()])).infer(<span class="kw-2">&amp;</span>val, query_schema);
+                    <span class="kw">let </span>inferred_typ = FieldTypeInferrer::new(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[typ.clone()])).infer(<span class="kw-2">&amp;</span>val);
 
-                    arg_value_to_json(val, inferred_typ, query_schema)
+                    arg_value_to_json(val, inferred_typ)
                 })
                 .collect_vec();
 
@@ -409,18 +393,14 @@
         }
         (ArgumentValue::List(list), InferredType::Unknown) =&gt; JsonValue::Array(
             list.into_iter()
-                .map(|val| arg_value_to_json(val, InferredType::Unknown, query_schema))
+                .map(|val| arg_value_to_json(val, InferredType::Unknown))
                 .collect_vec(),
         ),
         <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
     }
 }
 
-<span class="kw">fn </span>graphql_selection_to_json_selection(
-    selection: Selection,
-    schema_field: <span class="kw-2">&amp;</span>OutputField,
-    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
-) -&gt; SelectionSet {
+<span class="kw">fn </span>graphql_selection_to_json_selection(selection: Selection, schema_field: <span class="kw-2">&amp;</span>OutputField&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; SelectionSet {
     <span class="kw">let </span><span class="kw-2">mut </span>res: IndexMap&lt;String, SelectionSetValue&gt; = IndexMap::new();
 
     <span class="kw">for </span>nested_selection <span class="kw">in </span>selection.nested_selections().iter().cloned() {
@@ -428,10 +408,10 @@
         <span class="kw">let </span>no_nested_selection = nested_selection.nested_selections().is_empty();
         <span class="kw">let </span>selection_name = nested_selection.name().to_owned();
         <span class="kw">let </span>can_have_nested_selection = schema_field
-            .field_type
-            .as_object_type(<span class="kw-2">&amp;</span>query_schema.db)
-            .and_then(|(<span class="kw">_</span>, object)| object.find_field(<span class="kw-2">&amp;</span>selection_name))
-            .and_then(|(<span class="kw">_</span>, field)| field.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db))
+            .field_type()
+            .as_object_type()
+            .and_then(|object| object.find_field(<span class="kw-2">&amp;</span>selection_name))
+            .filter(|field| field.field_type().as_object_type().is_some())
             .is_some();
 
         <span class="kw">if </span>no_args &amp;&amp; no_nested_selection {
@@ -447,19 +427,15 @@
                 res.insert(selection_name, SelectionSetValue::Shorthand(<span class="bool-val">true</span>));
             }
         } <span class="kw">else </span>{
-            <span class="kw">let </span>(<span class="kw">_</span>, nested_field) = schema_field
-                .field_type
-                .as_object_type(<span class="kw-2">&amp;</span>query_schema.db)
+            <span class="kw">let </span>nested_field = schema_field
+                .field_type()
+                .as_object_type()
                 .unwrap()
-                .<span class="number">1
-                </span>.find_field(<span class="kw-2">&amp;</span>selection_name)
+                .find_field(<span class="kw-2">&amp;</span>selection_name)
                 .unwrap();
 
-            <span class="kw">let </span>nested = SelectionSetValue::Nested(graphql_selection_to_json_field_query(
-                nested_selection,
-                nested_field,
-                query_schema,
-            ));
+            <span class="kw">let </span>nested =
+                SelectionSetValue::Nested(graphql_selection_to_json_field_query(nested_selection, <span class="kw-2">&amp;</span>nested_field));
 
             res.insert(selection_name, nested);
         }
@@ -474,26 +450,26 @@
 
 <span class="doccomment">/// Tiny abstraction which helps inferring what type a value should be coerced to
 /// when translated from GraphQL to JSON.
-</span><span class="kw">struct </span>FieldTypeInferrer&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">struct </span>FieldTypeInferrer&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
     <span class="doccomment">/// The list of input types of an input field.
-    </span>types: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[InputType]&gt;,
+    </span>types: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>[InputType&lt;<span class="lifetime">&#39;a</span>&gt;]&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FieldTypeInferrer&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(types: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[InputType]&gt;) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; FieldTypeInferrer&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(types: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>[InputType&lt;<span class="lifetime">&#39;a</span>&gt;]&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{ types }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_field(field: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>InputField&gt;, query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_field(field: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>InputField&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
-            types: field.map(|field| field.field_types(query_schema)),
+            types: field.map(|field| field.field_types()),
         }
     }
 
     <span class="doccomment">/// Given a list of input types and an ArgumentValue, attempts to infer to the best of our ability
     /// what types it should be transformed to.
     /// If we cannot confidently infer the type, we return InferredType::Unknown.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>infer&lt;<span class="lifetime">&#39;b</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>ArgumentValue, query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>QuerySchema) -&gt; InferredType&lt;<span class="lifetime">&#39;b</span>&gt; {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>infer(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>ArgumentValue) -&gt; InferredType&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="kw">if </span><span class="self">self</span>.types.is_none() {
             <span class="kw">return </span>InferredType::Unknown;
         }
@@ -501,7 +477,7 @@
         <span class="kw">match </span>value {
             ArgumentValue::Object(obj) =&gt; {
                 <span class="kw">let </span>is_field_ref_obj = obj.contains_key(constants::filters::UNDERSCORE_REF) &amp;&amp; obj.len() == <span class="number">1</span>;
-                <span class="kw">let </span>schema_objects = <span class="self">self</span>.get_object_types(query_schema);
+                <span class="kw">let </span>schema_objects = <span class="self">self</span>.get_object_types();
 
                 <span class="kw">match </span>schema_objects {
                     <span class="prelude-val">Some</span>(schema_objects) =&gt; <span class="kw">match </span><span class="self">Self</span>::obj_val_fits_obj_types(obj, <span class="kw-2">&amp;</span>schema_objects) {
@@ -535,16 +511,12 @@
             .unwrap_or(<span class="bool-val">false</span>)
     }
 
-    <span class="kw">fn </span>get_object_types&lt;<span class="lifetime">&#39;b</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>QuerySchema) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>InputObjectType&gt;&gt; {
-        <span class="self">self</span>.types.map(|types| {
-            types
-                .iter()
-                .filter_map(|typ| typ.as_object(<span class="kw-2">&amp;</span>query_schema.db))
-                .collect_vec()
-        })
+    <span class="kw">fn </span>get_object_types(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;InputObjectType&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; {
+        <span class="self">self</span>.types
+            .map(|types| types.iter().cloned().filter_map(|typ| typ.into_object()).collect_vec())
     }
 
-    <span class="kw">fn </span>get_list_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;InputType&gt; {
+    <span class="kw">fn </span>get_list_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;InputType&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
         <span class="self">self</span>.types
             .and_then(|types| types.iter().find_map(|typ| typ.as_list()))
             .map(|typ| typ.to_owned())
@@ -554,10 +526,10 @@
         [json_null::DB_NULL, json_null::JSON_NULL, json_null::ANY_NULL].contains(<span class="kw-2">&amp;</span>val)
     }
 
-    <span class="kw">fn </span>obj_val_fits_obj_types&lt;<span class="lifetime">&#39;b</span>&gt;(
+    <span class="kw">fn </span>obj_val_fits_obj_types(
         val: <span class="kw-2">&amp;</span>ArgumentValueObject,
-        schema_objects: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>InputObjectType],
-    ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>InputObjectType&gt; {
+        schema_objects: <span class="kw-2">&amp;</span>[InputObjectType&lt;<span class="lifetime">&#39;a</span>&gt;],
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;InputObjectType&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
         schema_objects
             .iter()
             .find(|schema_object| val.keys().all(|key| schema_object.find_field(key).is_some()))
@@ -567,8 +539,8 @@
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">enum </span>InferredType&lt;<span class="lifetime">&#39;a</span>&gt; {
-    Object(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>InputObjectType),
-    List(InputType),
+    Object(InputObjectType&lt;<span class="lifetime">&#39;a</span>&gt;),
+    List(InputType&lt;<span class="lifetime">&#39;a</span>&gt;),
     Json,
     JsonNullEnum,
     FieldRef,

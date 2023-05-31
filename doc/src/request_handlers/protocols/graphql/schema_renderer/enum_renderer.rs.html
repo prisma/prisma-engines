@@ -33,11 +33,11 @@
 <a href="#33" id="33">33</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>GqlEnumRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
-    enum_type: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>EnumType,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>GqlEnumRenderer {
+    enum_type: EnumType,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Renderer <span class="kw">for </span>GqlEnumRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl </span>Renderer <span class="kw">for </span>GqlEnumRenderer {
     <span class="kw">fn </span>render(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
         <span class="kw">if </span>ctx.already_rendered(<span class="kw-2">&amp;</span><span class="self">self</span>.enum_type.name()) {
             <span class="kw">return </span><span class="string">&quot;&quot;</span>.to_owned();
@@ -51,13 +51,13 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; GqlEnumRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(enum_type: <span class="kw-2">&amp;</span>EnumType) -&gt; GqlEnumRenderer {
+<span class="kw">impl </span>GqlEnumRenderer {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(enum_type: EnumType) -&gt; GqlEnumRenderer {
         GqlEnumRenderer { enum_type }
     }
 
     <span class="kw">fn </span>format_enum_values(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;String&gt; {
-        <span class="kw">match </span><span class="self">self</span>.enum_type {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.enum_type {
             EnumType::String(s) =&gt; s.values().to_owned(),
             EnumType::Database(dbt) =&gt; dbt.external_values(),
             EnumType::FieldRef(f) =&gt; f.values(),

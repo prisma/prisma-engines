@@ -146,6 +146,10 @@
 <a href="#146" id="146">146</a>
 <a href="#147" id="147">147</a>
 <a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>psl::parser_database::{
     ast::FieldArity,
@@ -157,6 +161,10 @@
 <span class="kw">pub type </span>RelationFieldRef = RelationField;
 
 <span class="kw">impl </span>RelationField {
+    <span class="kw">pub fn </span>borrowed_name&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>psl::ValidatedSchema) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+        schema.db.walk(<span class="self">self</span>.id).name()
+    }
+
     <span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="self">self</span>.walker().name()
     }
@@ -189,7 +197,7 @@
         !<span class="self">self</span>.is_required()
     }
 
-    <span class="kw">pub fn </span>model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModelRef {
+    <span class="kw">pub fn </span>model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Model {
         <span class="self">self</span>.dm.find_model_by_id(<span class="self">self</span>.walker().model().id)
     }
 
@@ -224,7 +232,7 @@
         <span class="self">self</span>.relation().is_inline_relation() &amp;&amp; !<span class="self">self</span>.relation_is_inlined_in_parent()
     }
 
-    <span class="kw">pub fn </span>related_model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModelRef {
+    <span class="kw">pub fn </span>related_model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Model {
         <span class="self">self</span>.dm.find_model_by_id(<span class="self">self</span>.walker().related_model().id)
     }
 

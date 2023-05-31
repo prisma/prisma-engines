@@ -322,170 +322,192 @@
 <a href="#322" id="322">322</a>
 <a href="#323" id="323">323</a>
 <a href="#324" id="324">324</a>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{db::QuerySchemaDatabase, EnumType, IdentifierType, ObjectType, OutputField, OutputObjectTypeId};
-<span class="kw">use </span>prisma_models::{InternalDataModelRef, ModelRef};
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{IdentifierType, ObjectType, OutputField};
+<span class="kw">use </span>prisma_models::{ast, InternalDataModel};
 <span class="kw">use </span>psl::{
-    datamodel_connector::{ConnectorCapabilities, ConnectorCapability, RelationMode},
-    PreviewFeatures,
+    datamodel_connector::{Connector, ConnectorCapability, RelationMode},
+    PreviewFeature, PreviewFeatures,
 };
 <span class="kw">use </span>std::{collections::HashMap, fmt};
+
+<span class="attr">#[derive(Clone, Debug, Hash, Eq, PartialEq)]
+</span><span class="kw">enum </span>Operation {
+    Query,
+    Mutation,
+}
+
+<span class="kw">type </span>LazyField = Box&lt;<span class="kw">dyn for</span>&lt;<span class="lifetime">&#39;a</span>&gt; Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema) -&gt; OutputField&lt;<span class="lifetime">&#39;a</span>&gt; + Send + Sync&gt;;
 
 <span class="doccomment">/// The query schema defines which operations (query/mutations) are possible on a database, based
 /// on a Prisma schema.
 ///
 /// Conceptually, a query schema stores two trees (query/mutation) that consist of input and output
 /// types.
-</span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>QuerySchema {
-    <span class="doccomment">/// Root query object (read queries).
-    </span><span class="kw">pub </span>query: OutputObjectTypeId,
-
-    <span class="doccomment">/// Root mutation object (write queries).
-    </span><span class="kw">pub </span>mutation: OutputObjectTypeId,
-
     <span class="doccomment">/// Internal abstraction over the datamodel AST.
-    </span><span class="kw">pub </span>internal_data_model: InternalDataModelRef,
+    </span><span class="kw">pub </span>internal_data_model: InternalDataModel,
 
-    <span class="doccomment">/// Information about the connector this schema was build for.
-    </span><span class="kw">pub </span>context: ConnectorContext,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) enable_raw_queries: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) connector: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Connector,
 
-    <span class="doccomment">/// The primary source of truth for schema data.
-    </span><span class="kw">pub </span>db: QuerySchemaDatabase,
+    <span class="doccomment">/// Indexes query and mutation fields by their own query info for easier access.
+    </span>query_info_map: HashMap&lt;(Operation, QueryInfo), usize&gt;,
+    root_fields: HashMap&lt;(Operation, String), usize&gt;,
+    query_fields: Vec&lt;LazyField&gt;,
+    mutation_fields: Vec&lt;LazyField&gt;,
 
-    <span class="comment">// Indexes query fields by their own query info for easier access.
-    </span>query_map: HashMap&lt;QueryInfo, usize&gt;,
+    preview_features: PreviewFeatures,
 
-    <span class="comment">// Indexes mutation fields by their own query info for easier access.
-    </span>mutation_map: HashMap&lt;QueryInfo, usize&gt;,
-}
-
-<span class="doccomment">/// Connector meta information, to be used in query execution if necessary.
-</span><span class="attr">#[derive(Debug)]
-</span><span class="kw">pub struct </span>ConnectorContext {
-    <span class="doccomment">/// Capabilities of the provider.
-    </span><span class="kw">pub </span>capabilities: ConnectorCapabilities,
-
-    <span class="doccomment">/// Enabled preview features.
-    </span><span class="kw">pub </span>features: PreviewFeatures,
-
-    <span class="doccomment">/// Relation mode of the provider
-    </span><span class="kw">pub </span>relation_mode: RelationMode,
-}
-
-<span class="kw">impl </span>ConnectorContext {
-    <span class="kw">pub fn </span>new(capabilities: ConnectorCapabilities, features: PreviewFeatures, relation_mode: RelationMode) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            capabilities,
-            features,
-            relation_mode,
-        }
-    }
-
-    <span class="kw">pub fn </span>can_native_upsert(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.capabilities.contains(ConnectorCapability::NativeUpsert)
-    }
+    <span class="doccomment">/// Relation mode in the datasource.
+    </span>relation_mode: RelationMode,
 }
 
 <span class="kw">impl </span>QuerySchema {
-    <span class="attr">#[allow(clippy::too_many_arguments)]
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
-        query: OutputObjectTypeId,
-        mutation: OutputObjectTypeId,
-        db: QuerySchemaDatabase,
-        internal_data_model: InternalDataModelRef,
-        capabilities: ConnectorCapabilities,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
+        enable_raw_queries: bool,
+        connector: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Connector,
+        preview_features: PreviewFeatures,
+        internal_data_model: InternalDataModel,
     ) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>features = internal_data_model.schema.configuration.preview_features();
         <span class="kw">let </span>relation_mode = internal_data_model.schema.relation_mode();
-        <span class="kw">let </span><span class="kw-2">mut </span>query_map: HashMap&lt;QueryInfo, usize&gt; = HashMap::new();
-        <span class="kw">let </span><span class="kw-2">mut </span>mutation_map: HashMap&lt;QueryInfo, usize&gt; = HashMap::new();
 
-        <span class="kw">for </span>(field_idx, field) <span class="kw">in </span>db[query].get_fields().iter().enumerate() {
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(query_info) = field.query_info() {
-                query_map.insert(query_info.to_owned(), field_idx);
-            }
-        }
-
-        <span class="kw">for </span>(field_idx, field) <span class="kw">in </span>db[mutation].get_fields().iter().enumerate() {
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(query_info) = field.query_info() {
-                mutation_map.insert(query_info.to_owned(), field_idx);
-            }
-        }
-
-        QuerySchema {
-            query,
-            mutation,
-            query_map,
-            mutation_map,
-            db,
+        <span class="kw">let </span><span class="kw-2">mut </span>query_schema = QuerySchema {
+            preview_features,
+            enable_raw_queries,
+            query_info_map: Default::default(),
+            root_fields: Default::default(),
             internal_data_model,
-            context: ConnectorContext::new(capabilities, features, relation_mode),
+            connector,
+            relation_mode,
+            mutation_fields: Default::default(),
+            query_fields: Default::default(),
+        };
+
+        query_schema.query_fields = <span class="kw">crate</span>::build::query_type::query_fields(<span class="kw-2">&amp;</span>query_schema);
+        query_schema.mutation_fields = <span class="kw">crate</span>::build::mutation_type::mutation_fields(<span class="kw-2">&amp;</span>query_schema);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>query_info_map: HashMap&lt;(Operation, QueryInfo), <span class="kw">_</span>&gt; = HashMap::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>root_fields = HashMap::new();
+
+        <span class="kw">for </span>(idx, field_fn) <span class="kw">in </span>query_schema.query_fields.iter().enumerate() {
+            <span class="kw">let </span>field = field_fn(<span class="kw-2">&amp;</span>query_schema);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(query_info) = field.query_info() {
+                query_info_map.insert((Operation::Query, query_info.to_owned()), idx);
+            }
+            root_fields.insert((Operation::Query, field.name.into_owned()), idx);
         }
+
+        <span class="kw">for </span>(idx, field_fn) <span class="kw">in </span>query_schema.mutation_fields.iter().enumerate() {
+            <span class="kw">let </span>field = field_fn(<span class="kw-2">&amp;</span>query_schema);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(query_info) = field.query_info() {
+                query_info_map.insert((Operation::Mutation, query_info.to_owned()), idx);
+            }
+            root_fields.insert((Operation::Mutation, field.name.into_owned()), idx);
+        }
+
+        query_schema.query_info_map = query_info_map;
+        query_schema.root_fields = root_fields;
+        query_schema
     }
 
-    <span class="kw">pub fn </span>find_mutation_field&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: T) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>OutputField&gt;
-    <span class="kw">where
-        </span>T: Into&lt;String&gt;,
-    {
-        <span class="kw">let </span>name = name.into();
-        <span class="self">self</span>.mutation().get_fields().iter().find(|f| f.name == name)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>supports_any(<span class="kw-2">&amp;</span><span class="self">self</span>, capabilities: <span class="kw-2">&amp;</span>[ConnectorCapability]) -&gt; bool {
+        capabilities.iter().any(|c| <span class="self">self</span>.connector.has_capability(<span class="kw-2">*</span>c))
     }
 
-    <span class="kw">pub fn </span>find_query_field&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: T) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>OutputField&gt;
-    <span class="kw">where
-        </span>T: Into&lt;String&gt;,
-    {
-        <span class="kw">let </span>name = name.into();
-        <span class="self">self</span>.query().get_fields().iter().find(|f| f.name == name)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>can_full_text_search(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.has_feature(PreviewFeature::FullTextSearch)
+            &amp;&amp; (<span class="self">self</span>.has_capability(ConnectorCapability::FullTextSearchWithoutIndex)
+                || <span class="self">self</span>.has_capability(ConnectorCapability::FullTextSearchWithIndex))
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_feature(<span class="kw-2">&amp;</span><span class="self">self</span>, feature: PreviewFeature) -&gt; bool {
+        <span class="self">self</span>.preview_features.contains(feature)
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_capability(<span class="kw-2">&amp;</span><span class="self">self</span>, capability: ConnectorCapability) -&gt; bool {
+        <span class="self">self</span>.connector.has_capability(capability)
+    }
+
+    <span class="kw">pub fn </span>find_mutation_field(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;OutputField&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="self">self</span>.root_fields
+            .get(<span class="kw-2">&amp;</span>(Operation::Mutation, name.to_owned()))
+            .map(|i| <span class="self">self</span>.mutation_fields[<span class="kw-2">*</span>i](<span class="self">self</span>))
+    }
+
+    <span class="kw">pub fn </span>find_query_field(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;OutputField&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="self">self</span>.root_fields
+            .get(<span class="kw-2">&amp;</span>(Operation::Query, name.to_owned()))
+            .map(|i| <span class="self">self</span>.query_fields[<span class="kw-2">*</span>i](<span class="self">self</span>))
     }
 
     <span class="kw">pub fn </span>find_query_field_by_model_and_action(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         model_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
         tag: QueryTag,
-    ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>OutputField&gt; {
-        <span class="kw">let </span>model = model_name.and_then(|name| <span class="self">self</span>.internal_data_model.find_model(name).ok());
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;OutputField&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="kw">let </span>model = model_name
+            .and_then(|name| <span class="self">self</span>.internal_data_model.schema.db.find_model(name))
+            .map(|m| m.id);
         <span class="kw">let </span>query_info = QueryInfo { model, tag };
 
-        <span class="self">self</span>.query_map
-            .get(<span class="kw-2">&amp;</span>query_info)
-            .map(|idx| <span class="kw-2">&amp;</span><span class="self">self</span>.query().get_fields()[<span class="kw-2">*</span>idx])
+        <span class="self">self</span>.query_info_map
+            .get(<span class="kw-2">&amp;</span>(Operation::Query, query_info))
+            .map(|i| <span class="self">self</span>.query_fields[<span class="kw-2">*</span>i](<span class="self">self</span>))
     }
 
     <span class="kw">pub fn </span>find_mutation_field_by_model_and_action(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         model_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
         tag: QueryTag,
-    ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>OutputField&gt; {
-        <span class="kw">let </span>model = model_name.and_then(|name| <span class="self">self</span>.internal_data_model.find_model(name).ok());
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;OutputField&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="kw">let </span>model = model_name
+            .and_then(|name| <span class="self">self</span>.internal_data_model.schema.db.find_model(name))
+            .map(|m| m.id);
         <span class="kw">let </span>query_info = QueryInfo { model, tag };
 
-        <span class="self">self</span>.mutation_map
-            .get(<span class="kw-2">&amp;</span>query_info)
-            .map(|idx| <span class="kw-2">&amp;</span><span class="self">self</span>.mutation().get_fields()[<span class="kw-2">*</span>idx])
+        <span class="self">self</span>.query_info_map
+            .get(<span class="kw-2">&amp;</span>(Operation::Mutation, query_info))
+            .map(|i| <span class="self">self</span>.mutation_fields[<span class="kw-2">*</span>i](<span class="self">self</span>))
     }
 
-    <span class="kw">pub fn </span>mutation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ObjectType {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.db[<span class="self">self</span>.mutation]
+    <span class="kw">pub fn </span>mutation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ObjectType&lt;<span class="lifetime">&#39;_</span>&gt; {
+        ObjectType::new(Identifier::new_prisma(IdentifierType::Mutation), || {
+            <span class="self">self</span>.mutation_fields.iter().map(|f| f(<span class="self">self</span>)).collect()
+        })
     }
 
-    <span class="kw">pub fn </span>query(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ObjectType {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.db[<span class="self">self</span>.query]
+    <span class="kw">pub fn </span>query(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ObjectType&lt;<span class="lifetime">&#39;_</span>&gt; {
+        ObjectType::new(Identifier::new_prisma(IdentifierType::Query), || {
+            <span class="self">self</span>.query_fields.iter().map(|f| f(<span class="self">self</span>)).collect()
+        })
     }
 
-    <span class="kw">pub fn </span>enum_types(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>EnumType&gt; {
-        <span class="self">self</span>.db.iter_enum_types()
+    <span class="kw">pub fn </span>relation_mode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RelationMode {
+        <span class="self">self</span>.relation_mode
     }
 
-    <span class="kw">pub fn </span>context(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ConnectorContext {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.context
+    <span class="kw">pub fn </span>can_native_upsert(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.connector
+            .capabilities()
+            .contains(ConnectorCapability::NativeUpsert)
     }
 }
 
 <span class="doccomment">/// Designates a specific top-level operation on a corresponding model.
 </span><span class="attr">#[derive(Debug, Clone, PartialEq, Hash, Eq)]
 </span><span class="kw">pub struct </span>QueryInfo {
-    <span class="kw">pub </span>model: <span class="prelude-ty">Option</span>&lt;ModelRef&gt;,
+    <span class="kw">pub </span>model: <span class="prelude-ty">Option</span>&lt;ast::ModelId&gt;,
     <span class="kw">pub </span>tag: QueryTag,
 }
 
@@ -582,14 +604,14 @@
 }
 
 <span class="kw">impl </span>Identifier {
-    <span class="kw">pub fn </span>new_prisma(name: <span class="kw">impl </span>Into&lt;IdentifierType&gt;) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_prisma(name: <span class="kw">impl </span>Into&lt;IdentifierType&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             name: name.into(),
             namespace: IdentifierNamespace::Prisma,
         }
     }
 
-    <span class="kw">pub fn </span>new_model(name: <span class="kw">impl </span>Into&lt;IdentifierType&gt;) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_model(name: <span class="kw">impl </span>Into&lt;IdentifierType&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             name: name.into(),
             namespace: IdentifierNamespace::Model,
@@ -608,7 +630,7 @@
     }
 }
 
-<span class="attr">#[derive(Debug, Clone, PartialEq)]
+<span class="attr">#[derive(Debug, Clone, PartialEq, Copy)]
 </span><span class="kw">pub enum </span>ScalarType {
     Null,
     String,

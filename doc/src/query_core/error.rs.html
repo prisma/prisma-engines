@@ -227,7 +227,6 @@
 <a href="#227" id="227">227</a>
 <a href="#228" id="228">228</a>
 <a href="#229" id="229">229</a>
-<a href="#230" id="230">230</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{InterpreterError, QueryGraphBuilderError, RelationViolation, TransactionError};
 <span class="kw">use </span>connector::error::ConnectorError;
 <span class="kw">use </span>prisma_models::DomainError;
@@ -238,7 +237,6 @@
 #[error(
     <span class="string">&quot;Error converting field \&quot;{field}\&quot; of expected non-nullable type \&quot;{expected_type}\&quot;, found incompatible value of \&quot;{found}\&quot;.&quot;
 </span>)]
-
 </span><span class="kw">pub struct </span>FieldConversionError {
     <span class="kw">pub </span>field: String,
     <span class="kw">pub </span>expected_type: String,
@@ -246,7 +244,7 @@
 }
 
 <span class="kw">impl </span>FieldConversionError {
-    <span class="kw">pub fn </span>create(field: String, expected_type: String, found: String) -&gt; CoreError {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create(field: String, expected_type: String, found: String) -&gt; CoreError {
         CoreError::FieldConversionError(<span class="self">Self </span>{
             field,
             expected_type,

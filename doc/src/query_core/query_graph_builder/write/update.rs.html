@@ -206,38 +206,38 @@
     ArgumentListLookup, ParsedField, ParsedInputMap,
 };
 <span class="kw">use </span>connector::{Filter, IntoFilter};
-<span class="kw">use </span>prisma_models::ModelRef;
-<span class="kw">use </span>schema::{constants::args, ConnectorContext};
+<span class="kw">use </span>prisma_models::Model;
+<span class="kw">use </span>schema::{constants::args, QuerySchema};
 <span class="kw">use </span>std::convert::TryInto;
 
 <span class="doccomment">/// Creates an update record query and adds it to the query graph, together with it&#39;s nested queries and companion read query.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update_record(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
-    model: ModelRef,
-    <span class="kw-2">mut </span>field: ParsedField,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
+    model: Model,
+    <span class="kw-2">mut </span>field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="comment">// &quot;where&quot;
-    </span><span class="kw">let </span>where_arg: ParsedInputMap = field.arguments.lookup(args::WHERE).unwrap().value.try_into()<span class="question-mark">?</span>;
+    </span><span class="kw">let </span>where_arg: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = field.arguments.lookup(args::WHERE).unwrap().value.try_into()<span class="question-mark">?</span>;
     <span class="kw">let </span>filter = extract_unique_filter(where_arg, <span class="kw-2">&amp;</span>model)<span class="question-mark">?</span>;
 
     <span class="comment">// &quot;data&quot;
     </span><span class="kw">let </span>data_argument = field.arguments.lookup(args::DATA).unwrap();
-    <span class="kw">let </span>data_map: ParsedInputMap = data_argument.value.try_into()<span class="question-mark">?</span>;
+    <span class="kw">let </span>data_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = data_argument.value.try_into()<span class="question-mark">?</span>;
 
-    <span class="kw">let </span>update_node = update_record_node(graph, connector_ctx, filter.clone(), model.clone(), data_map)<span class="question-mark">?</span>;
+    <span class="kw">let </span>update_node = update_record_node(graph, query_schema, filter.clone(), model.clone(), data_map)<span class="question-mark">?</span>;
 
     <span class="kw">let </span>read_query = read::find_unique(field, model.clone())<span class="question-mark">?</span>;
     <span class="kw">let </span>read_node = graph.create_node(Query::Read(read_query));
 
-    <span class="kw">if </span>connector_ctx.relation_mode.is_prisma() {
+    <span class="kw">if </span>query_schema.relation_mode().is_prisma() {
         <span class="kw">let </span>read_parent_node = graph.create_node(utils::read_ids_infallible(
             model.clone(),
             model.primary_identifier(),
             filter,
         ));
 
-        utils::insert_emulated_on_update(graph, connector_ctx, <span class="kw-2">&amp;</span>model, <span class="kw-2">&amp;</span>read_parent_node, <span class="kw-2">&amp;</span>update_node)<span class="question-mark">?</span>;
+        utils::insert_emulated_on_update(graph, query_schema, <span class="kw-2">&amp;</span>model, <span class="kw-2">&amp;</span>read_parent_node, <span class="kw-2">&amp;</span>update_node)<span class="question-mark">?</span>;
 
         graph.create_edge(
             <span class="kw-2">&amp;</span>read_parent_node,
@@ -284,9 +284,9 @@
 <span class="doccomment">/// Creates an update many record query and adds it to the query graph.
 </span><span class="kw">pub fn </span>update_many_records(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
-    model: ModelRef,
-    <span class="kw-2">mut </span>field: ParsedField,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
+    model: Model,
+    <span class="kw-2">mut </span>field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     graph.flag_transactional();
 
@@ -298,19 +298,19 @@
 
     <span class="comment">// &quot;data&quot;
     </span><span class="kw">let </span>data_argument = field.arguments.lookup(args::DATA).unwrap();
-    <span class="kw">let </span>data_map: ParsedInputMap = data_argument.value.try_into()<span class="question-mark">?</span>;
+    <span class="kw">let </span>data_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = data_argument.value.try_into()<span class="question-mark">?</span>;
 
-    <span class="kw">if </span>connector_ctx.relation_mode.uses_foreign_keys() {
-        update_many_record_node(graph, connector_ctx, filter, model, data_map)<span class="question-mark">?</span>;
+    <span class="kw">if </span>query_schema.relation_mode().uses_foreign_keys() {
+        update_many_record_node(graph, query_schema, filter, model, data_map)<span class="question-mark">?</span>;
     } <span class="kw">else </span>{
         <span class="kw">let </span>pre_read_node = graph.create_node(utils::read_ids_infallible(
             model.clone(),
             model.primary_identifier(),
             filter,
         ));
-        <span class="kw">let </span>update_many_node = update_many_record_node(graph, connector_ctx, Filter::empty(), model.clone(), data_map)<span class="question-mark">?</span>;
+        <span class="kw">let </span>update_many_node = update_many_record_node(graph, query_schema, Filter::empty(), model.clone(), data_map)<span class="question-mark">?</span>;
 
-        utils::insert_emulated_on_update(graph, connector_ctx, <span class="kw-2">&amp;</span>model, <span class="kw-2">&amp;</span>pre_read_node, <span class="kw-2">&amp;</span>update_many_node)<span class="question-mark">?</span>;
+        utils::insert_emulated_on_update(graph, query_schema, <span class="kw-2">&amp;</span>model, <span class="kw-2">&amp;</span>pre_read_node, <span class="kw-2">&amp;</span>update_many_node)<span class="question-mark">?</span>;
 
         graph.create_edge(
             <span class="kw-2">&amp;</span>pre_read_node,
@@ -334,10 +334,10 @@
 <span class="doccomment">/// Creates an update record query node and adds it to the query graph.
 </span><span class="kw">pub fn </span>update_record_node&lt;T: Clone&gt;(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     filter: T,
-    model: ModelRef,
-    data_map: ParsedInputMap,
+    model: Model,
+    data_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; QueryGraphBuilderResult&lt;NodeRef&gt;
 <span class="kw">where
     </span>T: Into&lt;Filter&gt;,
@@ -358,7 +358,7 @@
     <span class="kw">let </span>update_node = graph.create_node(update_parent);
 
     <span class="kw">for </span>(relation_field, data_map) <span class="kw">in </span>update_args.nested {
-        nested::connect_nested_query(graph, connector_ctx, update_node, relation_field, data_map)<span class="question-mark">?</span>;
+        nested::connect_nested_query(graph, query_schema, update_node, relation_field, data_map)<span class="question-mark">?</span>;
     }
 
     <span class="prelude-val">Ok</span>(update_node)
@@ -367,10 +367,10 @@
 <span class="doccomment">/// Creates an update many record query node and adds it to the query graph.
 </span><span class="kw">pub fn </span>update_many_record_node&lt;T&gt;(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     filter: T,
-    model: ModelRef,
-    data_map: ParsedInputMap,
+    model: Model,
+    data_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; QueryGraphBuilderResult&lt;NodeRef&gt;
 <span class="kw">where
     </span>T: Into&lt;Filter&gt;,
@@ -393,7 +393,7 @@
     <span class="kw">let </span>update_many_node = graph.create_node(Query::Write(WriteQuery::UpdateManyRecords(update_many)));
 
     <span class="kw">for </span>(relation_field, data_map) <span class="kw">in </span>update_args.nested {
-        nested::connect_nested_query(graph, connector_ctx, update_many_node, relation_field, data_map)<span class="question-mark">?</span>;
+        nested::connect_nested_query(graph, query_schema, update_many_node, relation_field, data_map)<span class="question-mark">?</span>;
     }
 
     <span class="prelude-val">Ok</span>(update_many_node)

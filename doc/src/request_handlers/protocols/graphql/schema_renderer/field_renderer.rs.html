@@ -82,19 +82,15 @@
 <a href="#82" id="82">82</a>
 <a href="#83" id="83">83</a>
 <a href="#84" id="84">84</a>
-<a href="#85" id="85">85</a>
-<a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>GqlFieldRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
-    Input(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>InputField),
-    Output(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>OutputField),
+    Input(InputField&lt;<span class="lifetime">&#39;a</span>&gt;),
+    Output(OutputField&lt;<span class="lifetime">&#39;a</span>&gt;),
 }
 
-<span class="kw">impl </span>Renderer <span class="kw">for </span>GqlFieldRenderer&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Renderer <span class="kw">for </span>GqlFieldRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">fn </span>render(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
         <span class="kw">match </span><span class="self">self </span>{
             GqlFieldRenderer::Input(input) =&gt; <span class="self">self</span>.render_input_field(input, ctx),
@@ -103,18 +99,16 @@
     }
 }
 
-<span class="kw">impl </span>GqlFieldRenderer&lt;<span class="lifetime">&#39;_</span>&gt; {
-    <span class="kw">fn </span>render_input_field(<span class="kw-2">&amp;</span><span class="self">self</span>, input_field: <span class="kw-2">&amp;</span>InputField, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
-        <span class="kw">let </span>rendered_type = pick_input_type(input_field.field_types(ctx.query_schema))
-            .as_renderer()
-            .render(ctx);
-        <span class="kw">let </span>required = <span class="kw">if </span>input_field.is_required { <span class="string">&quot;!&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; GqlFieldRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>render_input_field(<span class="kw-2">&amp;</span><span class="self">self</span>, input_field: <span class="kw-2">&amp;</span>InputField&lt;<span class="lifetime">&#39;a</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
+        <span class="kw">let </span>rendered_type = pick_input_type(input_field.field_types()).as_renderer().render(ctx);
+        <span class="kw">let </span>required = <span class="kw">if </span>input_field.is_required() { <span class="string">&quot;!&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
 
         <span class="macro">format!</span>(<span class="string">&quot;{}: {}{}&quot;</span>, input_field.name, rendered_type, required)
     }
 
-    <span class="kw">fn </span>render_output_field(<span class="kw-2">&amp;</span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>OutputField, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
-        <span class="kw">let </span>rendered_args = <span class="self">self</span>.render_arguments(<span class="kw-2">&amp;</span>field.arguments, ctx);
+    <span class="kw">fn </span>render_output_field(<span class="kw-2">&amp;</span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>OutputField&lt;<span class="lifetime">&#39;a</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
+        <span class="kw">let </span>rendered_args = <span class="self">self</span>.render_arguments(field.arguments(), ctx);
         <span class="kw">let </span>rendered_args = <span class="kw">if </span>rendered_args.is_empty() {
             <span class="string">&quot;&quot;</span>.into()
         } <span class="kw">else if </span>rendered_args.len() &gt; <span class="number">1 </span>{
@@ -133,26 +127,24 @@
             </span><span class="macro">format!</span>(<span class="string">&quot;({})&quot;</span>, rendered_args.join(<span class="string">&quot;, &quot;</span>))
         };
 
-        <span class="kw">let </span>rendered_type = field.field_type.as_renderer().render(ctx);
+        <span class="kw">let </span>rendered_type = field.field_type().as_renderer().render(ctx);
         <span class="kw">let </span>bang = <span class="kw">if </span>!field.is_nullable { <span class="string">&quot;!&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
-        <span class="macro">format!</span>(<span class="string">&quot;{}{}: {}{}&quot;</span>, field.name, rendered_args, rendered_type, bang)
+        <span class="macro">format!</span>(<span class="string">&quot;{}{}: {}{}&quot;</span>, field.name(), rendered_args, rendered_type, bang)
     }
 
-    <span class="kw">fn </span>render_arguments(<span class="kw-2">&amp;</span><span class="self">self</span>, args: <span class="kw-2">&amp;</span>[InputField], ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; Vec&lt;String&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>output = Vec::with_capacity(args.len());
+    <span class="kw">fn </span>render_arguments(<span class="kw-2">&amp;</span><span class="self">self</span>, args: <span class="kw">impl </span>Iterator&lt;Item = InputField&lt;<span class="lifetime">&#39;a</span>&gt;&gt;, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; Vec&lt;String&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>output = Vec::new();
 
         <span class="kw">for </span>arg <span class="kw">in </span>args {
-            output.push(<span class="self">self</span>.render_argument(arg, ctx))
+            output.push(<span class="self">self</span>.render_argument(<span class="kw-2">&amp;</span>arg, ctx))
         }
 
         output
     }
 
-    <span class="kw">fn </span>render_argument(<span class="kw-2">&amp;</span><span class="self">self</span>, arg: <span class="kw-2">&amp;</span>InputField, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
-        <span class="kw">let </span>rendered_type = pick_input_type(arg.field_types(ctx.query_schema))
-            .as_renderer()
-            .render(ctx);
-        <span class="kw">let </span>required = <span class="kw">if </span>arg.is_required { <span class="string">&quot;!&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
+    <span class="kw">fn </span>render_argument(<span class="kw-2">&amp;</span><span class="self">self</span>, arg: <span class="kw-2">&amp;</span>InputField&lt;<span class="lifetime">&#39;a</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
+        <span class="kw">let </span>rendered_type = pick_input_type(arg.field_types()).as_renderer().render(ctx);
+        <span class="kw">let </span>required = <span class="kw">if </span>arg.is_required() { <span class="string">&quot;!&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
 
         <span class="macro">format!</span>(<span class="string">&quot;{}: {}{}&quot;</span>, arg.name, rendered_type, required)
     }
@@ -163,7 +155,7 @@
 ///
 /// Important: This doesn&#39;t really affect the functionality of the QE,
 ///            it&#39;s only serving the playground used for ad-hoc debugging.
-</span><span class="kw">fn </span>pick_input_type(candidates: <span class="kw-2">&amp;</span>[InputType]) -&gt; <span class="kw-2">&amp;</span>InputType {
+</span><span class="kw">fn </span>pick_input_type&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(candidates: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>[InputType&lt;<span class="lifetime">&#39;a</span>&gt;]) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>InputType&lt;<span class="lifetime">&#39;a</span>&gt; {
     candidates
         .iter()
         .reduce(|prev, next| <span class="kw">match </span>(prev, next) {

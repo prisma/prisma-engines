@@ -176,7 +176,7 @@
 <span class="kw">impl </span>ScalarOutputMeta {
     <span class="kw">pub fn </span>strip_list(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
-            ident: <span class="self">self</span>.ident.clone(),
+            ident: <span class="self">self</span>.ident,
             default: <span class="self">self</span>.default.clone(),
             list: <span class="bool-val">false</span>,
         }

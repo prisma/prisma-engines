@@ -150,34 +150,24 @@
 <a href="#150" id="150">150</a>
 <a href="#151" id="151">151</a>
 <a href="#152" id="152">152</a>
-<a href="#153" id="153">153</a>
-<a href="#154" id="154">154</a>
-<a href="#155" id="155">155</a>
-<a href="#156" id="156">156</a>
-<a href="#157" id="157">157</a>
-<a href="#158" id="158">158</a>
-<a href="#159" id="159">159</a>
-<a href="#160" id="160">160</a>
-<a href="#161" id="161">161</a>
-<a href="#162" id="162">162</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>psl::parser_database::ScalarFieldType;
-<span class="kw">use </span>std::collections::BTreeSet;
 
 <span class="attr">#[derive(Debug, Clone)]
-</span><span class="kw">pub struct </span>Fields {
-    model: Model,
+</span><span class="kw">pub struct </span>Fields&lt;<span class="lifetime">&#39;a</span>&gt; {
+    model: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Model,
 }
 
-<span class="kw">impl </span>Fields {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(model: Model) -&gt; Fields {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Fields&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(model: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Model) -&gt; Fields&lt;<span class="lifetime">&#39;a</span>&gt; {
         Fields { model }
     }
 
-    <span class="kw">pub fn </span>id_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>Iterator&lt;Item = ScalarFieldRef&gt; + Clone + <span class="lifetime">&#39;_</span>&gt; {
-        <span class="self">self</span>.model.walker().primary_key().map(|pk| {
+    <span class="kw">pub fn </span>id_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>Iterator&lt;Item = ScalarFieldRef&gt; + Clone + <span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">let </span>dm = <span class="kw-2">&amp;</span><span class="self">self</span>.model.dm;
+        <span class="self">self</span>.model.walker().primary_key().map(<span class="kw">move </span>|pk| {
             pk.fields()
-                .map(<span class="kw">move </span>|field| <span class="self">self</span>.model.dm.clone().zip(ScalarFieldId::InModel(field.id)))
+                .map(<span class="kw">move </span>|field| dm.clone().zip(ScalarFieldId::InModel(field.id)))
         })
     }
 
@@ -192,11 +182,11 @@
             })
     }
 
-    <span class="kw">pub fn </span>updated_at(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ScalarFieldRef&gt; {
-        <span class="self">self</span>.scalar().into_iter().filter(|sf| sf.is_updated_at())
+    <span class="kw">pub fn </span>updated_at(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ScalarFieldRef&gt; + <span class="lifetime">&#39;a </span>{
+        <span class="self">self</span>.scalar().filter(|sf| sf.is_updated_at())
     }
 
-    <span class="kw">pub fn </span>scalar(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ScalarFieldRef&gt; {
+    <span class="kw">pub fn </span>scalar(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ScalarFieldRef&gt; + Clone + <span class="lifetime">&#39;a </span>{
         <span class="self">self</span>.model
             .dm
             .walk(<span class="self">self</span>.model.id)
@@ -208,17 +198,15 @@
                 )
             })
             .map(|rf| <span class="self">self</span>.model.dm.clone().zip(ScalarFieldId::InModel(rf.id)))
-            .collect()
     }
 
-    <span class="kw">pub fn </span>relation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;RelationFieldRef&gt; {
+    <span class="kw">pub fn </span>relation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RelationFieldRef&gt; + <span class="lifetime">&#39;a </span>{
         <span class="self">self</span>.model
             .dm
             .walk(<span class="self">self</span>.model.id)
             .relation_fields()
             .filter(|rf| !rf.relation().is_ignored())
             .map(|rf| <span class="self">self</span>.model.dm.clone().zip(rf.id))
-            .collect()
     }
 
     <span class="kw">pub fn </span>composite(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;CompositeFieldRef&gt; {
@@ -233,16 +221,8 @@
 
     <span class="kw">pub fn </span>non_relational(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;Field&gt; {
         <span class="self">self</span>.scalar()
-            .into_iter()
             .map(Field::from)
             .chain(<span class="self">self</span>.composite().into_iter().map(Field::from))
-            .collect()
-    }
-
-    <span class="kw">pub fn </span>find_many_from_scalar(<span class="kw-2">&amp;</span><span class="self">self</span>, names: <span class="kw-2">&amp;</span>BTreeSet&lt;String&gt;) -&gt; Vec&lt;ScalarFieldRef&gt; {
-        <span class="self">self</span>.scalar()
-            .into_iter()
-            .filter(|field| names.contains(field.name()))
             .collect()
     }
 
@@ -269,7 +249,6 @@
     /// purely virtual on a model.
     </span><span class="kw">pub fn </span>find_from_non_virtual_by_db_name(<span class="kw-2">&amp;</span><span class="self">self</span>, db_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;Field&gt; {
         <span class="self">self</span>.filter_all(|f| f.db_name() == db_name)
-            .into_iter()
             .next()
             .ok_or_else(|| DomainError::FieldNotFound {
                 name: db_name.to_string(),
@@ -280,7 +259,6 @@
 
     <span class="kw">pub fn </span>find_from_scalar(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;ScalarFieldRef&gt; {
         <span class="self">self</span>.scalar()
-            .into_iter()
             .find(|field| field.name() == name)
             .ok_or_else(|| DomainError::ScalarFieldNotFound {
                 name: name.to_string(),
@@ -289,13 +267,12 @@
             })
     }
 
-    <span class="kw">fn </span>model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ModelRef {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.model
+    <span class="kw">fn </span>model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Model {
+        <span class="self">self</span>.model
     }
 
     <span class="kw">pub fn </span>find_from_relation_fields(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;RelationFieldRef&gt; {
         <span class="self">self</span>.relation()
-            .into_iter()
             .find(|field| field.name() == name)
             .ok_or_else(|| DomainError::RelationFieldNotFound {
                 name: name.to_string(),
@@ -303,23 +280,26 @@
             })
     }
 
-    <span class="kw">pub fn </span>filter_all&lt;P&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, predicate: P) -&gt; Vec&lt;Field&gt;
-    <span class="kw">where
-        </span>P: Fn(&amp;&amp;Field) -&gt; bool,
-    {
-        <span class="kw">let </span>model_walker = <span class="self">self</span>.model.walker();
+    <span class="kw">pub fn </span>all(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = Field&gt; + <span class="lifetime">&#39;a </span>{
+        <span class="kw">let </span>dm = <span class="kw-2">&amp;</span><span class="self">self</span>.model.dm;
+        <span class="kw">let </span>model_walker = dm.walk(<span class="self">self</span>.model.id);
         model_walker
             .scalar_fields()
             .filter(|f| !f.is_ignored() &amp;&amp; !f.is_unsupported())
-            .map(|w| Field::from((<span class="self">self</span>.model.dm.clone(), w)))
+            .map(|w| Field::from((dm.clone(), w)))
             .chain(
                 model_walker
                     .relation_fields()
                     .filter(|rf| !rf.relation().is_ignored())
-                    .map(|w| Field::from((<span class="self">self</span>.model.dm.clone(), w))),
+                    .map(|w| Field::from((dm.clone(), w))),
             )
-            .filter(|f| predicate(<span class="kw-2">&amp;</span>f))
-            .collect()
+    }
+
+    <span class="kw">pub fn </span>filter_all&lt;P&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, predicate: P) -&gt; <span class="kw">impl </span>Iterator&lt;Item = Field&gt; + <span class="lifetime">&#39;a
+    </span><span class="kw">where
+        </span>P: Fn(&amp;&amp;Field) -&gt; bool + <span class="lifetime">&#39;a</span>,
+    {
+        <span class="self">self</span>.all().filter(<span class="kw">move </span>|f| predicate(<span class="kw-2">&amp;</span>f))
     }
 }
 </code></pre></div>

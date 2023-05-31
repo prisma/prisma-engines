@@ -391,10 +391,10 @@
 /// Todo split this mess up and clean up the code.
 </span><span class="kw">pub fn </span>nested_upsert(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
-    value: ParsedInputValue,
+    value: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="kw">let </span>child_model = parent_relation_field.related_model();
     <span class="kw">let </span>child_model_identifier = child_model.primary_identifier();
@@ -403,7 +403,7 @@
         <span class="kw">let </span>parent_link = parent_relation_field.linking_fields();
         <span class="kw">let </span>child_link = parent_relation_field.related_field().linking_fields();
 
-        <span class="kw">let </span><span class="kw-2">mut </span>as_map: ParsedInputMap = value.try_into()<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>as_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = value.try_into()<span class="question-mark">?</span>;
         <span class="kw">let </span>create_input = as_map.remove(args::CREATE).expect(<span class="string">&quot;create argument is missing&quot;</span>);
         <span class="kw">let </span>update_input = as_map.remove(args::UPDATE).expect(<span class="string">&quot;update argument is missing&quot;</span>);
         <span class="kw">let </span>where_input = as_map.remove(args::WHERE);
@@ -412,7 +412,7 @@
         </span><span class="kw">let </span>filter = <span class="kw">match </span>(where_input, parent_relation_field.is_list()) {
             <span class="comment">// On a to-many relation the filter is a WhereUniqueInput
             </span>(<span class="prelude-val">Some</span>(where_input), <span class="bool-val">true</span>) =&gt; {
-                <span class="kw">let </span>where_input: ParsedInputMap = where_input.try_into()<span class="question-mark">?</span>;
+                <span class="kw">let </span>where_input: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = where_input.try_into()<span class="question-mark">?</span>;
 
                 extract_unique_filter(where_input, <span class="kw-2">&amp;</span>child_model)<span class="question-mark">?
             </span>}
@@ -420,7 +420,7 @@
             </span>(<span class="prelude-val">None</span>, <span class="bool-val">true</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;where argument is missing&quot;</span>),
             <span class="comment">// On a to-one relation, the filter is a WhereInput (because the record is pinned by the QE automatically)
             </span>(<span class="prelude-val">Some</span>(where_input), <span class="bool-val">false</span>) =&gt; {
-                <span class="kw">let </span>where_input: ParsedInputMap = where_input.try_into()<span class="question-mark">?</span>;
+                <span class="kw">let </span>where_input: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = where_input.try_into()<span class="question-mark">?</span>;
 
                 extract_filter(where_input, <span class="kw-2">&amp;</span>child_model)<span class="question-mark">?
             </span>}
@@ -433,10 +433,10 @@
 
         <span class="kw">let </span>if_node = graph.create_node(Flow::default_if());
         <span class="kw">let </span>create_node =
-            create::create_record_node(graph, connector_ctx, child_model.clone(), create_input.try_into()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
+            create::create_record_node(graph, query_schema, child_model.clone(), create_input.try_into()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>update_node = update::update_record_node(
             graph,
-            connector_ctx,
+            query_schema,
             filter.clone(),
             child_model.clone(),
             update_input.try_into()<span class="question-mark">?</span>,
@@ -490,7 +490,7 @@
         // the emulation node and the update node.
         </span><span class="kw">let </span>then_node = <span class="kw">if let </span><span class="prelude-val">Some</span>(emulation_node) = utils::insert_emulated_on_update_with_intermediary_node(
             graph,
-            connector_ctx,
+            query_schema,
             <span class="kw-2">&amp;</span>child_model,
             <span class="kw-2">&amp;</span>read_children_node,
             <span class="kw-2">&amp;</span>update_node,

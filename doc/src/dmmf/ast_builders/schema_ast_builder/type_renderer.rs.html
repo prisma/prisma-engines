@@ -125,20 +125,22 @@
 <a href="#125" id="125">125</a>
 <a href="#126" id="126">126</a>
 <a href="#127" id="127">127</a>
-<a href="#128" id="128">128</a>
-<a href="#129" id="129">129</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{DmmfTypeReference, RenderContext, TypeLocation};
-<span class="kw">use </span>schema::{InputType, ObjectTag, OutputType, ScalarType};
+<span class="kw">use </span>schema::{InnerOutputType, InputType, ObjectTag, OutputType, ScalarType};
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render_output_type(output_type: <span class="kw-2">&amp;</span>OutputType, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; DmmfTypeReference {
-    <span class="kw">match </span>output_type {
-        OutputType::Object(<span class="kw-2">ref </span>obj) =&gt; {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render_output_type&lt;<span class="lifetime">&#39;a</span>&gt;(output_type: <span class="kw-2">&amp;</span>OutputType&lt;<span class="lifetime">&#39;a</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>RenderContext&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; DmmfTypeReference {
+    <span class="kw">match </span><span class="kw-2">&amp;</span>output_type.inner {
+        <span class="kw">_ if </span>output_type.is_list() =&gt; {
+            <span class="kw">let </span><span class="kw-2">mut </span>type_reference = render_output_type(<span class="kw-2">&amp;</span>OutputType::non_list(output_type.inner.clone()), ctx);
+            type_reference.is_list = <span class="bool-val">true</span>;
+            type_reference
+        }
+        InnerOutputType::Object(obj) =&gt; {
             ctx.mark_to_be_rendered(obj);
-            <span class="kw">let </span>obj = <span class="kw-2">&amp;</span>ctx.query_schema.db[<span class="kw-2">*</span>obj];
 
             <span class="kw">let </span>type_reference = DmmfTypeReference {
-                typ: obj.identifier.name(),
-                namespace: <span class="prelude-val">Some</span>(obj.identifier.namespace().to_string()),
+                typ: obj.name(),
+                namespace: <span class="prelude-val">Some</span>(obj.identifier().namespace().to_string()),
                 location: TypeLocation::OutputObjectTypes,
                 is_list: <span class="bool-val">false</span>,
             };
@@ -146,9 +148,8 @@
             type_reference
         }
 
-        OutputType::Enum(et) =&gt; {
-            <span class="kw">let </span>et = <span class="kw-2">&amp;</span>ctx.query_schema.db[<span class="kw-2">*</span>et];
-            ctx.mark_to_be_rendered(<span class="kw-2">&amp;</span>et);
+        InnerOutputType::Enum(et) =&gt; {
+            ctx.mark_to_be_rendered(et);
 
             <span class="kw">let </span>ident = et.identifier();
             <span class="kw">let </span>type_reference = DmmfTypeReference {
@@ -161,13 +162,7 @@
             type_reference
         }
 
-        OutputType::List(<span class="kw-2">ref </span>l) =&gt; {
-            <span class="kw">let </span><span class="kw-2">mut </span>type_reference = render_output_type(l, ctx);
-            type_reference.is_list = <span class="bool-val">true</span>;
-            type_reference
-        }
-
-        OutputType::Scalar(<span class="kw-2">ref </span>scalar) =&gt; {
+        InnerOutputType::Scalar(scalar) =&gt; {
             <span class="kw">let </span>stringified = <span class="kw">match </span>scalar {
                 ScalarType::Null =&gt; <span class="string">&quot;Null&quot;</span>,
                 ScalarType::String =&gt; <span class="string">&quot;String&quot;</span>,
@@ -194,20 +189,22 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render_input_types(input_types: <span class="kw-2">&amp;</span>[InputType], ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; Vec&lt;DmmfTypeReference&gt; {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render_input_types&lt;<span class="lifetime">&#39;a</span>&gt;(
+    input_types: <span class="kw-2">&amp;</span>[InputType&lt;<span class="lifetime">&#39;a</span>&gt;],
+    ctx: <span class="kw-2">&amp;mut </span>RenderContext&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; Vec&lt;DmmfTypeReference&gt; {
     input_types
         .iter()
         .map(|input_type| render_input_type(input_type, ctx))
         .collect()
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render_input_type(input_type: <span class="kw-2">&amp;</span>InputType, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; DmmfTypeReference {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render_input_type&lt;<span class="lifetime">&#39;a</span>&gt;(input_type: <span class="kw-2">&amp;</span>InputType&lt;<span class="lifetime">&#39;a</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>RenderContext&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; DmmfTypeReference {
     <span class="kw">match </span>input_type {
         InputType::Object(<span class="kw-2">ref </span>obj) =&gt; {
             ctx.mark_to_be_rendered(obj);
-            <span class="kw">let </span>obj = <span class="kw-2">&amp;</span>ctx.query_schema.db[<span class="kw-2">*</span>obj];
 
-            <span class="kw">let </span>location = <span class="kw">match </span><span class="kw-2">&amp;</span>obj.tag {
+            <span class="kw">let </span>location = <span class="kw">match </span>obj.tag() {
                 <span class="prelude-val">Some</span>(ObjectTag::FieldRefType(<span class="kw">_</span>)) =&gt; TypeLocation::FieldRefTypes,
                 <span class="kw">_ </span>=&gt; TypeLocation::InputObjectTypes,
             };
@@ -223,8 +220,7 @@
         }
 
         InputType::Enum(et) =&gt; {
-            <span class="kw">let </span>et = <span class="kw-2">&amp;</span>ctx.query_schema.db[<span class="kw-2">*</span>et];
-            ctx.mark_to_be_rendered(<span class="kw-2">&amp;</span>et);
+            ctx.mark_to_be_rendered(et);
 
             <span class="kw">let </span>ident = et.identifier();
             <span class="kw">let </span>type_reference = DmmfTypeReference {

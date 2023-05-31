@@ -42,35 +42,35 @@
 };
 <span class="kw">use </span>schema::{InputField, InputType, OutputField, ScalarType};
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render_input_field(input_field: <span class="kw-2">&amp;</span>InputField, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; DmmfInputField {
-    <span class="kw">let </span>type_references = render_input_types(input_field.field_types(ctx.query_schema), ctx);
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render_input_field&lt;<span class="lifetime">&#39;a</span>&gt;(input_field: <span class="kw-2">&amp;</span>InputField&lt;<span class="lifetime">&#39;a</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>RenderContext&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; DmmfInputField {
+    <span class="kw">let </span>type_references = render_input_types(input_field.field_types(), ctx);
     <span class="kw">let </span>nullable = input_field
-        .field_types(ctx.query_schema)
+        .field_types()
         .iter()
         .any(|typ| <span class="macro">matches!</span>(typ, InputType::Scalar(ScalarType::Null)));
 
     DmmfInputField {
-        name: input_field.name.clone(),
+        name: input_field.name.to_string(),
         input_types: type_references,
-        is_required: input_field.is_required,
+        is_required: input_field.is_required(),
         is_nullable: nullable,
         deprecation: <span class="prelude-val">None</span>,
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render_output_field(field: <span class="kw-2">&amp;</span>OutputField, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; DmmfOutputField {
-    <span class="kw">let </span>rendered_inputs = field.arguments.iter().map(|arg| render_input_field(arg, ctx)).collect();
-    <span class="kw">let </span>output_type = render_output_type(<span class="kw-2">&amp;</span>field.field_type, ctx);
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render_output_field&lt;<span class="lifetime">&#39;a</span>&gt;(field: <span class="kw-2">&amp;</span>OutputField&lt;<span class="lifetime">&#39;a</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>RenderContext&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; DmmfOutputField {
+    <span class="kw">let </span>rendered_inputs = field.arguments().map(|arg| render_input_field(<span class="kw-2">&amp;</span>arg, ctx)).collect();
+    <span class="kw">let </span>output_type = render_output_type(field.field_type(), ctx);
 
     <span class="kw">let </span>output_field = DmmfOutputField {
-        name: field.name.clone(),
+        name: field.name().clone().into_owned(),
         args: rendered_inputs,
         output_type,
         is_nullable: field.is_nullable,
         deprecation: <span class="prelude-val">None</span>,
     };
 
-    ctx.add_mapping(field.name.clone(), field.query_info.as_ref());
+    ctx.add_mapping(field.name().clone().into_owned(), field.query_info());
 
     output_field
 }

@@ -8,7 +8,7 @@
 </pre><pre class="rust"><code><span class="kw">use </span>dmmf_crate::DataModelMetaFormat;
 <span class="kw">use </span>query_core::schema::QuerySchema;
 
-<span class="attr">#[tracing::instrument(name = <span class="string">&quot;prisma:engine:render_dmmf&quot;</span>)]
+<span class="attr">#[tracing::instrument(name = <span class="string">&quot;prisma:engine:render_dmmf&quot;</span>, skip(query_schema))]
 </span><span class="kw">pub fn </span>render_dmmf(query_schema: <span class="kw-2">&amp;</span>QuerySchema) -&gt; DataModelMetaFormat {
     dmmf_crate::from_precomputed_parts(query_schema)
 }

@@ -164,9 +164,6 @@
 <a href="#164" id="164">164</a>
 <a href="#165" id="165">165</a>
 <a href="#166" id="166">166</a>
-<a href="#167" id="167">167</a>
-<a href="#168" id="168">168</a>
-<a href="#169" id="169">169</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>enum_renderer;
 <span class="kw">mod </span>field_renderer;
 <span class="kw">mod </span>object_renderer;
@@ -176,29 +173,29 @@
 <span class="kw">use </span>field_renderer::<span class="kw-2">*</span>;
 <span class="kw">use </span>object_renderer::<span class="kw-2">*</span>;
 <span class="kw">use </span>query_core::schema::<span class="kw-2">*</span>;
-<span class="kw">use </span>std::{collections::HashMap, sync::Arc};
+<span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>type_renderer::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Top level GraphQL schema renderer.
-</span><span class="kw">struct </span>GqlSchemaRenderer {
-    query_schema: QuerySchemaRef,
+</span><span class="kw">struct </span>GqlSchemaRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
+    query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema,
 }
 
-<span class="kw">impl </span>Renderer <span class="kw">for </span>GqlSchemaRenderer {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Renderer <span class="kw">for </span>GqlSchemaRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">fn </span>render(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
-        <span class="kw">let _ </span>= <span class="self">self</span>.query_schema.query.as_renderer().render(ctx);
-        <span class="self">self</span>.query_schema.mutation.as_renderer().render(ctx)
+        <span class="kw">let _ </span>= <span class="self">self</span>.query_schema.query().as_renderer().render(ctx);
+        <span class="self">self</span>.query_schema.mutation().as_renderer().render(ctx)
     }
 }
 
-<span class="kw">impl </span>GqlSchemaRenderer {
-    <span class="kw">fn </span>new(query_schema: QuerySchemaRef) -&gt; GqlSchemaRenderer {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; GqlSchemaRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>new(query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema) -&gt; GqlSchemaRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
         GqlSchemaRenderer { query_schema }
     }
 }
 
-<span class="kw">pub fn </span>render_graphql_schema(query_schema: QuerySchemaRef) -&gt; String {
-    <span class="kw">let </span><span class="kw-2">mut </span>context = RenderContext::new(<span class="kw-2">&amp;</span>query_schema);
+<span class="kw">pub fn </span>render_graphql_schema(query_schema: <span class="kw-2">&amp;</span>QuerySchema) -&gt; String {
+    <span class="kw">let </span><span class="kw-2">mut </span>context = RenderContext::new();
     query_schema.as_renderer().render(<span class="kw-2">&amp;mut </span>context);
 
     <span class="comment">// Add custom scalar types (required for graphql.js implementations)
@@ -212,9 +209,7 @@
     <span class="kw">fn </span>render(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String;
 }
 
-<span class="kw">struct </span>RenderContext&lt;<span class="lifetime">&#39;a</span>&gt; {
-    query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema,
-
+<span class="kw">struct </span>RenderContext {
     <span class="doccomment">/// Output queue for all (top level) elements that need to be rendered,
     </span>output_queue: Vec&lt;String&gt;,
 
@@ -228,10 +223,9 @@
     </span>indent_str: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; RenderContext&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>new(query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema) -&gt; <span class="self">Self </span>{
+<span class="kw">impl </span>RenderContext {
+    <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
         RenderContext {
-            query_schema,
             output_queue: Default::default(),
             rendered: Default::default(),
             indent: <span class="number">2</span>,
@@ -266,11 +260,11 @@
 }
 
 <span class="kw">enum </span>GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
-    Schema(GqlSchemaRenderer),
-    Object(GqlObjectRenderer),
+    Schema(GqlSchemaRenderer&lt;<span class="lifetime">&#39;a</span>&gt;),
+    Object(GqlObjectRenderer&lt;<span class="lifetime">&#39;a</span>&gt;),
     Type(GqlTypeRenderer&lt;<span class="lifetime">&#39;a</span>&gt;),
     Field(GqlFieldRenderer&lt;<span class="lifetime">&#39;a</span>&gt;),
-    Enum(GqlEnumRenderer&lt;<span class="lifetime">&#39;a</span>&gt;),
+    Enum(GqlEnumRenderer),
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Renderer <span class="kw">for </span>GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -286,54 +280,54 @@
 }
 
 <span class="kw">trait </span>AsRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>as_renderer(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt;;
+    <span class="kw">fn </span>as_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt;;
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AsRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>QuerySchemaRef {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AsRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema {
     <span class="kw">fn </span>as_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
-        GqlRenderer::Schema(GqlSchemaRenderer::new(Arc::clone(<span class="self">self</span>)))
+        GqlRenderer::Schema(GqlSchemaRenderer::new(<span class="self">self</span>))
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AsRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>InputType {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AsRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>InputType&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">fn </span>as_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
-        GqlRenderer::Type(GqlTypeRenderer::Input(<span class="self">self</span>))
+        GqlRenderer::Type(GqlTypeRenderer::Input(<span class="self">self</span>.clone()))
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AsRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>OutputType {
-    <span class="kw">fn </span>as_renderer(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
-        GqlRenderer::Type(GqlTypeRenderer::Output(<span class="self">self</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AsRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>OutputType&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>as_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
+        GqlRenderer::Type(GqlTypeRenderer::Output(<span class="self">self</span>.clone()))
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AsRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>InputField {
-    <span class="kw">fn </span>as_renderer(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
-        GqlRenderer::Field(GqlFieldRenderer::Input(<span class="self">self</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AsRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>InputField&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>as_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
+        GqlRenderer::Field(GqlFieldRenderer::Input(<span class="self">self</span>.clone()))
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AsRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>OutputField {
-    <span class="kw">fn </span>as_renderer(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
-        GqlRenderer::Field(GqlFieldRenderer::Output(<span class="self">self</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AsRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>OutputField&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>as_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
+        GqlRenderer::Field(GqlFieldRenderer::Output(<span class="self">self</span>.clone()))
     }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AsRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>EnumType {
-    <span class="kw">fn </span>as_renderer(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
-        GqlRenderer::Enum(GqlEnumRenderer::new(<span class="self">self</span>))
+    <span class="kw">fn </span>as_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
+        GqlRenderer::Enum(GqlEnumRenderer::new(<span class="self">self</span>.clone()))
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AsRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>InputObjectTypeId {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AsRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>InputObjectType&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">fn </span>as_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
-        GqlRenderer::Object(GqlObjectRenderer::Input(<span class="kw-2">*</span><span class="self">self</span>))
+        GqlRenderer::Object(GqlObjectRenderer::Input(<span class="self">self</span>.clone()))
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AsRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>OutputObjectTypeId {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AsRenderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>ObjectType&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">fn </span>as_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; GqlRenderer&lt;<span class="lifetime">&#39;a</span>&gt; {
-        GqlRenderer::Object(GqlObjectRenderer::Output(<span class="kw-2">*</span><span class="self">self</span>))
+        GqlRenderer::Object(GqlObjectRenderer::Output(<span class="self">self</span>.clone()))
     }
 }
 </code></pre></div>

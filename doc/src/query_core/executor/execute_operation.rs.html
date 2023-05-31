@@ -444,12 +444,12 @@
     result
 }
 
-<span class="kw">async fn </span>execute_self_contained_without_retry(
+<span class="kw">async fn </span>execute_self_contained_without_retry&lt;<span class="lifetime">&#39;a</span>&gt;(
     <span class="kw-2">mut </span>conn: Box&lt;<span class="kw">dyn </span>Connection&gt;,
     graph: QueryGraph,
-    serializer: IrSerializer,
+    serializer: IrSerializer&lt;<span class="lifetime">&#39;a</span>&gt;,
     force_transactions: bool,
-    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
+    query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema,
     trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;ResponseData&gt; {
     <span class="kw">if </span>force_transactions || graph.needs_transaction() {
@@ -506,11 +506,11 @@
     </span>}
 }
 
-<span class="kw">async fn </span>execute_in_tx(
+<span class="kw">async fn </span>execute_in_tx&lt;<span class="lifetime">&#39;a</span>&gt;(
     conn: <span class="kw-2">&amp;mut </span>Box&lt;<span class="kw">dyn </span>Connection&gt;,
     graph: QueryGraph,
-    serializer: IrSerializer,
-    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
+    serializer: IrSerializer&lt;<span class="lifetime">&#39;a</span>&gt;,
+    query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema,
     trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;ResponseData&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>tx = conn.start_transaction(<span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -533,11 +533,11 @@
 }
 
 <span class="comment">// Simplest execution on anything that&#39;s a ConnectionLike. Caller decides handling of connections and transactions.
-</span><span class="kw">async fn </span>execute_on(
+</span><span class="kw">async fn </span>execute_on&lt;<span class="lifetime">&#39;a</span>&gt;(
     conn: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>ConnectionLike,
     graph: QueryGraph,
-    serializer: IrSerializer,
-    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
+    serializer: IrSerializer&lt;<span class="lifetime">&#39;a</span>&gt;,
+    query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema,
     trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;ResponseData&gt; {
     <span class="macro">increment_counter!</span>(PRISMA_CLIENT_QUERIES_TOTAL);
@@ -548,7 +548,7 @@
         .<span class="kw">await
 </span>}
 
-<span class="kw">fn </span>build_graph(query_schema: <span class="kw-2">&amp;</span>QuerySchema, operation: Operation) -&gt; <span class="kw">crate</span>::Result&lt;(QueryGraph, IrSerializer)&gt; {
+<span class="kw">fn </span>build_graph(query_schema: <span class="kw-2">&amp;</span>QuerySchema, operation: Operation) -&gt; <span class="kw">crate</span>::Result&lt;(QueryGraph, IrSerializer&lt;<span class="lifetime">&#39;_</span>&gt;)&gt; {
     <span class="kw">let </span>(query_graph, serializer) = QueryGraphBuilder::new(query_schema).build(operation)<span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>((query_graph, serializer))

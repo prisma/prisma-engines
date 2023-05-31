@@ -1162,13 +1162,6 @@
 <a href="#1162" id="1162">1162</a>
 <a href="#1163" id="1163">1163</a>
 <a href="#1164" id="1164">1164</a>
-<a href="#1165" id="1165">1165</a>
-<a href="#1166" id="1166">1166</a>
-<a href="#1167" id="1167">1167</a>
-<a href="#1168" id="1168">1168</a>
-<a href="#1169" id="1169">1169</a>
-<a href="#1170" id="1170">1170</a>
-<a href="#1171" id="1171">1171</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     query_ast::<span class="kw-2">*</span>,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
@@ -1176,13 +1169,13 @@
 };
 <span class="kw">use </span>connector::{DatasourceFieldName, Filter, RecordFilter, WriteArgs, WriteOperation};
 <span class="kw">use </span>indexmap::IndexMap;
-<span class="kw">use </span>prisma_models::{FieldSelection, ModelRef, PrismaValue, RelationFieldRef, SelectionResult};
+<span class="kw">use </span>prisma_models::{FieldSelection, Model, PrismaValue, RelationFieldRef, SelectionResult};
 <span class="kw">use </span>psl::parser_database::ReferentialAction;
-<span class="kw">use </span>schema::ConnectorContext;
+<span class="kw">use </span>schema::QuerySchema;
 
 <span class="doccomment">/// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.
 /// Simply unpacks `ParsedInputValue::List`.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>coerce_vec(val: ParsedInputValue) -&gt; Vec&lt;ParsedInputValue&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>coerce_vec(val: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Vec&lt;ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
     <span class="kw">match </span>val {
         ParsedInputValue::List(l) =&gt; l,
         m @ ParsedInputValue::Map(<span class="kw">_</span>) =&gt; <span class="macro">vec!</span>[m],
@@ -1198,7 +1191,7 @@
 }
 
 <span class="doccomment">/// Produces a non-failing read query that fetches the requested selection of records for a given filterable.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>read_ids_infallible&lt;T&gt;(model: ModelRef, selection: FieldSelection, filter: T) -&gt; Query
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>read_ids_infallible&lt;T&gt;(model: Model, selection: FieldSelection, filter: T) -&gt; Query
 <span class="kw">where
     </span>T: Into&lt;Filter&gt;,
 {
@@ -1220,7 +1213,7 @@
     Query::Read(read_query)
 }
 
-<span class="kw">fn </span>get_selected_fields(model: <span class="kw-2">&amp;</span>ModelRef, selection: FieldSelection) -&gt; FieldSelection {
+<span class="kw">fn </span>get_selected_fields(model: <span class="kw-2">&amp;</span>Model, selection: FieldSelection) -&gt; FieldSelection {
     <span class="comment">// Always fetch the primary identifier as well.
     </span><span class="kw">let </span>primary_model_id = model.primary_identifier();
 
@@ -1387,7 +1380,7 @@
 /// on available information.
 ///
 /// No edges are created.
-</span><span class="kw">pub fn </span>update_records_node_placeholder&lt;T&gt;(graph: <span class="kw-2">&amp;mut </span>QueryGraph, filter: T, model: ModelRef) -&gt; NodeRef
+</span><span class="kw">pub fn </span>update_records_node_placeholder&lt;T&gt;(graph: <span class="kw-2">&amp;mut </span>QueryGraph, filter: T, model: Model) -&gt; NodeRef
 <span class="kw">where
     </span>T: Into&lt;Filter&gt;,
 {
@@ -1552,15 +1545,15 @@
 ///               │                                                         │                                        │
 ///               └─────────────────────────────────────────────────────────┴────────────────────────────────────────┘
 /// ```
-</span><span class="kw">pub fn </span>insert_emulated_on_delete(
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>insert_emulated_on_delete(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
-    model_to_delete: <span class="kw-2">&amp;</span>ModelRef,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
+    model_to_delete: <span class="kw-2">&amp;</span>Model,
     parent_node: <span class="kw-2">&amp;</span>NodeRef,
     child_node: <span class="kw-2">&amp;</span>NodeRef,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="comment">// If the connector uses the `RelationMode::ForeignKeys` mode, we do not do any checks / emulation.
-    </span><span class="kw">if </span>connector_ctx.relation_mode.uses_foreign_keys() {
+    </span><span class="kw">if </span>query_schema.relation_mode().uses_foreign_keys() {
         <span class="kw">return </span><span class="prelude-val">Ok</span>(());
     }
 
@@ -1574,11 +1567,9 @@
                 emulate_on_delete_restrict(graph, <span class="kw-2">&amp;</span>rf, parent_node, child_node)<span class="question-mark">?
             </span>}
             ReferentialAction::SetNull =&gt; {
-                emulate_on_delete_set_null(graph, connector_ctx, <span class="kw-2">&amp;</span>rf, parent_node, child_node)<span class="question-mark">?
+                emulate_on_delete_set_null(graph, query_schema, <span class="kw-2">&amp;</span>rf, parent_node, child_node)<span class="question-mark">?
             </span>}
-            ReferentialAction::Cascade =&gt; {
-                emulate_on_delete_cascade(graph, <span class="kw-2">&amp;</span>rf, connector_ctx, parent_node, child_node)<span class="question-mark">?
-            </span>}
+            ReferentialAction::Cascade =&gt; emulate_on_delete_cascade(graph, <span class="kw-2">&amp;</span>rf, query_schema, parent_node, child_node)<span class="question-mark">?</span>,
             x =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported referential action emulation: {x}&quot;</span>),
         }
     }
@@ -1686,7 +1677,7 @@
 </span><span class="kw">pub fn </span>emulate_on_delete_cascade(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
     relation_field: <span class="kw-2">&amp;</span>RelationFieldRef, <span class="comment">// This is the field _on the other model_ for cascade.
-    </span>connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    </span>query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     parent_node: <span class="kw-2">&amp;</span>NodeRef,
     child_node: <span class="kw-2">&amp;</span>NodeRef,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
@@ -1707,7 +1698,7 @@
 
     insert_emulated_on_delete(
         graph,
-        connector_ctx,
+        query_schema,
         <span class="kw-2">&amp;</span>dependent_model,
         <span class="kw-2">&amp;</span>dependent_records_node,
         <span class="kw-2">&amp;</span>delete_dependents_node,
@@ -1777,7 +1768,7 @@
 /// ```
 </span><span class="kw">pub fn </span>emulate_on_delete_set_null(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
     parent_node: <span class="kw-2">&amp;</span>NodeRef,
     child_node: <span class="kw-2">&amp;</span>NodeRef,
@@ -1849,14 +1840,14 @@
             ReferentialAction::SetNull =&gt; emulate_on_update_set_null(
                 graph,
                 <span class="kw-2">&amp;</span>rf,
-                connector_ctx,
+                query_schema,
                 <span class="kw-2">&amp;</span>dependent_records_node,
                 <span class="kw-2">&amp;</span>set_null_dependents_node,
             )<span class="question-mark">?</span>,
             ReferentialAction::Cascade =&gt; emulate_on_update_cascade(
                 graph,
                 <span class="kw-2">&amp;</span>rf,
-                connector_ctx,
+                query_schema,
                 <span class="kw-2">&amp;</span>dependent_records_node,
                 <span class="kw-2">&amp;</span>set_null_dependents_node,
             )<span class="question-mark">?</span>,
@@ -1908,7 +1899,7 @@
 </span><span class="kw">pub fn </span>emulate_on_update_set_null(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
     relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     parent_node: <span class="kw-2">&amp;</span>NodeRef,
     child_node: <span class="kw-2">&amp;</span>NodeRef,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
@@ -1993,14 +1984,14 @@
             ReferentialAction::SetNull =&gt; emulate_on_update_set_null(
                 graph,
                 <span class="kw-2">&amp;</span>rf,
-                connector_ctx,
+                query_schema,
                 <span class="kw-2">&amp;</span>dependent_records_node,
                 <span class="kw-2">&amp;</span>set_null_dependents_node,
             )<span class="question-mark">?</span>,
             ReferentialAction::Cascade =&gt; emulate_on_update_cascade(
                 graph,
                 <span class="kw-2">&amp;</span>rf,
-                connector_ctx,
+                query_schema,
                 <span class="kw-2">&amp;</span>dependent_records_node,
                 <span class="kw-2">&amp;</span>set_null_dependents_node,
             )<span class="question-mark">?</span>,
@@ -2102,13 +2093,13 @@
 /// ```
 </span><span class="kw">pub fn </span>insert_emulated_on_update_with_intermediary_node(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
-    model_to_update: <span class="kw-2">&amp;</span>ModelRef,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
+    model_to_update: <span class="kw-2">&amp;</span>Model,
     parent_node: <span class="kw-2">&amp;</span>NodeRef,
     child_node: <span class="kw-2">&amp;</span>NodeRef,
 ) -&gt; QueryGraphBuilderResult&lt;<span class="prelude-ty">Option</span>&lt;NodeRef&gt;&gt; {
     <span class="comment">// If the connector uses the `RelationMode::ForeignKeys` mode, we do not do any checks / emulation.
-    </span><span class="kw">if </span>connector_ctx.relation_mode.uses_foreign_keys() {
+    </span><span class="kw">if </span>query_schema.relation_mode().uses_foreign_keys() {
         <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
     }
 
@@ -2138,10 +2129,8 @@
             ReferentialAction::NoAction | ReferentialAction::Restrict =&gt; {
                 emulate_on_update_restrict(graph, <span class="kw-2">&amp;</span>rf, <span class="kw-2">&amp;</span>join_node, child_node)<span class="question-mark">?
             </span>}
-            ReferentialAction::SetNull =&gt; {
-                emulate_on_update_set_null(graph, <span class="kw-2">&amp;</span>rf, connector_ctx, <span class="kw-2">&amp;</span>join_node, child_node)<span class="question-mark">?
-            </span>}
-            ReferentialAction::Cascade =&gt; emulate_on_update_cascade(graph, <span class="kw-2">&amp;</span>rf, connector_ctx, <span class="kw-2">&amp;</span>join_node, child_node)<span class="question-mark">?</span>,
+            ReferentialAction::SetNull =&gt; emulate_on_update_set_null(graph, <span class="kw-2">&amp;</span>rf, query_schema, <span class="kw-2">&amp;</span>join_node, child_node)<span class="question-mark">?</span>,
+            ReferentialAction::Cascade =&gt; emulate_on_update_cascade(graph, <span class="kw-2">&amp;</span>rf, query_schema, <span class="kw-2">&amp;</span>join_node, child_node)<span class="question-mark">?</span>,
             x =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported referential action emulation: {x}&quot;</span>),
         }
     }
@@ -2151,13 +2140,13 @@
 
 <span class="kw">pub fn </span>insert_emulated_on_update(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
-    model_to_update: <span class="kw-2">&amp;</span>ModelRef,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
+    model_to_update: <span class="kw-2">&amp;</span>Model,
     parent_node: <span class="kw-2">&amp;</span>NodeRef,
     child_node: <span class="kw-2">&amp;</span>NodeRef,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="comment">// If the connector uses the `RelationMode::ForeignKeys` mode, we do not do any checks / emulation.
-    </span><span class="kw">if </span>connector_ctx.relation_mode.uses_foreign_keys() {
+    </span><span class="kw">if </span>query_schema.relation_mode().uses_foreign_keys() {
         <span class="kw">return </span><span class="prelude-val">Ok</span>(());
     }
 
@@ -2171,11 +2160,9 @@
                 emulate_on_update_restrict(graph, <span class="kw-2">&amp;</span>rf, parent_node, child_node)<span class="question-mark">?
             </span>}
             ReferentialAction::SetNull =&gt; {
-                emulate_on_update_set_null(graph, <span class="kw-2">&amp;</span>rf, connector_ctx, parent_node, child_node)<span class="question-mark">?
+                emulate_on_update_set_null(graph, <span class="kw-2">&amp;</span>rf, query_schema, parent_node, child_node)<span class="question-mark">?
             </span>}
-            ReferentialAction::Cascade =&gt; {
-                emulate_on_update_cascade(graph, <span class="kw-2">&amp;</span>rf, connector_ctx, parent_node, child_node)<span class="question-mark">?
-            </span>}
+            ReferentialAction::Cascade =&gt; emulate_on_update_cascade(graph, <span class="kw-2">&amp;</span>rf, query_schema, parent_node, child_node)<span class="question-mark">?</span>,
             x =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported referential action emulation: {x}&quot;</span>),
         }
     }
@@ -2236,7 +2223,7 @@
 </span><span class="kw">pub fn </span>emulate_on_update_cascade(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
     relation_field: <span class="kw-2">&amp;</span>RelationFieldRef, <span class="comment">// This is the field _on the other model_ for cascade.
-    </span>connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    </span>query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     parent_node: <span class="kw-2">&amp;</span>NodeRef,
     child_node: <span class="kw-2">&amp;</span>NodeRef,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
@@ -2288,7 +2275,7 @@
 
     insert_emulated_on_update(
         graph,
-        connector_ctx,
+        query_schema,
         <span class="kw-2">&amp;</span>dependent_model,
         <span class="kw-2">&amp;</span>dependent_records_node,
         <span class="kw-2">&amp;</span>update_dependents_node,
@@ -2319,13 +2306,12 @@
 }
 
 <span class="doccomment">/// Collect relation fields that share at least one common foreign key with `relation_field`.
-</span><span class="kw">fn </span>collect_overlapping_relation_fields(model: ModelRef, relation_field: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; Vec&lt;RelationFieldRef&gt; {
+</span><span class="kw">fn </span>collect_overlapping_relation_fields(model: Model, relation_field: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; Vec&lt;RelationFieldRef&gt; {
     <span class="kw">let </span>child_fks = relation_field.left_scalars();
 
     <span class="kw">let </span>dependent_relation_fields: Vec&lt;<span class="kw">_</span>&gt; = model
         .fields()
         .relation()
-        .into_iter()
         .filter(|rf| rf != relation_field)
         .filter(|rf| {
             <span class="kw">let </span>fks = rf.left_scalars();

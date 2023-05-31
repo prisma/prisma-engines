@@ -41,11 +41,9 @@
 <a href="#41" id="41">41</a>
 <a href="#42" id="42">42</a>
 <a href="#43" id="43">43</a>
-<a href="#44" id="44">44</a>
-<a href="#45" id="45">45</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>render_enum_types&lt;<span class="lifetime">&#39;a</span>&gt;(ctx: <span class="kw-2">&amp;mut </span>RenderContext, enum_types: <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>EnumType&gt; + <span class="lifetime">&#39;a</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>render_enum_types&lt;<span class="lifetime">&#39;a</span>&gt;(ctx: <span class="kw-2">&amp;mut </span>RenderContext, enum_types: <span class="kw">impl </span>Iterator&lt;Item = EnumType&gt; + <span class="lifetime">&#39;a</span>) {
     <span class="kw">let </span><span class="kw-2">mut </span>borrows: Vec&lt;<span class="kw">_</span>&gt; = enum_types.collect();
 
     borrows.sort_by_key(|a| a.name());
@@ -56,7 +54,7 @@
     enum_type: EnumType,
 }
 
-<span class="kw">impl </span>Renderer <span class="kw">for </span>DmmfEnumRenderer {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Renderer&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>DmmfEnumRenderer {
     <span class="kw">fn </span>render(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>RenderContext) {
         <span class="kw">let </span>ident = <span class="self">self</span>.enum_type.identifier();
         <span class="kw">if </span>ctx.already_rendered(ident) {
@@ -74,10 +72,8 @@
 }
 
 <span class="kw">impl </span>DmmfEnumRenderer {
-    <span class="kw">pub fn </span>new(enum_type: <span class="kw-2">&amp;</span>EnumType) -&gt; DmmfEnumRenderer {
-        DmmfEnumRenderer {
-            enum_type: enum_type.clone(),
-        }
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(enum_type: EnumType) -&gt; DmmfEnumRenderer {
+        DmmfEnumRenderer { enum_type }
     }
 
     <span class="kw">fn </span>format_enum_values(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;String&gt; {

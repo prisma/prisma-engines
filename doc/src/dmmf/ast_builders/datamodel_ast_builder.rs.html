@@ -345,7 +345,7 @@
     schema_ast::ast::WithDocumentation,
 };
 
-<span class="kw">pub fn </span>schema_to_dmmf(schema: <span class="kw-2">&amp;</span>psl::ValidatedSchema) -&gt; Datamodel {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>schema_to_dmmf(schema: <span class="kw-2">&amp;</span>psl::ValidatedSchema) -&gt; Datamodel {
     <span class="kw">let </span><span class="kw-2">mut </span>datamodel = Datamodel {
         models: Vec::with_capacity(schema.db.models_count()),
         enums: Vec::with_capacity(schema.db.enums_count()),

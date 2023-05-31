@@ -2,7 +2,7 @@
     // Required methods
     fn <a href="#tymethod.get_single_record" class="fn">get_single_record</a>&lt;'life0, 'life1, 'life2, 'life3, 'life4, 'async_trait&gt;(
         &amp;'life0 mut self,
-        model: &amp;'life1 <a class="type" href="../prisma_models/model/type.ModelRef.html" title="type prisma_models::model::ModelRef">ModelRef</a>,
+        model: &amp;'life1 <a class="type" href="../prisma_models/model/type.Model.html" title="type prisma_models::model::Model">Model</a>,
         filter: &amp;'life2 <a class="enum" href="filter/enum.Filter.html" title="enum query_connector::filter::Filter">Filter</a>,
         selected_fields: &amp;'life3 <a class="struct" href="../prisma_models/field_selection/struct.FieldSelection.html" title="struct prisma_models::field_selection::FieldSelection">FieldSelection</a>,
         aggregation_selections: &amp;'life4 [<a class="enum" href="enum.RelAggregationSelection.html" title="enum query_connector::RelAggregationSelection">RelAggregationSelection</a>],
@@ -16,7 +16,7 @@
              'life4: 'async_trait</span>;
 <span class="item-spacer"></span>    fn <a href="#tymethod.get_many_records" class="fn">get_many_records</a>&lt;'life0, 'life1, 'life2, 'life3, 'async_trait&gt;(
         &amp;'life0 mut self,
-        model: &amp;'life1 <a class="type" href="../prisma_models/model/type.ModelRef.html" title="type prisma_models::model::ModelRef">ModelRef</a>,
+        model: &amp;'life1 <a class="type" href="../prisma_models/model/type.Model.html" title="type prisma_models::model::Model">Model</a>,
         query_arguments: <a class="struct" href="struct.QueryArguments.html" title="struct query_connector::QueryArguments">QueryArguments</a>,
         selected_fields: &amp;'life2 <a class="struct" href="../prisma_models/field_selection/struct.FieldSelection.html" title="struct prisma_models::field_selection::FieldSelection">FieldSelection</a>,
         aggregation_selections: &amp;'life3 [<a class="enum" href="enum.RelAggregationSelection.html" title="enum query_connector::RelAggregationSelection">RelAggregationSelection</a>],
@@ -39,7 +39,7 @@
              'life2: 'async_trait</span>;
 <span class="item-spacer"></span>    fn <a href="#tymethod.aggregate_records" class="fn">aggregate_records</a>&lt;'life0, 'life1, 'async_trait&gt;(
         &amp;'life0 mut self,
-        model: &amp;'life1 <a class="type" href="../prisma_models/model/type.ModelRef.html" title="type prisma_models::model::ModelRef">ModelRef</a>,
+        model: &amp;'life1 <a class="type" href="../prisma_models/model/type.Model.html" title="type prisma_models::model::Model">Model</a>,
         query_arguments: <a class="struct" href="struct.QueryArguments.html" title="struct query_connector::QueryArguments">QueryArguments</a>,
         selections: <a class="struct" href="https://doc.rust-lang.org/1.69.0/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="enum" href="enum.AggregationSelection.html" title="enum query_connector::AggregationSelection">AggregationSelection</a>&gt;,
         group_by: <a class="struct" href="https://doc.rust-lang.org/1.69.0/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="type" href="../prisma_models/field/scalar/type.ScalarFieldRef.html" title="type prisma_models::field::scalar::ScalarFieldRef">ScalarFieldRef</a>&gt;,
@@ -51,7 +51,7 @@
              'life1: 'async_trait</span>;
 }</code></pre><h2 id="required-methods" class="small-section-header">Required Methods<a href="#required-methods" class="anchor">§</a></h2><div class="methods"><details class="toggle method-toggle" open><summary><section id="tymethod.get_single_record" class="method"><a class="srclink rightside" href="../src/query_connector/interface.rs.html#228-235">source</a><h4 class="code-header">fn <a href="#tymethod.get_single_record" class="fn">get_single_record</a>&lt;'life0, 'life1, 'life2, 'life3, 'life4, 'async_trait&gt;(
     &amp;'life0 mut self,
-    model: &amp;'life1 <a class="type" href="../prisma_models/model/type.ModelRef.html" title="type prisma_models::model::ModelRef">ModelRef</a>,
+    model: &amp;'life1 <a class="type" href="../prisma_models/model/type.Model.html" title="type prisma_models::model::Model">Model</a>,
     filter: &amp;'life2 <a class="enum" href="filter/enum.Filter.html" title="enum query_connector::filter::Filter">Filter</a>,
     selected_fields: &amp;'life3 <a class="struct" href="../prisma_models/field_selection/struct.FieldSelection.html" title="struct prisma_models::field_selection::FieldSelection">FieldSelection</a>,
     aggregation_selections: &amp;'life4 [<a class="enum" href="enum.RelAggregationSelection.html" title="enum query_connector::RelAggregationSelection">RelAggregationSelection</a>],
@@ -71,7 +71,7 @@ defined to filter at most one item by the core.</li>
 </ul>
 </div></details><details class="toggle method-toggle" open><summary><section id="tymethod.get_many_records" class="method"><a class="srclink rightside" href="../src/query_connector/interface.rs.html#243-250">source</a><h4 class="code-header">fn <a href="#tymethod.get_many_records" class="fn">get_many_records</a>&lt;'life0, 'life1, 'life2, 'life3, 'async_trait&gt;(
     &amp;'life0 mut self,
-    model: &amp;'life1 <a class="type" href="../prisma_models/model/type.ModelRef.html" title="type prisma_models::model::ModelRef">ModelRef</a>,
+    model: &amp;'life1 <a class="type" href="../prisma_models/model/type.Model.html" title="type prisma_models::model::Model">Model</a>,
     query_arguments: <a class="struct" href="struct.QueryArguments.html" title="struct query_connector::QueryArguments">QueryArguments</a>,
     selected_fields: &amp;'life2 <a class="struct" href="../prisma_models/field_selection/struct.FieldSelection.html" title="struct prisma_models::field_selection::FieldSelection">FieldSelection</a>,
     aggregation_selections: &amp;'life3 [<a class="enum" href="enum.RelAggregationSelection.html" title="enum query_connector::RelAggregationSelection">RelAggregationSelection</a>],
@@ -105,7 +105,7 @@ database. The IDs returned will be used to perform a in-memory join
 between two datasets.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="tymethod.aggregate_records" class="method"><a class="srclink rightside" href="../src/query_connector/interface.rs.html#271-279">source</a><h4 class="code-header">fn <a href="#tymethod.aggregate_records" class="fn">aggregate_records</a>&lt;'life0, 'life1, 'async_trait&gt;(
     &amp;'life0 mut self,
-    model: &amp;'life1 <a class="type" href="../prisma_models/model/type.ModelRef.html" title="type prisma_models::model::ModelRef">ModelRef</a>,
+    model: &amp;'life1 <a class="type" href="../prisma_models/model/type.Model.html" title="type prisma_models::model::Model">Model</a>,
     query_arguments: <a class="struct" href="struct.QueryArguments.html" title="struct query_connector::QueryArguments">QueryArguments</a>,
     selections: <a class="struct" href="https://doc.rust-lang.org/1.69.0/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="enum" href="enum.AggregationSelection.html" title="enum query_connector::AggregationSelection">AggregationSelection</a>&gt;,
     group_by: <a class="struct" href="https://doc.rust-lang.org/1.69.0/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="type" href="../prisma_models/field/scalar/type.ScalarFieldRef.html" title="type prisma_models::field::scalar::ScalarFieldRef">ScalarFieldRef</a>&gt;,

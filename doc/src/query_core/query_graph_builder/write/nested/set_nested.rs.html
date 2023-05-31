@@ -369,7 +369,7 @@
 <span class="kw">use crate</span>::{query_ast::<span class="kw-2">*</span>, query_graph::<span class="kw-2">*</span>, ParsedInputValue};
 <span class="kw">use </span>connector::Filter;
 <span class="kw">use </span>itertools::Itertools;
-<span class="kw">use </span>prisma_models::{ModelRef, RelationFieldRef, SelectionResult};
+<span class="kw">use </span>prisma_models::{Model, RelationFieldRef, SelectionResult};
 <span class="kw">use </span>std::convert::TryInto;
 
 <span class="doccomment">/// Only for x-to-many relations.
@@ -381,16 +381,16 @@
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
     parent_node: <span class="kw-2">&amp;</span>NodeRef,
     parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
-    value: ParsedInputValue,
-    child_model: <span class="kw-2">&amp;</span>ModelRef,
+    value: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;,
+    child_model: <span class="kw-2">&amp;</span>Model,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="kw">let </span>relation = parent_relation_field.relation();
 
     <span class="comment">// Build all filters upfront.
     </span><span class="kw">let </span>filters: Vec&lt;Filter&gt; = utils::coerce_vec(value)
         .into_iter()
-        .map(|value: ParsedInputValue| {
-            <span class="kw">let </span>value: ParsedInputMap = value.try_into()<span class="question-mark">?</span>;
+        .map(|value: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;| {
+            <span class="kw">let </span>value: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = value.try_into()<span class="question-mark">?</span>;
             extract_unique_filter(value, child_model)
         })
         .collect::&lt;QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt;&gt;()<span class="question-mark">?

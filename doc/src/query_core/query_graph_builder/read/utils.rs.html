@@ -172,7 +172,7 @@
 <span class="kw">use </span>prisma_models::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>schema::constants::{aggregations::<span class="kw-2">*</span>, args};
 
-<span class="kw">pub fn </span>collect_selection_order(from: <span class="kw-2">&amp;</span>[FieldPair]) -&gt; Vec&lt;String&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>collect_selection_order(from: <span class="kw-2">&amp;</span>[FieldPair&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; Vec&lt;String&gt; {
     from.iter()
         .map(|pair| {
             pair.parsed_field
@@ -186,10 +186,10 @@
 <span class="doccomment">/// Creates a `FieldSelection` from a query selection.
 /// Automatically adds model IDs to the selected fields as well.
 /// Unwraps are safe due to query validation.
-</span><span class="kw">pub fn </span>collect_selected_fields(
-    from_pairs: <span class="kw-2">&amp;</span>[FieldPair],
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>collect_selected_fields(
+    from_pairs: <span class="kw-2">&amp;</span>[FieldPair&lt;<span class="lifetime">&#39;_</span>&gt;],
     distinct: <span class="prelude-ty">Option</span>&lt;FieldSelection&gt;,
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    model: <span class="kw-2">&amp;</span>Model,
 ) -&gt; FieldSelection {
     <span class="kw">let </span>model_id = model.primary_identifier();
     <span class="kw">let </span>selected_fields = pairs_to_selections(model, from_pairs);
@@ -205,7 +205,7 @@
     }
 }
 
-<span class="kw">fn </span>pairs_to_selections&lt;T&gt;(parent: T, pairs: <span class="kw-2">&amp;</span>[FieldPair]) -&gt; Vec&lt;SelectedField&gt;
+<span class="kw">fn </span>pairs_to_selections&lt;T&gt;(parent: T, pairs: <span class="kw-2">&amp;</span>[FieldPair&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; Vec&lt;SelectedField&gt;
 <span class="kw">where
     </span>T: Into&lt;ParentContainer&gt;,
 {
@@ -225,7 +225,7 @@
         .collect()
 }
 
-<span class="kw">fn </span>extract_composite_selection(pf: ParsedField, cf: CompositeFieldRef) -&gt; SelectedField {
+<span class="kw">fn </span>extract_composite_selection(pf: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;, cf: CompositeFieldRef) -&gt; SelectedField {
     <span class="kw">let </span>object = pf
         .nested_fields
         .expect(<span class="string">&quot;Invalid composite query shape: Composite field selected without sub-selection.&quot;</span>);
@@ -239,8 +239,8 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>collect_nested_queries(
-    from: Vec&lt;FieldPair&gt;,
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    from: Vec&lt;FieldPair&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+    model: <span class="kw-2">&amp;</span>Model,
 ) -&gt; QueryGraphBuilderResult&lt;Vec&lt;ReadQuery&gt;&gt; {
     from.into_iter()
         .filter_map(|pair| {
@@ -305,8 +305,8 @@
 }
 
 <span class="kw">pub fn </span>collect_relation_aggr_selections(
-    from: Vec&lt;FieldPair&gt;,
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    from: Vec&lt;FieldPair&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+    model: <span class="kw-2">&amp;</span>Model,
 ) -&gt; QueryGraphBuilderResult&lt;Vec&lt;RelAggregationSelection&gt;&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>selections = <span class="macro">vec!</span>[];
 

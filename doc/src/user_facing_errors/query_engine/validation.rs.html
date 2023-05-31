@@ -745,7 +745,7 @@
     ///         &quot;selection&quot;: {}
     ///     }
     /// }
-    </span><span class="kw">pub fn </span>empty_selection(selection_path: Vec&lt;String&gt;, output_type_description: OutputTypeDescription) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>empty_selection(selection_path: Vec&lt;<span class="kw-2">&amp;</span>str&gt;, output_type_description: OutputTypeDescription) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>message = String::from(<span class="string">&quot;Expected a minimum of 1 field to be present, got 0&quot;</span>);
         ValidationError {
             kind: ValidationErrorKind::EmptySelection,
@@ -776,9 +776,9 @@
     ///     }
     /// }
     </span><span class="kw">pub fn </span>invalid_argument_type(
-        selection_path: Vec&lt;String&gt;,
-        argument_path: Vec&lt;String&gt;,
-        argument_description: ArgumentDescription,
+        selection_path: Vec&lt;<span class="kw-2">&amp;</span>str&gt;,
+        argument_path: Vec&lt;<span class="kw-2">&amp;</span>str&gt;,
+        argument_description: ArgumentDescription&lt;<span class="lifetime">&#39;_</span>&gt;,
         inferred_argument_type: String,
     ) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>message = <span class="macro">format!</span>(
@@ -819,10 +819,10 @@
     ///     }
     /// }
     </span><span class="kw">pub fn </span>invalid_argument_value(
-        selection_path: Vec&lt;String&gt;,
-        argument_path: Vec&lt;String&gt;,
+        selection_path: Vec&lt;<span class="kw-2">&amp;</span>str&gt;,
+        argument_path: Vec&lt;<span class="kw-2">&amp;</span>str&gt;,
         value: String,
-        expected_argument_type: String,
+        expected_argument_type: <span class="kw-2">&amp;</span>str,
         underlying_err: <span class="prelude-ty">Option</span>&lt;Box&lt;<span class="kw">dyn </span>error::Error&gt;&gt;,
     ) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>argument_name = argument_path.last().expect(<span class="string">&quot;Argument path cannot not be empty&quot;</span>);
@@ -832,7 +832,7 @@
                 <span class="string">&quot;Invalid argument agument value. `{}` is not a valid `{}`. Underlying error: {}&quot;</span>,
                 value, expected_argument_type, <span class="kw-2">&amp;</span>err_msg
             );
-            <span class="kw">let </span>argument = ArgumentDescription::new(argument_name.to_owned(), <span class="macro">vec!</span>[expected_argument_type]);
+            <span class="kw">let </span>argument = ArgumentDescription::new(<span class="kw-2">*</span>argument_name, <span class="macro">vec!</span>[Cow::Borrowed(expected_argument_type)]);
             <span class="kw">let </span>meta = <span class="macro">json!</span>({<span class="string">&quot;argumentPath&quot;</span>: argument_path, <span class="string">&quot;argument&quot;</span>: argument, <span class="string">&quot;selectionPath&quot;</span>: selection_path, <span class="string">&quot;underlyingError&quot;</span>: <span class="kw-2">&amp;</span>err_msg});
             (message, <span class="prelude-val">Some</span>(meta))
         } <span class="kw">else </span>{
@@ -840,7 +840,7 @@
                 <span class="string">&quot;Invalid argument agument value. `{}` is not a valid `{}`&quot;</span>,
                 value, <span class="kw-2">&amp;</span>expected_argument_type
             );
-            <span class="kw">let </span>argument = ArgumentDescription::new(argument_name.to_owned(), <span class="macro">vec!</span>[expected_argument_type]);
+            <span class="kw">let </span>argument = ArgumentDescription::new(<span class="kw-2">*</span>argument_name, <span class="macro">vec!</span>[Cow::Borrowed(expected_argument_type)]);
             <span class="kw">let </span>meta = <span class="macro">json!</span>({<span class="string">&quot;argumentPath&quot;</span>: argument_path, <span class="string">&quot;argument&quot;</span>: argument, <span class="string">&quot;selectionPath&quot;</span>: selection_path, <span class="string">&quot;underlyingError&quot;</span>: serde_json::Value::Null});
             (message, <span class="prelude-val">Some</span>(meta))
         };
@@ -854,11 +854,11 @@
     <span class="doccomment">/// Creates an [`ValidationErrorKind::SomeFieldsMissing`] kind of error, which happens when
     /// there are some fields missing from a query
     </span><span class="kw">pub fn </span>some_fields_missing(
-        selection_path: Vec&lt;String&gt;,
-        argument_path: Vec&lt;String&gt;,
+        selection_path: Vec&lt;<span class="kw-2">&amp;</span>str&gt;,
+        argument_path: Vec&lt;<span class="kw-2">&amp;</span>str&gt;,
         min_field_count: <span class="prelude-ty">Option</span>&lt;usize&gt;,
         max_field_count: <span class="prelude-ty">Option</span>&lt;usize&gt;,
-        required_fields: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
+        required_fields: <span class="prelude-ty">Option</span>&lt;Vec&lt;Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;&gt;&gt;,
         provided_field_count: usize,
         input_type_description: <span class="kw-2">&amp;</span>InputTypeDescription,
     ) -&gt; <span class="self">Self </span>{
@@ -877,11 +877,11 @@
     <span class="doccomment">/// Creates an [`ValidationErrorKind::SomeFieldsMissing`] kind of error, which happens when
     /// there are more fields given than the ones a type accept
     </span><span class="kw">pub fn </span>too_many_fields_given(
-        selection_path: Vec&lt;String&gt;,
-        argument_path: Vec&lt;String&gt;,
+        selection_path: Vec&lt;<span class="kw-2">&amp;</span>str&gt;,
+        argument_path: Vec&lt;<span class="kw-2">&amp;</span>str&gt;,
         min_field_count: <span class="prelude-ty">Option</span>&lt;usize&gt;,
         max_field_count: <span class="prelude-ty">Option</span>&lt;usize&gt;,
-        required_fields: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
+        required_fields: <span class="prelude-ty">Option</span>&lt;Vec&lt;Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;&gt;&gt;,
         provided_field_count: usize,
         input_type_description: <span class="kw-2">&amp;</span>InputTypeDescription,
     ) -&gt; <span class="self">Self </span>{
@@ -911,8 +911,8 @@
     /// }
     ///
     </span><span class="kw">pub fn </span>required_argument_missing(
-        selection_path: Vec&lt;String&gt;,
-        argument_path: Vec&lt;String&gt;,
+        selection_path: Vec&lt;<span class="kw-2">&amp;</span>str&gt;,
+        argument_path: Vec&lt;<span class="kw-2">&amp;</span>str&gt;,
         input_type_descriptions: <span class="kw-2">&amp;</span>[InputTypeDescription],
     ) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>message = <span class="macro">format!</span>(<span class="string">&quot;`{}`: A value is required but not set&quot;</span>, argument_path.join(<span class="string">&quot;.&quot;</span>));
@@ -944,9 +944,9 @@
     /// }
     /// Todo: add the `given` type to the meta
     </span><span class="kw">pub fn </span>unknown_argument(
-        selection_path: Vec&lt;String&gt;,
-        argument_path: Vec&lt;String&gt;,
-        valid_argument_descriptions: Vec&lt;ArgumentDescription&gt;,
+        selection_path: Vec&lt;<span class="kw-2">&amp;</span>str&gt;,
+        argument_path: Vec&lt;<span class="kw-2">&amp;</span>str&gt;,
+        valid_argument_descriptions: Vec&lt;ArgumentDescription&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
     ) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>message = String::from(<span class="string">&quot;Argument does not exist in enclosing type&quot;</span>);
         ValidationError {
@@ -987,8 +987,8 @@
     /// }
     ///
     </span><span class="kw">pub fn </span>unknown_input_field(
-        selection_path: Vec&lt;String&gt;,
-        argument_path: Vec&lt;String&gt;,
+        selection_path: Vec&lt;<span class="kw-2">&amp;</span>str&gt;,
+        argument_path: Vec&lt;<span class="kw-2">&amp;</span>str&gt;,
         input_type_description: InputTypeDescription,
     ) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>message = <span class="macro">format!</span>(
@@ -1020,10 +1020,7 @@
     ///         }
     ///     }
     </span><span class="comment">// }
-    </span><span class="kw">pub fn </span>unknown_selection_field(
-        selection_path: Vec&lt;String&gt;,
-        output_type_description: OutputTypeDescription,
-    ) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>unknown_selection_field(selection_path: Vec&lt;<span class="kw-2">&amp;</span>str&gt;, output_type_description: OutputTypeDescription) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>message = <span class="macro">format!</span>(
             <span class="string">&quot;Field &#39;{}&#39; not found in enclosing type &#39;{}&#39;&quot;</span>,
             selection_path.last().expect(<span class="string">&quot;Selection path must not be empty&quot;</span>),
@@ -1054,7 +1051,7 @@
     ///         }
     ///     }
     /// }
-    </span><span class="kw">pub fn </span>selection_set_on_scalar(field_name: String, selection_path: Vec&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>selection_set_on_scalar(field_name: String, selection_path: Vec&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>message = <span class="macro">format!</span>(<span class="string">&quot;Cannot select over scalar field &#39;{}&#39;&quot;</span>, <span class="kw-2">&amp;</span>field_name);
         ValidationError {
             kind: ValidationErrorKind::SelectionSetOnScalar,
@@ -1097,12 +1094,12 @@
     ///     }
     /// }
     ///
-    </span><span class="kw">pub fn </span>value_too_large(selection_path: Vec&lt;String&gt;, argument_path: Vec&lt;String&gt;, value: String) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>value_too_large(selection_path: Vec&lt;<span class="kw-2">&amp;</span>str&gt;, argument_path: Vec&lt;<span class="kw-2">&amp;</span>str&gt;, value: String) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>argument_name = argument_path.last().expect(<span class="string">&quot;Argument path cannot not be empty&quot;</span>);
         <span class="kw">let </span>message = <span class="macro">format!</span>(
             <span class="string">&quot;Unable to fit float value (or large JS integer serialized in exponent notation) &#39;{value}&#39; into a 64 Bit signed integer for field &#39;{argument_name}&#39;. If you&#39;re trying to store large integers, consider using `BigInt`&quot;</span>,
         );
-        <span class="kw">let </span>argument = ArgumentDescription::new(argument_name.to_owned(), <span class="macro">vec!</span>[<span class="string">&quot;BigInt&quot;</span>.to_owned()]);
+        <span class="kw">let </span>argument = ArgumentDescription::new(<span class="kw-2">*</span>argument_name, <span class="macro">vec!</span>[Cow::Borrowed(<span class="string">&quot;BigInt&quot;</span>)]);
         ValidationError {
             kind: ValidationErrorKind::ValueTooLarge,
             message,
@@ -1184,26 +1181,26 @@
 }
 
 <span class="attr">#[derive(Debug, Serialize, Clone)]
-</span><span class="kw">pub struct </span>InputTypeConstraints {
+</span><span class="kw">pub struct </span>InputTypeConstraints&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="attr">#[serde(rename = <span class="string">&quot;minFieldCount&quot;</span>)]
     </span>min: <span class="prelude-ty">Option</span>&lt;usize&gt;,
     <span class="attr">#[serde(rename = <span class="string">&quot;maxFieldCount&quot;</span>)]
     </span>max: <span class="prelude-ty">Option</span>&lt;usize&gt;,
     <span class="attr">#[serde(rename = <span class="string">&quot;requiredFields&quot;</span>)]
-    </span>fields: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
+    </span>fields: <span class="prelude-ty">Option</span>&lt;Vec&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;&gt;,
     <span class="attr">#[serde(skip)]
     </span>got: usize,
 }
 
-<span class="kw">impl </span>InputTypeConstraints {
-    <span class="kw">fn </span>new(min: <span class="prelude-ty">Option</span>&lt;usize&gt;, max: <span class="prelude-ty">Option</span>&lt;usize&gt;, fields: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;, got: usize) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; InputTypeConstraints&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>new(min: <span class="prelude-ty">Option</span>&lt;usize&gt;, max: <span class="prelude-ty">Option</span>&lt;usize&gt;, fields: <span class="prelude-ty">Option</span>&lt;Vec&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;&gt;, got: usize) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{ min, max, fields, got }
     }
 }
 
 <span class="comment">// Todo: we might not need this, having only the two kind of error types related to cardinality
 // TooManyFieldsGiven, SomeFieldsMissing
-</span><span class="kw">impl </span>fmt::Display <span class="kw">for </span>InputTypeConstraints {
+</span><span class="kw">impl </span>fmt::Display <span class="kw">for </span>InputTypeConstraints&lt;<span class="lifetime">&#39;_</span>&gt; {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.fields {
             <span class="prelude-val">None </span>=&gt; <span class="kw">match </span>(<span class="self">self</span>.min, <span class="self">self</span>.max) {
@@ -1262,14 +1259,17 @@
 
 <span class="attr">#[derive(Debug, Serialize)]
 #[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
-</span><span class="kw">pub struct </span>ArgumentDescription {
-    name: String,
-    type_names: Vec&lt;String&gt;,
+</span><span class="kw">pub struct </span>ArgumentDescription&lt;<span class="lifetime">&#39;a</span>&gt; {
+    name: Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;,
+    type_names: Vec&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
 }
 
-<span class="kw">impl </span>ArgumentDescription {
-    <span class="kw">pub fn </span>new(name: String, type_names: Vec&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{ name, type_names }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ArgumentDescription&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>new(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;, type_names: Vec&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            name: name.into(),
+            type_names,
+        }
     }
 }
 </code></pre></div>

@@ -520,7 +520,6 @@
 <a href="#520" id="520">520</a>
 <a href="#521" id="521">521</a>
 <a href="#522" id="522">522</a>
-<a href="#523" id="523">523</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     error::{DecorateErrorWithFieldInformationExtension, MongoError},
@@ -538,7 +537,7 @@
     options::InsertManyOptions,
     ClientSession, Collection, Database,
 };
-<span class="kw">use </span>prisma_models::{ModelRef, PrismaValue, SelectionResult};
+<span class="kw">use </span>prisma_models::{Model, PrismaValue, SelectionResult};
 <span class="kw">use </span>std::{collections::HashMap, convert::TryInto};
 <span class="kw">use </span>tracing::{info_span, Instrument};
 <span class="kw">use </span>update::IntoUpdateDocumentExtension;
@@ -548,7 +547,7 @@
 </span><span class="kw">pub async fn </span>create_record&lt;<span class="lifetime">&#39;conn</span>&gt;(
     database: <span class="kw-2">&amp;</span>Database,
     session: <span class="kw-2">&amp;mut </span>ClientSession,
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    model: <span class="kw-2">&amp;</span>Model,
     <span class="kw-2">mut </span>args: WriteArgs,
 ) -&gt; <span class="kw">crate</span>::Result&lt;SelectionResult&gt; {
     <span class="kw">let </span>coll = database.collection::&lt;Document&gt;(model.db_name());
@@ -601,7 +600,7 @@
 <span class="kw">pub async fn </span>create_records&lt;<span class="lifetime">&#39;conn</span>&gt;(
     database: <span class="kw-2">&amp;</span>Database,
     session: <span class="kw-2">&amp;mut </span>ClientSession,
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    model: <span class="kw-2">&amp;</span>Model,
     args: Vec&lt;WriteArgs&gt;,
     skip_duplicates: bool,
 ) -&gt; <span class="kw">crate</span>::Result&lt;usize&gt; {
@@ -667,7 +666,7 @@
 <span class="kw">pub async fn </span>update_records&lt;<span class="lifetime">&#39;conn</span>&gt;(
     database: <span class="kw-2">&amp;</span>Database,
     session: <span class="kw-2">&amp;mut </span>ClientSession,
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    model: <span class="kw-2">&amp;</span>Model,
     record_filter: RecordFilter,
     <span class="kw-2">mut </span>args: WriteArgs,
     update_type: UpdateType,
@@ -709,8 +708,7 @@
     <span class="kw">let </span>filter = <span class="macro">doc! </span>{ id_field.db_name(): { <span class="string">&quot;$in&quot;</span>: ids.clone() } };
     <span class="kw">let </span>fields: Vec&lt;<span class="kw">_</span>&gt; = model
         .fields()
-        .filter_all(|<span class="kw">_</span>| <span class="bool-val">true</span>)
-        .into_iter()
+        .all()
         .filter_map(|field| {
             args.take_field_value(field.db_name())
                 .map(|write_op| (field.clone(), write_op))
@@ -757,7 +755,7 @@
 <span class="kw">pub async fn </span>delete_records&lt;<span class="lifetime">&#39;conn</span>&gt;(
     database: <span class="kw-2">&amp;</span>Database,
     session: <span class="kw-2">&amp;mut </span>ClientSession,
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    model: <span class="kw-2">&amp;</span>Model,
     record_filter: RecordFilter,
 ) -&gt; <span class="kw">crate</span>::Result&lt;usize&gt; {
     <span class="kw">let </span>coll = database.collection::&lt;Document&gt;(model.db_name());
@@ -803,7 +801,7 @@
     database: <span class="kw-2">&amp;</span>Database,
     collection: Collection&lt;Document&gt;,
     session: <span class="kw-2">&amp;mut </span>ClientSession,
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    model: <span class="kw-2">&amp;</span>Model,
     filter: MongoFilter,
 ) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;Bson&gt;&gt; {
     <span class="kw">let </span>coll = database.collection::&lt;Document&gt;(model.db_name());
@@ -982,7 +980,7 @@
 </span><span class="kw">pub async fn </span>query_raw&lt;<span class="lifetime">&#39;conn</span>&gt;(
     database: <span class="kw-2">&amp;</span>Database,
     session: <span class="kw-2">&amp;mut </span>ClientSession,
-    model: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ModelRef&gt;,
+    model: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Model&gt;,
     inputs: HashMap&lt;String, PrismaValue&gt;,
     query_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;serde_json::Value&gt; {
@@ -1034,7 +1032,7 @@
     .<span class="kw">await
 </span>}
 
-<span class="kw">fn </span>get_raw_db_statement(query_type: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;String&gt;, model: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ModelRef&gt;, database: <span class="kw-2">&amp;</span>Database) -&gt; String {
+<span class="kw">fn </span>get_raw_db_statement(query_type: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;String&gt;, model: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Model&gt;, database: <span class="kw-2">&amp;</span>Database) -&gt; String {
     <span class="kw">match </span>(query_type.as_deref(), model) {
         (<span class="prelude-val">Some</span>(<span class="string">&quot;findRaw&quot;</span>), <span class="prelude-val">Some</span>(m)) =&gt; <span class="macro">format!</span>(<span class="string">&quot;db.{}.findRaw(*)&quot;</span>, database.collection::&lt;Document&gt;(m.db_name()).name()),
         (<span class="prelude-val">Some</span>(<span class="string">&quot;aggregateRaw&quot;</span>), <span class="prelude-val">Some</span>(m)) =&gt; <span class="macro">format!</span>(

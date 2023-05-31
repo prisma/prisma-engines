@@ -45,10 +45,10 @@
 <a href="#45" id="45">45</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{query_ast::<span class="kw-2">*</span>, query_graph::QueryGraph, ParsedField};
-<span class="kw">use </span>prisma_models::{ModelRef, PrismaValue};
+<span class="kw">use </span>prisma_models::{Model, PrismaValue};
 <span class="kw">use </span>std::{collections::HashMap, convert::TryInto};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>execute_raw(graph: <span class="kw-2">&amp;mut </span>QueryGraph, field: ParsedField) -&gt; QueryGraphBuilderResult&lt;()&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>execute_raw(graph: <span class="kw-2">&amp;mut </span>QueryGraph, field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="kw">let </span>raw_query = Query::Write(WriteQuery::ExecuteRaw(raw_query(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, field)<span class="question-mark">?</span>));
 
     graph.create_node(raw_query);
@@ -57,9 +57,9 @@
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>query_raw(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    model: <span class="prelude-ty">Option</span>&lt;ModelRef&gt;,
+    model: <span class="prelude-ty">Option</span>&lt;Model&gt;,
     query_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    field: ParsedField,
+    field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="kw">let </span>raw_query = Query::Write(WriteQuery::QueryRaw(raw_query(model, query_type, field)<span class="question-mark">?</span>));
 
@@ -68,9 +68,9 @@
 }
 
 <span class="kw">fn </span>raw_query(
-    model: <span class="prelude-ty">Option</span>&lt;ModelRef&gt;,
+    model: <span class="prelude-ty">Option</span>&lt;Model&gt;,
     query_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    field: ParsedField,
+    field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; QueryGraphBuilderResult&lt;RawQuery&gt; {
     <span class="kw">let </span>inputs = field
         .arguments

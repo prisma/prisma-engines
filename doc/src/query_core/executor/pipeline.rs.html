@@ -38,19 +38,27 @@
 <a href="#38" id="38">38</a>
 <a href="#39" id="39">39</a>
 <a href="#40" id="40">40</a>
+<a href="#41" id="41">41</a>
+<a href="#42" id="42">42</a>
+<a href="#43" id="43">43</a>
+<a href="#44" id="44">44</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{Env, Expressionista, IrSerializer, QueryGraph, QueryInterpreter, ResponseData};
 <span class="kw">use </span>schema::QuerySchema;
 <span class="kw">use </span>tracing::Instrument;
 
 <span class="attr">#[derive(Debug)]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>QueryPipeline&lt;<span class="lifetime">&#39;conn</span>&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>QueryPipeline&lt;<span class="lifetime">&#39;conn</span>, <span class="lifetime">&#39;schema</span>&gt; {
     graph: QueryGraph,
     interpreter: QueryInterpreter&lt;<span class="lifetime">&#39;conn</span>&gt;,
-    serializer: IrSerializer,
+    serializer: IrSerializer&lt;<span class="lifetime">&#39;schema</span>&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;conn</span>&gt; QueryPipeline&lt;<span class="lifetime">&#39;conn</span>&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(graph: QueryGraph, interpreter: QueryInterpreter&lt;<span class="lifetime">&#39;conn</span>&gt;, serializer: IrSerializer) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;conn</span>, <span class="lifetime">&#39;schema</span>&gt; QueryPipeline&lt;<span class="lifetime">&#39;conn</span>, <span class="lifetime">&#39;schema</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
+        graph: QueryGraph,
+        interpreter: QueryInterpreter&lt;<span class="lifetime">&#39;conn</span>&gt;,
+        serializer: IrSerializer&lt;<span class="lifetime">&#39;schema</span>&gt;,
+    ) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             graph,
             interpreter,
@@ -60,7 +68,7 @@
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>execute(
         <span class="kw-2">mut </span><span class="self">self</span>,
-        query_schema: <span class="kw-2">&amp;</span>QuerySchema,
+        query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;schema </span>QuerySchema,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     ) -&gt; <span class="kw">crate</span>::Result&lt;ResponseData&gt; {
         <span class="kw">let </span>serializer = <span class="self">self</span>.serializer;

@@ -160,12 +160,6 @@
 <a href="#160" id="160">160</a>
 <a href="#161" id="161">161</a>
 <a href="#162" id="162">162</a>
-<a href="#163" id="163">163</a>
-<a href="#164" id="164">164</a>
-<a href="#165" id="165">165</a>
-<a href="#166" id="166">166</a>
-<a href="#167" id="167">167</a>
-<a href="#168" id="168">168</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     query_ast::<span class="kw-2">*</span>,
@@ -173,7 +167,7 @@
     ParsedInputValue,
 };
 <span class="kw">use </span>connector::Filter;
-<span class="kw">use </span>prisma_models::{ModelRef, RelationFieldRef};
+<span class="kw">use </span>prisma_models::{Model, RelationFieldRef};
 <span class="kw">use </span>schema::constants::args;
 <span class="kw">use </span>std::convert::TryInto;
 
@@ -207,19 +201,19 @@
 /// ```
 </span><span class="kw">pub fn </span>nested_update(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     parent: <span class="kw-2">&amp;</span>NodeRef,
     parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
-    value: ParsedInputValue,
-    child_model: <span class="kw-2">&amp;</span>ModelRef,
+    value: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;,
+    child_model: <span class="kw-2">&amp;</span>Model,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="kw">for </span>value <span class="kw">in </span>utils::coerce_vec(value) {
         <span class="kw">let </span>(data, filter) = <span class="kw">if </span>parent_relation_field.is_list() {
             <span class="comment">// We have to have a single record filter in &quot;where&quot;.
             // This is used to read the children first, to make sure they&#39;re actually connected.
             // The update itself operates on the record found by the read check.
-            </span><span class="kw">let </span><span class="kw-2">mut </span>map: ParsedInputMap = value.try_into()<span class="question-mark">?</span>;
-            <span class="kw">let </span>where_arg: ParsedInputMap = map.remove(args::WHERE).unwrap().try_into()<span class="question-mark">?</span>;
+            </span><span class="kw">let </span><span class="kw-2">mut </span>map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = value.try_into()<span class="question-mark">?</span>;
+            <span class="kw">let </span>where_arg: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = map.remove(args::WHERE).unwrap().try_into()<span class="question-mark">?</span>;
 
             <span class="kw">let </span>filter = extract_unique_filter(where_arg, child_model)<span class="question-mark">?</span>;
             <span class="kw">let </span>data_value = map.remove(args::DATA).unwrap();
@@ -230,7 +224,7 @@
                 <span class="comment">// If the update input is of shape { where?: WhereInput, data: DataInput }
                 </span>ParsedInputValue::Map(<span class="kw-2">mut </span>map) <span class="kw">if </span>map.is_nested_to_one_update_envelope() =&gt; {
                     <span class="kw">let </span>filter = <span class="kw">if let </span><span class="prelude-val">Some</span>(where_arg) = map.remove(args::WHERE) {
-                        <span class="kw">let </span>where_arg: ParsedInputMap = where_arg.try_into()<span class="question-mark">?</span>;
+                        <span class="kw">let </span>where_arg: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = where_arg.try_into()<span class="question-mark">?</span>;
 
                         extract_filter(where_arg, child_model)<span class="question-mark">?
                     </span>} <span class="kw">else </span>{
@@ -250,7 +244,7 @@
             utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())<span class="question-mark">?</span>;
 
         <span class="kw">let </span>update_node =
-            update::update_record_node(graph, connector_ctx, filter, child_model.clone(), data.try_into()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
+            update::update_record_node(graph, query_schema, filter, child_model.clone(), data.try_into()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
@@ -279,13 +273,7 @@
             ),
         )<span class="question-mark">?</span>;
 
-        utils::insert_emulated_on_update(
-            graph,
-            connector_ctx,
-            child_model,
-            <span class="kw-2">&amp;</span>find_child_records_node,
-            <span class="kw-2">&amp;</span>update_node,
-        )<span class="question-mark">?</span>;
+        utils::insert_emulated_on_update(graph, query_schema, child_model, <span class="kw-2">&amp;</span>find_child_records_node, <span class="kw-2">&amp;</span>update_node)<span class="question-mark">?</span>;
     }
 
     <span class="prelude-val">Ok</span>(())
@@ -293,18 +281,18 @@
 
 <span class="kw">pub fn </span>nested_update_many(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     parent: <span class="kw-2">&amp;</span>NodeRef,
     parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
-    value: ParsedInputValue,
-    child_model: <span class="kw-2">&amp;</span>ModelRef,
+    value: ParsedInputValue&lt;<span class="lifetime">&#39;_</span>&gt;,
+    child_model: <span class="kw-2">&amp;</span>Model,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     <span class="kw">for </span>value <span class="kw">in </span>utils::coerce_vec(value) {
-        <span class="kw">let </span><span class="kw-2">mut </span>map: ParsedInputMap = value.try_into()<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = value.try_into()<span class="question-mark">?</span>;
         <span class="kw">let </span>where_arg = map.remove(args::WHERE).unwrap();
         <span class="kw">let </span>data_value = map.remove(args::DATA).unwrap();
-        <span class="kw">let </span>data_map: ParsedInputMap = data_value.try_into()<span class="question-mark">?</span>;
-        <span class="kw">let </span>where_map: ParsedInputMap = where_arg.try_into()<span class="question-mark">?</span>;
+        <span class="kw">let </span>data_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = data_value.try_into()<span class="question-mark">?</span>;
+        <span class="kw">let </span>where_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = where_arg.try_into()<span class="question-mark">?</span>;
         <span class="kw">let </span>child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
         <span class="kw">let </span>filter = extract_filter(where_map, child_model)<span class="question-mark">?</span>;
@@ -313,7 +301,7 @@
             utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>update_many_node =
-            update::update_many_record_node(graph, connector_ctx, Filter::empty(), child_model.clone(), data_map)<span class="question-mark">?</span>;
+            update::update_many_record_node(graph, query_schema, Filter::empty(), child_model.clone(), data_map)<span class="question-mark">?</span>;
 
         graph.create_edge(
             <span class="kw-2">&amp;</span>find_child_records_node,

@@ -49,7 +49,7 @@
 <a href="#49" id="49">49</a>
 <a href="#50" id="50">50</a>
 </pre><pre class="rust"><code><span class="kw">use </span>connector::{AggregationRow, RelAggregationRow};
-<span class="kw">use </span>prisma_models::{ManyRecords, ModelRef, SelectionResult};
+<span class="kw">use </span>prisma_models::{ManyRecords, Model, SelectionResult};
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>QueryResult {
@@ -78,7 +78,7 @@
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) nested: Vec&lt;QueryResult&gt;,
 
     <span class="doccomment">/// The model of the contained records.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) model: ModelRef,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) model: Model,
 
     <span class="doccomment">/// Holds an ordered list of aggregation selections results for each contained record
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) aggregation_rows: <span class="prelude-ty">Option</span>&lt;Vec&lt;RelAggregationRow&gt;&gt;,

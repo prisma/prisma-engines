@@ -910,7 +910,7 @@
     visit::{EdgeRef <span class="kw">as </span>PEdgeRef, NodeIndexable},
     <span class="kw-2">*</span>,
 };
-<span class="kw">use </span>prisma_models::{FieldSelection, ModelRef, SelectionResult};
+<span class="kw">use </span>prisma_models::{FieldSelection, Model, SelectionResult};
 <span class="kw">use </span>std::{borrow::Borrow, collections::HashSet, fmt};
 
 <span class="kw">pub type </span>QueryGraphResult&lt;T&gt; = std::result::Result&lt;T, QueryGraphError&gt;;
@@ -1103,7 +1103,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>root&lt;F&gt;(f: F) -&gt; QueryGraphBuilderResult&lt;QueryGraph&gt;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>root&lt;F&gt;(f: F) -&gt; QueryGraphBuilderResult&lt;QueryGraph&gt;
     <span class="kw">where
         </span>F: FnOnce(<span class="kw-2">&amp;mut </span>QueryGraph) -&gt; QueryGraphBuilderResult&lt;()&gt;,
     {
@@ -1643,7 +1643,7 @@
     /// The `Reload` node is always a &quot;find many&quot; query.
     /// Unwraps are safe because we&#39;re operating on the unprocessed state of the graph (`Expressionista` changes that).
     </span><span class="kw">fn </span>insert_reloads(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; QueryGraphResult&lt;()&gt; {
-        <span class="kw">let </span>reloads: Vec&lt;(NodeRef, ModelRef, Vec&lt;FieldSelection&gt;)&gt; = <span class="self">self
+        <span class="kw">let </span>reloads: Vec&lt;(NodeRef, Model, Vec&lt;FieldSelection&gt;)&gt; = <span class="self">self
             </span>.graph
             .node_indices()
             .filter_map(|ix| {

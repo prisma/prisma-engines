@@ -176,6 +176,7 @@
 <a href="#176" id="176">176</a>
 <a href="#177" id="177">177</a>
 <a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
 </pre><pre class="rust"><code><span class="kw">use </span>indexmap::IndexMap;
 <span class="kw">use </span>query_core::{
     schema::{QuerySchemaRef, QueryTag},
@@ -199,15 +200,16 @@
         <span class="kw">let </span>_span = <span class="macro">info_span!</span>(<span class="string">&quot;prisma:engine:into_doc&quot;</span>).entered();
         <span class="kw">match </span><span class="self">self </span>{
             JsonBody::Single(query) =&gt; {
-                <span class="kw">let </span>operation = JsonProtocolAdapter::convert_single(query, query_schema)<span class="question-mark">?</span>;
+                <span class="kw">let </span>operation = JsonProtocolAdapter::new(query_schema).convert_single(query)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(QueryDocument::Single(operation))
             }
             JsonBody::Batch(query) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>protocol_adapter = JsonProtocolAdapter::new(query_schema);
                 <span class="kw">let </span>operations: <span class="kw">crate</span>::Result&lt;Vec&lt;Operation&gt;&gt; = query
                     .batch
                     .into_iter()
-                    .map(|single_query| JsonProtocolAdapter::convert_single(single_query, query_schema))
+                    .map(|single_query| protocol_adapter.convert_single(single_query))
                     .collect();
 
                 <span class="kw">let </span>transaction = <span class="kw">if let </span><span class="prelude-val">Some</span>(opts) = query.transaction {
@@ -304,8 +306,8 @@
         key == ALL_COMPOSITES
     }
 
-    <span class="kw">pub fn </span>selection(<span class="self">self</span>) -&gt; Vec&lt;(String, SelectionSetValue)&gt; {
-        <span class="self">self</span>.<span class="number">0</span>.into_iter().filter(|(<span class="kw">_</span>, v)| v.is_selected()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_selection(<span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = (String, SelectionSetValue)&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.into_iter().filter(|(<span class="kw">_</span>, v)| v.is_selected())
     }
 }
 

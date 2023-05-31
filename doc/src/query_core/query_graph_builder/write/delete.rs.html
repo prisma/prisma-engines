@@ -97,16 +97,16 @@
     ArgumentListLookup, FilteredQuery, ParsedField,
 };
 <span class="kw">use </span>connector::filter::Filter;
-<span class="kw">use </span>prisma_models::ModelRef;
-<span class="kw">use </span>schema::{constants::args, ConnectorContext};
+<span class="kw">use </span>prisma_models::Model;
+<span class="kw">use </span>schema::{constants::args, QuerySchema};
 <span class="kw">use </span>std::convert::TryInto;
 
 <span class="doccomment">/// Creates a top level delete record query and adds it to the query graph.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>delete_record(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
-    model: ModelRef,
-    <span class="kw-2">mut </span>field: ParsedField,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
+    model: Model,
+    <span class="kw-2">mut </span>field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     graph.flag_transactional();
 
@@ -124,7 +124,7 @@
     }));
 
     <span class="kw">let </span>delete_node = graph.create_node(delete_query);
-    utils::insert_emulated_on_delete(graph, connector_ctx, <span class="kw-2">&amp;</span>model, <span class="kw-2">&amp;</span>read_node, <span class="kw-2">&amp;</span>delete_node)<span class="question-mark">?</span>;
+    utils::insert_emulated_on_delete(graph, query_schema, <span class="kw-2">&amp;</span>model, <span class="kw-2">&amp;</span>read_node, <span class="kw-2">&amp;</span>delete_node)<span class="question-mark">?</span>;
 
     graph.create_edge(
         <span class="kw-2">&amp;</span>read_node,
@@ -150,9 +150,9 @@
 <span class="doccomment">/// Creates a top level delete many records query and adds it to the query graph.
 </span><span class="kw">pub fn </span>delete_many_records(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
-    model: ModelRef,
-    <span class="kw-2">mut </span>field: ParsedField,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
+    model: Model,
+    <span class="kw-2">mut </span>field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     graph.flag_transactional();
 
@@ -172,7 +172,7 @@
     <span class="kw">let </span>read_query_node = graph.create_node(read_query);
     <span class="kw">let </span>delete_many_node = graph.create_node(Query::Write(delete_many));
 
-    utils::insert_emulated_on_delete(graph, connector_ctx, <span class="kw-2">&amp;</span>model, <span class="kw-2">&amp;</span>read_query_node, <span class="kw-2">&amp;</span>delete_many_node)<span class="question-mark">?</span>;
+    utils::insert_emulated_on_delete(graph, query_schema, <span class="kw-2">&amp;</span>model, <span class="kw-2">&amp;</span>read_query_node, <span class="kw-2">&amp;</span>delete_many_node)<span class="question-mark">?</span>;
 
     graph.create_edge(
         <span class="kw-2">&amp;</span>read_query_node,

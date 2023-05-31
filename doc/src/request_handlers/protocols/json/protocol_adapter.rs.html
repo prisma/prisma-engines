@@ -1861,37 +1861,68 @@
 <a href="#1861" id="1861">1861</a>
 <a href="#1862" id="1862">1862</a>
 <a href="#1863" id="1863">1863</a>
+<a href="#1864" id="1864">1864</a>
+<a href="#1865" id="1865">1865</a>
+<a href="#1866" id="1866">1866</a>
+<a href="#1867" id="1867">1867</a>
+<a href="#1868" id="1868">1868</a>
+<a href="#1869" id="1869">1869</a>
+<a href="#1870" id="1870">1870</a>
+<a href="#1871" id="1871">1871</a>
+<a href="#1872" id="1872">1872</a>
+<a href="#1873" id="1873">1873</a>
+<a href="#1874" id="1874">1874</a>
+<a href="#1875" id="1875">1875</a>
+<a href="#1876" id="1876">1876</a>
+<a href="#1877" id="1877">1877</a>
+<a href="#1878" id="1878">1878</a>
+<a href="#1879" id="1879">1879</a>
+<a href="#1880" id="1880">1880</a>
+<a href="#1881" id="1881">1881</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{FieldQuery, HandlerError, JsonSingleQuery, SelectionSet};
 <span class="kw">use </span>bigdecimal::{BigDecimal, FromPrimitive};
 <span class="kw">use </span>indexmap::IndexMap;
 <span class="kw">use </span>prisma_models::{decode_bytes, parse_datetime, prelude::ParentContainer, Field};
 <span class="kw">use </span>query_core::{
     constants::custom_types,
-    schema::{ObjectType, OutputField, QuerySchema},
+    schema::{Identifier, ObjectType, OutputField, QuerySchema},
     ArgumentValue, Operation, Selection,
 };
 <span class="kw">use </span>serde_json::Value <span class="kw">as </span>JsonValue;
-<span class="kw">use </span>std::str::FromStr;
+<span class="kw">use </span>std::{collections::HashMap, str::FromStr};
 
 <span class="kw">enum </span>OperationType {
     Read,
     Write,
 }
 
-<span class="kw">pub struct </span>JsonProtocolAdapter;
+<span class="kw">pub struct </span>JsonProtocolAdapter&lt;<span class="lifetime">&#39;a</span>&gt; {
+    query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema,
+    output_type_fields: HashMap&lt;Identifier, Vec&lt;OutputField&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt;,
+}
 
-<span class="kw">impl </span>JsonProtocolAdapter {
-    <span class="kw">pub fn </span>convert_single(query: JsonSingleQuery, query_schema: <span class="kw-2">&amp;</span>QuerySchema) -&gt; <span class="kw">crate</span>::Result&lt;Operation&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; JsonProtocolAdapter&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>new(query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema) -&gt; <span class="self">Self </span>{
+        JsonProtocolAdapter {
+            query_schema,
+            output_type_fields: Default::default(),
+        }
+    }
+
+    <span class="kw">pub fn </span>convert_single(<span class="kw-2">&amp;mut </span><span class="self">self</span>, query: JsonSingleQuery) -&gt; <span class="kw">crate</span>::Result&lt;Operation&gt; {
         <span class="kw">let </span>JsonSingleQuery {
             model_name,
             action,
             query,
         } = query;
 
-        <span class="kw">let </span>(operation_type, field) = <span class="self">Self</span>::find_schema_field(query_schema, model_name, action)<span class="question-mark">?</span>;
-        <span class="kw">let </span>container = field.model().map(ParentContainer::from);
+        <span class="kw">let </span>(operation_type, field) = <span class="self">self</span>.find_schema_field(model_name, action)<span class="question-mark">?</span>;
+        <span class="kw">let </span>container = field
+            .model()
+            .map(|id| <span class="self">self</span>.query_schema.internal_data_model.clone().zip(id))
+            .map(ParentContainer::from);
 
-        <span class="kw">let </span>selection = <span class="self">Self</span>::convert_selection(field, container.as_ref(), query, query_schema)<span class="question-mark">?</span>;
+        <span class="kw">let </span>selection = <span class="self">self</span>.convert_selection(<span class="kw-2">&amp;</span>field, container.as_ref(), query)<span class="question-mark">?</span>;
 
         <span class="kw">match </span>operation_type {
             OperationType::Read =&gt; <span class="prelude-val">Ok</span>(Operation::Read(selection)),
@@ -1900,10 +1931,10 @@
     }
 
     <span class="kw">fn </span>convert_selection(
-        field: <span class="kw-2">&amp;</span>OutputField,
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        field: <span class="kw-2">&amp;</span>OutputField&lt;<span class="lifetime">&#39;a</span>&gt;,
         container: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ParentContainer&gt;,
         query: FieldQuery,
-        query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     ) -&gt; <span class="kw">crate</span>::Result&lt;Selection&gt; {
         <span class="kw">let </span>FieldQuery {
             arguments,
@@ -1917,40 +1948,41 @@
 
         <span class="kw">let </span>all_scalars_set = query_selection.all_scalars();
         <span class="kw">let </span>all_composites_set = query_selection.all_composites();
+        <span class="kw">let </span>fields: HashMap&lt;std::borrow::Cow&lt;str&gt;, OutputField&gt; = field
+            .field_type()
+            .as_object_type()
+            .map(|t| t.get_fields().map(|f| (f.name().clone(), f)).collect())
+            .unwrap_or_default();
 
-        <span class="kw">let </span><span class="kw-2">mut </span>selection = Selection::new(<span class="kw-2">&amp;</span>field.name, <span class="prelude-val">None</span>, arguments, Vec::new());
+        <span class="kw">let </span><span class="kw-2">mut </span>selection = Selection::new(field.name().clone(), <span class="prelude-val">None</span>, arguments, Vec::new());
 
-        <span class="kw">let </span>json_selection = query_selection.selection();
-
-        <span class="kw">for </span>(selection_name, selected) <span class="kw">in </span>json_selection {
+        <span class="kw">for </span>(selection_name, selected) <span class="kw">in </span>query_selection.into_selection() {
             <span class="kw">match </span>selected {
                 <span class="comment">// $scalars: true
                 </span><span class="kw">crate</span>::SelectionSetValue::Shorthand(<span class="bool-val">true</span>) <span class="kw">if </span>SelectionSet::is_all_scalars(<span class="kw-2">&amp;</span>selection_name) =&gt; {
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, schema_object)) = field.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db) {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(schema_object) = field.field_type().as_object_type() {
                         <span class="self">Self</span>::default_scalar_selection(schema_object, <span class="kw-2">&amp;mut </span>selection);
                     }
                 }
                 <span class="comment">// $composites: true
                 </span><span class="kw">crate</span>::SelectionSetValue::Shorthand(<span class="bool-val">true</span>) <span class="kw">if </span>SelectionSet::is_all_composites(<span class="kw-2">&amp;</span>selection_name) =&gt; {
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, schema_object)) = field.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db) {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(schema_object) = field.field_type().as_object_type() {
                         <span class="kw">if let </span><span class="prelude-val">Some</span>(container) = container {
                             <span class="self">Self</span>::default_composite_selection(
                                 <span class="kw-2">&amp;mut </span>selection,
                                 container,
                                 schema_object,
                                 <span class="kw-2">&amp;mut </span>Vec::&lt;String&gt;::new(),
-                                query_schema,
                             )<span class="question-mark">?</span>;
                         }
                     }
                 }
                 <span class="comment">// &lt;field_name&gt;: true
                 </span><span class="kw">crate</span>::SelectionSetValue::Shorthand(<span class="bool-val">true</span>) =&gt; {
-                    selection.push_nested_selection(<span class="self">Self</span>::create_shorthand_selection(
+                    selection.push_nested_selection(<span class="self">self</span>.create_shorthand_selection(
                         field,
                         <span class="kw-2">&amp;</span>selection_name,
                         container,
-                        query_schema,
                         all_scalars_set,
                     )<span class="question-mark">?</span>);
                 }
@@ -1958,15 +1990,16 @@
                 </span><span class="kw">crate</span>::SelectionSetValue::Shorthand(<span class="bool-val">false</span>) =&gt; (),
                 <span class="comment">// &lt;field_name&gt;: { selection: { ... }, arguments: { ... } }
                 </span><span class="kw">crate</span>::SelectionSetValue::Nested(nested_query) =&gt; {
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, schema_object)) = field.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db) {
-                        <span class="kw">let </span>(<span class="kw">_</span>, schema_field) = schema_object.find_field(<span class="kw-2">&amp;</span>selection_name).ok_or_else(|| {
+                    <span class="kw">if </span>field.field_type().as_object_type().is_some() {
+                        <span class="kw">let </span>schema_field = fields.get(selection_name.as_str()).ok_or_else(|| {
                             HandlerError::query_conversion(<span class="macro">format!</span>(
                                 <span class="string">&quot;Unknown nested field &#39;{}&#39; for operation {} does not match any query.&quot;</span>,
-                                selection_name, <span class="kw-2">&amp;</span>field.name
+                                selection_name,
+                                field.name()
                             ))
                         })<span class="question-mark">?</span>;
 
-                        <span class="kw">let </span>field = container.and_then(|container| container.find_field(<span class="kw-2">&amp;</span>schema_field.name));
+                        <span class="kw">let </span>field = container.and_then(|container| container.find_field(schema_field.name()));
                         <span class="kw">let </span>is_composite_field = field.as_ref().map(|f| f.is_composite()).unwrap_or(<span class="bool-val">false</span>);
                         <span class="kw">let </span>nested_container = field.map(|f| f.related_container());
 
@@ -1976,11 +2009,10 @@
                             )));
                         }
 
-                        selection.push_nested_selection(<span class="self">Self</span>::convert_selection(
+                        selection.push_nested_selection(<span class="self">self</span>.convert_selection(
                             schema_field,
                             nested_container.as_ref(),
                             nested_query,
-                            query_schema,
                         )<span class="question-mark">?</span>);
                     }
                 }
@@ -2108,18 +2140,17 @@
     }
 
     <span class="kw">fn </span>create_shorthand_selection(
-        parent_field: <span class="kw-2">&amp;</span>OutputField,
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        parent_field: <span class="kw-2">&amp;</span>OutputField&lt;<span class="lifetime">&#39;a</span>&gt;,
         nested_field_name: <span class="kw-2">&amp;</span>str,
         container: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ParentContainer&gt;,
-        query_schema: <span class="kw-2">&amp;</span>QuerySchema,
         all_scalars_set: bool,
     ) -&gt; <span class="kw">crate</span>::Result&lt;Selection&gt; {
         <span class="kw">let </span>nested_object_type = parent_field
-            .field_type
-            .as_object_type(<span class="kw-2">&amp;</span>query_schema.db)
-            .and_then(|(<span class="kw">_</span>, parent_object)| parent_object.find_field(nested_field_name))
-            .and_then(|(<span class="kw">_</span>, nested_field)| nested_field.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db))
-            .map(|(<span class="kw">_</span>, nested_object)| nested_object);
+            .field_type()
+            .as_object_type()
+            .and_then(|parent_object| <span class="self">self</span>.get_output_field(parent_object, nested_field_name))
+            .and_then(|nested_field| nested_field.field_type.as_object_type());
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(nested_object_type) = nested_object_type {
             <span class="comment">// case for a relation - we select all nested scalar fields and composite fields
@@ -2132,7 +2163,6 @@
                 <span class="kw-2">&amp;mut </span>nested_selection,
                 nested_object_type,
                 nested_container.as_ref(),
-                query_schema,
             )<span class="question-mark">?</span>;
 
             <span class="kw">return </span><span class="prelude-val">Ok</span>(nested_selection);
@@ -2149,13 +2179,13 @@
     }
 
     <span class="kw">fn </span>default_scalar_selection(schema_object: <span class="kw-2">&amp;</span>ObjectType, selection: <span class="kw-2">&amp;mut </span>Selection) {
-        <span class="kw">for </span>scalar <span class="kw">in </span>schema_object.get_fields().iter().filter(|f| {
-            f.field_type.is_scalar()
-                || f.field_type.is_scalar_list()
-                || f.field_type.is_enum()
-                || f.field_type.is_enum_list()
+        <span class="kw">for </span>scalar <span class="kw">in </span>schema_object.get_fields().filter(|f| {
+            f.field_type().is_scalar()
+                || f.field_type().is_scalar_list()
+                || f.field_type().is_enum()
+                || f.field_type().is_enum_list()
         }) {
-            selection.push_nested_selection(Selection::with_name(scalar.name.to_owned()));
+            selection.push_nested_selection(Selection::with_name(scalar.name().clone()));
         }
     }
 
@@ -2164,22 +2194,20 @@
         container: <span class="kw-2">&amp;</span>ParentContainer,
         schema_object: <span class="kw-2">&amp;</span>ObjectType,
         walked_types_stack: <span class="kw-2">&amp;mut </span>Vec&lt;String&gt;,
-        query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     ) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
         <span class="kw">match </span>container {
             ParentContainer::Model(model) =&gt; {
                 <span class="kw">for </span>cf <span class="kw">in </span>model.fields().composite() {
                     <span class="kw">let </span>schema_field = schema_object.find_field(cf.name());
 
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, schema_field)) = schema_field {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(schema_field) = schema_field {
                         <span class="kw">let </span><span class="kw-2">mut </span>nested_selection = Selection::with_name(cf.name());
 
                         <span class="self">Self</span>::default_composite_selection(
                             <span class="kw-2">&amp;mut </span>nested_selection,
                             <span class="kw-2">&amp;</span>ParentContainer::from(cf.typ()),
-                            schema_field.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db).unwrap().<span class="number">1</span>,
+                            schema_field.field_type.as_object_type().unwrap(),
                             walked_types_stack,
-                            query_schema,
                         )<span class="question-mark">?</span>;
 
                         selection.push_nested_selection(nested_selection);
@@ -2199,7 +2227,7 @@
 
                     <span class="kw">let </span>schema_field = schema_object.find_field(<span class="kw-2">&amp;</span>field_name);
 
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, schema_field)) = schema_field {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(schema_field) = schema_field {
                         <span class="kw">match </span>f {
                             Field::Scalar(s) =&gt; {
                                 selection.push_nested_selection(Selection::with_name(s.name().to_owned()))
@@ -2210,9 +2238,8 @@
                                 <span class="self">Self</span>::default_composite_selection(
                                     <span class="kw-2">&amp;mut </span>nested_selection,
                                     <span class="kw-2">&amp;</span>ParentContainer::from(cf.typ()),
-                                    schema_field.field_type.as_object_type(<span class="kw-2">&amp;</span>query_schema.db).unwrap().<span class="number">1</span>,
+                                    schema_field.field_type.as_object_type().unwrap(),
                                     walked_types_stack,
-                                    query_schema,
                                 )<span class="question-mark">?</span>;
 
                                 selection.push_nested_selection(nested_selection);
@@ -2232,32 +2259,30 @@
         selection: <span class="kw-2">&amp;mut </span>Selection,
         schema_object: <span class="kw-2">&amp;</span>ObjectType,
         container: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ParentContainer&gt;,
-        query_schema: <span class="kw-2">&amp;</span>QuerySchema,
     ) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
         <span class="self">Self</span>::default_scalar_selection(schema_object, selection);
         <span class="kw">if let </span><span class="prelude-val">Some</span>(container) = container {
-            <span class="self">Self</span>::default_composite_selection(
-                selection,
-                container,
-                schema_object,
-                <span class="kw-2">&amp;mut </span>Vec::&lt;String&gt;::new(),
-                query_schema,
-            )<span class="question-mark">?</span>;
+            <span class="self">Self</span>::default_composite_selection(selection, container, schema_object, <span class="kw-2">&amp;mut </span>Vec::&lt;String&gt;::new())<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="kw">fn </span>find_schema_field(
-        query_schema: <span class="kw-2">&amp;</span>QuerySchema,
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         model_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
         action: <span class="kw">crate</span>::Action,
-    ) -&gt; <span class="kw">crate</span>::Result&lt;(OperationType, <span class="kw-2">&amp;</span>OutputField)&gt; {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(field) = query_schema.find_query_field_by_model_and_action(model_name.as_deref(), action.value()) {
+    ) -&gt; <span class="kw">crate</span>::Result&lt;(OperationType, OutputField&lt;<span class="lifetime">&#39;a</span>&gt;)&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(field) = <span class="self">self
+            </span>.query_schema
+            .find_query_field_by_model_and_action(model_name.as_deref(), action.value())
+        {
             <span class="kw">return </span><span class="prelude-val">Ok</span>((OperationType::Read, field));
         };
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(field) = query_schema.find_mutation_field_by_model_and_action(model_name.as_deref(), action.value())
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(field) = <span class="self">self
+            </span>.query_schema
+            .find_mutation_field_by_model_and_action(model_name.as_deref(), action.value())
         {
             <span class="kw">return </span><span class="prelude-val">Ok</span>((OperationType::Write, field));
         };
@@ -2267,6 +2292,14 @@
             action.value(),
             model_name.unwrap_or_else(|| <span class="string">&quot;None&quot;</span>.to_string())
         )))
+    }
+
+    <span class="kw">fn </span>get_output_field(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ty: <span class="kw-2">&amp;</span>ObjectType&lt;<span class="lifetime">&#39;a</span>&gt;, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>OutputField&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="kw">let </span>parent_object_fields = <span class="self">self
+            </span>.output_type_fields
+            .entry(ty.identifier().clone())
+            .or_insert_with(|| ty.get_fields_vec());
+        parent_object_fields.iter().find(|f| f.name() == name)
     }
 }
 
@@ -2336,7 +2369,7 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>operation = JsonProtocolAdapter::convert_single(query, <span class="kw-2">&amp;</span>schema()).unwrap();
+        <span class="kw">let </span>operation = JsonProtocolAdapter::new(<span class="kw-2">&amp;</span>schema()).convert_single(query).unwrap();
 
         <span class="macro">assert_debug_snapshot!</span>(operation, @<span class="string">r###&quot;
         Read(
@@ -2388,7 +2421,7 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">pub fn </span>default_composite_selection() {
+    </span><span class="kw">fn </span>default_composite_selection() {
         <span class="kw">let </span>query: JsonSingleQuery = serde_json::from_str(
             <span class="string">r#&quot;{
             &quot;modelName&quot;: &quot;User&quot;,
@@ -2400,7 +2433,7 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>operation = JsonProtocolAdapter::convert_single(query, <span class="kw-2">&amp;</span>schema()).unwrap();
+        <span class="kw">let </span>operation = JsonProtocolAdapter::new(<span class="kw-2">&amp;</span>schema()).convert_single(query).unwrap();
 
         <span class="macro">assert_debug_snapshot!</span>(operation, @<span class="string">r###&quot;
         Write(
@@ -2441,7 +2474,7 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">pub fn </span>explicit_select() {
+    </span><span class="kw">fn </span>explicit_select() {
         <span class="kw">let </span>query: JsonSingleQuery = serde_json::from_str(
             <span class="string">r#&quot;{
             &quot;modelName&quot;: &quot;User&quot;,
@@ -2456,7 +2489,7 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>operation = JsonProtocolAdapter::convert_single(query, <span class="kw-2">&amp;</span>schema()).unwrap();
+        <span class="kw">let </span>operation = JsonProtocolAdapter::new(<span class="kw-2">&amp;</span>schema()).convert_single(query).unwrap();
 
         <span class="macro">assert_debug_snapshot!</span>(operation, @<span class="string">r###&quot;
         Read(
@@ -2478,7 +2511,7 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">pub fn </span>relation_shorthand() {
+    </span><span class="kw">fn </span>relation_shorthand() {
         <span class="kw">let </span>query: JsonSingleQuery = serde_json::from_str(
             <span class="string">r#&quot;{
             &quot;modelName&quot;: &quot;Post&quot;,
@@ -2491,7 +2524,7 @@
         }&quot;#</span>,
         )
         .unwrap();
-        <span class="kw">let </span>operation = JsonProtocolAdapter::convert_single(query, <span class="kw-2">&amp;</span>schema()).unwrap();
+        <span class="kw">let </span>operation = JsonProtocolAdapter::new(<span class="kw-2">&amp;</span>schema()).convert_single(query).unwrap();
         <span class="macro">assert_debug_snapshot!</span>(operation, @<span class="string">r###&quot;
         Read(
             Selection {
@@ -2574,7 +2607,7 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">pub fn </span>arguments() {
+    </span><span class="kw">fn </span>arguments() {
         <span class="kw">let </span>query: JsonSingleQuery = serde_json::from_str(
             <span class="string">r#&quot;{
             &quot;modelName&quot;: &quot;User&quot;,
@@ -2591,7 +2624,7 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>operation = JsonProtocolAdapter::convert_single(query, <span class="kw-2">&amp;</span>schema()).unwrap();
+        <span class="kw">let </span>operation = JsonProtocolAdapter::new(<span class="kw-2">&amp;</span>schema()).convert_single(query).unwrap();
 
         <span class="macro">assert_debug_snapshot!</span>(operation, @<span class="string">r###&quot;
         Read(
@@ -2656,7 +2689,7 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">pub fn </span>nested_arguments() {
+    </span><span class="kw">fn </span>nested_arguments() {
         <span class="kw">let </span>query: JsonSingleQuery = serde_json::from_str(
             <span class="string">r#&quot;{
             &quot;modelName&quot;: &quot;User&quot;,
@@ -2676,7 +2709,7 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>operation = JsonProtocolAdapter::convert_single(query, <span class="kw-2">&amp;</span>schema()).unwrap();
+        <span class="kw">let </span>operation = JsonProtocolAdapter::new(<span class="kw-2">&amp;</span>schema()).convert_single(query).unwrap();
 
         <span class="macro">assert_debug_snapshot!</span>(operation, @<span class="string">r###&quot;
         Read(
@@ -2766,7 +2799,7 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">pub fn </span>composite_selection_should_be_based_on_schema_1() {
+    </span><span class="kw">fn </span>composite_selection_should_be_based_on_schema_1() {
         <span class="kw">let </span>query: JsonSingleQuery = serde_json::from_str(
             <span class="string">r#&quot;{
             &quot;modelName&quot;: &quot;User&quot;,
@@ -2781,7 +2814,7 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>operation = JsonProtocolAdapter::convert_single(query, <span class="kw-2">&amp;</span>schema()).unwrap();
+        <span class="kw">let </span>operation = JsonProtocolAdapter::new(<span class="kw-2">&amp;</span>schema()).convert_single(query).unwrap();
 
         <span class="macro">assert_debug_snapshot!</span>(operation, @<span class="string">r###&quot;
         Write(
@@ -2803,7 +2836,7 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">pub fn </span>simple_mutation() {
+    </span><span class="kw">fn </span>simple_mutation() {
         <span class="kw">let </span>query: JsonSingleQuery = serde_json::from_str(
             <span class="string">r#&quot;{
             &quot;modelName&quot;: &quot;User&quot;,
@@ -2818,7 +2851,7 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>operation = JsonProtocolAdapter::convert_single(query, <span class="kw-2">&amp;</span>schema()).unwrap();
+        <span class="kw">let </span>operation = JsonProtocolAdapter::new(<span class="kw-2">&amp;</span>schema()).convert_single(query).unwrap();
 
         <span class="macro">assert_debug_snapshot!</span>(operation, @<span class="string">r###&quot;
         Write(
@@ -2840,7 +2873,7 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">pub fn </span>scalar_wildcard_and_scalar_selection() {
+    </span><span class="kw">fn </span>scalar_wildcard_and_scalar_selection() {
         <span class="kw">let </span>query: JsonSingleQuery = serde_json::from_str(
             <span class="string">r#&quot;{
             &quot;modelName&quot;: &quot;User&quot;,
@@ -2856,7 +2889,7 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>operation = JsonProtocolAdapter::convert_single(query, <span class="kw-2">&amp;</span>schema());
+        <span class="kw">let </span>operation = JsonProtocolAdapter::new(<span class="kw-2">&amp;</span>schema()).convert_single(query);
 
         <span class="macro">assert_debug_snapshot!</span>(operation, @<span class="string">r###&quot;
         Err(
@@ -2868,7 +2901,7 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">pub fn </span>composite_wildcard_and_composite_selection() {
+    </span><span class="kw">fn </span>composite_wildcard_and_composite_selection() {
         <span class="kw">let </span>query: JsonSingleQuery = serde_json::from_str(
             <span class="string">r#&quot;{
             &quot;modelName&quot;: &quot;User&quot;,
@@ -2887,7 +2920,7 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>operation = JsonProtocolAdapter::convert_single(query, <span class="kw-2">&amp;</span>schema());
+        <span class="kw">let </span>operation = JsonProtocolAdapter::new(<span class="kw-2">&amp;</span>schema()).convert_single(query);
 
         <span class="macro">assert_debug_snapshot!</span>(operation, @<span class="string">r###&quot;
         Err(
@@ -2899,7 +2932,7 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">pub fn </span>composite_wildcard_and_scalar_selection() {
+    </span><span class="kw">fn </span>composite_wildcard_and_scalar_selection() {
         <span class="kw">let </span>query: JsonSingleQuery = serde_json::from_str(
             <span class="string">r#&quot;{
             &quot;modelName&quot;: &quot;User&quot;,
@@ -2915,7 +2948,7 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>operation = JsonProtocolAdapter::convert_single(query, <span class="kw-2">&amp;</span>schema());
+        <span class="kw">let </span>operation = JsonProtocolAdapter::new(<span class="kw-2">&amp;</span>schema()).convert_single(query);
 
         <span class="macro">assert_debug_snapshot!</span>(operation, @<span class="string">r###&quot;
         Ok(
@@ -2964,7 +2997,7 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">pub fn </span>custom_arg_datetime() {
+    </span><span class="kw">fn </span>custom_arg_datetime() {
         <span class="kw">let </span>query: JsonSingleQuery = serde_json::from_str(
             <span class="string">r#&quot;{
             &quot;modelName&quot;: &quot;User&quot;,
@@ -2983,7 +3016,7 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>operation = JsonProtocolAdapter::convert_single(query, <span class="kw-2">&amp;</span>schema()).unwrap();
+        <span class="kw">let </span>operation = JsonProtocolAdapter::new(<span class="kw-2">&amp;</span>schema()).convert_single(query).unwrap();
 
         <span class="macro">assert_debug_snapshot!</span>(operation.arguments()[<span class="number">0</span>].<span class="number">1</span>, @<span class="string">r###&quot;
         Object(
@@ -2999,7 +3032,7 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">pub fn </span>custom_arg_bigint() {
+    </span><span class="kw">fn </span>custom_arg_bigint() {
         <span class="kw">let </span>query: JsonSingleQuery = serde_json::from_str(
             <span class="string">r#&quot;{
             &quot;modelName&quot;: &quot;User&quot;,
@@ -3019,7 +3052,7 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>operation = JsonProtocolAdapter::convert_single(query, <span class="kw-2">&amp;</span>schema()).unwrap();
+        <span class="kw">let </span>operation = JsonProtocolAdapter::new(<span class="kw-2">&amp;</span>schema()).convert_single(query).unwrap();
 
         <span class="macro">assert_debug_snapshot!</span>(operation.arguments(), @<span class="string">r###&quot;
         [
@@ -3045,7 +3078,7 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">pub fn </span>custom_arg_decimal() {
+    </span><span class="kw">fn </span>custom_arg_decimal() {
         <span class="kw">let </span>query: JsonSingleQuery = serde_json::from_str(
             <span class="string">r#&quot;{
             &quot;modelName&quot;: &quot;User&quot;,
@@ -3064,7 +3097,7 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>operation = JsonProtocolAdapter::convert_single(query, <span class="kw-2">&amp;</span>schema()).unwrap();
+        <span class="kw">let </span>operation = JsonProtocolAdapter::new(<span class="kw-2">&amp;</span>schema()).convert_single(query).unwrap();
 
         <span class="macro">assert_debug_snapshot!</span>(operation.arguments()[<span class="number">0</span>].<span class="number">1</span>, @<span class="string">r###&quot;
         Object(
@@ -3080,7 +3113,7 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">pub fn </span>custom_arg_bytes() {
+    </span><span class="kw">fn </span>custom_arg_bytes() {
         <span class="kw">let </span>query: JsonSingleQuery = serde_json::from_str(
             <span class="string">r#&quot;{
             &quot;modelName&quot;: &quot;User&quot;,
@@ -3099,7 +3132,7 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>operation = JsonProtocolAdapter::convert_single(query, <span class="kw-2">&amp;</span>schema()).unwrap();
+        <span class="kw">let </span>operation = JsonProtocolAdapter::new(<span class="kw-2">&amp;</span>schema()).convert_single(query).unwrap();
 
         <span class="macro">assert_debug_snapshot!</span>(operation.arguments()[<span class="number">0</span>].<span class="number">1</span>, @<span class="string">r###&quot;
         Object(
@@ -3120,7 +3153,7 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">pub fn </span>custom_arg_json() {
+    </span><span class="kw">fn </span>custom_arg_json() {
         <span class="kw">let </span>query: JsonSingleQuery = serde_json::from_str(
             <span class="string">r#&quot;{
             &quot;modelName&quot;: &quot;User&quot;,
@@ -3139,7 +3172,7 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>operation = JsonProtocolAdapter::convert_single(query, <span class="kw-2">&amp;</span>schema()).unwrap();
+        <span class="kw">let </span>operation = JsonProtocolAdapter::new(<span class="kw-2">&amp;</span>schema()).convert_single(query).unwrap();
 
         <span class="macro">assert_debug_snapshot!</span>(operation.arguments()[<span class="number">0</span>].<span class="number">1</span>, @<span class="string">r###&quot;
         Object(
@@ -3155,7 +3188,7 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">pub fn </span>unknown_custom_arg() {
+    </span><span class="kw">fn </span>unknown_custom_arg() {
         <span class="kw">let </span>query: JsonSingleQuery = serde_json::from_str(
             <span class="string">r#&quot;{
             &quot;modelName&quot;: &quot;User&quot;,
@@ -3174,7 +3207,7 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>operation = JsonProtocolAdapter::convert_single(query, <span class="kw-2">&amp;</span>schema()).unwrap();
+        <span class="kw">let </span>operation = JsonProtocolAdapter::new(<span class="kw-2">&amp;</span>schema()).convert_single(query).unwrap();
 
         <span class="macro">assert_debug_snapshot!</span>(operation.arguments()[<span class="number">0</span>].<span class="number">1</span>, @<span class="string">r###&quot;
         Object(
@@ -3199,7 +3232,7 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">pub fn </span>invalid_operation() {
+    </span><span class="kw">fn </span>invalid_operation() {
         <span class="kw">let </span>query: JsonSingleQuery = serde_json::from_str(
             <span class="string">r#&quot;{
             &quot;modelName&quot;: &quot;User&quot;,
@@ -3216,7 +3249,7 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>operation = JsonProtocolAdapter::convert_single(query, <span class="kw-2">&amp;</span>schema());
+        <span class="kw">let </span>operation = JsonProtocolAdapter::new(<span class="kw-2">&amp;</span>schema()).convert_single(query);
 
         <span class="macro">assert_debug_snapshot!</span>(operation, @<span class="string">r###&quot;
         Err(
@@ -3228,7 +3261,7 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">pub fn </span>query_raw() {
+    </span><span class="kw">fn </span>query_raw() {
         <span class="kw">let </span>query: JsonSingleQuery = serde_json::from_str(
             <span class="string">r#&quot;{
             &quot;action&quot;: &quot;runCommandRaw&quot;,
@@ -3246,7 +3279,7 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>operation = JsonProtocolAdapter::convert_single(query, <span class="kw-2">&amp;</span>schema());
+        <span class="kw">let </span>operation = JsonProtocolAdapter::new(<span class="kw-2">&amp;</span>schema()).convert_single(query);
 
         <span class="macro">assert_debug_snapshot!</span>(operation, @<span class="string">r###&quot;
         Ok(
@@ -3327,7 +3360,8 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>selection = JsonProtocolAdapter::convert_single(query, <span class="kw-2">&amp;</span>composite_schema())
+        <span class="kw">let </span>selection = JsonProtocolAdapter::new(<span class="kw-2">&amp;</span>composite_schema())
+            .convert_single(query)
             .unwrap()
             .into_selection();
 
@@ -3382,7 +3416,7 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">pub fn </span>nested_composite_wildcard_and_composite_selection() {
+    </span><span class="kw">fn </span>nested_composite_wildcard_and_composite_selection() {
         <span class="kw">let </span>query: JsonSingleQuery = serde_json::from_str(
             <span class="string">r#&quot;{
                 &quot;modelName&quot;: &quot;Comment&quot;,
@@ -3403,7 +3437,7 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>operation = JsonProtocolAdapter::convert_single(query, <span class="kw-2">&amp;</span>composite_schema());
+        <span class="kw">let </span>operation = JsonProtocolAdapter::new(<span class="kw-2">&amp;</span>composite_schema()).convert_single(query);
 
         <span class="macro">assert_debug_snapshot!</span>(operation, @<span class="string">r###&quot;
         Err(
@@ -3443,7 +3477,7 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">pub fn </span>recursive_composites() {
+    </span><span class="kw">fn </span>recursive_composites() {
         <span class="kw">let </span>query: JsonSingleQuery = serde_json::from_str(
             <span class="string">r#&quot;{
                 &quot;modelName&quot;: &quot;List&quot;,
@@ -3457,7 +3491,7 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>operation = JsonProtocolAdapter::convert_single(query, <span class="kw-2">&amp;</span>recursive_composite_schema());
+        <span class="kw">let </span>operation = JsonProtocolAdapter::new(<span class="kw-2">&amp;</span>recursive_composite_schema()).convert_single(query);
 
         <span class="macro">assert_debug_snapshot!</span>(operation, @<span class="string">r###&quot;
         Err(
@@ -3500,7 +3534,7 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">pub fn </span>sibling_composites() {
+    </span><span class="kw">fn </span>sibling_composites() {
         <span class="kw">let </span>query: JsonSingleQuery = serde_json::from_str(
             <span class="string">r#&quot;{
                 &quot;modelName&quot;: &quot;User&quot;,
@@ -3514,7 +3548,7 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>operation = JsonProtocolAdapter::convert_single(query, <span class="kw-2">&amp;</span>sibling_composite_schema());
+        <span class="kw">let </span>operation = JsonProtocolAdapter::new(<span class="kw-2">&amp;</span>sibling_composite_schema()).convert_single(query);
 
         <span class="macro">assert_debug_snapshot!</span>(operation, @<span class="string">r###&quot;
         Ok(
@@ -3631,7 +3665,9 @@
         )
         .unwrap();
 
-        <span class="kw">let </span>operation = JsonProtocolAdapter::convert_single(query, <span class="kw-2">&amp;</span>nested_sibling_composite_schema());
+        <span class="kw">let </span>schema = nested_sibling_composite_schema();
+        <span class="kw">let </span><span class="kw-2">mut </span>adapter = JsonProtocolAdapter::new(<span class="kw-2">&amp;</span>schema);
+        <span class="kw">let </span>operation = adapter.convert_single(query);
 
         <span class="macro">assert_debug_snapshot!</span>(operation, @<span class="string">r###&quot;
         Ok(

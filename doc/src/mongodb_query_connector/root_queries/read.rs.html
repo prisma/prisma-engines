@@ -177,7 +177,7 @@
 </span><span class="kw">pub async fn </span>get_single_record&lt;<span class="lifetime">&#39;conn</span>&gt;(
     database: <span class="kw-2">&amp;</span>Database,
     session: <span class="kw-2">&amp;mut </span>ClientSession,
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    model: <span class="kw-2">&amp;</span>Model,
     filter: <span class="kw-2">&amp;</span>Filter,
     selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
     aggregation_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
@@ -223,7 +223,7 @@
 </span><span class="kw">pub async fn </span>get_many_records&lt;<span class="lifetime">&#39;conn</span>&gt;(
     database: <span class="kw-2">&amp;</span>Database,
     session: <span class="kw-2">&amp;mut </span>ClientSession,
-    model: <span class="kw-2">&amp;</span>ModelRef,
+    model: <span class="kw-2">&amp;</span>Model,
     query_arguments: QueryArguments,
     selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
     aggregation_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],

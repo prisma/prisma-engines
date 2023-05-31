@@ -123,17 +123,17 @@
     ArgumentListLookup, ParsedField, ParsedInputList, ParsedInputMap,
 };
 <span class="kw">use </span>connector::IntoFilter;
-<span class="kw">use </span>prisma_models::ModelRef;
-<span class="kw">use </span>schema::{constants::args, ConnectorContext};
+<span class="kw">use </span>prisma_models::Model;
+<span class="kw">use </span>schema::{constants::args, QuerySchema};
 <span class="kw">use </span>std::convert::TryInto;
 <span class="kw">use </span>write_args_parser::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Creates a create record query and adds it to the query graph, together with it&#39;s nested queries and companion read query.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_record(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
-    model: ModelRef,
-    <span class="kw-2">mut </span>field: ParsedField,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
+    model: Model,
+    <span class="kw-2">mut </span>field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     graph.flag_transactional();
 
@@ -142,7 +142,7 @@
         <span class="prelude-val">None </span>=&gt; ParsedInputMap::default(),
     };
 
-    <span class="kw">let </span>create_node = create::create_record_node(graph, connector_ctx, model.clone(), data_map)<span class="question-mark">?</span>;
+    <span class="kw">let </span>create_node = create::create_record_node(graph, query_schema, model.clone(), data_map)<span class="question-mark">?</span>;
 
     <span class="comment">// Follow-up read query on the write
     </span><span class="kw">let </span>read_query = read::find_unique(field, model.clone())<span class="question-mark">?</span>;
@@ -175,15 +175,15 @@
 }
 
 <span class="doccomment">/// Creates a create record query and adds it to the query graph, together with it&#39;s nested queries and companion read query.
-</span><span class="kw">pub fn </span>create_many_records(
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_many_records(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    _connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
-    model: ModelRef,
-    <span class="kw-2">mut </span>field: ParsedField,
+    _query_schema: <span class="kw-2">&amp;</span>QuerySchema,
+    model: Model,
+    <span class="kw-2">mut </span>field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
     graph.flag_transactional();
 
-    <span class="kw">let </span>data_list: ParsedInputList = <span class="kw">match </span>field.arguments.lookup(args::DATA) {
+    <span class="kw">let </span>data_list: ParsedInputList&lt;<span class="lifetime">&#39;_</span>&gt; = <span class="kw">match </span>field.arguments.lookup(args::DATA) {
         <span class="prelude-val">Some</span>(data) =&gt; utils::coerce_vec(data.value),
         <span class="prelude-val">None </span>=&gt; <span class="macro">vec!</span>[],
     };
@@ -216,9 +216,9 @@
 
 <span class="kw">pub fn </span>create_record_node(
     graph: <span class="kw-2">&amp;mut </span>QueryGraph,
-    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
-    model: ModelRef,
-    data_map: ParsedInputMap,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
+    model: Model,
+    data_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; QueryGraphBuilderResult&lt;NodeRef&gt; {
     <span class="kw">let </span>create_args = WriteArgsParser::from(<span class="kw-2">&amp;</span>model, data_map)<span class="question-mark">?</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>args = create_args.args;
@@ -229,7 +229,7 @@
     <span class="kw">let </span>create_node = graph.create_node(Query::Write(WriteQuery::CreateRecord(cr)));
 
     <span class="kw">for </span>(relation_field, data_map) <span class="kw">in </span>create_args.nested {
-        nested::connect_nested_query(graph, connector_ctx, create_node, relation_field, data_map)<span class="question-mark">?</span>;
+        nested::connect_nested_query(graph, query_schema, create_node, relation_field, data_map)<span class="question-mark">?</span>;
     }
 
     <span class="prelude-val">Ok</span>(create_node)

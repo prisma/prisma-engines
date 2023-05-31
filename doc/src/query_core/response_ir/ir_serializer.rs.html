@@ -60,27 +60,26 @@
 <a href="#60" id="60">60</a>
 <a href="#61" id="61">61</a>
 <a href="#62" id="62">62</a>
-<a href="#63" id="63">63</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{internal::serialize_internal, response::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
 <span class="kw">use crate</span>::{CoreError, ExpressionResult, QueryResult};
 <span class="kw">use </span>prisma_models::PrismaValue;
-<span class="kw">use </span>schema::{OutputObjectTypeId, OutputType, QuerySchema};
+<span class="kw">use </span>schema::{OutputField, QuerySchema};
 
 <span class="attr">#[derive(Debug)]
-</span><span class="kw">pub struct </span>IrSerializer {
+</span><span class="kw">pub struct </span>IrSerializer&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="doccomment">/// Serialization key for root DataItem
     /// Note: This will change
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) key: String,
 
     <span class="doccomment">/// Output field describing the possible shape of the result
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) output_field: (OutputObjectTypeId, usize),
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) output_field: OutputField&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="kw">impl </span>IrSerializer {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IrSerializer&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>serialize(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         result: ExpressionResult,
-        query_schema: <span class="kw-2">&amp;</span>QuerySchema,
+        query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema,
     ) -&gt; <span class="kw">crate</span>::Result&lt;ResponseData&gt; {
         <span class="kw">let </span>_span = <span class="macro">info_span!</span>(<span class="string">&quot;prisma:engine:serialize&quot;</span>, user_facing = <span class="bool-val">true</span>);
         <span class="kw">match </span>result {
@@ -89,23 +88,22 @@
             }
 
             ExpressionResult::Query(r) =&gt; {
-                <span class="kw">let </span>output_field = <span class="kw-2">&amp;</span>query_schema.db[<span class="self">self</span>.output_field.<span class="number">0</span>].get_fields()[<span class="self">self</span>.output_field.<span class="number">1</span>];
-                <span class="kw">let </span>serialized = serialize_internal(r, output_field, <span class="bool-val">false</span>, query_schema)<span class="question-mark">?</span>;
+                <span class="kw">let </span>serialized = serialize_internal(r, <span class="kw-2">&amp;</span><span class="self">self</span>.output_field, <span class="bool-val">false</span>, query_schema)<span class="question-mark">?</span>;
 
                 <span class="comment">// On the top level, each result boils down to a exactly a single serialized result.
                 // All checks for lists and optionals have already been performed during the recursion,
                 // so we just unpack the only result possible.
                 // Todo: The following checks feel out of place. This probably needs to be handled already one level deeper.
                 </span><span class="kw">let </span>result = <span class="kw">if </span>serialized.is_empty() {
-                    <span class="kw">if </span>output_field.is_nullable {
+                    <span class="kw">if </span><span class="self">self</span>.output_field.is_nullable {
                         Item::Value(PrismaValue::Null)
                     } <span class="kw">else </span>{
-                        <span class="kw">match </span>output_field.field_type {
-                            OutputType::List(<span class="kw">_</span>) =&gt; Item::list(Vec::new()),
+                        <span class="kw">match </span><span class="self">self</span>.output_field.field_type() {
+                            t <span class="kw">if </span>t.is_list() =&gt; Item::list(Vec::new()),
                             <span class="kw">_ </span>=&gt; {
                                 <span class="kw">return </span><span class="prelude-val">Err</span>(CoreError::SerializationError(<span class="macro">format!</span>(
                                     <span class="string">&quot;Query {} is required to return data, but found no record(s).&quot;</span>,
-                                    output_field.name
+                                    <span class="self">self</span>.output_field.name()
                                 )))
                             }
                         }
