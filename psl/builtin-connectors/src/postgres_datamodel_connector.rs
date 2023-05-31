@@ -57,6 +57,7 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     ImplicitManyToManyRelation |
     DecimalType |
     OrderByNullsFirstLast |
+    FilteredInlineNestedToOneDisconnect |
     SupportsTxIsolationReadUncommitted |
     SupportsTxIsolationReadCommitted |
     SupportsTxIsolationRepeatableRead |

@@ -38,8 +38,8 @@ pub fn nested_disconnect(
     } else {
         let filter: Filter = if relation.is_one_to_one() {
             // One-to-one relations can simply specify if they want to disconnect the child or not as a bool.
-            if let ParsedInputValue::Single(PrismaValue::Boolean(should_delete)) = value {
-                if !should_delete {
+            if let ParsedInputValue::Single(PrismaValue::Boolean(should_disconnect)) = value {
+                if !should_disconnect {
                     return Ok(());
                 }
 
@@ -171,7 +171,7 @@ fn handle_one_to_x(
             let parent_model = parent_relation_field.model();
             let extractor_model_id = parent_model.primary_identifier();
             let null_record_id = SelectionResult::from(&parent_relation_field.linking_fields());
-            // If the relation is inlined on the parent and a filter is applied on the child then it means the update will be done on the parent table.
+            // If the relation is inlined on the parent and a filter is applied on the child then update is done on the parent table.
             // Therefore, the filter applied on the child needs to be converted to a "relational" filter so that the connector renders the adequate SQL to join the Child table.
             let filter = if !filter.is_empty() {
                 parent_relation_field.to_one_related(filter)
