@@ -162,7 +162,11 @@ pub(crate) fn nested_disconnect_input_field<'a>(
         (false, false) => {
             let mut types = vec![InputType::boolean()];
 
-            if ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {
+            if ctx.has_feature(PreviewFeature::ExtendedWhereUnique)
+                && (ctx.has_capability(ConnectorCapability::FilteredInlineChildNestedToOneDisconnect)
+                       // If the disconnect happens on the inline side, then we can allow filters
+                    || parent_field.related_field().is_inlined_on_enclosing_model())
+            {
                 types.push(InputType::object(filter_objects::where_object_type(
                     ctx,
                     parent_field.related_model().into(),
