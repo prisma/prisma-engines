@@ -956,9 +956,6 @@
 <a href="#956" id="956">956</a>
 <a href="#957" id="957">957</a>
 <a href="#958" id="958">958</a>
-<a href="#959" id="959">959</a>
-<a href="#960" id="960">960</a>
-<a href="#961" id="961">961</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{executor::get_engine_protocol, schema::<span class="kw-2">*</span>};
 <span class="kw">use </span>bigdecimal::{BigDecimal, ToPrimitive};
@@ -1322,7 +1319,6 @@
             </span>(PrismaValue::String(s), ScalarType::String) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::String(s)),
             (PrismaValue::Boolean(b), ScalarType::Boolean) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::Boolean(b)),
             (PrismaValue::Json(json), ScalarType::Json) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::Json(json)),
-            (PrismaValue::Xml(xml), ScalarType::Xml) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::Xml(xml)),
             (PrismaValue::Uuid(uuid), ScalarType::UUID) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::Uuid(uuid)),
             (PrismaValue::Bytes(bytes), ScalarType::Bytes) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::Bytes(bytes)),
             (PrismaValue::BigInt(b_int), ScalarType::BigInt) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::BigInt(b_int)),
@@ -1330,8 +1326,7 @@
             (PrismaValue::Null, ScalarType::Null) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::Null),
 
             <span class="comment">// String coercion matchers
-            </span>(PrismaValue::String(s), ScalarType::Xml) =&gt; <span class="prelude-val">Ok</span>(PrismaValue::Xml(s)),
-            (PrismaValue::String(s), ScalarType::JsonList) =&gt; {
+            </span>(PrismaValue::String(s), ScalarType::JsonList) =&gt; {
                 <span class="self">self</span>.parse_json_list_from_str(selection_path, argument_path, <span class="kw-2">&amp;</span>s)
             }
             (PrismaValue::String(s), ScalarType::Bytes) =&gt; <span class="self">self</span>.parse_bytes(selection_path, argument_path, s),
@@ -1853,7 +1848,6 @@
                 <span class="macro">format!</span>(<span class="string">&quot;({})&quot;</span>, itertools::join(v.iter().map(prisma_value_to_type_name), <span class="string">&quot;, &quot;</span>))
             }
             PrismaValue::Json(<span class="kw">_</span>) =&gt; <span class="string">&quot;JSON&quot;</span>.to_string(),
-            PrismaValue::Xml(<span class="kw">_</span>) =&gt; <span class="string">&quot;XML&quot;</span>.to_string(),
             PrismaValue::Object(<span class="kw">_</span>) =&gt; <span class="string">&quot;Object&quot;</span>.to_string(),
             PrismaValue::Null =&gt; <span class="string">&quot;Null&quot;</span>.to_string(),
             PrismaValue::DateTime(<span class="kw">_</span>) =&gt; <span class="string">&quot;DateTime&quot;</span>.to_string(),

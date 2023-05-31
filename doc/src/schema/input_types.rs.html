@@ -301,10 +301,6 @@
 <a href="#301" id="301">301</a>
 <a href="#302" id="302">302</a>
 <a href="#303" id="303">303</a>
-<a href="#304" id="304">304</a>
-<a href="#305" id="305">305</a>
-<a href="#306" id="306">306</a>
-<a href="#307" id="307">307</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>fmt::Debug;
 <span class="kw">use </span>prisma_models::{prelude::ParentContainer, DefaultKind};
@@ -564,10 +560,6 @@
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>uuid() -&gt; InputType&lt;<span class="lifetime">&#39;a</span>&gt; {
         InputType::Scalar(ScalarType::UUID)
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>xml() -&gt; InputType&lt;<span class="lifetime">&#39;a</span>&gt; {
-        InputType::Scalar(ScalarType::Xml)
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>bytes() -&gt; InputType&lt;<span class="lifetime">&#39;a</span>&gt; {

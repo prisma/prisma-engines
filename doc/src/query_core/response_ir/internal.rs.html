@@ -670,15 +670,6 @@
 <a href="#670" id="670">670</a>
 <a href="#671" id="671">671</a>
 <a href="#672" id="672">672</a>
-<a href="#673" id="673">673</a>
-<a href="#674" id="674">674</a>
-<a href="#675" id="675">675</a>
-<a href="#676" id="676">676</a>
-<a href="#677" id="677">677</a>
-<a href="#678" id="678">678</a>
-<a href="#679" id="679">679</a>
-<a href="#680" id="680">680</a>
-<a href="#681" id="681">681</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     constants::custom_types, protocol::EngineProtocol, CoreError, QueryResult, RecordAggregations, RecordSelection,
@@ -1263,15 +1254,11 @@
         (ScalarType::DateTime, PrismaValue::DateTime(dt)) =&gt; PrismaValue::DateTime(dt),
         (ScalarType::UUID, PrismaValue::Uuid(u)) =&gt; PrismaValue::Uuid(u),
         (ScalarType::Bytes, PrismaValue::Bytes(b)) =&gt; PrismaValue::Bytes(b),
-        (ScalarType::Xml, PrismaValue::Xml(b)) =&gt; PrismaValue::Xml(b),
 
         <span class="comment">// The Decimal type doesn&#39;t have a corresponding PrismaValue variant. We need to serialize it
         // to String so that client can deserialize it as Decimal again.
         </span>(ScalarType::Decimal, PrismaValue::Int(i)) =&gt; PrismaValue::String(i.to_string()),
         (ScalarType::Decimal, PrismaValue::Float(f)) =&gt; PrismaValue::String(f.to_string()),
-        <span class="comment">// TODO: Remove this, it is a hack. The Xml type no longer exists as a Prisma native type.
-        // TODO: It should not exist as a ScalarType, TypeIdentifier, or PrismaValue.
-        </span>(ScalarType::String, PrismaValue::Xml(xml)) =&gt; PrismaValue::String(xml),
 
         (st, pv) =&gt; {
             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="kw">crate</span>::FieldConversionError::create(
@@ -1317,11 +1304,6 @@
         (ScalarType::Boolean, PrismaValue::Boolean(x)) =&gt; PrismaValue::Boolean(x),
         (ScalarType::Int, PrismaValue::Int(x)) =&gt; PrismaValue::Int(x),
         (ScalarType::Float, PrismaValue::Float(x)) =&gt; PrismaValue::Float(x),
-
-        <span class="comment">// TODO: Xml is no longer a native Prisma type. It should not exist as special PrismaValue.
-        </span>(ScalarType::String | ScalarType::Xml, PrismaValue::Xml(xml) | PrismaValue::String(xml)) =&gt; {
-            PrismaValue::String(xml)
-        }
 
         (st, pv) =&gt; {
             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="kw">crate</span>::FieldConversionError::create(

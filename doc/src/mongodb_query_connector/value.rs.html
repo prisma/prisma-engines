@@ -484,7 +484,6 @@
 <a href="#484" id="484">484</a>
 <a href="#485" id="485">485</a>
 <a href="#486" id="486">486</a>
-<a href="#487" id="487">487</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     filter::FilterPrefix,
     output_meta::{CompositeOutputMeta, OutputMeta, ScalarOutputMeta},
@@ -758,8 +757,7 @@
             ),
 
             <span class="comment">// Unhandled mappings
-            </span>(TypeIdentifier::Xml, <span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(MongoError::Unsupported(<span class="string">&quot;Mongo doesn&#39;t support XML.&quot;</span>.to_owned())),
-            (TypeIdentifier::Unsupported, <span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Unsupported types should never hit the connector.&quot;</span>),
+            </span>(TypeIdentifier::Unsupported, <span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Unsupported types should never hit the connector.&quot;</span>),
 
             (ident, val) =&gt; {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(MongoError::Unsupported(<span class="macro">format!</span>(

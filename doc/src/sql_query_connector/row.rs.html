@@ -401,12 +401,6 @@
 <a href="#401" id="401">401</a>
 <a href="#402" id="402">402</a>
 <a href="#403" id="403">403</a>
-<a href="#404" id="404">404</a>
-<a href="#405" id="405">405</a>
-<a href="#406" id="406">406</a>
-<a href="#407" id="407">407</a>
-<a href="#408" id="408">408</a>
-<a href="#409" id="409">409</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{column_metadata::ColumnMetadata, error::SqlError, value::to_prisma_value};
 <span class="kw">use </span>bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 <span class="kw">use </span>chrono::{DateTime, NaiveDate, Utc};
@@ -694,12 +688,6 @@
         TypeIdentifier::Bytes =&gt; <span class="kw">match </span>p_value {
             value <span class="kw">if </span>value.is_null() =&gt; PrismaValue::Null,
             Value::Bytes(<span class="prelude-val">Some</span>(bytes)) =&gt; PrismaValue::Bytes(bytes.into()),
-            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(create_error(<span class="kw-2">&amp;</span>p_value)),
-        },
-        TypeIdentifier::Xml =&gt; <span class="kw">match </span>p_value {
-            value <span class="kw">if </span>value.is_null() =&gt; PrismaValue::Null,
-            Value::Xml(<span class="prelude-val">Some</span>(xml)) =&gt; PrismaValue::Xml(xml.to_string()),
-            Value::Text(<span class="prelude-val">Some</span>(s)) =&gt; PrismaValue::Xml(s.into_owned()),
             <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(create_error(<span class="kw-2">&amp;</span>p_value)),
         },
         TypeIdentifier::Unsupported =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;No unsupported field should reach that path&quot;</span>),

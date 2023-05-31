@@ -97,10 +97,6 @@
 <a href="#97" id="97">97</a>
 <a href="#98" id="98">98</a>
 <a href="#99" id="99">99</a>
-<a href="#100" id="100">100</a>
-<a href="#101" id="101">101</a>
-<a href="#102" id="102">102</a>
-<a href="#103" id="103">103</a>
 </pre><pre class="rust"><code><span class="kw">use </span>chrono::Utc;
 <span class="kw">use </span>prisma_models::{ScalarField, TypeIdentifier};
 <span class="kw">use </span>prisma_value::PrismaValue;
@@ -128,7 +124,6 @@
             (PrismaValue::List(l), <span class="kw">_</span>) =&gt; Value::Array(<span class="prelude-val">Some</span>(l.into_iter().map(|x| <span class="self">self</span>.value(x)).collect())),
             (PrismaValue::Json(s), <span class="kw">_</span>) =&gt; Value::Json(<span class="prelude-val">Some</span>(serde_json::from_str::&lt;serde_json::Value&gt;(<span class="kw-2">&amp;</span>s).unwrap())),
             (PrismaValue::Bytes(b), <span class="kw">_</span>) =&gt; Value::Bytes(<span class="prelude-val">Some</span>(b.into())),
-            (PrismaValue::Xml(s), <span class="kw">_</span>) =&gt; Value::Xml(<span class="prelude-val">Some</span>(s.into())),
             (PrismaValue::Object(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
             (PrismaValue::Null, ident) =&gt; <span class="kw">match </span>ident {
                 TypeIdentifier::String =&gt; Value::Text(<span class="prelude-val">None</span>),
@@ -142,7 +137,6 @@
                 TypeIdentifier::Int =&gt; Value::Int32(<span class="prelude-val">None</span>),
                 TypeIdentifier::BigInt =&gt; Value::Int64(<span class="prelude-val">None</span>),
                 TypeIdentifier::Bytes =&gt; Value::Bytes(<span class="prelude-val">None</span>),
-                TypeIdentifier::Xml =&gt; Value::Xml(<span class="prelude-val">None</span>),
                 TypeIdentifier::Unsupported =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;No unsupported field should reach that path&quot;</span>),
             },
         }
@@ -167,7 +161,6 @@
             TypeIdentifier::Enum(<span class="kw">_</span>) =&gt; TypeFamily::Text(<span class="prelude-val">Some</span>(TypeDataLength::Constant(<span class="number">8000</span>))),
             TypeIdentifier::UUID =&gt; TypeFamily::Uuid,
             TypeIdentifier::Json =&gt; TypeFamily::Text(<span class="prelude-val">Some</span>(TypeDataLength::Maximum)),
-            TypeIdentifier::Xml =&gt; TypeFamily::Text(<span class="prelude-val">Some</span>(TypeDataLength::Maximum)),
             TypeIdentifier::DateTime =&gt; TypeFamily::DateTime,
             TypeIdentifier::Bytes =&gt; TypeFamily::Text(parse_scalar_length(<span class="self">self</span>)),
             TypeIdentifier::Unsupported =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;No unsupported field should reach that path&quot;</span>),
@@ -190,7 +183,6 @@
         PrismaValue::List(l) =&gt; Value::Array(<span class="prelude-val">Some</span>(l.into_iter().map(convert_lossy).collect())),
         PrismaValue::Json(s) =&gt; Value::Json(serde_json::from_str(<span class="kw-2">&amp;</span>s).unwrap()),
         PrismaValue::Bytes(b) =&gt; Value::Bytes(<span class="prelude-val">Some</span>(b.into())),
-        PrismaValue::Xml(s) =&gt; Value::Xml(<span class="prelude-val">Some</span>(s.into())),
         PrismaValue::Null =&gt; Value::Int32(<span class="prelude-val">None</span>), <span class="comment">// Can&#39;t tell which type the null is supposed to be.
         </span>PrismaValue::Object(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
     }

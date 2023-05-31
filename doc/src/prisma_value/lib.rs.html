@@ -416,8 +416,6 @@
 <a href="#416" id="416">416</a>
 <a href="#417" id="417">417</a>
 <a href="#418" id="418">418</a>
-<a href="#419" id="419">419</a>
-<a href="#420" id="420">420</a>
 </pre><pre class="rust"><code><span class="kw">pub mod </span>arithmetic;
 
 <span class="kw">mod </span>error;
@@ -444,7 +442,6 @@
     Uuid(Uuid),
     List(PrismaListValue),
     Json(String),
-    Xml(String),
 
     <span class="doccomment">/// A collections of key-value pairs constituting an object.
     </span><span class="attr">#[serde(serialize_with = <span class="string">&quot;serialize_object&quot;</span>)]
@@ -739,7 +736,6 @@
             PrismaValue::Null =&gt; <span class="string">&quot;null&quot;</span>.fmt(f),
             PrismaValue::Uuid(x) =&gt; x.fmt(f),
             PrismaValue::Json(x) =&gt; x.fmt(f),
-            PrismaValue::Xml(x) =&gt; x.fmt(f),
             PrismaValue::BigInt(x) =&gt; x.fmt(f),
             PrismaValue::List(x) =&gt; {
                 <span class="kw">let </span>as_string = <span class="macro">format!</span>(<span class="string">&quot;{x:?}&quot;</span>);

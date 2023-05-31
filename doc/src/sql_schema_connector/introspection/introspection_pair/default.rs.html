@@ -180,7 +180,6 @@
 <a href="#180" id="180">180</a>
 <a href="#181" id="181">181</a>
 <a href="#182" id="182">182</a>
-<a href="#183" id="183">183</a>
 </pre><pre class="rust"><code><span class="kw">use </span>either::Either;
 <span class="kw">use </span>prisma_value::PrismaValue;
 <span class="kw">use </span>psl::{
@@ -248,7 +247,6 @@
             (<span class="prelude-val">Some</span>(sql::DefaultKind::Value(PrismaValue::Null)), <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(DefaultKind::Constant(<span class="kw-2">&amp;</span><span class="string">&quot;null&quot;</span>)),
             (<span class="prelude-val">Some</span>(sql::DefaultKind::Value(PrismaValue::String(val))), <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(DefaultKind::String(val)),
             (<span class="prelude-val">Some</span>(sql::DefaultKind::Value(PrismaValue::Json(val))), <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(DefaultKind::String(val)),
-            (<span class="prelude-val">Some</span>(sql::DefaultKind::Value(PrismaValue::Xml(val))), <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(DefaultKind::String(val)),
 
             (<span class="prelude-val">Some</span>(sql::DefaultKind::Value(PrismaValue::Boolean(val))), <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(DefaultKind::Constant(val)),
             (<span class="prelude-val">Some</span>(sql::DefaultKind::Value(PrismaValue::Enum(variant))), sql::ColumnTypeFamily::Enum(enum_id)) =&gt; {
@@ -278,7 +276,7 @@
 
             (<span class="prelude-val">Some</span>(sql::DefaultKind::Value(PrismaValue::List(vals))), <span class="kw">_</span>) =&gt; <span class="kw">match </span>vals.first() {
                 <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Some</span>(DefaultKind::ConstantList(Vec::new())),
-                <span class="prelude-val">Some</span>(PrismaValue::String(<span class="kw">_</span>) | PrismaValue::Xml(<span class="kw">_</span>) | PrismaValue::Json(<span class="kw">_</span>)) =&gt; {
+                <span class="prelude-val">Some</span>(PrismaValue::String(<span class="kw">_</span>) | PrismaValue::Json(<span class="kw">_</span>)) =&gt; {
                     <span class="kw">let </span>vals = vals.iter().filter_map(|val| val.as_string()).collect();
                     <span class="prelude-val">Some</span>(DefaultKind::StringList(vals))
                 }
