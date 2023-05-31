@@ -20,11 +20,10 @@ pub use self::{
     ids::*,
     walkers::*,
 };
-use enumflags2::{BitFlag, BitFlags};
+pub use either::Either;
 pub use prisma_value::PrismaValue;
 
-pub use either::Either;
-
+use enumflags2::{BitFlag, BitFlags};
 use once_cell::sync::Lazy;
 use regex::Regex;
 use serde::{Deserialize, Serialize};

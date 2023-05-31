@@ -14,7 +14,7 @@ async fn an_enum_with_invalid_value_names_should_have_them_commented_out(api: &m
           url      = "env(TEST_DATABASE_URL)"
         }
 
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model test {
           threechars test_threechars?
 

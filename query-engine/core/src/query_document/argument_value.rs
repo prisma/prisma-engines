@@ -73,7 +73,7 @@ impl ArgumentValue {
         }
     }
 
-    pub fn should_be_parsed_as_json(&self) -> bool {
+    pub(crate) fn should_be_parsed_as_json(&self) -> bool {
         match self {
             ArgumentValue::Object(_) => true,
             ArgumentValue::List(l) => l.iter().all(|v| v.should_be_parsed_as_json()),

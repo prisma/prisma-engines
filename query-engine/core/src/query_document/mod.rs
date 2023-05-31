@@ -29,9 +29,8 @@ pub(crate) use parse_ast::*;
 pub(crate) use parser::*;
 
 use crate::query_graph_builder::resolve_compound_field;
-use prisma_models::ModelRef;
-use schema::constants::*;
-use schema::QuerySchemaRef;
+use prisma_models::Model;
+use schema::{constants::*, QuerySchema};
 use std::collections::HashMap;
 use user_facing_errors::query_engine::validation::ValidationError;
 
@@ -69,18 +68,18 @@ impl BatchDocument {
     /// Those filters are:
     /// - non scalar filters (ie: relation filters, boolean operators...)
     /// - any scalar filters that is not `EQUALS`
-    fn invalid_compact_filter(op: &Operation, schema: &QuerySchemaRef) -> bool {
+    fn invalid_compact_filter(op: &Operation, schema: &QuerySchema) -> bool {
         if !op.is_find_unique(schema) {
             return true;
         }
 
         let where_obj = op.as_read().unwrap().arguments()[0].1.clone().into_object().unwrap();
         let field = schema.find_query_field(op.name()).unwrap();
-        let model = field.model().unwrap();
+        let model = schema.internal_data_model.clone().zip(field.model().unwrap());
 
         where_obj.iter().any(|(key, val)| match val {
             // If it's a compound, then it's still considered as scalar
-            ArgumentValue::Object(_) if resolve_compound_field(key, model).is_some() => false,
+            ArgumentValue::Object(_) if resolve_compound_field(key, &model).is_some() => false,
             // Otherwise, we just look for a scalar field inside the model. If it's not one, then we break.
             val => match model.fields().find_from_scalar(key) {
                 Ok(_) => match val {
@@ -94,7 +93,7 @@ impl BatchDocument {
     }
 
     /// Checks whether a BatchDocument can be compacted.
-    fn can_compact(&self, schema: &QuerySchemaRef) -> bool {
+    fn can_compact(&self, schema: &QuerySchema) -> bool {
         match self {
             Self::Multi(operations, _) => match operations.split_first() {
                 Some((first, rest)) if first.is_find_unique(schema) => {
@@ -123,7 +122,7 @@ impl BatchDocument {
         }
     }
 
-    pub fn compact(self, schema: &QuerySchemaRef) -> Self {
+    pub fn compact(self, schema: &QuerySchema) -> Self {
         match self {
             Self::Multi(operations, _) if self.can_compact(schema) => {
                 Self::Compact(CompactedDocument::from_operations(operations, schema))
@@ -173,9 +172,9 @@ impl CompactedDocument {
     }
 
     /// Here be the dragons. Ay caramba!
-    pub fn from_operations(ops: Vec<Operation>, schema: &QuerySchemaRef) -> Self {
+    pub fn from_operations(ops: Vec<Operation>, schema: &QuerySchema) -> Self {
         let field = schema.find_query_field(ops.first().unwrap().name()).unwrap();
-        let model = field.model().unwrap();
+        let model = schema.internal_data_model.clone().zip(field.model().unwrap());
         // Unpack all read queries (an enum) into a collection of selections.
         // We already took care earlier that all operations here must be reads.
         let selections: Vec<Selection> = ops
@@ -204,7 +203,7 @@ impl CompactedDocument {
                     .clone()
                     .into_object()
                     .expect("Trying to compact a selection with non-object argument");
-                let filters = extract_filter(where_obj, model);
+                let filters = extract_filter(where_obj, &model);
 
                 for (field, filter) in filters {
                     acc = acc.push(field, filter);
@@ -248,7 +247,8 @@ impl CompactedDocument {
             .into_iter()
             .map(|mut sel| {
                 let where_obj = sel.pop_argument().unwrap().1.into_object().unwrap();
-                let filter_map: HashMap<String, ArgumentValue> = extract_filter(where_obj, model).into_iter().collect();
+                let filter_map: HashMap<String, ArgumentValue> =
+                    extract_filter(where_obj, &model).into_iter().collect();
 
                 filter_map
             })
@@ -282,7 +282,7 @@ impl CompactedDocument {
 /// Furthermore, this list is used to match the results of the findMany query back to the original findUnique queries.
 /// Consequently, we only extract EQUALS filters or else we would have to manually implement other filters.
 /// This is a limitation that _could_ technically be lifted but that's not worth it for now.
-fn extract_filter(where_obj: ArgumentValueObject, model: &ModelRef) -> Vec<SelectionArgument> {
+fn extract_filter(where_obj: ArgumentValueObject, model: &Model) -> Vec<SelectionArgument> {
     where_obj
         .into_iter()
         .flat_map(|(key, val)| match val {

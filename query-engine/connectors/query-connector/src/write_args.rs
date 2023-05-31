@@ -4,7 +4,7 @@ use crate::{
 };
 use indexmap::{map::Keys, IndexMap};
 use prisma_models::{
-    CompositeFieldRef, Field, ModelProjection, ModelRef, PrismaValue, ScalarFieldRef, SelectedField, SelectionResult,
+    CompositeFieldRef, Field, Model, ModelProjection, PrismaValue, ScalarFieldRef, SelectedField, SelectionResult,
 };
 use std::{borrow::Borrow, convert::TryInto, ops::Deref};
 
@@ -392,7 +392,7 @@ impl WriteArgs {
     }
 
     // @updatedAt
-    pub fn add_datetimes(&mut self, model: &ModelRef) {
+    pub fn add_datetimes(&mut self, model: &Model) {
         let updated_at_fields = model.fields().updated_at();
         let value = &self.request_now;
 
@@ -403,7 +403,7 @@ impl WriteArgs {
         }
     }
 
-    pub fn update_datetimes(&mut self, model: &ModelRef) {
+    pub fn update_datetimes(&mut self, model: &Model) {
         if !self.args.is_empty() {
             self.add_datetimes(model)
         }

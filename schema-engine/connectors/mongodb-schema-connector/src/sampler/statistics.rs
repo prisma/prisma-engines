@@ -153,6 +153,11 @@ impl<'a> Statistics<'a> {
                         let comment = "This collection uses a JSON Schema defined in the database, which requires additional setup for migrations. Visit https://pris.ly/d/mongodb-json-schema for more info.";
                         model.documentation(comment)
                     }
+
+                    if walker.is_capped() {
+                        let comment = "This model is a capped collection, which is not yet fully supported. Read more: https://pris.ly/d/mongodb-capped-collections";
+                        model.documentation(comment)
+                    }
                 }
 
                 if !doc_count.has_id {

@@ -17,7 +17,7 @@ async fn relations_between_ignored_models_should_not_have_field_level_ignores(ap
         .await?;
 
     let expected = expect![[r#"
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model Post {
           id      Unsupported("macaddr") @id
           user_id Unsupported("macaddr")
@@ -26,7 +26,7 @@ async fn relations_between_ignored_models_should_not_have_field_level_ignores(ap
           @@ignore
         }
 
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model User {
           id   Unsupported("macaddr") @id
           Post Post[]
@@ -100,7 +100,7 @@ async fn unsupported_type_keeps_its_usages(api: &mut TestApi) -> TestResult {
     let expected = expect![[r#"
         *** WARNING ***
 
-        These fields are not supported by the Prisma Client, because Prisma currently does not support their types:
+        These fields are not supported by Prisma Client, because Prisma currently does not support their types:
           - Model: "Test", field: "broken", original data type: "macaddr"
     "#]];
 
@@ -149,10 +149,10 @@ async fn a_table_with_only_an_unsupported_id(api: &mut TestApi) -> TestResult {
     let expected = expect![[r#"
         *** WARNING ***
 
-        The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client:
+        The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client:
           - "Test"
 
-        These fields are not supported by the Prisma Client, because Prisma currently does not support their types:
+        These fields are not supported by Prisma Client, because Prisma currently does not support their types:
           - Model: "Test", field: "network_mac", original data type: "macaddr"
     "#]];
 
@@ -168,7 +168,7 @@ async fn a_table_with_only_an_unsupported_id(api: &mut TestApi) -> TestResult {
           url      = "env(TEST_DATABASE_URL)"
         }
 
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model Test {
           dummy       Int
           network_mac Unsupported("macaddr") @id @default(dbgenerated("'08:00:2b:01:02:03'::macaddr"))
@@ -303,7 +303,7 @@ async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &mut Te
         .await?;
 
     let expected = expect![[r#"
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model Post {
           id      Int
           user_ip Int
@@ -420,7 +420,7 @@ ALTER TABLE blocks_p2_0 ADD CONSTRAINT b2_unique UNIQUE (id);
     let expected = expect![[r#"
         *** WARNING ***
 
-        The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client:
+        The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client:
           - "blocks"
 
         These tables are partition tables, which are not yet fully supported:
@@ -440,7 +440,7 @@ ALTER TABLE blocks_p2_0 ADD CONSTRAINT b2_unique UNIQUE (id);
         }
 
         /// This table is a partition table and requires additional setup for migrations. Visit https://pris.ly/d/partition-tables for more info.
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model blocks {
           id Int
 

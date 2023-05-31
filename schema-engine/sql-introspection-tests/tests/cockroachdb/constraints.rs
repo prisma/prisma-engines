@@ -30,7 +30,7 @@ async fn aragon_test_cockroachdb(api: &mut TestApi) -> TestResult {
           url      = "env(TEST_DATABASE_URL)"
         }
 
-        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.
+        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
         model tokens {
           token_id    BigInt  @id
           token_scope String?
@@ -46,7 +46,7 @@ async fn aragon_test_cockroachdb(api: &mut TestApi) -> TestResult {
     let expectation = expect![[r#"
         *** WARNING ***
 
-        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints
+        These constraints are not supported by Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
           - Model: "tokens", constraint: "tokens_token_scope_check"
     "#]];
 
@@ -97,13 +97,13 @@ async fn noalyss_folder_test_cockroachdb(api: &mut TestApi) -> TestResult {
           url      = "env(TEST_DATABASE_URL)"
         }
 
-        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.
+        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
         model todo_list {
           tl_id     BigInt @id @default(autoincrement())
           is_public String @default("N") @db.Char(1)
         }
 
-        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.
+        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
         /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
         model user_active_security {
           id        BigInt @id(map: "user_active_security_pk") @default(autoincrement())
@@ -112,7 +112,7 @@ async fn noalyss_folder_test_cockroachdb(api: &mut TestApi) -> TestResult {
           us_action String @db.String(1)
         }
 
-        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/postgres-check-constraints for more info.
+        /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
         model user_sec_action_profile {
           ua_id    BigInt  @id @default(autoincrement())
           ua_right String? @db.Char(1)
@@ -124,7 +124,7 @@ async fn noalyss_folder_test_cockroachdb(api: &mut TestApi) -> TestResult {
     let expectation = expect![[r#"
         *** WARNING ***
 
-        These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints
+        These constraints are not supported by Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints
           - Model: "todo_list", constraint: "ck_is_public"
           - Model: "user_active_security", constraint: "user_active_security_action_check"
           - Model: "user_active_security", constraint: "user_active_security_ledger_check"

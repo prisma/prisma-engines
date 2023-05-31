@@ -1,8 +1,8 @@
-use mysql_async::prelude::*;
+use quaint::connector::mysql_async::{self, prelude::*};
 use std::time::Instant;
 
 #[tokio::main]
-async fn main() -> () {
+async fn main() {
     let url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set to a mysql URL");
     let start = Instant::now();
 

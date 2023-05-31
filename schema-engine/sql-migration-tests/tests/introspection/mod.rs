@@ -47,7 +47,7 @@ fn introspect_force_with_invalid_schema() {
           url      = "<db_path>"
         }
 
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model corgis {
           bites Boolean?
 

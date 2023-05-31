@@ -8,7 +8,7 @@ use psl::{
     schema_ast::ast::WithDocumentation,
 };
 
-pub fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
+pub(crate) fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
     let mut datamodel = Datamodel {
         models: Vec::with_capacity(schema.db.models_count()),
         enums: Vec::with_capacity(schema.db.enums_count()),
@@ -263,7 +263,6 @@ fn prisma_value_to_serde(value: &PrismaValue) -> serde_json::Value {
         PrismaValue::Null => serde_json::Value::Null,
         PrismaValue::Uuid(val) => serde_json::Value::String(val.to_string()),
         PrismaValue::Json(val) => serde_json::Value::String(val.to_string()),
-        PrismaValue::Xml(val) => serde_json::Value::String(val.to_string()),
         PrismaValue::List(value_vec) => serde_json::Value::Array(value_vec.iter().map(prisma_value_to_serde).collect()),
         PrismaValue::Bytes(b) => serde_json::Value::String(encode_bytes(b)),
         PrismaValue::Object(pairs) => {
