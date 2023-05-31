@@ -954,8 +954,6 @@
 <a href="#954" id="954">954</a>
 <a href="#955" id="955">955</a>
 <a href="#956" id="956">956</a>
-<a href="#957" id="957">957</a>
-<a href="#958" id="958">958</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{executor::get_engine_protocol, schema::<span class="kw-2">*</span>};
 <span class="kw">use </span>bigdecimal::{BigDecimal, ToPrimitive};
@@ -984,7 +982,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         selections: <span class="kw-2">&amp;</span>[Selection],
         schema_object: <span class="kw-2">&amp;</span>ObjectType&lt;<span class="lifetime">&#39;a</span>&gt;,
-        fields: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;OutputField&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        fields: ResolveField&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;_</span>&gt;,
         query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema,
     ) -&gt; QueryParserResult&lt;ParsedObject&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
         <span class="self">self</span>.parse_object(
@@ -1018,12 +1016,7 @@
             ));
         }
 
-        <span class="kw">let </span>adhoc_fields: HashMap&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt; = <span class="kw">if </span>resolve_field.is_none() {
-            (schema_object.get_fields().map(|f| (f.name().clone(), f))).collect()
-        } <span class="kw">else </span>{
-            Default::default()
-        };
-        <span class="kw">let </span>resolve_adhoc = <span class="kw">move </span>|name: <span class="kw-2">&amp;</span>str| adhoc_fields.get(name).cloned();
+        <span class="kw">let </span>resolve_adhoc = <span class="kw">move </span>|name: <span class="kw-2">&amp;</span>str| schema_object.find_field(name).cloned();
         <span class="kw">let </span>resolve_field = resolve_field.unwrap_or(<span class="kw-2">&amp;</span>resolve_adhoc);
 
         selections
@@ -1035,7 +1028,7 @@
                         selection_path.clone(),
                         argument_path.clone(),
                         selection,
-                        field.clone(),
+                        field,
                         query_schema,
                     ),
                     <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(ValidationError::unknown_selection_field(
@@ -1117,7 +1110,7 @@
     ) -&gt; QueryParserResult&lt;Vec&lt;ParsedArgument&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; {
         <span class="kw">let </span>arguments: IndexMap&lt;String, InputField&lt;<span class="lifetime">&#39;_</span>&gt;&gt; = schema_field
             .arguments()
-            .map(|arg| (arg.name.clone().into_owned(), arg))
+            .map(|arg| (arg.name.clone().into_owned(), arg.clone()))
             .collect();
 
         <span class="kw">for </span>(name, <span class="kw">_</span>) <span class="kw">in </span>given_arguments {
@@ -1126,7 +1119,7 @@
                 <span class="kw">return </span><span class="prelude-val">Err</span>(ValidationError::unknown_argument(
                     selection_path.segments(),
                     argument_path.segments(),
-                    conversions::schema_arguments_to_argument_description_vec(schema_field.arguments()),
+                    conversions::schema_arguments_to_argument_description_vec(schema_field.arguments().cloned()),
                 ));
             }
         }
@@ -1606,11 +1599,12 @@
         schema_object: <span class="kw-2">&amp;</span>InputObjectType&lt;<span class="lifetime">&#39;a</span>&gt;,
         query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema,
     ) -&gt; QueryParserResult&lt;ParsedInputMap&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
-        <span class="kw">let </span>fields = schema_object.get_fields();
-        <span class="kw">let </span>valid_field_names: IndexSet&lt;Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;&gt; = fields.clone().map(|field| field.name).collect();
+        <span class="kw">let </span>fields = schema_object.get_fields().iter();
+        <span class="kw">let </span>valid_field_names: IndexSet&lt;Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;&gt; = fields.clone().map(|field| field.name.clone()).collect();
         <span class="kw">let </span>given_field_names: IndexSet&lt;Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;&gt; = object.iter().map(|(k, <span class="kw">_</span>)| Cow::Borrowed(k.as_str())).collect();
         <span class="kw">let </span>missing_field_names = valid_field_names.difference(<span class="kw-2">&amp;</span>given_field_names);
-        <span class="kw">let </span>schema_fields: IndexMap&lt;Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;, InputField&lt;<span class="lifetime">&#39;_</span>&gt;&gt; = fields.map(|f| (f.name.clone(), f)).collect();
+        <span class="kw">let </span>schema_fields: IndexMap&lt;Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;, InputField&lt;<span class="lifetime">&#39;_</span>&gt;&gt; =
+            fields.map(|f| (f.name.clone(), f.clone())).collect();
 
         <span class="comment">// First, filter-in those fields that are not given but have a default value in the schema.
         // As in practise, it is like if they were given with said default value.
@@ -1761,6 +1755,7 @@
         <span class="kw">let </span>name = o.name();
         <span class="kw">let </span>fields: Vec&lt;validation::OutputTypeDescriptionField&gt; = o
             .get_fields()
+            .iter()
             .map(|field| {
                 <span class="kw">let </span>name = field.name();
                 <span class="kw">let </span>type_name = to_simplified_output_type_name(field.field_type());
@@ -1795,6 +1790,7 @@
         <span class="kw">let </span>name = i.identifier.name();
         <span class="kw">let </span>fields: Vec&lt;validation::InputTypeDescriptionField&gt; = i
             .get_fields()
+            .iter()
             .map(|field| {
                 <span class="kw">let </span>name = field.name.clone();
                 <span class="kw">let </span>type_names: Vec&lt;<span class="kw">_</span>&gt; = field.field_types().iter().map(to_simplified_input_type_name).collect();

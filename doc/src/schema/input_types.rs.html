@@ -301,16 +301,27 @@
 <a href="#301" id="301">301</a>
 <a href="#302" id="302">302</a>
 <a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>fmt::Debug;
+<span class="kw">use </span>once_cell::sync::Lazy;
 <span class="kw">use </span>prisma_models::{prelude::ParentContainer, DefaultKind};
 <span class="kw">use </span>std::{borrow::Cow, boxed::Box, fmt};
+
+<span class="kw">type </span>InputObjectFields&lt;<span class="lifetime">&#39;a</span>&gt; =
+    <span class="prelude-ty">Option</span>&lt;Arc&lt;Lazy&lt;Vec&lt;InputField&lt;<span class="lifetime">&#39;a</span>&gt;&gt;, Box&lt;<span class="kw">dyn </span>FnOnce() -&gt; Vec&lt;InputField&lt;<span class="lifetime">&#39;a</span>&gt;&gt; + Send + Sync + <span class="lifetime">&#39;a</span>&gt;&gt;&gt;&gt;;
 
 <span class="attr">#[derive(Clone)]
 </span><span class="kw">pub struct </span>InputObjectType&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub </span>identifier: Identifier,
     <span class="kw">pub </span>constraints: InputObjectTypeConstraints&lt;<span class="lifetime">&#39;a</span>&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) fields: Arc&lt;<span class="kw">dyn </span>Fn() -&gt; Vec&lt;InputField&lt;<span class="lifetime">&#39;a</span>&gt;&gt; + Send + Sync + <span class="lifetime">&#39;a</span>&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) fields: InputObjectFields&lt;<span class="lifetime">&#39;a</span>&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) tag: <span class="prelude-ty">Option</span>&lt;ObjectTag&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
 
@@ -356,17 +367,20 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; InputObjectType&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub fn </span>get_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = InputField&lt;<span class="lifetime">&#39;a</span>&gt;&gt; + Clone {
-        <span class="kw">let </span>f = <span class="kw-2">&amp;</span><span class="self">self</span>.fields;
-        f().into_iter()
+    <span class="kw">pub fn </span>get_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[InputField&lt;<span class="lifetime">&#39;a</span>&gt;] {
+        <span class="self">self</span>.fields.as_ref().map(|f| -&gt; <span class="kw-2">&amp;</span>[<span class="kw">_</span>] { f }).unwrap_or(<span class="kw-2">&amp;</span>[])
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_fields(<span class="kw-2">&amp;mut </span><span class="self">self</span>, f: <span class="kw">impl </span>FnOnce() -&gt; Vec&lt;InputField&lt;<span class="lifetime">&#39;a</span>&gt;&gt; + Send + Sync + <span class="lifetime">&#39;a</span>) {
+        <span class="self">self</span>.fields = <span class="prelude-val">Some</span>(Arc::new(Lazy::new(Box::new(f))));
     }
 
     <span class="kw">pub fn </span>tag(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ObjectTag&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
         <span class="self">self</span>.tag.as_ref()
     }
 
-    <span class="kw">pub fn </span>find_field(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
-        <span class="self">self</span>.get_fields().find(|f| f.name == name)
+    <span class="kw">pub fn </span>find_field(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>InputField&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.get_fields().iter().find(|f| f.name == name)
     }
 
     <span class="doccomment">/// Require exactly one field of the possible ones to be in the input.

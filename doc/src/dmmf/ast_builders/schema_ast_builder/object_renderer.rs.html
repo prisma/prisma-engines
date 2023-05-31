@@ -144,7 +144,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>rendered_fields = Vec::with_capacity(fields.len());
 
         <span class="kw">for </span>field <span class="kw">in </span>fields {
-            rendered_fields.push(render_input_field(<span class="kw-2">&amp;</span>field, ctx));
+            rendered_fields.push(render_input_field(field, ctx));
         }
 
         <span class="kw">let </span>meta = input_object.tag().and_then(|tag| <span class="kw">match </span>tag {
@@ -184,7 +184,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>rendered_fields = Vec::with_capacity(fields.len());
 
         <span class="kw">for </span>field <span class="kw">in </span>fields {
-            rendered_fields.push(render_input_field(<span class="kw-2">&amp;</span>field, ctx));
+            rendered_fields.push(render_input_field(field, ctx));
         }
 
         <span class="kw">let </span>allow_type = <span class="kw">match </span>input_object.tag() {
@@ -213,7 +213,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>rendered_fields: Vec&lt;DmmfOutputField&gt; = Vec::with_capacity(fields.len());
 
         <span class="kw">for </span>field <span class="kw">in </span>fields {
-            rendered_fields.push(render_output_field(<span class="kw-2">&amp;</span>field, ctx))
+            rendered_fields.push(render_output_field(field, ctx))
         }
 
         <span class="kw">let </span>output_type = DmmfOutputType {

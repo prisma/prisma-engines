@@ -82,6 +82,10 @@
 <a href="#82" id="82">82</a>
 <a href="#83" id="83">83</a>
 <a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
 <span class="attr">#[derive(Debug)]
@@ -132,11 +136,15 @@
         <span class="macro">format!</span>(<span class="string">&quot;{}{}: {}{}&quot;</span>, field.name(), rendered_args, rendered_type, bang)
     }
 
-    <span class="kw">fn </span>render_arguments(<span class="kw-2">&amp;</span><span class="self">self</span>, args: <span class="kw">impl </span>Iterator&lt;Item = InputField&lt;<span class="lifetime">&#39;a</span>&gt;&gt;, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; Vec&lt;String&gt; {
+    <span class="kw">fn </span>render_arguments&lt;<span class="lifetime">&#39;b</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="self">self</span>,
+        args: <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>InputField&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        ctx: <span class="kw-2">&amp;mut </span>RenderContext,
+    ) -&gt; Vec&lt;String&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>output = Vec::new();
 
         <span class="kw">for </span>arg <span class="kw">in </span>args {
-            output.push(<span class="self">self</span>.render_argument(<span class="kw-2">&amp;</span>arg, ctx))
+            output.push(<span class="self">self</span>.render_argument(arg, ctx))
         }
 
         output

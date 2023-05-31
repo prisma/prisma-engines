@@ -59,7 +59,7 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render_output_field&lt;<span class="lifetime">&#39;a</span>&gt;(field: <span class="kw-2">&amp;</span>OutputField&lt;<span class="lifetime">&#39;a</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>RenderContext&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; DmmfOutputField {
-    <span class="kw">let </span>rendered_inputs = field.arguments().map(|arg| render_input_field(<span class="kw-2">&amp;</span>arg, ctx)).collect();
+    <span class="kw">let </span>rendered_inputs = field.arguments().map(|arg| render_input_field(arg, ctx)).collect();
     <span class="kw">let </span>output_type = render_output_type(field.field_type(), ctx);
 
     <span class="kw">let </span>output_field = DmmfOutputField {

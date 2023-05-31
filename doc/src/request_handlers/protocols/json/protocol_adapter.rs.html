@@ -1870,26 +1870,17 @@
 <a href="#1870" id="1870">1870</a>
 <a href="#1871" id="1871">1871</a>
 <a href="#1872" id="1872">1872</a>
-<a href="#1873" id="1873">1873</a>
-<a href="#1874" id="1874">1874</a>
-<a href="#1875" id="1875">1875</a>
-<a href="#1876" id="1876">1876</a>
-<a href="#1877" id="1877">1877</a>
-<a href="#1878" id="1878">1878</a>
-<a href="#1879" id="1879">1879</a>
-<a href="#1880" id="1880">1880</a>
-<a href="#1881" id="1881">1881</a>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{FieldQuery, HandlerError, JsonSingleQuery, SelectionSet};
 <span class="kw">use </span>bigdecimal::{BigDecimal, FromPrimitive};
 <span class="kw">use </span>indexmap::IndexMap;
 <span class="kw">use </span>prisma_models::{decode_bytes, parse_datetime, prelude::ParentContainer, Field};
 <span class="kw">use </span>query_core::{
     constants::custom_types,
-    schema::{Identifier, ObjectType, OutputField, QuerySchema},
+    schema::{ObjectType, OutputField, QuerySchema},
     ArgumentValue, Operation, Selection,
 };
 <span class="kw">use </span>serde_json::Value <span class="kw">as </span>JsonValue;
-<span class="kw">use </span>std::{collections::HashMap, str::FromStr};
+<span class="kw">use </span>std::str::FromStr;
 
 <span class="kw">enum </span>OperationType {
     Read,
@@ -1898,15 +1889,11 @@
 
 <span class="kw">pub struct </span>JsonProtocolAdapter&lt;<span class="lifetime">&#39;a</span>&gt; {
     query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema,
-    output_type_fields: HashMap&lt;Identifier, Vec&lt;OutputField&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; JsonProtocolAdapter&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">pub fn </span>new(query_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QuerySchema) -&gt; <span class="self">Self </span>{
-        JsonProtocolAdapter {
-            query_schema,
-            output_type_fields: Default::default(),
-        }
+        JsonProtocolAdapter { query_schema }
     }
 
     <span class="kw">pub fn </span>convert_single(<span class="kw-2">&amp;mut </span><span class="self">self</span>, query: JsonSingleQuery) -&gt; <span class="kw">crate</span>::Result&lt;Operation&gt; {
@@ -1948,11 +1935,6 @@
 
         <span class="kw">let </span>all_scalars_set = query_selection.all_scalars();
         <span class="kw">let </span>all_composites_set = query_selection.all_composites();
-        <span class="kw">let </span>fields: HashMap&lt;std::borrow::Cow&lt;str&gt;, OutputField&gt; = field
-            .field_type()
-            .as_object_type()
-            .map(|t| t.get_fields().map(|f| (f.name().clone(), f)).collect())
-            .unwrap_or_default();
 
         <span class="kw">let </span><span class="kw-2">mut </span>selection = Selection::new(field.name().clone(), <span class="prelude-val">None</span>, arguments, Vec::new());
 
@@ -1991,13 +1973,17 @@
                 <span class="comment">// &lt;field_name&gt;: { selection: { ... }, arguments: { ... } }
                 </span><span class="kw">crate</span>::SelectionSetValue::Nested(nested_query) =&gt; {
                     <span class="kw">if </span>field.field_type().as_object_type().is_some() {
-                        <span class="kw">let </span>schema_field = fields.get(selection_name.as_str()).ok_or_else(|| {
-                            HandlerError::query_conversion(<span class="macro">format!</span>(
-                                <span class="string">&quot;Unknown nested field &#39;{}&#39; for operation {} does not match any query.&quot;</span>,
-                                selection_name,
-                                field.name()
-                            ))
-                        })<span class="question-mark">?</span>;
+                        <span class="kw">let </span>schema_field = field
+                            .field_type()
+                            .as_object_type()
+                            .and_then(|t| t.find_field(selection_name.as_str()))
+                            .ok_or_else(|| {
+                                HandlerError::query_conversion(<span class="macro">format!</span>(
+                                    <span class="string">&quot;Unknown nested field &#39;{}&#39; for operation {} does not match any query.&quot;</span>,
+                                    selection_name,
+                                    field.name()
+                                ))
+                            })<span class="question-mark">?</span>;
 
                         <span class="kw">let </span>field = container.and_then(|container| container.find_field(schema_field.name()));
                         <span class="kw">let </span>is_composite_field = field.as_ref().map(|f| f.is_composite()).unwrap_or(<span class="bool-val">false</span>);
@@ -2179,7 +2165,7 @@
     }
 
     <span class="kw">fn </span>default_scalar_selection(schema_object: <span class="kw-2">&amp;</span>ObjectType, selection: <span class="kw-2">&amp;mut </span>Selection) {
-        <span class="kw">for </span>scalar <span class="kw">in </span>schema_object.get_fields().filter(|f| {
+        <span class="kw">for </span>scalar <span class="kw">in </span>schema_object.get_fields().iter().filter(|f| {
             f.field_type().is_scalar()
                 || f.field_type().is_scalar_list()
                 || f.field_type().is_enum()
@@ -2294,12 +2280,8 @@
         )))
     }
 
-    <span class="kw">fn </span>get_output_field(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ty: <span class="kw-2">&amp;</span>ObjectType&lt;<span class="lifetime">&#39;a</span>&gt;, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>OutputField&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
-        <span class="kw">let </span>parent_object_fields = <span class="self">self
-            </span>.output_type_fields
-            .entry(ty.identifier().clone())
-            .or_insert_with(|| ty.get_fields_vec());
-        parent_object_fields.iter().find(|f| f.name() == name)
+    <span class="kw">fn </span>get_output_field&lt;<span class="lifetime">&#39;b</span>&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ty: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>ObjectType&lt;<span class="lifetime">&#39;a</span>&gt;, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>OutputField&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        ty.find_field(name)
     }
 }
 

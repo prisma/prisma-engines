@@ -661,15 +661,6 @@
 <a href="#661" id="661">661</a>
 <a href="#662" id="662">662</a>
 <a href="#663" id="663">663</a>
-<a href="#664" id="664">664</a>
-<a href="#665" id="665">665</a>
-<a href="#666" id="666">666</a>
-<a href="#667" id="667">667</a>
-<a href="#668" id="668">668</a>
-<a href="#669" id="669">669</a>
-<a href="#670" id="670">670</a>
-<a href="#671" id="671">671</a>
-<a href="#672" id="672">672</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     constants::custom_types, protocol::EngineProtocol, CoreError, QueryResult, RecordAggregations, RecordSelection,
@@ -751,7 +742,7 @@
             <span class="kw">match </span>result {
                 AggregationResult::Field(field, value) =&gt; {
                     <span class="kw">let </span>output_field = aggregate_object_type.find_field(field.name()).unwrap();
-                    flattened.insert(field.name().to_owned(), serialize_scalar(<span class="kw-2">&amp;</span>output_field, value)<span class="question-mark">?</span>);
+                    flattened.insert(field.name().to_owned(), serialize_scalar(output_field, value)<span class="question-mark">?</span>);
                 }
 
                 AggregationResult::Count(field, count) =&gt; {
@@ -765,19 +756,13 @@
                 AggregationResult::Average(field, value) =&gt; {
                     <span class="kw">let </span>output_field =
                         find_nested_aggregate_output_field(aggregate_object_type, UNDERSCORE_AVG, field.name());
-                    flattened.insert(
-                        <span class="macro">format!</span>(<span class="string">&quot;_avg_{}&quot;</span>, field.name()),
-                        serialize_scalar(<span class="kw-2">&amp;</span>output_field, value)<span class="question-mark">?</span>,
-                    );
+                    flattened.insert(<span class="macro">format!</span>(<span class="string">&quot;_avg_{}&quot;</span>, field.name()), serialize_scalar(output_field, value)<span class="question-mark">?</span>);
                 }
 
                 AggregationResult::Sum(field, value) =&gt; {
                     <span class="kw">let </span>output_field =
                         find_nested_aggregate_output_field(aggregate_object_type, UNDERSCORE_SUM, field.name());
-                    flattened.insert(
-                        <span class="macro">format!</span>(<span class="string">&quot;_sum_{}&quot;</span>, field.name()),
-                        serialize_scalar(<span class="kw-2">&amp;</span>output_field, value)<span class="question-mark">?</span>,
-                    );
+                    flattened.insert(<span class="macro">format!</span>(<span class="string">&quot;_sum_{}&quot;</span>, field.name()), serialize_scalar(output_field, value)<span class="question-mark">?</span>);
                 }
 
                 AggregationResult::Min(field, value) =&gt; {
@@ -785,7 +770,7 @@
                         find_nested_aggregate_output_field(aggregate_object_type, UNDERSCORE_MIN, field.name());
                     flattened.insert(
                         <span class="macro">format!</span>(<span class="string">&quot;_min_{}&quot;</span>, field.name()),
-                        serialize_scalar(<span class="kw-2">&amp;</span>output_field, coerce_non_numeric(value, output_field.field_type()))<span class="question-mark">?</span>,
+                        serialize_scalar(output_field, coerce_non_numeric(value, output_field.field_type()))<span class="question-mark">?</span>,
                     );
                 }
 
@@ -794,7 +779,7 @@
                         find_nested_aggregate_output_field(aggregate_object_type, UNDERSCORE_MAX, field.name());
                     flattened.insert(
                         <span class="macro">format!</span>(<span class="string">&quot;_max_{}&quot;</span>, field.name()),
-                        serialize_scalar(<span class="kw-2">&amp;</span>output_field, coerce_non_numeric(value, output_field.field_type()))<span class="question-mark">?</span>,
+                        serialize_scalar(output_field, coerce_non_numeric(value, output_field.field_type()))<span class="question-mark">?</span>,
                     );
                 }
             }
@@ -873,11 +858,11 @@
 }
 
 <span class="comment">// Workaround until we streamline serialization.
-</span><span class="kw">fn </span>find_nested_aggregate_output_field&lt;<span class="lifetime">&#39;a</span>&gt;(
-    object_type: <span class="kw-2">&amp;</span>ObjectType&lt;<span class="lifetime">&#39;a</span>&gt;,
+</span><span class="kw">fn </span>find_nested_aggregate_output_field&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
+    object_type: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>ObjectType&lt;<span class="lifetime">&#39;a</span>&gt;,
     nested_obj_name: <span class="kw-2">&amp;</span>str,
     nested_field_name: <span class="kw-2">&amp;</span>str,
-) -&gt; OutputField&lt;<span class="lifetime">&#39;a</span>&gt; {
+) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>OutputField&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">let </span>nested_field = object_type.find_field(nested_obj_name).unwrap();
     <span class="kw">let </span>nested_object_type = <span class="kw">match </span><span class="kw-2">&amp;</span>nested_field.field_type().inner {
         InnerOutputType::Object(obj) =&gt; obj,
@@ -1010,11 +995,11 @@
 
             <span class="kw">match </span>field {
                 Field::Composite(cf) =&gt; {
-                    object.insert(field.name().to_owned(), serialize_composite(cf, <span class="kw-2">&amp;</span>out_field, val)<span class="question-mark">?</span>);
+                    object.insert(field.name().to_owned(), serialize_composite(cf, out_field, val)<span class="question-mark">?</span>);
                 }
 
                 <span class="kw">_ if </span>!out_field.field_type().is_object() =&gt; {
-                    object.insert(field.name().to_owned(), serialize_scalar(<span class="kw-2">&amp;</span>out_field, val)<span class="question-mark">?</span>);
+                    object.insert(field.name().to_owned(), serialize_scalar(out_field, val)<span class="question-mark">?</span>);
                 }
 
                 <span class="kw">_ </span>=&gt; (),
@@ -1114,7 +1099,7 @@
         </span><span class="kw">if let </span>QueryResult::RecordSelection(<span class="kw-2">ref </span>rs) = nested_result {
             <span class="kw">let </span>name = rs.name.clone();
             <span class="kw">let </span>field = enclosing_type.find_field(<span class="kw-2">&amp;</span>name).unwrap();
-            <span class="kw">let </span>result = serialize_internal(nested_result, <span class="kw-2">&amp;</span>field, <span class="bool-val">false</span>, query_schema)<span class="question-mark">?</span>;
+            <span class="kw">let </span>result = serialize_internal(nested_result, field, <span class="bool-val">false</span>, query_schema)<span class="question-mark">?</span>;
 
             nested_mapping.insert(name, result);
         }
@@ -1161,15 +1146,12 @@
                     Field::Composite(cf) =&gt; {
                         map.insert(
                             inner_field.name().to_owned(),
-                            serialize_composite(cf, <span class="kw-2">&amp;</span>inner_out_field, value)<span class="question-mark">?</span>,
+                            serialize_composite(cf, inner_out_field, value)<span class="question-mark">?</span>,
                         );
                     }
 
                     <span class="kw">_ if </span>!inner_out_field.field_type().is_object() =&gt; {
-                        map.insert(
-                            inner_field.name().to_owned(),
-                            serialize_scalar(<span class="kw-2">&amp;</span>inner_out_field, value)<span class="question-mark">?</span>,
-                        );
+                        map.insert(inner_field.name().to_owned(), serialize_scalar(inner_out_field, value)<span class="question-mark">?</span>);
                     }
 
                     <span class="kw">_ </span>=&gt; (),
