@@ -104,6 +104,7 @@
 <a href="#104" id="104">104</a>
 <a href="#105" id="105">105</a>
 <a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::{fmt, str::FromStr};
 
 <span class="doccomment">/// Not all Databases are created equal. Hence connectors for our datasources support different capabilities.
@@ -199,6 +200,7 @@
     </span>DecimalType,                <span class="comment">// Connector supports Prisma Decimal type.
     </span>BackwardCompatibleQueryRaw, <span class="comment">// Temporary SQLite specific capability. Should be removed once https://github.com/prisma/prisma/issues/12784 is fixed,
     </span>OrderByNullsFirstLast,      <span class="comment">// Connector supports ORDER BY NULLS LAST/FIRST
+    </span>FilteredInlineChildNestedToOneDisconnect, <span class="comment">// Connector supports a filtered nested disconnect on both sides of a to-one relation.
     // Block of isolation levels.
     </span>SupportsTxIsolationReadUncommitted,
     SupportsTxIsolationReadCommitted,

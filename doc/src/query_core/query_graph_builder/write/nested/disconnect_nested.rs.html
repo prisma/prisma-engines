@@ -261,8 +261,8 @@
     } <span class="kw">else </span>{
         <span class="kw">let </span>filter: Filter = <span class="kw">if </span>relation.is_one_to_one() {
             <span class="comment">// One-to-one relations can simply specify if they want to disconnect the child or not as a bool.
-            </span><span class="kw">if let </span>ParsedInputValue::Single(PrismaValue::Boolean(should_delete)) = value {
-                <span class="kw">if </span>!should_delete {
+            </span><span class="kw">if let </span>ParsedInputValue::Single(PrismaValue::Boolean(should_disconnect)) = value {
+                <span class="kw">if </span>!should_disconnect {
                     <span class="kw">return </span><span class="prelude-val">Ok</span>(());
                 }
 
@@ -394,7 +394,7 @@
             </span><span class="kw">let </span>parent_model = parent_relation_field.model();
             <span class="kw">let </span>extractor_model_id = parent_model.primary_identifier();
             <span class="kw">let </span>null_record_id = SelectionResult::from(<span class="kw-2">&amp;</span>parent_relation_field.linking_fields());
-            <span class="comment">// If the relation is inlined on the parent and a filter is applied on the child then it means the update will be done on the parent table.
+            <span class="comment">// If the relation is inlined on the parent and a filter is applied on the child then update is done on the parent table.
             // Therefore, the filter applied on the child needs to be converted to a &quot;relational&quot; filter so that the connector renders the adequate SQL to join the Child table.
             </span><span class="kw">let </span>filter = <span class="kw">if </span>!filter.is_empty() {
                 parent_relation_field.to_one_related(filter)
