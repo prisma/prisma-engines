@@ -470,7 +470,7 @@ impl QueryEngine {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
 
-            Ok(render_graphql_schema(engine.query_schema().clone()))
+            Ok(render_graphql_schema(engine.query_schema()))
         })
         .await
     }

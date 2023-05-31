@@ -155,7 +155,7 @@ impl<'conn> QueryInterpreter<'conn> {
         tracing::level_filters::STATIC_MAX_LEVEL == tracing::level_filters::LevelFilter::TRACE
     }
 
-    pub(crate) fn new(conn: &'conn mut dyn ConnectionLike) -> QueryInterpreter<'_> {
+    pub(crate) fn new(conn: &'conn mut dyn ConnectionLike) -> QueryInterpreter<'conn> {
         let mut log = Vec::new();
 
         if Self::log_enabled() {

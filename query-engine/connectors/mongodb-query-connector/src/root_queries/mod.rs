@@ -37,7 +37,7 @@ fn document_to_record(mut doc: Document, fields: &[String], meta_mapping: &Outpu
 }
 
 /// We currently only allow a singular ID for Mongo, this helps extracting it.
-fn pick_singular_id(model: &ModelRef) -> ScalarFieldRef {
+fn pick_singular_id(model: &Model) -> ScalarFieldRef {
     model
         .primary_identifier()
         .as_scalar_fields()

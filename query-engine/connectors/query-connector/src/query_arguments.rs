@@ -21,7 +21,7 @@ pub struct SkipAndLimit {
 /// a single model (e.g. the cursor projection, distinct projection, orderby, ...).
 #[derive(Clone)]
 pub struct QueryArguments {
-    pub model: ModelRef,
+    pub model: Model,
     pub cursor: Option<SelectionResult>,
     pub take: Option<i64>,
     pub skip: Option<i64>,
@@ -49,7 +49,7 @@ impl std::fmt::Debug for QueryArguments {
 }
 
 impl QueryArguments {
-    pub fn new(model: ModelRef) -> Self {
+    pub fn new(model: Model) -> Self {
         Self {
             model,
             cursor: None,
@@ -227,16 +227,16 @@ impl QueryArguments {
         }
     }
 
-    pub fn model(&self) -> &ModelRef {
+    pub fn model(&self) -> &Model {
         &self.model
     }
 }
 
-impl<T> From<(ModelRef, T)> for QueryArguments
+impl<T> From<(Model, T)> for QueryArguments
 where
     T: Into<Filter>,
 {
-    fn from(model_filter: (ModelRef, T)) -> Self {
+    fn from(model_filter: (Model, T)) -> Self {
         let mut query_arguments = Self::new(model_filter.0);
         query_arguments.filter = Some(model_filter.1.into());
         query_arguments

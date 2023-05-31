@@ -71,7 +71,7 @@ impl WriteQuery {
         }
     }
 
-    pub fn model(&self) -> ModelRef {
+    pub fn model(&self) -> Model {
         match self {
             Self::CreateRecord(q) => q.model.clone(),
             Self::CreateManyRecords(q) => q.model.clone(),
@@ -89,7 +89,7 @@ impl WriteQuery {
 
     pub fn native_upsert(
         name: String,
-        model: ModelRef,
+        model: Model,
         record_filter: RecordFilter,
         create: WriteArgs,
         update: WriteArgs,
@@ -180,13 +180,13 @@ impl ToGraphviz for WriteQuery {
 
 #[derive(Debug, Clone)]
 pub struct CreateRecord {
-    pub model: ModelRef,
+    pub model: Model,
     pub args: WriteArgs,
 }
 
 #[derive(Debug, Clone)]
 pub struct CreateManyRecords {
-    pub model: ModelRef,
+    pub model: Model,
     pub args: Vec<WriteArgs>,
     pub skip_duplicates: bool,
 }
@@ -206,27 +206,27 @@ impl CreateManyRecords {
 
 #[derive(Debug, Clone)]
 pub struct UpdateRecord {
-    pub model: ModelRef,
+    pub model: Model,
     pub record_filter: RecordFilter,
     pub args: WriteArgs,
 }
 
 #[derive(Debug, Clone)]
 pub struct UpdateManyRecords {
-    pub model: ModelRef,
+    pub model: Model,
     pub record_filter: RecordFilter,
     pub args: WriteArgs,
 }
 
 #[derive(Debug, Clone)]
 pub struct DeleteRecord {
-    pub model: ModelRef,
+    pub model: Model,
     pub record_filter: Option<RecordFilter>,
 }
 
 #[derive(Debug, Clone)]
 pub struct DeleteManyRecords {
-    pub model: ModelRef,
+    pub model: Model,
     pub record_filter: RecordFilter,
 }
 
@@ -247,7 +247,7 @@ pub struct DisconnectRecords {
 #[derive(Debug, Clone)]
 pub struct RawQuery {
     /// Model associated with the raw query, if one is necessary
-    pub model: Option<ModelRef>,
+    pub model: Option<Model>,
     /// Map of query arguments and their values
     pub inputs: HashMap<String, PrismaValue>,
     /// Hint as to what kind of query is being executed

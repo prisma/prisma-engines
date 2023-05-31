@@ -7,11 +7,10 @@ use tracing::Span;
 
 /// `INSERT` a new record to the database. Resulting an `INSERT` ast and an
 /// optional `RecordProjection` if available from the arguments or model.
-pub(crate) fn create_record(model: &ModelRef, mut args: WriteArgs, ctx: &Context<'_>) -> Insert<'static> {
+pub(crate) fn create_record(model: &Model, mut args: WriteArgs, ctx: &Context<'_>) -> Insert<'static> {
     let fields: Vec<_> = model
         .fields()
         .scalar()
-        .into_iter()
         .filter(|field| args.has_arg_for(field.db_name()))
         .collect();
 
@@ -38,7 +37,7 @@ pub(crate) fn create_record(model: &ModelRef, mut args: WriteArgs, ctx: &Context
 /// Requires `affected_fields` to be non-empty to produce valid SQL.
 #[allow(clippy::mutable_key_type)]
 pub(crate) fn create_records_nonempty(
-    model: &ModelRef,
+    model: &Model,
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
     affected_fields: &HashSet<ScalarFieldRef>,
@@ -89,7 +88,7 @@ pub(crate) fn create_records_nonempty(
 }
 
 /// `INSERT` empty records statement.
-pub(crate) fn create_records_empty(model: &ModelRef, skip_duplicates: bool, ctx: &Context<'_>) -> Insert<'static> {
+pub(crate) fn create_records_empty(model: &Model, skip_duplicates: bool, ctx: &Context<'_>) -> Insert<'static> {
     let insert: Insert<'static> = Insert::single_into(model.as_table(ctx)).into();
     let insert = insert.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
 
@@ -100,7 +99,7 @@ pub(crate) fn create_records_empty(model: &ModelRef, skip_duplicates: bool, ctx:
     }
 }
 
-pub(crate) fn build_update_and_set_query(model: &ModelRef, args: WriteArgs, ctx: &Context<'_>) -> Update<'static> {
+pub(crate) fn build_update_and_set_query(model: &Model, args: WriteArgs, ctx: &Context<'_>) -> Update<'static> {
     let scalar_fields = model.fields().scalar();
     let table = model.as_table(ctx);
     let query = args
@@ -109,7 +108,7 @@ pub(crate) fn build_update_and_set_query(model: &ModelRef, args: WriteArgs, ctx:
         .fold(Update::table(table.clone()), |acc, (field_name, val)| {
             let DatasourceFieldName(name) = field_name;
             let field = scalar_fields
-                .iter()
+                .clone()
                 .find(|f| f.db_name() == name)
                 .expect("Expected field to be valid");
 
@@ -157,7 +156,7 @@ pub(crate) fn build_update_and_set_query(model: &ModelRef, args: WriteArgs, ctx:
 
 pub(crate) fn chunk_update_with_ids(
     update: Update<'static>,
-    model: &ModelRef,
+    model: &Model,
     ids: &[&SelectionResult],
     filter_condition: ConditionTree<'static>,
     ctx: &Context<'_>,
@@ -174,7 +173,7 @@ pub(crate) fn chunk_update_with_ids(
 }
 
 pub(crate) fn delete_many(
-    model: &ModelRef,
+    model: &Model,
     ids: &[&SelectionResult],
     filter_condition: ConditionTree<'static>,
     ctx: &Context<'_>,

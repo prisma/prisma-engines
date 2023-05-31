@@ -11,7 +11,7 @@ use tracing::Span;
 pub(crate) trait SelectDefinition {
     fn into_select(
         self,
-        _: &ModelRef,
+        _: &Model,
         aggr_selections: &[RelAggregationSelection],
         ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>);
@@ -20,7 +20,7 @@ pub(crate) trait SelectDefinition {
 impl SelectDefinition for Filter {
     fn into_select(
         self,
-        model: &ModelRef,
+        model: &Model,
         aggr_selections: &[RelAggregationSelection],
         ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
@@ -32,7 +32,7 @@ impl SelectDefinition for Filter {
 impl SelectDefinition for &Filter {
     fn into_select(
         self,
-        model: &ModelRef,
+        model: &Model,
         aggr_selections: &[RelAggregationSelection],
         ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
@@ -43,7 +43,7 @@ impl SelectDefinition for &Filter {
 impl SelectDefinition for Select<'static> {
     fn into_select(
         self,
-        _: &ModelRef,
+        _: &Model,
         _: &[RelAggregationSelection],
         _ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
@@ -54,7 +54,7 @@ impl SelectDefinition for Select<'static> {
 impl SelectDefinition for QueryArguments {
     fn into_select(
         self,
-        model: &ModelRef,
+        model: &Model,
         aggr_selections: &[RelAggregationSelection],
         ctx: &Context<'_>,
     ) -> (Select<'static>, Vec<Expression<'static>>) {
@@ -106,7 +106,7 @@ impl SelectDefinition for QueryArguments {
 }
 
 pub(crate) fn get_records<T>(
-    model: &ModelRef,
+    model: &Model,
     columns: impl Iterator<Item = Column<'static>>,
     aggr_selections: &[RelAggregationSelection],
     query: T,
@@ -152,7 +152,7 @@ where
 /// Important note: Do not use the AsColumn trait here as we need to construct column references that are relative,
 /// not absolute - e.g. `SELECT "field" FROM (...)` NOT `SELECT "full"."path"."to"."field" FROM (...)`.
 pub(crate) fn aggregate(
-    model: &ModelRef,
+    model: &Model,
     selections: &[AggregationSelection],
     args: QueryArguments,
     ctx: &Context<'_>,
@@ -200,7 +200,7 @@ pub(crate) fn aggregate(
 }
 
 pub(crate) fn group_by_aggregate(
-    model: &ModelRef,
+    model: &Model,
     args: QueryArguments,
     selections: &[AggregationSelection],
     group_by: Vec<ScalarFieldRef>,
@@ -252,7 +252,7 @@ pub(crate) fn group_by_aggregate(
     }
 }
 
-fn extract_columns(model: &ModelRef, selections: &[AggregationSelection], ctx: &Context<'_>) -> Vec<Column<'static>> {
+fn extract_columns(model: &Model, selections: &[AggregationSelection], ctx: &Context<'_>) -> Vec<Column<'static>> {
     let fields: Vec<_> = selections
         .iter()
         .flat_map(|selection| match selection {

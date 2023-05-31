@@ -5,7 +5,7 @@ use crate::{
 };
 use connector::{Filter, RelationCompare};
 use itertools::Itertools;
-use prisma_models::{ModelRef, PrismaValue, RelationFieldRef, SelectionResult};
+use prisma_models::{Model, PrismaValue, RelationFieldRef, SelectionResult};
 use std::convert::TryInto;
 
 /// Handles nested disconnect cases.
@@ -16,8 +16,8 @@ pub fn nested_disconnect(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    value: ParsedInputValue,
-    child_model: &ModelRef,
+    value: ParsedInputValue<'_>,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
 
@@ -25,8 +25,8 @@ pub fn nested_disconnect(
         // Build all filters upfront.
         let filters: Vec<Filter> = utils::coerce_vec(value)
             .into_iter()
-            .map(|value: ParsedInputValue| {
-                let value: ParsedInputMap = value.try_into()?;
+            .map(|value: ParsedInputValue<'_>| {
+                let value: ParsedInputMap<'_> = value.try_into()?;
                 extract_unique_filter(value, child_model)
             })
             .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
@@ -45,7 +45,7 @@ pub fn nested_disconnect(
 
                 Filter::empty()
             } else {
-                let value: ParsedInputMap = value.try_into()?;
+                let value: ParsedInputMap<'_> = value.try_into()?;
 
                 extract_filter(value, child_model)?
             }
@@ -55,8 +55,8 @@ pub fn nested_disconnect(
             if parent_relation_field.is_list() {
                 let filters = utils::coerce_vec(value)
                     .into_iter()
-                    .map(|value: ParsedInputValue| {
-                        let value: ParsedInputMap = value.try_into()?;
+                    .map(|value: ParsedInputValue<'_>| {
+                        let value: ParsedInputMap<'_> = value.try_into()?;
                         extract_unique_filter(value, child_model)
                     })
                     .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
