@@ -15,17 +15,10 @@ use std::collections::HashMap;
 const PROVIDER_KEY: &str = "provider";
 const OUTPUT_KEY: &str = "output";
 const BINARY_TARGETS_KEY: &str = "binaryTargets";
-const EXPERIMENTAL_FEATURES_KEY: &str = "experimentalFeatures";
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
 const ENGINE_TYPE_KEY: &str = "engineType";
 
-const FIRST_CLASS_PROPERTIES: &[&str] = &[
-    PROVIDER_KEY,
-    OUTPUT_KEY,
-    BINARY_TARGETS_KEY,
-    EXPERIMENTAL_FEATURES_KEY,
-    PREVIEW_FEATURES_KEY,
-];
+const FIRST_CLASS_PROPERTIES: &[&str] = &[PROVIDER_KEY, OUTPUT_KEY, BINARY_TARGETS_KEY, PREVIEW_FEATURES_KEY];
 
 /// Load and validate Generators defined in an AST.
 pub(crate) fn load_generators_from_ast(ast_schema: &ast::SchemaAst, diagnostics: &mut Diagnostics) -> Vec<Generator> {
@@ -97,7 +90,6 @@ fn lift_generator(ast_generator: &ast::GeneratorConfig, diagnostics: &mut Diagno
     // for compatibility reasons we still accept the old experimental key
     let preview_features = args
         .get(PREVIEW_FEATURES_KEY)
-        .or_else(|| args.get(EXPERIMENTAL_FEATURES_KEY))
         .and_then(|v| coerce_array(v, &coerce::string, diagnostics).map(|arr| (arr, v.span())))
         .map(|(arr, span)| parse_and_validate_preview_features(arr, &ALL_PREVIEW_FEATURES, span, diagnostics));
 
