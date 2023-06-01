@@ -160,15 +160,20 @@ pub struct CompactedDocument {
     pub operation: Operation,
     pub keys: Vec<String>,
     name: String,
+    suffix: String,
 }
 
 impl CompactedDocument {
     pub fn single_name(&self) -> String {
-        format!("findUnique{}", self.name)
+        format!("findUnique{}{}", self.name, self.suffix)
     }
 
     pub fn plural_name(&self) -> String {
         format!("findMany{}", self.name)
+    }
+
+    pub fn reject_on_not_found(&self) -> bool {
+        self.suffix == "OrThrow"
     }
 
     /// Here be the dragons. Ay caramba!
@@ -187,7 +192,12 @@ impl CompactedDocument {
             // The name of the query should be findManyX if the first query
             // here is findUniqueX. We took care earlier the queries are all the
             // same. Otherwise we fail hard here.
-            let mut builder = Selection::with_name(selections[0].name().replacen("findUnique", "findMany", 1));
+            let mut builder = Selection::with_name(
+                selections[0]
+                    .name()
+                    .replacen("findUnique", "findMany", 1)
+                    .trim_end_matches("OrThrow"),
+            );
 
             // Take the nested selection set from the first query. We took care
             // earlier that all the nested selections are the same in every
@@ -239,7 +249,17 @@ impl CompactedDocument {
             .collect();
 
         // Saving the stub of the query name for later use.
-        let name = selections[0].name().replacen("findUnique", "", 1);
+        let name = selections[0]
+            .name()
+            .replacen("findUnique", "", 1)
+            .trim_end_matches("OrThrow")
+            .to_string();
+
+        let suffix = if selections[0].name().ends_with("OrThrow") {
+            "OrThrow".to_string()
+        } else {
+            "".to_string()
+        };
 
         // Convert the selections into a map of arguments. This defines the
         // response order and how we fetch the right data from the response set.
@@ -269,6 +289,7 @@ impl CompactedDocument {
             nested_selection,
             keys,
             operation: Operation::Read(selection),
+            suffix,
         }
     }
 }
