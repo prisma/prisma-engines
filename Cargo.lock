@@ -3162,7 +3162,6 @@ dependencies = [
  "either",
  "futures",
  "hex",
- "libsqlite3-sys",
  "lru-cache",
  "metrics 0.18.1",
  "mobc",

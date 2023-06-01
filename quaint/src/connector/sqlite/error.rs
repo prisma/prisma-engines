@@ -1,5 +1,5 @@
 use crate::error::*;
-use libsqlite3_sys as ffi;
+use rusqlite::ffi;
 use rusqlite::types::FromSqlError;
 
 impl From<rusqlite::Error> for Error {
