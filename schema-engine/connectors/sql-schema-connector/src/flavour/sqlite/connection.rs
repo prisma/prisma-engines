@@ -78,9 +78,9 @@ pub(super) fn generic_apply_migration_script(
     let conn = conn.0.lock().unwrap();
     conn.execute_batch(script).map_err(|sqlite_error: rusqlite::Error| {
         let database_error_code = match sqlite_error {
-            rusqlite::Error::SqliteFailure(rusqlite::ffi::Error { code: _, extended_code }, _)
+            rusqlite::Error::SqliteFailure(rusqlite::ffi::Error { extended_code, .. }, _)
             | rusqlite::Error::SqlInputError {
-                error: rusqlite::ffi::Error { code: _, extended_code },
+                error: rusqlite::ffi::Error { extended_code, .. },
                 ..
             } => extended_code.to_string(),
             _ => "none".to_owned(),
