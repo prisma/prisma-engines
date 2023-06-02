@@ -13,9 +13,6 @@ use quaint::{
 };
 use std::time::Duration;
 
-#[cfg(feature = "nodejs-drivers")]
-use nodejs_drivers::{pool::NodeJSPool, queryable::NodeJSQueryable};
-
 impl RuntimePool {
     /// Reserve a connection from the pool
     pub async fn check_out(&self) -> crate::Result<RuntimeConnection> {
@@ -25,10 +22,7 @@ impl RuntimePool {
                 Ok(RuntimeConnection::Rust(conn))
             }
             #[cfg(feature = "nodejs-drivers")]
-            Self::NodeJS(pool) => {
-                let conn: NodeJSQueryable = pool.nodejs_queryable.clone();
-                Ok(RuntimeConnection::NodeJS(conn))
-            }
+            Self::NodeJS(queryable) => Ok(RuntimeConnection::NodeJS(queryable.clone())),
         }
     }
 }
@@ -37,24 +31,6 @@ pub struct Mysql {
     pool: RuntimePool,
     connection_info: ConnectionInfo,
     features: psl::PreviewFeatures,
-}
-
-#[cfg(feature = "nodejs-drivers")]
-impl Mysql {
-    pub async fn from_source_and_nodejs_driver(
-        url: &str,
-        features: psl::PreviewFeatures,
-        nodejs_queryable: NodeJSQueryable,
-    ) -> connector_interface::Result<Mysql> {
-        let connection_info = get_connection_info(url)?;
-        let pool = RuntimePool::NodeJS(NodeJSPool { nodejs_queryable });
-
-        Ok(Mysql {
-            pool,
-            connection_info,
-            features: features.to_owned(),
-        })
-    }
 }
 
 impl Mysql {
@@ -80,10 +56,32 @@ fn get_connection_info(url: &str) -> connector::Result<ConnectionInfo> {
 #[async_trait]
 impl FromSource for Mysql {
     async fn from_source(
-        _source: &psl::Datasource,
+        source: &psl::Datasource,
         url: &str,
         features: psl::PreviewFeatures,
     ) -> connector_interface::Result<Mysql> {
+        if source.provider == "@prisma/mysql" {
+            #[cfg(feature = "nodejs-drivers")]
+            {
+                let queryable = nodejs_drivers::installed_driver().unwrap().clone();
+                let connection_info = get_connection_info(url)?;
+                let pool = RuntimePool::NodeJS(queryable);
+
+                return Ok(Mysql {
+                    pool,
+                    connection_info,
+                    features: features.to_owned(),
+                });
+            }
+
+            #[cfg(not(feature = "nodejs-drivers"))]
+            {
+                return Err(ConnectorError::from_kind(ErrorKind::UnsupportedConnector(
+                    "The @prisma/mysql connector requires the `nodejs-drivers` feature to be enabled.".into(),
+                )));
+            }
+        }
+
         let connection_info = get_connection_info(url)?;
 
         let mut builder = Quaint::builder(url)

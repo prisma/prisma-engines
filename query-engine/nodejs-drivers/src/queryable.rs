@@ -1,64 +1,55 @@
-#[cfg(feature = "nodejs-drivers")]
 use async_trait::async_trait;
 
-#[cfg(feature = "nodejs-drivers")]
-use crate::ctx::NodeJSFunctionContext;
+use crate::driver::Driver;
 
-#[cfg(feature = "nodejs-drivers")]
 use quaint::{
     connector::IsolationLevel,
-    prelude::{Query, Queryable, TransactionCapable},
+    prelude::{Query, Queryable as QuaintQueryable, TransactionCapable},
     visitor::{self, Visitor},
     Value,
 };
 
-#[cfg(feature = "nodejs-drivers")]
+use napi::JsObject;
+
 #[derive(Clone)]
-pub struct NodeJSQueryable {
-    pub(crate) ctx: NodeJSFunctionContext,
+pub struct Queryable {
+    pub(crate) driver: Driver,
 }
 
-#[cfg(feature = "nodejs-drivers")]
-impl NodeJSQueryable {
-    pub fn new(ctx: NodeJSFunctionContext) -> Self {
-        Self { ctx }
+impl Queryable {
+    pub fn new(driver: Driver) -> Self {
+        Self { driver }
     }
 }
 
-#[cfg(not(feature = "nodejs-drivers"))]
-// This is a dummy struct that will only be used for structural type checking.
-#[derive(Clone)]
-pub struct NodeJSQueryable;
-
-impl std::fmt::Display for NodeJSQueryable {
+impl std::fmt::Display for Queryable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "NodeJSQueryable(ctx)")
+        write!(f, "JSQueryable(driver)")
     }
 }
 
-impl std::fmt::Debug for NodeJSQueryable {
+impl std::fmt::Debug for Queryable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "NodeJSQueryable(ctx)")
+        write!(f, "JSQueryable(driver)")
     }
 }
 
-#[cfg(feature = "nodejs-drivers")]
 #[async_trait]
-impl Queryable for NodeJSQueryable {
+impl QuaintQueryable for Queryable {
     /// Execute the given query.
     async fn query(&self, q: Query<'_>) -> quaint::Result<quaint::prelude::ResultSet> {
         let (sql, params) = visitor::Mysql::build(q)?;
-        println!("NodeJSQueryable::query()");
+        println!("JSQueryable::query()");
         self.query_raw(&sql, &params).await
     }
 
     /// Execute a query given as SQL, interpolating the given parameters.
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<quaint::prelude::ResultSet> {
-        println!("NodeJSQueryable::query_raw({}, {:?})", &sql, params);
+        println!("JSQueryable::query_raw({}, {:?})", &sql, params);
 
         // Note: we ignore the parameters for now.
         // Todo: convert napi::Error to quaint::error::Error.
-        let result_set = self.ctx.query_raw(sql.to_string()).await.unwrap();
+        let result_set = self.driver.query_raw(sql.to_string()).await.unwrap();
 
         Ok(quaint::prelude::ResultSet::new(
             result_set.columns,
@@ -77,13 +68,13 @@ impl Queryable for NodeJSQueryable {
     ///
     /// NOTE: This method will eventually be removed & merged into Queryable::query_raw().
     async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<quaint::prelude::ResultSet> {
-        println!("NodeJSQueryable::query_raw()");
+        println!("JSQueryable::query_raw()");
         self.query_raw(sql, params).await
     }
 
     /// Execute the given query, returning the number of affected rows.
     async fn execute(&self, q: Query<'_>) -> quaint::Result<u64> {
-        println!("NodeJSQueryable::execute()");
+        println!("JSQueryable::execute()");
         let (sql, params) = visitor::Mysql::build(q)?;
         self.execute_raw(&sql, &params).await
     }
@@ -91,11 +82,11 @@ impl Queryable for NodeJSQueryable {
     /// Execute a query given as SQL, interpolating the given parameters and
     /// returning the number of affected rows.
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
-        println!("NodeJSQueryable::execute_raw({}, {:?})", &sql, &params);
+        println!("JSQueryable::execute_raw({}, {:?})", &sql, &params);
 
         // Note: we ignore the parameters for now.
         // Todo: convert napi::Error to quaint::error::Error.
-        let affected_rows = self.ctx.execute_raw(sql.to_string()).await.unwrap();
+        let affected_rows = self.driver.execute_raw(sql.to_string()).await.unwrap();
         Ok(affected_rows as u64)
     }
 
@@ -107,14 +98,14 @@ impl Queryable for NodeJSQueryable {
     ///
     /// NOTE: This method will eventually be removed & merged into Queryable::query_raw().
     async fn execute_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
-        println!("NodeJSQueryable::execute_raw_typed({}, {:?})", &sql, &params);
+        println!("JSQueryable::execute_raw_typed({}, {:?})", &sql, &params);
         self.execute_raw(sql, params).await
     }
 
     /// Run a command in the database, for queries that can't be run using
     /// prepared statements.
     async fn raw_cmd(&self, cmd: &str) -> quaint::Result<()> {
-        println!("NodeJSQueryable::raw_cmd({})", &cmd);
+        println!("JSQueryable::raw_cmd({})", &cmd);
         unimplemented!("raw_cmd");
     }
 
@@ -123,15 +114,15 @@ impl Queryable for NodeJSQueryable {
     /// example. The version string is returned directly without any form of
     /// parsing or normalization.
     async fn version(&self) -> quaint::Result<Option<String>> {
-        println!("NodeJSQueryable::version()");
+        println!("JSQueryable::version()");
         // Todo: convert napi::Error to quaint::error::Error.
-        let version = self.ctx.version().await.unwrap();
+        let version = self.driver.version().await.unwrap();
         Ok(version)
     }
 
     /// Returns false, if connection is considered to not be in a working state.
     fn is_healthy(&self) -> bool {
-        // TODO: use self.ctx.is_healthy()
+        // TODO: use self.driver.is_healthy()
         true
     }
 
@@ -147,5 +138,22 @@ impl Queryable for NodeJSQueryable {
     }
 }
 
-#[cfg(feature = "nodejs-drivers")]
-impl TransactionCapable for NodeJSQueryable {}
+impl TransactionCapable for Queryable {}
+
+// Global JSQueryable instance serving as a proxy to the driver implemented by NodeJSFunctionContext
+//
+// It´s unlikely that we swap implementations, nor in production code, nor in test doubles, so relying
+// on a global instance is fine.
+static QUERYABLE: once_cell::sync::OnceCell<Queryable> = once_cell::sync::OnceCell::new();
+
+pub fn install_driver(js_driver: JsObject) {
+    let driver = crate::driver::reify(js_driver).unwrap();
+    let nodejs_queryable = Queryable::new(driver);
+    QUERYABLE
+        .set(nodejs_queryable)
+        .expect("Already initialized global instance of JSQueryable");
+}
+
+pub fn installed_driver() -> Option<&'static Queryable> {
+    QUERYABLE.get()
+}

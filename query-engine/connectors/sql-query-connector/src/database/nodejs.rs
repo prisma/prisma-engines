@@ -6,14 +6,11 @@ use quaint::{
     Value,
 };
 
-#[cfg(feature = "nodejs-drivers")]
-use nodejs_drivers::{pool::NodeJSPool, queryable::NodeJSQueryable};
-
 pub enum RuntimePool {
     Rust(Quaint),
 
     #[cfg(feature = "nodejs-drivers")]
-    NodeJS(NodeJSPool),
+    NodeJS(nodejs_drivers::Queryable),
 }
 
 impl RuntimePool {
@@ -31,7 +28,7 @@ pub enum RuntimeConnection {
     Rust(PooledConnection),
 
     #[cfg(feature = "nodejs-drivers")]
-    NodeJS(NodeJSQueryable),
+    NodeJS(nodejs_drivers::Queryable),
 }
 
 #[async_trait]
@@ -132,7 +129,12 @@ impl Queryable for RuntimeConnection {
 
     /// Signals if the isolation level SET needs to happen before or after the tx BEGIN.
     fn requires_isolation_first(&self) -> bool {
-        false
+        match self {
+            Self::Rust(conn) => conn.requires_isolation_first(),
+
+            #[cfg(feature = "nodejs-drivers")]
+            Self::NodeJS(conn) => conn.requires_isolation_first(),
+        }
     }
 }
 

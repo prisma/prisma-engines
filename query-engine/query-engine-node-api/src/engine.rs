@@ -2,9 +2,7 @@ use crate::{error::ApiError, log_callback::LogCallback, logger::Logger};
 use futures::FutureExt;
 use napi::{Env, JsFunction, JsObject, JsUnknown};
 use napi_derive::napi;
-use nodejs_drivers::ctx::read_nodejs_function_ctx;
-use nodejs_drivers::queryable::NodeJSQueryable;
-use once_cell::sync::OnceCell;
+
 use psl::PreviewFeature;
 use query_core::{
     protocol::EngineProtocol,
@@ -26,8 +24,6 @@ use tokio::sync::RwLock;
 use tracing::{field, instrument::WithSubscriber, Instrument, Span};
 use tracing_subscriber::filter::LevelFilter;
 use user_facing_errors::Error;
-
-static NODEJS_QUERYABLE: OnceCell<NodeJSQueryable> = OnceCell::new();
 
 /// The main query engine used by JS
 #[napi]
@@ -161,9 +157,7 @@ impl QueryEngine {
         // Initialize the global NODEJS_QUERYABLE from fn_ctx.
         // This implies that there can only be one QueryEngine instance per process.
         if let Some(ctx) = fn_ctx {
-            let ctx = read_nodejs_function_ctx(ctx).unwrap();
-            let nodejs_queryable = NodeJSQueryable::new(ctx);
-            NODEJS_QUERYABLE.set(nodejs_queryable).unwrap();
+            nodejs_drivers::install_driver(ctx);
         }
 
         let ConstructorOptions {
@@ -277,8 +271,7 @@ impl QueryEngine {
                 let preview_features = arced_schema.configuration.preview_features();
 
                 let executor_fut = async {
-                    let nodejs_queryable = NODEJS_QUERYABLE.get();
-                    let executor = load_executor(data_source, preview_features, &url, nodejs_queryable).await?;
+                    let executor = load_executor(data_source, preview_features, &url).await?;
                     let connector = executor.primary_connector();
 
                     let conn_span = tracing::info_span!(

@@ -203,18 +203,14 @@ pub(crate) trait QueryExt {
     /// or fetch IDs from the database.
     async fn filter_selectors(
         &self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: RecordFilter,
         ctx: &Context<'_>,
     ) -> crate::Result<Vec<SelectionResult>>;
 
     /// Read the all columns as a (primary) identifier.
-    async fn filter_ids(
-        &self,
-        model: &ModelRef,
-        filter: Filter,
-        ctx: &Context<'_>,
-    ) -> crate::Result<Vec<SelectionResult>>;
+    async fn filter_ids(&self, model: &Model, filter: Filter, ctx: &Context<'_>)
+        -> crate::Result<Vec<SelectionResult>>;
 
     async fn select_ids(
         &self,

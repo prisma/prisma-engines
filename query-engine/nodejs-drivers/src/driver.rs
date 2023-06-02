@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 // "TypeError [ERR_INVALID_ARG_TYPE]: The first argument must be of type string or an instance of Buffer, ArrayBuffer, or Array or an Array-like Object. Received null".
 // See: https://github.com/napi-rs/napi-rs/issues/1521.
 #[derive(Clone)]
-pub struct NodeJSFunctionContext {
+pub struct Driver {
     /// Execute a query given as SQL, interpolating the given parameters.
     query_raw: ThreadsafeFunction<String, ErrorStrategy::Fatal>,
 
@@ -25,19 +25,20 @@ pub struct NodeJSFunctionContext {
     is_healthy: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
 }
 
-pub fn read_nodejs_function_ctx(ctx: JsObject) -> napi::Result<NodeJSFunctionContext> {
-    let query_raw = ctx.get_named_property("queryRaw")?;
-    let execute_raw = ctx.get_named_property("executeRaw")?;
-    let version = ctx.get_named_property("version")?;
-    let is_healthy = ctx.get_named_property("isHealthy")?;
+// Reify creates a rust representation of the JS driver
+pub fn reify(js_driver: JsObject) -> napi::Result<Driver> {
+    let query_raw = js_driver.get_named_property("queryRaw")?;
+    let execute_raw = js_driver.get_named_property("executeRaw")?;
+    let version = js_driver.get_named_property("version")?;
+    let is_healthy = js_driver.get_named_property("isHealthy")?;
 
-    let ctx = NodeJSFunctionContext {
+    let driver = Driver {
         query_raw,
         execute_raw,
         version,
         is_healthy,
     };
-    Ok(ctx)
+    Ok(driver)
 }
 
 #[napi(object)]
@@ -49,7 +50,7 @@ pub struct ResultSet {
     pub rows: Vec<Vec<String>>,
 }
 
-impl NodeJSFunctionContext {
+impl Driver {
     pub async fn query_raw(&self, sql: String) -> napi::Result<ResultSet> {
         println!("[rs] calling query_raw: {}", &sql);
 

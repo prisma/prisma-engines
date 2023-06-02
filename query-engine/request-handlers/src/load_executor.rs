@@ -1,4 +1,3 @@
-use nodejs_drivers::queryable::NodeJSQueryable;
 use psl::{builtin_connectors::*, Datasource, PreviewFeatures};
 use query_core::{executor::InterpretingExecutor, Connector, QueryExecutor};
 use sql_query_connector::*;
@@ -14,11 +13,10 @@ pub async fn load(
     source: &Datasource,
     features: PreviewFeatures,
     url: &str,
-    nodejs_queryable_option: Option<&NodeJSQueryable>,
 ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync + 'static>> {
     match source.active_provider {
         p if SQLITE.is_provider(p) => sqlite(source, url, features).await,
-        p if MYSQL.is_provider(p) => mysql(source, url, features, nodejs_queryable_option).await,
+        p if MYSQL.is_provider(p) => mysql(source, url, features).await,
         p if POSTGRES.is_provider(p) => postgres(source, url, features).await,
         p if MSSQL.is_provider(p) => mssql(source, url, features).await,
         p if COCKROACH.is_provider(p) => postgres(source, url, features).await,
@@ -70,18 +68,7 @@ async fn mysql(
     source: &Datasource,
     url: &str,
     features: PreviewFeatures,
-    _nodejs_queryable_option: Option<&NodeJSQueryable>,
 ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync>> {
-    trace!("Loading MySQL query connector...");
-
-    #[cfg(feature = "nodejs-drivers")]
-    if source.provider == "@prisma/mysql" {
-        let nodejs_queryable = _nodejs_queryable_option.unwrap().clone();
-        let prisma_mysql = Mysql::from_source_and_nodejs_driver(url, features, nodejs_queryable).await?;
-        trace!("Loaded @prisma/mysql query connector.");
-        return Ok(sql_executor(prisma_mysql, false));
-    }
-
     let mysql = Mysql::from_source(source, url, features).await?;
     trace!("Loaded MySQL query connector.");
     Ok(sql_executor(mysql, false))
