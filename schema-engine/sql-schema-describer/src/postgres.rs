@@ -148,7 +148,7 @@ pub enum ConstraintOption {
 pub struct PostgresSchemaExt {
     pub opclasses: Vec<(IndexColumnId, SQLOperatorClass)>,
     pub indexes: Vec<(IndexId, SqlIndexAlgorithm)>,
-    pub expression_indexes: Vec<String>,
+    pub expression_indexes: Vec<(TableId, String)>,
     pub index_null_position: HashMap<IndexColumnId, IndexNullPosition>,
     pub constraint_options: HashMap<Constraint, BitFlags<ConstraintOption>>,
     pub table_options: Vec<BTreeMap<String, String>>,
@@ -1318,8 +1318,20 @@ impl<'a> SqlSchemaDescriber<'a> {
                 return Ok(());
             }
 
+            // * Expression Indexes
             if result_rows.iter().any(|row| row.get_string("column_name").is_none()) {
-                // Todo expression idx
+                let row = result_rows.first().unwrap();
+                let namespace = row.get_expect_string("namespace");
+                let table_name = row.get_expect_string("table_name");
+                let table_id: TableId = match table_ids.get(&(namespace, table_name)) {
+                    Some(id) => *id,
+                    None => continue,
+                };
+
+                pg_ext
+                    .expression_indexes
+                    .push((table_id, row.get_expect_string("index_name")));
+
                 continue;
             }
 
@@ -1435,16 +1447,22 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 }
 
-fn group_next_index<T>(rows: &mut Vec<ResultRow>, index_rows: &mut Peekable<T>)
+fn group_next_index<T>(result_rows: &mut Vec<ResultRow>, index_rows: &mut Peekable<T>)
 where
     T: Iterator<Item = ResultRow>,
 {
-    let idx_name = match dbg!(index_rows.peek()) {
+    let idx_name = match index_rows.peek() {
         Some(idx_name) => idx_name.get_expect_string("index_name"),
         None => return,
     };
 
-    rows.extend(index_rows.take_while(|row| row.get_expect_string("index_name") == idx_name));
+    while let Some(row) = index_rows.peek() {
+        if row.get_expect_string("index_name") == idx_name {
+            result_rows.push(index_rows.next().unwrap());
+        } else {
+            return;
+        }
+    }
 }
 
 fn index_from_row(

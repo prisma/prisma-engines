@@ -23,6 +23,7 @@ CREATE INDEX index_communication_channels_on_confirmation_code ON communication_
 
 
 
+
 /*
 generator js {
   provider = "prisma-client-js"
@@ -34,6 +35,7 @@ datasource db {
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// This model contains an exression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model communication_channels {
   id                BigInt
   path              String  @db.VarChar(255)

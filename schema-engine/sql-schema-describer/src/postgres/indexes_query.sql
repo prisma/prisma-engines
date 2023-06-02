@@ -11,7 +11,6 @@ WITH rawindex AS (
     FROM pg_index -- https://www.postgresql.org/docs/current/catalog-pg-index.html
     WHERE
         indpred IS NULL -- filter out partial indexes
-        AND array_position(indkey::int2[], 0::int2) IS NULL -- filter out expression indexes
         AND NOT indisexclusion -- filter out exclusion constraints
 )
 SELECT
