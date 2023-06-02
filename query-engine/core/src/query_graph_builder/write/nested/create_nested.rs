@@ -6,27 +6,27 @@ use crate::{
     ParsedInputList, ParsedInputValue,
 };
 use connector::{Filter, IntoFilter};
-use prisma_models::{ModelRef, RelationFieldRef};
-use schema_builder::constants::args;
-use std::{convert::TryInto, sync::Arc};
+use prisma_models::{Model, RelationFieldRef};
+use schema::constants::args;
+use std::convert::TryInto;
 
 /// Handles nested create one cases.
 /// The resulting graph can take multiple forms, based on the relation type to the parent model.
 /// Information on the graph shapes can be found on the individual handlers.
 pub fn nested_create(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
+    query_schema: &QuerySchema,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    value: ParsedInputValue,
-    child_model: &ModelRef,
+    value: ParsedInputValue<'_>,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
 
     // Build all create nodes upfront.
     let creates: Vec<NodeRef> = utils::coerce_vec(value)
         .into_iter()
-        .map(|value| create::create_record_node(graph, connector_ctx, Arc::clone(child_model), value.try_into()?))
+        .map(|value| create::create_record_node(graph, query_schema, child_model.clone(), value.try_into()?))
         .collect::<QueryGraphBuilderResult<Vec<NodeRef>>>()?;
 
     if relation.is_many_to_many() {
@@ -144,7 +144,7 @@ fn handle_one_to_many(
         let parent_link = parent_relation_field.linking_fields();
         let child_link = parent_relation_field.related_field().linking_fields();
 
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
         let parent_model_name = parent_relation_field.model().name().to_owned();
         let child_model_name = parent_relation_field.related_model().name().to_owned();
 
@@ -335,7 +335,7 @@ fn handle_one_to_one(
         )
     };
 
-    let relation_name = parent_relation_field.relation().name().to_owned();
+    let relation_name = parent_relation_field.relation().name();
     let parent_model_name = extractor_model.name().to_owned();
     let child_model_name = assimilator_model.name().to_owned();
 
@@ -364,7 +364,7 @@ fn handle_one_to_one(
     // For explanation see end of doc comment.
     if relation_inlined_parent && !parent_is_create {
         let parent_model = parent_relation_field.model();
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
         let parent_model_name = parent_model.name().to_owned();
         let child_model_name = parent_relation_field.related_model().name().to_owned();
         let update_node = utils::update_records_node_placeholder(graph, Filter::empty(), parent_model);
@@ -390,7 +390,7 @@ fn handle_one_to_one(
          )?;
 
         let parent_model_identifier = parent_relation_field.model().primary_identifier();
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
         let parent_model_name = parent_relation_field.model().name().to_owned();
 
         graph.create_edge(
@@ -421,13 +421,13 @@ pub fn nested_create_many(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    value: ParsedInputValue,
-    child_model: &ModelRef,
+    value: ParsedInputValue<'_>,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     // Nested input is an object of { data: [...], skipDuplicates: bool }
-    let mut obj: ParsedInputMap = value.try_into()?;
+    let mut obj: ParsedInputMap<'_> = value.try_into()?;
 
-    let data_list: ParsedInputList = obj.remove(args::DATA).unwrap().try_into()?;
+    let data_list: ParsedInputList<'_> = utils::coerce_vec(obj.remove(args::DATA).unwrap());
     let skip_duplicates: bool = match obj.remove(args::SKIP_DUPLICATES) {
         Some(val) => val.try_into()?,
         None => false,
@@ -437,15 +437,15 @@ pub fn nested_create_many(
         .into_iter()
         .map(|data_value| {
             let data_map = data_value.try_into()?;
-            let mut args = WriteArgsParser::from(&child_model, data_map)?.args;
+            let mut args = WriteArgsParser::from(child_model, data_map)?.args;
 
-            args.add_datetimes(&child_model);
+            args.add_datetimes(child_model);
             Ok(args)
         })
         .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
 
     let query = CreateManyRecords {
-        model: Arc::clone(child_model),
+        model: child_model.clone(),
         args,
         skip_duplicates,
     };
@@ -456,7 +456,7 @@ pub fn nested_create_many(
     let linking_fields = parent_relation_field.linking_fields();
     let child_linking_fields = parent_relation_field.related_field().linking_fields();
 
-    let relation_name = parent_relation_field.relation().name().to_owned();
+    let relation_name = parent_relation_field.relation().name();
     let parent_model_name = parent_relation_field.model().name().to_owned();
     let child_model_name = child_model.name().to_owned();
 

@@ -1,133 +1,217 @@
-mod binary;
-mod direct;
-mod node_api;
+mod json_adapter;
 
-pub use binary::*;
-pub use direct::*;
-pub use node_api::*;
-use query_core::{schema::QuerySchemaRef, TxId};
+pub use json_adapter::*;
+
+use crate::{ConnectorTag, ConnectorVersion, QueryResult, TestLogCapture, TestResult, ENGINE_PROTOCOL};
+use colored::Colorize;
+use quaint::{prelude::Queryable, single::Quaint};
+use query_core::{
+    protocol::EngineProtocol,
+    schema::{self, QuerySchemaRef},
+    QueryExecutor, TransactionOptions, TxId,
+};
 use query_engine_metrics::MetricRegistry;
-
-use crate::{ConnectorTag, ConnectorVersion, QueryResult, TestError, TestLogCapture, TestResult};
-use colored::*;
+use request_handlers::{
+    load_executor, BatchTransactionOption, GraphqlBody, JsonBatchQuery, JsonBody, JsonSingleQuery, MultiQuery,
+    RequestBody, RequestHandler,
+};
+use std::{env, sync::Arc};
 
 pub type TxResult = Result<(), user_facing_errors::Error>;
 
-#[async_trait::async_trait]
-pub trait RunnerInterface: Sized {
-    /// Initializes the runner.
-    async fn load(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<Self>;
+pub(crate) type Executor = Box<dyn QueryExecutor + Send + Sync>;
 
-    /// Queries the engine.
-    async fn query(&self, query: String) -> TestResult<QueryResult>;
-
-    /// Queries the engine with a batch.
-    async fn batch(
-        &self,
-        queries: Vec<String>,
-        transaction: bool,
-        isolation_level: Option<String>,
-    ) -> TestResult<QueryResult>;
-
-    /// Execute a raw query on the underlying connected database.
-    async fn raw_execute(&self, query: String) -> TestResult<()>;
-
-    /// start a transaction for a batch run
-    async fn start_tx(
-        &self,
-        max_acquisition_millis: u64,
-        valid_for_millis: u64,
-        isolation_level: Option<String>,
-    ) -> TestResult<TxId>;
-
-    /// commit transaction
-    async fn commit_tx(&self, tx_id: TxId) -> TestResult<TxResult>;
-
-    /// rollback transaction
-    async fn rollback_tx(&self, tx_id: TxId) -> TestResult<TxResult>;
-
-    /// The connector tag used to load this runner.
-    fn connector(&self) -> &ConnectorTag;
-
-    /// Instructs this runner to use a specific ITX ID for queries.
-    fn set_active_tx(&mut self, tx_id: TxId);
-
-    /// Clears ITX ID for queries.
-    fn clear_active_tx(&mut self);
-
-    fn get_metrics(&self) -> MetricRegistry;
-
-    /// The query schema used for the test.
-    fn query_schema(&self) -> &QuerySchemaRef;
-}
-
-enum RunnerType {
-    /// Using the QE crate directly for queries.
-    Direct(DirectRunner),
-
-    /// Using a NodeJS runner.
-    NodeApi(NodeApiRunner),
-
-    /// Using the HTTP bridge
-    Binary(BinaryRunner),
-}
-
+/// Direct engine runner.
 pub struct Runner {
+    executor: Executor,
+    query_schema: QuerySchemaRef,
+    connector_tag: ConnectorTag,
+    connection_url: String,
+    current_tx_id: Option<TxId>,
+    metrics: MetricRegistry,
+    protocol: EngineProtocol,
     log_capture: TestLogCapture,
-    inner: RunnerType,
 }
 
 impl Runner {
+    pub fn prisma_dml(&self) -> &str {
+        self.query_schema.internal_data_model.schema.db.source()
+    }
+
     pub async fn load(
-        ident: &str,
         datamodel: String,
+        db_schemas: &[&str],
         connector_tag: ConnectorTag,
         metrics: MetricRegistry,
         log_capture: TestLogCapture,
     ) -> TestResult<Self> {
-        let inner = match ident {
-            "direct" => Self::direct(datamodel, connector_tag, metrics).await,
-            "node-api" => Ok(RunnerType::NodeApi(NodeApiRunner {})),
-            "binary" => Self::binary(datamodel, connector_tag, metrics).await,
-            unknown => Err(TestError::parse_error(format!("Unknown test runner '{unknown}'"))),
-        }?;
+        qe_setup::setup(&datamodel, db_schemas).await?;
 
-        Ok(Self { log_capture, inner })
+        let protocol = EngineProtocol::from(&ENGINE_PROTOCOL.to_string());
+        let schema = psl::parse_schema(datamodel).unwrap();
+        let data_source = schema.configuration.datasources.first().unwrap();
+        let url = data_source.load_url(|key| env::var(key).ok()).unwrap();
+        let executor = load_executor(data_source, schema.configuration.preview_features(), &url).await?;
+        let query_schema: QuerySchemaRef = Arc::new(schema::build(Arc::new(schema), true));
+
+        Ok(Self {
+            executor,
+            query_schema,
+            connector_tag,
+            connection_url: url,
+            current_tx_id: None,
+            metrics,
+            protocol,
+            log_capture,
+        })
     }
 
-    pub async fn query<T>(&self, gql_query: T) -> TestResult<QueryResult>
+    pub async fn query<T>(&self, query: T) -> TestResult<QueryResult>
     where
         T: Into<String>,
     {
-        let gql_query = gql_query.into();
-        tracing::debug!("Querying: {}", gql_query.clone().green());
+        let query = query.into();
 
-        let response = match &self.inner {
-            RunnerType::Direct(r) => r.query(gql_query).await,
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.query(gql_query).await,
-        }?;
+        tracing::debug!("Querying: {}", query.clone().green());
 
-        if response.failed() {
-            tracing::debug!("Response: {}", response.to_string().red());
+        let handler = RequestHandler::new(&*self.executor, &self.query_schema, self.protocol);
+
+        let request_body = match self.protocol {
+            EngineProtocol::Json => {
+                // Translate the GraphQL query to JSON
+                let json_query = JsonRequest::from_graphql(&query, self.query_schema()).unwrap();
+                println!("{}", serde_json::to_string_pretty(&json_query).unwrap().green());
+
+                RequestBody::Json(JsonBody::Single(json_query))
+            }
+            EngineProtocol::Graphql => {
+                println!("{}", query.bright_green());
+
+                RequestBody::Graphql(GraphqlBody::Single(query.into()))
+            }
+        };
+
+        let response = handler.handle(request_body, self.current_tx_id.clone(), None).await;
+
+        let result: QueryResult = match self.protocol {
+            EngineProtocol::Json => JsonResponse::from_graphql(response).into(),
+            EngineProtocol::Graphql => response.into(),
+        };
+
+        if result.failed() {
+            tracing::debug!("Response: {}", result.to_string().red());
         } else {
-            tracing::debug!("Response: {}", response.to_string().green());
+            tracing::debug!("Response: {}", result.to_string().green());
         }
 
-        Ok(response)
+        Ok(result)
     }
 
-    pub async fn raw_execute<T>(&self, sql: T) -> TestResult<()>
+    pub async fn query_json<T>(&self, query: T) -> TestResult<QueryResult>
     where
         T: Into<String>,
     {
-        let sql = sql.into();
-        tracing::debug!("Raw execute: {}", sql.clone().green());
+        let query = query.into();
 
-        match &self.inner {
-            RunnerType::Direct(r) => r.raw_execute(sql).await,
-            RunnerType::Binary(r) => r.raw_execute(sql).await,
-            RunnerType::NodeApi(_) => todo!(),
+        tracing::debug!("Querying: {}", query.clone().green());
+
+        println!("{}", query.bright_green());
+
+        let handler = RequestHandler::new(&*self.executor, &self.query_schema, EngineProtocol::Json);
+
+        let serialized_query: JsonSingleQuery = serde_json::from_str(&query).unwrap();
+        let request_body = RequestBody::Json(JsonBody::Single(serialized_query));
+
+        let result: QueryResult = handler
+            .handle(request_body, self.current_tx_id.clone(), None)
+            .await
+            .into();
+
+        if result.failed() {
+            tracing::debug!("Response: {}", result.to_string().red());
+        } else {
+            tracing::debug!("Response: {}", result.to_string().green());
+        }
+
+        Ok(result)
+    }
+
+    pub async fn raw_execute<T>(&self, query: T) -> TestResult<()>
+    where
+        T: Into<String>,
+    {
+        let query = query.into();
+        tracing::debug!("Raw execute: {}", query.clone().green());
+
+        if matches!(self.connector_tag, ConnectorTag::MongoDb(_)) {
+            panic!("raw_execute is not supported for MongoDB yet");
+        }
+
+        let conn = Quaint::new(&self.connection_url).await?;
+        conn.raw_cmd(&query).await?;
+
+        Ok(())
+    }
+
+    pub async fn batch_json(
+        &self,
+        queries: Vec<String>,
+        transaction: bool,
+        isolation_level: Option<String>,
+    ) -> TestResult<crate::QueryResult> {
+        let handler = RequestHandler::new(&*self.executor, &self.query_schema, self.protocol);
+        let body = RequestBody::Json(JsonBody::Batch(JsonBatchQuery {
+            batch: queries
+                .into_iter()
+                .map(|q| serde_json::from_str::<JsonSingleQuery>(&q).unwrap())
+                .collect(),
+            transaction: transaction.then_some(BatchTransactionOption { isolation_level }),
+        }));
+
+        let res = handler.handle(body, self.current_tx_id.clone(), None).await;
+
+        Ok(res.into())
+    }
+
+    pub async fn batch(
+        &self,
+        queries: Vec<String>,
+        transaction: bool,
+        isolation_level: Option<String>,
+    ) -> TestResult<crate::QueryResult> {
+        let handler = RequestHandler::new(&*self.executor, &self.query_schema, self.protocol);
+        let body = match self.protocol {
+            EngineProtocol::Json => {
+                // Translate the GraphQL query to JSON
+                let batch = queries
+                    .into_iter()
+                    .map(|query| JsonRequest::from_graphql(&query, self.query_schema()))
+                    .collect::<TestResult<Vec<_>>>()
+                    .unwrap();
+                let transaction_opts = match transaction {
+                    true => Some(BatchTransactionOption { isolation_level }),
+                    false => None,
+                };
+
+                println!("{}", serde_json::to_string_pretty(&batch).unwrap().green());
+
+                RequestBody::Json(JsonBody::Batch(JsonBatchQuery {
+                    batch,
+                    transaction: transaction_opts,
+                }))
+            }
+            EngineProtocol::Graphql => RequestBody::Graphql(GraphqlBody::Multi(MultiQuery::new(
+                queries.into_iter().map(Into::into).collect(),
+                transaction,
+                isolation_level,
+            ))),
+        };
+
+        let res = handler.handle(body, self.current_tx_id.clone(), None).await;
+
+        match self.protocol {
+            EngineProtocol::Json => Ok(JsonResponse::from_graphql(res).into()),
+            EngineProtocol::Graphql => Ok(res.into()),
         }
     }
 
@@ -137,109 +221,64 @@ impl Runner {
         valid_for_millis: u64,
         isolation_level: Option<String>,
     ) -> TestResult<TxId> {
-        match &self.inner {
-            RunnerType::Direct(r) => {
-                r.start_tx(max_acquisition_millis, valid_for_millis, isolation_level)
-                    .await
-            }
-            RunnerType::Binary(r) => {
-                r.start_tx(max_acquisition_millis, valid_for_millis, isolation_level)
-                    .await
-            }
-            RunnerType::NodeApi(_) => todo!(),
-        }
+        let tx_opts = TransactionOptions::new(max_acquisition_millis, valid_for_millis, isolation_level);
+
+        let id = self
+            .executor
+            .start_tx(self.query_schema.clone(), self.protocol, tx_opts)
+            .await?;
+        Ok(id)
     }
 
     pub async fn commit_tx(&self, tx_id: TxId) -> TestResult<TxResult> {
-        match &self.inner {
-            RunnerType::Direct(r) => r.commit_tx(tx_id).await,
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.commit_tx(tx_id).await,
+        let res = self.executor.commit_tx(tx_id).await;
+
+        if let Err(error) = res {
+            Ok(Err(error.into()))
+        } else {
+            Ok(Ok(()))
         }
     }
 
     pub async fn rollback_tx(&self, tx_id: TxId) -> TestResult<TxResult> {
-        match &self.inner {
-            RunnerType::Direct(r) => r.rollback_tx(tx_id).await,
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.rollback_tx(tx_id).await,
+        let res = self.executor.rollback_tx(tx_id).await;
+
+        if let Err(error) = res {
+            Ok(Err(error.into()))
+        } else {
+            Ok(Ok(()))
         }
     }
 
-    pub async fn batch(
-        &self,
-        queries: Vec<String>,
-        transaction: bool,
-        isolation_level: Option<String>,
-    ) -> TestResult<QueryResult> {
-        match &self.inner {
-            RunnerType::Direct(r) => r.batch(queries, transaction, isolation_level).await,
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.batch(queries, transaction, isolation_level).await,
-        }
+    pub fn connector(&self) -> &crate::ConnectorTag {
+        &self.connector_tag
     }
 
-    async fn direct(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<RunnerType> {
-        let runner = DirectRunner::load(datamodel, connector_tag, metrics).await?;
-
-        Ok(RunnerType::Direct(runner))
-    }
-
-    async fn binary(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -> TestResult<RunnerType> {
-        let runner = BinaryRunner::load(datamodel, connector_tag, metrics).await?;
-
-        Ok(RunnerType::Binary(runner))
-    }
-
-    pub fn connector(&self) -> &ConnectorTag {
-        match &self.inner {
-            RunnerType::Direct(r) => r.connector(),
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.connector(),
-        }
-    }
-
-    pub fn connector_version(&self) -> ConnectorVersion {
-        match &self.inner {
-            RunnerType::Direct(r) => ConnectorVersion::from(r.connector()),
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => ConnectorVersion::from(r.connector()),
-        }
-    }
-
-    pub fn set_active_tx(&mut self, tx_id: TxId) {
-        match &mut self.inner {
-            RunnerType::Direct(r) => r.set_active_tx(tx_id),
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.set_active_tx(tx_id),
-        }
+    pub fn set_active_tx(&mut self, tx_id: query_core::TxId) {
+        self.current_tx_id = Some(tx_id);
     }
 
     pub fn clear_active_tx(&mut self) {
-        match &mut self.inner {
-            RunnerType::Direct(r) => r.clear_active_tx(),
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.clear_active_tx(),
-        }
+        self.current_tx_id = None;
     }
 
     pub fn get_metrics(&self) -> MetricRegistry {
-        match &self.inner {
-            RunnerType::Direct(r) => r.get_metrics(),
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.get_metrics(),
-        }
+        self.metrics.clone()
+    }
+
+    pub fn query_schema(&self) -> &QuerySchemaRef {
+        &self.query_schema
     }
 
     pub async fn get_logs(&mut self) -> Vec<String> {
         self.log_capture.get_logs().await
     }
 
-    pub fn query_schema(&self) -> &QuerySchemaRef {
-        match &self.inner {
-            RunnerType::Direct(r) => r.query_schema(),
-            RunnerType::NodeApi(_) => todo!(),
-            RunnerType::Binary(r) => r.query_schema(),
-        }
+    pub fn connector_version(&self) -> ConnectorVersion {
+        ConnectorVersion::from(self.connector())
+    }
+
+    pub fn protocol(&self) -> EngineProtocol {
+        self.protocol
     }
 }

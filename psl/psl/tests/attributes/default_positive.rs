@@ -1,196 +1,205 @@
+use psl::parser_database::ScalarType;
+
 use crate::common::*;
 
 #[test]
 fn should_set_default_for_all_scalar_types() {
-    let dml = r#"
-    datasource test {
-        provider = "postgresql"
-        url = "postgresql://"
-    }
+    let dml = indoc! {r#"
+        datasource test {
+          provider = "postgresql"
+          url = "postgresql://"
+        }
 
-    generator js {
-        provider = "prisma-client-js"
-    }
+        generator js {
+          provider = "prisma-client-js"
+        }
 
-    model Model {
-        id Int @id
-        int Int @default(3)
-        float Float @default(3.20)
-        string String @default("String")
-        boolean Boolean @default(false)
-        dateTime DateTime @default("2019-06-17T14:20:57Z")
-        bytes    Bytes @default("aGVsbG8gd29ybGQ=")
-        json     Json  @default("{ \"a\": [\"b\"] }")
-        decimal  Decimal  @default("121.10299000124800000001")
-    }
-    "#;
+        model Model {
+          id Int @id
+          int Int @default(3)
+          float Float @default(3.20)
+          string String @default("String")
+          boolean Boolean @default(false)
+          dateTime DateTime @default("2019-06-17T14:20:57Z")
+          bytes    Bytes @default("aGVsbG8gd29ybGQ=")
+          json     Json  @default("{ \"a\": [\"b\"] }")
+          decimal  Decimal  @default("121.10299000124800000001")
+        }
+    "#};
 
-    let datamodel = parse(dml);
-    let user_model = datamodel.assert_has_model("Model");
-    user_model
+    let datamodel = psl::parse_schema(dml).unwrap();
+    let model = datamodel.assert_has_model("Model");
+
+    model
         .assert_has_scalar_field("int")
-        .assert_base_type(&ScalarType::Int)
-        .assert_default_value(DefaultValue::new_single(PrismaValue::Int(3)));
-    user_model
+        .assert_scalar_type(ScalarType::Int)
+        .assert_default_value()
+        .assert_int(3);
+
+    model
         .assert_has_scalar_field("float")
-        .assert_base_type(&ScalarType::Float);
+        .assert_scalar_type(ScalarType::Float);
 
-    user_model
+    model
         .assert_has_scalar_field("string")
-        .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::new_single(PrismaValue::String(String::from("String"))));
-    user_model
-        .assert_has_scalar_field("boolean")
-        .assert_base_type(&ScalarType::Boolean)
-        .assert_default_value(DefaultValue::new_single(PrismaValue::Boolean(false)));
-    user_model
-        .assert_has_scalar_field("dateTime")
-        .assert_base_type(&ScalarType::DateTime);
+        .assert_scalar_type(ScalarType::String)
+        .assert_default_value()
+        .assert_string("String");
 
-    user_model
+    model
+        .assert_has_scalar_field("boolean")
+        .assert_scalar_type(ScalarType::Boolean)
+        .assert_default_value()
+        .assert_bool(false);
+
+    model
+        .assert_has_scalar_field("dateTime")
+        .assert_scalar_type(ScalarType::DateTime);
+
+    model
         .assert_has_scalar_field("bytes")
-        .assert_base_type(&ScalarType::Bytes)
-        .assert_default_value(DefaultValue::new_single(PrismaValue::Bytes(b"hello world".to_vec())));
-    user_model
+        .assert_scalar_type(ScalarType::Bytes)
+        .assert_default_value()
+        .assert_bytes(b"hello world");
+
+    model
         .assert_has_scalar_field("json")
-        .assert_base_type(&ScalarType::Json)
-        .assert_default_value(DefaultValue::new_single(PrismaValue::Json(
-            r#"{ "a": ["b"] }"#.to_owned(),
-        )));
-    user_model
+        .assert_scalar_type(ScalarType::Json)
+        .assert_default_value()
+        .assert_string(r#"{ "a": ["b"] }"#);
+
+    model
         .assert_has_scalar_field("decimal")
-        .assert_base_type(&ScalarType::Decimal)
-        .assert_default_value(DefaultValue::new_single(PrismaValue::Float(
-            r#"121.10299000124800000001"#.parse().unwrap(),
-        )));
+        .assert_scalar_type(ScalarType::Decimal)
+        .assert_default_value()
+        .assert_decimal(r#"121.10299000124800000001"#);
 }
 
 #[test]
 fn should_set_default_an_enum_type() {
-    let dml = r#"
-    model Model {
-        id Int @id
-        role Role @default(A_VARIANT_WITH_UNDERSCORES)
-    }
+    let dml = indoc! {r#"
+        model Model {
+          id Int @id
+          role Role @default(A_VARIANT_WITH_UNDERSCORES)
+        }
 
-    enum Role {
-        ADMIN
-        MODERATOR
-        A_VARIANT_WITH_UNDERSCORES
-    }
-    "#;
+        enum Role {
+          ADMIN
+          MODERATOR
+          A_VARIANT_WITH_UNDERSCORES
+        }
+    "#};
 
-    let datamodel = parse(dml);
-    let user_model = datamodel.assert_has_model("Model");
-    user_model
+    psl::parse_schema(dml)
+        .unwrap()
+        .assert_has_model("Model")
         .assert_has_scalar_field("role")
-        .assert_enum_type("Role")
-        .assert_default_value(DefaultValue::new_single(PrismaValue::Enum(String::from(
-            "A_VARIANT_WITH_UNDERSCORES",
-        ))));
+        .assert_default_value()
+        .assert_constant("A_VARIANT_WITH_UNDERSCORES");
 }
 
 #[test]
 fn should_set_default_on_remapped_enum_type() {
-    let dml = r#"
-    model Model {
-        id Int @id
-        role Role @default(A_VARIANT_WITH_UNDERSCORES)
-    }
+    let dml = indoc! {r#"
+        model Model {
+          id Int @id
+          role Role @default(A_VARIANT_WITH_UNDERSCORES)
+        }
 
-    enum Role {
-        ADMIN
-        MODERATOR
-        A_VARIANT_WITH_UNDERSCORES @map("A VARIANT WITH UNDERSCORES")
-    }
-    "#;
+        enum Role {
+          ADMIN
+          MODERATOR
+          A_VARIANT_WITH_UNDERSCORES @map("A VARIANT WITH UNDERSCORES")
+        }
+    "#};
 
-    let datamodel = parse(dml);
-    let user_model = datamodel.assert_has_model("Model");
-    user_model
+    psl::parse_schema(dml)
+        .unwrap()
+        .assert_has_model("Model")
         .assert_has_scalar_field("role")
-        .assert_enum_type("Role")
-        .assert_default_value(DefaultValue::new_single(PrismaValue::Enum(String::from(
-            "A_VARIANT_WITH_UNDERSCORES",
-        ))));
+        .assert_default_value()
+        .assert_constant("A_VARIANT_WITH_UNDERSCORES");
 }
 
 #[test]
 fn db_generated_function_must_work_for_enum_fields() {
-    let dml = r#"
-    model Model {
-        id Int @id
-        role Role @default(dbgenerated("ADMIN"))
-    }
+    let dml = indoc! {r#"
+        model Model {
+          id Int @id
+          role Role @default(dbgenerated("ADMIN"))
+        }
 
-    enum Role {
-        ADMIN
-        MODERATOR
-    }
-    "#;
+        enum Role {
+          ADMIN
+          MODERATOR
+        }
+    "#};
 
-    let datamodel = parse(dml);
-    let user_model = datamodel.assert_has_model("Model");
-
-    user_model
+    psl::parse_schema(dml)
+        .unwrap()
+        .assert_has_model("Model")
         .assert_has_scalar_field("role")
-        .assert_enum_type("Role")
-        .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_dbgenerated(
-            "ADMIN".to_string(),
-        )));
+        .assert_default_value()
+        .assert_dbgenerated("ADMIN");
 }
 
 #[test]
 fn named_default_constraints_should_work_on_sql_server() {
     let dml = indoc! { r#"
         datasource test {
-            provider = "sqlserver"
-            url = "sqlserver://"
+          provider = "sqlserver"
+          url = "sqlserver://"
         }
 
         generator js {
-            provider = "prisma-client-js"
+          provider = "prisma-client-js"
         }
 
         model A {
-            id Int @id @default(autoincrement())
-            data String @default("beeb buub", map: "meow")
+          id Int @id @default(autoincrement())
+          data String @default("beeb buub", map: "meow")
         }
     "#};
 
-    let mut expected_default = DefaultValue::new_single(PrismaValue::String(String::from("beeb buub")));
-    expected_default.set_db_name("meow");
-
-    parse(dml)
+    psl::parse_schema(dml)
+        .unwrap()
         .assert_has_model("A")
         .assert_has_scalar_field("data")
-        .assert_default_value(expected_default);
+        .assert_default_value()
+        .assert_string("beeb buub")
+        .assert_mapped_name("meow");
 }
 
 #[test]
 fn string_literals_with_double_quotes_work() {
-    let schema = r#"
+    let schema = indoc! {r#"
         model Test {
-            id   String @id @default("abcd")
-            name String @default("ab\"c\"d")
-            name2 String @default("\"")
+          id   String @id @default("abcd")
+          name String @default("ab\"c\"d")
+          name2 String @default("\"")
         }
-    "#;
+    "#};
 
-    let datamodel = parse(schema);
-    let test_model = datamodel.assert_has_model("Test");
+    let schema = psl::parse_schema(schema).unwrap();
+    let test_model = schema.assert_has_model("Test");
+
     test_model
         .assert_has_scalar_field("id")
-        .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::new_single(PrismaValue::String(String::from("abcd"))));
+        .assert_scalar_type(ScalarType::String)
+        .assert_default_value()
+        .assert_string("abcd");
+
     test_model
         .assert_has_scalar_field("name")
-        .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::new_single(PrismaValue::String(String::from("ab\"c\"d"))));
+        .assert_scalar_type(ScalarType::String)
+        .assert_default_value()
+        .assert_string("ab\"c\"d");
+
     test_model
         .assert_has_scalar_field("name2")
-        .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::new_single(PrismaValue::String(String::from("\""))));
+        .assert_scalar_type(ScalarType::String)
+        .assert_default_value()
+        .assert_string("\"");
 }
 
 #[test]
@@ -206,12 +215,12 @@ fn mongodb_auto_id() {
         }
     "#};
 
-    let datamodel = parse(dml);
-
-    datamodel
+    psl::parse_schema(dml)
+        .unwrap()
         .assert_has_model("a")
         .assert_has_scalar_field("id")
-        .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_auto()));
+        .assert_default_value()
+        .assert_auto();
 }
 
 #[test]

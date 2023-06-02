@@ -3,8 +3,12 @@ use prisma_models::Model;
 use quaint::ast::{Column, Table};
 
 pub(crate) fn db_name_with_schema(model: &Model, ctx: &Context<'_>) -> Table<'static> {
-    let schema_prefix = model.schema_name().unwrap_or_else(|| ctx.schema_name().to_owned());
-    let model_db_name = model.db_name().to_string();
+    let schema_prefix = model
+        .walker()
+        .schema_name()
+        .map(ToOwned::to_owned)
+        .unwrap_or_else(|| ctx.schema_name().to_owned());
+    let model_db_name = model.db_name().to_owned();
     (schema_prefix, model_db_name).into()
 }
 
@@ -25,8 +29,12 @@ impl AsTable for Model {
 
         let table = table.add_unique_index(id_cols);
 
-        self.unique_indexes().into_iter().fold(table, |table, index| {
-            let index: Vec<Column<'static>> = index.fields().as_columns(ctx).collect();
+        self.unique_indexes().fold(table, |table, index| {
+            let fields: Vec<_> = index
+                .fields()
+                .map(|f| prisma_models::ScalarFieldRef::from((self.dm.clone(), f)))
+                .collect();
+            let index: Vec<Column<'static>> = fields.as_columns(ctx).collect();
             table.add_unique_index(index)
         })
     }

@@ -18,16 +18,16 @@ fn map_attribute() {
     }
     "#;
 
-    let schema = parse(dml);
-    let user_model = schema.assert_has_model("User").assert_with_db_name("user");
-    user_model
-        .assert_has_scalar_field("firstName")
-        .assert_with_db_name("first_name");
+    let schema = psl::parse_schema(dml).unwrap();
 
-    let post_model = schema.assert_has_model("Post").assert_with_db_name("posti");
-    post_model
-        .assert_has_scalar_field("text")
-        .assert_with_db_name("post_text");
+    let user = schema.assert_has_model("User");
+    user.assert_mapped_name("user");
+    user.assert_has_scalar_field("firstName")
+        .assert_mapped_name("first_name");
+
+    let post = schema.assert_has_model("Post");
+    post.assert_mapped_name("posti");
+    post.assert_has_scalar_field("text").assert_mapped_name("post_text");
 }
 
 #[test]
@@ -43,7 +43,9 @@ fn map_on_composite_type_field() {
         }
    "#;
 
-    let schema = parse(dml);
-    let address_type = &schema.composite_types[0];
-    assert_eq!(address_type.fields[0].database_name.as_deref(), Some("full_name"));
+    psl::parse_schema(dml)
+        .unwrap()
+        .assert_has_type("Address")
+        .assert_has_scalar_field("fullName")
+        .assert_mapped_name("full_name");
 }

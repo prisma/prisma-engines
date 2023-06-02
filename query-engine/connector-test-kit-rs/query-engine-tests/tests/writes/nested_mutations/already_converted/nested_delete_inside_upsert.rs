@@ -796,7 +796,8 @@ mod delete_inside_upsert {
 
         assert_error!(
             runner,
-            format!(r#"mutation {{
+            format!(
+                r#"mutation {{
               upsertOneParent(
               where: {parent}
               update:{{
@@ -808,9 +809,10 @@ mod delete_inside_upsert {
                   c
                 }}
               }}
-            }}"#),
+            }}"#
+            ),
             2009,
-            "`Mutation.upsertOneParent.update.ParentUpdateInput.childReq.ChildUpdateOneRequiredWithoutParentsOptNestedInput.delete`: Field does not exist on enclosing type."
+            "Field does not exist in enclosing type."
         );
 
         Ok(())
@@ -849,7 +851,8 @@ mod delete_inside_upsert {
 
         assert_error!(
             runner,
-            format!(r#"mutation {{
+            format!(
+                r#"mutation {{
               upsertOneParent(
               where: {parent}
               update:{{
@@ -861,9 +864,10 @@ mod delete_inside_upsert {
                   c
                 }}
               }}
-            }}"#),
+            }}"#
+            ),
             2009,
-            "`Mutation.upsertOneParent.update.ParentUpdateInput.childReq.ChildUpdateOneRequiredWithoutParentsOptNestedInput.delete`: Field does not exist on enclosing type."
+            "Field does not exist in enclosing type."
         );
 
         Ok(())

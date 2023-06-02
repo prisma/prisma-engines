@@ -3,13 +3,17 @@ mod validations;
 
 pub use native_types::MySqlType;
 
+use crate::completions;
 use enumflags2::BitFlags;
+use lsp_types::CompletionList;
 use psl_core::{
     datamodel_connector::{
-        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
+        Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, NativeTypeConstructor,
+        NativeTypeInstance, RelationMode,
     },
     diagnostics::{DatamodelError, Diagnostics, Span},
     parser_database::{walkers, ReferentialAction, ScalarType},
+    PreviewFeature,
 };
 use MySqlType::*;
 
@@ -22,39 +26,40 @@ const TEXT_TYPE_NAME: &str = "Text";
 const MEDIUM_TEXT_TYPE_NAME: &str = "MediumText";
 const LONG_TEXT_TYPE_NAME: &str = "LongText";
 
-const CAPABILITIES: &[ConnectorCapability] = &[
-    ConnectorCapability::Enums,
-    ConnectorCapability::EnumArrayPush,
-    ConnectorCapability::Json,
-    ConnectorCapability::AutoIncrementAllowedOnNonId,
-    ConnectorCapability::RelationFieldsInArbitraryOrder,
-    ConnectorCapability::CreateMany,
-    ConnectorCapability::WritableAutoincField,
-    ConnectorCapability::CreateSkipDuplicates,
-    ConnectorCapability::UpdateableId,
-    ConnectorCapability::JsonFiltering,
-    ConnectorCapability::JsonFilteringJsonPath,
-    ConnectorCapability::JsonFilteringAlphanumeric,
-    ConnectorCapability::CreateManyWriteableAutoIncId,
-    ConnectorCapability::AutoIncrement,
-    ConnectorCapability::CompoundIds,
-    ConnectorCapability::AnyId,
-    ConnectorCapability::SqlQueryRaw,
-    ConnectorCapability::NamedForeignKeys,
-    ConnectorCapability::AdvancedJsonNullability,
-    ConnectorCapability::IndexColumnLengthPrefixing,
-    ConnectorCapability::MultiSchema,
-    ConnectorCapability::FullTextIndex,
-    ConnectorCapability::FullTextSearchWithIndex,
-    ConnectorCapability::MultipleFullTextAttributesPerModel,
-    ConnectorCapability::ImplicitManyToManyRelation,
-    ConnectorCapability::DecimalType,
-    ConnectorCapability::OrderByNullsFirstLast,
-    ConnectorCapability::SupportsTxIsolationReadUncommitted,
-    ConnectorCapability::SupportsTxIsolationReadCommitted,
-    ConnectorCapability::SupportsTxIsolationRepeatableRead,
-    ConnectorCapability::SupportsTxIsolationSerializable,
-];
+const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
+    Enums |
+    EnumArrayPush |
+    Json |
+    AutoIncrementAllowedOnNonId |
+    RelationFieldsInArbitraryOrder |
+    CreateMany |
+    WritableAutoincField |
+    CreateSkipDuplicates |
+    UpdateableId |
+    JsonFiltering |
+    JsonFilteringJsonPath |
+    JsonFilteringAlphanumeric |
+    CreateManyWriteableAutoIncId |
+    AutoIncrement |
+    CompoundIds |
+    AnyId |
+    SqlQueryRaw |
+    NamedForeignKeys |
+    AdvancedJsonNullability |
+    IndexColumnLengthPrefixing |
+    MultiSchema |
+    FullTextIndex |
+    FullTextSearchWithIndex |
+    MultipleFullTextAttributesPerModel |
+    ImplicitManyToManyRelation |
+    DecimalType |
+    OrderByNullsFirstLast |
+    FilteredInlineChildNestedToOneDisconnect |
+    SupportsTxIsolationReadUncommitted |
+    SupportsTxIsolationReadCommitted |
+    SupportsTxIsolationRepeatableRead |
+    SupportsTxIsolationSerializable
+});
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalForeignKey, ConstraintScope::ModelKeyIndex];
 
@@ -81,7 +86,11 @@ impl Connector for MySqlDatamodelConnector {
         "MySQL"
     }
 
-    fn capabilities(&self) -> &'static [ConnectorCapability] {
+    fn is_provider(&self, name: &str) -> bool {
+        name == "mysql" || name == "@prisma/mysql"
+    }
+
+    fn capabilities(&self) -> ConnectorCapabilities {
         CAPABILITIES
     }
 
@@ -258,5 +267,16 @@ impl Connector for MySqlDatamodelConnector {
         }
 
         Ok(())
+    }
+
+    fn datasource_completions(&self, config: &psl_core::Configuration, completion_list: &mut CompletionList) {
+        let ds = match config.datasources.first() {
+            Some(ds) => ds,
+            None => return,
+        };
+
+        if config.preview_features().contains(PreviewFeature::MultiSchema) && !ds.schemas_defined() {
+            completions::schemas_completion(completion_list);
+        }
     }
 }

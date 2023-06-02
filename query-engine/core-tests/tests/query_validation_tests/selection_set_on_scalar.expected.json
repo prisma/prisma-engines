@@ -1,0 +1,13 @@
+{
+  "is_panic": false,
+  "message": "Cannot select over scalar field 'email'",
+  "meta": {
+    "kind": "SelectionSetOnScalar",
+    "fieldName": "email",
+    "selectionPath": [
+      "findManyUser",
+      "email"
+    ]
+  },
+  "error_code": "P2009"
+}

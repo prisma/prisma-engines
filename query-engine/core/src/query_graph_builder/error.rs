@@ -1,5 +1,6 @@
-use crate::{QueryGraphError, QueryParserError};
+use crate::QueryGraphError;
 use prisma_models::{DomainError, RelationFieldRef};
+use user_facing_errors::query_engine::validation::ValidationError;
 
 #[derive(Debug)]
 pub enum QueryGraphBuilderError {
@@ -19,7 +20,7 @@ pub enum QueryGraphBuilderError {
     },
 
     /// Wraps the initial parsing stage errors.
-    QueryParserError(QueryParserError),
+    QueryParserError(ValidationError),
 
     /// Wraps transformation errors from the prisma models.
     DomainError(DomainError),
@@ -58,11 +59,13 @@ impl From<RelationFieldRef> for RelationViolation {
 impl From<&RelationFieldRef> for RelationViolation {
     fn from(rf: &RelationFieldRef) -> Self {
         let relation = rf.relation();
+        let relation_name = relation.name();
+        let [model_a_name, model_b_name] = relation.walker().models().map(|m| rf.dm.walk(m).name().to_owned());
 
         Self {
-            relation_name: relation.name().to_owned(),
-            model_a_name: relation.model_a().name().to_owned(),
-            model_b_name: relation.model_b().name().to_owned(),
+            relation_name,
+            model_a_name,
+            model_b_name,
         }
     }
 }
@@ -73,8 +76,8 @@ impl From<DomainError> for QueryGraphBuilderError {
     }
 }
 
-impl From<QueryParserError> for QueryGraphBuilderError {
-    fn from(err: QueryParserError) -> Self {
+impl From<ValidationError> for QueryGraphBuilderError {
+    fn from(err: ValidationError) -> Self {
         QueryGraphBuilderError::QueryParserError(err)
     }
 }

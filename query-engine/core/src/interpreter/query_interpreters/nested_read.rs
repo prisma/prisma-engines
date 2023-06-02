@@ -4,11 +4,10 @@ use connector::{
     self, filter::Filter, ConditionListValue, ConnectionLike, QueryArguments, RelAggregationRow,
     RelAggregationSelection, ScalarCompare,
 };
-use prisma_models::{FieldSelection, ManyRecords, Record, RelationFieldRef, SelectionResult};
-use prisma_value::PrismaValue;
+use prisma_models::{FieldSelection, ManyRecords, PrismaValue, Record, RelationFieldRef, SelectionResult};
 use std::collections::HashMap;
 
-pub async fn m2m(
+pub(crate) async fn m2m(
     tx: &mut dyn ConnectionLike,
     query: &RelatedRecordsQuery,
     parent_result: Option<&ManyRecords>,
@@ -175,9 +174,7 @@ pub async fn one2m(
         match link_mapping.get_mut(&link_values) {
             Some(records) => records.push(id),
             None => {
-                let mut ids = Vec::new();
-
-                ids.push(id);
+                let ids = vec![id];
                 uniq_selections.push(link_values.clone());
                 link_mapping.insert(link_values, ids);
             }

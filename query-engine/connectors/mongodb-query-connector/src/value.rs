@@ -70,12 +70,12 @@ fn convert_composite_object(cf: &CompositeFieldRef, pairs: Vec<(String, PrismaVa
     let mut doc = Document::new();
 
     for (field, value) in pairs {
-        let field = cf
-            .typ
+        let composite_type = cf.typ();
+        let field = composite_type
             .find_field(&field) // Todo: This is assuming a lot by only checking the prisma names, not DB names.
             .expect("Writing unavailable composite field.");
 
-        let converted = (field, value).into_bson()?;
+        let converted = (&field, value).into_bson()?;
 
         doc.insert(field.db_name(), converted);
     }
@@ -103,7 +103,7 @@ impl IntoBson for (&FilterPrefix, &RelationFieldRef) {
     fn into_bson(self) -> crate::Result<Bson> {
         let (prefix, rf) = self;
 
-        Ok(Bson::String(prefix.render_with(rf.relation().name().to_owned())))
+        Ok(Bson::String(prefix.render_with(rf.relation().name())))
     }
 }
 
@@ -111,13 +111,14 @@ impl IntoBson for (&ScalarFieldRef, PrismaValue) {
     fn into_bson(self) -> crate::Result<Bson> {
         let (sf, value) = self;
 
-        let mongo_type: Option<&MongoDbType> = sf.native_type().map(|nt| nt.deserialize_native_type());
+        let nt = sf.native_type();
+        let mongo_type: Option<MongoDbType> = nt.map(|nt| nt.deserialize_native_type::<MongoDbType>().to_owned());
 
         // If we have a native type, use that one as source of truth for mapping, else use the type ident for defaults.
         match (mongo_type, &sf.type_identifier(), value) {
             // We assume this is always valid if it arrives here.
             (_, _, PrismaValue::Null) => Ok(Bson::Null),
-            (Some(mt), _, value) => (mt, value).into_bson(),
+            (Some(mt), _, value) => (&mt, value).into_bson(),
             (_, field_type, value) => (field_type, value).into_bson(),
         }
     }
@@ -128,7 +129,7 @@ impl IntoBson for (&MongoDbType, PrismaValue) {
     fn into_bson(self) -> crate::Result<Bson> {
         Ok(match self {
             // ObjectId
-            (MongoDbType::ObjectId, PrismaValue::String(s)) => Bson::ObjectId(ObjectId::parse_str(&s)?),
+            (MongoDbType::ObjectId, PrismaValue::String(s)) => Bson::ObjectId(ObjectId::parse_str(s)?),
             (MongoDbType::ObjectId, PrismaValue::Bytes(b)) => {
                 if b.len() != 12 {
                     return Err(MongoError::MalformedObjectId(format!(
@@ -270,7 +271,6 @@ impl IntoBson for (&TypeIdentifier, PrismaValue) {
             ),
 
             // Unhandled mappings
-            (TypeIdentifier::Xml, _) => return Err(MongoError::Unsupported("Mongo doesn't support XML.".to_owned())),
             (TypeIdentifier::Unsupported, _) => unreachable!("Unsupported types should never hit the connector."),
 
             (ident, val) => {

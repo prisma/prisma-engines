@@ -1,0 +1,14 @@
+{
+    "action": "findMany",
+    "modelName": "User",
+    "query": {
+        "arguments": {
+            "where": {
+                "id": "a22b8732-be32-4a30-9b38-78843aaa48f8"
+            }
+        },
+        "selection": {
+            "$scalars": true
+        }
+    }
+}

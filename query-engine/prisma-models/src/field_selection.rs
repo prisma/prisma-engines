@@ -1,11 +1,10 @@
-use std::fmt::Display;
-
 use crate::{
-    parent_container::ParentContainer, CompositeFieldRef, DomainError, Field, PrismaValueExtensions, RelationField,
+    parent_container::ParentContainer, prisma_value_ext::PrismaValueExtensions, CompositeFieldRef, DomainError, Field,
     ScalarFieldRef, SelectionResult,
 };
 use itertools::Itertools;
 use prisma_value::PrismaValue;
+use std::fmt::Display;
 
 /// A selection of fields from a model.
 #[derive(Debug, Clone, PartialEq, Default, Hash, Eq)]
@@ -26,9 +25,9 @@ impl FieldSelection {
     /// Recurses into composite selections and ensures that composite selections are supersets as well.
     pub fn is_superset_of(&self, other: &Self) -> bool {
         other.selections.iter().all(|selection| match selection {
-            SelectedField::Scalar(sf) => self.contains(&sf.name),
+            SelectedField::Scalar(sf) => self.contains(sf.name()),
             SelectedField::Composite(other_cs) => self
-                .get(&other_cs.field.name)
+                .get(other_cs.field.name())
                 .and_then(|selection| selection.as_composite())
                 .map(|cs| cs.is_superset_of(other_cs))
                 .unwrap_or(false),
@@ -78,7 +77,7 @@ impl FieldSelection {
                 SelectedField::Scalar(sf) => Some(sf.clone()),
                 SelectedField::Composite(_) => None,
             })
-            .collect_vec();
+            .collect::<Vec<_>>();
 
         if scalar_fields.len() == self.selections.len() {
             Some(scalar_fields)
@@ -153,8 +152,8 @@ pub enum SelectedField {
 impl SelectedField {
     pub fn prisma_name(&self) -> &str {
         match self {
-            SelectedField::Scalar(sf) => &sf.name,
-            SelectedField::Composite(cf) => &cf.field.name,
+            SelectedField::Scalar(sf) => sf.name(),
+            SelectedField::Composite(cf) => cf.field.name(),
         }
     }
 
@@ -172,7 +171,7 @@ impl SelectedField {
         }
     }
 
-    pub fn container(&self) -> &ParentContainer {
+    pub fn container(&self) -> ParentContainer {
         match self {
             SelectedField::Scalar(sf) => sf.container(),
             SelectedField::Composite(cs) => cs.field.container(),
@@ -180,9 +179,9 @@ impl SelectedField {
     }
 
     /// Coerces a value to fit the selection. If the conversion is not possible, an error will be thrown.
-    pub fn coerce_value(&self, value: PrismaValue) -> crate::Result<PrismaValue> {
+    pub(crate) fn coerce_value(&self, value: PrismaValue) -> crate::Result<PrismaValue> {
         match self {
-            SelectedField::Scalar(sf) => value.coerce(&sf.type_identifier),
+            SelectedField::Scalar(sf) => value.coerce(&sf.type_identifier()),
             SelectedField::Composite(cs) => cs.coerce_value(value),
         }
     }
@@ -196,11 +195,11 @@ pub struct CompositeSelection {
 
 impl CompositeSelection {
     pub fn is_superset_of(&self, other: &Self) -> bool {
-        self.field.typ == other.field.typ
+        self.field.typ() == other.field.typ()
             && other.selections.iter().all(|selection| match selection {
-                SelectedField::Scalar(sf) => self.contains(&sf.name),
+                SelectedField::Scalar(sf) => self.contains(sf.name()),
                 SelectedField::Composite(other_cs) => self
-                    .get(&other_cs.field.name)
+                    .get(other_cs.field.name())
                     .and_then(|selection| selection.as_composite())
                     .map(|cs| cs.is_superset_of(other_cs))
                     .unwrap_or(false),
@@ -227,7 +226,7 @@ impl CompositeSelection {
                         Some(selection) => Ok((key, selection.coerce_value(value)?)),
                         None => Err(DomainError::FieldNotFound {
                             name: key.clone(),
-                            container_name: self.field.name.clone(),
+                            container_name: self.field.name().to_owned(),
                             container_type: "composite type",
                         }),
                     })
@@ -242,33 +241,10 @@ impl CompositeSelection {
     }
 }
 
-impl From<Vec<Field>> for FieldSelection {
-    fn from(fields: Vec<Field>) -> Self {
+impl From<Vec<ScalarFieldRef>> for FieldSelection {
+    fn from(fields: Vec<ScalarFieldRef>) -> Self {
         Self {
-            selections: fields
-                .into_iter()
-                .flat_map(|field| match field {
-                    Field::Relation(rf) => rf.scalar_fields().into_iter().map(Into::into).collect(),
-                    Field::Scalar(sf) => vec![sf.into()],
-                    Field::Composite(_cf) => todo!(),
-                })
-                .collect(),
-        }
-    }
-}
-
-impl From<ScalarFieldRef> for FieldSelection {
-    fn from(field: ScalarFieldRef) -> Self {
-        Self {
-            selections: vec![field.into()],
-        }
-    }
-}
-
-impl From<&RelationField> for FieldSelection {
-    fn from(rf: &RelationField) -> Self {
-        Self {
-            selections: rf.scalar_fields().into_iter().map(|sf| sf.into()).collect(),
+            selections: fields.into_iter().map(Into::into).collect(),
         }
     }
 }

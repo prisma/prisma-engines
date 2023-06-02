@@ -1,4 +1,4 @@
-use crate::{ConnectorTag, ConnectorTagInterface, TestError, TestResult};
+use crate::{ConnectorTag, ConnectorTagInterface, TestResult};
 use serde::Deserialize;
 use std::{convert::TryFrom, env, fs::File, io::Read, path::PathBuf};
 
@@ -7,10 +7,6 @@ static TEST_CONFIG_FILE_NAME: &str = ".test_config";
 /// The central test configuration.
 #[derive(Debug, Default, Deserialize)]
 pub struct TestConfig {
-    /// The test runner to use for the tests.
-    /// Env key: `TEST_RUNNER`
-    runner: String,
-
     /// The connector that tests should run for.
     /// Env key: `TEST_CONNECTOR`
     connector: String,
@@ -27,28 +23,53 @@ pub struct TestConfig {
     is_ci: bool,
 }
 
+const CONFIG_LOAD_FAILED: &str = r####"
+=============================================
+🔴 Unable to load config from file or env. 🔴
+=============================================
+
+ℹ️  How do I fix this? ℹ️ 
+
+Test config can come from the environment, or a config file.
+
+♻️  Environment
+
+Set the following env vars:
+
+- TEST_CONNECTOR
+- TEST_CONNECTOR_VERSION (optional)
+
+📁 Config file
+
+Use the Makefile.
+"####;
+
+fn exit_with_message(msg: &str) -> ! {
+    use std::io::{stderr, Write};
+    let stderr = stderr();
+    let mut sink = stderr.lock();
+    sink.write_all(msg.as_bytes()).unwrap();
+    sink.write_all(b"\n").unwrap();
+
+    std::process::exit(1)
+}
+
 impl TestConfig {
     /// Loads a configuration. File-based config has precedence over env config.
-    pub(crate) fn load() -> TestResult<Self> {
-        let config = Self::from_file().or_else(Self::from_env);
+    pub(crate) fn load() -> Self {
+        let config = match Self::from_file().or_else(Self::from_env) {
+            Some(config) => config,
+            None => exit_with_message(CONFIG_LOAD_FAILED),
+        };
 
-        match config {
-            Some(config) => {
-                config.validate()?;
-                config.log_info();
-
-                Ok(config)
-            }
-            None => Err(TestError::ConfigError(
-                "Unable to load config from file or env.".to_owned(),
-            )),
-        }
+        config.validate();
+        config.log_info();
+        config
     }
 
     fn log_info(&self) {
         println!("******************************");
         println!("* Test run information:");
-        println!("* Runner: {}", self.runner);
         println!(
             "* Connector: {} {}",
             self.connector,
@@ -59,22 +80,17 @@ impl TestConfig {
     }
 
     fn from_env() -> Option<Self> {
-        let runner = std::env::var("TEST_RUNNER").ok();
         let connector = std::env::var("TEST_CONNECTOR").ok();
         let connector_version = std::env::var("TEST_CONNECTOR_VERSION").ok();
 
         // Just care for a set value for now.
         let is_ci = std::env::var("BUILDKITE").is_ok();
 
-        match (runner, connector) {
-            (Some(runner), Some(connector)) => Some(Self {
-                runner,
-                connector,
-                connector_version,
-                is_ci,
-            }),
-            _ => None,
-        }
+        connector.map(|connector| Self {
+            connector,
+            connector_version,
+            is_ci,
+        })
     }
 
     fn from_file() -> Option<Self> {
@@ -96,26 +112,18 @@ impl TestConfig {
         })
     }
 
-    fn validate(&self) -> TestResult<()> {
-        if self.runner.is_empty() {
-            return Err(TestError::config_error("A test runner is required but was not set."));
-        }
-
+    fn validate(&self) {
         if self.connector.is_empty() {
-            return Err(TestError::config_error("A test connector is required but was not set."));
+            exit_with_message("A test connector is required but was not set.");
         }
 
-        if self.test_connector_tag()?.is_versioned() && self.connector_version.is_none() {
-            return Err(TestError::config_error(
-                "The current test connector requires a version to be set to run.",
-            ));
+        match self.test_connector_tag() {
+            Ok(tag) if tag.is_versioned() && self.connector_version.is_none() => {
+                exit_with_message("The current test connector requires a version to be set to run.");
+            }
+            Ok(_) => (),
+            Err(err) => exit_with_message(&err.to_string()),
         }
-
-        Ok(())
-    }
-
-    pub fn runner(&self) -> &str {
-        self.runner.as_str()
     }
 
     pub fn connector(&self) -> &str {

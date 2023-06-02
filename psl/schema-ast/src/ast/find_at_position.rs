@@ -9,6 +9,9 @@ impl ast::SchemaAst {
                     SchemaPosition::Model(model_id, ModelPosition::new(&self[model_id], position))
                 }
                 ast::TopId::Enum(enum_id) => SchemaPosition::Enum(enum_id, EnumPosition::new(&self[enum_id], position)),
+                ast::TopId::Source(source_id) => {
+                    SchemaPosition::DataSource(source_id, SourcePosition::new(&self[source_id], position))
+                }
                 // Falling back to TopLevel as "not implemented"
                 _ => SchemaPosition::TopLevel,
             })
@@ -45,6 +48,8 @@ pub enum SchemaPosition<'ast> {
     Model(ast::ModelId, ModelPosition<'ast>),
     /// In an enum
     Enum(ast::EnumId, EnumPosition<'ast>),
+    /// In a datasource
+    DataSource(ast::SourceId, SourcePosition<'ast>),
 }
 
 /// A cursor position in a context.
@@ -316,5 +321,60 @@ impl<'ast> ExpressionPosition<'ast> {
             }
             _ => Self::Expression,
         }
+    }
+}
+
+#[derive(Debug)]
+pub enum SourcePosition<'ast> {
+    /// In the general datasource
+    Source,
+    /// In a property
+    Property(&'ast str, PropertyPosition<'ast>),
+    /// Outside of the braces
+    Outer,
+}
+
+impl<'ast> SourcePosition<'ast> {
+    fn new(source: &'ast ast::SourceConfig, position: usize) -> Self {
+        for property in &source.properties {
+            if property.span.contains(position) {
+                return SourcePosition::Property(&property.name.name, PropertyPosition::new(property, position));
+            }
+        }
+
+        if source.inner_span.contains(position) {
+            return SourcePosition::Source;
+        }
+
+        SourcePosition::Outer
+    }
+}
+
+#[derive(Debug)]
+pub enum PropertyPosition<'ast> {
+    /// prop
+    Property,
+    ///
+    Value(&'ast str),
+    ///
+    FunctionValue(&'ast str),
+}
+
+impl<'ast> PropertyPosition<'ast> {
+    fn new(property: &'ast ast::ConfigBlockProperty, position: usize) -> Self {
+        if let Some(val) = &property.value {
+            if val.span().contains(position) && val.is_function() {
+                let func = val.as_function().unwrap();
+
+                if func.0 == "env" {
+                    return PropertyPosition::FunctionValue("env");
+                }
+            }
+        }
+        if property.span.contains(position) && !property.name.span.contains(position) {
+            return PropertyPosition::Value(&property.name.name);
+        }
+
+        PropertyPosition::Property
     }
 }

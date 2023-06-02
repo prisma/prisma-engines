@@ -3,9 +3,7 @@ mod formatters;
 mod guard;
 mod transformers;
 
-pub use error::*;
-pub use formatters::*;
-pub use transformers::*;
+pub(crate) use error::*;
 
 use crate::{
     interpreter::ExpressionResult, FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderResult, QueryOptions,
@@ -19,13 +17,13 @@ use petgraph::{
     visit::{EdgeRef as PEdgeRef, NodeIndexable},
     *,
 };
-use prisma_models::{FieldSelection, ModelRef, SelectionResult};
+use prisma_models::{FieldSelection, Model, SelectionResult};
 use std::{borrow::Borrow, collections::HashSet, fmt};
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
 
 #[allow(clippy::large_enum_variant)]
-pub enum Node {
+pub(crate) enum Node {
     /// Nodes representing actual queries to the underlying connector.
     Query(Query),
 
@@ -69,7 +67,7 @@ impl Flow {
 }
 
 // Current limitation: We need to narrow it down to ID diffs for Hash and EQ.
-pub enum Computation {
+pub(crate) enum Computation {
     Diff(DiffNode),
 }
 
@@ -111,15 +109,15 @@ impl EdgeRef {
     }
 }
 
-pub type ProjectedDataDependencyFn =
+pub(crate) type ProjectedDataDependencyFn =
     Box<dyn FnOnce(Node, Vec<SelectionResult>) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
 
-pub type DataDependencyFn =
+pub(crate) type DataDependencyFn =
     Box<dyn FnOnce(Node, &ExpressionResult) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
 
 /// Stored on the edges of the QueryGraph, a QueryGraphDependency contains information on how children are connected to their parents,
 /// expressing for example the need for additional information from the parent to be able to execute at runtime.
-pub enum QueryGraphDependency {
+pub(crate) enum QueryGraphDependency {
     /// Simple dependency indicating order of execution. Effectively an ordering and reachability tool for now.
     ExecutionOrder,
 
@@ -212,7 +210,7 @@ impl QueryGraph {
         }
     }
 
-    pub fn root<F>(f: F) -> QueryGraphBuilderResult<QueryGraph>
+    pub(crate) fn root<F>(f: F) -> QueryGraphBuilderResult<QueryGraph>
     where
         F: FnOnce(&mut QueryGraph) -> QueryGraphBuilderResult<()>,
     {
@@ -288,7 +286,7 @@ impl QueryGraph {
 
     /// Creates a node with content `t` and adds it to the graph.
     /// Returns a `NodeRef` to the newly added node.
-    pub fn create_node<T>(&mut self, t: T) -> NodeRef
+    pub(crate) fn create_node<T>(&mut self, t: T) -> NodeRef
     where
         T: Into<Node>,
     {
@@ -301,7 +299,7 @@ impl QueryGraph {
     /// Checks are run after edge creation to ensure validity of the query graph.
     /// Returns an `EdgeRef` to the newly added edge.
     /// Todo currently panics, change interface to result type.
-    pub fn create_edge(
+    pub(crate) fn create_edge(
         &mut self,
         from: &NodeRef,
         to: &NodeRef,
@@ -314,33 +312,33 @@ impl QueryGraph {
     }
 
     /// Mark the query graph to need a transaction.
-    pub fn flag_transactional(&mut self) {
+    pub(crate) fn flag_transactional(&mut self) {
         self.needs_transaction = true;
     }
 
     /// If true, the graph should be executed inside of a transaction.
-    pub fn needs_transaction(&self) -> bool {
+    pub(crate) fn needs_transaction(&self) -> bool {
         self.needs_transaction
     }
 
     /// Returns a reference to the content of `node`, if the content is still present.
-    pub fn node_content(&self, node: &NodeRef) -> Option<&Node> {
+    pub(crate) fn node_content(&self, node: &NodeRef) -> Option<&Node> {
         self.graph.node_weight(node.node_ix).unwrap().borrow()
     }
 
     /// Returns a reference to the content of `edge`, if the content is still present.
-    pub fn edge_content(&self, edge: &EdgeRef) -> Option<&QueryGraphDependency> {
+    pub(crate) fn edge_content(&self, edge: &EdgeRef) -> Option<&QueryGraphDependency> {
         self.graph.edge_weight(edge.edge_ix).unwrap().borrow()
     }
 
     /// Returns the node from where `edge` originates (e.g. source).
-    pub fn edge_source(&self, edge: &EdgeRef) -> NodeRef {
+    pub(crate) fn edge_source(&self, edge: &EdgeRef) -> NodeRef {
         let (node_ix, _) = self.graph.edge_endpoints(edge.edge_ix).unwrap();
         NodeRef { node_ix }
     }
 
     /// Returns the node to which `edge` points (e.g. target).
-    pub fn edge_target(&self, edge: &EdgeRef) -> NodeRef {
+    pub(crate) fn edge_target(&self, edge: &EdgeRef) -> NodeRef {
         let (_, node_ix) = self.graph.edge_endpoints(edge.edge_ix).unwrap();
         NodeRef { node_ix }
     }
@@ -357,19 +355,19 @@ impl QueryGraph {
 
     /// Removes the edge from the graph but leaves the graph intact by keeping the empty
     /// edge in the graph by plucking the content of the edge, but not the edge itself.
-    pub fn pluck_edge(&mut self, edge: &EdgeRef) -> QueryGraphDependency {
+    pub(crate) fn pluck_edge(&mut self, edge: &EdgeRef) -> QueryGraphDependency {
         self.graph.edge_weight_mut(edge.edge_ix).unwrap().unset()
     }
 
     /// Removes the node from the graph but leaves the graph intact by keeping the empty
     /// node in the graph by plucking the content of the node, but not the node itself.
-    pub fn pluck_node(&mut self, node: &NodeRef) -> Node {
+    pub(crate) fn pluck_node(&mut self, node: &NodeRef) -> Node {
         self.graph.node_weight_mut(node.node_ix).unwrap().unset()
     }
 
     /// Completely removes the edge from the graph, returning it's content.
     /// This operation is destructive on the underlying graph and invalidates references.
-    pub fn remove_edge(&mut self, edge: EdgeRef) -> Option<QueryGraphDependency> {
+    pub(crate) fn remove_edge(&mut self, edge: EdgeRef) -> Option<QueryGraphDependency> {
         self.graph.remove_edge(edge.edge_ix).unwrap().into_inner()
     }
 
@@ -752,7 +750,7 @@ impl QueryGraph {
     /// The `Reload` node is always a "find many" query.
     /// Unwraps are safe because we're operating on the unprocessed state of the graph (`Expressionista` changes that).
     fn insert_reloads(&mut self) -> QueryGraphResult<()> {
-        let reloads: Vec<(NodeRef, ModelRef, Vec<FieldSelection>)> = self
+        let reloads: Vec<(NodeRef, Model, Vec<FieldSelection>)> = self
             .graph
             .node_indices()
             .filter_map(|ix| {
@@ -846,7 +844,6 @@ impl ToGraphviz for QueryGraph {
         let nodes = self
             .graph
             .node_indices()
-            .into_iter()
             .map(|idx| (idx, self.graph.node_weight(idx).unwrap().borrow().unwrap()))
             .map(|(idx, node)| {
                 if self.is_result_node(&NodeRef { node_ix: idx }) {
@@ -878,7 +875,6 @@ impl ToGraphviz for QueryGraph {
         let edges = self
             .graph
             .edge_references()
-            .into_iter()
             .map(|edge| {
                 let idx = edge.id();
                 let edge_content = self.graph.edge_weight(idx).unwrap().borrow().unwrap();

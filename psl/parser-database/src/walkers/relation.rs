@@ -2,7 +2,7 @@ mod implicit_many_to_many;
 mod inline;
 mod two_way_embedded_many_to_many;
 
-pub use implicit_many_to_many::ImplicitManyToManyRelationWalker;
+pub use implicit_many_to_many::{ImplicitManyToManyRelationTableName, ImplicitManyToManyRelationWalker};
 pub use inline::{CompleteInlineRelationWalker, InlineRelationWalker};
 pub use two_way_embedded_many_to_many::TwoWayEmbeddedManyToManyRelationWalker;
 
@@ -13,6 +13,29 @@ use crate::{ast, relations::*, walkers::*};
 pub type RelationWalker<'db> = Walker<'db, RelationId>;
 
 impl<'db> RelationWalker<'db> {
+    /// The models at each end of the relation. [model A, model B]. Can be the same model twice.
+    pub fn models(self) -> [ast::ModelId; 2] {
+        let rel = self.get();
+        [rel.model_a, rel.model_b]
+    }
+
+    /// The relation fields that define the relation. A then B.
+    pub fn relation_fields(self) -> impl Iterator<Item = RelationFieldWalker<'db>> {
+        let (a, b) = self.get().attributes.fields();
+        [a, b].into_iter().flatten().map(move |field| self.walk(field))
+    }
+
+    /// Is any field part of the relation ignored (`@ignore`) or unsupported?
+    pub fn is_ignored(self) -> bool {
+        self.relation_fields().any(|f| {
+            f.is_ignored()
+                || f.referencing_fields()
+                    .into_iter()
+                    .flatten()
+                    .any(|scalar_field| scalar_field.is_ignored() || scalar_field.is_unsupported())
+        })
+    }
+
     /// Is this a relation where both ends are the same model?
     pub fn is_self_relation(self) -> bool {
         let r = self.get();
@@ -41,8 +64,20 @@ impl<'db> RelationWalker<'db> {
         self.get().relation_name.map(|string_id| &self.db[string_id])
     }
 
-    pub(crate) fn has_field(self, model_id: ast::ModelId, field_id: ast::FieldId) -> bool {
-        self.get().has_field(model_id, field_id)
+    /// The relation name, explicit or inferred.
+    ///
+    /// ```ignore
+    /// posts Post[] @relation("UserPosts")
+    ///                        ^^^^^^^^^^^
+    /// ```
+    pub fn relation_name(self) -> RelationName<'db> {
+        let relation = self.get();
+        relation
+            .relation_name
+            .map(|s| RelationName::Explicit(&self.db[s]))
+            .unwrap_or_else(|| {
+                RelationName::generated(self.walk(relation.model_a).name(), self.walk(relation.model_b).name())
+            })
     }
 
     /// The relation attributes parsed from the AST.

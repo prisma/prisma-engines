@@ -11,9 +11,13 @@ on:
       - 'CODEOWNERS'
       - 'renovate.json'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  rust-vitess-tests:
-    name: "Rust test suite: ${{ matrix.database.name }} on Linux"
+  rust-query-engine-tests:
+    name: "Test ${{ matrix.database.name }} (${{ matrix.engine_protocol }}) on Linux"
 
     strategy:
       fail-fast: false
@@ -35,6 +39,19 @@ jobs:
             single_threaded: false
             connector: "sqlserver"
             version: "2022"
+          - name: "mongodb_4_2"
+            single_threaded: true
+            connector: "mongodb"
+            version: "4.2"
+          - name: "cockroach_22_2"
+            single_threaded: false
+            connector: "cockroachdb"
+            version: "22.2"
+          - name: "cockroach_22_1_0"
+            single_threaded: false
+            connector: "cockroachdb"
+            version: "22.1"
+        engine_protocol: [graphql, json]
 
     env:
       LOG_LEVEL: "info"
@@ -48,6 +65,7 @@ jobs:
       TEST_RUNNER: "direct"
       TEST_CONNECTOR: ${{ matrix.database.connector }}
       TEST_CONNECTOR_VERSION: ${{ matrix.database.version }}
+      PRISMA_ENGINE_PROTOCOL: ${{ matrix.engine_protocol }}
 
     runs-on: buildjet-16vcpu-ubuntu-2004
     steps:
@@ -60,13 +78,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: "Start ${{ matrix.database.name }}"
+      - name: "Start ${{ matrix.database.name }} (${{ matrix.engine_protocol }})"
         run: make start-${{ matrix.database.name }}
 
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          default: true
+      - uses: dtolnay/rust-toolchain@stable
 
       - run: export WORKSPACE_ROOT=$(pwd) && cargo test --package query-engine-tests -- --test-threads=1
         if: ${{ matrix.database.single_threaded }}

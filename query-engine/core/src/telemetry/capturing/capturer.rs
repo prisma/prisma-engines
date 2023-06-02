@@ -80,8 +80,8 @@ impl SpanProcessor for Processor {
         // no-op
     }
 
-    /// Exports a spancontaining zero or more events that might represent
-    /// logs in the prisma client logging categories of logs (query, info, warn, error)
+    /// Exports a span containing zero or more events that might represent
+    /// logs in Prisma Client logging categories of logs (query, info, warn, error)
     ///
     /// There's an impedance between the client categories of logs and the server (standard)
     /// hierarchical levels of logs (trace, debug, info, warn, error).
@@ -145,7 +145,7 @@ mod task {
         fn query_event(mut self) -> models::LogEvent {
             self.value
                 .attributes
-                .retain(|key, _| (&VALID_QUERY_ATTRS).contains(&key.as_str()));
+                .retain(|key, _| VALID_QUERY_ATTRS.contains(&key.as_str()));
 
             models::LogEvent {
                 level: "query".to_string(),

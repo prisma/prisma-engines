@@ -6,9 +6,9 @@ pub use composite::*;
 pub use relation::*;
 pub use scalar::*;
 
-use crate::ModelRef;
-use dml::ScalarType;
-use std::{hash::Hash, sync::Arc};
+use crate::{ast, parent_container::ParentContainer, Model};
+use psl::parser_database::{walkers, ScalarType};
+use std::{borrow::Cow, hash::Hash};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Field {
@@ -18,18 +18,26 @@ pub enum Field {
 }
 
 impl Field {
+    pub fn borrowed_name<'a>(&self, schema: &'a psl::ValidatedSchema) -> &'a str {
+        match self {
+            Field::Relation(rf) => schema.db.walk(rf.id).name(),
+            Field::Scalar(sf) => sf.borrowed_name(schema),
+            Field::Composite(cf) => cf.borrowed_name(schema),
+        }
+    }
+
     pub fn name(&self) -> &str {
         match self {
-            Field::Scalar(ref sf) => &sf.name,
-            Field::Relation(ref rf) => &rf.name,
-            Field::Composite(ref cf) => &cf.name,
+            Field::Scalar(ref sf) => sf.name(),
+            Field::Relation(ref rf) => rf.walker().name(),
+            Field::Composite(ref cf) => cf.name(),
         }
     }
 
     pub fn db_name(&self) -> &str {
         match self {
             Field::Scalar(ref sf) => sf.db_name(),
-            Field::Relation(ref rf) => &rf.name,
+            Field::Relation(rf) => rf.name(),
             Field::Composite(ref cf) => cf.db_name(),
         }
     }
@@ -55,7 +63,7 @@ impl Field {
 
     pub fn is_id(&self) -> bool {
         match self {
-            Field::Scalar(sf) => sf.is_id,
+            Field::Scalar(sf) => sf.is_id(),
             Field::Relation(_) => false,
             Field::Composite(_) => false,
         }
@@ -92,11 +100,11 @@ impl Field {
         }
     }
 
-    pub fn model(&self) -> Option<ModelRef> {
+    pub fn model(&self) -> Option<Model> {
         match self {
-            Self::Scalar(sf) => sf.container.as_model(),
+            Self::Scalar(sf) => sf.container().as_model(),
             Self::Relation(rf) => Some(rf.model()),
-            Self::Composite(cf) => cf.container.as_model(),
+            Self::Composite(cf) => cf.container().as_model(),
         }
     }
 
@@ -105,14 +113,6 @@ impl Field {
             Self::Scalar(sf) => vec![sf.clone()],
             Self::Relation(rf) => rf.scalar_fields(),
             Self::Composite(_cf) => vec![], // [Composites] todo
-        }
-    }
-
-    pub fn downgrade(&self) -> FieldWeak {
-        match self {
-            Field::Relation(field) => FieldWeak::Relation(Arc::downgrade(field)),
-            Field::Scalar(field) => FieldWeak::Scalar(Arc::downgrade(field)),
-            Field::Composite(field) => FieldWeak::Composite(Arc::downgrade(field)),
         }
     }
 
@@ -131,54 +131,17 @@ impl Field {
             None
         }
     }
-}
 
-#[derive(Debug, Clone)]
-pub enum FieldWeak {
-    Relation(RelationFieldWeak),
-    Scalar(ScalarFieldWeak),
-    Composite(CompositeFieldWeak),
-}
-
-impl FieldWeak {
-    pub fn upgrade(&self) -> Field {
+    pub fn related_container(&self) -> ParentContainer {
         match self {
-            Self::Relation(rf) => rf.upgrade().unwrap().into(),
-            Self::Scalar(sf) => sf.upgrade().unwrap().into(),
-            Self::Composite(cf) => cf.upgrade().unwrap().into(),
+            Field::Relation(rf) => ParentContainer::from(rf.related_model()),
+            Field::Scalar(sf) => sf.container(),
+            Field::Composite(cf) => ParentContainer::from(cf.typ()),
         }
     }
 }
 
-impl From<&Field> for FieldWeak {
-    fn from(f: &Field) -> Self {
-        match f {
-            Field::Scalar(sf) => sf.into(),
-            Field::Relation(rf) => rf.into(),
-            Field::Composite(cf) => cf.into(),
-        }
-    }
-}
-
-impl From<&ScalarFieldRef> for FieldWeak {
-    fn from(f: &ScalarFieldRef) -> Self {
-        FieldWeak::Scalar(Arc::downgrade(f))
-    }
-}
-
-impl From<&RelationFieldRef> for FieldWeak {
-    fn from(f: &RelationFieldRef) -> Self {
-        FieldWeak::Relation(Arc::downgrade(f))
-    }
-}
-
-impl From<&CompositeFieldRef> for FieldWeak {
-    fn from(f: &CompositeFieldRef) -> Self {
-        FieldWeak::Composite(Arc::downgrade(f))
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Copy)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum TypeIdentifier {
     String,
@@ -187,10 +150,9 @@ pub enum TypeIdentifier {
     Float,
     Decimal,
     Boolean,
-    Enum(String),
+    Enum(ast::EnumId),
     UUID,
     Json,
-    Xml,
     DateTime,
     Bytes,
     Unsupported,
@@ -203,24 +165,24 @@ impl TypeIdentifier {
             TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float | TypeIdentifier::Decimal
         )
     }
-}
 
-impl std::fmt::Display for TypeIdentifier {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    pub fn type_name(&self, schema: &psl::ValidatedSchema) -> Cow<'static, str> {
         match self {
-            TypeIdentifier::String => write!(f, "String"),
-            TypeIdentifier::Int => write!(f, "Int"),
-            TypeIdentifier::BigInt => write!(f, "BigInt"),
-            TypeIdentifier::Float => write!(f, "Float"),
-            TypeIdentifier::Decimal => write!(f, "Decimal"),
-            TypeIdentifier::Boolean => write!(f, "Bool"),
-            TypeIdentifier::Enum(e) => write!(f, "Enum{e}"),
-            TypeIdentifier::UUID => write!(f, "UUID"),
-            TypeIdentifier::Json => write!(f, "Json"),
-            TypeIdentifier::Xml => write!(f, "Xml"),
-            TypeIdentifier::DateTime => write!(f, "DateTime"),
-            TypeIdentifier::Bytes => write!(f, "Bytes"),
-            TypeIdentifier::Unsupported => write!(f, "Unsupported"),
+            TypeIdentifier::String => "String".into(),
+            TypeIdentifier::Int => "Int".into(),
+            TypeIdentifier::BigInt => "BigInt".into(),
+            TypeIdentifier::Float => "Float".into(),
+            TypeIdentifier::Decimal => "Decimal".into(),
+            TypeIdentifier::Boolean => "Bool".into(),
+            TypeIdentifier::Enum(enum_id) => {
+                let enum_name = schema.db.walk(*enum_id).name();
+                format!("Enum{enum_name}").into()
+            }
+            TypeIdentifier::UUID => "UUID".into(),
+            TypeIdentifier::Json => "Json".into(),
+            TypeIdentifier::DateTime => "DateTime".into(),
+            TypeIdentifier::Bytes => "Bytes".into(),
+            TypeIdentifier::Unsupported => "Unsupported".into(),
         }
     }
 }
@@ -230,6 +192,32 @@ pub enum DateType {
     Date,
     Time,
     DateTime,
+}
+
+impl From<(crate::InternalDataModelRef, walkers::CompositeTypeFieldWalker<'_>)> for Field {
+    fn from((dm, sf): (crate::InternalDataModelRef, walkers::CompositeTypeFieldWalker<'_>)) -> Self {
+        if sf.r#type().as_composite_type().is_some() {
+            Field::Composite(dm.zip(CompositeFieldId::InCompositeType(sf.id)))
+        } else {
+            Field::Scalar(dm.zip(ScalarFieldId::InCompositeType(sf.id)))
+        }
+    }
+}
+
+impl From<(crate::InternalDataModelRef, walkers::ScalarFieldWalker<'_>)> for Field {
+    fn from((dm, sf): (crate::InternalDataModelRef, walkers::ScalarFieldWalker<'_>)) -> Self {
+        if sf.scalar_field_type().as_composite_type().is_some() {
+            Field::Composite(dm.zip(CompositeFieldId::InModel(sf.id)))
+        } else {
+            Field::Scalar(dm.zip(ScalarFieldId::InModel(sf.id)))
+        }
+    }
+}
+
+impl From<(crate::InternalDataModelRef, walkers::RelationFieldWalker<'_>)> for Field {
+    fn from((dm, rf): (crate::InternalDataModelRef, walkers::RelationFieldWalker<'_>)) -> Self {
+        Field::Relation(dm.zip(rf.id))
+    }
 }
 
 impl From<ScalarFieldRef> for Field {

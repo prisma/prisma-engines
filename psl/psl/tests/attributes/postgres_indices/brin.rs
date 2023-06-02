@@ -1,3 +1,5 @@
+use psl::parser_database::{IndexAlgorithm, OperatorClass};
+
 use crate::{common::*, with_header, Provider};
 
 #[test]
@@ -11,21 +13,13 @@ fn with_raw_unsupported() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::raw("tsvector_ops"));
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_raw_ops("tsvector_ops");
 }
 
 #[test]
@@ -39,20 +33,11 @@ fn with_unsupported_no_ops() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 // Bit
@@ -68,20 +53,11 @@ fn bit_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 #[test]
@@ -95,21 +71,13 @@ fn bit_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::BitMinMaxOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::BitMinMaxOps);
 }
 
 // VarBit
@@ -125,20 +93,11 @@ fn varbit_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 #[test]
@@ -152,21 +111,13 @@ fn varbit_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::VarBitMinMaxOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::VarBitMinMaxOps);
 }
 
 // date
@@ -182,20 +133,11 @@ fn date_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 #[test]
@@ -209,21 +151,13 @@ fn date_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::DateMinMaxOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::DateMinMaxOps);
 }
 
 #[test]
@@ -237,21 +171,13 @@ fn date_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::DateMinMaxMultiOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::DateMinMaxMultiOps);
 }
 
 #[test]
@@ -265,21 +191,13 @@ fn date_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::DateBloomOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::DateBloomOps);
 }
 
 // real
@@ -295,20 +213,11 @@ fn real_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 #[test]
@@ -322,21 +231,13 @@ fn real_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::Float4MinMaxOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::Float4MinMaxOps);
 }
 
 #[test]
@@ -376,21 +277,13 @@ fn real_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::Float4MinMaxMultiOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::Float4MinMaxMultiOps);
 }
 
 #[test]
@@ -430,21 +323,13 @@ fn real_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::Float4BloomOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::Float4BloomOps);
 }
 
 #[test]
@@ -486,20 +371,11 @@ fn prisma_float_all_defaults() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 #[test]
@@ -513,20 +389,11 @@ fn double_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 #[test]
@@ -540,21 +407,13 @@ fn double_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::Float8MinMaxOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::Float8MinMaxOps);
 }
 
 #[test]
@@ -568,21 +427,13 @@ fn double_minmax_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::Float8MinMaxOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::Float8MinMaxOps);
 }
 
 #[test]
@@ -596,21 +447,13 @@ fn double_minmaxmulti_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::Float8MinMaxMultiOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::Float8MinMaxMultiOps);
 }
 
 #[test]
@@ -624,21 +467,13 @@ fn double_bloom_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::Float8BloomOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::Float8BloomOps);
 }
 
 #[test]
@@ -678,21 +513,13 @@ fn double_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::Float8MinMaxMultiOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::Float8MinMaxMultiOps);
 }
 
 #[test]
@@ -732,21 +559,13 @@ fn double_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::Float8BloomOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::Float8BloomOps);
 }
 
 #[test]
@@ -788,20 +607,11 @@ fn inet_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 #[test]
@@ -815,21 +625,13 @@ fn inet_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::InetMinMaxOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::InetMinMaxOps);
 }
 
 #[test]
@@ -895,21 +697,13 @@ fn inet_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::InetMinMaxMultiOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::InetMinMaxMultiOps);
 }
 
 #[test]
@@ -975,21 +769,13 @@ fn inet_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::InetBloomOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::InetBloomOps);
 }
 
 #[test]
@@ -1055,21 +841,13 @@ fn inet_inclusion_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::InetInclusionOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::InetInclusionOps);
 }
 
 #[test]
@@ -1137,20 +915,11 @@ fn int2_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 #[test]
@@ -1164,21 +933,13 @@ fn int2_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::Int2MinMaxOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::Int2MinMaxOps);
 }
 
 #[test]
@@ -1244,21 +1005,13 @@ fn int2_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::Int2MinMaxMultiOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::Int2MinMaxMultiOps);
 }
 
 #[test]
@@ -1324,21 +1077,13 @@ fn int2_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::Int2BloomOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::Int2BloomOps);
 }
 
 #[test]
@@ -1406,20 +1151,11 @@ fn int4_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 #[test]
@@ -1433,20 +1169,11 @@ fn int4_default_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 #[test]
@@ -1460,21 +1187,13 @@ fn int4_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::Int4MinMaxOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::Int4MinMaxOps);
 }
 
 #[test]
@@ -1514,21 +1233,13 @@ fn int4_minmax_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::Int4MinMaxOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::Int4MinMaxOps);
 }
 
 #[test]
@@ -1542,21 +1253,13 @@ fn int4_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::Int4MinMaxMultiOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::Int4MinMaxMultiOps);
 }
 
 #[test]
@@ -1596,21 +1299,13 @@ fn int4_minmaxmulti_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::Int4MinMaxMultiOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::Int4MinMaxMultiOps);
 }
 
 #[test]
@@ -1624,21 +1319,13 @@ fn int4_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::Int4BloomOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::Int4BloomOps);
 }
 
 #[test]
@@ -1678,21 +1365,13 @@ fn int4_bloom_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::Int4BloomOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::Int4BloomOps);
 }
 
 // int8
@@ -1708,20 +1387,11 @@ fn int8_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 #[test]
@@ -1735,20 +1405,11 @@ fn int8_default_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 #[test]
@@ -1762,21 +1423,13 @@ fn int8_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::Int8MinMaxOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::Int8MinMaxOps);
 }
 
 #[test]
@@ -1790,21 +1443,13 @@ fn int8_minmax_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::Int8MinMaxOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::Int8MinMaxOps);
 }
 
 #[test]
@@ -1818,21 +1463,13 @@ fn int8_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::Int8MinMaxMultiOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::Int8MinMaxMultiOps);
 }
 
 #[test]
@@ -1846,21 +1483,13 @@ fn int8_minmaxmulti_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::Int8MinMaxMultiOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::Int8MinMaxMultiOps);
 }
 
 #[test]
@@ -1874,21 +1503,13 @@ fn int8_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::Int8BloomOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::Int8BloomOps);
 }
 
 #[test]
@@ -1902,21 +1523,13 @@ fn int8_bloom_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::Int8BloomOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::Int8BloomOps);
 }
 
 // numeric
@@ -1932,20 +1545,11 @@ fn prisma_decimal_all_defaults() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 #[test]
@@ -1959,20 +1563,11 @@ fn decimal_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 #[test]
@@ -1986,21 +1581,13 @@ fn decimal_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::NumericMinMaxOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::NumericMinMaxOps);
 }
 
 #[test]
@@ -2040,21 +1627,13 @@ fn decimal_minmax_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::NumericMinMaxOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::NumericMinMaxOps);
 }
 
 #[test]
@@ -2094,21 +1673,13 @@ fn decimal_minmaxmulti_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::NumericMinMaxMultiOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::NumericMinMaxMultiOps);
 }
 
 #[test]
@@ -2148,21 +1719,13 @@ fn decimal_bloom_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::NumericBloomOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::NumericBloomOps);
 }
 
 #[test]
@@ -2176,21 +1739,13 @@ fn decimal_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::Float8MinMaxMultiOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::Float8MinMaxMultiOps);
 }
 
 #[test]
@@ -2204,21 +1759,13 @@ fn decimal_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::NumericBloomOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::NumericBloomOps);
 }
 
 // oid
@@ -2234,20 +1781,11 @@ fn oid_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 #[test]
@@ -2261,21 +1799,13 @@ fn oid_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::OidMinMaxOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::OidMinMaxOps);
 }
 
 #[test]
@@ -2315,21 +1845,13 @@ fn oid_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::OidMinMaxMultiOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::OidMinMaxMultiOps);
 }
 
 #[test]
@@ -2369,21 +1891,13 @@ fn oid_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::OidBloomOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::OidBloomOps);
 }
 
 #[test]
@@ -2425,20 +1939,11 @@ fn char_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 #[test]
@@ -2452,21 +1957,13 @@ fn char_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::BpcharMinMaxOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::BpcharMinMaxOps);
 }
 
 #[test]
@@ -2506,21 +2003,13 @@ fn char_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::BpcharBloomOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::BpcharBloomOps);
 }
 
 #[test]
@@ -2562,20 +2051,11 @@ fn prisma_text_all_defaults() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 #[test]
@@ -2589,20 +2069,11 @@ fn text_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 #[test]
@@ -2616,20 +2087,11 @@ fn varchar_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 #[test]
@@ -2643,21 +2105,13 @@ fn text_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::TextMinMaxOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::TextMinMaxOps);
 }
 
 #[test]
@@ -2671,21 +2125,13 @@ fn varchar_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::TextMinMaxOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::TextMinMaxOps);
 }
 
 #[test]
@@ -2725,21 +2171,13 @@ fn text_minmax_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::TextMinMaxOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::TextMinMaxOps);
 }
 
 #[test]
@@ -2779,21 +2217,13 @@ fn text_bloom_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::TextBloomOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::TextBloomOps);
 }
 
 #[test]
@@ -2807,21 +2237,13 @@ fn text_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::TextBloomOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::TextBloomOps);
 }
 
 #[test]
@@ -2835,21 +2257,13 @@ fn varchar_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::TextBloomOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::TextBloomOps);
 }
 
 #[test]
@@ -2863,21 +2277,13 @@ fn no_native_type_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::TextBloomOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::TextBloomOps);
 }
 
 // timestamp
@@ -2893,20 +2299,11 @@ fn prisma_datetime_all_defaults() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 #[test]
@@ -2920,20 +2317,11 @@ fn timestamp_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 #[test]
@@ -2947,21 +2335,13 @@ fn timestamp_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::TimestampMinMaxOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::TimestampMinMaxOps);
 }
 
 #[test]
@@ -2975,21 +2355,13 @@ fn timestamp_minmax_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::TimestampMinMaxOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::TimestampMinMaxOps);
 }
 
 #[test]
@@ -3003,21 +2375,13 @@ fn timestamp_minmaxmulti_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::TimestampMinMaxMultiOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::TimestampMinMaxMultiOps);
 }
 
 #[test]
@@ -3031,21 +2395,13 @@ fn timestamp_bloom_no_native_type() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::TimestampBloomOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::TimestampBloomOps);
 }
 
 #[test]
@@ -3085,21 +2441,13 @@ fn timestamp_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::TimestampMinMaxMultiOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::TimestampMinMaxMultiOps);
 }
 
 #[test]
@@ -3139,21 +2487,13 @@ fn timestamp_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::TimestampBloomOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::TimestampBloomOps);
 }
 
 #[test]
@@ -3195,20 +2535,11 @@ fn timestamptz_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 #[test]
@@ -3222,21 +2553,13 @@ fn timestamptz_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::TimestampTzMinMaxOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::TimestampTzMinMaxOps);
 }
 
 #[test]
@@ -3276,21 +2599,13 @@ fn timestamptz_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::TimestampTzMinMaxMultiOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::TimestampTzMinMaxMultiOps);
 }
 
 #[test]
@@ -3330,21 +2645,13 @@ fn timestamptz_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::TimestampTzBloomOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::TimestampTzBloomOps);
 }
 
 #[test]
@@ -3386,20 +2693,11 @@ fn time_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 #[test]
@@ -3413,21 +2711,13 @@ fn time_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::TimeMinMaxOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::TimeMinMaxOps);
 }
 
 #[test]
@@ -3467,21 +2757,13 @@ fn time_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::TimeMinMaxMultiOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::TimeMinMaxMultiOps);
 }
 
 #[test]
@@ -3521,21 +2803,13 @@ fn time_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::TimeBloomOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::TimeBloomOps);
 }
 
 #[test]
@@ -3577,20 +2851,11 @@ fn timetz_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 #[test]
@@ -3604,21 +2869,13 @@ fn timetz_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::TimeTzMinMaxOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::TimeTzMinMaxOps);
 }
 
 #[test]
@@ -3658,21 +2915,13 @@ fn timetz_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::TimeTzMinMaxMultiOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::TimeTzMinMaxMultiOps);
 }
 
 #[test]
@@ -3712,21 +2961,13 @@ fn timetz_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::TimeTzBloomOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::TimeTzBloomOps);
 }
 
 #[test]
@@ -3768,20 +3009,11 @@ fn uuid_default_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let field = IndexField::new_in_model("a");
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin);
 }
 
 #[test]
@@ -3795,21 +3027,13 @@ fn uuid_minmax_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::UuidMinMaxOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::UuidMinMaxOps);
 }
 
 #[test]
@@ -3823,21 +3047,13 @@ fn uuid_minmaxmulti_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::UuidMinMaxMultiOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::UuidMinMaxMultiOps);
 }
 
 #[test]
@@ -3851,19 +3067,11 @@ fn uuid_bloom_opclass() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Postgres, &[]);
-    let schema = parse(&schema);
-
-    let mut field = IndexField::new_in_model("a");
-    field.operator_class = Some(OperatorClass::UuidBloomOps);
-
-    schema.assert_has_model("A").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("A_a_idx".to_string()),
-        fields: vec![field],
-        tpe: IndexType::Normal,
-        defined_on_field: false,
-        algorithm: Some(IndexAlgorithm::Brin),
-        clustered: None,
-    });
+    psl::parse_schema(with_header(dml, Provider::Postgres, &[]))
+        .unwrap()
+        .assert_has_model("A")
+        .assert_index_on_fields(&["a"])
+        .assert_type(IndexAlgorithm::Brin)
+        .assert_field("a")
+        .assert_ops(OperatorClass::UuidBloomOps);
 }

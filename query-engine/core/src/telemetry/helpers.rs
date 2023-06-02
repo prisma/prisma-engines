@@ -109,7 +109,7 @@ pub fn env_filter(log_queries: bool, qe_log_level: QueryEngineLogLevel) -> EnvFi
     filter
 }
 
-pub fn user_facing_span_only_filter(meta: &Metadata) -> bool {
+pub fn user_facing_span_only_filter(meta: &Metadata<'_>) -> bool {
     if !meta.is_span() {
         return false;
     }

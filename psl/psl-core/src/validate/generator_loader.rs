@@ -7,7 +7,7 @@ use crate::{
 use enumflags2::BitFlags;
 use itertools::Itertools;
 use parser_database::{
-    ast::{self, WithDocumentation},
+    ast::{self, Expression, WithDocumentation},
     coerce, coerce_array,
 };
 use std::collections::HashMap;
@@ -41,11 +41,24 @@ pub(crate) fn load_generators_from_ast(ast_schema: &ast::SchemaAst, diagnostics:
 }
 
 fn lift_generator(ast_generator: &ast::GeneratorConfig, diagnostics: &mut Diagnostics) -> Option<Generator> {
-    let args: HashMap<_, _> = ast_generator
+    let generator_name = ast_generator.name.name.as_str();
+    let args: HashMap<_, &Expression> = ast_generator
         .properties
         .iter()
-        .map(|arg| (arg.name.name.as_str(), &arg.value))
-        .collect();
+        .map(|arg| match &arg.value {
+            Some(expr) => Some((arg.name.name.as_str(), expr)),
+            None => {
+                diagnostics.push_error(DatamodelError::new_config_property_missing_value_error(
+                    arg.name.name.as_str(),
+                    generator_name,
+                    "generator",
+                    ast_generator.span,
+                ));
+
+                None
+            }
+        })
+        .collect::<Option<HashMap<_, _>>>()?;
 
     if let Some(expr) = args.get(ENGINE_TYPE_KEY) {
         if !expr.is_string() {
@@ -95,11 +108,23 @@ fn lift_generator(ast_generator: &ast::GeneratorConfig, diagnostics: &mut Diagno
         }
 
         let value = match &prop.value {
-            ast::Expression::NumericValue(val, _) => val.clone(),
-            ast::Expression::StringValue(val, _) => val.clone(),
-            ast::Expression::ConstantValue(val, _) => val.clone(),
-            ast::Expression::Function(_, _, _) => String::from("(function)"),
-            ast::Expression::Array(_, _) => String::from("(array)"),
+            Some(val) => match val {
+                ast::Expression::NumericValue(val, _) => val.clone(),
+                ast::Expression::StringValue(val, _) => val.clone(),
+                ast::Expression::ConstantValue(val, _) => val.clone(),
+                ast::Expression::Function(_, _, _) => String::from("(function)"),
+                ast::Expression::Array(_, _) => String::from("(array)"),
+            },
+            None => {
+                diagnostics.push_error(DatamodelError::new_config_property_missing_value_error(
+                    &prop.name.name,
+                    generator_name,
+                    "generator",
+                    prop.span,
+                ));
+
+                continue;
+            }
         };
 
         properties.insert(prop.name.name.clone(), value);

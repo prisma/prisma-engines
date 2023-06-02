@@ -175,7 +175,6 @@ fn compute_aggr_join_m2m(
 
     let left_join_conditions: Vec<Expression> = child_ids
         .as_columns(ctx)
-        .into_iter()
         .map(|c| c.equals(rf.m2m_columns(ctx)).into())
         .collect();
 

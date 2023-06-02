@@ -26,7 +26,8 @@ mod um_inside_update {
 
         assert_error!(
             runner,
-            format!(r#"mutation {{
+            format!(
+                r#"mutation {{
               updateOneParent(
                 where: {parent}
                 data:{{
@@ -42,9 +43,12 @@ mod um_inside_update {
                   c
                 }}
               }}
-            }}"#, parent = parent, selection = t.parent().selection()),
+            }}"#,
+                parent = parent,
+                selection = t.parent().selection()
+            ),
             2009,
-            "`Mutation.updateOneParent.data.ParentUpdateInput.childOpt.ChildUpdateOneWithoutParentOptNestedInput.updateMany`: Field does not exist on enclosing type."
+            "Field does not exist in enclosing type."
         );
 
         Ok(())

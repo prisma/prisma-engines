@@ -3,9 +3,9 @@ use crate::{
     query_ast::*,
     QueryResult, RecordSelection,
 };
-use connector::{ConnectionLike, NativeUpsert, QueryArguments};
+use connector::{ConnectionLike, NativeUpsert};
 
-pub async fn execute(
+pub(crate) async fn execute(
     tx: &mut dyn ConnectionLike,
     write_query: WriteQuery,
     trace_id: Option<String>,
@@ -80,7 +80,6 @@ async fn native_upsert(
         fields: query.selection_order().to_owned(),
         scalars: scalars.into(),
         nested: Vec::new(),
-        query_arguments: QueryArguments::new(query.model().clone()),
         model: query.model().clone(),
         aggregation_rows: None,
     }

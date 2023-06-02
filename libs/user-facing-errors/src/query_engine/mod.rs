@@ -1,0 +1,330 @@
+pub mod validation;
+
+use serde::Serialize;
+use std::fmt;
+use user_facing_error_macros::*;
+
+#[derive(Debug, PartialEq, Eq, Serialize, Clone)]
+#[serde(untagged)]
+pub enum DatabaseConstraint {
+    Fields(Vec<String>),
+    Index(String),
+    ForeignKey,
+    CannotParse,
+}
+
+impl fmt::Display for DatabaseConstraint {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Fields(fields) => {
+                let quoted_fields: Vec<String> = fields.iter().map(|f| format!("`{f}`")).collect();
+                write!(f, "fields: ({})", quoted_fields.join(","))
+            }
+            Self::Index(index) => write!(f, "constraint: `{index}`"),
+            Self::ForeignKey => write!(f, "foreign key"),
+            Self::CannotParse => write!(f, "(not available)"),
+        }
+    }
+}
+
+impl From<Vec<String>> for DatabaseConstraint {
+    fn from(fields: Vec<String>) -> Self {
+        Self::Fields(fields)
+    }
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2000",
+    message = "The provided value for the column is too long for the column's type. Column: {column_name}"
+)]
+pub struct InputValueTooLong {
+    pub column_name: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2001",
+    message = "The record searched for in the where condition (`{model_name}.{argument_name} = {argument_value}`) does not exist"
+)]
+pub struct RecordNotFound {
+    /// Model name from Prisma schema
+    pub model_name: String,
+
+    /// Argument name from a supported query on a Prisma schema model
+    pub argument_name: String,
+
+    /// Concrete value provided for an argument on a query. Should be peeked/truncated if too long
+    /// to display in the error message
+    pub argument_value: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2002", message = "Unique constraint failed on the {constraint}")]
+pub struct UniqueKeyViolation {
+    /// Field name from one model from Prisma schema
+    #[serde(rename = "target")]
+    pub constraint: DatabaseConstraint,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2003",
+    message = "Foreign key constraint failed on the field: `{field_name}`"
+)]
+pub struct ForeignKeyViolation {
+    /// Field name from one model from Prisma schema
+    pub field_name: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2004", message = "A constraint failed on the database: `{database_error}`")]
+pub struct ConstraintViolation {
+    /// Database error returned by the underlying data source
+    pub database_error: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2005",
+    message = "The value `{field_value}` stored in the database for the field `{field_name}` is invalid for the field's type"
+)]
+pub struct StoredValueIsInvalid {
+    /// Concrete value provided for a field on a model in Prisma schema. Should be peeked/truncated if too long to display in the error message
+    pub field_value: String,
+
+    /// Field name from one model from Prisma schema
+    pub field_name: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2006",
+    message = "The provided value `{field_value}` for `{model_name}` field `{field_name}` is not valid"
+)]
+pub struct TypeMismatch {
+    /// Concrete value provided for a field on a model in Prisma schema. Should be peeked/truncated if too long to display in the error message
+    pub field_value: String,
+
+    /// Model name from Prisma schema
+    pub model_name: String,
+
+    /// Field name from one model from Prisma schema
+    pub field_name: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2007", message = "Data validation error `{database_error}`")]
+pub struct TypeMismatchInvalidCustomType {
+    /// Database error returned by the underlying data source
+    pub database_error: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2008",
+    message = "Failed to parse the query `{query_parsing_error}` at `{query_position}`"
+)]
+pub struct QueryParsingFailed {
+    /// Error(s) encountered when trying to parse a query in the query engine
+    pub query_parsing_error: String,
+
+    /// Location of the incorrect parsing, validation in a query. Represented by tuple or object with (line, character)
+    pub query_position: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2010", message = "Raw query failed. Code: `{code}`. Message: `{message}`")]
+pub struct RawQueryFailed {
+    pub code: String,
+    pub message: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2011", message = "Null constraint violation on the {constraint}")]
+pub struct NullConstraintViolation {
+    pub constraint: DatabaseConstraint,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2013",
+    message = "Missing the required argument `{argument_name}` for field `{field_name}` on `{object_name}`."
+)]
+pub struct MissingRequiredArgument {
+    pub argument_name: String,
+    pub field_name: String,
+    pub object_name: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2014",
+    message = "The change you are trying to make would violate the required relation '{relation_name}' between the `{model_a_name}` and `{model_b_name}` models."
+)]
+pub struct RelationViolation {
+    pub relation_name: String,
+    pub model_a_name: String,
+    pub model_b_name: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2015", message = "A related record could not be found. {details}")]
+pub struct RelatedRecordNotFound {
+    pub details: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2016", message = "Query interpretation error. {details}")]
+pub struct InterpretationError {
+    pub details: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2017",
+    message = "The records for relation `{relation_name}` between the `{parent_name}` and `{child_name}` models are not connected."
+)]
+pub struct RecordsNotConnected {
+    pub relation_name: String,
+    pub parent_name: String,
+    pub child_name: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2018", message = "The required connected records were not found. {details}")]
+pub struct ConnectedRecordsNotFound {
+    pub details: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2019", message = "Input error. {details}")]
+pub struct InputError {
+    pub details: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2020", message = "Value out of range for the type. {details}")]
+pub struct ValueOutOfRange {
+    pub details: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2021",
+    message = "The table `{table}` does not exist in the current database."
+)]
+pub struct TableDoesNotExist {
+    pub table: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2022",
+    message = "The column `{column}` does not exist in the current database."
+)]
+pub struct ColumnDoesNotExist {
+    pub column: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2023", message = "Inconsistent column data: {message}")]
+pub struct InconsistentColumnData {
+    pub message: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2024",
+    message = "Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: {timeout}, connection limit: {connection_limit})"
+)]
+pub struct PoolTimeout {
+    pub connection_limit: u64,
+    pub timeout: u64,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2025",
+    message = "An operation failed because it depends on one or more records that were required but not found. {cause}"
+)]
+pub struct RecordRequiredButNotFound {
+    pub cause: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2026",
+    message = "The current database provider doesn't support a feature that the query used: {feature}"
+)]
+pub struct UnsupportedFeature {
+    pub feature: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2027",
+    message = "Multiple errors occurred on the database during query execution: {errors}"
+)]
+pub struct MultiError {
+    pub errors: String, // Might want to change it to collection of user facing errors.
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2028", message = "Transaction API error: {error}")]
+pub struct InteractiveTransactionError {
+    pub error: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2029", message = "Query parameter limit exceeded error: {message}.")]
+pub struct QueryParameterLimitExceeded {
+    pub message: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2030",
+    message = "Cannot find a fulltext index to use for the search, try adding a @@fulltext([Fields...]) to your schema"
+)]
+pub struct MissingFullTextSearchIndex {}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2031",
+    message = "Prisma needs to perform transactions, which requires your MongoDB server to be run as a replica set. https://pris.ly/d/mongodb-replica-set"
+)]
+pub struct MongoReplicaSetRequired {}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2032",
+    message = "Error converting field \"{field}\" of expected non-nullable type \"{expected_type}\", found incompatible value of \"{found}\"."
+)]
+
+pub struct MissingFieldsInModel {
+    pub field: String,
+    pub expected_type: String,
+    pub found: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2033", message = "{details}")]
+
+pub struct ValueFitError {
+    pub details: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2034",
+    message = "Transaction failed due to a write conflict or a deadlock. Please retry your transaction"
+)]
+pub struct TransactionWriteConflict {}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2035", message = "Assertion violation on the database: `{database_error}`")]
+pub struct DatabaseAssertionViolation {
+    /// Database error returned by the underlying connector driver.
+    pub database_error: String,
+}

@@ -4,8 +4,7 @@ use mongodb::{
     bson::{from_bson, Bson, Document},
     options::*,
 };
-use prisma_models::dml::PrismaValue;
-use prisma_models::ModelRef;
+use prisma_models::{Model, PrismaValue};
 use std::collections::HashMap;
 
 #[allow(clippy::large_enum_variant)]
@@ -27,7 +26,7 @@ pub enum MongoOperation {
 
 impl MongoCommand {
     pub fn from_raw_query(
-        model: Option<&ModelRef>,
+        model: Option<&Model>,
         inputs: HashMap<String, PrismaValue>,
         query_type: Option<String>,
     ) -> crate::Result<MongoCommand> {
@@ -39,7 +38,7 @@ impl MongoCommand {
         }
     }
 
-    fn find(model: &ModelRef, inputs: HashMap<String, PrismaValue>) -> crate::Result<MongoCommand> {
+    fn find(model: &Model, inputs: HashMap<String, PrismaValue>) -> crate::Result<MongoCommand> {
         let filter = inputs.get_document("filter")?;
         let options = inputs
             .get_document("options")?
@@ -53,7 +52,7 @@ impl MongoCommand {
         })
     }
 
-    fn aggregate(model: &ModelRef, inputs: HashMap<String, PrismaValue>) -> crate::Result<MongoCommand> {
+    fn aggregate(model: &Model, inputs: HashMap<String, PrismaValue>) -> crate::Result<MongoCommand> {
         let pipeline = inputs.get_array_document("pipeline")?.unwrap_or_default();
         let options = inputs
             .get_document("options")?

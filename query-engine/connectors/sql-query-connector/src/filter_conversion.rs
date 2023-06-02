@@ -8,15 +8,11 @@ use std::convert::TryInto;
 #[derive(Clone, Copy, Debug)]
 /// A distinction in aliasing to separate the parent table and the joined data
 /// in the statement.
+#[derive(Default)]
 pub enum AliasMode {
+    #[default]
     Table,
     Join,
-}
-
-impl Default for AliasMode {
-    fn default() -> Self {
-        AliasMode::Table
-    }
 }
 
 #[derive(Clone, Copy, Debug, Default)]

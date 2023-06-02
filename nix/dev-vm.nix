@@ -75,7 +75,7 @@ let
             port = 22;
           }];
           enable = true;
-          passwordAuthentication = true;
+          settings.PasswordAuthentication = true;
         };
 
         users.users.prisma = {

@@ -1,5 +1,5 @@
 use crate::filter::Filter;
-use prisma_models::*;
+use prisma_models::{ast::FieldArity, *};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct SkipAndLimit {
@@ -21,7 +21,7 @@ pub struct SkipAndLimit {
 /// a single model (e.g. the cursor projection, distinct projection, orderby, ...).
 #[derive(Clone)]
 pub struct QueryArguments {
-    pub model: ModelRef,
+    pub model: Model,
     pub cursor: Option<SelectionResult>,
     pub take: Option<i64>,
     pub skip: Option<i64>,
@@ -49,7 +49,7 @@ impl std::fmt::Debug for QueryArguments {
 }
 
 impl QueryArguments {
-    pub fn new(model: ModelRef) -> Self {
+    pub fn new(model: Model) -> Self {
         Self {
             model,
             cursor: None,
@@ -140,11 +140,12 @@ impl QueryArguments {
             stable_candidates.iter().partition(|o| o.path.is_empty());
 
         // Indicates whether or not a combination of contained fields is on the source model (we don't check for relations for now).
-        let order_by_contains_unique_index = self.model.unique_indexes().into_iter().any(|index| {
-            index
-                .fields()
-                .into_iter()
-                .all(|f| on_model.iter().any(|o| o.field == f))
+        let order_by_contains_unique_index = self.model.unique_indexes().any(|index| {
+            index.fields().all(|f| {
+                on_model
+                    .iter()
+                    .any(|o| Some(o.field.id) == f.as_scalar_field().map(|sf| ScalarFieldId::InModel(sf.id)))
+            })
         });
 
         let source_contains_unique = on_model.iter().any(|o| o.field.unique());
@@ -158,7 +159,7 @@ impl QueryArguments {
 
         let has_optional_hop = on_relation.iter().any(|o| {
             o.path.iter().any(|hop| match hop {
-                OrderByHop::Relation(rf) => rf.arity == dml::FieldArity::Optional,
+                OrderByHop::Relation(rf) => rf.arity() == FieldArity::Optional,
                 OrderByHop::Composite(cf) => !cf.is_required(),
             })
         });
@@ -226,16 +227,16 @@ impl QueryArguments {
         }
     }
 
-    pub fn model(&self) -> &ModelRef {
+    pub fn model(&self) -> &Model {
         &self.model
     }
 }
 
-impl<T> From<(ModelRef, T)> for QueryArguments
+impl<T> From<(Model, T)> for QueryArguments
 where
     T: Into<Filter>,
 {
-    fn from(model_filter: (ModelRef, T)) -> Self {
+    fn from(model_filter: (Model, T)) -> Self {
         let mut query_arguments = Self::new(model_filter.0);
         query_arguments.filter = Some(model_filter.1.into());
         query_arguments

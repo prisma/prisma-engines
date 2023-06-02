@@ -2,11 +2,15 @@ use super::extract_filter;
 use crate::{ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult};
 use connector::{Filter, RelationCompare};
 use prisma_models::RelationFieldRef;
-use schema_builder::constants::filters;
+use schema::constants::filters;
 use std::convert::TryInto;
 
-pub fn parse(filter_key: &str, field: &RelationFieldRef, input: ParsedInputValue) -> QueryGraphBuilderResult<Filter> {
-    let value: Option<ParsedInputMap> = input.try_into()?;
+pub fn parse(
+    filter_key: &str,
+    field: &RelationFieldRef,
+    input: ParsedInputValue<'_>,
+) -> QueryGraphBuilderResult<Filter> {
+    let value: Option<ParsedInputMap<'_>> = input.try_into()?;
 
     match (filter_key, value) {
         // Relation list filters

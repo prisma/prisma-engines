@@ -2,9 +2,8 @@ use super::*;
 use crate::{query_ast::*, query_graph::*, ParsedInputValue};
 use connector::Filter;
 use itertools::Itertools;
-use prisma_models::{ModelRef, RelationFieldRef, SelectionResult};
+use prisma_models::{Model, RelationFieldRef, SelectionResult};
 use std::convert::TryInto;
-use std::sync::Arc;
 
 /// Only for x-to-many relations.
 ///
@@ -15,16 +14,16 @@ pub fn nested_set(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
-    value: ParsedInputValue,
-    child_model: &ModelRef,
+    value: ParsedInputValue<'_>,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
 
     // Build all filters upfront.
     let filters: Vec<Filter> = utils::coerce_vec(value)
         .into_iter()
-        .map(|value: ParsedInputValue| {
-            let value: ParsedInputMap = value.try_into()?;
+        .map(|value: ParsedInputValue<'_>| {
+            let value: ParsedInputMap<'_> = value.try_into()?;
             extract_unique_filter(value, child_model)
         })
         .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
@@ -97,11 +96,11 @@ fn handle_many_to_many(
     let disconnect = WriteQuery::DisconnectRecords(DisconnectRecords {
         parent_id: None,
         child_ids: vec![],
-        relation_field: Arc::clone(parent_relation_field),
+        relation_field: parent_relation_field.clone(),
     });
 
     let disconnect_node = graph.create_node(Query::Write(disconnect));
-    let relation_name = parent_relation_field.relation().name().to_owned();
+    let relation_name = parent_relation_field.relation().name();
     let parent_model_name = parent_relation_field.model().name().to_owned();
 
     // Edge from parent to disconnect
@@ -260,7 +259,7 @@ fn handle_one_to_many(
 
     // Update (connect) case: Check left diff IDs
     let connect_if_node = graph.create_node(Node::Flow(Flow::default_if()));
-    let update_connect_node = utils::update_records_node_placeholder(graph, Filter::empty(), Arc::clone(&child_model));
+    let update_connect_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model.clone());
 
     graph.create_edge(
         &diff_node,
@@ -277,7 +276,7 @@ fn handle_one_to_many(
         })),
     )?;
 
-    let relation_name = parent_relation_field.relation().name().to_owned();
+    let relation_name = parent_relation_field.relation().name();
     let parent_model_name = parent_relation_field.model().name().to_owned();
 
     // Connect to the if node, the parent node (for the inlining ID) and the diff node (to get the IDs to update)
@@ -320,11 +319,10 @@ fn handle_one_to_many(
 
     // Update (disconnect) case: Check right diff IDs.
     let disconnect_if_node = graph.create_node(Node::Flow(Flow::default_if()));
-    let update_disconnect_node =
-        utils::update_records_node_placeholder(graph, Filter::empty(), Arc::clone(&child_model));
+    let update_disconnect_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model);
 
     let child_side_required = parent_relation_field.related_field().is_required();
-    let rf = Arc::clone(parent_relation_field);
+    let rf = parent_relation_field.clone();
 
     graph.create_edge(
         &diff_node,

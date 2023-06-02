@@ -7,96 +7,59 @@ fn from_env(key: &str) -> Option<String> {
 
 #[test]
 fn strings_with_quotes_are_unescaped() {
-    let input = indoc!(
-        r#"
+    let input = indoc! {r#"
         model Category {
           id   String @id
           name String @default("a \" b\"c d")
-        }"#
-    );
+        }
+    "#};
 
-    let dml = parse(input);
-    let cat = dml.models().find(|m| m.name == "Category").unwrap();
-    let name = cat.scalar_fields().find(|f| f.name == "name").unwrap();
-
-    assert_eq!(
-        name.default_value
-            .as_ref()
-            .unwrap()
-            .as_single()
-            .unwrap()
-            .as_string()
-            .unwrap(),
-        "a \" b\"c d"
-    );
+    psl::parse_schema(input)
+        .unwrap()
+        .assert_has_model("Category")
+        .assert_has_scalar_field("name")
+        .assert_default_value()
+        .assert_string("a \" b\"c d");
 }
 
 #[test]
 fn strings_with_newlines_are_unescaped() {
-    let input = indoc!(
-        r#"
+    let input = indoc! {r#"
         model Category {
           id   String @id
           name String @default("Jean\nClaude\nVan\nDamme")
-        }"#
-    );
+        }
+    "#};
 
-    let dml = parse(input);
-    let cat = dml.models().find(|m| m.name == "Category").unwrap();
-    let name = cat.scalar_fields().find(|f| f.name == "name").unwrap();
-
-    assert_eq!(
-        name.default_value
-            .as_ref()
-            .unwrap()
-            .as_single()
-            .unwrap()
-            .as_string()
-            .unwrap(),
-        "Jean\nClaude\nVan\nDamme"
-    );
+    psl::parse_schema(input)
+        .unwrap()
+        .assert_has_model("Category")
+        .assert_has_scalar_field("name")
+        .assert_default_value()
+        .assert_string("Jean\nClaude\nVan\nDamme");
 }
 
 #[test]
 fn strings_with_escaped_unicode_codepoints_are_unescaped() {
-    let input = indoc!(
-        r#"
+    let input = indoc! {r#"
         model Category {
           id   String @id
           name String @default("mfw \u56e7 - \u56E7 ^^")
           // Escaped UTF-16 with surrogate pair (rolling eyes emoji).
           nameUtf16 String @default("oh my \ud83d\ude44...")
-        }"#
-    );
+        }
+    "#};
 
-    let dml = parse(input);
-    let cat = dml.models().find(|m| m.name == "Category").unwrap();
-    let name = cat.scalar_fields().find(|f| f.name == "name").unwrap();
+    let dml = psl::parse_schema(input).unwrap();
+    let cat = dml.assert_has_model("Category");
 
-    assert_eq!(
-        name.default_value
-            .as_ref()
-            .unwrap()
-            .as_single()
-            .unwrap()
-            .as_string()
-            .unwrap(),
-        "mfw 囧 - 囧 ^^"
-    );
+    cat.assert_has_scalar_field("name")
+        .assert_default_value()
+        .assert_string("mfw 囧 - 囧 ^^");
 
-    let nameutf16 = cat.scalar_fields().find(|f| f.name == "nameUtf16").unwrap();
-
-    assert_eq!(
-        nameutf16
-            .default_value
-            .as_ref()
-            .unwrap()
-            .as_single()
-            .unwrap()
-            .as_string()
-            .unwrap(),
-        "oh my 🙄..."
-    );
+    cat.assert_has_scalar_field("nameUtf16")
+        .assert_default_value()
+        .assert_string("oh my 🙄...");
 }
 
 #[test]

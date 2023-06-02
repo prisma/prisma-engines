@@ -4,7 +4,7 @@ use connector::{
     ScalarListCompare,
 };
 use prisma_models::{Field, PrismaValue, ScalarFieldRef, TypeIdentifier};
-use schema_builder::constants::{aggregations, filters, json_null};
+use schema::constants::{aggregations, filters, json_null};
 use std::convert::TryInto;
 
 pub struct ScalarFilterParser<'a> {
@@ -26,7 +26,7 @@ impl<'a> ScalarFilterParser<'a> {
     }
 
     fn field(&self) -> &ScalarFieldRef {
-        &self.field
+        self.field
     }
 
     fn reverse(&self) -> bool {
@@ -45,7 +45,7 @@ impl<'a> ScalarFilterParser<'a> {
         self
     }
 
-    pub fn parse(&self, mut filter_map: ParsedInputMap) -> QueryGraphBuilderResult<Vec<Filter>> {
+    pub fn parse(&self, mut filter_map: ParsedInputMap<'_>) -> QueryGraphBuilderResult<Vec<Filter>> {
         let json_path: Option<JsonFilterPath> = match filter_map.remove(filters::PATH) {
             Some(v) => Some(parse_json_path(v)?),
             _ => None,
@@ -71,7 +71,7 @@ impl<'a> ScalarFilterParser<'a> {
         Ok(filters)
     }
 
-    fn parse_scalar(&self, filter_name: &str, input: ParsedInputValue) -> QueryGraphBuilderResult<Vec<Filter>> {
+    fn parse_scalar(&self, filter_name: &str, input: ParsedInputValue<'_>) -> QueryGraphBuilderResult<Vec<Filter>> {
         let field = self.field();
 
         match filter_name {
@@ -80,7 +80,7 @@ impl<'a> ScalarFilterParser<'a> {
                     // Support for syntax `{ scalarField: { not: null } }` and `{ scalarField: { not: <value> } }`
                     ParsedInputValue::Single(value) => Ok(vec![field.not_equals(value)]),
                     _ => {
-                        let inner_object: ParsedInputMap = input.try_into()?;
+                        let inner_object: ParsedInputMap<'_> = input.try_into()?;
 
                         ScalarFilterParser::new(self.field, !self.reverse()).parse(inner_object)
                     }
@@ -98,7 +98,8 @@ impl<'a> ScalarFilterParser<'a> {
                         PrismaValue::Null => field.equals(value),
                         PrismaValue::List(values) => field.is_in(values),
 
-                        _ => unreachable!(), // Validation guarantees this.
+                        val if self.reverse() => field.not_in(vec![val]),
+                        val => field.is_in(vec![val]),
                     },
                     ConditionValue::FieldRef(field_ref) if self.reverse() => field.not_in(field_ref),
                     ConditionValue::FieldRef(field_ref) => field.is_in(field_ref),
@@ -119,7 +120,8 @@ impl<'a> ScalarFilterParser<'a> {
                         PrismaValue::Null => field.not_equals(value),
                         PrismaValue::List(values) => field.not_in(values),
 
-                        _ => unreachable!(), // Validation guarantees this.
+                        val if self.reverse() => field.is_in(vec![val]),
+                        val => field.not_in(vec![val]),
                     },
                     ConditionValue::FieldRef(field_ref) if self.reverse() => field.is_in(field_ref),
                     ConditionValue::FieldRef(field_ref) => field.not_in(field_ref),
@@ -185,18 +187,16 @@ impl<'a> ScalarFilterParser<'a> {
             aggregations::UNDERSCORE_MIN => self.aggregation_filter(input, Filter::min, false),
             aggregations::UNDERSCORE_MAX => self.aggregation_filter(input, Filter::max, false),
 
-            _ => {
-                return Err(QueryGraphBuilderError::InputError(format!(
-                    "{filter_name} is not a valid scalar filter operation"
-                )))
-            }
+            _ => Err(QueryGraphBuilderError::InputError(format!(
+                "{filter_name} is not a valid scalar filter operation"
+            ))),
         }
     }
 
     fn parse_json(
         &self,
         filter_name: &str,
-        input: ParsedInputValue,
+        input: ParsedInputValue<'_>,
         json_path: Option<JsonFilterPath>,
     ) -> QueryGraphBuilderResult<Vec<Filter>> {
         let field = self.field();
@@ -217,7 +217,7 @@ impl<'a> ScalarFilterParser<'a> {
                         Ok(vec![filter])
                     }
                     _ => {
-                        let inner_object: ParsedInputMap = input.try_into()?;
+                        let inner_object: ParsedInputMap<'_> = input.try_into()?;
 
                         ScalarFilterParser::new(self.field(), !self.reverse()).parse(inner_object)
                     }
@@ -396,17 +396,15 @@ impl<'a> ScalarFilterParser<'a> {
                 JsonTargetType::String,
             )]),
 
-            _ => {
-                return Err(QueryGraphBuilderError::InputError(format!(
-                    "{filter_name} is not a valid scalar filter operation"
-                )))
-            }
+            _ => Err(QueryGraphBuilderError::InputError(format!(
+                "{filter_name} is not a valid scalar filter operation"
+            ))),
         }
     }
 
     fn as_condition_value(
         &self,
-        input: ParsedInputValue,
+        input: ParsedInputValue<'_>,
         expect_list_ref: bool,
     ) -> QueryGraphBuilderResult<ConditionValue> {
         // If we're parsing a count filter, force the referenced field to be of TypeIdentifier::Int
@@ -421,7 +419,7 @@ impl<'a> ScalarFilterParser<'a> {
 
     fn internal_as_condition_value(
         &self,
-        input: ParsedInputValue,
+        input: ParsedInputValue<'_>,
         expect_list_ref: bool,
         expected_type: &TypeIdentifier,
     ) -> QueryGraphBuilderResult<ConditionValue> {
@@ -440,7 +438,7 @@ impl<'a> ScalarFilterParser<'a> {
                         Ok(ConditionValue::reference(field_ref))
                     }
                     Some(Field::Scalar(field_ref)) => Err(QueryGraphBuilderError::InputError(format!(
-                        "Expected a referenced scalar field of type {}{} but found {} of type {}{}.",
+                        "Expected a referenced scalar field of type {:?}{} but found {} of type {:?}{}.",
                         expected_type,
                         if field.is_list() { "[]" } else { "" },
                         field_ref,
@@ -464,7 +462,7 @@ impl<'a> ScalarFilterParser<'a> {
         }
     }
 
-    fn as_condition_list_value(&self, input: ParsedInputValue) -> QueryGraphBuilderResult<ConditionListValue> {
+    fn as_condition_list_value(&self, input: ParsedInputValue<'_>) -> QueryGraphBuilderResult<ConditionListValue> {
         let field = self.field();
 
         match input {
@@ -480,7 +478,7 @@ impl<'a> ScalarFilterParser<'a> {
                         Ok(ConditionListValue::reference(field_ref))
                     }
                     Some(Field::Scalar(field_ref)) => Err(QueryGraphBuilderError::InputError(format!(
-                        "Expected a referenced scalar field of type {}{} but found {} of type {}{}.",
+                        "Expected a referenced scalar field of type {:?}{} but found {} of type {:?}{}.",
                         field.type_identifier(),
                         if field.is_list() { "[]" } else { "" },
                         field_ref,
@@ -510,14 +508,14 @@ impl<'a> ScalarFilterParser<'a> {
 
     fn aggregation_filter<F>(
         &self,
-        input: ParsedInputValue,
+        input: ParsedInputValue<'_>,
         func: F,
         is_count_filter: bool,
     ) -> QueryGraphBuilderResult<Vec<Filter>>
     where
         F: Fn(Filter) -> Filter,
     {
-        let inner_object: ParsedInputMap = input.try_into()?;
+        let inner_object: ParsedInputMap<'_> = input.try_into()?;
         let filters: Vec<Filter> = ScalarFilterParser::new(self.field, self.reverse())
             .set_is_count_filter(is_count_filter)
             .parse(inner_object)?;
@@ -561,7 +559,7 @@ where
     filter
 }
 
-fn parse_json_path(input: ParsedInputValue) -> QueryGraphBuilderResult<JsonFilterPath> {
+fn parse_json_path(input: ParsedInputValue<'_>) -> QueryGraphBuilderResult<JsonFilterPath> {
     let path: PrismaValue = input.try_into()?;
 
     match path {

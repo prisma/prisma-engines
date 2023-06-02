@@ -6,9 +6,8 @@ use crate::{
 };
 use connector::{Filter, IntoFilter};
 use itertools::Itertools;
-use prisma_models::{ModelRef, RelationFieldRef};
+use prisma_models::{Model, RelationFieldRef};
 use std::convert::TryInto;
-use std::sync::Arc;
 
 /// Handles nested connect cases.
 ///
@@ -18,17 +17,17 @@ pub fn nested_connect(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    value: ParsedInputValue,
-    child_model: &ModelRef,
+    value: ParsedInputValue<'_>,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let relation = parent_relation_field.relation();
 
     // Build all filters upfront.
     let filters: Vec<Filter> = utils::coerce_vec(value)
         .into_iter()
-        .map(|value: ParsedInputValue| {
-            let value: ParsedInputMap = value.try_into()?;
-            extract_unique_filter(value, &child_model)
+        .map(|value: ParsedInputValue<'_>| {
+            let value: ParsedInputMap<'_> = value.try_into()?;
+            extract_unique_filter(value, child_model)
         })
         .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
         .into_iter()
@@ -78,7 +77,7 @@ fn handle_many_to_many(
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     filter: Filter,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let expected_connects = filter.size();
     let child_read_query = utils::read_ids_infallible(child_model.clone(), child_model.primary_identifier(), filter);
@@ -89,7 +88,7 @@ fn handle_many_to_many(
         graph,
         &parent_node,
         &child_node,
-        &parent_relation_field,
+        parent_relation_field,
         expected_connects,
     )?;
 
@@ -156,7 +155,7 @@ fn handle_one_to_many(
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     child_filter: Filter,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let parent_link = parent_relation_field.linking_fields();
     let child_link = parent_relation_field.related_field().linking_fields();
@@ -164,7 +163,7 @@ fn handle_one_to_many(
     if parent_relation_field.relation_is_inlined_in_parent() {
         let read_query = utils::read_ids_infallible(child_model.clone(), child_link.clone(), child_filter);
         let read_children_node = graph.create_node(read_query);
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
         let parent_model_name = parent_relation_field.model().name().to_owned();
         let child_model_name = child_model.name().to_owned();
 
@@ -194,9 +193,9 @@ fn handle_one_to_many(
         )?;
     } else {
         let expected_id_count = child_filter.size();
-        let update_node = utils::update_records_node_placeholder(graph, child_filter, Arc::clone(child_model));
+        let update_node = utils::update_records_node_placeholder(graph, child_filter, child_model.clone());
         let check_node = graph.create_node(Node::Empty);
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
         let parent_model_name = parent_relation_field.model().name().to_owned();
         let child_model_name = child_model.name().to_owned();
 
@@ -222,7 +221,7 @@ fn handle_one_to_many(
             ),
         )?;
 
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
 
         // Check that all specified children have been updated.
         graph.create_edge(
@@ -337,7 +336,7 @@ fn handle_one_to_one(
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     filter: Filter,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let parent_is_create = utils::node_is_create(graph, &parent_node);
     let child_relation_field = parent_relation_field.related_field();
@@ -365,7 +364,7 @@ fn handle_one_to_one_parent_update(
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     filter: Filter,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let child_linking_fields = parent_relation_field.related_field().linking_fields();
 
@@ -410,13 +409,12 @@ fn handle_one_to_one_parent_update(
 
     // If the relation is inlined on the child, we also need to update the child to connect it to the parent.
     if relation_inlined_child {
-        let update_children_node =
-            utils::update_records_node_placeholder(graph, Filter::empty(), Arc::clone(child_model));
+        let update_children_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model.clone());
 
         let parent_linking_fields = parent_relation_field.linking_fields();
         let child_linking_fields = parent_relation_field.related_field().linking_fields();
         let child_model_identifier = parent_relation_field.related_field().model().primary_identifier();
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
         let child_model_name = child_model.name().to_owned();
 
         graph.create_edge(
@@ -428,7 +426,7 @@ fn handle_one_to_one_parent_update(
                     let child_id = match child_ids.pop() {
                         Some(pid) => Ok(pid),
                         None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "No '{child_model_name}' record to connect was found was found for a nested connect on one-to-one relation '{relation_name}'."
+                            "No '{child_model_name}' record to connect was found for a nested connect on one-to-one relation '{relation_name}'."
                         ))),
                     }?;
 
@@ -441,7 +439,7 @@ fn handle_one_to_one_parent_update(
             ),
         )?;
 
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
         let parent_model_name = parent_relation_field.model().name().to_owned();
         let child_model_name = child_model.name().to_owned();
 
@@ -477,7 +475,7 @@ fn handle_one_to_one_parent_update(
         let child_model_name = child_model.name().to_owned();
         let update_parent_node = utils::update_records_node_placeholder(graph, Filter::empty(), parent_model.clone());
         let parent_linking_fields = parent_relation_field.linking_fields();
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
 
         graph.create_edge(
             &read_new_child_node,
@@ -499,7 +497,7 @@ fn handle_one_to_one_parent_update(
          )?;
 
         let parent_model_identifier = parent_relation_field.model().primary_identifier();
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
         let parent_model_name = parent_model.name().to_owned();
         let child_model_name = child_model.name().to_owned();
 
@@ -537,7 +535,7 @@ fn handle_one_to_one_parent_create(
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     filter: Filter,
-    child_model: &ModelRef,
+    child_model: &Model,
 ) -> QueryGraphBuilderResult<()> {
     let parent_linking_fields = parent_relation_field.linking_fields();
     let child_linking_fields = parent_relation_field.related_field().linking_fields();
@@ -559,7 +557,7 @@ fn handle_one_to_one_parent_create(
         utils::insert_existing_1to1_related_model_checks(graph, &read_new_child_node, &child_relation_field)?;
     }
 
-    let relation_name = parent_relation_field.relation().name().to_owned();
+    let relation_name = parent_relation_field.relation().name();
     let parent_model_name = parent_relation_field.model().name().to_owned();
     let child_model_name = child_model.name().to_owned();
 
@@ -591,13 +589,12 @@ fn handle_one_to_one_parent_create(
 
     // If the relation is inlined on the child, we also need to update the child to connect it to the parent.
     if relation_inlined_child {
-        let update_children_node =
-            utils::update_records_node_placeholder(graph, Filter::empty(), Arc::clone(child_model));
+        let update_children_node = utils::update_records_node_placeholder(graph, Filter::empty(), child_model.clone());
 
         let parent_linking_fields = parent_relation_field.linking_fields();
         let child_linking_fields = parent_relation_field.related_field().linking_fields();
         let child_model_identifier = parent_relation_field.related_field().model().primary_identifier();
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
         let child_model_name = child_model.name().to_owned();
 
         graph.create_edge(
@@ -609,7 +606,7 @@ fn handle_one_to_one_parent_create(
                     let child_id = match child_ids.pop() {
                         Some(pid) => Ok(pid),
                         None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "No '{child_model_name}' record to connect was found was found for a nested connect on one-to-one relation '{relation_name}'."
+                            "No '{child_model_name}' record to connect was found for a nested connect on one-to-one relation '{relation_name}'."
                         ))),
                     }?;
 
@@ -622,7 +619,7 @@ fn handle_one_to_one_parent_create(
             ),
         )?;
 
-        let relation_name = parent_relation_field.relation().name().to_owned();
+        let relation_name = parent_relation_field.relation().name();
         let parent_model_name = parent_relation_field.model().name().to_owned();
         let child_model_name = child_model.name().to_owned();
 

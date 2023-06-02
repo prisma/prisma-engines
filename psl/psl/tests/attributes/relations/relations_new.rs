@@ -17,22 +17,16 @@ fn relation_happy_path() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse_schema(dml);
     let user_model = schema.assert_has_model("User");
+    let post_model = schema.assert_has_model("Post");
     user_model
         .assert_has_relation_field("posts")
-        .assert_arity(&dml::FieldArity::List)
-        .assert_relation_to("Post")
-        .assert_relation_base_fields(&[])
-        .assert_relation_referenced_fields(&[]);
+        .assert_relation_to(post_model.id);
 
-    let post_model = schema.assert_has_model("Post");
     post_model
         .assert_has_relation_field("user")
-        .assert_arity(&dml::FieldArity::Required)
-        .assert_relation_to("User")
-        .assert_relation_base_fields(&["userId"])
-        .assert_relation_referenced_fields(&["id"]);
+        .assert_relation_to(user_model.id);
 }
 
 #[test]
@@ -123,7 +117,7 @@ fn optional_relation_field_must_succeed_when_all_underlying_fields_are_optional(
     "#;
 
     // must not crash
-    let _ = parse(dml);
+    let _ = parse_schema(dml);
 }
 
 #[test]
@@ -184,7 +178,7 @@ fn optional_relation_field_must_succeed_when_at_least_one_underlying_fields_is_o
     "#;
 
     // must not crash
-    let _ = parse(dml);
+    parse_schema(dml);
 }
 
 #[test]

@@ -172,7 +172,7 @@ mod create {
             }
           }"#,
           2009,
-          "`Mutation.createOneScalarModel.data.ScalarModelCreateInput.optDateTime`: Error parsing value: Invalid DateTime: '2016-0B-31T23:59:01.000Z' (must be ISO 8601 compatible). Underlying error: input contains invalid characters."
+          "2016-0B-31T23:59:01.000Z` is not a valid `ISO-8601 DateTime`. Underlying error: input contains invalid characters"
         );
 
         Ok(())
@@ -182,8 +182,8 @@ mod create {
     #[connector_test]
     async fn fail_when_int_invalid(runner: Runner) -> TestResult<()> {
         assert_error!(
-          runner,
-          r#"mutation {
+            runner,
+            r#"mutation {
             createOneScalarModel(data: {
               id: "1",
               optString: "test",
@@ -194,8 +194,8 @@ mod create {
               optDateTime: "2016-07-31T23:59:01.000Z"
             }
           ){ optString, optInt, optFloat, optBoolean, optEnum, optDateTime }}"#,
-          2009,
-          "Query parsing/validation error at `Mutation.createOneScalarModel.data.ScalarModelCreateInput.optInt`: Value types mismatch. Have: Enum(\"B\"), want: Int"
+            2009,
+            "Invalid argument type. `optInt` should be of any of the following types: `Int`"
         );
 
         Ok(())
@@ -236,10 +236,10 @@ mod create {
     #[connector_test]
     async fn fail_if_string_dont_match_enum_val(runner: Runner) -> TestResult<()> {
         assert_error!(
-          runner,
-          r#"mutation {createOneScalarModel(data: {id: "1", optEnum: "NOPE"}){ optEnum }}"#,
-          2009,
-          "Query parsing/validation error at `Mutation.createOneScalarModel.data.ScalarModelCreateInput.optEnum`: Error parsing value: Enum value 'NOPE' is invalid for enum type MyEnum."
+            runner,
+            r#"mutation {createOneScalarModel(data: {id: "1", optEnum: "NOPE"}){ optEnum }}"#,
+            2009,
+            "`NOPE` is not a valid `MyEnum`"
         );
 
         Ok(())
@@ -252,7 +252,7 @@ mod create {
             &runner,
             r#"mutation { createOneScalarModel(data: { id: "1", optRel: null }){ relId }}"#,
             2009,
-            "`Mutation.createOneScalarModel.data.ScalarModelCreateInput.optRel`: A value is required but not set"
+            "A value is required but not set"
         );
 
         Ok(())
@@ -353,16 +353,20 @@ mod json_create {
 
     #[connector_test(capabilities(AdvancedJsonNullability))]
     async fn create_json_errors(runner: Runner) -> TestResult<()> {
-        assert_error!(
-            &runner,
-            r#"mutation {
-                  createOneTestModel(data: { id: 1, json: null }) {
-                    json
-                  }
-                }"#,
-            2009,
-            "A value is required but not set."
-        );
+        // On the JSON protocol, this succeeds because `null` is serialized as JSON.
+        // It doesn't matter since the client does _not_ allow to send null values, but only DbNull or JsonNull.
+        if runner.protocol().is_graphql() {
+            assert_error!(
+                &runner,
+                r#"mutation {
+                    createOneTestModel(data: { id: 1, json: null }) {
+                      json
+                    }
+                  }"#,
+                2009,
+                "A value is required but not set"
+            );
+        }
 
         assert_error!(
             &runner,
@@ -372,7 +376,7 @@ mod json_create {
                 }
               }"#,
             2009,
-            "Value types mismatch. Have: Enum(\"AnyNull\")"
+            "`AnyNull` is not a valid `NullableJsonNullValueInput`"
         );
 
         Ok(())

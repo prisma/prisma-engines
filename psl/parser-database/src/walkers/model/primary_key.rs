@@ -2,7 +2,7 @@ use crate::{
     ast,
     types::IdAttribute,
     walkers::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
-    ParserDatabase,
+    ParserDatabase, ScalarFieldId,
 };
 
 /// An `@(@)id` attribute in the schema.
@@ -65,11 +65,11 @@ impl<'db> PrimaryKeyWalker<'db> {
     }
 
     /// The scalar fields constrained by the id.
-    pub fn fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'db>> + 'db {
-        self.attribute.fields.iter().map(move |field| {
-            let field_id = field.path.field_in_index();
-            self.model().scalar_field(field_id)
-        })
+    pub fn fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'db>> + Clone + 'db {
+        self.attribute
+            .fields
+            .iter()
+            .map(move |field| self.db.walk(field.path.root()))
     }
 
     /// The scalar fields covered by the id, and their arguments.
@@ -79,7 +79,6 @@ impl<'db> PrimaryKeyWalker<'db> {
             .iter()
             .enumerate()
             .map(move |(field_arg_id, _)| ScalarFieldAttributeWalker {
-                model_id: self.model_id,
                 fields: &self.attribute.fields,
                 db: self.db,
                 field_arg_id,
@@ -87,14 +86,14 @@ impl<'db> PrimaryKeyWalker<'db> {
     }
 
     /// Do the constrained fields match exactly these?
-    pub(crate) fn contains_exactly_fields_by_id(self, fields: &[ast::FieldId]) -> bool {
+    pub(crate) fn contains_exactly_fields_by_id(self, fields: &[ScalarFieldId]) -> bool {
         self.attribute.fields.len() == fields.len()
             && self
                 .attribute
                 .fields
                 .iter()
                 .zip(fields)
-                .all(|(a, b)| a.path.field_in_index() == *b)
+                .all(|(a, b)| matches!(a.path.field_in_index(), either::Either::Left(id)  if id == *b))
     }
 
     /// Do the constrained fields match exactly these?

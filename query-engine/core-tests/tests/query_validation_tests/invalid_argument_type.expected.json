@@ -1,0 +1,44 @@
+{
+  "is_panic": false,
+  "message": "Unable to match input value to any allowed input type for the field. Parse errors: [Invalid argument type. `id` should be of any of the following types: `IntFilter`, Invalid argument type. `id` should be of any of the following types: `Int`]",
+  "meta": {
+    "kind": "Union",
+    "errors": [
+      {
+        "kind": "InvalidArgumentType",
+        "argumentPath": [
+          "where",
+          "id"
+        ],
+        "argument": {
+          "name": "id",
+          "typeNames": [
+            "IntFilter"
+          ]
+        },
+        "selectionPath": [
+          "findManyUser"
+        ],
+        "inferredType": "String"
+      },
+      {
+        "kind": "InvalidArgumentType",
+        "argumentPath": [
+          "where",
+          "id"
+        ],
+        "argument": {
+          "name": "id",
+          "typeNames": [
+            "Int"
+          ]
+        },
+        "selectionPath": [
+          "findManyUser"
+        ],
+        "inferredType": "String"
+      }
+    ]
+  },
+  "error_code": "P2009"
+}

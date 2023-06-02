@@ -1,5 +1,4 @@
 {
     "connector": "mysql",
-    "version": "mariadb",
-    "runner": "direct"
+    "version": "mariadb"
 }

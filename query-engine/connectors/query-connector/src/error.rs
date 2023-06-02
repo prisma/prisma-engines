@@ -1,8 +1,7 @@
-use std::fmt::Display;
-
 use crate::filter::Filter;
 use itertools::Itertools;
 use prisma_models::prelude::DomainError;
+use std::fmt::Display;
 use thiserror::Error;
 use user_facing_errors::{query_engine::DatabaseConstraint, KnownError};
 

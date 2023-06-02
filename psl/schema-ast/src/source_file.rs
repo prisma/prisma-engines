@@ -33,6 +33,12 @@ impl From<&str> for SourceFile {
     }
 }
 
+impl From<&String> for SourceFile {
+    fn from(s: &String) -> Self {
+        Self::new_allocated(Arc::from(s.to_owned().into_boxed_str()))
+    }
+}
+
 impl From<Box<str>> for SourceFile {
     fn from(s: Box<str>) -> Self {
         Self::new_allocated(Arc::from(s))

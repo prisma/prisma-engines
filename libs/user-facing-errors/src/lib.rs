@@ -4,11 +4,10 @@
 mod panic_hook;
 
 pub mod common;
-pub mod introspection_engine;
-pub mod migration_engine;
 #[cfg(feature = "sql")]
 pub mod quaint;
 pub mod query_engine;
+pub mod schema_engine;
 
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
@@ -63,6 +62,15 @@ pub struct UnknownError {
     pub backtrace: Option<String>,
 }
 
+impl UnknownError {
+    pub fn new(err: &dyn std::error::Error) -> Self {
+        UnknownError {
+            message: err.to_string(),
+            backtrace: None,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct Error {
     is_panic: bool,
@@ -105,17 +113,6 @@ impl Error {
             inner: ErrorType::Unknown(UnknownError {
                 message,
                 backtrace: Some(format!("{:?}", backtrace::Backtrace::new())),
-            }),
-            is_panic: false,
-            batch_request_idx: None,
-        }
-    }
-
-    pub fn from_dyn_error(err: &dyn std::error::Error) -> Self {
-        Error {
-            inner: ErrorType::Unknown(UnknownError {
-                message: err.to_string(),
-                backtrace: None,
             }),
             is_panic: false,
             batch_request_idx: None,
@@ -192,6 +189,12 @@ impl Error {
 
 pub fn new_backtrace() -> backtrace::Backtrace {
     backtrace::Backtrace::new()
+}
+
+impl<T: UserFacingError> From<T> for Error {
+    fn from(err: T) -> Self {
+        Self::from(KnownError::new(err))
+    }
 }
 
 impl From<UnknownError> for Error {

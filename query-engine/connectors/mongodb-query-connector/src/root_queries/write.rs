@@ -15,7 +15,7 @@ use mongodb::{
     options::InsertManyOptions,
     ClientSession, Collection, Database,
 };
-use prisma_models::{ModelRef, PrismaValue, SelectionResult};
+use prisma_models::{Model, PrismaValue, SelectionResult};
 use std::{collections::HashMap, convert::TryInto};
 use tracing::{info_span, Instrument};
 use update::IntoUpdateDocumentExtension;
@@ -25,7 +25,7 @@ use update::IntoUpdateDocumentExtension;
 pub async fn create_record<'conn>(
     database: &Database,
     session: &mut ClientSession,
-    model: &ModelRef,
+    model: &Model,
     mut args: WriteArgs,
 ) -> crate::Result<SelectionResult> {
     let coll = database.collection::<Document>(model.db_name());
@@ -78,7 +78,7 @@ pub async fn create_record<'conn>(
 pub async fn create_records<'conn>(
     database: &Database,
     session: &mut ClientSession,
-    model: &ModelRef,
+    model: &Model,
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
 ) -> crate::Result<usize> {
@@ -105,7 +105,7 @@ pub async fn create_records<'conn>(
                     .try_into()
                     .expect("Create calls can only use PrismaValue write expressions (right now).");
 
-                let bson = (field, value).into_bson().decorate_with_field_info(&field)?;
+                let bson = (field, value).into_bson().decorate_with_field_info(field)?;
 
                 doc.insert(field_name.to_string(), bson);
             }
@@ -144,7 +144,7 @@ pub async fn create_records<'conn>(
 pub async fn update_records<'conn>(
     database: &Database,
     session: &mut ClientSession,
-    model: &ModelRef,
+    model: &Model,
     record_filter: RecordFilter,
     mut args: WriteArgs,
     update_type: UpdateType,
@@ -186,8 +186,7 @@ pub async fn update_records<'conn>(
     let filter = doc! { id_field.db_name(): { "$in": ids.clone() } };
     let fields: Vec<_> = model
         .fields()
-        .all
-        .iter()
+        .all()
         .filter_map(|field| {
             args.take_field_value(field.db_name())
                 .map(|write_op| (field.clone(), write_op))
@@ -210,7 +209,10 @@ pub async fn update_records<'conn>(
         .instrument(span)
         .await?;
 
-        if update_type == UpdateType::Many && res.modified_count == 0 {
+        // It's important we check the `matched_count` and not the `modified_count` here.
+        // MongoDB returns `modified_count: 0` when performing a noop update, which breaks
+        // nested connect mutations as it rely on the returned count to know whether the update happened.
+        if update_type == UpdateType::Many && res.matched_count == 0 {
             return Ok(Vec::new());
         }
     }
@@ -231,7 +233,7 @@ pub async fn update_records<'conn>(
 pub async fn delete_records<'conn>(
     database: &Database,
     session: &mut ClientSession,
-    model: &ModelRef,
+    model: &Model,
     record_filter: RecordFilter,
 ) -> crate::Result<usize> {
     let coll = database.collection::<Document>(model.db_name());
@@ -277,7 +279,7 @@ async fn find_ids(
     database: &Database,
     collection: Collection<Document>,
     session: &mut ClientSession,
-    model: &ModelRef,
+    model: &Model,
     filter: MongoFilter,
 ) -> crate::Result<Vec<Bson>> {
     let coll = database.collection::<Document>(model.db_name());
@@ -326,7 +328,7 @@ pub async fn m2m_connect<'conn>(
     let parent_id = parent_id.values().next().unwrap();
     let parent_id_field = pick_singular_id(&parent_model);
 
-    let parent_ids_scalar_field_name = field.relation_info().fields.get(0).unwrap();
+    let parent_ids_scalar_field_name = field.walker().fields().unwrap().next().unwrap().name().to_owned();
     let parent_id = (&parent_id_field, parent_id)
         .into_bson()
         .decorate_with_scalar_field_info(&parent_id_field)?;
@@ -339,7 +341,7 @@ pub async fn m2m_connect<'conn>(
 
             (selection, value.clone())
                 .into_bson()
-                .decorate_with_selected_field_info(&selection)
+                .decorate_with_selected_field_info(selection)
         })
         .collect::<crate::Result<Vec<_>>>()?;
 
@@ -354,7 +356,16 @@ pub async fn m2m_connect<'conn>(
 
     // Then update all children and add the parent
     let child_filter = doc! { "_id": { "$in": child_ids } };
-    let child_ids_scalar_field_name = field.related_field().relation_info().fields.get(0).unwrap().clone();
+    let child_ids_scalar_field_name = field
+        .walker()
+        .opposite_relation_field()
+        .unwrap()
+        .fields()
+        .unwrap()
+        .next()
+        .unwrap()
+        .name()
+        .to_owned();
     let child_update = doc! { "$addToSet": { child_ids_scalar_field_name: parent_id } };
 
     let child_updates = vec![child_update.clone()];
@@ -383,7 +394,7 @@ pub async fn m2m_disconnect<'conn>(
     let parent_id = parent_id.values().next().unwrap();
     let parent_id_field = pick_singular_id(&parent_model);
 
-    let parent_ids_scalar_field_name = field.relation_info().fields.get(0).unwrap();
+    let parent_ids_scalar_field_name = field.walker().fields().unwrap().next().unwrap().name().to_owned();
     let parent_id = (&parent_id_field, parent_id)
         .into_bson()
         .decorate_with_scalar_field_info(&parent_id_field)?;
@@ -396,7 +407,7 @@ pub async fn m2m_disconnect<'conn>(
 
             (field, value.clone())
                 .into_bson()
-                .decorate_with_selected_field_info(&field)
+                .decorate_with_selected_field_info(field)
         })
         .collect::<crate::Result<Vec<_>>>()?;
 
@@ -411,7 +422,16 @@ pub async fn m2m_disconnect<'conn>(
 
     // Then update all children and add the parent
     let child_filter = doc! { "_id": { "$in": child_ids } };
-    let child_ids_scalar_field_name = field.related_field().relation_info().fields.get(0).unwrap().clone();
+    let child_ids_scalar_field_name = field
+        .walker()
+        .opposite_relation_field()
+        .unwrap()
+        .fields()
+        .unwrap()
+        .next()
+        .unwrap()
+        .name()
+        .to_owned();
 
     let child_update = doc! { "$pull": { child_ids_scalar_field_name: parent_id } };
 
@@ -438,7 +458,7 @@ pub async fn execute_raw<'conn>(
 pub async fn query_raw<'conn>(
     database: &Database,
     session: &mut ClientSession,
-    model: Option<&ModelRef>,
+    model: Option<&Model>,
     inputs: HashMap<String, PrismaValue>,
     query_type: Option<String>,
 ) -> crate::Result<serde_json::Value> {
@@ -490,7 +510,7 @@ pub async fn query_raw<'conn>(
     .await
 }
 
-fn get_raw_db_statement(query_type: &Option<String>, model: &Option<&ModelRef>, database: &Database) -> String {
+fn get_raw_db_statement(query_type: &Option<String>, model: &Option<&Model>, database: &Database) -> String {
     match (query_type.as_deref(), model) {
         (Some("findRaw"), Some(m)) => format!("db.{}.findRaw(*)", database.collection::<Document>(m.db_name()).name()),
         (Some("aggregateRaw"), Some(m)) => format!(

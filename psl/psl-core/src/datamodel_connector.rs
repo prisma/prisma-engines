@@ -7,6 +7,9 @@ pub mod constraint_names;
 /// Extensions for parser database walkers with context from the connector.
 pub mod walker_ext_traits;
 
+/// Connector completions
+pub mod completions;
+
 mod empty_connector;
 mod filters;
 mod native_types;
@@ -14,13 +17,14 @@ mod relation_mode;
 
 pub use self::{
     capabilities::{ConnectorCapabilities, ConnectorCapability},
+    completions::format_completion_docs,
     empty_connector::EmptyDatamodelConnector,
     filters::*,
     native_types::{NativeTypeArguments, NativeTypeConstructor, NativeTypeInstance},
     relation_mode::RelationMode,
 };
 
-use crate::{configuration::DatasourceConnectorData, Datasource, PreviewFeature};
+use crate::{configuration::DatasourceConnectorData, Configuration, Datasource, PreviewFeature};
 use diagnostics::{DatamodelError, Diagnostics, NativeTypeErrorFactory, Span};
 use enumflags2::BitFlags;
 use lsp_types::CompletionList;
@@ -49,11 +53,11 @@ pub trait Connector: Send + Sync {
     fn name(&self) -> &str;
 
     /// The static list of capabilities for the connector.
-    fn capabilities(&self) -> &'static [ConnectorCapability];
+    fn capabilities(&self) -> ConnectorCapabilities;
 
     /// Does the connector have this capability?
     fn has_capability(&self, capability: ConnectorCapability) -> bool {
-        self.capabilities().contains(&capability)
+        self.capabilities().contains(capability)
     }
 
     /// The maximum length of constraint names in bytes. Connectors without a
@@ -331,8 +335,15 @@ pub trait Connector: Send + Sync {
 
     fn validate_url(&self, url: &str) -> Result<(), String>;
 
-    fn push_completions(&self, _db: &ParserDatabase, _position: SchemaPosition<'_>, _completions: &mut CompletionList) {
+    fn datamodel_completions(
+        &self,
+        _db: &ParserDatabase,
+        _position: SchemaPosition<'_>,
+        _completions: &mut CompletionList,
+    ) {
     }
+
+    fn datasource_completions(&self, _config: &Configuration, _completion_list: &mut CompletionList) {}
 
     fn parse_datasource_properties(
         &self,

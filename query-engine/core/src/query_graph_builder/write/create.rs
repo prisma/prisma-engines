@@ -5,18 +5,17 @@ use crate::{
     ArgumentListLookup, ParsedField, ParsedInputList, ParsedInputMap,
 };
 use connector::IntoFilter;
-use prisma_models::ModelRef;
-use schema::ConnectorContext;
-use schema_builder::constants::args;
-use std::{convert::TryInto, sync::Arc};
+use prisma_models::Model;
+use schema::{constants::args, QuerySchema};
+use std::convert::TryInto;
 use write_args_parser::*;
 
 /// Creates a create record query and adds it to the query graph, together with it's nested queries and companion read query.
-pub fn create_record(
+pub(crate) fn create_record(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
-    model: ModelRef,
-    mut field: ParsedField,
+    query_schema: &QuerySchema,
+    model: Model,
+    mut field: ParsedField<'_>,
 ) -> QueryGraphBuilderResult<()> {
     graph.flag_transactional();
 
@@ -25,7 +24,7 @@ pub fn create_record(
         None => ParsedInputMap::default(),
     };
 
-    let create_node = create::create_record_node(graph, connector_ctx, Arc::clone(&model), data_map)?;
+    let create_node = create::create_record_node(graph, query_schema, model.clone(), data_map)?;
 
     // Follow-up read query on the write
     let read_query = read::find_unique(field, model.clone())?;
@@ -58,16 +57,16 @@ pub fn create_record(
 }
 
 /// Creates a create record query and adds it to the query graph, together with it's nested queries and companion read query.
-pub fn create_many_records(
+pub(crate) fn create_many_records(
     graph: &mut QueryGraph,
-    _connector_ctx: &ConnectorContext,
-    model: ModelRef,
-    mut field: ParsedField,
+    _query_schema: &QuerySchema,
+    model: Model,
+    mut field: ParsedField<'_>,
 ) -> QueryGraphBuilderResult<()> {
     graph.flag_transactional();
 
-    let data_list: ParsedInputList = match field.arguments.lookup(args::DATA) {
-        Some(data) => data.value.try_into()?,
+    let data_list: ParsedInputList<'_> = match field.arguments.lookup(args::DATA) {
+        Some(data) => utils::coerce_vec(data.value),
         None => vec![],
     };
 
@@ -99,9 +98,9 @@ pub fn create_many_records(
 
 pub fn create_record_node(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
-    model: ModelRef,
-    data_map: ParsedInputMap,
+    query_schema: &QuerySchema,
+    model: Model,
+    data_map: ParsedInputMap<'_>,
 ) -> QueryGraphBuilderResult<NodeRef> {
     let create_args = WriteArgsParser::from(&model, data_map)?;
     let mut args = create_args.args;
@@ -112,7 +111,7 @@ pub fn create_record_node(
     let create_node = graph.create_node(Query::Write(WriteQuery::CreateRecord(cr)));
 
     for (relation_field, data_map) in create_args.nested {
-        nested::connect_nested_query(graph, connector_ctx, create_node, relation_field, data_map)?;
+        nested::connect_nested_query(graph, query_schema, create_node, relation_field, data_map)?;
     }
 
     Ok(create_node)

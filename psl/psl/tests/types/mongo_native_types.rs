@@ -11,13 +11,12 @@ fn valid_json_usage_in_model() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let datamodel = parse(&schema);
-
+    let datamodel = psl::parse_schema(schema).unwrap();
     let model = datamodel.assert_has_model("A");
 
-    let nt = model.assert_has_scalar_field("a").assert_native_type();
-    let mongo_type: &MongoDbType = nt.deserialize_native_type();
-    assert_eq!(&MongoDbType::Json, mongo_type);
+    model
+        .assert_has_scalar_field("a")
+        .assert_native_type(datamodel.connector, &MongoDbType::Json);
 }
 
 #[test]
@@ -31,17 +30,16 @@ fn valid_object_id_usage_in_model() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let datamodel = parse(&schema);
-
+    let datamodel = psl::parse_schema(schema).unwrap();
     let model = datamodel.assert_has_model("A");
 
-    let nt = model.assert_has_scalar_field("a").assert_native_type();
-    let mongo_type: &MongoDbType = nt.deserialize_native_type();
-    assert_eq!(&MongoDbType::ObjectId, mongo_type);
+    model
+        .assert_has_scalar_field("a")
+        .assert_native_type(datamodel.connector, &MongoDbType::ObjectId);
 
-    let nt = model.assert_has_scalar_field("b").assert_native_type();
-    let mongo_type: &MongoDbType = nt.deserialize_native_type();
-    assert_eq!(&MongoDbType::ObjectId, mongo_type);
+    model
+        .assert_has_scalar_field("b")
+        .assert_native_type(datamodel.connector, &MongoDbType::ObjectId);
 }
 
 #[test]
@@ -55,15 +53,14 @@ fn valid_long_usage_in_model() {
     "#};
 
     let schema = with_header(dml, Provider::Mongo, &[]);
-    let datamodel = parse(&schema);
-
+    let datamodel = psl::parse_schema(schema).unwrap();
     let model = datamodel.assert_has_model("A");
 
-    let nt = model.assert_has_scalar_field("a").assert_native_type();
-    let mongo_type: &MongoDbType = nt.deserialize_native_type();
-    assert_eq!(&MongoDbType::Long, mongo_type);
+    model
+        .assert_has_scalar_field("a")
+        .assert_native_type(datamodel.connector, &MongoDbType::Long);
 
-    let nt = model.assert_has_scalar_field("b").assert_native_type();
-    let mongo_type: &MongoDbType = nt.deserialize_native_type();
-    assert_eq!(&MongoDbType::Long, mongo_type);
+    model
+        .assert_has_scalar_field("b")
+        .assert_native_type(datamodel.connector, &MongoDbType::Long);
 }

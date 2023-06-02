@@ -1,5 +1,6 @@
 use super::Selection;
-use schema::QuerySchemaRef;
+use crate::ArgumentValue;
+use schema::QuerySchema;
 
 #[derive(Debug, Clone)]
 pub enum Operation {
@@ -8,7 +9,7 @@ pub enum Operation {
 }
 
 impl Operation {
-    pub fn is_find_unique(&self, schema: &QuerySchemaRef) -> bool {
+    pub(crate) fn is_find_unique(&self, schema: &QuerySchema) -> bool {
         schema
             .find_query_field(self.name())
             .map(|field| field.is_find_unique())
@@ -29,11 +30,25 @@ impl Operation {
         }
     }
 
+    pub fn into_selection(self) -> Selection {
+        match self {
+            Operation::Read(selection) => selection,
+            Operation::Write(selection) => selection,
+        }
+    }
+
     pub fn as_read(&self) -> Option<&Selection> {
         if let Self::Read(v) = self {
             Some(v)
         } else {
             None
+        }
+    }
+
+    pub fn arguments(&self) -> &[(String, ArgumentValue)] {
+        match self {
+            Operation::Read(x) => x.arguments(),
+            Operation::Write(x) => x.arguments(),
         }
     }
 }

@@ -25,7 +25,6 @@ impl ScalarFieldExt for ScalarField {
             (PrismaValue::List(l), _) => Value::Array(Some(l.into_iter().map(|x| self.value(x)).collect())),
             (PrismaValue::Json(s), _) => Value::Json(Some(serde_json::from_str::<serde_json::Value>(&s).unwrap())),
             (PrismaValue::Bytes(b), _) => Value::Bytes(Some(b.into())),
-            (PrismaValue::Xml(s), _) => Value::Xml(Some(s.into())),
             (PrismaValue::Object(_), _) => unimplemented!(),
             (PrismaValue::Null, ident) => match ident {
                 TypeIdentifier::String => Value::Text(None),
@@ -39,7 +38,6 @@ impl ScalarFieldExt for ScalarField {
                 TypeIdentifier::Int => Value::Int32(None),
                 TypeIdentifier::BigInt => Value::Int64(None),
                 TypeIdentifier::Bytes => Value::Bytes(None),
-                TypeIdentifier::Xml => Value::Xml(None),
                 TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
             },
         }
@@ -64,7 +62,6 @@ impl ScalarFieldExt for ScalarField {
             TypeIdentifier::Enum(_) => TypeFamily::Text(Some(TypeDataLength::Constant(8000))),
             TypeIdentifier::UUID => TypeFamily::Uuid,
             TypeIdentifier::Json => TypeFamily::Text(Some(TypeDataLength::Maximum)),
-            TypeIdentifier::Xml => TypeFamily::Text(Some(TypeDataLength::Maximum)),
             TypeIdentifier::DateTime => TypeFamily::DateTime,
             TypeIdentifier::Bytes => TypeFamily::Text(parse_scalar_length(self)),
             TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
@@ -87,7 +84,6 @@ pub fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
         PrismaValue::List(l) => Value::Array(Some(l.into_iter().map(convert_lossy).collect())),
         PrismaValue::Json(s) => Value::Json(serde_json::from_str(&s).unwrap()),
         PrismaValue::Bytes(b) => Value::Bytes(Some(b.into())),
-        PrismaValue::Xml(s) => Value::Xml(Some(s.into())),
         PrismaValue::Null => Value::Int32(None), // Can't tell which type the null is supposed to be.
         PrismaValue::Object(_) => unimplemented!(),
     }

@@ -52,7 +52,7 @@ where
             Some(level) => {
                 let transformed = IsolationLevel::from_str(&level)
                     .map_err(SqlError::from)
-                    .map_err(|err| err.into_connector_error(&connection_info))?;
+                    .map_err(|err| err.into_connector_error(connection_info))?;
 
                 Some(transformed)
             }
@@ -81,7 +81,7 @@ where
 {
     async fn get_single_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         filter: &Filter,
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
@@ -105,7 +105,7 @@ where
 
     async fn get_many_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
@@ -141,7 +141,7 @@ where
 
     async fn aggregate_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         query_arguments: QueryArguments,
         selections: Vec<AggregationSelection>,
         group_by: Vec<ScalarFieldRef>,
@@ -163,7 +163,7 @@ where
 {
     async fn create_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         args: WriteArgs,
         trace_id: Option<String>,
     ) -> connector::Result<SelectionResult> {
@@ -176,7 +176,7 @@ where
 
     async fn create_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         args: Vec<WriteArgs>,
         skip_duplicates: bool,
         trace_id: Option<String>,
@@ -190,7 +190,7 @@ where
 
     async fn update_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: RecordFilter,
         args: WriteArgs,
         trace_id: Option<String>,
@@ -204,7 +204,7 @@ where
 
     async fn update_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: RecordFilter,
         args: WriteArgs,
         trace_id: Option<String>,
@@ -219,7 +219,7 @@ where
 
     async fn delete_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: RecordFilter,
         trace_id: Option<String>,
     ) -> connector::Result<usize> {
@@ -279,7 +279,7 @@ where
 
     async fn query_raw(
         &mut self,
-        _model: Option<&ModelRef>,
+        _model: Option<&Model>,
         inputs: HashMap<String, PrismaValue>,
         _query_type: Option<String>,
     ) -> connector::Result<serde_json::Value> {

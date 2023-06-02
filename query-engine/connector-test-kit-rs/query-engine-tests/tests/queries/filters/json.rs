@@ -43,7 +43,7 @@ mod json {
         if runner
             .connector()
             .capabilities()
-            .contains(&ConnectorCapability::AdvancedJsonNullability)
+            .contains(ConnectorCapability::AdvancedJsonNullability)
         {
             insta::assert_snapshot!(
               run_query!(&runner, r#"query { findManyTestModel(where: { json: { equals: DbNull }}) { id }}"#),
@@ -85,7 +85,7 @@ mod json {
         if runner
             .connector()
             .capabilities()
-            .contains(&ConnectorCapability::AdvancedJsonNullability)
+            .contains(ConnectorCapability::AdvancedJsonNullability)
         {
             insta::assert_snapshot!(
                 run_query!(&runner, r#"query { findManyTestModel(where: { NOT: [{ json: { equals: DbNull } }]}) { id }}"#),
@@ -128,15 +128,12 @@ mod json {
         if runner
             .connector()
             .capabilities()
-            .contains(&ConnectorCapability::AdvancedJsonNullability)
+            .contains(ConnectorCapability::AdvancedJsonNullability)
         {
             runner
                 .query("mutation { createOneTestModel(data: { id: 1, json: DbNull}) { id }}")
                 .await?
-                .assert_failure(
-                    2009,
-                    Some("Enum value 'DbNull' is invalid for enum type JsonNullValueInput".to_owned()),
-                );
+                .assert_failure(2009, Some("`DbNull` is not a valid `JsonNullValueInput`".to_owned()));
 
             insta::assert_snapshot!(
               run_query!(&runner, r#"query { findManyTestModel(where: { NOT: [{ json: { equals: DbNull } }]}) { id }}"#),
@@ -179,7 +176,7 @@ mod json {
         if runner
             .connector()
             .capabilities()
-            .contains(&ConnectorCapability::AdvancedJsonNullability)
+            .contains(ConnectorCapability::AdvancedJsonNullability)
         {
             // Should work, but not useful with req. fields.
             insta::assert_snapshot!(
@@ -197,14 +194,14 @@ mod json {
             &runner,
             r#"query { findManyTestModel(where: { json: "{}" }) { id }}"#,
             2009,
-            "`Value types mismatch. Have: String(\"{}\"), want: Object(JsonNullableFilter)` at `Query.findManyTestModel.where.TestModelWhereInput.json`"
+            "Invalid argument type"
         );
 
         assert_error!(
             &runner,
             r#"query { findManyTestModel(where: { json: null }) { id }}"#,
             2012,
-            "Missing a required value at `Query.findManyTestModel.where.TestModelWhereInput.json`"
+            "A value is required but not set"
         );
 
         Ok(())
@@ -212,19 +209,23 @@ mod json {
 
     #[connector_test(schema(json_opt))]
     async fn nested_not_shorthand(runner: Runner) -> TestResult<()> {
-        assert_error!(
-            &runner,
-            r#"query { findManyTestModel(where: { json: { not: { equals: "{}" }}}) { id }}"#,
-            2009,
-            "`Query.findManyTestModel.where.TestModelWhereInput.json.JsonNullableFilter.not`: Value types mismatch. Have: Object([(\"equals\", String(\"{}\"))]), want: Json"
-        );
+        // Those tests pass with the JSON protocol because the entire object is parsed as JSON.
+        // They remain useful to ensure we don't ever allow a full JSON filter input object type at the schema level.
+        if runner.protocol().is_graphql() {
+            assert_error!(
+                &runner,
+                r#"query { findManyTestModel(where: { json: { not: { equals: "{}" }}}) { id }}"#,
+                2009,
+                "Invalid argument type"
+            );
 
-        assert_error!(
-            &runner,
-            r#"query { findManyTestModel(where: { json: { not: { equals: null }}}) { id }}"#,
-            2009,
-            "`Query.findManyTestModel.where.TestModelWhereInput.json.JsonNullableFilter.not`: Value types mismatch. Have: Object([(\"equals\", Null)]), want: Json"
-        );
+            assert_error!(
+                &runner,
+                r#"query { findManyTestModel(where: { json: { not: { equals: null }}}) { id }}"#,
+                2009,
+                "Invalid argument type"
+            );
+        }
 
         Ok(())
     }

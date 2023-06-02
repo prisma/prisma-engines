@@ -2,7 +2,7 @@ use crate::{column_metadata::ColumnMetadata, error::SqlError, value::to_prisma_v
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
 use connector_interface::{coerce_null_to_zero_value, AggregationResult, AggregationSelection};
-use prisma_models::{dml::FieldArity, ConversionFailure, PrismaValue, Record, TypeIdentifier};
+use prisma_models::{ConversionFailure, FieldArity, PrismaValue, Record, TypeIdentifier};
 use quaint::{ast::Value, connector::ResultRow};
 use std::{io, str::FromStr};
 use uuid::Uuid;
@@ -285,12 +285,6 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
         TypeIdentifier::Bytes => match p_value {
             value if value.is_null() => PrismaValue::Null,
             Value::Bytes(Some(bytes)) => PrismaValue::Bytes(bytes.into()),
-            _ => return Err(create_error(&p_value)),
-        },
-        TypeIdentifier::Xml => match p_value {
-            value if value.is_null() => PrismaValue::Null,
-            Value::Xml(Some(xml)) => PrismaValue::Xml(xml.to_string()),
-            Value::Text(Some(s)) => PrismaValue::Xml(s.into_owned()),
             _ => return Err(create_error(&p_value)),
         },
         TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),

@@ -1,16 +1,18 @@
 use crate::{
     context::PrismaContext,
+    features::{EnabledFeatures, Feature},
     opt::{CliOpt, PrismaOpt, Subcommand},
     PrismaResult,
 };
-use query_core::{schema::QuerySchemaRef, schema_builder};
-use request_handlers::{dmmf, GraphQlHandler};
+use query_core::{protocol::EngineProtocol, schema};
+use request_handlers::{dmmf, RequestBody, RequestHandler};
 use std::{env, sync::Arc};
 
 pub struct ExecuteRequest {
     query: String,
     schema: psl::ValidatedSchema,
     enable_raw_queries: bool,
+    engine_protocol: EngineProtocol,
 }
 
 pub struct DmmfRequest {
@@ -53,11 +55,17 @@ impl CliCommand {
                     config: opts.configuration(input.ignore_env_var_errors)?,
                     ignore_env_var_errors: input.ignore_env_var_errors,
                 }))),
-                CliOpt::ExecuteRequest(input) => Ok(Some(CliCommand::ExecuteRequest(ExecuteRequest {
-                    query: input.query.clone(),
-                    enable_raw_queries: opts.enable_raw_queries,
-                    schema: opts.schema(false)?,
-                }))),
+                CliOpt::ExecuteRequest(input) => {
+                    let schema = opts.schema(false)?;
+                    let features = schema.configuration.preview_features();
+
+                    Ok(Some(CliCommand::ExecuteRequest(ExecuteRequest {
+                        query: input.query.clone(),
+                        enable_raw_queries: opts.enable_raw_queries,
+                        schema,
+                        engine_protocol: opts.engine_protocol(features),
+                    })))
+                }
                 CliOpt::DebugPanic(input) => Ok(Some(CliCommand::DebugPanic(DebugPanicRequest {
                     message: input.message.clone(),
                 }))),
@@ -81,10 +89,8 @@ impl CliCommand {
     }
 
     async fn dmmf(request: DmmfRequest) -> PrismaResult<()> {
-        let internal_data_model = prisma_models::convert(Arc::new(request.schema));
-        let query_schema: QuerySchemaRef =
-            Arc::new(schema_builder::build(internal_data_model, request.enable_raw_queries));
-        let dmmf = dmmf::render_dmmf(query_schema);
+        let query_schema = schema::build(Arc::new(request.schema), request.enable_raw_queries);
+        let dmmf = dmmf::render_dmmf(&query_schema);
         let serialized = serde_json::to_string_pretty(&dmmf)?;
 
         println!("{serialized}");
@@ -95,9 +101,7 @@ impl CliCommand {
     fn get_config(mut req: GetConfigRequest) -> PrismaResult<()> {
         let config = &mut req.config;
 
-        if !req.ignore_env_var_errors {
-            config.resolve_datasource_urls_from_env(&[], |key| env::var(key).ok())?;
-        }
+        config.resolve_datasource_urls_query_engine(&[], |key| env::var(key).ok(), req.ignore_env_var_errors)?;
 
         let json = psl::get_config::config_to_mcf_json_value(config);
         let serialized = serde_json::to_string(&json)?;
@@ -116,17 +120,19 @@ impl CliCommand {
             .configuration
             .validate_that_one_datasource_is_provided()?;
 
-        let cx = PrismaContext::builder(request.schema)
-            .enable_raw_queries(request.enable_raw_queries)
-            .build()
-            .await?;
+        let mut features = EnabledFeatures::default();
+        if request.enable_raw_queries {
+            features |= Feature::RawQueries
+        }
+        let cx = PrismaContext::new(request.schema, request.engine_protocol, features, None).await?;
 
         let cx = Arc::new(cx);
 
-        let handler = GraphQlHandler::new(&*cx.executor, cx.query_schema());
-        let res = handler
-            .handle(serde_json::from_str(&decoded_request)?, None, None)
-            .await;
+        let handler = RequestHandler::new(cx.executor(), cx.query_schema(), cx.engine_protocol());
+
+        let body = RequestBody::try_from_str(&decoded_request, cx.engine_protocol())?;
+
+        let res = handler.handle(body, None, None).await;
         let res = serde_json::to_string(&res).unwrap();
 
         let encoded_response = base64::encode(res);

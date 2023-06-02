@@ -2,8 +2,8 @@ use crate::{
     ast::{self, WithName, WithSpan},
     coerce,
     context::Context,
-    types::{CompositeTypeField, ModelAttributes, ScalarField},
-    DatamodelError, StringId,
+    types::ModelAttributes,
+    DatamodelError, ScalarFieldId, StringId,
 };
 
 pub(super) fn model(model_attributes: &mut ModelAttributes, ctx: &mut Context<'_>) {
@@ -16,11 +16,11 @@ pub(super) fn model(model_attributes: &mut ModelAttributes, ctx: &mut Context<'_
 }
 
 pub(super) fn scalar_field(
+    sfid: ScalarFieldId,
     ast_model: &ast::Model,
     ast_field: &ast::Field,
     model_id: ast::ModelId,
     field_id: ast::FieldId,
-    scalar_field_data: &mut ScalarField,
     ctx: &mut Context<'_>,
 ) {
     let mapped_name = match visit_map_attribute(ctx) {
@@ -28,7 +28,7 @@ pub(super) fn scalar_field(
         None => return,
     };
 
-    scalar_field_data.mapped_name = Some(mapped_name);
+    ctx.types[sfid].mapped_name = Some(mapped_name);
 
     if ctx
         .mapped_model_scalar_field_names
@@ -43,26 +43,28 @@ pub(super) fn scalar_field(
         ));
     }
 
-    if let Some(field_id) = ctx.names.model_fields.get(&(model_id, mapped_name)) {
-        // @map only conflicts with _scalar_ fields
-        if !ctx.types.scalar_fields.contains_key(&(model_id, *field_id)) {
-            return;
-        }
-
+    if let Some(dup_field_id) = ctx.names.model_fields.get(&(model_id, mapped_name)) {
         match ctx
             .types
-            .scalar_fields
-            .get(&(model_id, *field_id))
-            .and_then(|sf| sf.mapped_name)
+            .range_model_scalar_fields(model_id)
+            // Do not compare field to itself
+            .filter(|(_, sf)| sf.field_id != field_id)
+            // Find the field with the given mapped name.
+            .find(|(_, sf)| sf.field_id == *dup_field_id)
+            .map(|(_, sf)| sf.mapped_name)
         {
-            Some(name) if name != mapped_name => {}
-            _ => ctx.push_error(DatamodelError::new_duplicate_field_error(
-                ast_model.name(),
-                ast_field.name(),
-                if ast_model.is_view() { "view" } else { "model" },
-                ast_field.span(),
-            )),
+            // @map only conflicts with _scalar_ fields
+            None => return,
+            Some(Some(sf_mapped_name)) if sf_mapped_name != mapped_name => return,
+            Some(_) => {}
         }
+
+        ctx.push_error(DatamodelError::new_duplicate_field_error(
+            ast_model.name(),
+            ast_field.name(),
+            if ast_model.is_view() { "view" } else { "model" },
+            ast_field.span(),
+        ))
     }
 }
 
@@ -71,7 +73,6 @@ pub(super) fn composite_type_field(
     ast_field: &ast::Field,
     ctid: ast::CompositeTypeId,
     field_id: ast::FieldId,
-    field: &mut CompositeTypeField,
     ctx: &mut Context<'_>,
 ) {
     let mapped_name_id = match visit_map_attribute(ctx) {
@@ -79,7 +80,10 @@ pub(super) fn composite_type_field(
         None => return,
     };
 
-    field.mapped_name = Some(mapped_name_id);
+    {
+        let mut field = ctx.types.composite_type_fields.get_mut(&(ctid, field_id)).unwrap();
+        field.mapped_name = Some(mapped_name_id);
+    }
 
     if ctx
         .mapped_composite_type_names

@@ -11,7 +11,7 @@ mod sql_server {
             runner,
             "mutation { createManyTestModel(data: [{ id: 2 }]) { count }}",
             2009,
-            "Field does not exist on enclosing type."
+            "Field does not exist in enclosing type."
         );
 
         insta::assert_snapshot!(

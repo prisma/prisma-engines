@@ -1,5 +1,8 @@
 use super::{CompositeTypeFieldWalker, ModelWalker, RelationFieldWalker, ScalarFieldWalker, Walker};
-use crate::ScalarType;
+use crate::{
+    types::{RelationField, ScalarField},
+    ScalarType,
+};
 use schema_ast::ast;
 
 /// A model field, scalar or relation.
@@ -23,26 +26,9 @@ impl<'db> FieldWalker<'db> {
 
     /// Find out which kind of field this is.
     pub fn refine(self) -> RefinedFieldWalker<'db> {
-        let Walker {
-            id: (model_id, field_id),
-            db,
-        } = self;
-        if let Some(relation_field) = &self.db.types.relation_fields.get(&self.id) {
-            RefinedFieldWalker::Relation(RelationFieldWalker {
-                model_id,
-                field_id,
-                db,
-                relation_field,
-            })
-        } else if let Some(scalar_field) = self.db.types.scalar_fields.get(&self.id) {
-            RefinedFieldWalker::Scalar(ScalarFieldWalker {
-                model_id,
-                field_id,
-                db,
-                scalar_field,
-            })
-        } else {
-            unreachable!("{:?} is neither a scalar field nor a relation field", self.id)
+        match self.db.types.refine_field(self.id) {
+            either::Either::Left(id) => RefinedFieldWalker::Relation(self.walk(id)),
+            either::Either::Right(id) => RefinedFieldWalker::Scalar(self.walk(id)),
         }
     }
 }
@@ -58,18 +44,20 @@ pub enum RefinedFieldWalker<'db> {
 
 impl<'db> From<ScalarFieldWalker<'db>> for FieldWalker<'db> {
     fn from(w: ScalarFieldWalker<'db>) -> Self {
+        let ScalarField { model_id, field_id, .. } = w.db.types[w.id];
         Walker {
             db: w.db,
-            id: (w.model_id, w.field_id),
+            id: (model_id, field_id),
         }
     }
 }
 
 impl<'db> From<RelationFieldWalker<'db>> for FieldWalker<'db> {
     fn from(w: RelationFieldWalker<'db>) -> Self {
+        let RelationField { model_id, field_id, .. } = w.db.types[w.id];
         Walker {
             db: w.db,
-            id: (w.model_id, w.field_id),
+            id: (model_id, field_id),
         }
     }
 }

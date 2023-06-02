@@ -1,7 +1,7 @@
 use super::{Env, ExpressionResult, InterpretationResult};
 use crate::Query;
 
-pub enum Expression {
+pub(crate) enum Expression {
     Sequence {
         seq: Vec<Expression>,
     },
@@ -38,7 +38,7 @@ pub enum Expression {
     },
 }
 
-pub struct Binding {
+pub(crate) struct Binding {
     pub name: String,
     pub expr: Expression,
 }

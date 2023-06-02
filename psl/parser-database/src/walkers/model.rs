@@ -89,22 +89,6 @@ impl<'db> ModelWalker<'db> {
             .unwrap_or_else(|| self.db.ast[self.id].name())
     }
 
-    /// Get the database name of the scalar field.
-    pub fn get_field_database_name(self, field_id: ast::FieldId) -> &'db str {
-        self.db.types.scalar_fields[&(self.id, field_id)]
-            .mapped_name
-            .map(|id| &self.db[id])
-            .unwrap_or_else(|| self.db.ast[self.id][field_id].name())
-    }
-
-    /// Get the database names of the constrained scalar fields.
-    #[allow(clippy::unnecessary_lazy_evaluations)] // respectfully disagree
-    pub fn get_field_database_names(self, fields: &'db [ast::FieldId]) -> impl Iterator<Item = &'db str> {
-        fields
-            .iter()
-            .map(move |&field_id| self.get_field_database_name(field_id))
-    }
-
     /// Used in validation. True only if the model has a single field id.
     pub fn has_single_id_field(self) -> bool {
         matches!(&self.attributes().primary_key, Some(pk) if pk.fields.len() == 1)
@@ -124,57 +108,41 @@ impl<'db> ModelWalker<'db> {
         })
     }
 
-    /// Walk a scalar field by id.
-    #[track_caller]
-    pub fn scalar_field(self, field_id: ast::FieldId) -> ScalarFieldWalker<'db> {
-        ScalarFieldWalker {
-            model_id: self.id,
-            field_id,
-            db: self.db,
-            scalar_field: &self.db.types.scalar_fields[&(self.id, field_id)],
-        }
-    }
-
     /// Iterate all the scalar fields in a given model in the order they were defined.
-    pub fn scalar_fields(self) -> impl Iterator<Item = ScalarFieldWalker<'db>> {
-        let db = self.db;
-        db.types
-            .scalar_fields
-            .range((self.id, ast::FieldId::MIN)..=(self.id, ast::FieldId::MAX))
-            .map(move |((model_id, field_id), scalar_field)| ScalarFieldWalker {
-                model_id: *model_id,
-                field_id: *field_id,
-                db,
-                scalar_field,
-            })
+    pub fn scalar_fields(self) -> impl Iterator<Item = ScalarFieldWalker<'db>> + Clone {
+        self.db
+            .types
+            .range_model_scalar_fields(self.id)
+            .map(move |(id, _)| self.walk(id))
     }
 
     /// All unique criterias of the model; consisting of the primary key and
     /// unique indexes, if set.
     pub fn unique_criterias(self) -> impl Iterator<Item = UniqueCriteriaWalker<'db>> {
-        let model_id = self.id;
         let db = self.db;
 
         let from_pk = self
             .attributes()
             .primary_key
             .iter()
-            .map(move |pk| UniqueCriteriaWalker {
-                model_id,
-                fields: &pk.fields,
-                db,
-            });
+            .map(move |pk| UniqueCriteriaWalker { fields: &pk.fields, db });
 
         let from_indices = self
             .indexes()
             .filter(|walker| walker.attribute().is_unique())
             .map(move |walker| UniqueCriteriaWalker {
-                model_id,
                 fields: &walker.attribute().fields,
                 db,
             });
 
         from_pk.chain(from_indices)
+    }
+
+    /// All _required_ unique criterias of the model; consisting of the primary key and
+    /// unique indexes, if set.
+    pub fn required_unique_criterias(self) -> impl Iterator<Item = UniqueCriteriaWalker<'db>> {
+        self.unique_criterias()
+            .filter(|walker| !walker.fields().any(|field| field.is_optional()))
     }
 
     /// Iterate all the indexes in the model in the order they were
@@ -195,34 +163,13 @@ impl<'db> ModelWalker<'db> {
     }
 
     /// All (concrete) relation fields of the model.
-    pub fn relation_fields(self) -> impl Iterator<Item = RelationFieldWalker<'db>> {
+    pub fn relation_fields(self) -> impl Iterator<Item = RelationFieldWalker<'db>> + Clone + 'db {
         let model_id = self.id;
-        let db = self.db;
 
         self.db
             .types
-            .relation_fields
-            .range((model_id, ast::FieldId::MIN)..=(model_id, ast::FieldId::MAX))
-            .map(move |((_, field_id), relation_field)| RelationFieldWalker {
-                model_id,
-                field_id: *field_id,
-                db,
-                relation_field,
-            })
-    }
-
-    /// Find a relation field with the given id.
-    ///
-    /// ## Panics
-    ///
-    /// If the field does not exist.
-    pub fn relation_field(self, field_id: ast::FieldId) -> RelationFieldWalker<'db> {
-        RelationFieldWalker {
-            model_id: self.id,
-            field_id,
-            db: self.db,
-            relation_field: &self.db.types.relation_fields[&(self.id, field_id)],
-        }
+            .range_model_relation_fields(model_id)
+            .map(move |(id, _)| self.walk(id))
     }
 
     /// All relations that start from this model.

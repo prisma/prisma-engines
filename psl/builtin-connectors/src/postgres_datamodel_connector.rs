@@ -8,59 +8,62 @@ use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList, InsertTextFormat};
 use psl_core::{
     datamodel_connector::{
-        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
-        StringFilter,
+        Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, NativeTypeConstructor,
+        NativeTypeInstance, RelationMode, StringFilter,
     },
     diagnostics::Diagnostics,
     parser_database::{ast, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction, ScalarType},
-    Datasource, DatasourceConnectorData, PreviewFeature,
+    Configuration, Datasource, DatasourceConnectorData, PreviewFeature,
 };
 use std::{borrow::Cow, collections::HashMap};
 use PostgresType::*;
+
+use crate::completions;
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[
     ConstraintScope::GlobalPrimaryKeyKeyIndex,
     ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey,
 ];
 
-const CAPABILITIES: &[ConnectorCapability] = &[
-    ConnectorCapability::AdvancedJsonNullability,
-    ConnectorCapability::AnyId,
-    ConnectorCapability::AutoIncrement,
-    ConnectorCapability::AutoIncrementAllowedOnNonId,
-    ConnectorCapability::AutoIncrementMultipleAllowed,
-    ConnectorCapability::AutoIncrementNonIndexedAllowed,
-    ConnectorCapability::CompoundIds,
-    ConnectorCapability::CreateMany,
-    ConnectorCapability::CreateManyWriteableAutoIncId,
-    ConnectorCapability::CreateSkipDuplicates,
-    ConnectorCapability::Enums,
-    ConnectorCapability::EnumArrayPush,
-    ConnectorCapability::FullTextSearchWithoutIndex,
-    ConnectorCapability::InsensitiveFilters,
-    ConnectorCapability::Json,
-    ConnectorCapability::JsonFiltering,
-    ConnectorCapability::JsonFilteringArrayPath,
-    ConnectorCapability::JsonFilteringAlphanumeric,
-    ConnectorCapability::JsonFilteringAlphanumericFieldRef,
-    ConnectorCapability::MultiSchema,
-    ConnectorCapability::NamedForeignKeys,
-    ConnectorCapability::NamedPrimaryKeys,
-    ConnectorCapability::SqlQueryRaw,
-    ConnectorCapability::RelationFieldsInArbitraryOrder,
-    ConnectorCapability::ScalarLists,
-    ConnectorCapability::JsonLists,
-    ConnectorCapability::UpdateableId,
-    ConnectorCapability::WritableAutoincField,
-    ConnectorCapability::ImplicitManyToManyRelation,
-    ConnectorCapability::DecimalType,
-    ConnectorCapability::OrderByNullsFirstLast,
-    ConnectorCapability::SupportsTxIsolationReadUncommitted,
-    ConnectorCapability::SupportsTxIsolationReadCommitted,
-    ConnectorCapability::SupportsTxIsolationRepeatableRead,
-    ConnectorCapability::SupportsTxIsolationSerializable,
-    ConnectorCapability::NativeUpsert,
-];
+const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
+    AdvancedJsonNullability |
+    AnyId |
+    AutoIncrement |
+    AutoIncrementAllowedOnNonId |
+    AutoIncrementMultipleAllowed |
+    AutoIncrementNonIndexedAllowed |
+    CompoundIds |
+    CreateMany |
+    CreateManyWriteableAutoIncId |
+    CreateSkipDuplicates |
+    Enums |
+    EnumArrayPush |
+    FullTextSearchWithoutIndex |
+    InsensitiveFilters |
+    Json |
+    JsonFiltering |
+    JsonFilteringArrayPath |
+    JsonFilteringAlphanumeric |
+    JsonFilteringAlphanumericFieldRef |
+    MultiSchema |
+    NamedForeignKeys |
+    NamedPrimaryKeys |
+    SqlQueryRaw |
+    RelationFieldsInArbitraryOrder |
+    ScalarLists |
+    JsonLists |
+    UpdateableId |
+    WritableAutoincField |
+    ImplicitManyToManyRelation |
+    DecimalType |
+    OrderByNullsFirstLast |
+    FilteredInlineChildNestedToOneDisconnect |
+    SupportsTxIsolationReadUncommitted |
+    SupportsTxIsolationReadCommitted |
+    SupportsTxIsolationRepeatableRead |
+    SupportsTxIsolationSerializable |
+    NativeUpsert
+});
 
 pub struct PostgresDatamodelConnector;
 
@@ -93,6 +96,11 @@ impl PostgresDatasourceProperties {
             extensions,
             span: ast::Span::empty(),
         });
+    }
+
+    // Validation for property existence
+    pub fn extensions_defined(&self) -> bool {
+        self.extensions.is_some()
     }
 }
 
@@ -244,7 +252,7 @@ impl Connector for PostgresDatamodelConnector {
         "Postgres"
     }
 
-    fn capabilities(&self) -> &'static [ConnectorCapability] {
+    fn capabilities(&self) -> ConnectorCapabilities {
         CAPABILITIES
     }
 
@@ -443,7 +451,7 @@ impl Connector for PostgresDatamodelConnector {
         Ok(())
     }
 
-    fn push_completions(
+    fn datamodel_completions(
         &self,
         db: &ParserDatabase,
         position: ast::SchemaPosition<'_>,
@@ -515,6 +523,28 @@ impl Connector for PostgresDatamodelConnector {
                 }
             }
             _ => (),
+        }
+    }
+
+    fn datasource_completions(&self, config: &Configuration, completion_list: &mut CompletionList) {
+        let ds = match config.datasources.first() {
+            Some(ds) => ds,
+            None => return,
+        };
+
+        let connector_data = ds
+            .connector_data
+            .downcast_ref::<PostgresDatasourceProperties>()
+            .unwrap();
+
+        if config.preview_features().contains(PreviewFeature::PostgresqlExtensions)
+            && !connector_data.extensions_defined()
+        {
+            completions::extensions_completion(completion_list);
+        }
+
+        if config.preview_features().contains(PreviewFeature::MultiSchema) && !ds.schemas_defined() {
+            completions::schemas_completion(completion_list);
         }
     }
 

@@ -210,7 +210,7 @@ mod one2one_opt {
           runner,
           query,
           2014,
-          "The change you are trying to make would violate the required relation 'BToC' between the `B` and `C` models."
+          "The change you are trying to make would violate the required relation 'BToC' between the `C` and `B` models."
         );
 
         insta::assert_snapshot!(
@@ -650,7 +650,7 @@ mod one2many_opt {
           runner,
           query,
           2014,
-          "The change you are trying to make would violate the required relation 'BToC' between the `B` and `C` models."
+          "The change you are trying to make would violate the required relation 'BToC' between the `C` and `B` models."
         );
 
         insta::assert_snapshot!(

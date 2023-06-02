@@ -1,3 +1,5 @@
+use either::Either;
+
 use super::CompositeTypeFieldWalker;
 use crate::{
     ast,
@@ -105,21 +107,13 @@ impl<'db> IndexWalker<'db> {
 
     /// The scalar fields covered by the index.
     pub fn fields(self) -> impl ExactSizeIterator<Item = IndexFieldWalker<'db>> {
-        self.index_attribute.fields.iter().map(move |attributes| {
-            let path = &attributes.path;
-            let field_id = path.field_in_index();
-
-            match path.type_holding_the_indexed_field() {
-                Some(ctid) => {
-                    let walker = self.db.walk((ctid, field_id));
-                    IndexFieldWalker::new(walker)
-                }
-                None => {
-                    let walker = self.model().scalar_field(field_id);
-                    IndexFieldWalker::new(walker)
-                }
-            }
-        })
+        self.index_attribute
+            .fields
+            .iter()
+            .map(move |attributes| match attributes.path.field_in_index() {
+                Either::Left(ctid) => IndexFieldWalker::new(self.db.walk(ctid)),
+                Either::Right(id) => IndexFieldWalker::new(self.db.walk(id)),
+            })
     }
 
     /// The scalar fields covered by the index, and their arguments.
@@ -129,7 +123,6 @@ impl<'db> IndexWalker<'db> {
             .iter()
             .enumerate()
             .map(move |(field_arg_id, _)| ScalarFieldAttributeWalker {
-                model_id: self.model_id,
                 fields: &self.attribute().fields,
                 db: self.db,
                 field_arg_id,
@@ -192,9 +185,7 @@ impl<'db> IndexWalker<'db> {
 
     /// The field the model was defined on, if any.
     pub fn source_field(self) -> Option<ScalarFieldWalker<'db>> {
-        self.index_attribute
-            .source_field
-            .map(|field_id| self.model().scalar_field(field_id))
+        self.index_attribute.source_field.map(|field_id| self.db.walk(field_id))
     }
 }
 
@@ -277,7 +268,7 @@ impl<'db> IndexFieldWalker<'db> {
     pub fn scalar_field_type(self) -> ScalarFieldType {
         match self {
             IndexFieldWalker::Scalar(sf) => sf.scalar_field_type(),
-            IndexFieldWalker::Composite(cf) => *cf.r#type(),
+            IndexFieldWalker::Composite(cf) => cf.r#type(),
         }
     }
 

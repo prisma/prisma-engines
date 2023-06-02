@@ -25,7 +25,7 @@ pub(crate) async fn native_upsert(
     let where_condition = upsert.filter().aliased_condition_from(None, false, ctx);
     let update = build_update_and_set_query(upsert.model(), upsert.update().clone(), ctx).so_that(where_condition);
 
-    let insert = create_record(&upsert.model(), upsert.create().clone(), ctx);
+    let insert = create_record(upsert.model(), upsert.create().clone(), ctx);
 
     let constraints: Vec<_> = upsert.unique_constraints().as_columns(ctx).collect();
     let query: Query = insert

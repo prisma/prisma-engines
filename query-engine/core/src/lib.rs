@@ -1,15 +1,13 @@
-#![allow(
-    clippy::module_inception,
-    clippy::vec_init_then_push,
-    clippy::derive_partial_eq_without_eq,
-    clippy::needless_borrow
-)]
+#![deny(unsafe_code, rust_2018_idioms)]
 
 #[macro_use]
 extern crate tracing;
 
+pub mod constants;
 pub mod executor;
+pub mod protocol;
 pub mod query_document;
+pub mod query_graph_builder;
 pub mod response_ir;
 pub mod telemetry;
 
@@ -20,13 +18,13 @@ pub use self::{
     query_document::*,
     telemetry::*,
 };
+pub use connector::{error::ConnectorError, Connector};
 
 mod error;
 mod interactive_transactions;
 mod interpreter;
 mod query_ast;
 mod query_graph;
-mod query_graph_builder;
 mod result_ast;
 
 use self::{
@@ -44,5 +42,4 @@ use self::{
 pub type Result<T> = std::result::Result<T, CoreError>;
 
 // Re-exports
-pub extern crate schema;
-pub extern crate schema_builder;
+pub use schema;

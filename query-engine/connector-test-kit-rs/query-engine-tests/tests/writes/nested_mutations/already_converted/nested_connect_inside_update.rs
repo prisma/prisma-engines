@@ -1116,4 +1116,52 @@ mod connect_inside_update {
 
         Ok(())
     }
+
+    fn p1_c1_child_compound_unique_schema() -> String {
+        let schema = indoc! {
+            r#"model Parent {
+              #id(id, Int, @id)
+            
+              to_compound_unique Child?
+            }
+            
+            model Child {
+              id   Int
+              name String
+            
+              parentId  Int?  @unique
+              parent Parent? @relation(fields: [parentId], references: [id])
+            
+              @@unique([id, name])
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // Regression test for https://github.com/prisma/prisma/issues/18173
+    // Excluded on MongoDB because all models require an @id attribute
+    // Excluded on SQLServer because models with unique nulls can't have multiple NULLs, unlike other dbs.
+    #[connector_test(schema(p1_c1_child_compound_unique_schema), exclude(MongoDb, SqlServer))]
+    async fn p1_c1_child_compound_unique(runner: Runner) -> TestResult<()> {
+        run_query!(&runner, r#"mutation { createOneParent(data: { id: 1 }) { id } }"#);
+        run_query!(
+            &runner,
+            r#"mutation { createOneChild(data: { id: 1, name: "Alice" }) { id } }"#
+        );
+        run_query!(
+            &runner,
+            r#"mutation { createOneChild(data: { id: 2, name: "Bob" }) { id } }"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation { updateOneParent(
+            where: { id: 1},
+            data: { to_compound_unique: { connect: { id_name: { id: 1, name: "Alice" } } } }
+          ) { id to_compound_unique { id } } }"#),
+          @r###"{"data":{"updateOneParent":{"id":1,"to_compound_unique":{"id":1}}}}"###
+        );
+
+        Ok(())
+    }
 }

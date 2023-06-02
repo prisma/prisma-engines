@@ -12,13 +12,15 @@ mod internal;
 mod ir_serializer;
 mod response;
 
+pub use response::*;
+
+pub(crate) use ir_serializer::*;
+
+use crate::ArgumentValue;
 use indexmap::IndexMap;
 use prisma_models::PrismaValue;
 use serde::ser::{Serialize, SerializeMap, SerializeSeq, Serializer};
 use std::{collections::HashMap, fmt, sync::Arc};
-
-pub use ir_serializer::*;
-pub use response::*;
 
 /// A `key -> value` map to an IR item
 pub type Map = IndexMap<String, Item>;
@@ -43,14 +45,20 @@ impl List {
         self.len() == 0
     }
 
-    pub fn index_by(self, keys: &[String]) -> Vec<(HashMap<String, PrismaValue>, Map)> {
-        let mut map: Vec<(HashMap<String, PrismaValue>, Map)> = Vec::with_capacity(self.len());
+    pub fn index_by(self, keys: &[String]) -> Vec<(HashMap<String, ArgumentValue>, Map)> {
+        let mut map: Vec<(HashMap<String, ArgumentValue>, Map)> = Vec::with_capacity(self.len());
 
         for item in self.into_iter() {
             let inner = item.into_map().unwrap();
-            let key: HashMap<String, PrismaValue> = keys
+            let key: HashMap<String, ArgumentValue> = keys
                 .iter()
-                .map(|key| (key.clone(), inner.get(key).unwrap().clone().into_value().unwrap()))
+                .map(|key| {
+                    let item = inner.get(key).unwrap().clone();
+                    let pv = item.into_value().unwrap();
+
+                    (key.clone(), pv)
+                })
+                .map(|(key, val)| (key, ArgumentValue::from(val)))
                 .collect();
 
             map.push((key, inner));

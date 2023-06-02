@@ -1,148 +1,183 @@
-use super::*;
-use fmt::Debug;
-use prisma_models::{InternalDataModelRef, ModelRef};
+use crate::{IdentifierType, ObjectType, OutputField};
+use prisma_models::{ast, InternalDataModel};
 use psl::{
-    datamodel_connector::{ConnectorCapability, RelationMode},
-    PreviewFeatures,
+    datamodel_connector::{Connector, ConnectorCapability, RelationMode},
+    PreviewFeature, PreviewFeatures,
 };
-use std::{borrow::Borrow, fmt};
+use std::{collections::HashMap, fmt};
 
-/// The query schema.
-/// Defines which operations (query/mutations) are possible on a database, based on the (internal) data model.
+#[derive(Clone, Debug, Hash, Eq, PartialEq)]
+enum Operation {
+    Query,
+    Mutation,
+}
+
+type LazyField = Box<dyn for<'a> Fn(&'a QuerySchema) -> OutputField<'a> + Send + Sync>;
+
+/// The query schema defines which operations (query/mutations) are possible on a database, based
+/// on a Prisma schema.
 ///
-/// Conceptually, a query schema stores two trees (query / mutation) that consist of
-/// input and output types. Special consideration is required when dealing with object types.
-///
-/// Object types can be referenced multiple times throughout the schema, also recursively, which requires the use
-/// of weak references to prevent memory leaks. To simplify the overall management of Arcs and weaks, the
-/// query schema is subject to a number of invariants.
-/// The most important one is that the only strong references (Arc) to a single object types
-/// is only ever held by the top-level QuerySchema struct, never by the trees, which only ever hold weak refs.
-///
-/// Using a QuerySchema should never involve dealing with the strong references.
-#[derive(Debug)]
+/// Conceptually, a query schema stores two trees (query/mutation) that consist of input and output
+/// types.
 pub struct QuerySchema {
-    /// Root query object (read queries).
-    pub query: OutputTypeRef,
-
-    /// Root mutation object (write queries).
-    pub mutation: OutputTypeRef,
-
     /// Internal abstraction over the datamodel AST.
-    pub internal_data_model: InternalDataModelRef,
+    pub internal_data_model: InternalDataModel,
 
-    /// Information about the connector this schema was build for.
-    pub context: ConnectorContext,
+    pub(crate) enable_raw_queries: bool,
+    pub(crate) connector: &'static dyn Connector,
 
-    /// Internal. Stores all strong Arc refs to the input object types.
-    _input_object_types: Vec<InputObjectTypeStrongRef>,
+    /// Indexes query and mutation fields by their own query info for easier access.
+    query_info_map: HashMap<(Operation, QueryInfo), usize>,
+    root_fields: HashMap<(Operation, String), usize>,
+    query_fields: Vec<LazyField>,
+    mutation_fields: Vec<LazyField>,
 
-    /// Internal. Stores all strong Arc refs to the output object types.
-    _output_object_types: Vec<ObjectTypeStrongRef>,
+    preview_features: PreviewFeatures,
 
-    /// Internal. Stores all enum refs.
-    _enum_types: Vec<EnumTypeRef>,
-}
-
-/// Connector meta information, to be used in query execution if necessary.
-#[derive(Debug)]
-pub struct ConnectorContext {
-    /// Capabilities of the provider.
-    pub capabilities: Vec<ConnectorCapability>,
-
-    /// Enabled preview features.
-    pub features: PreviewFeatures,
-
-    /// Relation mode of the provider
-    pub relation_mode: RelationMode,
-}
-
-impl ConnectorContext {
-    pub fn new(capabilities: Vec<ConnectorCapability>, features: PreviewFeatures, relation_mode: RelationMode) -> Self {
-        Self {
-            capabilities,
-            features,
-            relation_mode,
-        }
-    }
-
-    pub fn can_native_upsert(&self) -> bool {
-        self.capabilities.contains(&ConnectorCapability::NativeUpsert)
-    }
+    /// Relation mode in the datasource.
+    relation_mode: RelationMode,
 }
 
 impl QuerySchema {
-    #[allow(clippy::too_many_arguments)]
-    pub fn new(
-        query: OutputTypeRef,
-        mutation: OutputTypeRef,
-        _input_object_types: Vec<InputObjectTypeStrongRef>,
-        _output_object_types: Vec<ObjectTypeStrongRef>,
-        _enum_types: Vec<EnumTypeRef>,
-        internal_data_model: InternalDataModelRef,
-        capabilities: Vec<ConnectorCapability>,
+    pub(crate) fn new(
+        enable_raw_queries: bool,
+        connector: &'static dyn Connector,
+        preview_features: PreviewFeatures,
+        internal_data_model: InternalDataModel,
     ) -> Self {
-        let features = internal_data_model.schema.configuration.preview_features();
         let relation_mode = internal_data_model.schema.relation_mode();
-        QuerySchema {
-            query,
-            mutation,
-            _input_object_types,
-            _output_object_types,
-            _enum_types,
+
+        let mut query_schema = QuerySchema {
+            preview_features,
+            enable_raw_queries,
+            query_info_map: Default::default(),
+            root_fields: Default::default(),
             internal_data_model,
-            context: ConnectorContext::new(capabilities, features, relation_mode),
+            connector,
+            relation_mode,
+            mutation_fields: Default::default(),
+            query_fields: Default::default(),
+        };
+
+        query_schema.query_fields = crate::build::query_type::query_fields(&query_schema);
+        query_schema.mutation_fields = crate::build::mutation_type::mutation_fields(&query_schema);
+
+        let mut query_info_map: HashMap<(Operation, QueryInfo), _> = HashMap::new();
+        let mut root_fields = HashMap::new();
+
+        for (idx, field_fn) in query_schema.query_fields.iter().enumerate() {
+            let field = field_fn(&query_schema);
+            if let Some(query_info) = field.query_info() {
+                query_info_map.insert((Operation::Query, query_info.to_owned()), idx);
+            }
+            root_fields.insert((Operation::Query, field.name.into_owned()), idx);
         }
-    }
 
-    pub fn find_mutation_field<T>(&self, name: T) -> Option<OutputFieldRef>
-    where
-        T: Into<String>,
-    {
-        let name = name.into();
-        self.mutation().get_fields().iter().find(|f| f.name == name).cloned()
-    }
-
-    pub fn find_query_field<T>(&self, name: T) -> Option<OutputFieldRef>
-    where
-        T: Into<String>,
-    {
-        let name = name.into();
-        self.query().get_fields().iter().find(|f| f.name == name).cloned()
-    }
-
-    pub fn mutation(&self) -> ObjectTypeStrongRef {
-        match self.mutation.borrow() {
-            OutputType::Object(ref o) => o.into_arc(),
-            _ => unreachable!(),
+        for (idx, field_fn) in query_schema.mutation_fields.iter().enumerate() {
+            let field = field_fn(&query_schema);
+            if let Some(query_info) = field.query_info() {
+                query_info_map.insert((Operation::Mutation, query_info.to_owned()), idx);
+            }
+            root_fields.insert((Operation::Mutation, field.name.into_owned()), idx);
         }
+
+        query_schema.query_info_map = query_info_map;
+        query_schema.root_fields = root_fields;
+        query_schema
     }
 
-    pub fn query(&self) -> ObjectTypeStrongRef {
-        match self.query.borrow() {
-            OutputType::Object(ref o) => o.into_arc(),
-            _ => unreachable!(),
-        }
+    pub(crate) fn supports_any(&self, capabilities: &[ConnectorCapability]) -> bool {
+        capabilities.iter().any(|c| self.connector.has_capability(*c))
     }
 
-    pub fn enum_types(&self) -> &[EnumTypeRef] {
-        &self._enum_types
+    pub(crate) fn can_full_text_search(&self) -> bool {
+        self.has_feature(PreviewFeature::FullTextSearch)
+            && (self.has_capability(ConnectorCapability::FullTextSearchWithoutIndex)
+                || self.has_capability(ConnectorCapability::FullTextSearchWithIndex))
     }
 
-    pub fn context(&self) -> &ConnectorContext {
-        &self.context
+    pub(crate) fn has_feature(&self, feature: PreviewFeature) -> bool {
+        self.preview_features.contains(feature)
+    }
+
+    pub(crate) fn has_capability(&self, capability: ConnectorCapability) -> bool {
+        self.connector.has_capability(capability)
+    }
+
+    pub fn find_mutation_field(&self, name: &str) -> Option<OutputField<'_>> {
+        self.root_fields
+            .get(&(Operation::Mutation, name.to_owned()))
+            .map(|i| self.mutation_fields[*i](self))
+    }
+
+    pub fn find_query_field(&self, name: &str) -> Option<OutputField<'_>> {
+        self.root_fields
+            .get(&(Operation::Query, name.to_owned()))
+            .map(|i| self.query_fields[*i](self))
+    }
+
+    pub fn find_query_field_by_model_and_action(
+        &self,
+        model_name: Option<&str>,
+        tag: QueryTag,
+    ) -> Option<OutputField<'_>> {
+        let model = model_name
+            .and_then(|name| self.internal_data_model.schema.db.find_model(name))
+            .map(|m| m.id);
+        let query_info = QueryInfo { model, tag };
+
+        self.query_info_map
+            .get(&(Operation::Query, query_info))
+            .map(|i| self.query_fields[*i](self))
+    }
+
+    pub fn find_mutation_field_by_model_and_action(
+        &self,
+        model_name: Option<&str>,
+        tag: QueryTag,
+    ) -> Option<OutputField<'_>> {
+        let model = model_name
+            .and_then(|name| self.internal_data_model.schema.db.find_model(name))
+            .map(|m| m.id);
+        let query_info = QueryInfo { model, tag };
+
+        self.query_info_map
+            .get(&(Operation::Mutation, query_info))
+            .map(|i| self.mutation_fields[*i](self))
+    }
+
+    pub fn mutation(&self) -> ObjectType<'_> {
+        ObjectType::new(Identifier::new_prisma(IdentifierType::Mutation), || {
+            self.mutation_fields.iter().map(|f| f(self)).collect()
+        })
+    }
+
+    pub fn query(&self) -> ObjectType<'_> {
+        ObjectType::new(Identifier::new_prisma(IdentifierType::Query), || {
+            self.query_fields.iter().map(|f| f(self)).collect()
+        })
+    }
+
+    pub fn relation_mode(&self) -> RelationMode {
+        self.relation_mode
+    }
+
+    pub fn can_native_upsert(&self) -> bool {
+        self.connector
+            .capabilities()
+            .contains(ConnectorCapability::NativeUpsert)
     }
 }
 
 /// Designates a specific top-level operation on a corresponding model.
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Hash, Eq)]
 pub struct QueryInfo {
-    pub model: Option<ModelRef>,
+    pub model: Option<ast::ModelId>,
     pub tag: QueryTag,
 }
 
 /// A `QueryTag` designates a top level query possible with Prisma.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Hash, Eq)]
 pub enum QueryTag {
     FindUnique,
     FindUniqueOrThrow,
@@ -158,6 +193,7 @@ pub enum QueryTag {
     UpsertOne,
     Aggregate,
     GroupBy,
+    // Raw operations
     ExecuteRaw,
     QueryRaw,
     RunCommandRaw,
@@ -166,7 +202,7 @@ pub enum QueryTag {
 }
 
 impl fmt::Display for QueryTag {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let s = match self {
             Self::FindUnique => "findUnique",
             Self::FindUniqueOrThrow => "findUniqueOrThrow",
@@ -189,44 +225,77 @@ impl fmt::Display for QueryTag {
             Self::AggregateRaw => "aggregateRaw",
         };
 
-        write!(f, "{s}")
+        f.write_str(s)
+    }
+}
+
+impl From<&str> for QueryTag {
+    fn from(value: &str) -> Self {
+        match value {
+            "findUnique" => Self::FindUnique,
+            "findUniqueOrThrow" => Self::FindUniqueOrThrow,
+            "findFirst" => Self::FindFirst,
+            "findFirstOrThrow" => Self::FindFirstOrThrow,
+            "findMany" => Self::FindMany,
+            "createOne" => Self::CreateOne,
+            "createMany" => Self::CreateMany,
+            "updateOne" => Self::UpdateOne,
+            "updateMany" => Self::UpdateMany,
+            "deleteOne" => Self::DeleteOne,
+            "deleteMany" => Self::DeleteMany,
+            "upsertOne" => Self::UpsertOne,
+            "aggregate" => Self::Aggregate,
+            "groupBy" => Self::GroupBy,
+            "executeRaw" => Self::ExecuteRaw,
+            "queryRaw" => Self::QueryRaw,
+            "findRaw" => Self::FindRaw,
+            "aggregateRaw" => Self::AggregateRaw,
+            "runCommandRaw" => Self::RunCommandRaw,
+            v => panic!("Unknown query tag: {v}"),
+        }
     }
 }
 
 #[derive(PartialEq, Hash, Eq, Debug, Clone)]
 pub struct Identifier {
-    name: String,
-    namespace: String,
+    name: IdentifierType,
+    namespace: IdentifierNamespace,
+}
+
+#[derive(PartialEq, Eq, Hash, Debug, Clone)]
+enum IdentifierNamespace {
+    Prisma,
+    Model,
 }
 
 impl Identifier {
-    pub fn new<T, U>(name: T, namespace: U) -> Self
-    where
-        T: Into<String>,
-        U: Into<String>,
-    {
+    pub(crate) fn new_prisma(name: impl Into<IdentifierType>) -> Self {
         Self {
             name: name.into(),
-            namespace: namespace.into(),
+            namespace: IdentifierNamespace::Prisma,
         }
     }
 
-    pub fn name(&self) -> &str {
-        &self.name
+    pub(crate) fn new_model(name: impl Into<IdentifierType>) -> Self {
+        Self {
+            name: name.into(),
+            namespace: IdentifierNamespace::Model,
+        }
+    }
+
+    pub fn name(&self) -> String {
+        self.name.to_string()
     }
 
     pub fn namespace(&self) -> &str {
-        &self.namespace
+        match self.namespace {
+            IdentifierNamespace::Prisma => "prisma",
+            IdentifierNamespace::Model => "model",
+        }
     }
 }
 
-impl ToString for Identifier {
-    fn to_string(&self) -> String {
-        format!("{}.{}", self.namespace(), self.name())
-    }
-}
-
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Copy)]
 pub enum ScalarType {
     Null,
     String,
@@ -239,12 +308,11 @@ pub enum ScalarType {
     Json,
     JsonList,
     UUID,
-    Xml,
     Bytes,
 }
 
-impl std::fmt::Display for ScalarType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl fmt::Display for ScalarType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let typ = match self {
             ScalarType::Null => "Null",
             ScalarType::String => "String",
@@ -257,10 +325,9 @@ impl std::fmt::Display for ScalarType {
             ScalarType::Json => "Json",
             ScalarType::UUID => "UUID",
             ScalarType::JsonList => "Json",
-            ScalarType::Xml => "Xml",
             ScalarType::Bytes => "Bytes",
         };
 
-        write!(f, "{typ}")
+        f.write_str(typ)
     }
 }

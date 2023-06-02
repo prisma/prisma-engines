@@ -27,20 +27,19 @@ impl<'db> TwoWayEmbeddedManyToManyRelationWalker<'db> {
 
     /// The field that defines the relation in model a.
     pub fn field_a(self) -> RelationFieldWalker<'db> {
-        match self.get().attributes {
-            RelationAttributes::TwoWayEmbeddedManyToMany { field_a, field_b: _ } => {
-                self.model_a().relation_field(field_a)
-            }
+        let rel = self.get();
+        match rel.attributes {
+            RelationAttributes::TwoWayEmbeddedManyToMany { field_a, field_b: _ } => self.0.walk(field_a),
             _ => unreachable!(),
         }
     }
 
     /// The field that defines the relation in model b.
     pub fn field_b(self) -> RelationFieldWalker<'db> {
-        match self.get().attributes {
-            RelationAttributes::TwoWayEmbeddedManyToMany { field_a: _, field_b } => {
-                self.model_b().relation_field(field_b)
-            }
+        let rel = self.get();
+        match rel.attributes {
+            RelationAttributes::TwoWayEmbeddedManyToMany { field_a: _, field_b } => self.0.walk(field_b),
+
             _ => unreachable!(),
         }
     }

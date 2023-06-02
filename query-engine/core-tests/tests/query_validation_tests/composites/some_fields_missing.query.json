@@ -1,0 +1,14 @@
+{
+    "action": "findUnique",
+    "modelName": "TestModel",
+    "query": {
+        "arguments": {
+            "where": {
+                "unique4": 1
+            }
+        },
+        "selection": {
+            "$scalars": true
+        }
+    }
+}

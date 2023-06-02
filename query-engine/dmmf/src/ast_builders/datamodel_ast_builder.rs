@@ -2,13 +2,13 @@ use crate::serialization_ast::datamodel_ast::{
     Datamodel, Enum, EnumValue, Field, Function, Model, PrimaryKey, UniqueIndex,
 };
 use bigdecimal::ToPrimitive;
-use prisma_models::dml::{self, PrismaValue};
+use prisma_models::{dml_default_kind, encode_bytes, DefaultKind, FieldArity, PrismaValue};
 use psl::{
     parser_database::{walkers, ScalarFieldType},
     schema_ast::ast::WithDocumentation,
 };
 
-pub fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
+pub(crate) fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
     let mut datamodel = Datamodel {
         models: Vec::with_capacity(schema.db.models_count()),
         enums: Vec::with_capacity(schema.db.enums_count()),
@@ -19,7 +19,12 @@ pub fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
         datamodel.enums.push(enum_to_dmmf(enum_model));
     }
 
-    for model in schema.db.walk_models().filter(|model| !model.is_ignored()) {
+    for model in schema
+        .db
+        .walk_models()
+        .filter(|model| !model.is_ignored())
+        .chain(schema.db.walk_views())
+    {
         datamodel.models.push(model_to_dmmf(model));
     }
 
@@ -79,22 +84,22 @@ fn composite_type_field_to_dmmf(field: walkers::CompositeTypeFieldWalker<'_>) ->
             ScalarFieldType::Unsupported(_) => unreachable!(),
         },
         db_name: field.mapped_name().map(ToOwned::to_owned),
-        is_required: field.arity() == dml::FieldArity::Required || field.arity() == dml::FieldArity::List,
-        is_list: field.arity() == dml::FieldArity::List,
+        is_required: field.arity() == FieldArity::Required || field.arity() == FieldArity::List,
+        is_list: field.arity() == FieldArity::List,
         is_id: false,
         is_read_only: false,
         has_default_value: field.default_value().is_some(),
         default: field
             .default_value()
-            .map(|dv| default_value_to_serde(&dml::dml_default_kind(dv, field.scalar_type()))),
+            .map(|dv| default_value_to_serde(&dml_default_kind(dv, field.scalar_type()))),
         is_unique: false,
         relation_name: None,
         relation_from_fields: None,
         relation_to_fields: None,
         relation_on_delete: None,
         field_type: match field.r#type() {
-            ScalarFieldType::CompositeType(ct) => field.walk(*ct).name().to_owned(),
-            ScalarFieldType::Enum(enm) => field.walk(*enm).name().to_owned(),
+            ScalarFieldType::CompositeType(ct) => field.walk(ct).name().to_owned(),
+            ScalarFieldType::Enum(enm) => field.walk(enm).name().to_owned(),
             ScalarFieldType::BuiltInScalar(st) => st.as_str().to_owned(),
             ScalarFieldType::Unsupported(_) => unreachable!(),
         },
@@ -171,7 +176,7 @@ fn scalar_field_to_dmmf(field: walkers::ScalarFieldWalker<'_>) -> Field {
             ScalarFieldType::Unsupported(_) => unreachable!(),
         },
         is_list: ast_field.arity.is_list(),
-        is_required: matches!(ast_field.arity, dml::FieldArity::Required | dml::FieldArity::List),
+        is_required: matches!(ast_field.arity, FieldArity::Required | FieldArity::List),
         is_unique: !is_id && field.is_unique(),
         is_id,
         is_read_only: field.model().relation_fields().any(|rf| {
@@ -189,7 +194,7 @@ fn scalar_field_to_dmmf(field: walkers::ScalarFieldWalker<'_>) -> Field {
         },
         default: field
             .default_value()
-            .map(|dv| default_value_to_serde(&dml::dml_default_kind(dv.value(), field.scalar_type()))),
+            .map(|dv| default_value_to_serde(&dml_default_kind(dv.value(), field.scalar_type()))),
         relation_name: None,
         relation_from_fields: None,
         relation_to_fields: None,
@@ -207,7 +212,7 @@ fn relation_field_to_dmmf(field: walkers::RelationFieldWalker<'_>) -> Field {
         db_name: None,
         kind: "object",
         is_list: ast_field.arity.is_list(),
-        is_required: matches!(ast_field.arity, dml::FieldArity::Required | dml::FieldArity::List),
+        is_required: matches!(ast_field.arity, FieldArity::Required | FieldArity::List),
         is_unique: false,
         is_id: false,
         is_read_only: false,
@@ -234,10 +239,10 @@ fn relation_field_to_dmmf(field: walkers::RelationFieldWalker<'_>) -> Field {
     }
 }
 
-fn default_value_to_serde(dv: &dml::DefaultKind) -> serde_json::Value {
+fn default_value_to_serde(dv: &DefaultKind) -> serde_json::Value {
     match dv {
-        dml::DefaultKind::Single(value) => prisma_value_to_serde(&value.clone()),
-        dml::DefaultKind::Expression(vg) => {
+        DefaultKind::Single(value) => prisma_value_to_serde(&value.clone()),
+        DefaultKind::Expression(vg) => {
             let args: Vec<_> = vg.args().iter().map(|(_, v)| v.clone()).collect();
             function_to_serde(vg.name(), &args)
         }
@@ -258,9 +263,8 @@ fn prisma_value_to_serde(value: &PrismaValue) -> serde_json::Value {
         PrismaValue::Null => serde_json::Value::Null,
         PrismaValue::Uuid(val) => serde_json::Value::String(val.to_string()),
         PrismaValue::Json(val) => serde_json::Value::String(val.to_string()),
-        PrismaValue::Xml(val) => serde_json::Value::String(val.to_string()),
         PrismaValue::List(value_vec) => serde_json::Value::Array(value_vec.iter().map(prisma_value_to_serde).collect()),
-        PrismaValue::Bytes(b) => serde_json::Value::String(dml::prisma_value::encode_bytes(b)),
+        PrismaValue::Bytes(b) => serde_json::Value::String(encode_bytes(b)),
         PrismaValue::Object(pairs) => {
             let mut map = serde_json::Map::with_capacity(pairs.len());
             pairs.iter().for_each(|(key, value)| {
@@ -303,6 +307,7 @@ mod tests {
             "source_with_generator",
             "without_relation_name",
             "ignore",
+            "views",
         ];
 
         for test_case in test_cases {
@@ -310,12 +315,9 @@ mod tests {
 
             let datamodel_string = load_from_file(format!("{test_case}.prisma").as_str());
             let dmmf_string = render_to_dmmf(&datamodel_string);
-
-            assert_eq_json(
-                &dmmf_string,
-                &load_from_file(format!("{test_case}.json").as_str()),
-                test_case,
-            );
+            let expected_json = load_from_file(format!("{test_case}.json").as_str());
+            println!("{dmmf_string}");
+            assert_eq_json(&dmmf_string, &expected_json, test_case);
         }
     }
 

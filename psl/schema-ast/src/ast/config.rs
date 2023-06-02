@@ -27,7 +27,7 @@ pub struct ConfigBlockProperty {
     ///           ^^^^^^^^^^
     /// }
     /// ```
-    pub value: Expression,
+    pub value: Option<Expression>,
     /// The node span.
     pub span: Span,
 }

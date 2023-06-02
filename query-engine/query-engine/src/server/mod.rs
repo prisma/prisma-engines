@@ -1,4 +1,5 @@
-use crate::state::State;
+use crate::context::PrismaContext;
+use crate::features::Feature;
 use crate::{opt::PrismaOpt, PrismaResult};
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{header::CONTENT_TYPE, Body, HeaderMap, Method, Request, Response, Server, StatusCode};
@@ -6,11 +7,8 @@ use opentelemetry::trace::TraceContextExt;
 use opentelemetry::{global, propagation::Extractor};
 use query_core::helpers::*;
 use query_core::telemetry::capturing::TxTraceExt;
-use query_core::{
-    schema::QuerySchemaRenderer, telemetry, ExtendedTransactionUserFacingError, TransactionOptions, TxId,
-};
-use query_engine_metrics::MetricFormat;
-use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlHandler};
+use query_core::{telemetry, ExtendedTransactionUserFacingError, TransactionOptions, TxId};
+use request_handlers::{dmmf, render_graphql_schema, RequestBody, RequestHandler};
 use serde_json::json;
 use std::collections::HashMap;
 use std::net::SocketAddr;
@@ -20,10 +18,10 @@ use tracing::{field, Instrument, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 /// Starts up the graphql query engine server
-pub async fn listen(opts: &PrismaOpt, state: State) -> PrismaResult<()> {
+pub async fn listen(cx: Arc<PrismaContext>, opts: &PrismaOpt) -> PrismaResult<()> {
     let query_engine = make_service_fn(move |_| {
-        let state = state.clone();
-        async move { Ok::<_, hyper::Error>(service_fn(move |req| routes(state.clone(), req))) }
+        let cx = cx.clone();
+        async move { Ok::<_, hyper::Error>(service_fn(move |req| routes(cx.clone(), req))) }
     });
 
     let ip = opts.host.parse().expect("Host was not a valid IP address.");
@@ -31,7 +29,14 @@ pub async fn listen(opts: &PrismaOpt, state: State) -> PrismaResult<()> {
 
     let server = Server::bind(&addr).tcp_nodelay(true).serve(query_engine);
 
-    info!("Started query engine http server on http://{}", addr);
+    // Note: we call `server.local_addr()` instead of reusing original `addr` because it may contain port 0 to request
+    // the OS to assign a free port automatically, and we want to print the address which is actually in use.
+    info!(
+        ip = %server.local_addr().ip(),
+        port = %server.local_addr().port(),
+        "Started query engine http server on http://{}",
+        server.local_addr()
+    );
 
     if let Err(e) = server.await {
         eprintln!("server error: {e}");
@@ -40,23 +45,23 @@ pub async fn listen(opts: &PrismaOpt, state: State) -> PrismaResult<()> {
     Ok(())
 }
 
-pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+pub(crate) async fn routes(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     let start = Instant::now();
 
     if req.method() == Method::POST && req.uri().path().starts_with("/transaction") {
-        return transaction_handler(state, req).await;
+        return transaction_handler(cx, req).await;
     }
 
     if [Method::POST, Method::GET].contains(req.method())
         && req.uri().path().starts_with("/metrics")
-        && state.enable_metrics
+        && cx.enabled_features.contains(Feature::Metrics)
     {
-        return metrics_handler(state, req).await;
+        return metrics_handler(cx, req).await;
     }
 
     let mut res = match (req.method(), req.uri().path()) {
-        (&Method::POST, "/") => graphql_handler(state, req).await?,
-        (&Method::GET, "/") if state.enable_playground => playground_handler(),
+        (&Method::POST, "/") => request_handler(cx, req).await?,
+        (&Method::GET, "/") if cx.enabled_features.contains(Feature::Playground) => playground_handler(),
         (&Method::GET, "/status") => Response::builder()
             .status(StatusCode::OK)
             .header(CONTENT_TYPE, "application/json")
@@ -64,7 +69,7 @@ pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, 
             .unwrap(),
 
         (&Method::GET, "/sdl") => {
-            let schema = GraphQLSchemaRenderer::render(state.cx.query_schema().clone());
+            let schema = render_graphql_schema(cx.query_schema());
 
             Response::builder()
                 .status(StatusCode::OK)
@@ -74,7 +79,7 @@ pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, 
         }
 
         (&Method::GET, "/dmmf") => {
-            let schema = dmmf::render_dmmf(Arc::clone(state.cx.query_schema()));
+            let schema = dmmf::render_dmmf(cx.query_schema());
 
             Response::builder()
                 .status(StatusCode::OK)
@@ -87,7 +92,7 @@ pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, 
             let body = json!({
                 "commit": env!("GIT_HASH"),
                 "version": env!("CARGO_PKG_VERSION"),
-                "primary_connector": state.cx.primary_connector(),
+                "primary_connector": cx.primary_connector(),
             });
 
             Response::builder()
@@ -108,11 +113,11 @@ pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, 
     Ok(res)
 }
 
-/// The main query handler. This handles incoming GraphQL queries and passes it
+/// The main query handler. This handles incoming requests and passes it
 /// to the query engine.
-async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     // Check for debug headers if enabled.
-    if state.enable_debug_mode {
+    if cx.enabled_features.contains(Feature::DebugMode) {
         return Ok(handle_debug_headers(&req));
     }
 
@@ -120,11 +125,11 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
     let capture_settings = capture_settings(headers);
 
     let tx_id = transaction_id(headers);
-    let cx = get_parent_span_context(headers);
+    let tracing_cx = get_parent_span_context(headers);
 
     let span = if tx_id.is_none() {
         let span = info_span!("prisma:engine", user_facing = true);
-        span.set_parent(cx);
+        span.set_parent(tracing_cx);
         span
     } else {
         Span::none()
@@ -170,14 +175,15 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
         capturer.start_capturing().await;
     }
 
-    let work = async move {
-        let body_start = req.into_body();
-        // block and buffer request until the request has completed
-        let full_body = hyper::body::to_bytes(body_start).await?;
+    let body_start = req.into_body();
+    // block and buffer request until the request has completed
+    let full_body = hyper::body::to_bytes(body_start).await?;
+    let serialized_body = RequestBody::try_from_slice(full_body.as_ref(), cx.engine_protocol());
 
-        match serde_json::from_slice(full_body.as_ref()) {
+    let work = async move {
+        match serialized_body {
             Ok(body) => {
-                let handler = GraphQlHandler::new(&*state.cx.executor, state.cx.query_schema());
+                let handler = RequestHandler::new(cx.executor(), cx.query_schema(), cx.engine_protocol());
                 let mut result = handler.handle(body, tx_id, traceparent).instrument(span).await;
 
                 if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
@@ -198,10 +204,20 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
 
                 Ok(res)
             }
-            Err(_e) => {
+            Err(e) => {
+                let ufe: user_facing_errors::Error = request_handlers::HandlerError::query_conversion(format!(
+                    "Error parsing {:?} query. {}",
+                    cx.engine_protocol(),
+                    e
+                ))
+                .into();
+
+                let result_bytes = serde_json::to_vec(&ufe).unwrap();
+
                 let res = Response::builder()
-                    .status(StatusCode::BAD_REQUEST)
-                    .body(Body::empty())
+                    .status(StatusCode::UNPROCESSABLE_ENTITY) // 422
+                    .header(CONTENT_TYPE, "application/json")
+                    .body(Body::from(result_bytes))
                     .unwrap();
 
                 Ok(res)
@@ -228,17 +244,8 @@ fn playground_handler() -> Response<Body> {
         .unwrap()
 }
 
-async fn metrics_handler(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
-    let format = if let Some(query) = req.uri().query() {
-        if query.contains("format=json") {
-            MetricFormat::Json
-        } else {
-            MetricFormat::Prometheus
-        }
-    } else {
-        MetricFormat::Prometheus
-    };
-
+async fn metrics_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+    let requested_json = req.uri().query().map(|q| q.contains("format=json")).unwrap_or_default();
     let body_start = req.into_body();
     // block and buffer request until the request has completed
     let full_body = hyper::body::to_bytes(body_start).await?;
@@ -248,47 +255,45 @@ async fn metrics_handler(state: State, req: Request<Body>) -> Result<Response<Bo
         Err(_e) => HashMap::new(),
     };
 
-    if format == MetricFormat::Json {
-        let metrics = state.cx.metrics.to_json(global_labels);
+    let response = if requested_json {
+        let metrics = cx.metrics.to_json(global_labels);
 
-        let res = Response::builder()
+        Response::builder()
             .status(StatusCode::OK)
             .header(CONTENT_TYPE, "application/json")
             .body(Body::from(metrics.to_string()))
-            .unwrap();
+            .unwrap()
+    } else {
+        let metrics = cx.metrics.to_prometheus(global_labels);
 
-        return Ok(res);
-    }
+        Response::builder()
+            .status(StatusCode::OK)
+            .header(CONTENT_TYPE, "text/plain; version=0.0.4")
+            .body(Body::from(metrics))
+            .unwrap()
+    };
 
-    let metrics = state.cx.metrics.to_prometheus(global_labels);
-
-    let res = Response::builder()
-        .status(StatusCode::OK)
-        .header(CONTENT_TYPE, "text/plain; version=0.0.4")
-        .body(Body::from(metrics))
-        .unwrap();
-
-    Ok(res)
+    Ok(response)
 }
 
 /// Sadly the routing doesn't make it obvious what the transaction routes are:
 /// POST /transaction/start -> start a transaction
 /// POST /transaction/{tx_id}/commit -> commit a transaction
 /// POST /transaction/{tx_id}/rollback -> rollback a transaction
-async fn transaction_handler(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+async fn transaction_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     let path = req.uri().path().to_owned();
     let sections: Vec<&str> = path.split('/').collect();
 
     if sections.len() == 3 && sections[2] == "start" {
-        return transaction_start_handler(state, req).await;
+        return transaction_start_handler(cx, req).await;
     }
 
     if sections.len() == 4 && sections[3] == "commit" {
-        return transaction_commit_handler(state, req, sections[2].into()).await;
+        return transaction_commit_handler(cx, req, sections[2].into()).await;
     }
 
     if sections.len() == 4 && sections[3] == "rollback" {
-        return transaction_rollback_handler(state, req, sections[2].into()).await;
+        return transaction_rollback_handler(cx, req, sections[2].into()).await;
     }
 
     let res = Response::builder()
@@ -298,7 +303,7 @@ async fn transaction_handler(state: State, req: Request<Body>) -> Result<Respons
     Ok(res)
 }
 
-async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+async fn transaction_start_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     let headers = req.headers().to_owned();
 
     let body_start = req.into_body();
@@ -344,10 +349,9 @@ async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<R
         capturer.start_capturing().await;
     }
 
-    let result = state
-        .cx
+    let result = cx
         .executor
-        .start_tx(state.cx.query_schema().clone(), tx_opts)
+        .start_tx(cx.query_schema().clone(), cx.engine_protocol(), tx_opts)
         .instrument(span)
         .await;
 
@@ -378,7 +382,7 @@ async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<R
 }
 
 async fn transaction_commit_handler(
-    state: State,
+    cx: Arc<PrismaContext>,
     req: Request<Body>,
     tx_id: TxId,
 ) -> Result<Response<Body>, hyper::Error> {
@@ -388,7 +392,7 @@ async fn transaction_commit_handler(
         capturer.start_capturing().await;
     }
 
-    let result = state.cx.executor.commit_tx(tx_id).await;
+    let result = cx.executor.commit_tx(tx_id).await;
 
     let telemetry = if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
         capturer.fetch_captures().await
@@ -403,7 +407,7 @@ async fn transaction_commit_handler(
 }
 
 async fn transaction_rollback_handler(
-    state: State,
+    cx: Arc<PrismaContext>,
     req: Request<Body>,
     tx_id: TxId,
 ) -> Result<Response<Body>, hyper::Error> {
@@ -413,7 +417,7 @@ async fn transaction_rollback_handler(
         capturer.start_capturing().await;
     }
 
-    let result = state.cx.executor.rollback_tx(tx_id).await;
+    let result = cx.executor.rollback_tx(tx_id).await;
 
     let telemetry = if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {
         capturer.fetch_captures().await

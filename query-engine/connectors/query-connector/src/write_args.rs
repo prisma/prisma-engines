@@ -4,7 +4,7 @@ use crate::{
 };
 use indexmap::{map::Keys, IndexMap};
 use prisma_models::{
-    CompositeFieldRef, Field, ModelProjection, ModelRef, PrismaValue, ScalarFieldRef, SelectedField, SelectionResult,
+    CompositeFieldRef, Field, Model, ModelProjection, PrismaValue, ScalarFieldRef, SelectedField, SelectionResult,
 };
 use std::{borrow::Borrow, convert::TryInto, ops::Deref};
 
@@ -284,30 +284,26 @@ impl NestedWrite {
     ///  - `Set("3")` is the write operation to execute
     ///  - `Field("field_b")` is the field on which to execute the write operation
     /// - `"field_a.field_b"` is the path for MongoDB to access the nested field
-    pub fn unfold(self, field: &Field, field_path: FieldPath) -> Vec<(WriteOperation, &Field, FieldPath)> {
-        self.unfold_internal(field, field_path)
+    pub fn unfold(self, field: &Field, field_path: FieldPath) -> Vec<(WriteOperation, Field, FieldPath)> {
+        self.unfold_internal(field.clone(), field_path)
     }
 
-    fn unfold_internal(self, field: &'_ Field, field_path: FieldPath) -> Vec<(WriteOperation, &'_ Field, FieldPath)> {
-        let mut nested_writes: Vec<(WriteOperation, &Field, FieldPath)> = vec![];
+    fn unfold_internal(self, field: Field, field_path: FieldPath) -> Vec<(WriteOperation, Field, FieldPath)> {
+        let mut nested_writes: Vec<(WriteOperation, Field, FieldPath)> = vec![];
 
         for (DatasourceFieldName(db_name), write) in self.writes {
-            let nested_field = field
-                .as_composite()
-                .unwrap()
-                .typ
-                .find_field_by_db_name(&db_name)
-                .unwrap();
+            let nested_ct = field.as_composite().unwrap().typ();
+            let nested_field = nested_ct.find_field_by_db_name(&db_name).unwrap();
             let mut new_path = field_path.clone();
 
-            new_path.add_segment(nested_field);
+            new_path.add_segment(&nested_field);
 
             match write {
                 WriteOperation::Composite(CompositeWriteOperation::Update(nested_write)) => {
-                    nested_writes.extend(nested_write.unfold_internal(nested_field, new_path));
+                    nested_writes.extend(nested_write.unfold_internal(nested_field.clone(), new_path));
                 }
                 _ => {
-                    nested_writes.push((write, nested_field, new_path));
+                    nested_writes.push((write, nested_field.clone(), new_path));
                 }
             }
         }
@@ -396,18 +392,18 @@ impl WriteArgs {
     }
 
     // @updatedAt
-    pub fn add_datetimes(&mut self, model: &ModelRef) {
+    pub fn add_datetimes(&mut self, model: &Model) {
         let updated_at_fields = model.fields().updated_at();
         let value = &self.request_now;
 
         for f in updated_at_fields {
             if self.args.get(f.db_name()).is_none() {
-                self.args.insert(f.into(), WriteOperation::scalar_set(value.clone()));
+                self.args.insert((&f).into(), WriteOperation::scalar_set(value.clone()));
             }
         }
     }
 
-    pub fn update_datetimes(&mut self, model: &ModelRef) {
+    pub fn update_datetimes(&mut self, model: &Model) {
         if !self.args.is_empty() {
             self.add_datetimes(model)
         }
@@ -445,7 +441,6 @@ impl WriteArgs {
 pub fn pick_args(projection: &ModelProjection, args: &WriteArgs) -> WriteArgs {
     let pairs = projection
         .scalar_fields()
-        .into_iter()
         .filter_map(|field| {
             args.get_field_value(field.db_name())
                 .map(|v| (DatasourceFieldName::from(&field), v.clone()))

@@ -1,0 +1,13 @@
+{
+    "action": "findMany",
+    "modelName": "User",
+    "query": {
+        "selection": {
+            "email": {
+                "selection": {
+                    "id": true
+                }
+            }
+        }
+    }
+}

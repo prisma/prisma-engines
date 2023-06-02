@@ -3,11 +3,9 @@ pub(crate) mod index_fields;
 use crate::{context::Context, interner::StringId, walkers::IndexFieldWalker, DatamodelError};
 use either::Either;
 use enumflags2::bitflags;
+use rustc_hash::FxHashMap as HashMap;
 use schema_ast::ast::{self, WithName};
-use std::{
-    collections::{BTreeMap, HashMap},
-    fmt,
-};
+use std::{collections::BTreeMap, fmt};
 
 pub(super) fn resolve_types(ctx: &mut Context<'_>) {
     for (top_id, top) in ctx.ast.iter_tops() {
@@ -24,38 +22,124 @@ pub(super) fn resolve_types(ctx: &mut Context<'_>) {
 #[derive(Debug, Default)]
 pub(super) struct Types {
     pub(super) composite_type_fields: BTreeMap<(ast::CompositeTypeId, ast::FieldId), CompositeTypeField>,
-    pub(super) scalar_fields: BTreeMap<(ast::ModelId, ast::FieldId), ScalarField>,
+    scalar_fields: Vec<ScalarField>,
     /// This contains only the relation fields actually present in the schema
     /// source text.
-    pub(super) relation_fields: BTreeMap<(ast::ModelId, ast::FieldId), RelationField>,
+    relation_fields: Vec<RelationField>,
     pub(super) enum_attributes: HashMap<ast::EnumId, EnumAttributes>,
     pub(super) model_attributes: HashMap<ast::ModelId, ModelAttributes>,
     /// Sorted array of scalar fields that have an `@default()` attribute with a function that is
     /// not part of the base Prisma ones. This is meant for later validation in the datamodel
     /// connector.
-    pub(super) unknown_function_defaults: Vec<(ast::ModelId, ast::FieldId)>,
+    pub(super) unknown_function_defaults: Vec<ScalarFieldId>,
 }
 
 impl Types {
+    pub(super) fn find_model_scalar_field(
+        &self,
+        model_id: ast::ModelId,
+        field_id: ast::FieldId,
+    ) -> Option<ScalarFieldId> {
+        self.scalar_fields
+            .binary_search_by_key(&(model_id, field_id), |sf| (sf.model_id, sf.field_id))
+            .ok()
+            .map(|idx| ScalarFieldId(idx as u32))
+    }
+
     pub(super) fn range_model_scalar_fields(
         &self,
         model_id: ast::ModelId,
-    ) -> impl Iterator<Item = (ast::FieldId, &ScalarField)> {
-        self.scalar_fields
-            .range((model_id, ast::FieldId::MIN)..=(model_id, ast::FieldId::MAX))
-            .map(|((_, field_id), scalar_field)| (*field_id, scalar_field))
+    ) -> impl Iterator<Item = (ScalarFieldId, &ScalarField)> + Clone {
+        let start = self.scalar_fields.partition_point(|sf| sf.model_id < model_id);
+        self.scalar_fields[start..]
+            .iter()
+            .take_while(move |sf| sf.model_id == model_id)
+            .enumerate()
+            .map(move |(idx, sf)| (ScalarFieldId((start + idx) as u32), sf))
     }
 
-    pub(super) fn take_scalar_field(&mut self, model_id: ast::ModelId, field_id: ast::FieldId) -> Option<ScalarField> {
-        self.scalar_fields.remove(&(model_id, field_id))
+    pub(super) fn iter_relation_field_ids(&self) -> impl Iterator<Item = RelationFieldId> + 'static {
+        (0..self.relation_fields.len()).map(|idx| RelationFieldId(idx as u32))
     }
 
-    pub(super) fn take_relation_field(
-        &mut self,
+    pub(super) fn iter_relation_fields(&self) -> impl Iterator<Item = (RelationFieldId, &RelationField)> {
+        self.relation_fields
+            .iter()
+            .enumerate()
+            .map(|(idx, rf)| (RelationFieldId(idx as u32), rf))
+    }
+
+    pub(super) fn range_model_scalar_field_ids(
+        &self,
         model_id: ast::ModelId,
-        field_id: ast::FieldId,
-    ) -> Option<RelationField> {
-        self.relation_fields.remove(&(model_id, field_id))
+    ) -> impl Iterator<Item = ScalarFieldId> + Clone {
+        let end = self.scalar_fields.partition_point(|sf| sf.model_id <= model_id);
+        let start = self.scalar_fields[..end].partition_point(|sf| sf.model_id < model_id);
+        (start..end).map(|idx| ScalarFieldId(idx as u32))
+    }
+
+    pub(super) fn range_model_relation_fields(
+        &self,
+        model_id: ast::ModelId,
+    ) -> impl Iterator<Item = (RelationFieldId, &RelationField)> + Clone {
+        let first_relation_field_idx = self.relation_fields.partition_point(|rf| rf.model_id < model_id);
+        self.relation_fields[first_relation_field_idx..]
+            .iter()
+            .take_while(move |rf| rf.model_id == model_id)
+            .enumerate()
+            .map(move |(idx, rf)| (RelationFieldId((first_relation_field_idx + idx) as u32), rf))
+    }
+
+    pub(super) fn refine_field(&self, id: (ast::ModelId, ast::FieldId)) -> Either<RelationFieldId, ScalarFieldId> {
+        self.relation_fields
+            .binary_search_by_key(&id, |rf| (rf.model_id, rf.field_id))
+            .map(|idx| Either::Left(RelationFieldId(idx as u32)))
+            .or_else(|_| {
+                self.scalar_fields
+                    .binary_search_by_key(&id, |sf| (sf.model_id, sf.field_id))
+                    .map(|id| Either::Right(ScalarFieldId(id as u32)))
+            })
+            .expect("expected field to be either scalar or relation field")
+    }
+
+    pub(super) fn push_relation_field(&mut self, relation_field: RelationField) -> RelationFieldId {
+        let id = RelationFieldId(self.relation_fields.len() as u32);
+        self.relation_fields.push(relation_field);
+        id
+    }
+
+    pub(super) fn push_scalar_field(&mut self, scalar_field: ScalarField) -> ScalarFieldId {
+        let id = ScalarFieldId(self.scalar_fields.len() as u32);
+        self.scalar_fields.push(scalar_field);
+        id
+    }
+}
+
+impl std::ops::Index<RelationFieldId> for Types {
+    type Output = RelationField;
+
+    fn index(&self, index: RelationFieldId) -> &Self::Output {
+        &self.relation_fields[index.0 as usize]
+    }
+}
+
+impl std::ops::IndexMut<RelationFieldId> for Types {
+    fn index_mut(&mut self, index: RelationFieldId) -> &mut Self::Output {
+        &mut self.relation_fields[index.0 as usize]
+    }
+}
+
+impl std::ops::Index<ScalarFieldId> for Types {
+    type Output = ScalarField;
+
+    fn index(&self, index: ScalarFieldId) -> &Self::Output {
+        &self.scalar_fields[index.0 as usize]
+    }
+}
+
+impl std::ops::IndexMut<ScalarFieldId> for Types {
+    fn index_mut(&mut self, index: ScalarFieldId) -> &mut Self::Output {
+        &mut self.scalar_fields[index.0 as usize]
     }
 }
 
@@ -107,6 +191,22 @@ impl ScalarFieldType {
     pub fn as_builtin_scalar(self) -> Option<ScalarType> {
         match self {
             ScalarFieldType::BuiltInScalar(s) => Some(s),
+            _ => None,
+        }
+    }
+
+    /// Try to interpret this field type as a Composite Type.
+    pub fn as_composite_type(self) -> Option<ast::CompositeTypeId> {
+        match self {
+            ScalarFieldType::CompositeType(id) => Some(id),
+            _ => None,
+        }
+    }
+
+    /// Try to interpret this field type as an enum.
+    pub fn as_enum(self) -> Option<ast::EnumId> {
+        match self {
+            ScalarFieldType::Enum(id) => Some(id),
             _ => None,
         }
     }
@@ -166,6 +266,8 @@ pub(crate) struct DefaultAttribute {
 
 #[derive(Debug)]
 pub(crate) struct ScalarField {
+    pub(crate) model_id: ast::ModelId,
+    pub(crate) field_id: ast::FieldId,
     pub(crate) r#type: ScalarFieldType,
     pub(crate) is_ignored: bool,
     pub(crate) is_updated_at: bool,
@@ -182,13 +284,15 @@ pub(crate) struct ScalarField {
 
 #[derive(Debug)]
 pub(crate) struct RelationField {
+    pub(crate) model_id: ast::ModelId,
+    pub(crate) field_id: ast::FieldId,
     pub(crate) referenced_model: ast::ModelId,
     pub(crate) on_delete: Option<(crate::ReferentialAction, ast::Span)>,
     pub(crate) on_update: Option<(crate::ReferentialAction, ast::Span)>,
     /// The fields _explicitly present_ in the AST.
-    pub(crate) fields: Option<Vec<ast::FieldId>>,
+    pub(crate) fields: Option<Vec<ScalarFieldId>>,
     /// The `references` fields _explicitly present_ in the AST.
-    pub(crate) references: Option<Vec<ast::FieldId>>,
+    pub(crate) references: Option<Vec<ScalarFieldId>>,
     /// The name _explicitly present_ in the AST.
     pub(crate) name: Option<StringId>,
     pub(crate) is_ignored: bool,
@@ -198,8 +302,10 @@ pub(crate) struct RelationField {
 }
 
 impl RelationField {
-    fn new(referenced_model: ast::ModelId) -> Self {
+    fn new(model_id: ast::ModelId, field_id: ast::FieldId, referenced_model: ast::ModelId) -> Self {
         RelationField {
+            model_id,
+            field_id,
             referenced_model,
             on_delete: None,
             on_update: None,
@@ -239,7 +345,7 @@ pub(crate) struct ModelAttributes {
 /// ```
 #[bitflags]
 #[repr(u8)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum IndexAlgorithm {
     /// Binary tree index (the default in most databases)
     BTree,
@@ -360,7 +466,7 @@ pub enum IndexType {
 pub(crate) struct IndexAttribute {
     pub(crate) r#type: IndexType,
     pub(crate) fields: Vec<FieldWithArgs>,
-    pub(crate) source_field: Option<ast::FieldId>,
+    pub(crate) source_field: Option<ScalarFieldId>,
     pub(crate) name: Option<StringId>,
     pub(crate) mapped_name: Option<StringId>,
     pub(crate) algorithm: Option<IndexAlgorithm>,
@@ -423,7 +529,7 @@ pub struct IndexFieldPath {
     ///   @@index([a.field])
     /// }
     /// ```
-    root: ast::FieldId,
+    root: ScalarFieldId,
     /// Path from the root, one composite type at a time. The final item is the
     /// field that gets included in the index.
     ///
@@ -443,7 +549,7 @@ pub struct IndexFieldPath {
 }
 
 impl IndexFieldPath {
-    pub(crate) fn new(root: ast::FieldId) -> Self {
+    pub(crate) fn new(root: ScalarFieldId) -> Self {
         Self { root, path: Vec::new() }
     }
 
@@ -467,7 +573,7 @@ impl IndexFieldPath {
     ///   @@index([a.field])
     /// }
     /// ```
-    pub fn root(&self) -> ast::FieldId {
+    pub fn root(&self) -> ScalarFieldId {
         self.root
     }
 
@@ -495,15 +601,11 @@ impl IndexFieldPath {
     /// or in a composite type embedded in the model. Returns the same value as
     /// the [`root`](Self::root()) method if the field is in a model rather than in a
     /// composite type.
-    pub fn field_in_index(&self) -> ast::FieldId {
-        self.path.last().map(|(_, field_id)| *field_id).unwrap_or(self.root)
-    }
-
-    /// If the indexed field is in a composite type embedded to the model, gives
-    /// a pointer to the type. Use this method to determine the type of the
-    /// index field.
-    pub fn type_holding_the_indexed_field(&self) -> Option<ast::CompositeTypeId> {
-        self.path.last().map(|(ctid, _)| *ctid)
+    pub fn field_in_index(&self) -> Either<ScalarFieldId, (ast::CompositeTypeId, ast::FieldId)> {
+        self.path
+            .last()
+            .map(|id| Either::Right(*id))
+            .unwrap_or(Either::Left(self.root))
     }
 }
 
@@ -531,20 +633,20 @@ fn visit_model<'db>(model_id: ast::ModelId, ast_model: &'db ast::Model, ctx: &mu
     for (field_id, ast_field) in ast_model.iter_fields() {
         match field_type(ast_field, ctx) {
             Ok(FieldType::Model(referenced_model)) => {
-                let rf = RelationField::new(referenced_model);
-                ctx.types.relation_fields.insert((model_id, field_id), rf);
+                let rf = RelationField::new(model_id, field_id, referenced_model);
+                ctx.types.push_relation_field(rf);
             }
             Ok(FieldType::Scalar(scalar_field_type)) => {
-                let field_data = ScalarField {
+                ctx.types.push_scalar_field(ScalarField {
+                    model_id,
+                    field_id,
                     r#type: scalar_field_type,
                     is_ignored: false,
                     is_updated_at: false,
                     default: None,
                     mapped_name: None,
                     native_type: None,
-                };
-
-                ctx.types.scalar_fields.insert((model_id, field_id), field_data);
+                });
             }
             Err(supported) => ctx.push_error(DatamodelError::new_type_not_found_error(
                 supported,
@@ -1336,3 +1438,11 @@ impl ScalarType {
         }
     }
 }
+
+/// An opaque identifier for a model relation field in a schema.
+#[derive(Copy, Clone, PartialEq, Debug, Hash, Eq, PartialOrd, Ord)]
+pub struct RelationFieldId(u32);
+
+/// An opaque identifier for a model scalar field in a schema.
+#[derive(Copy, Clone, PartialEq, Debug, Eq, Hash)]
+pub struct ScalarFieldId(u32);

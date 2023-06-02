@@ -8,7 +8,7 @@ use std::fmt::Display;
 
 #[allow(clippy::enum_variant_names)]
 #[derive(Debug, Clone)]
-pub enum ReadQuery {
+pub(crate) enum ReadQuery {
     RecordQuery(RecordQuery),
     ManyRecordsQuery(ManyRecordsQuery),
     RelatedRecordsQuery(RelatedRecordsQuery),
@@ -26,7 +26,7 @@ impl ReadQuery {
         }
     }
 
-    pub fn model(&self) -> ModelRef {
+    pub fn model(&self) -> Model {
         match self {
             ReadQuery::RecordQuery(x) => x.model.clone(),
             ReadQuery::ManyRecordsQuery(x) => x.model.clone(),
@@ -55,7 +55,7 @@ impl FilteredQuery for ReadQuery {
 }
 
 impl Display for ReadQuery {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::RecordQuery(q) => write!(
                 f,
@@ -144,10 +144,10 @@ impl QueryOptions {
 pub struct RecordQuery {
     pub name: String,
     pub alias: Option<String>,
-    pub model: ModelRef,
+    pub model: Model,
     pub filter: Option<Filter>,
     pub selected_fields: FieldSelection,
-    pub nested: Vec<ReadQuery>,
+    pub(crate) nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
     pub aggregation_selections: Vec<RelAggregationSelection>,
     pub options: QueryOptions,
@@ -157,10 +157,10 @@ pub struct RecordQuery {
 pub struct ManyRecordsQuery {
     pub name: String,
     pub alias: Option<String>,
-    pub model: ModelRef,
+    pub model: Model,
     pub args: QueryArguments,
     pub selected_fields: FieldSelection,
-    pub nested: Vec<ReadQuery>,
+    pub(crate) nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
     pub aggregation_selections: Vec<RelAggregationSelection>,
     pub options: QueryOptions,
@@ -173,7 +173,7 @@ pub struct RelatedRecordsQuery {
     pub parent_field: RelationFieldRef,
     pub args: QueryArguments,
     pub selected_fields: FieldSelection,
-    pub nested: Vec<ReadQuery>,
+    pub(crate) nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
     pub aggregation_selections: Vec<RelAggregationSelection>,
 
@@ -186,7 +186,7 @@ pub struct RelatedRecordsQuery {
 pub struct AggregateRecordsQuery {
     pub name: String,
     pub alias: Option<String>,
-    pub model: ModelRef,
+    pub model: Model,
     pub selection_order: Vec<(String, Option<Vec<String>>)>,
     pub args: QueryArguments,
     pub selectors: Vec<AggregationSelection>,

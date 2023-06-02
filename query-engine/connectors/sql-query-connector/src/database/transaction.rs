@@ -65,7 +65,7 @@ impl<'tx> Transaction for SqlConnectorTransaction<'tx> {
 impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
     async fn get_single_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         filter: &Filter,
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
@@ -88,7 +88,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
 
     async fn get_many_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
@@ -124,7 +124,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
 
     async fn aggregate_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         query_arguments: QueryArguments,
         selections: Vec<AggregationSelection>,
         group_by: Vec<ScalarFieldRef>,
@@ -143,7 +143,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
 impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
     async fn create_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         args: WriteArgs,
         trace_id: Option<String>,
     ) -> connector::Result<SelectionResult> {
@@ -156,7 +156,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
 
     async fn create_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         args: Vec<WriteArgs>,
         skip_duplicates: bool,
         trace_id: Option<String>,
@@ -170,7 +170,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
 
     async fn update_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: RecordFilter,
         args: WriteArgs,
         trace_id: Option<String>,
@@ -184,7 +184,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
 
     async fn update_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: RecordFilter,
         args: WriteArgs,
         trace_id: Option<String>,
@@ -199,7 +199,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
 
     async fn delete_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: RecordFilter,
         trace_id: Option<String>,
     ) -> connector::Result<usize> {
@@ -259,7 +259,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
 
     async fn query_raw(
         &mut self,
-        _model: Option<&ModelRef>,
+        _model: Option<&Model>,
         inputs: HashMap<String, PrismaValue>,
         _query_type: Option<String>,
     ) -> connector::Result<serde_json::Value> {

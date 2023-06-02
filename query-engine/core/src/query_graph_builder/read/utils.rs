@@ -2,10 +2,9 @@ use super::*;
 use crate::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
 use connector::RelAggregationSelection;
 use prisma_models::prelude::*;
-use schema_builder::constants::{aggregations::*, args};
-use std::sync::Arc;
+use schema::constants::{aggregations::*, args};
 
-pub fn collect_selection_order(from: &[FieldPair]) -> Vec<String> {
+pub(crate) fn collect_selection_order(from: &[FieldPair<'_>]) -> Vec<String> {
     from.iter()
         .map(|pair| {
             pair.parsed_field
@@ -19,10 +18,10 @@ pub fn collect_selection_order(from: &[FieldPair]) -> Vec<String> {
 /// Creates a `FieldSelection` from a query selection.
 /// Automatically adds model IDs to the selected fields as well.
 /// Unwraps are safe due to query validation.
-pub fn collect_selected_fields(
-    from_pairs: &[FieldPair],
+pub(crate) fn collect_selected_fields(
+    from_pairs: &[FieldPair<'_>],
     distinct: Option<FieldSelection>,
-    model: &ModelRef,
+    model: &Model,
 ) -> FieldSelection {
     let model_id = model.primary_identifier();
     let selected_fields = pairs_to_selections(model, from_pairs);
@@ -38,7 +37,7 @@ pub fn collect_selected_fields(
     }
 }
 
-fn pairs_to_selections<T>(parent: T, pairs: &[FieldPair]) -> Vec<SelectedField>
+fn pairs_to_selections<T>(parent: T, pairs: &[FieldPair<'_>]) -> Vec<SelectedField>
 where
     T: Into<ParentContainer>,
 {
@@ -58,20 +57,23 @@ where
         .collect()
 }
 
-fn extract_composite_selection(pf: ParsedField, cf: CompositeFieldRef) -> SelectedField {
+fn extract_composite_selection(pf: ParsedField<'_>, cf: CompositeFieldRef) -> SelectedField {
     let object = pf
         .nested_fields
         .expect("Invalid composite query shape: Composite field selected without sub-selection.");
 
-    let typ = cf.typ.clone();
+    let typ = cf.typ();
 
     SelectedField::Composite(CompositeSelection {
         field: cf,
-        selections: pairs_to_selections(&typ, &object.fields),
+        selections: pairs_to_selections(typ, &object.fields),
     })
 }
 
-pub fn collect_nested_queries(from: Vec<FieldPair>, model: &ModelRef) -> QueryGraphBuilderResult<Vec<ReadQuery>> {
+pub(crate) fn collect_nested_queries(
+    from: Vec<FieldPair<'_>>,
+    model: &Model,
+) -> QueryGraphBuilderResult<Vec<ReadQuery>> {
     from.into_iter()
         .filter_map(|pair| {
             if is_aggr_selection(&pair) {
@@ -85,7 +87,7 @@ pub fn collect_nested_queries(from: Vec<FieldPair>, model: &ModelRef) -> QueryGr
                 Field::Composite(_) => None,
                 Field::Relation(ref rf) => {
                     let model = rf.related_model();
-                    let parent = Arc::clone(&rf);
+                    let parent = rf.clone();
 
                     Some(related::find_related(pair.parsed_field, parent, model))
                 }
@@ -98,7 +100,7 @@ pub fn collect_nested_queries(from: Vec<FieldPair>, model: &ModelRef) -> QueryGr
 /// to resolve the nested queries.
 /// A lookback on the parent is also performed to ensure that fields required for
 /// resolving the parent relation are present.
-pub fn merge_relation_selections(
+pub(crate) fn merge_relation_selections(
     selected_fields: FieldSelection,
     parent_relation: Option<RelationFieldRef>,
     nested_queries: &[ReadQuery],
@@ -135,8 +137,8 @@ pub fn merge_cursor_fields(selected_fields: FieldSelection, cursor: &Option<Sele
 }
 
 pub fn collect_relation_aggr_selections(
-    from: Vec<FieldPair>,
-    model: &ModelRef,
+    from: Vec<FieldPair<'_>>,
+    model: &Model,
 ) -> QueryGraphBuilderResult<Vec<RelAggregationSelection>> {
     let mut selections = vec![];
 

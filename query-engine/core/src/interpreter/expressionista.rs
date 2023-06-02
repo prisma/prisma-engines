@@ -4,7 +4,7 @@ use super::{
 use crate::{query_graph::*, Query};
 use std::{collections::VecDeque, convert::TryInto};
 
-pub struct Expressionista;
+pub(crate) struct Expressionista;
 
 /// Helper accumulator struct.
 #[derive(Default)]
@@ -45,16 +45,16 @@ impl Expressionista {
         node: &NodeRef,
         parent_edges: Vec<EdgeRef>,
     ) -> InterpretationResult<Expression> {
-        graph.mark_visited(&node);
+        graph.mark_visited(node);
 
         // Child edges are ordered, evaluation order is low to high in the graph, unless other rules override.
-        let direct_children = graph.direct_child_pairs(&node);
+        let direct_children = graph.direct_child_pairs(node);
 
         let mut child_expressions = Self::process_children(graph, direct_children)?;
 
-        let is_result = graph.is_result_node(&node);
+        let is_result = graph.is_result_node(node);
         let node_id = node.id();
-        let node = graph.pluck_node(&node);
+        let node = graph.pluck_node(node);
         let into_expr = Box::new(|node: Node| {
             let query: Box<Query> = Box::new(node.try_into()?);
             Ok(Expression::Query { query })
@@ -94,7 +94,7 @@ impl Expressionista {
             .iter()
             .enumerate()
             .filter_map(|(ix, (_, child_node))| {
-                if graph.subgraph_contains_result(&child_node) {
+                if graph.subgraph_contains_result(child_node) {
                     Some(ix)
                 } else {
                     None
@@ -284,7 +284,7 @@ impl Expressionista {
         node: &NodeRef,
         parent_edges: Vec<EdgeRef>,
     ) -> InterpretationResult<Expression> {
-        let direct_children = graph.direct_child_pairs(&node);
+        let direct_children = graph.direct_child_pairs(node);
         let child_expressions = Self::process_children(graph, direct_children)?;
 
         let into_expr = Box::new(move |node: Node| {
@@ -357,7 +357,7 @@ impl Expressionista {
                                             .as_selection_results(&selection)
                                             .and_then(|parent_selections| Ok(f(node, parent_selections)?)),
 
-                                        QueryGraphDependency::DataDependency(f) => Ok(f(node, &binding)?),
+                                        QueryGraphDependency::DataDependency(f) => Ok(f(node, binding)?),
 
                                         _ => unreachable!(),
                                     };

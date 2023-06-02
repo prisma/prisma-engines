@@ -1,0 +1,69 @@
+{
+  "is_panic": false,
+  "message": "`findManyUser.where.foo`: Field does not exist in enclosing type.",
+  "meta": {
+    "kind": "UnknownInputField",
+    "inputType": {
+      "kind": "object",
+      "name": "UserWhereInput",
+      "fields": [
+        {
+          "name": "AND",
+          "typeNames": [
+            "UserWhereInput",
+            "UserWhereInput[]"
+          ],
+          "required": false
+        },
+        {
+          "name": "OR",
+          "typeNames": [
+            "UserWhereInput[]"
+          ],
+          "required": false
+        },
+        {
+          "name": "NOT",
+          "typeNames": [
+            "UserWhereInput",
+            "UserWhereInput[]"
+          ],
+          "required": false
+        },
+        {
+          "name": "id",
+          "typeNames": [
+            "IntFilter",
+            "Int"
+          ],
+          "required": false
+        },
+        {
+          "name": "email",
+          "typeNames": [
+            "StringFilter",
+            "String"
+          ],
+          "required": false
+        },
+        {
+          "name": "dob",
+          "typeNames": [
+            "DateTimeNullableFilter",
+            "DateTime",
+            "Null"
+          ],
+          "required": false
+        }
+      ]
+    },
+    "argumentPath": [
+      "where",
+      "foo"
+    ],
+    "selectionPath": [
+      "findManyUser"
+    ]
+  },
+  "error_code": "P2009"
+}
