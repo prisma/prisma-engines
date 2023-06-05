@@ -128,7 +128,7 @@ fn render_model(model: ModelPair<'_>, sql_family: SqlFamily) -> renderer::Model<
     }
 
     if model.expression_indexes().next().is_some() {
-        let docs = "This model contains an exression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.";
+        let docs = "This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.";
 
         rendered.documentation(docs);
     }
