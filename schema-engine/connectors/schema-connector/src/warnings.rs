@@ -427,7 +427,7 @@ impl fmt::Display for Warnings {
         )?;
 
         render_warnings(
-            "These indexes are not supported by the Prisma Client, because Prisma currently does not fully support expression indexes. Read more: https://pris.ly/d/expression-indexes",
+            "These indexes are not supported by Prisma Client, because Prisma currently does not fully support expression indexes. Read more: https://pris.ly/d/expression-indexes",
             &self.expression_indexes,
             f
         )?;
