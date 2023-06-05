@@ -12,8 +12,7 @@ impl<T> Guard<T> {
     }
 
     pub fn unset(&mut self) -> T {
-        let content = std::mem::replace(&mut self.content, None);
-        match content {
+        match self.content.take() {
             Some(c) => c,
             None => panic!("Logic error: Attempted to unset empty graph guard."),
         }
