@@ -1806,6 +1806,7 @@ fn extensions_are_described_correctly(api: TestApi) {
         PostgresSchemaExt {
             opclasses: [],
             indexes: [],
+            expression_indexes: [],
             index_null_position: {},
             constraint_options: {},
             table_options: [],
