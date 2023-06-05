@@ -46,7 +46,7 @@ published on our fabulous repo page.
 
 **Prerequisites:**
 
-- Installed the stable Rust toolchain, at least version 1.52.0. You can get the
+- Installed the latest stable version of the Rust toolchain. You can get the
   toolchain at [rustup](https://rustup.rs/) or the package manager of your
   choice.
 - Linux only: OpenSSL is required to be installed.
