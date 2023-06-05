@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["concurrency","rate"],"struct":["ConcurrencyLimit","ConcurrencyLimitLayer","GlobalConcurrencyLimitLayer","RateLimit","RateLimitLayer"]};
+window.SIDEBAR_ITEMS = {"mod":["concurrency","rate"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["DenseDFA","ErrorKind","SparseDFA"],"mod":["dense","sparse"],"struct":["Error","Regex","RegexBuilder"],"trait":["DFA","StateID"]};
+window.SIDEBAR_ITEMS = {"enum":["ErrorKind"],"mod":["dense","sparse"],"struct":["Error","Regex","RegexBuilder"],"trait":["DFA","StateID"]};

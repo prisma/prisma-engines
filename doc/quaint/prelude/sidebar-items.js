@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["ConnectionInfo","SqlFamily"],"macro":["col","val","values"],"struct":["ResultRow","ResultSet","Transaction"],"trait":["Queryable","TransactionCapable"]};
+window.SIDEBAR_ITEMS = {"macro":["col","val","values"]};

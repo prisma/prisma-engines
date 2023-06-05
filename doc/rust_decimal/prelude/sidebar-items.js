@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["RoundingStrategy"],"struct":["Decimal"],"trait":["FromPrimitive","FromStr","One","Signed","ToPrimitive","Zero"]};
+window.SIDEBAR_ITEMS = {"trait":["FromPrimitive","FromStr","One","Signed","ToPrimitive","Zero"]};

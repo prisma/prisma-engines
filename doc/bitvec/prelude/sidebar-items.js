@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"macro":["BitArr","bitarr","bitbox","bits","bitvec"],"struct":["BitPtr","BitPtrRange","BitRef"]};
+window.SIDEBAR_ITEMS = {"macro":["BitArr","bitarr","bitbox","bits","bitvec"]};

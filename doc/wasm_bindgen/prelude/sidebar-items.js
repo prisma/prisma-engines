@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"attr":["wasm_bindgen"],"trait":["JsCast"]};
+window.SIDEBAR_ITEMS = {"attr":["wasm_bindgen"]};
