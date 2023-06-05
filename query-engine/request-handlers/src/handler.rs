@@ -12,7 +12,6 @@ use query_core::{
     QueryDocument, QueryExecutor, TxId,
 };
 use std::{collections::HashMap, fmt, panic::AssertUnwindSafe};
-use user_facing_errors::{query_engine::RecordRequiredButNotFound, KnownError};
 
 type ArgsToResult = (HashMap<String, ArgumentValue>, IndexMap<String, Item>);
 
@@ -112,8 +111,8 @@ impl<'a> RequestHandler<'a> {
     ) -> PrismaResponse {
         let plural_name = document.plural_name();
         let singular_name = document.single_name();
-        let reject_on_not_found = document.reject_on_not_found();
-        let keys = document.keys;
+        let throw_on_empty = document.throw_on_empty();
+        let keys: Vec<String> = document.keys;
         let arguments = document.arguments;
         let nested_selection = document.nested_selection;
 
@@ -173,13 +172,14 @@ impl<'a> RequestHandler<'a> {
 
                                 responses.insert_data(&singular_name, Item::Map(result));
                             }
-                            _ => {
-                                if reject_on_not_found {
+                            None => {
+                                if throw_on_empty {
                                     responses.insert_error(GQLError::from_user_facing_error(
-                                        user_facing_errors::Error::from(KnownError::new(RecordRequiredButNotFound {
+                                        user_facing_errors::query_engine::RecordRequiredButNotFound {
                                             cause: "Expected a record, found none.".to_owned(),
-                                        })),
-                                    ));
+                                        }
+                                        .into(),
+                                    ))
                                 } else {
                                     responses.insert_data(&singular_name, Item::null());
                                 }
