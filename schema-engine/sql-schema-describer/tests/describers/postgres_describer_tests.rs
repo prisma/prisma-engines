@@ -1022,6 +1022,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                     BTree,
                 ),
             ],
+            expression_indexes: [],
             index_null_position: {},
             constraint_options: {
                 Index(
@@ -1206,6 +1207,7 @@ fn postgres_sequences_must_work(api: TestApi) {
         PostgresSchemaExt {
             opclasses: [],
             indexes: [],
+            expression_indexes: [],
             index_null_position: {},
             constraint_options: {},
             table_options: [],
