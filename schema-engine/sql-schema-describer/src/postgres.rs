@@ -714,6 +714,8 @@ impl<'a> SqlSchemaDescriber<'a> {
         let mut names = Vec::with_capacity(rows.len());
 
         for row in rows.into_iter() {
+            dbg!(&row);
+
             let options: BTreeMap<String, String> = row
                 .get_string_array("reloptions")
                 .unwrap_or_default()
@@ -731,6 +733,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 row.get_expect_string("table_name"),
                 row.get_expect_string("namespace"),
                 row.get_expect_bool("is_partition"),
+                row.get_expect_bool("is_foreign_table"),
                 row.get_expect_bool("has_subclass"),
                 row.get_expect_bool("has_row_level_security"),
                 row.get_string("description"),
@@ -741,8 +744,21 @@ impl<'a> SqlSchemaDescriber<'a> {
 
         let mut map = IndexMap::default();
 
-        for (table_name, namespace, is_partition, has_subclass, has_row_level_security, description) in names {
+        for (
+            table_name,
+            namespace,
+            is_partition,
+            is_foreign_table,
+            has_subclass,
+            has_row_level_security,
+            description,
+        ) in names
+        {
             let cloned_name = table_name.clone();
+
+            if is_foreign_table {
+                continue;
+            }
 
             let partition = if is_partition {
                 BitFlags::from_flag(TableProperties::IsPartition)

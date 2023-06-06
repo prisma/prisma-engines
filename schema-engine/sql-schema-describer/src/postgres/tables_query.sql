@@ -3,6 +3,7 @@ SELECT
   namespace.nspname as namespace,
   (tbl.relhassubclass and tbl.relkind = 'p') as is_partition,
   (tbl.relhassubclass and tbl.relkind = 'r') as has_subclass,
+  tbl.relkind = 'f' as is_foreign_table,
   tbl.relrowsecurity as has_row_level_security,
   reloptions,
   obj_description(tbl.oid, 'pg_class') as description

@@ -39,11 +39,4 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model bar {
-  id Int @default(autoincrement())
-
-  @@ignore
-}
 */
