@@ -20,10 +20,6 @@ CREATE INDEX index_communication_channels_on_path_and_path_type ON communication
 CREATE UNIQUE INDEX index_communication_channels_on_user_id_and_path_and_path_type ON communication_channels (user_id, lower((path)::text), path_type);
 CREATE INDEX index_communication_channels_on_confirmation_code ON communication_channels (confirmation_code);
 
-
-
-
-
 /*
 generator js {
   provider = "prisma-client-js"
