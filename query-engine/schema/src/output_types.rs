@@ -224,7 +224,10 @@ impl<'a> OutputField<'a> {
     }
 
     pub fn is_find_unique(&self) -> bool {
-        matches!(self.query_tag(), Some(&QueryTag::FindUnique))
+        matches!(
+            self.query_tag(),
+            Some(&QueryTag::FindUnique | QueryTag::FindUniqueOrThrow)
+        )
     }
 
     /// Relevant for resolving top level queries.
