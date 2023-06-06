@@ -264,6 +264,11 @@
 <a href="#264" id="264">264</a>
 <a href="#265" id="265">265</a>
 <a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::GQLResponse;
 <span class="kw">use crate</span>::{GQLError, PrismaResponse, RequestBody};
 <span class="kw">use </span>futures::FutureExt;
@@ -377,7 +382,8 @@
     ) -&gt; PrismaResponse {
         <span class="kw">let </span>plural_name = document.plural_name();
         <span class="kw">let </span>singular_name = document.single_name();
-        <span class="kw">let </span>keys = document.keys;
+        <span class="kw">let </span>throw_on_empty = document.throw_on_empty();
+        <span class="kw">let </span>keys: Vec&lt;String&gt; = document.keys;
         <span class="kw">let </span>arguments = document.arguments;
         <span class="kw">let </span>nested_selection = document.nested_selection;
 
@@ -437,9 +443,13 @@
 
                                 responses.insert_data(<span class="kw-2">&amp;</span>singular_name, Item::Map(result));
                             }
-                            <span class="kw">_ </span>=&gt; {
-                                responses.insert_data(<span class="kw-2">&amp;</span>singular_name, Item::null());
-                            }
+                            <span class="prelude-val">None </span><span class="kw">if </span>throw_on_empty =&gt; responses.insert_error(GQLError::from_user_facing_error(
+                                user_facing_errors::query_engine::RecordRequiredButNotFound {
+                                    cause: <span class="string">&quot;Expected a record, found none.&quot;</span>.to_owned(),
+                                }
+                                .into(),
+                            )),
+                            <span class="prelude-val">None </span>=&gt; responses.insert_data(<span class="kw-2">&amp;</span>singular_name, Item::null()),
                         }
 
                         responses

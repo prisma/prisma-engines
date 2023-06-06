@@ -302,6 +302,34 @@
 <a href="#302" id="302">302</a>
 <a href="#303" id="303">303</a>
 <a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Intermediate representation of the input document that is used by the query engine to build
 //! query ASTs and validate the incoming data.
 //!
@@ -332,7 +360,10 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>parse_ast::<span class="kw-2">*</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>parser::<span class="kw-2">*</span>;
 
-<span class="kw">use </span><span class="kw">crate</span>::query_graph_builder::resolve_compound_field;
+<span class="kw">use crate</span>::{
+    query_ast::{QueryOption, QueryOptions},
+    query_graph_builder::resolve_compound_field,
+};
 <span class="kw">use </span>prisma_models::Model;
 <span class="kw">use </span>schema::{constants::<span class="kw-2">*</span>, QuerySchema};
 <span class="kw">use </span>std::collections::HashMap;
@@ -463,12 +494,21 @@
     <span class="kw">pub </span>nested_selection: Vec&lt;String&gt;,
     <span class="kw">pub </span>operation: Operation,
     <span class="kw">pub </span>keys: Vec&lt;String&gt;,
+    <span class="kw">pub </span>original_query_options: <span class="kw">crate</span>::QueryOptions,
     name: String,
 }
 
 <span class="kw">impl </span>CompactedDocument {
+    <span class="kw">pub fn </span>throw_on_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.original_query_options.contains(QueryOption::ThrowOnEmpty)
+    }
+
     <span class="kw">pub fn </span>single_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-        <span class="macro">format!</span>(<span class="string">&quot;findUnique{}&quot;</span>, <span class="self">self</span>.name)
+        <span class="kw">if </span><span class="self">self</span>.throw_on_empty() {
+            <span class="macro">format!</span>(<span class="string">&quot;findUnique{}OrThrow&quot;</span>, <span class="self">self</span>.name)
+        } <span class="kw">else </span>{
+            <span class="macro">format!</span>(<span class="string">&quot;findUnique{}&quot;</span>, <span class="self">self</span>.name)
+        }
     }
 
     <span class="kw">pub fn </span>plural_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
@@ -491,7 +531,12 @@
             <span class="comment">// The name of the query should be findManyX if the first query
             // here is findUniqueX. We took care earlier the queries are all the
             // same. Otherwise we fail hard here.
-            </span><span class="kw">let </span><span class="kw-2">mut </span>builder = Selection::with_name(selections[<span class="number">0</span>].name().replacen(<span class="string">&quot;findUnique&quot;</span>, <span class="string">&quot;findMany&quot;</span>, <span class="number">1</span>));
+            </span><span class="kw">let </span><span class="kw-2">mut </span>builder = Selection::with_name(
+                selections[<span class="number">0</span>]
+                    .name()
+                    .replacen(<span class="string">&quot;findUnique&quot;</span>, <span class="string">&quot;findMany&quot;</span>, <span class="number">1</span>)
+                    .trim_end_matches(<span class="string">&quot;OrThrow&quot;</span>),
+            );
 
             <span class="comment">// Take the nested selection set from the first query. We took care
             // earlier that all the nested selections are the same in every
@@ -543,7 +588,17 @@
             .collect();
 
         <span class="comment">// Saving the stub of the query name for later use.
-        </span><span class="kw">let </span>name = selections[<span class="number">0</span>].name().replacen(<span class="string">&quot;findUnique&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="number">1</span>);
+        </span><span class="kw">let </span>name = selections[<span class="number">0</span>]
+            .name()
+            .replacen(<span class="string">&quot;findUnique&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="number">1</span>)
+            .trim_end_matches(<span class="string">&quot;OrThrow&quot;</span>)
+            .to_string();
+
+        <span class="kw">let </span>original_query_options = <span class="kw">if </span>selections[<span class="number">0</span>].name().ends_with(<span class="string">&quot;OrThrow&quot;</span>) {
+            QueryOptions::from(QueryOption::ThrowOnEmpty)
+        } <span class="kw">else </span>{
+            QueryOptions::none()
+        };
 
         <span class="comment">// Convert the selections into a map of arguments. This defines the
         // response order and how we fetch the right data from the response set.
@@ -568,11 +623,12 @@
             .collect();
 
         <span class="self">Self </span>{
+            operation: Operation::Read(selection),
             name,
             arguments,
             nested_selection,
             keys,
-            operation: Operation::Read(selection),
+            original_query_options,
         }
     }
 }

@@ -243,6 +243,9 @@
 <a href="#243" id="243">243</a>
 <a href="#244" id="244">244</a>
 <a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>fmt::Debug;
 <span class="kw">use </span>once_cell::sync::Lazy;
@@ -469,7 +472,10 @@
     }
 
     <span class="kw">pub fn </span>is_find_unique(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="macro">matches!</span>(<span class="self">self</span>.query_tag(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>QueryTag::FindUnique))
+        <span class="macro">matches!</span>(
+            <span class="self">self</span>.query_tag(),
+            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>QueryTag::FindUnique | QueryTag::FindUniqueOrThrow)
+        )
     }
 
     <span class="doccomment">/// Relevant for resolving top level queries.
