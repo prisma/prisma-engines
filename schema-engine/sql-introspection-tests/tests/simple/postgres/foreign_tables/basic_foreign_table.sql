@@ -42,9 +42,8 @@ datasource db {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 /// This model represents a foreign data wrapper which requires additional setup for migrations. Visit https://pris.ly/d/fdw for more info.
-model bar {
-  id Int @default(autoincrement())
-
-  @@ignore
-}
+// model bar {
+// id Int @default(autoincrement())
+// @@ignore
+// }
 */

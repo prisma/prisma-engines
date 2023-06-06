@@ -136,6 +136,7 @@ fn render_model(model: ModelPair<'_>, sql_family: SqlFamily) -> renderer::Model<
     if model.is_foreign_data_wrapper() {
         let docs = "This model represents a foreign data wrapper which requires additional setup for migrations. Visit https://pris.ly/d/fdw for more info.";
         rendered.documentation(docs);
+        rendered.comment_out();
     }
 
     for field in model.scalar_fields() {

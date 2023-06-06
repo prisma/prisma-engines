@@ -748,7 +748,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             table_name,
             namespace,
             is_partition,
-            is_foreign_table,
+            is_foreign_data_wrapper,
             has_subclass,
             has_row_level_security,
             description,
@@ -756,7 +756,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         {
             let cloned_name = table_name.clone();
 
-            let foreign_wrapper = if is_foreign_table {
+            let foreign_data_wrapper = if is_foreign_data_wrapper {
                 BitFlags::from_flag(TableProperties::IsForeignWrapper)
             } else {
                 BitFlags::empty()
@@ -788,7 +788,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             let id = sql_schema.push_table_with_properties(
                 table_name,
                 sql_schema.get_namespace_id(&namespace).unwrap(),
-                partition | subclass | row_level_security | foreign_wrapper,
+                partition | subclass | row_level_security | foreign_data_wrapper,
                 description,
             );
 
