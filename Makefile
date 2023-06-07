@@ -257,7 +257,7 @@ qe-dev-chinook-postgres10: start-postgres10
 qe-dev-mongo_4_4: start-mongodb_4_4
 	cp $(SCHEMA_EXAMPLES_PATH)/generic_mongo4.prisma $(DEV_SCHEMA_FILE)
 
-use-local-migration-engine:
+use-local-schema-engine:
 	cargo build --release
 	cp target/release/schema-engine $(PRISMA2_BINARY_PATH)/
 
