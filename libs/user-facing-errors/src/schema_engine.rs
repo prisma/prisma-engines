@@ -9,13 +9,14 @@ pub struct DatabaseCreationFailed {
 }
 
 /// [spec](https://github.com/prisma/specs/tree/master/errors#p3001-destructive-migration-detected)
+/// No longer used.
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P3001",
-    message = "Migration possible with destructive changes and possible data loss: {migration_engine_destructive_details}"
+    message = "Migration possible with destructive changes and possible data loss: {destructive_details}"
 )]
 pub struct DestructiveMigrationDetected {
-    pub migration_engine_destructive_details: String,
+    pub destructive_details: String,
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
