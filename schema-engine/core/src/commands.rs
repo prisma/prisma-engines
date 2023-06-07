@@ -1,5 +1,4 @@
-//! The commands exposed by the migration engine core are defined in this
-//! module.
+//! The commands exposed by the schema engine core are defined in this module.
 
 mod apply_migrations;
 mod create_migration;

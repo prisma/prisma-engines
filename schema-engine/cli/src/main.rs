@@ -38,7 +38,7 @@ async fn main() {
     match input.cli_subcommand {
         None => start_engine(input.datamodel.as_deref()).await,
         Some(SubCommand::Cli(cli_command)) => {
-            tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine CLI");
+            tracing::info!(git_hash = env!("GIT_HASH"), "Starting schema engine CLI");
             cli_command.run().await;
         }
     }
@@ -94,7 +94,7 @@ impl ConnectorHost for JsonRpcHost {
 async fn start_engine(datamodel_location: Option<&str>) {
     use std::io::Read as _;
 
-    tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine RPC server",);
+    tracing::info!(git_hash = env!("GIT_HASH"), "Starting schema engine RPC server",);
 
     let datamodel = datamodel_location.map(|location| {
         let mut file = match std::fs::File::open(location) {

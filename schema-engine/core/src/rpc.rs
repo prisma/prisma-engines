@@ -2,7 +2,7 @@ use crate::{json_rpc::method_names::*, CoreError, CoreResult, GenericApi};
 use jsonrpc_core::{types::error::Error as JsonRpcError, IoHandler, Params};
 use std::sync::Arc;
 
-/// Initialize a JSON-RPC ready migration engine API.
+/// Initialize a JSON-RPC ready schema engine API.
 pub fn rpc_api(prisma_schema: Option<String>, host: Arc<dyn schema_connector::ConnectorHost>) -> IoHandler {
     let mut io_handler = IoHandler::default();
     let api = Arc::new(crate::state::EngineState::new(prisma_schema, Some(host)));

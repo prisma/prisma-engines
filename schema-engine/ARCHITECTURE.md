@@ -356,9 +356,9 @@ to be a best-of-both-worlds solution.
   schema changes you wanted. It's easier to adjust something that is mostly
   there, than remembering how to write the whole thing. We expect users to
   tinker with the migrations.
-- Not only do you get the generated SQL script, but the migration engine does
-  know what changes are potentially destructive or impossible, or things that
-  could go wrong with large amounts of data, and it can document that in the
+- Not only do you get the generated SQL script, but the schema engine does know
+  what changes are potentially destructive or impossible, or things that could
+  go wrong with large amounts of data, and it can document that in the
   migration script directly for you to review and make decisions about.
 - The tool acknowledges it won't be able to declaratively handle everything. If
   you want to tweak row-level security policies in your migration scripts, you
@@ -398,9 +398,9 @@ you could break your existing migrations without editing them by just changing
 that option. An option to generate (or not) a `BEGIN;` and a `COMMIT;` for new
 migrations would be conceivable.
 
-The migration engine should blissfully ignore that problem when actually
-applying migrations (we want that code to stay as simple as possible because
-it's critical).
+The schema engine should blissfully ignore that problem when actually applying
+migrations (we want that code to stay as simple as possible because it's
+critical).
 
 For reproducibility, we always want to run exactly the same migration in dev
 and production, in the same way. "Why would we have a failing migration on
