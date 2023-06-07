@@ -12,15 +12,15 @@ mod error;
 mod introspection_context;
 mod introspection_result;
 mod migration;
-mod migration_connector;
 mod migration_persistence;
 mod namespaces;
+mod schema_connector;
 
 pub mod migrations_directory;
 pub mod warnings;
 
-pub use crate::migration_connector::SchemaConnector;
 pub use crate::namespaces::Namespaces;
+pub use crate::schema_connector::SchemaConnector;
 pub use connector_host::{ConnectorHost, EmptyHost};
 pub use connector_params::ConnectorParams;
 pub use database_schema::DatabaseSchema;
