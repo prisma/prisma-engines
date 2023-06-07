@@ -13,7 +13,7 @@ use structopt::StructOpt;
 /// server over stdio.
 #[derive(Debug, StructOpt)]
 #[structopt(version = env!("GIT_HASH"))]
-struct MigrationEngineCli {
+struct SchemaEngineCli {
     /// Path to the datamodel
     #[structopt(short = "d", long, name = "FILE")]
     datamodel: Option<String>,
@@ -33,7 +33,7 @@ async fn main() {
     set_panic_hook();
     logger::init_logger();
 
-    let input = MigrationEngineCli::from_args();
+    let input = SchemaEngineCli::from_args();
 
     match input.cli_subcommand {
         None => start_engine(input.datamodel.as_deref()).await,
