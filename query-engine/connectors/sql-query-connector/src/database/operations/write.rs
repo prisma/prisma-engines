@@ -64,7 +64,7 @@ async fn generate_id(
 pub(crate) async fn create_record(
     conn: &dyn QueryExt,
     sql_family: &SqlFamily,
-    model: &ModelRef,
+    model: &Model,
     mut args: WriteArgs,
     ctx: &Context<'_>,
 ) -> crate::Result<SelectionResult> {
@@ -154,7 +154,7 @@ pub(crate) async fn create_record(
 
 pub(crate) async fn create_records(
     conn: &dyn QueryExt,
-    model: &ModelRef,
+    model: &Model,
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
     ctx: &Context<'_>,
@@ -170,14 +170,7 @@ pub(crate) async fn create_records(
     #[allow(clippy::mutable_key_type)]
     let affected_fields: HashSet<ScalarFieldRef> = fields
         .into_iter()
-        .map(|dsfn| {
-            model
-                .fields()
-                .scalar()
-                .into_iter()
-                .find(|sf| sf.db_name() == dsfn.deref())
-                .unwrap()
-        })
+        .map(|dsfn| model.fields().scalar().find(|sf| sf.db_name() == dsfn.deref()).unwrap())
         .collect();
 
     if affected_fields.is_empty() {
@@ -192,7 +185,7 @@ pub(crate) async fn create_records(
 #[allow(clippy::mutable_key_type)]
 async fn create_many_nonempty(
     conn: &dyn QueryExt,
-    model: &ModelRef,
+    model: &Model,
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
     affected_fields: HashSet<ScalarFieldRef>,
@@ -280,7 +273,7 @@ async fn create_many_nonempty(
 /// Creates many empty (all default values) rows.
 async fn create_many_empty(
     conn: &dyn QueryExt,
-    model: &ModelRef,
+    model: &Model,
     num_records: usize,
     skip_duplicates: bool,
     ctx: &Context<'_>,
@@ -300,7 +293,7 @@ async fn create_many_empty(
 /// operation.
 pub(crate) async fn update_record(
     conn: &dyn QueryExt,
-    model: &ModelRef,
+    model: &Model,
     record_filter: RecordFilter,
     args: WriteArgs,
     ctx: &Context<'_>,
@@ -324,7 +317,7 @@ pub(crate) async fn update_record(
 //  UPDATE "public"."User" SET "name" = $1 WHERE "public"."User"."id" IN ($2,$3,$4,$5,$6,$7,$8,$9,$10,$11) AND "public"."User"."age" > $1
 async fn update_records_from_ids_and_filter(
     conn: &dyn QueryExt,
-    model: &ModelRef,
+    model: &Model,
     record_filter: RecordFilter,
     args: WriteArgs,
     ctx: &Context<'_>,
@@ -357,7 +350,7 @@ async fn update_records_from_ids_and_filter(
 //  UPDATE "public"."User" SET "name" = $1 WHERE "public"."User"."age" > $1
 async fn update_records_from_filter(
     conn: &dyn QueryExt,
-    model: &ModelRef,
+    model: &Model,
     record_filter: RecordFilter,
     args: WriteArgs,
     ctx: &Context<'_>,
@@ -377,7 +370,7 @@ async fn update_records_from_filter(
 /// Otherwise it used the passed down arguments to update.
 pub(crate) async fn update_records(
     conn: &dyn QueryExt,
-    model: &ModelRef,
+    model: &Model,
     record_filter: RecordFilter,
     args: WriteArgs,
     ctx: &Context<'_>,
@@ -397,7 +390,7 @@ pub(crate) async fn update_records(
 /// Delete multiple records in `conn`, defined in the `Filter`. Result is the number of items deleted.
 pub(crate) async fn delete_records(
     conn: &dyn QueryExt,
-    model: &ModelRef,
+    model: &Model,
     record_filter: RecordFilter,
     ctx: &Context<'_>,
 ) -> crate::Result<usize> {

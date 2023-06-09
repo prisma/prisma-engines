@@ -6,38 +6,38 @@ use crate::{
     ArgumentListLookup, ParsedField, ParsedInputMap,
 };
 use connector::{Filter, IntoFilter};
-use prisma_models::ModelRef;
-use schema::{constants::args, ConnectorContext};
+use prisma_models::Model;
+use schema::{constants::args, QuerySchema};
 use std::convert::TryInto;
 
 /// Creates an update record query and adds it to the query graph, together with it's nested queries and companion read query.
-pub fn update_record(
+pub(crate) fn update_record(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
-    model: ModelRef,
-    mut field: ParsedField,
+    query_schema: &QuerySchema,
+    model: Model,
+    mut field: ParsedField<'_>,
 ) -> QueryGraphBuilderResult<()> {
     // "where"
-    let where_arg: ParsedInputMap = field.arguments.lookup(args::WHERE).unwrap().value.try_into()?;
+    let where_arg: ParsedInputMap<'_> = field.arguments.lookup(args::WHERE).unwrap().value.try_into()?;
     let filter = extract_unique_filter(where_arg, &model)?;
 
     // "data"
     let data_argument = field.arguments.lookup(args::DATA).unwrap();
-    let data_map: ParsedInputMap = data_argument.value.try_into()?;
+    let data_map: ParsedInputMap<'_> = data_argument.value.try_into()?;
 
-    let update_node = update_record_node(graph, connector_ctx, filter.clone(), model.clone(), data_map)?;
+    let update_node = update_record_node(graph, query_schema, filter.clone(), model.clone(), data_map)?;
 
     let read_query = read::find_unique(field, model.clone())?;
     let read_node = graph.create_node(Query::Read(read_query));
 
-    if connector_ctx.relation_mode.is_prisma() {
+    if query_schema.relation_mode().is_prisma() {
         let read_parent_node = graph.create_node(utils::read_ids_infallible(
             model.clone(),
             model.primary_identifier(),
             filter,
         ));
 
-        utils::insert_emulated_on_update(graph, connector_ctx, &model, &read_parent_node, &update_node)?;
+        utils::insert_emulated_on_update(graph, query_schema, &model, &read_parent_node, &update_node)?;
 
         graph.create_edge(
             &read_parent_node,
@@ -84,9 +84,9 @@ pub fn update_record(
 /// Creates an update many record query and adds it to the query graph.
 pub fn update_many_records(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
-    model: ModelRef,
-    mut field: ParsedField,
+    query_schema: &QuerySchema,
+    model: Model,
+    mut field: ParsedField<'_>,
 ) -> QueryGraphBuilderResult<()> {
     graph.flag_transactional();
 
@@ -98,19 +98,19 @@ pub fn update_many_records(
 
     // "data"
     let data_argument = field.arguments.lookup(args::DATA).unwrap();
-    let data_map: ParsedInputMap = data_argument.value.try_into()?;
+    let data_map: ParsedInputMap<'_> = data_argument.value.try_into()?;
 
-    if connector_ctx.relation_mode.uses_foreign_keys() {
-        update_many_record_node(graph, connector_ctx, filter, model, data_map)?;
+    if query_schema.relation_mode().uses_foreign_keys() {
+        update_many_record_node(graph, query_schema, filter, model, data_map)?;
     } else {
         let pre_read_node = graph.create_node(utils::read_ids_infallible(
             model.clone(),
             model.primary_identifier(),
             filter,
         ));
-        let update_many_node = update_many_record_node(graph, connector_ctx, Filter::empty(), model.clone(), data_map)?;
+        let update_many_node = update_many_record_node(graph, query_schema, Filter::empty(), model.clone(), data_map)?;
 
-        utils::insert_emulated_on_update(graph, connector_ctx, &model, &pre_read_node, &update_many_node)?;
+        utils::insert_emulated_on_update(graph, query_schema, &model, &pre_read_node, &update_many_node)?;
 
         graph.create_edge(
             &pre_read_node,
@@ -134,10 +134,10 @@ pub fn update_many_records(
 /// Creates an update record query node and adds it to the query graph.
 pub fn update_record_node<T: Clone>(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
+    query_schema: &QuerySchema,
     filter: T,
-    model: ModelRef,
-    data_map: ParsedInputMap,
+    model: Model,
+    data_map: ParsedInputMap<'_>,
 ) -> QueryGraphBuilderResult<NodeRef>
 where
     T: Into<Filter>,
@@ -158,7 +158,7 @@ where
     let update_node = graph.create_node(update_parent);
 
     for (relation_field, data_map) in update_args.nested {
-        nested::connect_nested_query(graph, connector_ctx, update_node, relation_field, data_map)?;
+        nested::connect_nested_query(graph, query_schema, update_node, relation_field, data_map)?;
     }
 
     Ok(update_node)
@@ -167,10 +167,10 @@ where
 /// Creates an update many record query node and adds it to the query graph.
 pub fn update_many_record_node<T>(
     graph: &mut QueryGraph,
-    connector_ctx: &ConnectorContext,
+    query_schema: &QuerySchema,
     filter: T,
-    model: ModelRef,
-    data_map: ParsedInputMap,
+    model: Model,
+    data_map: ParsedInputMap<'_>,
 ) -> QueryGraphBuilderResult<NodeRef>
 where
     T: Into<Filter>,
@@ -193,7 +193,7 @@ where
     let update_many_node = graph.create_node(Query::Write(WriteQuery::UpdateManyRecords(update_many)));
 
     for (relation_field, data_map) in update_args.nested {
-        nested::connect_nested_query(graph, connector_ctx, update_many_node, relation_field, data_map)?;
+        nested::connect_nested_query(graph, query_schema, update_many_node, relation_field, data_map)?;
     }
 
     Ok(update_many_node)

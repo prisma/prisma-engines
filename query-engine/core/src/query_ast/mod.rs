@@ -6,7 +6,7 @@ pub use write::*;
 
 use crate::ToGraphviz;
 use connector::filter::Filter;
-use prisma_models::{FieldSelection, ModelRef, SelectionResult};
+use prisma_models::{FieldSelection, Model, SelectionResult};
 
 #[derive(Debug, Clone)]
 #[allow(clippy::large_enum_variant)]
@@ -23,7 +23,7 @@ impl Query {
         }
     }
 
-    pub(crate) fn model(&self) -> ModelRef {
+    pub(crate) fn model(&self) -> Model {
         match self {
             Self::Read(rq) => rq.model(),
             Self::Write(wq) => wq.model(),

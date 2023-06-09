@@ -1,6 +1,6 @@
 use super::*;
 
-pub(crate) fn render_enum_types<'a>(ctx: &mut RenderContext, enum_types: impl Iterator<Item = &'a EnumType> + 'a) {
+pub(crate) fn render_enum_types<'a>(ctx: &mut RenderContext, enum_types: impl Iterator<Item = EnumType> + 'a) {
     let mut borrows: Vec<_> = enum_types.collect();
 
     borrows.sort_by_key(|a| a.name());
@@ -11,7 +11,7 @@ pub struct DmmfEnumRenderer {
     enum_type: EnumType,
 }
 
-impl Renderer for DmmfEnumRenderer {
+impl<'a> Renderer<'a> for DmmfEnumRenderer {
     fn render(&self, ctx: &mut RenderContext) {
         let ident = self.enum_type.identifier();
         if ctx.already_rendered(ident) {
@@ -29,10 +29,8 @@ impl Renderer for DmmfEnumRenderer {
 }
 
 impl DmmfEnumRenderer {
-    pub fn new(enum_type: &EnumType) -> DmmfEnumRenderer {
-        DmmfEnumRenderer {
-            enum_type: enum_type.clone(),
-        }
+    pub(crate) fn new(enum_type: EnumType) -> DmmfEnumRenderer {
+        DmmfEnumRenderer { enum_type }
     }
 
     fn format_enum_values(&self) -> Vec<String> {

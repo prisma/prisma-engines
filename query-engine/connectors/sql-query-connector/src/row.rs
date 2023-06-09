@@ -287,12 +287,6 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             Value::Bytes(Some(bytes)) => PrismaValue::Bytes(bytes.into()),
             _ => return Err(create_error(&p_value)),
         },
-        TypeIdentifier::Xml => match p_value {
-            value if value.is_null() => PrismaValue::Null,
-            Value::Xml(Some(xml)) => PrismaValue::Xml(xml.to_string()),
-            Value::Text(Some(s)) => PrismaValue::Xml(s.into_owned()),
-            _ => return Err(create_error(&p_value)),
-        },
         TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
     })
 }

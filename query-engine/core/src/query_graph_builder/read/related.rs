@@ -1,11 +1,11 @@
 use super::*;
 use crate::{query_document::ParsedField, ReadQuery, RelatedRecordsQuery};
-use prisma_models::{ModelRef, RelationFieldRef};
+use prisma_models::{Model, RelationFieldRef};
 
 pub(crate) fn find_related(
-    field: ParsedField,
+    field: ParsedField<'_>,
     parent: RelationFieldRef,
-    model: ModelRef,
+    model: Model,
 ) -> QueryGraphBuilderResult<ReadQuery> {
     let args = extractors::extract_query_args(field.arguments, &model)?;
     let name = field.name;

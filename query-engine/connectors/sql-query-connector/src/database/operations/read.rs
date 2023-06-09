@@ -12,7 +12,7 @@ use quaint::ast::*;
 
 pub(crate) async fn get_single_record(
     conn: &dyn QueryExt,
-    model: &ModelRef,
+    model: &Model,
     filter: &Filter,
     selected_fields: &ModelProjection,
     aggr_selections: &[RelAggregationSelection],
@@ -49,7 +49,7 @@ pub(crate) async fn get_single_record(
 
 pub(crate) async fn get_many_records(
     conn: &dyn QueryExt,
-    model: &ModelRef,
+    model: &Model,
     mut query_arguments: QueryArguments,
     selected_fields: &ModelProjection,
     aggr_selections: &[RelAggregationSelection],
@@ -212,7 +212,7 @@ pub(crate) async fn get_related_m2m_record_ids(
 
 pub(crate) async fn aggregate(
     conn: &dyn QueryExt,
-    model: &ModelRef,
+    model: &Model,
     query_arguments: QueryArguments,
     selections: Vec<AggregationSelection>,
     group_by: Vec<ScalarFieldRef>,
@@ -230,7 +230,7 @@ pub(crate) async fn aggregate(
 
 async fn plain_aggregate(
     conn: &dyn QueryExt,
-    model: &ModelRef,
+    model: &Model,
     query_arguments: QueryArguments,
     selections: Vec<AggregationSelection>,
     ctx: &Context<'_>,
@@ -255,7 +255,7 @@ async fn plain_aggregate(
 
 async fn group_by_aggregate(
     conn: &dyn QueryExt,
-    model: &ModelRef,
+    model: &Model,
     query_arguments: QueryArguments,
     selections: Vec<AggregationSelection>,
     group_by: Vec<ScalarFieldRef>,

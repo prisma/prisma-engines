@@ -15,6 +15,13 @@ pub type CompositeField = crate::Zipper<CompositeFieldId>;
 pub type CompositeFieldRef = CompositeField;
 
 impl CompositeField {
+    pub fn borrowed_name<'a>(&self, schema: &'a psl::ValidatedSchema) -> &'a str {
+        match self.id {
+            CompositeFieldId::InModel(sfid) => schema.db.walk(sfid).name(),
+            CompositeFieldId::InCompositeType(id) => schema.db.walk(id).name(),
+        }
+    }
+
     pub fn arity(&self) -> FieldArity {
         match self.id {
             CompositeFieldId::InModel(sfid) => self.dm.walk(sfid).ast_field().arity,

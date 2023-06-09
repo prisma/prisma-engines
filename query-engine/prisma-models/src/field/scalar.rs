@@ -69,6 +69,13 @@ impl ScalarField {
         }
     }
 
+    pub fn borrowed_name<'a>(&self, schema: &'a psl::ValidatedSchema) -> &'a str {
+        match self.id {
+            ScalarFieldId::InModel(id) => schema.db.walk(id).name(),
+            ScalarFieldId::InCompositeType(id) => schema.db.walk(id).name(),
+        }
+    }
+
     pub fn name(&self) -> &str {
         match self.id {
             ScalarFieldId::InModel(id) => self.dm.walk(id).name(),

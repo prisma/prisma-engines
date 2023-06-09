@@ -111,7 +111,8 @@ impl<'a> RequestHandler<'a> {
     ) -> PrismaResponse {
         let plural_name = document.plural_name();
         let singular_name = document.single_name();
-        let keys = document.keys;
+        let throw_on_empty = document.throw_on_empty();
+        let keys: Vec<String> = document.keys;
         let arguments = document.arguments;
         let nested_selection = document.nested_selection;
 
@@ -171,9 +172,13 @@ impl<'a> RequestHandler<'a> {
 
                                 responses.insert_data(&singular_name, Item::Map(result));
                             }
-                            _ => {
-                                responses.insert_data(&singular_name, Item::null());
-                            }
+                            None if throw_on_empty => responses.insert_error(GQLError::from_user_facing_error(
+                                user_facing_errors::query_engine::RecordRequiredButNotFound {
+                                    cause: "Expected a record, found none.".to_owned(),
+                                }
+                                .into(),
+                            )),
+                            None => responses.insert_data(&singular_name, Item::null()),
                         }
 
                         responses
