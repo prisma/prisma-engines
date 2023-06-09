@@ -427,34 +427,31 @@ fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
         .assert_no_steps();
 }
 
-// We will want to validate this in the future: https://github.com/prisma/prisma/issues/13222
-//
-// #[test_connector(tags(CockroachDb))]
-// fn connecting_to_a_cockroachdb_database_with_the_postgresql_connector_fails(_api: TestApi) {
-//     let dm = r#"
-//         datasource crdb {
-//             provider = "postgresql"
-//             url = env("TEST_DATABASE_URL")
-//         }
+#[test_connector(tags(CockroachDb))]
+fn connecting_to_a_cockroachdb_database_with_the_postgresql_connector_fails(_api: TestApi) {
+    let dm = r#"
+        datasource crdb {
+            provider = "postgresql"
+            url = env("TEST_DATABASE_URL")
+        }
+    "#;
 
-//     "#;
+    let engine = schema_core::schema_api(None, None).unwrap();
+    let err = tok(
+        engine.ensure_connection_validity(schema_core::json_rpc::types::EnsureConnectionValidityParams {
+            datasource: schema_core::json_rpc::types::DatasourceParam::SchemaString(SchemaContainer {
+                schema: dm.to_owned(),
+            }),
+        }),
+    )
+    .unwrap_err()
+    .to_string();
 
-//     let engine = schema_core::migration_api(None, None).unwrap();
-//     let err = tok(
-//         engine.ensure_connection_validity(schema_core::json_rpc::types::EnsureConnectionValidityParams {
-//             datasource: schema_core::json_rpc::types::DatasourceParam::SchemaString(SchemaContainer {
-//                 schema: dm.to_owned(),
-//             }),
-//         }),
-//     )
-//     .unwrap_err()
-//     .to_string();
-
-//     let expected_error = expect![[r#"
-//         You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`.
-//     "#]];
-//     expected_error.assert_eq(&err);
-// }
+    let expected_error = expect![[r#"
+        You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`.
+    "#]];
+    expected_error.assert_eq(&err);
+}
 
 #[test_connector(tags(CockroachDb))]
 fn connecting_to_a_cockroachdb_database_with_the_postgresql_connector_says_nothing(_api: TestApi) {
