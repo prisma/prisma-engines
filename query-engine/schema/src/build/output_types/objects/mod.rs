@@ -4,27 +4,12 @@ pub mod model;
 use super::*;
 use constants::output_fields::*;
 
-/// Initializes output object type caches on the context.
-/// This is a critical first step to ensure that all model and composite output
-/// object types are present and that subsequent schema computation has a base to rely on.
-/// Called only once at the very beginning of schema building.
-pub(crate) fn initialize_caches(ctx: &mut BuilderContext<'_>) {
-    model::initialize_cache(ctx);
-    composite::initialize_cache(ctx);
-
-    model::initialize_fields(ctx);
-    composite::initialize_fields(ctx);
-}
-
-pub(crate) fn affected_records_object_type(ctx: &mut BuilderContext<'_>) -> OutputObjectTypeId {
-    let ident = Identifier::new_prisma("AffectedRowsOutput".to_owned());
-    return_cached_output!(ctx, &ident);
-
-    let object_type = object_type(
-        ident.clone(),
-        vec![field(AFFECTED_COUNT, vec![], OutputType::int(), None)],
-        None,
-    );
-
-    ctx.cache_output_type(ident, object_type)
+pub(crate) fn affected_records_object_type<'a>() -> ObjectType<'a> {
+    ObjectType::new(Identifier::new_prisma(IdentifierType::AffectedRowsOutput), || {
+        vec![field_no_arguments(
+            AFFECTED_COUNT,
+            OutputType::non_list(OutputType::int()),
+            None,
+        )]
+    })
 }

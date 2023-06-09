@@ -124,7 +124,7 @@ pub(crate) trait QueryExt: Queryable + Send + Sync {
     /// or fetch IDs from the database.
     async fn filter_selectors(
         &self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: RecordFilter,
         ctx: &Context<'_>,
     ) -> crate::Result<Vec<SelectionResult>> {
@@ -138,7 +138,7 @@ pub(crate) trait QueryExt: Queryable + Send + Sync {
     /// Read the all columns as a (primary) identifier.
     async fn filter_ids(
         &self,
-        model: &ModelRef,
+        model: &Model,
         filter: Filter,
         ctx: &Context<'_>,
     ) -> crate::Result<Vec<SelectionResult>> {

@@ -69,7 +69,7 @@ pub(crate) async fn routes(cx: Arc<PrismaContext>, req: Request<Body>) -> Result
             .unwrap(),
 
         (&Method::GET, "/sdl") => {
-            let schema = render_graphql_schema(cx.query_schema().clone());
+            let schema = render_graphql_schema(cx.query_schema());
 
             Response::builder()
                 .status(StatusCode::OK)

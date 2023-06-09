@@ -199,7 +199,7 @@ struct CursorOrderForeignKey {
 /// ```
 pub(crate) fn build(
     query_arguments: &QueryArguments,
-    model: &ModelRef,
+    model: &Model,
     order_by_defs: &[OrderByDefinition],
     ctx: &Context<'_>,
 ) -> ConditionTree<'static> {
@@ -412,7 +412,7 @@ fn map_equality_condition(
 
 fn order_definitions(
     query_arguments: &QueryArguments,
-    model: &ModelRef,
+    model: &Model,
     order_by_defs: &[OrderByDefinition],
     ctx: &Context<'_>,
 ) -> Vec<CursorOrderDefinition> {

@@ -61,7 +61,7 @@ pub fn relation_link_test_impl(attr: TokenStream, input: TokenStream) -> TokenSt
                 #id_only,
                 &[#only],
                 &[#exclude],
-                enumflags2::make_bitflags!(ConnectorCapability::{#(#required_capabilities|)*}),
+                enumflags2::make_bitflags!(ConnectorCapability::{#(#required_capabilities)|*}),
                 (#suite_name, #test_name),
                 #runner_fn_ident
             )

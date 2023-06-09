@@ -26,7 +26,7 @@ pub struct ScalarOutputMeta {
 impl ScalarOutputMeta {
     pub fn strip_list(&self) -> Self {
         Self {
-            ident: self.ident.clone(),
+            ident: self.ident,
             default: self.default.clone(),
             list: false,
         }

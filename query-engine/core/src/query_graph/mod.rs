@@ -17,7 +17,7 @@ use petgraph::{
     visit::{EdgeRef as PEdgeRef, NodeIndexable},
     *,
 };
-use prisma_models::{FieldSelection, ModelRef, SelectionResult};
+use prisma_models::{FieldSelection, Model, SelectionResult};
 use std::{borrow::Borrow, collections::HashSet, fmt};
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
@@ -210,7 +210,7 @@ impl QueryGraph {
         }
     }
 
-    pub fn root<F>(f: F) -> QueryGraphBuilderResult<QueryGraph>
+    pub(crate) fn root<F>(f: F) -> QueryGraphBuilderResult<QueryGraph>
     where
         F: FnOnce(&mut QueryGraph) -> QueryGraphBuilderResult<()>,
     {
@@ -750,7 +750,7 @@ impl QueryGraph {
     /// The `Reload` node is always a "find many" query.
     /// Unwraps are safe because we're operating on the unprocessed state of the graph (`Expressionista` changes that).
     fn insert_reloads(&mut self) -> QueryGraphResult<()> {
-        let reloads: Vec<(NodeRef, ModelRef, Vec<FieldSelection>)> = self
+        let reloads: Vec<(NodeRef, Model, Vec<FieldSelection>)> = self
             .graph
             .node_indices()
             .filter_map(|ix| {

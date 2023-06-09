@@ -52,7 +52,11 @@ mod disconnect_inside_update {
     }
 
     // "a P1 to C1 relation " should "be disconnectable through a nested mutation by id"
-    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt")]
+    #[relation_link_test(
+        on_parent = "ToOneOpt",
+        on_child = "ToOneOpt",
+        capabilities(FilteredInlineChildNestedToOneDisconnect)
+    )]
     async fn p1_c1_by_filters_should_work(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(
@@ -99,8 +103,11 @@ mod disconnect_inside_update {
     }
 
     // "a P1 to C1 relation " should "be disconnectable through a nested mutation by id"
-    // TODO: MongoDB doesn't support joins on top-level updates. It should be un-excluded once we fix that.
-    #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt", exclude(MongoDb))]
+    #[relation_link_test(
+        on_parent = "ToOneOpt",
+        on_child = "ToOneOpt",
+        capabilities(FilteredInlineChildNestedToOneDisconnect)
+    )]
     async fn p1_c1_by_fails_if_filters_no_match(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
         let parent = t.parent().parse(
             run_query_json!(
