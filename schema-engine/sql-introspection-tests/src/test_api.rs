@@ -73,19 +73,30 @@ impl TestApi {
             me.set_params(params).unwrap();
 
             (Quaint::new(&cs).await.unwrap(), cs, me)
-        } else if tags.contains(Tags::Postgres) {
+        } else if tags.contains(Tags::Postgres) && !tags.contains(Tags::CockroachDb) {
             let (_, q, cs) = args.create_postgres_database().await;
-            if tags.contains(Tags::CockroachDb) {
-                q.raw_cmd(
-                    r#"
+            let mut me = SqlSchemaConnector::new_postgres();
+
+            let params = ConnectorParams {
+                connection_string: cs.to_owned(),
+                preview_features,
+                shadow_database_connection_string: None,
+            };
+            me.set_params(params).unwrap();
+
+            (q, cs, me)
+        } else if tags.contains(Tags::CockroachDb) {
+            let (_, q, cs) = args.create_postgres_database().await;
+
+            q.raw_cmd(
+                r#"
                     SET default_int_size = 4;
                     "#,
-                )
-                .await
-                .unwrap();
-            }
+            )
+            .await
+            .unwrap();
 
-            let mut me = SqlSchemaConnector::new_postgres();
+            let mut me = SqlSchemaConnector::new_cockroach();
 
             let params = ConnectorParams {
                 connection_string: cs.to_owned(),
