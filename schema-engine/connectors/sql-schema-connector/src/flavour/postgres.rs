@@ -33,18 +33,25 @@ struct Params {
     url: PostgresUrl,
 }
 
+/// The specific provider that was requested by the user.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub(crate) enum PostgresProvider {
+    /// Used when `provider = "postgresql"` was specified in the schema.
+    PostgreSql,
+    /// Used when `provider = "cockroachdb"` was specified in the schema.
+    CockroachDb,
+    /// Used when there is no schema but only the connection string to the database.
+    Unspecified,
+}
+
 pub(crate) struct PostgresFlavour {
     state: State,
-    /// Should only be set in the constructor.
-    is_cockroach: bool,
+    provider: PostgresProvider,
 }
 
 impl Default for PostgresFlavour {
     fn default() -> Self {
-        PostgresFlavour {
-            state: State::Initial,
-            is_cockroach: false,
-        }
+        PostgresFlavour::new_unspecified()
     }
 }
 
@@ -55,10 +62,24 @@ impl std::fmt::Debug for PostgresFlavour {
 }
 
 impl PostgresFlavour {
+    pub(crate) fn new_postgres() -> Self {
+        PostgresFlavour {
+            state: State::Initial,
+            provider: PostgresProvider::PostgreSql,
+        }
+    }
+
     pub(crate) fn new_cockroach() -> Self {
         PostgresFlavour {
             state: State::Initial,
-            is_cockroach: true,
+            provider: PostgresProvider::CockroachDb,
+        }
+    }
+
+    pub(crate) fn new_unspecified() -> Self {
+        PostgresFlavour {
+            state: State::Initial,
+            provider: PostgresProvider::Unspecified,
         }
     }
 
@@ -70,7 +91,7 @@ impl PostgresFlavour {
     }
 
     pub(crate) fn is_cockroachdb(&self) -> bool {
-        self.is_cockroach
+        self.provider == PostgresProvider::CockroachDb
             || self
                 .circumstances()
                 .map(|c| c.contains(Circumstances::IsCockroachDb))
@@ -115,10 +136,9 @@ impl SqlFlavour for PostgresFlavour {
     }
 
     fn connector_type(&self) -> &'static str {
-        if self.is_cockroach {
-            "cockroachdb"
-        } else {
-            "postgresql"
+        match self.provider {
+            PostgresProvider::PostgreSql | PostgresProvider::Unspecified => "postgresql",
+            PostgresProvider::CockroachDb => "cockroachdb",
         }
     }
 
@@ -553,9 +573,9 @@ where
         };
 
         let mut circumstances = BitFlags::<Circumstances>::default();
-        let provider_is_cockroachdb = flavour.is_cockroach;
+        let provider = flavour.provider;
 
-        if provider_is_cockroachdb {
+        if provider == PostgresProvider::CockroachDb {
             circumstances |= Circumstances::IsCockroachDb;
         }
 
@@ -581,15 +601,19 @@ where
                         Some((version, version_num)) => {
                             let db_is_cockroach = version.contains("CockroachDB");
 
-                            if db_is_cockroach && !provider_is_cockroachdb  {
+                            if db_is_cockroach && provider == PostgresProvider::PostgreSql  {
                                 let msg = "You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`.";
 
                                 return Err(ConnectorError::from_msg(msg.to_owned()));
-                            } else if !db_is_cockroach && provider_is_cockroachdb {
+                            }
+
+                            if !db_is_cockroach && provider == PostgresProvider::CockroachDb {
                                 let msg = "You are trying to connect to a PostgreSQL database, but the provider in your Prisma schema is `cockroachdb`. Please change it to `postgresql`.";
 
                                 return Err(ConnectorError::from_msg(msg.to_owned()));
-                            } else if db_is_cockroach {
+                            }
+
+                            if db_is_cockroach {
                                 circumstances |= Circumstances::IsCockroachDb;
                                 connection.raw_cmd(COCKROACHDB_PRELUDE, &params.url).await?;
                             } else if version_num >= 100000 {

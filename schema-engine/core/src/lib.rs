@@ -43,7 +43,7 @@ fn connector_for_connection_string(
                 preview_features,
                 shadow_database_connection_string,
             };
-            let mut connector = SqlSchemaConnector::new_postgres();
+            let mut connector = SqlSchemaConnector::new_postgres_like();
             connector.set_params(params)?;
             Ok(Box::new(connector))
         }
