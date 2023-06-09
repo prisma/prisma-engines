@@ -2376,6 +2376,7 @@ dependencies = [
  "once_cell",
  "quaint",
  "serde",
+ "serde_json",
  "tokio",
 ]
 
