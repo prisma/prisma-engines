@@ -6,7 +6,7 @@ use schema_connector::{CompositeTypeDepth, IntrospectionContext, SchemaConnector
 use sql_introspection_tests::test_api::*;
 
 #[test_connector(tags(CockroachDb))]
-async fn introspecting_cockroach_db_with_postgres_provider(api: TestApi) {
+async fn introspecting_cockroach_db_with_postgres_provider_fails(api: TestApi) {
     let setup = r#"
         CREATE TABLE "myTable" (
             id   INTEGER PRIMARY KEY,
@@ -29,7 +29,13 @@ async fn introspecting_cockroach_db_with_postgres_provider(api: TestApi) {
 
     let schema = psl::parse_schema(schema).unwrap();
     let ctx = IntrospectionContext::new_config_only(schema, CompositeTypeDepth::Infinite, None);
-    api.api.introspect(&ctx).await.unwrap();
+    let err = api.api.introspect(&ctx).await.unwrap_err().to_string();
+
+    let expected_err = expect![[r#"
+        You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`.
+    "#]];
+
+    expected_err.assert_eq(&err);
 }
 
 #[test_connector(tags(CockroachDb))]
