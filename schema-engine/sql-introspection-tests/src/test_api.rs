@@ -90,8 +90,8 @@ impl TestApi {
 
             q.raw_cmd(
                 r#"
-                    SET default_int_size = 4;
-                    "#,
+                SET default_int_size = 4;
+                "#,
             )
             .await
             .unwrap();
