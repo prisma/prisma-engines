@@ -105,8 +105,10 @@ impl QuaintQueryable for Queryable {
     /// Run a command in the database, for queries that can't be run using
     /// prepared statements.
     async fn raw_cmd(&self, cmd: &str) -> quaint::Result<()> {
-        println!("JSQueryable::raw_cmd({})", &cmd);
-        unimplemented!("raw_cmd");
+        println!("JSQueryable::raw_cmdx({})", &cmd);
+        self.execute_raw(cmd, &[]).await?;
+
+        Ok(())
     }
 
     /// Return the version of the underlying database, queried directly from the
