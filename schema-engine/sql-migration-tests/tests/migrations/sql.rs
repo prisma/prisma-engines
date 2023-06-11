@@ -1,3 +1,5 @@
+mod vitess;
+
 use sql_migration_tests::test_api::*;
 
 #[test_connector]
