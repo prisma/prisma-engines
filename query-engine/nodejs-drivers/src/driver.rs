@@ -20,6 +20,10 @@ pub struct Driver {
     /// source.
     version: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
 
+    /// Closes the underlying database connection.
+    #[allow(dead_code)]
+    close: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
+
     /// Return true iff the underlying database connection is healthy.
     #[allow(dead_code)]
     is_healthy: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
@@ -30,12 +34,14 @@ pub fn reify(js_driver: JsObject) -> napi::Result<Driver> {
     let query_raw = js_driver.get_named_property("queryRaw")?;
     let execute_raw = js_driver.get_named_property("executeRaw")?;
     let version = js_driver.get_named_property("version")?;
+    let close = js_driver.get_named_property("close")?;
     let is_healthy = js_driver.get_named_property("isHealthy")?;
 
     let driver = Driver {
         query_raw,
         execute_raw,
         version,
+        close,
         is_healthy,
     };
     Ok(driver)
@@ -80,6 +86,11 @@ impl Driver {
         println!("[rs] version: {:?}", &version);
 
         Ok(version)
+    }
+
+    pub async fn close(&self) -> napi::Result<()> {
+        println!("[rs] calling close");
+        self.close.call_async::<()>(()).await
     }
 
     pub fn is_healthy(&self) -> napi::Result<bool> {
