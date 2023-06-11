@@ -263,6 +263,9 @@ pub enum ErrorKind {
 
     #[error("Replica Set required for Transactions")]
     MongoReplicaSetRequired,
+
+    #[error("Unsupported connector: {0}")]
+    UnsupportedConnector(String),
 }
 
 impl From<DomainError> for ConnectorError {

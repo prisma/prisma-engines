@@ -5,6 +5,7 @@ version = "0.1.0"
 
 [features]
 vendored-openssl = ["quaint/vendored-openssl"]
+nodejs-drivers = ["dep:nodejs-drivers"]
 
 [dependencies]
 psl.workspace = true
@@ -24,6 +25,7 @@ uuid.workspace = true
 opentelemetry = { version = "0.17", features = ["tokio"] }
 tracing-opentelemetry = "0.17.3"
 quaint.workspace = true
+nodejs-drivers = { path = "../../nodejs-drivers", optional = true }
 
 [dependencies.connector-interface]
 package = "query-connector"
