@@ -165,7 +165,7 @@ The engine uses:
 ## Prisma format
 
 Prisma format can format prisma schema files. It also comes as a WASM module via
-a node package. You can read more [here](./prisma-fmt-wasm/README.md).
+a node package. You can read more [here](./prisma-schema-wasm/README.md).
 
 ## Debugging
 

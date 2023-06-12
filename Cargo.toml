@@ -28,7 +28,7 @@ members = [
   "query-engine/schema",
   "libs/*",
   "prisma-fmt",
-  "prisma-fmt-wasm",
+  "prisma-schema-wasm",
   "psl/*",
 ]
 

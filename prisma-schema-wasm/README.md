@@ -1,4 +1,4 @@
-# @prisma/prisma-fmt-wasm
+# @prisma/prisma-schema-wasm
 
 [![Publish pipeline](https://github.com/prisma/prisma-engines/actions/workflows/publish-prisma-fmt-wasm.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/publish-prisma-fmt-wasm.yml)
 [![npm package](https://img.shields.io/npm/v/@prisma/prisma-fmt-wasm/latest)](https://www.npmjs.com/package/@prisma/prisma-fmt-wasm)
@@ -13,7 +13,7 @@ The published NPM package is internal to Prisma. Its API will break without prio
 ## Example
 
 ```bash
-node -e "const prismaFmt = require('@prisma/prisma-fmt-wasm'); console.log(prismaFmt.version())"
+node -e "const prismaSchema = require('@prisma/prisma-schema-wasm'); console.log(prismaSchema.version())"
 ```
 
 ## Components

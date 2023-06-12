@@ -45,4 +45,4 @@ dev_datamodel.prisma
 dmmf.json
 graph.dot
 
-prisma-fmt-wasm/nodejs
+prisma-schema-wasm/nodejs

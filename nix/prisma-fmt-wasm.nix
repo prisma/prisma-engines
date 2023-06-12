@@ -1,14 +1,14 @@
 { pkgs, system, self', ... }:
 
 let
-  toolchain = pkgs.rust-bin.fromRustupToolchainFile ../prisma-fmt-wasm/rust-toolchain.toml;
-  scriptsDir = ../prisma-fmt-wasm/scripts;
+  toolchain = pkgs.rust-bin.fromRustupToolchainFile ../prisma-schema-wasm/rust-toolchain.toml;
+  scriptsDir = ../prisma-schema-wasm/scripts;
   inherit (pkgs) jq nodejs coreutils wasm-bindgen-cli stdenv;
   inherit (builtins) readFile replaceStrings;
 in
 {
-  packages.prisma-fmt-wasm = stdenv.mkDerivation {
-    name = "prisma-fmt-wasm";
+  packages.prisma-schema-wasm = stdenv.mkDerivation {
+    name = "prisma-schema-wasm";
     nativeBuildInputs = with pkgs; [ git wasm-bindgen-cli toolchain ];
     inherit (self'.packages.prisma-engines) configurePhase src;
 
@@ -17,19 +17,19 @@ in
   };
 
   # Takes a package version as its single argument, and produces
-  # prisma-fmt-wasm with the right package.json in a temporary directory,
+  # prisma-schema-wasm with the right package.json in a temporary directory,
   # then prints the directory's path. This is used by the publish pipeline in CI.
-  packages.renderPrismaFmtWasmPackage =
+  packages.renderPrismaSchemaWasmPackage =
     pkgs.writeShellApplication {
-      name = "renderPrismaFmtWasmPackage";
+      name = "renderPrismaSchemaWasmPackage";
       runtimeInputs = [ jq ];
       text = ''
         set -euxo pipefail
 
         PACKAGE_DIR=$(mktemp -d)
-        cp -r --no-target-directory ${self'.packages.prisma-fmt-wasm} "$PACKAGE_DIR"
+        cp -r --no-target-directory ${self'.packages.prisma-schema-wasm} "$PACKAGE_DIR"
         rm -f "$PACKAGE_DIR/package.json"
-        jq ".version = \"$1\"" ${self'.packages.prisma-fmt-wasm}/package.json > "$PACKAGE_DIR/package.json"
+        jq ".version = \"$1\"" ${self'.packages.prisma-schema-wasm}/package.json > "$PACKAGE_DIR/package.json"
         echo "$PACKAGE_DIR"
       '';
     };
@@ -41,7 +41,7 @@ in
       text = replaceStrings [ "$WASM_BINDGEN_VERSION" ] [ wasm-bindgen-cli.version ] template;
     };
 
-  checks.prismaFmtWasmE2E = pkgs.runCommand "prismaFmtWasmE2E"
-    { PRISMA_FMT_WASM = self'.packages.prisma-fmt-wasm; NODE = "${nodejs}/bin/node"; }
+  checks.prismaSchemaWasmE2E = pkgs.runCommand "prismaSchemaWasmE2E"
+    { PRISMA_SCHEMA_WASM = self'.packages.prisma-schema-wasm; NODE = "${nodejs}/bin/node"; }
     (readFile "${scriptsDir}/check.sh");
 }

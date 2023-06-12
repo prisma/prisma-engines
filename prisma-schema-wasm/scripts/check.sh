@@ -6,7 +6,7 @@ set -euo pipefail
 
 echo -n '1. The final wasm file is not empty: '
 
-EXPECTED_FINAL_WASM_FILE_PATH="$PRISMA_FMT_WASM/src/prisma_fmt_build_bg.wasm";
+EXPECTED_FINAL_WASM_FILE_PATH="$PRISMA_schema_WASM/src/prisma_schema_build_bg.wasm";
 WASM_FILE_SIZE=$(wc -c "$EXPECTED_FINAL_WASM_FILE_PATH" | sed 's/ .*$//')
 
 if [[ $WASM_FILE_SIZE == '0' ]]; then
@@ -20,7 +20,7 @@ echo 'ok.'
 
 echo '2. We can call the module directly and get back a valid result.'
 
-REFORMATTED_MEOW=$($NODE -e "const prismaFmt = require('$PRISMA_FMT_WASM'); console.log(prismaFmt.format('meow', '{}'))")
+REFORMATTED_MEOW=$($NODE -e "const prismaSchema = require('$PRISMA_SCHEMA_WASM'); console.log(prismaSchema.format('meow', '{}'))")
 
 echo "REFORMATTED_MEOW=$REFORMATTED_MEOW"
 
