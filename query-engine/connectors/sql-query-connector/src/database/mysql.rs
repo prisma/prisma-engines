@@ -22,7 +22,7 @@ impl RuntimePool {
                 Ok(RuntimeConnection::Rust(conn))
             }
             #[cfg(feature = "client-drivers")]
-            Self::NodeJS(queryable) => Ok(RuntimeConnection::NodeJS(queryable.clone())),
+            Self::Client(queryable) => Ok(RuntimeConnection::Client(queryable.clone())),
         }
     }
 }
@@ -65,7 +65,7 @@ impl FromSource for Mysql {
             {
                 let queryable = client_drivers::installed_driver().unwrap().clone();
                 let connection_info = get_connection_info(url)?;
-                let pool = RuntimePool::NodeJS(queryable);
+                let pool = RuntimePool::Client(queryable);
 
                 return Ok(Mysql {
                     pool,
@@ -117,7 +117,7 @@ impl Connector for Mysql {
     }
 
     fn name(&self) -> &'static str {
-        if self.pool.is_nodejs() {
+        if self.pool.is_client_side() {
             "@prisma/mysql"
         } else {
             "mysql"
