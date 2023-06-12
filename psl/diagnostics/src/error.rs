@@ -287,8 +287,9 @@ impl DatamodelError {
     }
 
     pub fn new_type_not_found_error(type_name: &str, span: Span) -> DatamodelError {
+        let lowercase_type_name = type_name.to_lowercase();
         let msg = format!(
-            "Type \"{type_name}\" is neither a built-in type, nor refers to another model, custom type, or enum."
+            "Type \"{type_name}\" is neither a built-in type, nor refers to another model, custom type, or enum. Did you mean ...\"{lowercase_type_name}\"?"
         );
         Self::new(msg, span)
     }
