@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["NapiItem"],"macro":["bail_span","err_span"],"mod":["ast","codegen","error","typegen"],"struct":["Napi"]};

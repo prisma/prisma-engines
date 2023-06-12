@@ -76,7 +76,60 @@
 <a href="#76" id="76">76</a>
 <a href="#77" id="77">77</a>
 <a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::connection::SqlConnection;
+<span class="kw">use </span><span class="kw">super</span>::nodejs::{RuntimeConnection, RuntimePool};
 <span class="kw">use crate</span>::{FromSource, SqlError};
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>connector_interface::{
@@ -84,11 +137,28 @@
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-<span class="kw">use </span>quaint::{pooled::Quaint, prelude::ConnectionInfo};
+<span class="kw">use </span>quaint::{
+    pooled::{PooledConnection, Quaint},
+    prelude::ConnectionInfo,
+};
 <span class="kw">use </span>std::time::Duration;
 
+<span class="kw">impl </span>RuntimePool {
+    <span class="doccomment">/// Reserve a connection from the pool
+    </span><span class="kw">pub async fn </span>check_out(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;RuntimeConnection&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Rust(pool) =&gt; {
+                <span class="kw">let </span>conn: PooledConnection = pool.check_out().<span class="kw">await</span>.map_err(SqlError::from)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(RuntimeConnection::Rust(conn))
+            }
+            <span class="attr">#[cfg(feature = <span class="string">&quot;nodejs-drivers&quot;</span>)]
+            </span><span class="self">Self</span>::NodeJS(queryable) =&gt; <span class="prelude-val">Ok</span>(RuntimeConnection::NodeJS(queryable.clone())),
+        }
+    }
+}
+
 <span class="kw">pub struct </span>Mysql {
-    pool: Quaint,
+    pool: RuntimePool,
     connection_info: ConnectionInfo,
     features: psl::PreviewFeatures,
 }
@@ -100,21 +170,49 @@
     }
 }
 
+<span class="kw">fn </span>get_connection_info(url: <span class="kw-2">&amp;</span>str) -&gt; connector::Result&lt;ConnectionInfo&gt; {
+    <span class="kw">let </span>database_str = url;
+
+    <span class="kw">let </span>connection_info = ConnectionInfo::from_url(database_str).map_err(|err| {
+        ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl {
+            details: err.to_string(),
+            url: database_str.to_string(),
+        })
+    })<span class="question-mark">?</span>;
+
+    <span class="prelude-val">Ok</span>(connection_info)
+}
+
 <span class="attr">#[async_trait]
 </span><span class="kw">impl </span>FromSource <span class="kw">for </span>Mysql {
     <span class="kw">async fn </span>from_source(
-        _source: <span class="kw-2">&amp;</span>psl::Datasource,
+        source: <span class="kw-2">&amp;</span>psl::Datasource,
         url: <span class="kw-2">&amp;</span>str,
         features: psl::PreviewFeatures,
     ) -&gt; connector_interface::Result&lt;Mysql&gt; {
-        <span class="kw">let </span>database_str = url;
+        <span class="kw">if </span>source.provider == <span class="string">&quot;@prisma/mysql&quot; </span>{
+            <span class="attr">#[cfg(feature = <span class="string">&quot;nodejs-drivers&quot;</span>)]
+            </span>{
+                <span class="kw">let </span>queryable = nodejs_drivers::installed_driver().unwrap().clone();
+                <span class="kw">let </span>connection_info = get_connection_info(url)<span class="question-mark">?</span>;
+                <span class="kw">let </span>pool = RuntimePool::NodeJS(queryable);
 
-        <span class="kw">let </span>connection_info = ConnectionInfo::from_url(database_str).map_err(|err| {
-            ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl {
-                details: err.to_string(),
-                url: database_str.to_string(),
-            })
-        })<span class="question-mark">?</span>;
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(Mysql {
+                    pool,
+                    connection_info,
+                    features: features.to_owned(),
+                });
+            }
+
+            <span class="attr">#[cfg(not(feature = <span class="string">&quot;nodejs-drivers&quot;</span>))]
+            </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(ConnectorError::from_kind(ErrorKind::UnsupportedConnector(
+                    <span class="string">&quot;The @prisma/mysql connector requires the `nodejs-drivers` feature to be enabled.&quot;</span>.into(),
+                )));
+            }
+        }
+
+        <span class="kw">let </span>connection_info = get_connection_info(url)<span class="question-mark">?</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>builder = Quaint::builder(url)
             .map_err(SqlError::from)
@@ -127,7 +225,7 @@
         <span class="kw">let </span>connection_info = pool.connection_info().to_owned();
 
         <span class="prelude-val">Ok</span>(Mysql {
-            pool,
+            pool: RuntimePool::Rust(pool),
             connection_info,
             features: features.to_owned(),
         })
@@ -138,17 +236,23 @@
 </span><span class="kw">impl </span>Connector <span class="kw">for </span>Mysql {
     <span class="kw">async fn </span>get_connection&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; connector::Result&lt;Box&lt;<span class="kw">dyn </span>Connection + Send + Sync + <span class="lifetime">&#39;static</span>&gt;&gt; {
         <span class="kw">super</span>::catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
-            <span class="kw">let </span>conn = <span class="self">self</span>.pool.check_out().<span class="kw">await</span>.map_err(SqlError::from)<span class="question-mark">?</span>;
-            <span class="kw">let </span>conn = SqlConnection::new(conn, <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, <span class="self">self</span>.features);
+            <span class="kw">let </span>runtime_conn = <span class="self">self</span>.pool.check_out().<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="prelude-val">Ok</span>(Box::new(conn) <span class="kw">as </span>Box&lt;<span class="kw">dyn </span>Connection + Send + Sync + <span class="lifetime">&#39;static</span>&gt;)
+            <span class="comment">// Note: `runtime_conn` must be `Sized`, as that&#39;s required by `TransactionCapable`
+            </span><span class="kw">let </span>sql_conn = SqlConnection::new(runtime_conn, <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, <span class="self">self</span>.features);
+
+            <span class="prelude-val">Ok</span>(Box::new(sql_conn) <span class="kw">as </span>Box&lt;<span class="kw">dyn </span>Connection + Send + Sync + <span class="lifetime">&#39;static</span>&gt;)
         })
         .<span class="kw">await
     </span>}
 
     <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
-        <span class="string">&quot;mysql&quot;
-    </span>}
+        <span class="kw">if </span><span class="self">self</span>.pool.is_nodejs() {
+            <span class="string">&quot;@prisma/mysql&quot;
+        </span>} <span class="kw">else </span>{
+            <span class="string">&quot;mysql&quot;
+        </span>}
+    }
 
     <span class="kw">fn </span>should_retry_on_transient_error(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="bool-val">false

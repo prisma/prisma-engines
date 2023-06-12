@@ -38,22 +38,20 @@
 <a href="#38" id="38">38</a>
 <a href="#39" id="39">39</a>
 <a href="#40" id="40">40</a>
-<a href="#41" id="41">41</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     column_metadata,
     filter_conversion::AliasedCondition,
     model_extensions::AsColumns,
     query_builder::write::{build_update_and_set_query, create_record},
-    query_ext::QueryExt,
     row::ToSqlRow,
-    Context,
+    Context, Queryable,
 };
 <span class="kw">use </span>connector_interface::NativeUpsert;
 <span class="kw">use </span>prisma_models::{ModelProjection, Record, SingleRecord};
 <span class="kw">use </span>quaint::prelude::{OnConflict, Query};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>native_upsert(
-    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,
     upsert: NativeUpsert,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;SingleRecord&gt; {

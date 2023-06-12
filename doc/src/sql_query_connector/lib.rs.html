@@ -25,6 +25,7 @@
 <a href="#25" id="25">25</a>
 <a href="#26" id="26">26</a>
 <a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::wrong_self_convention)]
 #![deny(unsafe_code)]
 
@@ -47,6 +48,7 @@
 <span class="kw">mod </span>value_ext;
 
 <span class="kw">use </span><span class="self">self</span>::{column_metadata::<span class="kw-2">*</span>, context::Context, filter_conversion::<span class="kw-2">*</span>, query_ext::QueryExt, row::<span class="kw-2">*</span>};
+<span class="kw">use </span>quaint::prelude::Queryable;
 
 <span class="kw">pub use </span>database::{FromSource, Mssql, Mysql, PostgreSql, Sqlite};
 <span class="kw">pub use </span>error::SqlError;

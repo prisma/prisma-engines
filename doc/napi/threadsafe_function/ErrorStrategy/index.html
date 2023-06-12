@@ -1,0 +1,54 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Type-level `enum` to express how to feed `ThreadsafeFunction` errors to the inner [`JsFunction`]."><title>napi::threadsafe_function::ErrorStrategy - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="napi" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../../../napi/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2></h2></nav><nav class="sidebar"><a class="logo-container" href="../../../napi/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2 class="location"><a href="#">Module ErrorStrategy</a></h2><div class="sidebar-elems"><section><ul class="block"><li><a href="#reexports">Re-exports</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Module <a href="../../index.html">napi</a>::<wbr><a href="../index.html">threadsafe_function</a>::<wbr><a class="mod" href="#">ErrorStrategy</a><button id="copy-path" title="Copy item path to clipboard"><img src="../../../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="srclink" href="../../../src/napi/threadsafe_function.rs.html#37-97">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Type-level <code>enum</code> to express how to feed <a href="../struct.ThreadsafeFunction.html" title="struct napi::threadsafe_function::ThreadsafeFunction"><code>ThreadsafeFunction</code></a> errors to
+the inner [<code>JsFunction</code>].</p>
+<h4 id="context"><a href="#context">Context</a></h4>
+<p>For callbacks that expect a <code>Result</code>-like kind of input, the convention is
+to have the callback take an <code>error</code> parameter as its first parameter.</p>
+<p>This way receiving a <code>Result&lt;Args…&gt;</code> can be modelled as follows:</p>
+<ul>
+<li>
+<p>In case of <code>Err(error)</code>, feed that <code>error</code> entity as the first parameter
+of the callback;</p>
+</li>
+<li>
+<p>Otherwise (in case of <code>Ok(_)</code>), feed <code>null</code> instead.</p>
+</li>
+</ul>
+<p>In pseudo-code:</p>
+
+<div class="example-wrap ignore"><a href="#" class="tooltip" title="This example is not tested">ⓘ</a><pre class="rust rust-example-rendered"><code><span class="kw">match </span>result_args {
+    <span class="prelude-val">Ok</span>(args) =&gt; {
+        <span class="kw">let </span>js_null = <span class="comment">/* … */</span>;
+        callback.call(
+            <span class="comment">// this
+            </span><span class="prelude-val">None</span>,
+            <span class="comment">// args…
+            </span><span class="kw-2">&amp;</span>iter::once(js_null).chain(args).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;(),
+        )
+    },
+    <span class="prelude-val">Err</span>(err) =&gt; callback.call(<span class="prelude-val">None</span>, <span class="kw-2">&amp;</span>[JsError::from(err)]),
+}</code></pre></div>
+<p><strong>Note that the <code>Err</code> case can stem from a failed conversion from native
+values to js values when calling the callback!</strong></p>
+<p>That’s why:</p>
+<blockquote>
+<p><strong><a href="enum.CalleeHandled.html" title="enum napi::threadsafe_function::ErrorStrategy::CalleeHandled">This</a> is the default error strategy</strong>.</p>
+</blockquote>
+<p>In order to opt-out of it, <a href="../struct.ThreadsafeFunction.html" title="struct napi::threadsafe_function::ThreadsafeFunction"><code>ThreadsafeFunction</code></a> has an optional second
+generic parameter (of “kind” <a href="trait.ErrorStrategy.html" title="trait napi::threadsafe_function::ErrorStrategy::ErrorStrategy"><code>ErrorStrategy::T</code></a>) that defines whether
+this behavior (<a href="enum.CalleeHandled.html" title="enum napi::threadsafe_function::ErrorStrategy::CalleeHandled"><code>ErrorStrategy::CalleeHandled</code></a>) or a non-<code>Result</code> one
+(<a href="enum.Fatal.html" title="enum napi::threadsafe_function::ErrorStrategy::Fatal"><code>ErrorStrategy::Fatal</code></a>) is desired.</p>
+<h4 id="type-level-enum"><a href="#type-level-enum">Type-level <code>enum</code></a></h4>
+<p>Until <code>const_generics</code> can handle custom <code>enum</code>s, this pattern must be
+implemented at the type level.</p>
+<p>We thus end up with:</p>
+
+<div class="example-wrap ignore"><a href="#" class="tooltip" title="This example is not tested">ⓘ</a><pre class="rust rust-example-rendered"><code><span class="attr">#[type_level_enum]
+</span><span class="kw">enum </span>ErrorStrategy {
+    CalleeHandled,
+    Fatal,
+}</code></pre></div>
+<p>With <a href="#reexports"><code>ErrorStrategy::T</code></a> being the type-level “enum type”:</p>
+
+<div class="example-wrap ignore"><a href="#" class="tooltip" title="This example is not tested">ⓘ</a><pre class="rust rust-example-rendered"><code>&lt;Param: ErrorStrategy::T&gt;</code></pre></div>
+</div></details><h2 id="reexports" class="small-section-header"><a href="#reexports">Re-exports</a></h2><ul class="item-table"><li><div class="item-name" id="reexport.T"><code>pub use <a class="trait" href="trait.ErrorStrategy.html" title="trait napi::threadsafe_function::ErrorStrategy::ErrorStrategy">ErrorStrategy</a> as T;</code></div></li></ul><h2 id="enums" class="small-section-header"><a href="#enums">Enums</a></h2><ul class="item-table"><li><div class="item-name"><a class="enum" href="enum.CalleeHandled.html" title="enum napi::threadsafe_function::ErrorStrategy::CalleeHandled">CalleeHandled</a></div><div class="desc docblock-short">Input errors (including conversion errors) are left for the callee to
+handle:</div></li><li><div class="item-name"><a class="enum" href="enum.Fatal.html" title="enum napi::threadsafe_function::ErrorStrategy::Fatal">Fatal</a></div><div class="desc docblock-short">Input errors (including conversion errors) are deemed fatal:</div></li></ul><h2 id="traits" class="small-section-header"><a href="#traits">Traits</a></h2><ul class="item-table"><li><div class="item-name"><a class="trait" href="trait.ErrorStrategy.html" title="trait napi::threadsafe_function::ErrorStrategy::ErrorStrategy">ErrorStrategy</a></div><div class="desc docblock-short">See <a href="index.html" title="mod napi::threadsafe_function::ErrorStrategy"><code>ErrorStrategy</code></a></div></li></ul></section></div></main></body></html>

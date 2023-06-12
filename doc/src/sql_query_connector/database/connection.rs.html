@@ -290,7 +290,7 @@
 <a href="#290" id="290">290</a>
 <a href="#291" id="291">291</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{catch, transaction::SqlConnectorTransaction};
-<span class="kw">use crate</span>::{database::operations::<span class="kw-2">*</span>, Context, QueryExt, SqlError};
+<span class="kw">use crate</span>::{database::operations::<span class="kw-2">*</span>, Context, SqlError};
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>connector::{ConnectionLike, RelAggregationSelection};
 <span class="kw">use </span>connector_interface::{
@@ -301,7 +301,7 @@
 <span class="kw">use </span>prisma_value::PrismaValue;
 <span class="kw">use </span>quaint::{
     connector::{IsolationLevel, TransactionCapable},
-    prelude::ConnectionInfo,
+    prelude::{ConnectionInfo, Queryable},
 };
 <span class="kw">use </span>std::{collections::HashMap, str::FromStr};
 
@@ -313,7 +313,7 @@
 
 <span class="kw">impl</span>&lt;C&gt; SqlConnection&lt;C&gt;
 <span class="kw">where
-    </span>C: QueryExt + Send + Sync + <span class="lifetime">&#39;static</span>,
+    </span>C: Queryable + TransactionCapable + Send + Sync + <span class="lifetime">&#39;static</span>,
 {
     <span class="kw">pub fn </span>new(inner: C, connection_info: <span class="kw-2">&amp;</span>ConnectionInfo, features: psl::PreviewFeatures) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>connection_info = connection_info.clone();
@@ -326,12 +326,12 @@
     }
 }
 
-<span class="kw">impl</span>&lt;C&gt; ConnectionLike <span class="kw">for </span>SqlConnection&lt;C&gt; <span class="kw">where </span>C: QueryExt + TransactionCapable + Send + Sync + <span class="lifetime">&#39;static </span>{}
+<span class="kw">impl</span>&lt;C&gt; ConnectionLike <span class="kw">for </span>SqlConnection&lt;C&gt; <span class="kw">where </span>C: Queryable + TransactionCapable + Send + Sync + <span class="lifetime">&#39;static </span>{}
 
 <span class="attr">#[async_trait]
 </span><span class="kw">impl</span>&lt;C&gt; Connection <span class="kw">for </span>SqlConnection&lt;C&gt;
 <span class="kw">where
-    </span>C: QueryExt + TransactionCapable + Send + Sync + <span class="lifetime">&#39;static</span>,
+    </span>C: Queryable + TransactionCapable + Send + Sync + <span class="lifetime">&#39;static</span>,
 {
     <span class="kw">async fn </span>start_transaction&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
@@ -368,7 +368,7 @@
 <span class="attr">#[async_trait]
 </span><span class="kw">impl</span>&lt;C&gt; ReadOperations <span class="kw">for </span>SqlConnection&lt;C&gt;
 <span class="kw">where
-    </span>C: QueryExt + Send + Sync + <span class="lifetime">&#39;static</span>,
+    </span>C: Queryable + Send + Sync + <span class="lifetime">&#39;static</span>,
 {
     <span class="kw">async fn </span>get_single_record(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
@@ -450,7 +450,7 @@
 <span class="attr">#[async_trait]
 </span><span class="kw">impl</span>&lt;C&gt; WriteOperations <span class="kw">for </span>SqlConnection&lt;C&gt;
 <span class="kw">where
-    </span>C: QueryExt + Send + Sync + <span class="lifetime">&#39;static</span>,
+    </span>C: Queryable + Send + Sync + <span class="lifetime">&#39;static</span>,
 {
     <span class="kw">async fn </span>create_record(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,

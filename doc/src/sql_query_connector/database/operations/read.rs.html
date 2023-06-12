@@ -283,7 +283,7 @@
     model_extensions::<span class="kw-2">*</span>,
     query_arguments_ext::QueryArgumentsExt,
     query_builder::{<span class="self">self</span>, read},
-    Context, QueryExt, SqlError,
+    Context, QueryExt, Queryable, SqlError,
 };
 <span class="kw">use </span>connector_interface::<span class="kw-2">*</span>;
 <span class="kw">use </span>futures::stream::{FuturesUnordered, StreamExt};
@@ -291,7 +291,7 @@
 <span class="kw">use </span>quaint::ast::<span class="kw-2">*</span>;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>get_single_record(
-    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,
     model: <span class="kw-2">&amp;</span>Model,
     filter: <span class="kw-2">&amp;</span>Filter,
     selected_fields: <span class="kw-2">&amp;</span>ModelProjection,
@@ -328,7 +328,7 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>get_many_records(
-    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,
     model: <span class="kw-2">&amp;</span>Model,
     <span class="kw-2">mut </span>query_arguments: QueryArguments,
     selected_fields: <span class="kw-2">&amp;</span>ModelProjection,
@@ -422,7 +422,7 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>get_related_m2m_record_ids(
-    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,
     from_field: <span class="kw-2">&amp;</span>RelationFieldRef,
     from_record_ids: <span class="kw-2">&amp;</span>[SelectionResult],
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
@@ -491,7 +491,7 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>aggregate(
-    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,
     model: <span class="kw-2">&amp;</span>Model,
     query_arguments: QueryArguments,
     selections: Vec&lt;AggregationSelection&gt;,
@@ -509,7 +509,7 @@
 }
 
 <span class="kw">async fn </span>plain_aggregate(
-    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,
     model: <span class="kw-2">&amp;</span>Model,
     query_arguments: QueryArguments,
     selections: Vec&lt;AggregationSelection&gt;,
@@ -534,7 +534,7 @@
 }
 
 <span class="kw">async fn </span>group_by_aggregate(
-    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,
     model: <span class="kw-2">&amp;</span>Model,
     query_arguments: QueryArguments,
     selections: Vec&lt;AggregationSelection&gt;,

@@ -464,10 +464,12 @@
 <a href="#464" id="464">464</a>
 <a href="#465" id="465">465</a>
 <a href="#466" id="466">466</a>
+<a href="#467" id="467">467</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::filter_conversion::AliasedCondition;
 <span class="kw">use </span><span class="kw">crate</span>::query_builder::write::{build_update_and_set_query, chunk_update_with_ids};
 <span class="kw">use crate</span>::{
     error::SqlError, model_extensions::<span class="kw-2">*</span>, query_builder::write, sql_trace::SqlTraceComment, Context, QueryExt,
+    Queryable,
 };
 <span class="kw">use </span>connector_interface::<span class="kw-2">*</span>;
 <span class="kw">use </span>itertools::Itertools;
@@ -485,7 +487,7 @@
 <span class="kw">use </span>user_facing_errors::query_engine::DatabaseConstraint;
 
 <span class="kw">async fn </span>generate_id(
-    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,
     primary_key: <span class="kw-2">&amp;</span>FieldSelection,
     args: <span class="kw-2">&amp;</span>WriteArgs,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
@@ -528,7 +530,7 @@
 <span class="doccomment">/// Create a single record to the database defined in `conn`, resulting into a
 /// `RecordProjection` as an identifier pointing to the just-created record.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>create_record(
-    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,
     sql_family: <span class="kw-2">&amp;</span>SqlFamily,
     model: <span class="kw-2">&amp;</span>Model,
     <span class="kw-2">mut </span>args: WriteArgs,
@@ -619,7 +621,7 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>create_records(
-    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,
     model: <span class="kw-2">&amp;</span>Model,
     args: Vec&lt;WriteArgs&gt;,
     skip_duplicates: bool,
@@ -650,7 +652,7 @@
 <span class="doccomment">/// Standard create many records, requires `affected_fields` to be non-empty.
 </span><span class="attr">#[allow(clippy::mutable_key_type)]
 </span><span class="kw">async fn </span>create_many_nonempty(
-    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,
     model: <span class="kw-2">&amp;</span>Model,
     args: Vec&lt;WriteArgs&gt;,
     skip_duplicates: bool,
@@ -738,7 +740,7 @@
 
 <span class="doccomment">/// Creates many empty (all default values) rows.
 </span><span class="kw">async fn </span>create_many_empty(
-    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,
     model: <span class="kw-2">&amp;</span>Model,
     num_records: usize,
     skip_duplicates: bool,
@@ -758,7 +760,7 @@
 /// defined in `args`, resulting the identifiers that were modified in the
 /// operation.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>update_record(
-    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,
     model: <span class="kw-2">&amp;</span>Model,
     record_filter: RecordFilter,
     args: WriteArgs,
@@ -782,7 +784,7 @@
 <span class="comment">// Generates a query like this:
 //  UPDATE &quot;public&quot;.&quot;User&quot; SET &quot;name&quot; = $1 WHERE &quot;public&quot;.&quot;User&quot;.&quot;id&quot; IN ($2,$3,$4,$5,$6,$7,$8,$9,$10,$11) AND &quot;public&quot;.&quot;User&quot;.&quot;age&quot; &gt; $1
 </span><span class="kw">async fn </span>update_records_from_ids_and_filter(
-    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,
     model: <span class="kw-2">&amp;</span>Model,
     record_filter: RecordFilter,
     args: WriteArgs,
@@ -815,7 +817,7 @@
 <span class="comment">// Generates a query like this:
 //  UPDATE &quot;public&quot;.&quot;User&quot; SET &quot;name&quot; = $1 WHERE &quot;public&quot;.&quot;User&quot;.&quot;age&quot; &gt; $1
 </span><span class="kw">async fn </span>update_records_from_filter(
-    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,
     model: <span class="kw-2">&amp;</span>Model,
     record_filter: RecordFilter,
     args: WriteArgs,
@@ -835,7 +837,7 @@
 /// This works via two ways, when there are ids in record_filter.selectors, it uses that to update
 /// Otherwise it used the passed down arguments to update.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>update_records(
-    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,
     model: <span class="kw-2">&amp;</span>Model,
     record_filter: RecordFilter,
     args: WriteArgs,
@@ -855,7 +857,7 @@
 
 <span class="doccomment">/// Delete multiple records in `conn`, defined in the `Filter`. Result is the number of items deleted.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>delete_records(
-    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,
     model: <span class="kw-2">&amp;</span>Model,
     record_filter: RecordFilter,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
@@ -883,7 +885,7 @@
 <span class="doccomment">/// Connect relations defined in `child_ids` to a parent defined in `parent_id`.
 /// The relation information is in the `RelationFieldRef`.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>m2m_connect(
-    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,
     field: <span class="kw-2">&amp;</span>RelationFieldRef,
     parent_id: <span class="kw-2">&amp;</span>SelectionResult,
     child_ids: <span class="kw-2">&amp;</span>[SelectionResult],
@@ -898,7 +900,7 @@
 <span class="doccomment">/// Disconnect relations defined in `child_ids` to a parent defined in `parent_id`.
 /// The relation information is in the `RelationFieldRef`.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>m2m_disconnect(
-    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,
     field: <span class="kw-2">&amp;</span>RelationFieldRef,
     parent_id: <span class="kw-2">&amp;</span>SelectionResult,
     child_ids: <span class="kw-2">&amp;</span>[SelectionResult],
@@ -913,7 +915,7 @@
 <span class="doccomment">/// Execute a plain SQL query with the given parameters, returning the number of
 /// affected rows.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>execute_raw(
-    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,
     features: psl::PreviewFeatures,
     inputs: HashMap&lt;String, PrismaValue&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;usize&gt; {
@@ -925,7 +927,7 @@
 <span class="doccomment">/// Execute a plain SQL query with the given parameters, returning the answer as
 /// a JSON `Value`.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>query_raw(
-    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,
     inputs: HashMap&lt;String, PrismaValue&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;serde_json::Value&gt; {
     <span class="prelude-val">Ok</span>(conn.raw_json(inputs).<span class="kw">await</span><span class="question-mark">?</span>)

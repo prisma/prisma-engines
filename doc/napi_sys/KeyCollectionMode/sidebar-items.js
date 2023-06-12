@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["include_prototypes","own_only"],"type":["napi_key_collection_mode"]};
