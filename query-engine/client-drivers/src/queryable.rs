@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use async_trait::async_trait;
 
 use crate::driver::Driver;
@@ -9,15 +11,13 @@ use quaint::{
     Value,
 };
 
-use napi::JsObject;
-
 #[derive(Clone)]
 pub struct Queryable {
-    pub(crate) driver: Driver,
+    pub(crate) driver: Arc<dyn Driver>,
 }
 
 impl Queryable {
-    pub fn new(driver: Driver) -> Self {
+    pub fn new(driver: Arc<dyn Driver>) -> Self {
         Self { driver }
     }
 }
@@ -148,11 +148,10 @@ impl TransactionCapable for Queryable {}
 // on a global instance is fine.
 static QUERYABLE: once_cell::sync::OnceCell<Queryable> = once_cell::sync::OnceCell::new();
 
-pub fn install_driver(js_driver: JsObject) {
-    let driver = crate::driver::reify(js_driver).unwrap();
-    let nodejs_queryable = Queryable::new(driver);
+pub fn install_driver(driver: Arc<dyn Driver>) {
+    let queryable = Queryable::new(driver);
     QUERYABLE
-        .set(nodejs_queryable)
+        .set(queryable)
         .expect("Already initialized global instance of JSQueryable");
 }
 

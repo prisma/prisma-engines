@@ -9,8 +9,8 @@ use quaint::{
 pub enum RuntimePool {
     Rust(Quaint),
 
-    #[cfg(feature = "nodejs-drivers")]
-    NodeJS(nodejs_drivers::Queryable),
+    #[cfg(feature = "client-drivers")]
+    NodeJS(client_drivers::Queryable),
 }
 
 impl RuntimePool {
@@ -18,7 +18,7 @@ impl RuntimePool {
         match self {
             Self::Rust(_) => false,
 
-            #[cfg(feature = "nodejs-drivers")]
+            #[cfg(feature = "client-drivers")]
             Self::NodeJS(_) => true,
         }
     }
@@ -27,8 +27,8 @@ impl RuntimePool {
 pub enum RuntimeConnection {
     Rust(PooledConnection),
 
-    #[cfg(feature = "nodejs-drivers")]
-    NodeJS(nodejs_drivers::Queryable),
+    #[cfg(feature = "client-drivers")]
+    NodeJS(client_drivers::Queryable),
 }
 
 #[async_trait]
@@ -37,7 +37,7 @@ impl Queryable for RuntimeConnection {
         match self {
             Self::Rust(conn) => conn.query(q).await,
 
-            #[cfg(feature = "nodejs-drivers")]
+            #[cfg(feature = "client-drivers")]
             Self::NodeJS(conn) => conn.query(q).await,
         }
     }
@@ -46,7 +46,7 @@ impl Queryable for RuntimeConnection {
         match self {
             Self::Rust(conn) => conn.query_raw(sql, params).await,
 
-            #[cfg(feature = "nodejs-drivers")]
+            #[cfg(feature = "client-drivers")]
             Self::NodeJS(conn) => conn.query_raw(sql, params).await,
         }
     }
@@ -55,7 +55,7 @@ impl Queryable for RuntimeConnection {
         match self {
             Self::Rust(conn) => conn.query_raw_typed(sql, params).await,
 
-            #[cfg(feature = "nodejs-drivers")]
+            #[cfg(feature = "client-drivers")]
             Self::NodeJS(conn) => conn.query_raw_typed(sql, params).await,
         }
     }
@@ -64,7 +64,7 @@ impl Queryable for RuntimeConnection {
         match self {
             Self::Rust(conn) => conn.execute(q).await,
 
-            #[cfg(feature = "nodejs-drivers")]
+            #[cfg(feature = "client-drivers")]
             Self::NodeJS(conn) => conn.execute(q).await,
         }
     }
@@ -73,7 +73,7 @@ impl Queryable for RuntimeConnection {
         match self {
             Self::Rust(conn) => conn.execute_raw(sql, params).await,
 
-            #[cfg(feature = "nodejs-drivers")]
+            #[cfg(feature = "client-drivers")]
             Self::NodeJS(conn) => conn.execute_raw(sql, params).await,
         }
     }
@@ -82,7 +82,7 @@ impl Queryable for RuntimeConnection {
         match self {
             Self::Rust(conn) => conn.execute_raw_typed(sql, params).await,
 
-            #[cfg(feature = "nodejs-drivers")]
+            #[cfg(feature = "client-drivers")]
             Self::NodeJS(conn) => conn.execute_raw_typed(sql, params).await,
         }
     }
@@ -93,7 +93,7 @@ impl Queryable for RuntimeConnection {
         match self {
             Self::Rust(conn) => conn.raw_cmd(cmd).await,
 
-            #[cfg(feature = "nodejs-drivers")]
+            #[cfg(feature = "client-drivers")]
             Self::NodeJS(conn) => conn.raw_cmd(cmd).await,
         }
     }
@@ -102,7 +102,7 @@ impl Queryable for RuntimeConnection {
         match self {
             Self::Rust(conn) => conn.version().await,
 
-            #[cfg(feature = "nodejs-drivers")]
+            #[cfg(feature = "client-drivers")]
             Self::NodeJS(conn) => conn.version().await,
         }
     }
@@ -111,7 +111,7 @@ impl Queryable for RuntimeConnection {
         match self {
             Self::Rust(conn) => conn.is_healthy(),
 
-            #[cfg(feature = "nodejs-drivers")]
+            #[cfg(feature = "client-drivers")]
             Self::NodeJS(conn) => conn.is_healthy(),
         }
     }
@@ -122,7 +122,7 @@ impl Queryable for RuntimeConnection {
         match self {
             Self::Rust(conn) => conn.set_tx_isolation_level(isolation_level).await,
 
-            #[cfg(feature = "nodejs-drivers")]
+            #[cfg(feature = "client-drivers")]
             Self::NodeJS(conn) => conn.set_tx_isolation_level(isolation_level).await,
         }
     }
@@ -132,7 +132,7 @@ impl Queryable for RuntimeConnection {
         match self {
             Self::Rust(conn) => conn.requires_isolation_first(),
 
-            #[cfg(feature = "nodejs-drivers")]
+            #[cfg(feature = "client-drivers")]
             Self::NodeJS(conn) => conn.requires_isolation_first(),
         }
     }

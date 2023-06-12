@@ -469,6 +469,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "client-drivers"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "expect-test",
+ "once_cell",
+ "quaint",
+ "serde",
+ "tokio",
+]
+
+[[package]]
 name = "cmake"
 version = "0.1.48"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2366,20 +2378,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "nodejs-drivers"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "expect-test",
- "napi",
- "napi-derive",
- "once_cell",
- "quaint",
- "serde",
- "tokio",
-]
-
-[[package]]
 name = "nom"
 version = "7.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3309,12 +3307,12 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
+ "client-drivers",
  "connection-string",
  "futures",
  "napi",
  "napi-build",
  "napi-derive",
- "nodejs-drivers",
  "opentelemetry",
  "prisma-models",
  "psl",
@@ -3581,6 +3579,7 @@ name = "request-handlers"
 version = "0.1.0"
 dependencies = [
  "bigdecimal",
+ "client-drivers",
  "codspeed-criterion-compat",
  "connection-string",
  "dmmf",
@@ -3590,7 +3589,6 @@ dependencies = [
  "insta",
  "itertools",
  "mongodb-query-connector",
- "nodejs-drivers",
  "once_cell",
  "prisma-models",
  "psl",
@@ -4277,10 +4275,10 @@ dependencies = [
  "async-trait",
  "bigdecimal",
  "chrono",
+ "client-drivers",
  "cuid",
  "futures",
  "itertools",
- "nodejs-drivers",
  "once_cell",
  "opentelemetry",
  "prisma-models",

@@ -6,6 +6,7 @@
 mod driver;
 mod queryable;
 
+pub use driver::{Driver, Error, Result, ResultSet};
 pub use queryable::install_driver;
 pub use queryable::installed_driver;
 pub use queryable::Queryable;
