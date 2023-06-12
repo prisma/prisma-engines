@@ -67,7 +67,7 @@ fn composite_type_to_dmmf(ct: walkers::CompositeTypeWalker<'_>) -> Model {
             .map(composite_type_field_to_dmmf)
             .collect(),
         is_generated: None,
-        documentation: None,
+        documentation: ct.ast_composite_type().documentation().map(ToOwned::to_owned),
         primary_key: None,
         unique_fields: Vec::new(),
         unique_indexes: Vec::new(),
@@ -105,7 +105,7 @@ fn composite_type_field_to_dmmf(field: walkers::CompositeTypeFieldWalker<'_>) ->
         },
         is_generated: None,
         is_updated_at: None,
-        documentation: None,
+        documentation: field.documentation().map(ToOwned::to_owned),
     }
 }
 
