@@ -1,4 +1,4 @@
-use crate::{error::ApiError, log_callback::LogCallback, logger::Logger};
+use crate::{error::ApiError, log_callback::LogCallback, logger::Logger, nodejs_drivers::NodejsDriver};
 use futures::FutureExt;
 use napi::{Env, JsFunction, JsObject, JsUnknown};
 use napi_derive::napi;
@@ -155,7 +155,7 @@ impl QueryEngine {
         // Initialize the global NODEJS_QUERYABLE from fn_ctx.
         // This implies that there can only be one QueryEngine instance per process.
         if let Some(ctx) = fn_ctx {
-            nodejs_drivers::install_driver(ctx);
+            js_drivers::install_driver(Arc::new(NodejsDriver::reify(ctx)?));
         }
 
         let ConstructorOptions {

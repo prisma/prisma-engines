@@ -21,8 +21,8 @@ impl RuntimePool {
                 let conn: PooledConnection = pool.check_out().await.map_err(SqlError::from)?;
                 Ok(RuntimeConnection::Rust(conn))
             }
-            #[cfg(feature = "nodejs-drivers")]
-            Self::NodeJS(queryable) => Ok(RuntimeConnection::NodeJS(queryable.clone())),
+            #[cfg(feature = "js-drivers")]
+            Self::JS(queryable) => Ok(RuntimeConnection::JS(queryable.clone())),
         }
     }
 }
@@ -61,11 +61,11 @@ impl FromSource for Mysql {
         features: psl::PreviewFeatures,
     ) -> connector_interface::Result<Mysql> {
         if source.provider == "@prisma/mysql" {
-            #[cfg(feature = "nodejs-drivers")]
+            #[cfg(feature = "js-drivers")]
             {
-                let queryable = nodejs_drivers::installed_driver().unwrap().clone();
+                let queryable = js_drivers::installed_driver().unwrap().clone();
                 let connection_info = get_connection_info(url)?;
-                let pool = RuntimePool::NodeJS(queryable);
+                let pool = RuntimePool::JS(queryable);
 
                 return Ok(Mysql {
                     pool,
@@ -74,10 +74,10 @@ impl FromSource for Mysql {
                 });
             }
 
-            #[cfg(not(feature = "nodejs-drivers"))]
+            #[cfg(not(feature = "js-drivers"))]
             {
                 return Err(ConnectorError::from_kind(ErrorKind::UnsupportedConnector(
-                    "The @prisma/mysql connector requires the `nodejs-drivers` feature to be enabled.".into(),
+                    "The @prisma/mysql connector requires the `js-drivers` feature to be enabled.".into(),
                 )));
             }
         }
@@ -117,7 +117,7 @@ impl Connector for Mysql {
     }
 
     fn name(&self) -> &'static str {
-        if self.pool.is_nodejs() {
+        if self.pool.is_js() {
             "@prisma/mysql"
         } else {
             "mysql"

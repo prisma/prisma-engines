@@ -37,8 +37,8 @@ in
     ];
 
     configurePhase = ''
-      echo -e "\n" >> .cargo/config.toml
-      cat ${deps}/config.toml >> .cargo/config.toml
+      mkdir .cargo
+      ln -s ${deps}/config.toml .cargo/config.toml
     '';
 
     buildPhase = ''
