@@ -9,23 +9,46 @@ fn sqlite_ignore() {
     assert_eq!(dmmf.mappings.model_operations.len(), 1);
 }
 
+fn assert_comment(actual: Option<&String>, expected: &str) {
+    assert!(actual.is_some_and(|c| c.as_str() == expected))
+}
+
 #[test]
 fn mongo_docs() {
     let dmmf = dmmf_from_schema(include_str!("./test-schemas/mongo.prisma"));
 
     for it in dmmf.data_model.types.iter() {
         assert_eq!(it.name, "Post");
-        assert!(it.documentation.as_ref().is_some_and(|x| x.as_str() == "Post comment"));
+        assert_comment(it.documentation.as_ref(), "Post comment");
+        for field in it.fields.iter() {
+            let name = field.name.as_str();
+            let comment = field.documentation.as_ref();
+            match name {
+                "published" => assert_comment(comment, "published comment"),
+                "authorId" => assert_comment(comment, "authorId comment"),
+                _ => assert!(comment.as_ref().is_none()),
+            };
+        }
+    }
+}
 
-        let mut fields = it.fields.iter();
-        assert!(fields.any(|f| f.name == "published"
-            && f.documentation
-                .as_ref()
-                .is_some_and(|x| x.as_str() == "published comment")));
-        assert!(fields.any(|f| f.name == "authorId"
-            && f.documentation
-                .as_ref()
-                .is_some_and(|x| x.as_str() == "authorId comment")));
+#[test]
+fn enum_docs() {
+    let dmmf = dmmf_from_schema(include_str!("./test-schemas/postgres.prisma"));
+
+    for it in dmmf.data_model.enums.iter() {
+        assert_eq!(it.name, "Role");
+        assert_comment(it.documentation.as_ref(), "Role enum comment");
+
+        for field in it.values.iter() {
+            let name = field.name.as_str();
+            let comment = field.documentation.as_ref();
+            match name {
+                "USER" => assert_comment(comment, "user comment"),
+                "ADMIN" => assert_comment(comment, "admin comment"),
+                _ => assert!(comment.as_ref().is_none()),
+            };
+        }
     }
 }
 
