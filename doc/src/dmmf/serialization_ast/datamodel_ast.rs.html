@@ -105,6 +105,8 @@
 <a href="#105" id="105">105</a>
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
 </pre></div><pre class="rust"><code><span class="comment">// Datamodel serialization AST for the DMMF.
 </span><span class="attr">#[derive(Debug, serde::Serialize)]
 #[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
@@ -211,5 +213,7 @@
 </span><span class="kw">pub struct </span>EnumValue {
     <span class="kw">pub </span>name: String,
     <span class="kw">pub </span>db_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>documentation: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 </code></pre></div></section></main></body></html>

@@ -334,6 +334,7 @@
 <a href="#334" id="334">334</a>
 <a href="#335" id="335">335</a>
 <a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::serialization_ast::datamodel_ast::{
     Datamodel, Enum, EnumValue, Field, Function, Model, PrimaryKey, UniqueIndex,
 };
@@ -390,6 +391,7 @@
     EnumValue {
         name: en.name().to_owned(),
         db_name: en.mapped_name().map(ToOwned::to_owned),
+        documentation: en.documentation().map(ToOwned::to_owned),
     }
 }
 
