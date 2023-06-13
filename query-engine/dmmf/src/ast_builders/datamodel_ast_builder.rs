@@ -54,6 +54,7 @@ fn enum_value_to_dmmf(en: walkers::EnumValueWalker<'_>) -> EnumValue {
     EnumValue {
         name: en.name().to_owned(),
         db_name: en.mapped_name().map(ToOwned::to_owned),
+        documentation: en.documentation().map(ToOwned::to_owned),
     }
 }
 
