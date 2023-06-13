@@ -452,27 +452,6 @@ fn connecting_to_a_cockroachdb_database_with_the_postgresql_connector_fails(_api
 }
 
 #[test_connector(tags(CockroachDb))]
-fn connecting_to_a_cockroachdb_database_with_the_postgresql_connector_says_nothing(_api: TestApi) {
-    let dm = r#"
-        datasource crdb {
-            provider = "postgresql"
-            url = env("TEST_DATABASE_URL")
-        }
-    "#;
-
-    let engine = schema_core::schema_api(None, None).unwrap();
-
-    tok(
-        engine.ensure_connection_validity(schema_core::json_rpc::types::EnsureConnectionValidityParams {
-            datasource: schema_core::json_rpc::types::DatasourceParam::SchemaString(SchemaContainer {
-                schema: dm.to_owned(),
-            }),
-        }),
-    )
-    .unwrap();
-}
-
-#[test_connector(tags(CockroachDb))]
 fn int_to_string_conversions_work(api: TestApi) {
     let dm1 = r#"
         model Cat {
