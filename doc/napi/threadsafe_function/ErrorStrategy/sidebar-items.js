@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["CalleeHandled","Fatal"],"trait":["ErrorStrategy"]};

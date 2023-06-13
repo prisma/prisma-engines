@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["FnKind","FnSelf","NapiEnumValue","NapiFnArgKind","NapiStructKind"],"struct":["CallbackArg","NapiConst","NapiEnum","NapiEnumVariant","NapiFn","NapiFnArg","NapiImpl","NapiMod","NapiStruct","NapiStructField"]};

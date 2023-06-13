@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["ThreadsafeFunctionCallMode"],"mod":["ErrorStrategy"],"struct":["ThreadSafeCallContext","ThreadsafeFunction","UnknownReturnValue"],"trait":["JsValuesTupleIntoVec"]};

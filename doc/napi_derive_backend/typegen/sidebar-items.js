@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["js_doc_from_comments","ty_to_ts_type"],"static":["NAPI_RS_CLI_VERSION","NAPI_RS_CLI_VERSION_WITH_SHARED_CRATES_FIX"],"struct":["TypeDef"],"trait":["ToTypeDef"]};

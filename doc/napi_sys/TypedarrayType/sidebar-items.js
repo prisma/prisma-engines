@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["bigint64_array","biguint64_array","float32_array","float64_array","int16_array","int32_array","int8_array","uint16_array","uint32_array","uint8_array","uint8_clamped_array"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["keep_numbers","numbers_to_strings"]};

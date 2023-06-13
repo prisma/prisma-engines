@@ -151,8 +151,8 @@
                 <span class="kw">let </span>conn: PooledConnection = pool.check_out().<span class="kw">await</span>.map_err(SqlError::from)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(RuntimeConnection::Rust(conn))
             }
-            <span class="attr">#[cfg(feature = <span class="string">&quot;nodejs-drivers&quot;</span>)]
-            </span><span class="self">Self</span>::NodeJS(queryable) =&gt; <span class="prelude-val">Ok</span>(RuntimeConnection::NodeJS(queryable.clone())),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;js-drivers&quot;</span>)]
+            </span><span class="self">Self</span>::JS(queryable) =&gt; <span class="prelude-val">Ok</span>(RuntimeConnection::JS(queryable.clone())),
         }
     }
 }
@@ -191,11 +191,11 @@
         features: psl::PreviewFeatures,
     ) -&gt; connector_interface::Result&lt;Mysql&gt; {
         <span class="kw">if </span>source.provider == <span class="string">&quot;@prisma/mysql&quot; </span>{
-            <span class="attr">#[cfg(feature = <span class="string">&quot;nodejs-drivers&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">&quot;js-drivers&quot;</span>)]
             </span>{
-                <span class="kw">let </span>queryable = nodejs_drivers::installed_driver().unwrap().clone();
+                <span class="kw">let </span>queryable = js_drivers::installed_driver().unwrap().clone();
                 <span class="kw">let </span>connection_info = get_connection_info(url)<span class="question-mark">?</span>;
-                <span class="kw">let </span>pool = RuntimePool::NodeJS(queryable);
+                <span class="kw">let </span>pool = RuntimePool::JS(queryable);
 
                 <span class="kw">return </span><span class="prelude-val">Ok</span>(Mysql {
                     pool,
@@ -204,10 +204,10 @@
                 });
             }
 
-            <span class="attr">#[cfg(not(feature = <span class="string">&quot;nodejs-drivers&quot;</span>))]
+            <span class="attr">#[cfg(not(feature = <span class="string">&quot;js-drivers&quot;</span>))]
             </span>{
                 <span class="kw">return </span><span class="prelude-val">Err</span>(ConnectorError::from_kind(ErrorKind::UnsupportedConnector(
-                    <span class="string">&quot;The @prisma/mysql connector requires the `nodejs-drivers` feature to be enabled.&quot;</span>.into(),
+                    <span class="string">&quot;The @prisma/mysql connector requires the `js-drivers` feature to be enabled.&quot;</span>.into(),
                 )));
             }
         }
@@ -247,7 +247,7 @@
     </span>}
 
     <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
-        <span class="kw">if </span><span class="self">self</span>.pool.is_nodejs() {
+        <span class="kw">if </span><span class="self">self</span>.pool.is_js() {
             <span class="string">&quot;@prisma/mysql&quot;
         </span>} <span class="kw">else </span>{
             <span class="string">&quot;mysql&quot;
