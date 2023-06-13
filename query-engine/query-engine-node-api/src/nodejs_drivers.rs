@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use client_drivers::{Driver, Result, ResultSet};
+use js_drivers::{Driver, Result, ResultSet};
 use napi::bindgen_prelude::Promise as JsPromise;
 use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction};
 use napi::JsObject;

@@ -155,7 +155,7 @@ impl QueryEngine {
         // Initialize the global NODEJS_QUERYABLE from fn_ctx.
         // This implies that there can only be one QueryEngine instance per process.
         if let Some(ctx) = fn_ctx {
-            client_drivers::install_driver(Arc::new(NodejsDriver::reify(ctx)?));
+            js_drivers::install_driver(Arc::new(NodejsDriver::reify(ctx)?));
         }
 
         let ConstructorOptions {

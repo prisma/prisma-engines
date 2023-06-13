@@ -9,9 +9,9 @@ crate-type = ["cdylib"]
 name = "query_engine"
 
 [features]
-default = ["client-drivers"]
+default = ["js-drivers"]
 vendored-openssl = ["sql-connector/vendored-openssl"]
-client-drivers = ["sql-connector/client-drivers", "request-handlers/client-drivers"]
+js-drivers = ["sql-connector/js-drivers", "request-handlers/js-drivers"]
 
 [dependencies]
 anyhow = "1"
@@ -23,7 +23,7 @@ user-facing-errors = { path = "../../libs/user-facing-errors" }
 psl.workspace = true
 sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector" }
 prisma-models = { path = "../prisma-models" }
-client-drivers = { path = "../client-drivers" }
+js-drivers = { path = "../js-drivers" }
 
 napi = { version = "2.12.4", default-features = false, features = ["napi8", "tokio_rt", "serde-json"] }
 napi-derive = "2.12.3"

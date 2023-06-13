@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 prisma-models = { path = "../prisma-models" }
-client-drivers = { path = "../client-drivers" }
+js-drivers = { path = "../js-drivers" }
 query-core = { path = "../core" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 psl.workspace = true
@@ -36,7 +36,7 @@ codspeed-criterion-compat = "1.1.0"
 default = ["mongodb", "sql"]
 mongodb = ["mongodb-query-connector"]
 sql = ["sql-query-connector"]
-client-drivers = ["sql-query-connector?/client-drivers"]
+js-drivers = ["sql-query-connector?/js-drivers"]
 
 [[bench]]
 name = "query_planning_bench"

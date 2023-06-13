@@ -1,4 +1,4 @@
-//! Query Engine Client-Side Driver
+//! Query Engine JavaScript Driver
 //!
 //! This crate is responsible for defining a `Queryable` + `TransactionCapable` + `Send` + `Sync` implementation that
 //! uses an external driver provided by the client and exposed via FFI (or even RPC).
