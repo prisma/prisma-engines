@@ -2,7 +2,7 @@ mod constraints;
 mod gin;
 
 use indoc::indoc;
-use schema_connector::{CompositeTypeDepth, IntrospectionContext, SchemaConnector, ConnectorParams};
+use schema_connector::{CompositeTypeDepth, ConnectorParams, IntrospectionContext, SchemaConnector};
 use sql_introspection_tests::test_api::*;
 use sql_schema_connector::SqlSchemaConnector;
 
