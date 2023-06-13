@@ -260,7 +260,6 @@
          | FieldReference
          | PostgresqlExtensions
          | ExtendedWhereUnique
-         | ClientExtensions
          | MultiSchema
          | Views
          | JsonProtocol
@@ -291,6 +290,7 @@
         | ImprovedQueryRaw
         | DataProxy
         | InteractiveTransactions
+        | ClientExtensions
     }),
     hidden: <span class="macro">enumflags2::make_bitflags!</span>(PreviewFeature::{
         NodeDrivers
