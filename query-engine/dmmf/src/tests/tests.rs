@@ -9,6 +9,26 @@ fn sqlite_ignore() {
     assert_eq!(dmmf.mappings.model_operations.len(), 1);
 }
 
+#[test]
+fn mongo_docs() {
+    let dmmf = dmmf_from_schema(include_str!("./test-schemas/mongo.prisma"));
+
+    for it in dmmf.data_model.types.iter() {
+        assert_eq!(it.name, "Post");
+        assert!(it.documentation.as_ref().is_some_and(|x| x.as_str() == "Post comment"));
+
+        let mut fields = it.fields.iter();
+        assert!(fields.any(|f| f.name == "published"
+            && f.documentation
+                .as_ref()
+                .is_some_and(|x| x.as_str() == "published comment")));
+        assert!(fields.any(|f| f.name == "authorId"
+            && f.documentation
+                .as_ref()
+                .is_some_and(|x| x.as_str() == "authorId comment")));
+    }
+}
+
 const SNAPSHOTS_PATH: &str = concat!(
     env!("CARGO_MANIFEST_DIR"),
     "/src",
