@@ -55,7 +55,8 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     SupportsTxIsolationSerializable |
     NativeUpsert |
     MultiSchema |
-    FilteredInlineChildNestedToOneDisconnect
+    FilteredInlineChildNestedToOneDisconnect |
+    InsertReturning
 });
 
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, CockroachType)] = &[
