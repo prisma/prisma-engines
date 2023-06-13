@@ -1636,6 +1636,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6c8af84674fe1f223a982c933a0ee1086ac4d4052aa0fb8060c12c6ad838e754"
 
 [[package]]
+name = "js-drivers"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "expect-test",
+ "once_cell",
+ "quaint",
+ "serde",
+ "tokio",
+]
+
+[[package]]
 name = "js-sys"
 version = "0.3.56"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3297,12 +3309,14 @@ dependencies = [
  "async-trait",
  "connection-string",
  "futures",
+ "js-drivers",
  "napi",
  "napi-build",
  "napi-derive",
  "opentelemetry",
  "prisma-models",
  "psl",
+ "quaint",
  "query-connector",
  "query-core",
  "query-engine-metrics",
@@ -3573,9 +3587,12 @@ dependencies = [
  "indexmap",
  "insta",
  "itertools",
+ "js-drivers",
  "mongodb-query-connector",
+ "once_cell",
  "prisma-models",
  "psl",
+ "quaint",
  "query-core",
  "schema",
  "serde",
@@ -4261,6 +4278,7 @@ dependencies = [
  "cuid",
  "futures",
  "itertools",
+ "js-drivers",
  "once_cell",
  "opentelemetry",
  "prisma-models",

@@ -1,0 +1,14 @@
+[package]
+name = "js-drivers"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-trait = "0.1"
+once_cell = "1.15"
+serde.workspace = true
+quaint.workspace = true
+
+[dev-dependencies]
+expect-test = "1"
+tokio.workspace = true

@@ -1,6 +1,7 @@
 mod connection;
 mod mssql;
 mod mysql;
+mod nodejs;
 mod postgresql;
 mod sqlite;
 mod transaction;
