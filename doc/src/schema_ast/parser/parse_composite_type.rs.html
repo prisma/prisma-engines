@@ -128,11 +128,6 @@
 <a href="#128" id="128">128</a>
 <a href="#129" id="129">129</a>
 <a href="#130" id="130">130</a>
-<a href="#131" id="131">131</a>
-<a href="#132" id="132">132</a>
-<a href="#133" id="133">133</a>
-<a href="#134" id="134">134</a>
-<a href="#135" id="135">135</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{
     helpers::{parsing_catch_all, Pair},
     parse_attribute::parse_attribute,
@@ -151,10 +146,9 @@
     <span class="kw">let </span>pair_span = pair.as_span();
     <span class="kw">let </span><span class="kw-2">mut </span>name: <span class="prelude-ty">Option</span>&lt;ast::Identifier&gt; = <span class="prelude-val">None</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>fields: Vec&lt;ast::Field&gt; = <span class="macro">vec!</span>[];
-    <span class="kw">let </span><span class="kw-2">mut </span>pairs = pair.into_inner();
     <span class="kw">let </span><span class="kw-2">mut </span>inner_span: <span class="prelude-ty">Option</span>&lt;Span&gt; = <span class="prelude-val">None</span>;
 
-    <span class="kw">while let </span><span class="prelude-val">Some</span>(current) = pairs.next() {
+    <span class="kw">for </span>current <span class="kw">in </span>pair.into_inner() {
         <span class="kw">match </span>current.as_rule() {
             Rule::BLOCK_OPEN | Rule::BLOCK_CLOSE =&gt; {}
             Rule::TYPE_KEYWORD =&gt; (),
@@ -240,11 +234,7 @@
                             }
                             <span class="prelude-val">Err</span>(err) =&gt; diagnostics.push_error(err),
                         },
-                        Rule::comment_block =&gt; {
-                            <span class="kw">if let </span><span class="prelude-val">Some</span>(Rule::field_declaration) = pairs.peek().map(|p| p.as_rule()) {
-                                pending_field_comment = <span class="prelude-val">Some</span>(item);
-                            }
-                        }
+                        Rule::comment_block =&gt; pending_field_comment = <span class="prelude-val">Some</span>(item),
                         Rule::BLOCK_LEVEL_CATCH_ALL =&gt; diagnostics.push_error(DatamodelError::new_validation_error(
                             <span class="string">&quot;This line is not a valid field or attribute definition.&quot;</span>,
                             item.as_span().into(),

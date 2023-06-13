@@ -403,7 +403,7 @@
             .map(composite_type_field_to_dmmf)
             .collect(),
         is_generated: <span class="prelude-val">None</span>,
-        documentation: <span class="prelude-val">None</span>,
+        documentation: ct.ast_composite_type().documentation().map(ToOwned::to_owned),
         primary_key: <span class="prelude-val">None</span>,
         unique_fields: Vec::new(),
         unique_indexes: Vec::new(),
@@ -441,7 +441,7 @@
         },
         is_generated: <span class="prelude-val">None</span>,
         is_updated_at: <span class="prelude-val">None</span>,
-        documentation: <span class="prelude-val">None</span>,
+        documentation: field.documentation().map(ToOwned::to_owned),
     }
 }
 
