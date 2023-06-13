@@ -24,17 +24,15 @@ pub(crate) async fn native_upsert(
     let where_condition = upsert.filter().aliased_condition_from(None, false, ctx);
     let update = build_update_and_set_query(upsert.model(), upsert.update().clone(), ctx).so_that(where_condition);
 
-    let insert = create_record(upsert.model(), upsert.create().clone(), ctx);
+    let insert = create_record(upsert.model(), upsert.create().clone(), &selected_fields, ctx);
 
     let constraints: Vec<_> = upsert.unique_constraints().as_columns(ctx).collect();
-    let query: Query = insert
-        .on_conflict(OnConflict::Update(update, constraints))
-        .returning(selected_fields.as_columns(ctx))
-        .into();
+    let query: Query = insert.on_conflict(OnConflict::Update(update, constraints)).into();
 
     let result_set = conn.query(query).await?;
 
     let row = result_set.into_single()?;
     let record = Record::from(row.to_sql_row(&meta)?);
+
     Ok(SingleRecord { record, field_names })
 }

@@ -143,6 +143,12 @@ pub struct Record {
     pub parent_id: Option<SelectionResult>,
 }
 
+impl From<SelectionResult> for Record {
+    fn from(selection_result: SelectionResult) -> Self {
+        Record::new(selection_result.values().collect())
+    }
+}
+
 impl Record {
     pub fn new(values: Vec<PrismaValue>) -> Record {
         Record {

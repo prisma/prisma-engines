@@ -100,7 +100,8 @@ capabilities!(
     SupportsTxIsolationRepeatableRead,
     SupportsTxIsolationSerializable,
     SupportsTxIsolationSnapshot,
-    NativeUpsert
+    NativeUpsert,
+    InsertReturning
 );
 
 /// Contains all capabilities that the connector is able to serve.

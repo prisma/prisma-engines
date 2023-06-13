@@ -100,7 +100,7 @@ impl QuerySchema {
         self.preview_features.contains(feature)
     }
 
-    pub(crate) fn has_capability(&self, capability: ConnectorCapability) -> bool {
+    pub fn has_capability(&self, capability: ConnectorCapability) -> bool {
         self.connector.has_capability(capability)
     }
 

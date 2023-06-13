@@ -180,8 +180,11 @@ impl ToGraphviz for WriteQuery {
 
 #[derive(Debug, Clone)]
 pub struct CreateRecord {
+    pub name: String,
     pub model: Model,
     pub args: WriteArgs,
+    pub selected_fields: FieldSelection,
+    pub selection_order: Vec<String>,
 }
 
 #[derive(Debug, Clone)]

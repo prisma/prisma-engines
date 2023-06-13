@@ -51,6 +51,12 @@ impl<'a> WriteArgsParser<'a> {
             },
         )
     }
+
+    pub(crate) fn has_nested_create(model: &Model, data_map: &ParsedInputMap<'a>) -> bool {
+        data_map
+            .iter()
+            .any(|(field_name, _)| model.fields().find_from_relation_fields(field_name).is_ok())
+    }
 }
 
 fn parse_scalar(sf: &ScalarFieldRef, v: ParsedInputValue<'_>) -> Result<WriteOperation, QueryGraphBuilderError> {

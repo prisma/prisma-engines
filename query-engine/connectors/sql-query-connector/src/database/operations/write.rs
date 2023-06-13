@@ -1,5 +1,7 @@
+use crate::column_metadata;
 use crate::filter_conversion::AliasedCondition;
 use crate::query_builder::write::{build_update_and_set_query, chunk_update_with_ids};
+use crate::row::ToSqlRow;
 use crate::{
     error::SqlError, model_extensions::*, query_builder::write, sql_trace::SqlTraceComment, Context, QueryExt,
     Queryable,
@@ -29,7 +31,7 @@ async fn generate_id(
     let (pk_select, need_select) = primary_key
         .selections()
         .filter_map(|field| match field {
-            SelectedField::Scalar(x) if x.default_value().is_some() && !args.has_arg_for(x.db_name()) => x
+            SelectedField::Scalar(sf) if sf.default_value().is_some() && !args.has_arg_for(sf.db_name()) => sf
                 .default_value()
                 .unwrap()
                 .to_dbgenerated_func()
@@ -67,17 +69,18 @@ pub(crate) async fn create_record(
     sql_family: &SqlFamily,
     model: &Model,
     mut args: WriteArgs,
+    selected_fields: FieldSelection,
     ctx: &Context<'_>,
-) -> crate::Result<SelectionResult> {
-    let pk = model.primary_identifier();
+) -> crate::Result<SingleRecord> {
+    let pk: FieldSelection = model.primary_identifier();
 
     let returned_id = if *sql_family == SqlFamily::Mysql {
-        generate_id(conn, &pk, &args, ctx).await?
+        generate_id(conn, &pk, &args, ctx)
+            .await?
+            .or_else(|| args.as_selection_result(pk.clone().into()))
     } else {
-        args.as_record_projection(pk.clone().into())
+        args.as_selection_result(pk.clone().into())
     };
-
-    let returned_id = returned_id.or_else(|| args.as_record_projection(pk.clone().into()));
 
     let args = match returned_id {
         Some(ref pk) if *sql_family == SqlFamily::Mysql => {
@@ -91,7 +94,7 @@ pub(crate) async fn create_record(
         _ => args,
     };
 
-    let insert = write::create_record(model, args, ctx);
+    let insert = write::create_record(model, args, &ModelProjection::from(&selected_fields), ctx);
 
     let result_set = match conn.insert(insert).await {
         Ok(id) => id,
@@ -137,16 +140,34 @@ pub(crate) async fn create_record(
     };
 
     match (returned_id, result_set.len(), result_set.last_insert_id()) {
-        // All values provided in the write arrghs
-        (Some(identifier), _, _) if !identifier.misses_autogen_value() => Ok(identifier),
-
         // with a working RETURNING statement
-        (_, n, _) if n > 0 => Ok(try_convert(&model.primary_identifier().into(), result_set)?),
+        (_, n, _) if n > 0 => {
+            let row = result_set.into_single()?;
+            let field_names: Vec<_> = selected_fields.db_names().collect();
+            let idents = ModelProjection::from(&selected_fields).type_identifiers_with_arities();
+            let meta = column_metadata::create(&field_names, &idents);
+            let sql_row = row.to_sql_row(&meta)?;
+            let record = Record::from(sql_row);
+
+            Ok(SingleRecord { record, field_names })
+        }
+
+        // All values provided in the write args
+        (Some(identifier), _, _) if !identifier.misses_autogen_value() => {
+            let field_names = identifier.db_names().map(ToOwned::to_owned).collect();
+            let record = Record::from(identifier);
+
+            Ok(SingleRecord { record, field_names })
+        }
 
         // We have an auto-incremented id that we got from MySQL or SQLite
         (Some(mut identifier), _, Some(num)) if identifier.misses_autogen_value() => {
             identifier.add_autogen_value(num as i64);
-            Ok(identifier)
+
+            let field_names = identifier.db_names().map(ToOwned::to_owned).collect();
+            let record = Record::from(identifier);
+
+            Ok(SingleRecord { record, field_names })
         }
 
         (_, _, _) => panic!("Could not figure out an ID in create"),
