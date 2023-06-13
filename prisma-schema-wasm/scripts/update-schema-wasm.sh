@@ -22,5 +22,5 @@ out=$prisma_schema_wasm_dir/nodejs $prisma_schema_wasm_dir/scripts/install.sh
 printf '%s\n' "Removing pre-existing wasm in language-tools"
 rm -rf $language_tools_node/src/*
 
-printf '%s\n' "Moving generated prisma-fmt-wasm :: engines -> language-tools"
+printf '%s\n' "Moving generated prisma-schema-wasm :: engines -> language-tools"
 cp $prisma_schema_wasm_dir/nodejs/src/prisma_schema_build{_bg.wasm,_bg.wasm.d.ts,.d.ts,.js} $language_tools_node/src

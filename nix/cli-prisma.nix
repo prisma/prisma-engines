@@ -5,7 +5,7 @@
 # See https://zimbatm.com/notes/nix-packaging-the-heretic-way for more details
 # on impure builds.
 let
-  fmt-wasm = self'.packages.prisma-schema-wasm;
+  schema-wasm = self'.packages.prisma-schema-wasm;
   version = "4.11.0";
 in
 {
