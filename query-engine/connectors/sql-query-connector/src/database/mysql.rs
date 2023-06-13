@@ -1,5 +1,5 @@
 use super::connection::SqlConnection;
-use super::nodejs::{RuntimeConnection, RuntimePool};
+use super::nodejs::RuntimePool;
 use crate::{FromSource, SqlError};
 use async_trait::async_trait;
 use connector_interface::{
@@ -7,25 +7,8 @@ use connector_interface::{
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-use quaint::{
-    pooled::{PooledConnection, Quaint},
-    prelude::ConnectionInfo,
-};
+use quaint::{pooled::Quaint, prelude::ConnectionInfo};
 use std::time::Duration;
-
-impl RuntimePool {
-    /// Reserve a connection from the pool
-    pub async fn check_out(&self) -> crate::Result<RuntimeConnection> {
-        match self {
-            Self::Rust(pool) => {
-                let conn: PooledConnection = pool.check_out().await.map_err(SqlError::from)?;
-                Ok(RuntimeConnection::Rust(conn))
-            }
-            #[cfg(feature = "nodejs-drivers")]
-            Self::NodeJS(queryable) => Ok(RuntimeConnection::NodeJS(queryable.clone())),
-        }
-    }
-}
 
 pub struct Mysql {
     pool: RuntimePool,
@@ -63,12 +46,11 @@ impl FromSource for Mysql {
         if source.provider == "@prisma/mysql" {
             #[cfg(feature = "nodejs-drivers")]
             {
-                let queryable = nodejs_drivers::installed_driver().unwrap().clone();
+                let pool = super::js::registered_driver();
                 let connection_info = get_connection_info(url)?;
-                let pool = RuntimePool::NodeJS(queryable);
 
                 return Ok(Mysql {
-                    pool,
+                    pool: RuntimePool::NodeJS(pool.unwrap().boxed()),
                     connection_info,
                     features: features.to_owned(),
                 });

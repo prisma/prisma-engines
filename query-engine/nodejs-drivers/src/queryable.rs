@@ -1,10 +1,8 @@
+use crate::driver::{self, Driver};
 use async_trait::async_trait;
-
-use crate::driver::Driver;
-
 use quaint::{
     connector::IsolationLevel,
-    prelude::{Query, Queryable as QuaintQueryable, TransactionCapable},
+    prelude::{BoxedQueryable, Query, Queryable as QuaintQueryable, TransactionCapable},
     visitor::{self, Visitor},
     Value,
 };
@@ -31,6 +29,16 @@ impl std::fmt::Display for Queryable {
 impl std::fmt::Debug for Queryable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "JSQueryable(driver)")
+    }
+}
+
+impl BoxedQueryable for Queryable {
+    fn boxed_queryable(&self) -> Box<dyn QuaintQueryable> {
+        Box::new(self.clone())
+    }
+
+    fn boxed(&self) -> Box<dyn BoxedQueryable> {
+        Box::new(self.clone())
     }
 }
 
@@ -142,20 +150,9 @@ impl QuaintQueryable for Queryable {
 
 impl TransactionCapable for Queryable {}
 
-// Global JSQueryable instance serving as a proxy to the driver implemented by NodeJSFunctionContext
-//
-// It´s unlikely that we swap implementations, nor in production code, nor in test doubles, so relying
-// on a global instance is fine.
-static QUERYABLE: once_cell::sync::OnceCell<Queryable> = once_cell::sync::OnceCell::new();
-
-pub fn install_driver(js_driver: JsObject) {
-    let driver = crate::driver::reify(js_driver).unwrap();
-    let nodejs_queryable = Queryable::new(driver);
-    QUERYABLE
-        .set(nodejs_queryable)
-        .expect("Already initialized global instance of JSQueryable");
-}
-
-pub fn installed_driver() -> Option<&'static Queryable> {
-    QUERYABLE.get()
+impl From<JsObject> for Queryable {
+    fn from(driver: JsObject) -> Self {
+        let driver = driver::reify(driver).unwrap();
+        Self { driver }
+    }
 }

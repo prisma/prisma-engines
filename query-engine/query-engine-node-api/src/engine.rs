@@ -3,6 +3,7 @@ use futures::FutureExt;
 use napi::{Env, JsFunction, JsObject, JsUnknown};
 use napi_derive::napi;
 
+use nodejs_drivers::Queryable;
 use psl::PreviewFeature;
 use query_core::{
     protocol::EngineProtocol,
@@ -147,15 +148,19 @@ impl QueryEngine {
         napi_env: Env,
         options: JsUnknown,
         callback: JsFunction,
-        fn_ctx: Option<JsObject>,
+        maybe_driver: Option<JsObject>,
     ) -> napi::Result<Self> {
         let log_callback = LogCallback::new(napi_env, callback)?;
         log_callback.unref(&napi_env)?;
 
         // Initialize the global NODEJS_QUERYABLE from fn_ctx.
         // This implies that there can only be one QueryEngine instance per process.
-        if let Some(ctx) = fn_ctx {
-            nodejs_drivers::install_driver(ctx);
+        if let Some(driver) = maybe_driver {
+            let queryable = Queryable::from(driver);
+            #[cfg(feature = "nodejs-drivers")]
+            {
+                sql_connector::register_driver(Box::new(queryable));
+            }
         }
 
         let ConstructorOptions {
