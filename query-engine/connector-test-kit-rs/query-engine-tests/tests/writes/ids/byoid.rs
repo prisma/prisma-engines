@@ -56,7 +56,7 @@ mod byoid {
 
         let error_target = match runner.connector_version() {
             query_engine_tests::ConnectorVersion::MySql(_) => "constraint: `PRIMARY`",
-            query_engine_tests::ConnectorVersion::Vitess(_) => "(not available)",
+            query_engine_tests::ConnectorVersion::Vitess(_) => "MISSING",
             _ => "fields: (`id`)",
         };
 
@@ -84,7 +84,7 @@ mod byoid {
 
         let error_target = match runner.connector_version() {
             ConnectorVersion::MySql(_) => "constraint: `PRIMARY`",
-            ConnectorVersion::Vitess(_) => "(not available)",
+            ConnectorVersion::Vitess(_) => "MISSING",
             _ => "fields: (`id`)",
         };
 
@@ -142,7 +142,7 @@ mod byoid {
 
         let error_target = match runner.connector_version() {
             ConnectorVersion::MySql(_) => "constraint: `PRIMARY`",
-            ConnectorVersion::Vitess(_) => "(not available)",
+            ConnectorVersion::Vitess(_) => "MISSING",
             _ => "fields: (`id`)",
         };
 
@@ -170,7 +170,7 @@ mod byoid {
 
         let error_target = match runner.connector_version() {
             ConnectorVersion::MySql(_) => "constraint: `PRIMARY`",
-            ConnectorVersion::Vitess(_) => "(not available)",
+            ConnectorVersion::Vitess(_) => "MISSING",
             _ => "fields: (`id`)",
         };
 

@@ -53,7 +53,7 @@ impl fmt::Display for Name {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Available(name) => name.fmt(f),
-            Self::Unavailable => write!(f, "(not available)"),
+            Self::Unavailable => write!(f, "THIS SHOULD BE SOMETHING ELSE (error.rs, Display, Name, Unavailable"),
         }
     }
 }

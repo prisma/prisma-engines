@@ -46,7 +46,7 @@ impl ConnectorError {
                     DatabaseConstraint::Fields(fields) => fields.join(","),
                     DatabaseConstraint::Index(index) => format!("{index} (index)"),
                     DatabaseConstraint::ForeignKey => "foreign key".to_string(),
-                    DatabaseConstraint::CannotParse => "(not available)".to_string(),
+                    DatabaseConstraint::CannotParse => "THIS SHOULD BE SOMETHING ELSE (error.rs, CannotParse)".to_string(),
                 };
 
                 Some(KnownError::new(user_facing_errors::query_engine::ForeignKeyViolation {

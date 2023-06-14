@@ -883,7 +883,7 @@ fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: TestApi
     let json_error = serde_json::to_value(&res).unwrap();
 
     let expected_msg = if api.is_vitess() {
-        "Unique constraint failed on the (not available)"
+        "Unique constraint failed on the MISSING"
     } else if api.is_mysql() || api.is_mssql() {
         "Unique constraint failed on the constraint: `Fruit_name_key`"
     } else {
