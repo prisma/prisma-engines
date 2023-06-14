@@ -1,4 +1,4 @@
-#[cfg(feature = "nodejs-drivers")]
+#[cfg(feature = "js-drivers")]
 pub mod js;
 mod runtime;
 
