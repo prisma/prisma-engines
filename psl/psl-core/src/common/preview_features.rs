@@ -120,6 +120,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | ImprovedQueryRaw
         | DataProxy
         | InteractiveTransactions
+        | ClientExtensions
         | OrderByNulls
     }),
     hidden: enumflags2::make_bitflags!(PreviewFeature::{
