@@ -1,7 +1,8 @@
-use crate::{error::ApiError, log_callback::LogCallback, logger::Logger};
+use crate::{error::ApiError, log_callback::LogCallback, logger::Logger, nodejs_drivers::NodejsDriver};
 use futures::FutureExt;
-use napi::{Env, JsFunction, JsUnknown};
+use napi::{Env, JsFunction, JsObject, JsUnknown};
 use napi_derive::napi;
+
 use psl::PreviewFeature;
 use query_core::{
     protocol::EngineProtocol,
@@ -138,10 +139,24 @@ impl Inner {
 #[napi]
 impl QueryEngine {
     /// Parse a validated datamodel and configuration to allow connecting later on.
+    /// Note: any new method added to this struct should be added to
+    /// `query_engine_node_api::node_drivers::engine::QueryEngineNodeDrivers` as well.
+    /// Unfortunately the `#[napi]` macro does not support deriving traits.
     #[napi(constructor)]
-    pub fn new(napi_env: Env, options: JsUnknown, callback: JsFunction) -> napi::Result<Self> {
+    pub fn new(
+        napi_env: Env,
+        options: JsUnknown,
+        callback: JsFunction,
+        fn_ctx: Option<JsObject>,
+    ) -> napi::Result<Self> {
         let log_callback = LogCallback::new(napi_env, callback)?;
         log_callback.unref(&napi_env)?;
+
+        // Initialize the global NODEJS_QUERYABLE from fn_ctx.
+        // This implies that there can only be one QueryEngine instance per process.
+        if let Some(ctx) = fn_ctx {
+            js_drivers::install_driver(Arc::new(NodejsDriver::reify(ctx)?));
+        }
 
         let ConstructorOptions {
             datamodel,
@@ -310,6 +325,8 @@ impl QueryEngine {
             let span = tracing::info_span!("prisma:engine:disconnect");
             let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
 
+            // TODO: when using Node Drivers, we need to call Driver::close() here.
+
             async {
                 let mut inner = self.inner.write().await;
                 let engine = inner.as_engine()?;
@@ -470,7 +487,7 @@ impl QueryEngine {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
 
-            Ok(render_graphql_schema(engine.query_schema().clone()))
+            Ok(render_graphql_schema(engine.query_schema()))
         })
         .await
     }

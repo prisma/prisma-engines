@@ -23,7 +23,8 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     BackwardCompatibleQueryRaw |
     OrderByNullsFirstLast |
     SupportsTxIsolationSerializable |
-    NativeUpsert
+    NativeUpsert |
+    FilteredInlineChildNestedToOneDisconnect
 });
 
 pub struct SqliteDatamodelConnector;

@@ -2,8 +2,8 @@ use super::*;
 
 #[derive(Debug)]
 pub enum GqlTypeRenderer<'a> {
-    Input(&'a InputType),
-    Output(&'a OutputType),
+    Input(InputType<'a>),
+    Output(OutputType<'a>),
 }
 
 impl<'a> Renderer for GqlTypeRenderer<'a> {
@@ -17,15 +17,14 @@ impl<'a> Renderer for GqlTypeRenderer<'a> {
 
 #[allow(clippy::only_used_in_recursion)]
 impl<'a> GqlTypeRenderer<'a> {
-    fn render_input_type(&self, i: &InputType, ctx: &mut RenderContext) -> String {
+    fn render_input_type(&self, i: &InputType<'a>, ctx: &mut RenderContext) -> String {
         match i {
-            InputType::Object(ref obj) => {
-                let _ = obj.as_renderer().render(ctx);
-                ctx.query_schema.db[*obj].identifier.name()
+            InputType::Object(obj) => {
+                obj.as_renderer().render(ctx);
+                obj.identifier.name()
             }
 
             InputType::Enum(et) => {
-                let et = &ctx.query_schema.db[*et];
                 et.as_renderer().render(ctx);
                 et.identifier().name()
             }
@@ -47,7 +46,6 @@ impl<'a> GqlTypeRenderer<'a> {
                     ScalarType::Json => "Json",
                     ScalarType::UUID => "UUID",
                     ScalarType::JsonList => "Json",
-                    ScalarType::Xml => "Xml",
                     ScalarType::Bytes => "Bytes",
                     ScalarType::Null => unreachable!("Null types should not be picked for GQL rendering."),
                 };
@@ -57,25 +55,24 @@ impl<'a> GqlTypeRenderer<'a> {
         }
     }
 
-    fn render_output_type(&self, o: &OutputType, ctx: &mut RenderContext) -> String {
-        match o {
-            OutputType::Object(obj) => {
-                let _ = obj.as_renderer().render(ctx);
-                ctx.query_schema.db[*obj].identifier.name()
+    fn render_output_type(&self, o: &OutputType<'a>, ctx: &mut RenderContext) -> String {
+        if o.is_list() {
+            let substring = self.render_output_type(&OutputType::non_list(o.inner.clone()), ctx);
+            return format!("[{substring}]");
+        }
+
+        match &o.inner {
+            InnerOutputType::Object(obj) => {
+                obj.as_renderer().render(ctx);
+                obj.name()
             }
 
-            OutputType::Enum(et) => {
-                let et = &ctx.query_schema.db[*et];
+            InnerOutputType::Enum(et) => {
                 et.as_renderer().render(ctx);
                 et.identifier().name()
             }
 
-            OutputType::List(l) => {
-                let substring = self.render_output_type(l, ctx);
-                format!("[{substring}]")
-            }
-
-            OutputType::Scalar(ref scalar) => {
+            InnerOutputType::Scalar(ref scalar) => {
                 let stringified = match scalar {
                     ScalarType::String => "String",
                     ScalarType::Int => "Int",
@@ -87,7 +84,6 @@ impl<'a> GqlTypeRenderer<'a> {
                     ScalarType::Json => "Json",
                     ScalarType::UUID => "UUID",
                     ScalarType::JsonList => "Json",
-                    ScalarType::Xml => "Xml",
                     ScalarType::Bytes => "Bytes",
                     ScalarType::Null => unreachable!("Null types should not be picked for GQL rendering."),
                 };

@@ -20,6 +20,7 @@ mod value;
 mod value_ext;
 
 use self::{column_metadata::*, context::Context, filter_conversion::*, query_ext::QueryExt, row::*};
+use quaint::prelude::Queryable;
 
 pub use database::{FromSource, Mssql, Mysql, PostgreSql, Sqlite};
 pub use error::SqlError;

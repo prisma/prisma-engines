@@ -3,16 +3,15 @@ use crate::{
     filter_conversion::AliasedCondition,
     model_extensions::AsColumns,
     query_builder::write::{build_update_and_set_query, create_record},
-    query_ext::QueryExt,
     row::ToSqlRow,
-    Context,
+    Context, Queryable,
 };
 use connector_interface::NativeUpsert;
 use prisma_models::{ModelProjection, Record, SingleRecord};
 use quaint::prelude::{OnConflict, Query};
 
 pub(crate) async fn native_upsert(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     upsert: NativeUpsert,
     ctx: &Context<'_>,
 ) -> crate::Result<SingleRecord> {

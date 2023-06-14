@@ -2,7 +2,7 @@ use quaint::{pooled::Quaint, prelude::Queryable};
 use std::time::Instant;
 
 #[tokio::main]
-async fn main() -> () {
+async fn main() {
     let url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set to a quaint-compatible database URL");
     let start = Instant::now();
 

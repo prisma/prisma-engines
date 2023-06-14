@@ -90,7 +90,6 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
          | FieldReference
          | PostgresqlExtensions
          | ExtendedWhereUnique
-         | ClientExtensions
          | MultiSchema
          | Views
          | JsonProtocol
@@ -122,6 +121,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | DataProxy
         | InteractiveTransactions
         | FilteredRelationCount
+        | ClientExtensions
     }),
     hidden: enumflags2::make_bitflags!(PreviewFeature::{
         NodeDrivers

@@ -1,21 +1,21 @@
 use crate::*;
 use psl::parser_database::ScalarFieldType;
-use std::collections::BTreeSet;
 
 #[derive(Debug, Clone)]
-pub struct Fields {
-    model: Model,
+pub struct Fields<'a> {
+    model: &'a Model,
 }
 
-impl Fields {
-    pub(crate) fn new(model: Model) -> Fields {
+impl<'a> Fields<'a> {
+    pub(crate) fn new(model: &'a Model) -> Fields<'a> {
         Fields { model }
     }
 
-    pub fn id_fields(&self) -> Option<impl Iterator<Item = ScalarFieldRef> + Clone + '_> {
-        self.model.walker().primary_key().map(|pk| {
+    pub fn id_fields(&self) -> Option<impl Iterator<Item = ScalarFieldRef> + Clone + 'a> {
+        let dm = &self.model.dm;
+        self.model.walker().primary_key().map(move |pk| {
             pk.fields()
-                .map(move |field| self.model.dm.clone().zip(ScalarFieldId::InModel(field.id)))
+                .map(move |field| dm.clone().zip(ScalarFieldId::InModel(field.id)))
         })
     }
 
@@ -30,11 +30,11 @@ impl Fields {
             })
     }
 
-    pub fn updated_at(&self) -> impl Iterator<Item = ScalarFieldRef> {
-        self.scalar().into_iter().filter(|sf| sf.is_updated_at())
+    pub fn updated_at(&self) -> impl Iterator<Item = ScalarFieldRef> + 'a {
+        self.scalar().filter(|sf| sf.is_updated_at())
     }
 
-    pub fn scalar(&self) -> Vec<ScalarFieldRef> {
+    pub fn scalar(&self) -> impl Iterator<Item = ScalarFieldRef> + Clone + 'a {
         self.model
             .dm
             .walk(self.model.id)
@@ -46,17 +46,15 @@ impl Fields {
                 )
             })
             .map(|rf| self.model.dm.clone().zip(ScalarFieldId::InModel(rf.id)))
-            .collect()
     }
 
-    pub fn relation(&self) -> Vec<RelationFieldRef> {
+    pub fn relation(&self) -> impl Iterator<Item = RelationFieldRef> + 'a {
         self.model
             .dm
             .walk(self.model.id)
             .relation_fields()
             .filter(|rf| !rf.relation().is_ignored())
             .map(|rf| self.model.dm.clone().zip(rf.id))
-            .collect()
     }
 
     pub fn composite(&self) -> Vec<CompositeFieldRef> {
@@ -71,16 +69,8 @@ impl Fields {
 
     pub fn non_relational(&self) -> Vec<Field> {
         self.scalar()
-            .into_iter()
             .map(Field::from)
             .chain(self.composite().into_iter().map(Field::from))
-            .collect()
-    }
-
-    pub fn find_many_from_scalar(&self, names: &BTreeSet<String>) -> Vec<ScalarFieldRef> {
-        self.scalar()
-            .into_iter()
-            .filter(|field| names.contains(field.name()))
             .collect()
     }
 
@@ -107,7 +97,6 @@ impl Fields {
     /// purely virtual on a model.
     pub fn find_from_non_virtual_by_db_name(&self, db_name: &str) -> crate::Result<Field> {
         self.filter_all(|f| f.db_name() == db_name)
-            .into_iter()
             .next()
             .ok_or_else(|| DomainError::FieldNotFound {
                 name: db_name.to_string(),
@@ -118,7 +107,6 @@ impl Fields {
 
     pub fn find_from_scalar(&self, name: &str) -> crate::Result<ScalarFieldRef> {
         self.scalar()
-            .into_iter()
             .find(|field| field.name() == name)
             .ok_or_else(|| DomainError::ScalarFieldNotFound {
                 name: name.to_string(),
@@ -127,13 +115,12 @@ impl Fields {
             })
     }
 
-    fn model(&self) -> &ModelRef {
-        &self.model
+    fn model(&self) -> &Model {
+        self.model
     }
 
     pub fn find_from_relation_fields(&self, name: &str) -> Result<RelationFieldRef> {
         self.relation()
-            .into_iter()
             .find(|field| field.name() == name)
             .ok_or_else(|| DomainError::RelationFieldNotFound {
                 name: name.to_string(),
@@ -141,22 +128,25 @@ impl Fields {
             })
     }
 
-    pub fn filter_all<P>(&self, predicate: P) -> Vec<Field>
-    where
-        P: Fn(&&Field) -> bool,
-    {
-        let model_walker = self.model.walker();
+    pub fn all(&self) -> impl Iterator<Item = Field> + 'a {
+        let dm = &self.model.dm;
+        let model_walker = dm.walk(self.model.id);
         model_walker
             .scalar_fields()
             .filter(|f| !f.is_ignored() && !f.is_unsupported())
-            .map(|w| Field::from((self.model.dm.clone(), w)))
+            .map(|w| Field::from((dm.clone(), w)))
             .chain(
                 model_walker
                     .relation_fields()
                     .filter(|rf| !rf.relation().is_ignored())
-                    .map(|w| Field::from((self.model.dm.clone(), w))),
+                    .map(|w| Field::from((dm.clone(), w))),
             )
-            .filter(|f| predicate(&f))
-            .collect()
+    }
+
+    pub fn filter_all<P>(&self, predicate: P) -> impl Iterator<Item = Field> + 'a
+    where
+        P: Fn(&&Field) -> bool + 'a,
+    {
+        self.all().filter(move |f| predicate(&f))
     }
 }

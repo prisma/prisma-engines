@@ -65,7 +65,6 @@ impl<'a> DefaultValuePair<'a> {
             (Some(sql::DefaultKind::Value(PrismaValue::Null)), _) => Some(DefaultKind::Constant(&"null")),
             (Some(sql::DefaultKind::Value(PrismaValue::String(val))), _) => Some(DefaultKind::String(val)),
             (Some(sql::DefaultKind::Value(PrismaValue::Json(val))), _) => Some(DefaultKind::String(val)),
-            (Some(sql::DefaultKind::Value(PrismaValue::Xml(val))), _) => Some(DefaultKind::String(val)),
 
             (Some(sql::DefaultKind::Value(PrismaValue::Boolean(val))), _) => Some(DefaultKind::Constant(val)),
             (Some(sql::DefaultKind::Value(PrismaValue::Enum(variant))), sql::ColumnTypeFamily::Enum(enum_id)) => {
@@ -95,7 +94,7 @@ impl<'a> DefaultValuePair<'a> {
 
             (Some(sql::DefaultKind::Value(PrismaValue::List(vals))), _) => match vals.first() {
                 None => Some(DefaultKind::ConstantList(Vec::new())),
-                Some(PrismaValue::String(_) | PrismaValue::Xml(_) | PrismaValue::Json(_)) => {
+                Some(PrismaValue::String(_) | PrismaValue::Json(_)) => {
                     let vals = vals.iter().filter_map(|val| val.as_string()).collect();
                     Some(DefaultKind::StringList(vals))
                 }
@@ -122,7 +121,7 @@ impl<'a> DefaultValuePair<'a> {
                 _ => unreachable!(),
             },
 
-            (None, sql::ColumnTypeFamily::String) => match self.previous {
+            (None, sql::ColumnTypeFamily::String | sql::ColumnTypeFamily::Uuid) => match self.previous {
                 Some(previous) if previous.is_cuid() => Some(DefaultKind::Cuid),
                 Some(previous) if previous.is_uuid() => Some(DefaultKind::Uuid),
                 Some(previous) if previous.is_nanoid() => {

@@ -1,5 +1,5 @@
 use connector::{AggregationRow, RelAggregationRow};
-use prisma_models::{ManyRecords, ModelRef, SelectionResult};
+use prisma_models::{ManyRecords, Model, SelectionResult};
 
 #[derive(Debug, Clone)]
 pub(crate) enum QueryResult {
@@ -28,7 +28,7 @@ pub struct RecordSelection {
     pub(crate) nested: Vec<QueryResult>,
 
     /// The model of the contained records.
-    pub(crate) model: ModelRef,
+    pub(crate) model: Model,
 
     /// Holds an ordered list of aggregation selections results for each contained record
     pub(crate) aggregation_rows: Option<Vec<RelAggregationRow>>,
