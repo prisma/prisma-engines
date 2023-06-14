@@ -43,7 +43,7 @@ impl QuaintQueryable for Queryable {
 
     /// Execute a query given as SQL, interpolating the given parameters.
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<quaint::prelude::ResultSet> {
-        println!("JSQueryable::query_raw({}, {:?})", &sql, params);
+        println!("JSQueryable::query_raw()");
 
         // Note: we ignore the parameters for now.
         // Todo: convert napi::Error to quaint::error::Error.
@@ -73,7 +73,7 @@ impl QuaintQueryable for Queryable {
     /// Execute a query given as SQL, interpolating the given parameters and
     /// returning the number of affected rows.
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
-        println!("JSQueryable::execute_raw({}, {:?})", &sql, &params);
+        println!("JSQueryable::execute_raw()");
 
         // Note: we ignore the parameters for now.
         // Todo: convert napi::Error to quaint::error::Error.
@@ -89,7 +89,7 @@ impl QuaintQueryable for Queryable {
     ///
     /// NOTE: This method will eventually be removed & merged into Queryable::query_raw().
     async fn execute_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
-        println!("JSQueryable::execute_raw_typed({}, {:?})", &sql, &params);
+        println!("JSQueryable::execute_raw_typed()");
         self.execute_raw(sql, params).await
     }
 
