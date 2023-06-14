@@ -18,4 +18,4 @@ printf '%s\n' " -> Generating node package"
 wasm-bindgen \
   --target nodejs \
   --out-dir "$out"/src \
-  target/wasm32-unknown-unknown/release/prisma_fmt_build.wasm
+  target/wasm32-unknown-unknown/release/prisma_schema_build.wasm
