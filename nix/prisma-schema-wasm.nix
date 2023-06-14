@@ -12,7 +12,7 @@ in
     nativeBuildInputs = with pkgs; [ git wasm-bindgen-cli toolchain ];
     inherit (self'.packages.prisma-engines) configurePhase src;
 
-    buildPhase = "cargo build --release --target=wasm32-unknown-unknown -p prisma-fmt-build";
+    buildPhase = "cargo build --release --target=wasm32-unknown-unknown -p prisma-schema-build";
     installPhase = readFile "${scriptsDir}/install.sh";
   };
 
