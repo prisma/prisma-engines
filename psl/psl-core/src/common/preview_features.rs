@@ -86,8 +86,6 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
          | FullTextIndex
          | Tracing
          | Metrics
-         | OrderByNulls
-         | FilteredRelationCount
          | FieldReference
          | PostgresqlExtensions
          | ExtendedWhereUnique
@@ -122,6 +120,8 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | DataProxy
         | InteractiveTransactions
         | ClientExtensions
+        | FilteredRelationCount
+        | OrderByNulls
     }),
     hidden: enumflags2::make_bitflags!(PreviewFeature::{
         NodeDrivers
