@@ -90,7 +90,6 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
          | FieldReference
          | PostgresqlExtensions
          | ExtendedWhereUnique
-         | ClientExtensions
          | MultiSchema
          | Views
          | JsonProtocol
