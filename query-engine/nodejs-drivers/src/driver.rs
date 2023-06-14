@@ -138,44 +138,27 @@ impl From<ResultSet> for QuaintResultSet {
 
 impl Driver {
     pub async fn query_raw(&self, params: Query) -> napi::Result<ResultSet> {
-        println!("[rs] calling query_raw: {:?}", &params);
-
         let promise = self.query_raw.call_async::<JsPromise<ResultSet>>(params).await?;
-
-        println!("[rs] awaiting promise");
         let value = promise.await?;
-
-        println!("[rs] awaited: {:?}", &value);
         Ok(value)
     }
 
     pub async fn execute_raw(&self, params: Query) -> napi::Result<u32> {
-        println!("[rs] calling execute_raw: {:?}", &params);
         let promise = self.execute_raw.call_async::<JsPromise<u32>>(params).await?;
-
-        println!("[rs] awaiting promise");
         let value = promise.await?;
-        println!("[rs] got awaited value: {:?}", &value);
         Ok(value)
     }
 
     pub async fn version(&self) -> napi::Result<Option<String>> {
-        println!("[rs] calling version");
-
         let version = self.version.call_async::<Option<String>>(()).await?;
-        println!("[rs] version: {:?}", &version);
-
         Ok(version)
     }
 
     pub async fn close(&self) -> napi::Result<()> {
-        println!("[rs] calling close");
         self.close.call_async::<()>(()).await
     }
 
     pub fn is_healthy(&self) -> napi::Result<bool> {
-        println!("[rs] calling is_healthy");
-
         // TODO: call `is_healthy` in a blocking fashion, returning its result as a boolean.
         unimplemented!();
     }
