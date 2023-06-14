@@ -255,7 +255,6 @@
          | FullTextIndex
          | Tracing
          | Metrics
-         | OrderByNulls
          | FieldReference
          | PostgresqlExtensions
          | ExtendedWhereUnique
@@ -289,8 +288,9 @@
         | ImprovedQueryRaw
         | DataProxy
         | InteractiveTransactions
-        | FilteredRelationCount
         | ClientExtensions
+        | FilteredRelationCount
+        | OrderByNulls
     }),
     hidden: <span class="macro">enumflags2::make_bitflags!</span>(PreviewFeature::{
         NodeDrivers
