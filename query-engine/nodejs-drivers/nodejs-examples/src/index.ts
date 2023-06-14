@@ -36,10 +36,10 @@ async function main() {
   // I assume nobody will run this on Windows ¯\_(ツ)_/¯
   const libExt = os.platform() === 'darwin' ? 'dylib' : 'so'
   const libQueryEnginePath = path.join(__dirname, `../../../../target/debug/libquery_engine.${libExt}`)
-  
+
   const schemaPath = path.join(__dirname, `../prisma/schema.prisma`)
 
-  const libqueryEngine = { exports: {} as unknown as Library} 
+  const libqueryEngine = { exports: {} as unknown as Library }
   // @ts-ignore
   process.dlopen(libqueryEngine, libQueryEnginePath)
 
@@ -64,7 +64,7 @@ async function main() {
   await engine.connect('trace')
   console.log('[nodejs] connected')
 
-  const resultSet = await engine.query(`{
+  let resultSet = await engine.query(`{
     "modelName": "some_user",
     "action": "findMany",
     "query": {
@@ -76,7 +76,21 @@ async function main() {
       } 
     }`, 'trace', undefined)
 
-  console.log('[nodejs] resultSet', resultSet)
+  console.log('[nodejs] findMany resultSet', resultSet)
+
+  resultSet = await engine.query(`{
+    "modelName": "some_user",
+    "action": "findFirst",
+    "query": {
+        "selection": {
+          "id": true,
+          "firstname": true,
+          "company_id": true
+        }
+      } 
+    }`, 'trace', undefined)
+
+  console.log('[nodejs] findFirst resultSet', resultSet)
 
   // Note: calling `engine.disconnect` won't actually close the database connection.
   console.log('[nodejs] disconnecting...')
