@@ -2,7 +2,7 @@ use crate::driver::{self, Driver, Query};
 use async_trait::async_trait;
 use quaint::{
     connector::IsolationLevel,
-    prelude::{Query as QuaintQuery, Queryable as QuaintQueryable, TransactionCapable},
+    prelude::{Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable},
     visitor::{self, Visitor},
     Value,
 };
@@ -35,16 +35,16 @@ impl std::fmt::Debug for Queryable {
 #[async_trait]
 impl QuaintQueryable for Queryable {
     /// Execute the given query.
-    async fn query(&self, q: QuaintQuery<'_>) -> quaint::Result<quaint::prelude::ResultSet> {
+    async fn query(&self, q: QuaintQuery<'_>) -> quaint::Result<ResultSet> {
         let (sql, params) = visitor::Mysql::build(q)?;
         self.query_raw(&sql, &params).await
     }
 
     /// Execute a query given as SQL, interpolating the given parameters.
-    async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<quaint::prelude::ResultSet> {
+    async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
         // Note: we ignore the parameters for now.
         // Todo: convert napi::Error to quaint::error::Error.
-        let result_set = self.driver.query_raw((sql, params).into()).await.unwrap();
+        let result_set = self.driver.query_raw(Query::from((sql, params))).await.unwrap();
 
         Ok(result_set.into())
     }
@@ -55,7 +55,7 @@ impl QuaintQueryable for Queryable {
     /// instead of letting Postgres infer them based on their usage in the SQL query.
     ///
     /// NOTE: This method will eventually be removed & merged into Queryable::query_raw().
-    async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<quaint::prelude::ResultSet> {
+    async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
         self.query_raw(sql, params).await
     }
 

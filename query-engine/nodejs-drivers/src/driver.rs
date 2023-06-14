@@ -66,7 +66,7 @@ pub fn reify(js_driver: JsObject) -> napi::Result<Driver> {
 //
 #[napi(object)]
 #[derive(Debug)]
-pub struct ResultSet {
+pub struct JSResultSet {
     pub column_types: Vec<ColumnType>,
     pub column_names: Vec<String>,
     // Note this might be encoded differently for performance reasons
@@ -100,8 +100,8 @@ pub struct Query {
     pub args: Vec<serde_json::Value>,
 }
 
-impl From<ResultSet> for QuaintResultSet {
-    fn from(mut val: ResultSet) -> Self {
+impl From<JSResultSet> for QuaintResultSet {
+    fn from(mut val: JSResultSet) -> Self {
         // TODO: extract, todo: error rather than panic?
         let to_quaint_row = move |row: &mut Vec<serde_json::Value>| -> Vec<quaint::Value<'static>> {
             let mut res = Vec::with_capacity(row.len());
@@ -137,8 +137,8 @@ impl From<ResultSet> for QuaintResultSet {
 }
 
 impl Driver {
-    pub async fn query_raw(&self, params: Query) -> napi::Result<ResultSet> {
-        let promise = self.query_raw.call_async::<JsPromise<ResultSet>>(params).await?;
+    pub async fn query_raw(&self, params: Query) -> napi::Result<JSResultSet> {
+        let promise = self.query_raw.call_async::<JsPromise<JSResultSet>>(params).await?;
         let value = promise.await?;
         Ok(value)
     }
