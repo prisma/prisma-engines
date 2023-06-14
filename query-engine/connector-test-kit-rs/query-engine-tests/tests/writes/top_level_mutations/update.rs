@@ -137,9 +137,9 @@ mod update {
         insta::assert_snapshot!(
           run_query!(&runner, r#"query {
             findManyTestModel(
-              where: { AND: [{updatedAt_w_default: { gt: { _ref: "createdAt" } }},
-                             {updatedAt_wo_default: { gt: { _ref: "createdAt" } }},
-                             {updatedAt_wo_default: { equals: { _ref: "updatedAt_w_default" } }}
+              where: { AND: [{updatedAt_w_default: { gt: { _ref: "createdAt", _container: "TestModel" } }},
+                             {updatedAt_wo_default: { gt: { _ref: "createdAt", _container: "TestModel" } }},
+                             {updatedAt_wo_default: { equals: { _ref: "updatedAt_w_default", _container: "TestModel" } }}
                      ]}
             ) {
               id
