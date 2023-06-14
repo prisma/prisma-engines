@@ -44,10 +44,12 @@ fn connecting_to_a_postgres_database_with_missing_schema_creates_it(api: TestApi
 
         url.set_query(Some(new_qs.trim_end_matches('&')));
 
+        let provider = api.provider();
+
         let schema = format!(
             r#"
                 datasource db {{
-                    provider = "postgresql"
+                    provider = "{provider}"
                     url = "{url}"
                 }}
                 "#
