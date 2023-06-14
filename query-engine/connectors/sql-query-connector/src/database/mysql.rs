@@ -59,7 +59,7 @@ impl FromSource for Mysql {
             #[cfg(not(feature = "js-drivers"))]
             {
                 return Err(ConnectorError::from_kind(ErrorKind::UnsupportedConnector(
-                    "The @prisma/mysql connector requires the `js-drivers` feature to be enabled.".into(),
+                    "The @prisma/mysql connector requires the `nodeDrivers` preview feature to be enabled.".into(),
                 )));
             }
         }
