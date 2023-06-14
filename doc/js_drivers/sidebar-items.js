@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["install_driver","installed_driver"],"struct":["Queryable","ResultSet"],"trait":["Driver"],"type":["Error","Result"]};

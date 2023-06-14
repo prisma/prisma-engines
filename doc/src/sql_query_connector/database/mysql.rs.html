@@ -110,26 +110,8 @@
 <a href="#110" id="110">110</a>
 <a href="#111" id="111">111</a>
 <a href="#112" id="112">112</a>
-<a href="#113" id="113">113</a>
-<a href="#114" id="114">114</a>
-<a href="#115" id="115">115</a>
-<a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-<a href="#121" id="121">121</a>
-<a href="#122" id="122">122</a>
-<a href="#123" id="123">123</a>
-<a href="#124" id="124">124</a>
-<a href="#125" id="125">125</a>
-<a href="#126" id="126">126</a>
-<a href="#127" id="127">127</a>
-<a href="#128" id="128">128</a>
-<a href="#129" id="129">129</a>
-<a href="#130" id="130">130</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::connection::SqlConnection;
-<span class="kw">use </span><span class="kw">super</span>::nodejs::{RuntimeConnection, RuntimePool};
+<span class="kw">use </span><span class="kw">super</span>::nodejs::RuntimePool;
 <span class="kw">use crate</span>::{FromSource, SqlError};
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>connector_interface::{
@@ -137,25 +119,8 @@
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-<span class="kw">use </span>quaint::{
-    pooled::{PooledConnection, Quaint},
-    prelude::ConnectionInfo,
-};
+<span class="kw">use </span>quaint::{pooled::Quaint, prelude::ConnectionInfo};
 <span class="kw">use </span>std::time::Duration;
-
-<span class="kw">impl </span>RuntimePool {
-    <span class="doccomment">/// Reserve a connection from the pool
-    </span><span class="kw">pub async fn </span>check_out(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;RuntimeConnection&gt; {
-        <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Rust(pool) =&gt; {
-                <span class="kw">let </span>conn: PooledConnection = pool.check_out().<span class="kw">await</span>.map_err(SqlError::from)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(RuntimeConnection::Rust(conn))
-            }
-            <span class="attr">#[cfg(feature = <span class="string">&quot;js-drivers&quot;</span>)]
-            </span><span class="self">Self</span>::JS(queryable) =&gt; <span class="prelude-val">Ok</span>(RuntimeConnection::JS(queryable.clone())),
-        }
-    }
-}
 
 <span class="kw">pub struct </span>Mysql {
     pool: RuntimePool,
@@ -191,23 +156,22 @@
         features: psl::PreviewFeatures,
     ) -&gt; connector_interface::Result&lt;Mysql&gt; {
         <span class="kw">if </span>source.provider == <span class="string">&quot;@prisma/mysql&quot; </span>{
-            <span class="attr">#[cfg(feature = <span class="string">&quot;js-drivers&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">&quot;nodejs-drivers&quot;</span>)]
             </span>{
-                <span class="kw">let </span>queryable = js_drivers::installed_driver().unwrap().clone();
+                <span class="kw">let </span>driver = <span class="kw">super</span>::js::registered_driver();
                 <span class="kw">let </span>connection_info = get_connection_info(url)<span class="question-mark">?</span>;
-                <span class="kw">let </span>pool = RuntimePool::JS(queryable);
 
                 <span class="kw">return </span><span class="prelude-val">Ok</span>(Mysql {
-                    pool,
+                    pool: RuntimePool::NodeJS(driver.unwrap().clone()),
                     connection_info,
                     features: features.to_owned(),
                 });
             }
 
-            <span class="attr">#[cfg(not(feature = <span class="string">&quot;js-drivers&quot;</span>))]
+            <span class="attr">#[cfg(not(feature = <span class="string">&quot;nodejs-drivers&quot;</span>))]
             </span>{
                 <span class="kw">return </span><span class="prelude-val">Err</span>(ConnectorError::from_kind(ErrorKind::UnsupportedConnector(
-                    <span class="string">&quot;The @prisma/mysql connector requires the `js-drivers` feature to be enabled.&quot;</span>.into(),
+                    <span class="string">&quot;The @prisma/mysql connector requires the `nodejs-drivers` feature to be enabled.&quot;</span>.into(),
                 )));
             }
         }
@@ -247,7 +211,7 @@
     </span>}
 
     <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
-        <span class="kw">if </span><span class="self">self</span>.pool.is_js() {
+        <span class="kw">if </span><span class="self">self</span>.pool.is_nodejs() {
             <span class="string">&quot;@prisma/mysql&quot;
         </span>} <span class="kw">else </span>{
             <span class="string">&quot;mysql&quot;

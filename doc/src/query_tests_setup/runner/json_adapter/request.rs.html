@@ -271,6 +271,8 @@
 <a href="#271" id="271">271</a>
 <a href="#272" id="272">272</a>
 <a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::TestResult;
 <span class="kw">use </span>indexmap::IndexMap;
 <span class="kw">use </span>itertools::Itertools;
@@ -474,7 +476,9 @@
 
         <span class="kw">match </span>value {
             ArgumentValue::Object(obj) =&gt; {
-                <span class="kw">let </span>is_field_ref_obj = obj.contains_key(constants::filters::UNDERSCORE_REF) &amp;&amp; obj.len() == <span class="number">1</span>;
+                <span class="kw">let </span>is_field_ref_obj = obj.contains_key(constants::filters::UNDERSCORE_REF)
+                    &amp;&amp; obj.contains_key(constants::filters::UNDERSCORE_CONTAINER)
+                    &amp;&amp; obj.len() == <span class="number">2</span>;
                 <span class="kw">let </span>schema_objects = <span class="self">self</span>.get_object_types();
 
                 <span class="kw">match </span>schema_objects {

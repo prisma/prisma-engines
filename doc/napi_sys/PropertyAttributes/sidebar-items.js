@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["configurable","default","enumerable","static_","writable"]};

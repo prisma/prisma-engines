@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["SqlError"],"struct":["Mssql","Mysql","PostgreSql","Sqlite"],"trait":["FromSource"]};
+window.SIDEBAR_ITEMS = {"enum":["SqlError"],"fn":["register_driver"],"struct":["Mssql","Mysql","PostgreSql","Sqlite"],"trait":["FromSource"]};

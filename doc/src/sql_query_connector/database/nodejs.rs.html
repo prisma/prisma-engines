@@ -139,28 +139,56 @@
 <a href="#139" id="139">139</a>
 <a href="#140" id="140">140</a>
 <a href="#141" id="141">141</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>async_trait::async_trait;
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::SqlError;
+<span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>quaint::{
     connector::IsolationLevel,
     pooled::{PooledConnection, Quaint},
     prelude::{Query, Queryable, TransactionCapable},
     Value,
 };
+<span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">pub enum </span>RuntimePool {
     Rust(Quaint),
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;js-drivers&quot;</span>)]
-    </span>JS(js_drivers::Queryable),
+    <span class="attr">#[cfg(feature = <span class="string">&quot;nodejs-drivers&quot;</span>)]
+    </span>NodeJS(Arc&lt;<span class="kw">dyn </span>Queryable&gt;),
 }
 
 <span class="kw">impl </span>RuntimePool {
-    <span class="kw">pub fn </span>is_js(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+    <span class="kw">pub fn </span>is_nodejs(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Rust(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;js-drivers&quot;</span>)]
-            </span><span class="self">Self</span>::JS(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;nodejs-drivers&quot;</span>)]
+            </span><span class="self">Self</span>::NodeJS(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+        }
+    }
+
+    <span class="doccomment">/// Reserve a connection from the pool
+    </span><span class="kw">pub async fn </span>check_out(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;RuntimeConnection&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Rust(pool) =&gt; {
+                <span class="kw">let </span>conn: PooledConnection = pool.check_out().<span class="kw">await</span>.map_err(SqlError::from)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(RuntimeConnection::Rust(conn))
+            }
+            <span class="attr">#[cfg(feature = <span class="string">&quot;nodejs-drivers&quot;</span>)]
+            </span><span class="self">Self</span>::NodeJS(queryable) =&gt; <span class="prelude-val">Ok</span>(RuntimeConnection::NodeJS(queryable.clone())),
         }
     }
 }
@@ -168,8 +196,8 @@
 <span class="kw">pub enum </span>RuntimeConnection {
     Rust(PooledConnection),
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;js-drivers&quot;</span>)]
-    </span>JS(js_drivers::Queryable),
+    <span class="attr">#[cfg(feature = <span class="string">&quot;nodejs-drivers&quot;</span>)]
+    </span>NodeJS(Arc&lt;<span class="kw">dyn </span>Queryable&gt;),
 }
 
 <span class="attr">#[async_trait]
@@ -178,8 +206,8 @@
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Rust(conn) =&gt; conn.query(q).<span class="kw">await</span>,
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;js-drivers&quot;</span>)]
-            </span><span class="self">Self</span>::JS(conn) =&gt; conn.query(q).<span class="kw">await</span>,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;nodejs-drivers&quot;</span>)]
+            </span><span class="self">Self</span>::NodeJS(conn) =&gt; conn.query(q).<span class="kw">await</span>,
         }
     }
 
@@ -187,8 +215,8 @@
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Rust(conn) =&gt; conn.query_raw(sql, params).<span class="kw">await</span>,
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;js-drivers&quot;</span>)]
-            </span><span class="self">Self</span>::JS(conn) =&gt; conn.query_raw(sql, params).<span class="kw">await</span>,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;nodejs-drivers&quot;</span>)]
+            </span><span class="self">Self</span>::NodeJS(conn) =&gt; conn.query_raw(sql, params).<span class="kw">await</span>,
         }
     }
 
@@ -196,8 +224,8 @@
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Rust(conn) =&gt; conn.query_raw_typed(sql, params).<span class="kw">await</span>,
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;js-drivers&quot;</span>)]
-            </span><span class="self">Self</span>::JS(conn) =&gt; conn.query_raw_typed(sql, params).<span class="kw">await</span>,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;nodejs-drivers&quot;</span>)]
+            </span><span class="self">Self</span>::NodeJS(conn) =&gt; conn.query_raw_typed(sql, params).<span class="kw">await</span>,
         }
     }
 
@@ -205,8 +233,8 @@
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Rust(conn) =&gt; conn.execute(q).<span class="kw">await</span>,
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;js-drivers&quot;</span>)]
-            </span><span class="self">Self</span>::JS(conn) =&gt; conn.execute(q).<span class="kw">await</span>,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;nodejs-drivers&quot;</span>)]
+            </span><span class="self">Self</span>::NodeJS(conn) =&gt; conn.execute(q).<span class="kw">await</span>,
         }
     }
 
@@ -214,8 +242,8 @@
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Rust(conn) =&gt; conn.execute_raw(sql, params).<span class="kw">await</span>,
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;js-drivers&quot;</span>)]
-            </span><span class="self">Self</span>::JS(conn) =&gt; conn.execute_raw(sql, params).<span class="kw">await</span>,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;nodejs-drivers&quot;</span>)]
+            </span><span class="self">Self</span>::NodeJS(conn) =&gt; conn.execute_raw(sql, params).<span class="kw">await</span>,
         }
     }
 
@@ -223,8 +251,8 @@
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Rust(conn) =&gt; conn.execute_raw_typed(sql, params).<span class="kw">await</span>,
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;js-drivers&quot;</span>)]
-            </span><span class="self">Self</span>::JS(conn) =&gt; conn.execute_raw_typed(sql, params).<span class="kw">await</span>,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;nodejs-drivers&quot;</span>)]
+            </span><span class="self">Self</span>::NodeJS(conn) =&gt; conn.execute_raw_typed(sql, params).<span class="kw">await</span>,
         }
     }
 
@@ -234,8 +262,8 @@
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Rust(conn) =&gt; conn.raw_cmd(cmd).<span class="kw">await</span>,
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;js-drivers&quot;</span>)]
-            </span><span class="self">Self</span>::JS(conn) =&gt; conn.raw_cmd(cmd).<span class="kw">await</span>,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;nodejs-drivers&quot;</span>)]
+            </span><span class="self">Self</span>::NodeJS(conn) =&gt; conn.raw_cmd(cmd).<span class="kw">await</span>,
         }
     }
 
@@ -243,8 +271,8 @@
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Rust(conn) =&gt; conn.version().<span class="kw">await</span>,
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;js-drivers&quot;</span>)]
-            </span><span class="self">Self</span>::JS(conn) =&gt; conn.version().<span class="kw">await</span>,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;nodejs-drivers&quot;</span>)]
+            </span><span class="self">Self</span>::NodeJS(conn) =&gt; conn.version().<span class="kw">await</span>,
         }
     }
 
@@ -252,8 +280,8 @@
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Rust(conn) =&gt; conn.is_healthy(),
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;js-drivers&quot;</span>)]
-            </span><span class="self">Self</span>::JS(conn) =&gt; conn.is_healthy(),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;nodejs-drivers&quot;</span>)]
+            </span><span class="self">Self</span>::NodeJS(conn) =&gt; conn.is_healthy(),
         }
     }
 
@@ -263,8 +291,8 @@
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Rust(conn) =&gt; conn.set_tx_isolation_level(isolation_level).<span class="kw">await</span>,
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;js-drivers&quot;</span>)]
-            </span><span class="self">Self</span>::JS(conn) =&gt; conn.set_tx_isolation_level(isolation_level).<span class="kw">await</span>,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;nodejs-drivers&quot;</span>)]
+            </span><span class="self">Self</span>::NodeJS(conn) =&gt; conn.set_tx_isolation_level(isolation_level).<span class="kw">await</span>,
         }
     }
 
@@ -273,8 +301,8 @@
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Rust(conn) =&gt; conn.requires_isolation_first(),
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;js-drivers&quot;</span>)]
-            </span><span class="self">Self</span>::JS(conn) =&gt; conn.requires_isolation_first(),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;nodejs-drivers&quot;</span>)]
+            </span><span class="self">Self</span>::NodeJS(conn) =&gt; conn.requires_isolation_first(),
         }
     }
 }
