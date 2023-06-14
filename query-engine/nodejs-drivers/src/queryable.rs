@@ -1,8 +1,8 @@
-use crate::driver::{self, Driver};
+use crate::driver::{self, Driver, Query};
 use async_trait::async_trait;
 use quaint::{
     connector::IsolationLevel,
-    prelude::{Query, Queryable as QuaintQueryable, TransactionCapable},
+    prelude::{Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable},
     visitor::{self, Visitor},
     Value,
 };
@@ -35,28 +35,18 @@ impl std::fmt::Debug for Queryable {
 #[async_trait]
 impl QuaintQueryable for Queryable {
     /// Execute the given query.
-    async fn query(&self, q: Query<'_>) -> quaint::Result<quaint::prelude::ResultSet> {
+    async fn query(&self, q: QuaintQuery<'_>) -> quaint::Result<ResultSet> {
         let (sql, params) = visitor::Mysql::build(q)?;
-        println!("JSQueryable::query()");
         self.query_raw(&sql, &params).await
     }
 
     /// Execute a query given as SQL, interpolating the given parameters.
-    async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<quaint::prelude::ResultSet> {
-        println!("JSQueryable::query_raw({}, {:?})", &sql, params);
-
+    async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
         // Note: we ignore the parameters for now.
         // Todo: convert napi::Error to quaint::error::Error.
-        let result_set = self.driver.query_raw(sql.to_string()).await.unwrap();
+        let result_set = self.driver.query_raw(Query::from((sql, params))).await.unwrap();
 
-        Ok(quaint::prelude::ResultSet::new(
-            result_set.columns,
-            result_set
-                .rows
-                .into_iter()
-                .map(|row| row.into_iter().map(quaint::Value::text).collect())
-                .collect(),
-        ))
+        Ok(result_set.into())
     }
 
     /// Execute a query given as SQL, interpolating the given parameters.
@@ -65,14 +55,12 @@ impl QuaintQueryable for Queryable {
     /// instead of letting Postgres infer them based on their usage in the SQL query.
     ///
     /// NOTE: This method will eventually be removed & merged into Queryable::query_raw().
-    async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<quaint::prelude::ResultSet> {
-        println!("JSQueryable::query_raw()");
+    async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
         self.query_raw(sql, params).await
     }
 
     /// Execute the given query, returning the number of affected rows.
-    async fn execute(&self, q: Query<'_>) -> quaint::Result<u64> {
-        println!("JSQueryable::execute()");
+    async fn execute(&self, q: QuaintQuery<'_>) -> quaint::Result<u64> {
         let (sql, params) = visitor::Mysql::build(q)?;
         self.execute_raw(&sql, &params).await
     }
@@ -80,11 +68,9 @@ impl QuaintQueryable for Queryable {
     /// Execute a query given as SQL, interpolating the given parameters and
     /// returning the number of affected rows.
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
-        println!("JSQueryable::execute_raw({}, {:?})", &sql, &params);
-
         // Note: we ignore the parameters for now.
         // Todo: convert napi::Error to quaint::error::Error.
-        let affected_rows = self.driver.execute_raw(sql.to_string()).await.unwrap();
+        let affected_rows = self.driver.execute_raw((sql, params).into()).await.unwrap();
         Ok(affected_rows as u64)
     }
 
@@ -96,14 +82,12 @@ impl QuaintQueryable for Queryable {
     ///
     /// NOTE: This method will eventually be removed & merged into Queryable::query_raw().
     async fn execute_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
-        println!("JSQueryable::execute_raw_typed({}, {:?})", &sql, &params);
         self.execute_raw(sql, params).await
     }
 
     /// Run a command in the database, for queries that can't be run using
     /// prepared statements.
     async fn raw_cmd(&self, cmd: &str) -> quaint::Result<()> {
-        println!("JSQueryable::raw_cmdx({})", &cmd);
         self.execute_raw(cmd, &[]).await?;
 
         Ok(())
@@ -114,7 +98,6 @@ impl QuaintQueryable for Queryable {
     /// example. The version string is returned directly without any form of
     /// parsing or normalization.
     async fn version(&self) -> quaint::Result<Option<String>> {
-        println!("JSQueryable::version()");
         // Todo: convert napi::Error to quaint::error::Error.
         let version = self.driver.version().await.unwrap();
         Ok(version)
@@ -144,5 +127,13 @@ impl From<JsObject> for Queryable {
     fn from(driver: JsObject) -> Self {
         let driver = driver::reify(driver).unwrap();
         Self { driver }
+    }
+}
+
+impl From<(&str, &[quaint::Value<'_>])> for Query {
+    fn from(value: (&str, &[quaint::Value])) -> Self {
+        let sql = value.0.to_string();
+        let args = value.1.iter().map(|v| v.clone().into()).collect();
+        Query { sql, args }
     }
 }

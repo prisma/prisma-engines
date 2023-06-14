@@ -1,8 +1,11 @@
-use napi::bindgen_prelude::Promise as JsPromise;
+use core::panic;
+
+use napi::bindgen_prelude::{FromNapiValue, Promise as JsPromise, ToNapiValue};
 use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction};
 use napi::JsObject;
 use napi_derive::napi;
-use serde::{Deserialize, Serialize};
+use quaint::connector::ResultSet as QuaintResultSet;
+use quaint::Value as QuaintValue;
 
 // Note: Every ThreadsafeFunction<T, ?> should have an explicit `ErrorStrategy::Fatal` set, as to avoid
 // "TypeError [ERR_INVALID_ARG_TYPE]: The first argument must be of type string or an instance of Buffer, ArrayBuffer, or Array or an Array-like Object. Received null".
@@ -10,11 +13,11 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone)]
 pub struct Driver {
     /// Execute a query given as SQL, interpolating the given parameters.
-    query_raw: ThreadsafeFunction<String, ErrorStrategy::Fatal>,
+    query_raw: ThreadsafeFunction<Query, ErrorStrategy::Fatal>,
 
     /// Execute a query given as SQL, interpolating the given parameters and
     /// returning the number of affected rows.
-    execute_raw: ThreadsafeFunction<String, ErrorStrategy::Fatal>,
+    execute_raw: ThreadsafeFunction<Query, ErrorStrategy::Fatal>,
 
     /// Return the version of the underlying database, queried directly from the
     /// source.
@@ -47,55 +50,115 @@ pub fn reify(js_driver: JsObject) -> napi::Result<Driver> {
     Ok(driver)
 }
 
+// This result set is more convenient to be manipulated from both Rust and NodeJS.
+// Quaint's version of  ResultSet is:
+//
+// pub struct ResultSet {
+//     pub(crate) columns: Arc<Vec<String>>,
+//     pub(crate) rows: Vec<Vec<Value<'static>>>,
+//     pub(crate) last_insert_id: Option<u64>,
+// }
+//
+// If we used this ResultSet would we would have worse ergonomics as quaint::Value is a structured
+// enum and cannot be used directly with the #[napi(Object)] macro. Thus requiring us to implement
+// the FromNapiValue and ToNapiValue traits for quaint::Value, and use a different custom type
+// representing the Value in javascript.
+//
 #[napi(object)]
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ResultSet {
-    pub columns: Vec<String>,
+#[derive(Debug)]
+pub struct JSResultSet {
+    pub column_types: Vec<ColumnType>,
+    pub column_names: Vec<String>,
+    // Note this might be encoded differently for performance reasons
+    pub rows: Vec<Vec<serde_json::Value>>,
+}
 
-    // TODO: support any JS-serializable type, not just String.
-    pub rows: Vec<Vec<String>>,
+#[napi]
+#[derive(Debug)]
+pub enum ColumnType {
+    Int32,
+    Int64,
+    Float,
+    Double,
+    Text,
+    Enum,
+    Bytes,
+    Boolean,
+    Char,
+    Array,
+    Numeric,
+    Json,
+    DateTime,
+    Date,
+    Time,
+}
+
+#[napi(object)]
+#[derive(Debug)]
+pub struct Query {
+    pub sql: String,
+    pub args: Vec<serde_json::Value>,
+}
+
+impl From<JSResultSet> for QuaintResultSet {
+    fn from(mut val: JSResultSet) -> Self {
+        // TODO: extract, todo: error rather than panic?
+        let to_quaint_row = move |row: &mut Vec<serde_json::Value>| -> Vec<quaint::Value<'static>> {
+            let mut res = Vec::with_capacity(row.len());
+
+            for i in 0..row.len() {
+                match val.column_types[i] {
+                    ColumnType::Int64 => match row.remove(0) {
+                        serde_json::Value::Number(n) => {
+                            res.push(QuaintValue::int64(n.as_i64().expect("number must be an i64")))
+                        }
+                        serde_json::Value::Null => todo!(),
+                        mismatch => panic!("Expected a number, found {:?}", mismatch),
+                    },
+                    ColumnType::Text => match row.remove(0) {
+                        serde_json::Value::String(s) => res.push(QuaintValue::text(s)),
+                        serde_json::Value::Null => res.push(QuaintValue::Text(None)),
+                        mismatch => panic!("Expected a string, found {:?}", mismatch),
+                    },
+                    unimplemented => {
+                        todo!("support column type: Column: {:?}", unimplemented)
+                    }
+                }
+            }
+
+            res
+        };
+
+        let names = val.column_names;
+        let rows = val.rows.iter_mut().map(to_quaint_row).collect();
+
+        QuaintResultSet::new(names, rows)
+    }
 }
 
 impl Driver {
-    pub async fn query_raw(&self, sql: String) -> napi::Result<ResultSet> {
-        println!("[rs] calling query_raw: {}", &sql);
-
-        let promise = self.query_raw.call_async::<JsPromise<ResultSet>>(sql).await?;
-
-        println!("[rs] awaiting promise");
+    pub async fn query_raw(&self, params: Query) -> napi::Result<JSResultSet> {
+        let promise = self.query_raw.call_async::<JsPromise<JSResultSet>>(params).await?;
         let value = promise.await?;
-
-        println!("[rs] awaited: {:?}", &value);
         Ok(value)
     }
 
-    pub async fn execute_raw(&self, sql: String) -> napi::Result<u32> {
-        println!("[rs] calling execute_raw: {}", &sql);
-        let promise = self.execute_raw.call_async::<JsPromise<u32>>(sql).await?;
-
-        println!("[rs] awaiting promise");
+    pub async fn execute_raw(&self, params: Query) -> napi::Result<u32> {
+        let promise = self.execute_raw.call_async::<JsPromise<u32>>(params).await?;
         let value = promise.await?;
-        println!("[rs] got awaited value: {:?}", &value);
         Ok(value)
     }
 
     pub async fn version(&self) -> napi::Result<Option<String>> {
-        println!("[rs] calling version");
-
         let version = self.version.call_async::<Option<String>>(()).await?;
-        println!("[rs] version: {:?}", &version);
-
         Ok(version)
     }
 
     pub async fn close(&self) -> napi::Result<()> {
-        println!("[rs] calling close");
         self.close.call_async::<()>(()).await
     }
 
     pub fn is_healthy(&self) -> napi::Result<bool> {
-        println!("[rs] calling is_healthy");
-
         // TODO: call `is_healthy` in a blocking fashion, returning its result as a boolean.
         unimplemented!();
     }

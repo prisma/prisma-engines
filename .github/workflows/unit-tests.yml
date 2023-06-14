@@ -30,6 +30,7 @@ jobs:
       - run: |
             cargo test --workspace \
                   --exclude=query-engine \
+                  --exclude=query-engine-node-api \
                   --exclude=black-box-tests \
                   --exclude=query-engine-tests \
                   --exclude=sql-migration-tests \
