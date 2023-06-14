@@ -256,7 +256,6 @@
          | Tracing
          | Metrics
          | OrderByNulls
-         | FilteredRelationCount
          | FieldReference
          | PostgresqlExtensions
          | ExtendedWhereUnique
@@ -290,6 +289,7 @@
         | ImprovedQueryRaw
         | DataProxy
         | InteractiveTransactions
+        | FilteredRelationCount
         | ClientExtensions
     }),
     hidden: <span class="macro">enumflags2::make_bitflags!</span>(PreviewFeature::{
