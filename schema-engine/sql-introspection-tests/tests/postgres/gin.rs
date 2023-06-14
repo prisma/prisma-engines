@@ -6,15 +6,15 @@ use test_macros::test_connector;
 #[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn full_text_functions_filtered_out(api: &mut TestApi) -> TestResult {
     let schema_name = api.schema_name();
-    let create_table = format!("CREATE TABLE \"{schema_name}\".\"A\" (id SERIAL PRIMARY KEY, data text not null)",);
+    let create_table = format!("CREATE TABLE \"{schema_name}\".\"B\" (id SERIAL PRIMARY KEY, data text not null)",);
     let create_idx =
-        format!("CREATE INDEX \"A_data_idx\" ON \"{schema_name}\".\"A\" USING GIN (to_tsvector('english', data));",);
+        format!("CREATE INDEX \"B_data_idx\" ON \"{schema_name}\".\"B\" USING GIN (to_tsvector('english', data));",);
 
     api.database().raw_cmd(&create_table).await?;
     api.database().raw_cmd(&create_idx).await?;
 
     let expected = expect![[r#"
-        model A {
+        model B {
           id   Int    @id @default(autoincrement())
           data String
         }
