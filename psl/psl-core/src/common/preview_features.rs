@@ -87,7 +87,6 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
          | Tracing
          | Metrics
          | OrderByNulls
-         | FilteredRelationCount
          | FieldReference
          | PostgresqlExtensions
          | ExtendedWhereUnique
@@ -121,6 +120,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | ImprovedQueryRaw
         | DataProxy
         | InteractiveTransactions
+        | FilteredRelationCount
         | ClientExtensions
     }),
     hidden: enumflags2::make_bitflags!(PreviewFeature::{
