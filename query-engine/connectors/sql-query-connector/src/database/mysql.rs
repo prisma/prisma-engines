@@ -1,5 +1,5 @@
 use super::connection::SqlConnection;
-use super::nodejs::RuntimePool;
+use super::runtime::RuntimePool;
 use crate::{FromSource, SqlError};
 use async_trait::async_trait;
 use connector_interface::{
@@ -50,7 +50,7 @@ impl FromSource for Mysql {
                 let connection_info = get_connection_info(url)?;
 
                 return Ok(Mysql {
-                    pool: RuntimePool::NodeJS(driver.unwrap().clone()),
+                    pool: RuntimePool::Js(driver.unwrap().clone()),
                     connection_info,
                     features: features.to_owned(),
                 });
