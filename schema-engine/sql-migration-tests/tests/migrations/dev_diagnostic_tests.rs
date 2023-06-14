@@ -773,11 +773,9 @@ fn dev_diagnostic_multi_schema_does_not_panic() {
     ))
     .unwrap();
 
-    let is_cockroachdb = test_setup::TestApiArgs::new("dev_diagnostic_multi_schema_does_not_panic", &[], &[])
-        .tags()
-        .contains(test_setup::Tags::CockroachDb);
-
-    let provider = if is_cockroachdb { "cockroachdb" } else { "postgresql" };
+    let provider = test_setup::TestApiArgs::new("dev_diagnostic_multi_schema_does_not_panic", &[], &[])
+        .provider()
+        .to_owned();
 
     let schema = format! {r#"
         datasource db {{
