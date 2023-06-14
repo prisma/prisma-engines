@@ -36,7 +36,7 @@ Example test output:
 ```
 ❯ pnpm dev
 
-> @prisma/nodejs-playground@1.0.0 dev /Users/jkomyno/work/prisma/prisma-engines-2/query-engine/js-drivers/nodejs-examples
+> @prisma/nodejs-playground@1.0.0 dev /Users/jkomyno/work/prisma/prisma-engines-2/query-engine/nodejs-drivers/nodejs-examples
 > ts-node ./src/index.ts
 
 [nodejs] initializing mock connection pool: mysql://root:prisma@localhost:3307/test
