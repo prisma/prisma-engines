@@ -46,11 +46,11 @@ impl FromSource for Mysql {
         if source.provider == "@prisma/mysql" {
             #[cfg(feature = "nodejs-drivers")]
             {
-                let pool = super::js::registered_driver();
+                let driver = super::js::registered_driver();
                 let connection_info = get_connection_info(url)?;
 
                 return Ok(Mysql {
-                    pool: RuntimePool::NodeJS(pool.unwrap().boxed()),
+                    pool: RuntimePool::NodeJS(driver.unwrap().clone()),
                     connection_info,
                     features: features.to_owned(),
                 });

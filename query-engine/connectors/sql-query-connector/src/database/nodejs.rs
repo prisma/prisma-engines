@@ -1,18 +1,18 @@
+use crate::SqlError;
 use async_trait::async_trait;
 use quaint::{
     connector::IsolationLevel,
     pooled::{PooledConnection, Quaint},
-    prelude::{BoxedQueryable, Query, Queryable, TransactionCapable},
+    prelude::{Query, Queryable, TransactionCapable},
     Value,
 };
-
-use crate::SqlError;
+use std::sync::Arc;
 
 pub enum RuntimePool {
     Rust(Quaint),
 
     #[cfg(feature = "nodejs-drivers")]
-    NodeJS(Box<dyn BoxedQueryable>),
+    NodeJS(Arc<dyn Queryable>),
 }
 
 impl RuntimePool {
@@ -33,7 +33,7 @@ impl RuntimePool {
                 Ok(RuntimeConnection::Rust(conn))
             }
             #[cfg(feature = "nodejs-drivers")]
-            Self::NodeJS(boxed_queryable) => Ok(RuntimeConnection::NodeJS(boxed_queryable.boxed_queryable())),
+            Self::NodeJS(queryable) => Ok(RuntimeConnection::NodeJS(queryable.clone())),
         }
     }
 }
@@ -42,7 +42,7 @@ pub enum RuntimeConnection {
     Rust(PooledConnection),
 
     #[cfg(feature = "nodejs-drivers")]
-    NodeJS(Box<dyn Queryable>),
+    NodeJS(Arc<dyn Queryable>),
 }
 
 #[async_trait]

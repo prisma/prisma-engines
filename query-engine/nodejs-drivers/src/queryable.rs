@@ -2,7 +2,7 @@ use crate::driver::{self, Driver};
 use async_trait::async_trait;
 use quaint::{
     connector::IsolationLevel,
-    prelude::{BoxedQueryable, Query, Queryable as QuaintQueryable, TransactionCapable},
+    prelude::{Query, Queryable as QuaintQueryable, TransactionCapable},
     visitor::{self, Visitor},
     Value,
 };
@@ -29,16 +29,6 @@ impl std::fmt::Display for Queryable {
 impl std::fmt::Debug for Queryable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "JSQueryable(driver)")
-    }
-}
-
-impl BoxedQueryable for Queryable {
-    fn boxed_queryable(&self) -> Box<dyn QuaintQueryable> {
-        Box::new(self.clone())
-    }
-
-    fn boxed(&self) -> Box<dyn BoxedQueryable> {
-        Box::new(self.clone())
     }
 }
 

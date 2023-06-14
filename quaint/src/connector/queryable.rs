@@ -14,11 +14,6 @@ pub trait ToColumnNames {
     fn to_column_names(&self) -> Vec<String>;
 }
 
-pub trait BoxedQueryable: Send + Sync {
-    fn boxed_queryable(&self) -> Box<dyn Queryable>;
-    fn boxed(&self) -> Box<dyn BoxedQueryable>;
-}
-
 /// Represents a connection or a transaction that can be queried.
 #[async_trait]
 pub trait Queryable: Send + Sync {
