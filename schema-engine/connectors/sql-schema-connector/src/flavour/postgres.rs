@@ -537,7 +537,6 @@ pub(crate) enum Circumstances {
     CanPartitionTables,
 }
 
-#[allow(clippy::needless_collect)] // clippy is wrong
 fn disable_postgres_statement_cache(url: &mut Url) -> ConnectorResult<()> {
     let params: Vec<(String, String)> = url.query_pairs().map(|(k, v)| (k.to_string(), v.to_string())).collect();
 
