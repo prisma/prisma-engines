@@ -151,14 +151,10 @@ impl QueryEngine {
         let log_callback = LogCallback::new(napi_env, callback)?;
         log_callback.unref(&napi_env)?;
 
-        // Initialize the global NODEJS_QUERYABLE from fn_ctx.
-        // This implies that there can only be one QueryEngine instance per process.
+        #[cfg(feature = "js-drivers")]
         if let Some(driver) = maybe_driver {
-            let queryable = nodejs_drivers::Queryable::from(driver);
-            #[cfg(feature = "nodejs-drivers")]
-            {
-                sql_connector::register_driver(Arc::new(queryable));
-            }
+            let queryable = js_drivers::Queryable::from(driver);
+            sql_connector::register_driver(Arc::new(queryable));
         }
 
         let ConstructorOptions {

@@ -1,5 +1,5 @@
 use super::connection::SqlConnection;
-use super::nodejs::RuntimePool;
+use super::runtime::RuntimePool;
 use crate::{FromSource, SqlError};
 use async_trait::async_trait;
 use connector_interface::{
@@ -44,22 +44,22 @@ impl FromSource for Mysql {
         features: psl::PreviewFeatures,
     ) -> connector_interface::Result<Mysql> {
         if source.provider == "@prisma/mysql" {
-            #[cfg(feature = "nodejs-drivers")]
+            #[cfg(feature = "js-drivers")]
             {
                 let driver = super::js::registered_driver();
                 let connection_info = get_connection_info(url)?;
 
                 return Ok(Mysql {
-                    pool: RuntimePool::NodeJS(driver.unwrap().clone()),
+                    pool: RuntimePool::Js(driver.unwrap().clone()),
                     connection_info,
                     features: features.to_owned(),
                 });
             }
 
-            #[cfg(not(feature = "nodejs-drivers"))]
+            #[cfg(not(feature = "js-drivers"))]
             {
                 return Err(ConnectorError::from_kind(ErrorKind::UnsupportedConnector(
-                    "The @prisma/mysql connector requires the `nodejs-drivers` feature to be enabled.".into(),
+                    "The @prisma/mysql connector requires the `nodeDrivers` preview feature to be enabled.".into(),
                 )));
             }
         }

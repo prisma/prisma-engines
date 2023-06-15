@@ -1,4 +1,4 @@
-# @prisma/nodejs-playground
+# @prisma/jsdrivers-playground
 
 This is a playground for testing the `libquery` client with the experimental Node.js drivers.
 It contains a subset of `@prisma/client`, plus a handy [`index.ts`](./src/index.ts) file with a `main` function.
@@ -36,7 +36,7 @@ Example test output:
 ```
 ❯ pnpm dev
 
-> @prisma/nodejs-playground@1.0.0 dev /Users/jkomyno/work/prisma/prisma-engines-2/query-engine/nodejs-drivers/nodejs-examples
+> @prisma/nodejs-playground@1.0.0 dev /Users/jkomyno/work/prisma/prisma-engines-2/query-engine/js-drivers/nodejs-examples
 > ts-node ./src/index.ts
 
 [nodejs] initializing mock connection pool: mysql://root:prisma@localhost:3307/test

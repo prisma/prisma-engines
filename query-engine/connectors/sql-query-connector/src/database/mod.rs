@@ -1,6 +1,6 @@
-#[cfg(feature = "nodejs-drivers")]
+#[cfg(feature = "js-drivers")]
 pub mod js;
-mod nodejs;
+mod runtime;
 
 mod connection;
 mod mssql;
