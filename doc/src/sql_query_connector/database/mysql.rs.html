@@ -111,7 +111,7 @@
 <a href="#111" id="111">111</a>
 <a href="#112" id="112">112</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::connection::SqlConnection;
-<span class="kw">use </span><span class="kw">super</span>::nodejs::RuntimePool;
+<span class="kw">use </span><span class="kw">super</span>::runtime::RuntimePool;
 <span class="kw">use crate</span>::{FromSource, SqlError};
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>connector_interface::{
@@ -156,22 +156,22 @@
         features: psl::PreviewFeatures,
     ) -&gt; connector_interface::Result&lt;Mysql&gt; {
         <span class="kw">if </span>source.provider == <span class="string">&quot;@prisma/mysql&quot; </span>{
-            <span class="attr">#[cfg(feature = <span class="string">&quot;nodejs-drivers&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">&quot;js-drivers&quot;</span>)]
             </span>{
                 <span class="kw">let </span>driver = <span class="kw">super</span>::js::registered_driver();
                 <span class="kw">let </span>connection_info = get_connection_info(url)<span class="question-mark">?</span>;
 
                 <span class="kw">return </span><span class="prelude-val">Ok</span>(Mysql {
-                    pool: RuntimePool::NodeJS(driver.unwrap().clone()),
+                    pool: RuntimePool::Js(driver.unwrap().clone()),
                     connection_info,
                     features: features.to_owned(),
                 });
             }
 
-            <span class="attr">#[cfg(not(feature = <span class="string">&quot;nodejs-drivers&quot;</span>))]
+            <span class="attr">#[cfg(not(feature = <span class="string">&quot;js-drivers&quot;</span>))]
             </span>{
                 <span class="kw">return </span><span class="prelude-val">Err</span>(ConnectorError::from_kind(ErrorKind::UnsupportedConnector(
-                    <span class="string">&quot;The @prisma/mysql connector requires the `nodejs-drivers` feature to be enabled.&quot;</span>.into(),
+                    <span class="string">&quot;The @prisma/mysql connector requires the `nodeDrivers` preview feature to be enabled.&quot;</span>.into(),
                 )));
             }
         }

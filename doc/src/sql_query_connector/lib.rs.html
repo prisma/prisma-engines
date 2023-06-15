@@ -52,7 +52,7 @@
 <span class="kw">use </span><span class="self">self</span>::{column_metadata::<span class="kw-2">*</span>, context::Context, filter_conversion::<span class="kw-2">*</span>, query_ext::QueryExt, row::<span class="kw-2">*</span>};
 <span class="kw">use </span>quaint::prelude::Queryable;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;nodejs-drivers&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;js-drivers&quot;</span>)]
 </span><span class="kw">pub use </span>database::js::register_driver;
 <span class="kw">pub use </span>database::{FromSource, Mssql, Mysql, PostgreSql, Sqlite};
 <span class="kw">pub use </span>error::SqlError;

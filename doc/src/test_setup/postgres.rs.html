@@ -103,15 +103,15 @@
             <span class="prelude-val">Some</span>(version) =&gt; {
                 <span class="macro">eprintln!</span>(<span class="string">&quot;version: {version:?}&quot;</span>);
 
-                <span class="kw">if </span>version.contains(<span class="string">&quot;9.&quot;</span>) {
+                <span class="kw">if </span>version.contains(<span class="string">&quot;PostgreSQL 9&quot;</span>) {
                     tags |= Tags::Postgres9;
                 }
 
-                <span class="kw">if </span>version.contains(<span class="string">&quot;12.&quot;</span>) {
+                <span class="kw">if </span>version.contains(<span class="string">&quot;PostgreSQL 12&quot;</span>) {
                     tags |= Tags::Postgres12;
                 }
 
-                <span class="kw">if </span>version.contains(<span class="string">&quot;14.&quot;</span>) {
+                <span class="kw">if </span>version.contains(<span class="string">&quot;PostgreSQL 14&quot;</span>) {
                     tags |= Tags::Postgres14;
                 }
 
