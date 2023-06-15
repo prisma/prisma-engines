@@ -112,7 +112,7 @@ impl From<JSResultSet> for QuaintResultSet {
                         serde_json::Value::Number(n) => {
                             res.push(QuaintValue::int64(n.as_i64().expect("number must be an i64")))
                         }
-                        serde_json::Value::Null => todo!(),
+                        serde_json::Value::Null => res.push(QuaintValue::Int64(None)),
                         mismatch => panic!("Expected a number, found {:?}", mismatch),
                     },
                     ColumnType::Text => match row.remove(0) {
