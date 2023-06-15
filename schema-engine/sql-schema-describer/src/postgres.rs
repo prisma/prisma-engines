@@ -1521,6 +1521,7 @@ fn index_from_row(
             }
         };
 
+        // * Note: Expression Indexes can have 1 & 2
         if column_index == 0 {
             // new index!
             let index_id = if is_primary_key {
