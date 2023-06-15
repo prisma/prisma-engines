@@ -7,7 +7,7 @@ use crate::{
         Order, Ordering, Row, Table, TypeDataLength, TypeFamily, Values,
     },
     error::{Error, ErrorKind},
-    prelude::{Aliasable, Average, Query},
+    prelude::{Aliasable, Average, ConditionTree, Query},
     visitor, Value,
 };
 use std::{convert::TryFrom, fmt::Write, iter};
@@ -124,7 +124,10 @@ impl<'a> Mssql<'a> {
                 let left = Column::from(("t", col.name.to_string()));
                 let right = Column::from(("g", col.name.to_string()));
 
-                acc.on((left).equals(right))
+                acc.on(ConditionTree::Or(vec![
+                    (left.clone()).equals(right.clone()).into(),
+                    ConditionTree::And(vec![left.is_null().into(), right.is_null().into()]).into(),
+                ]))
             });
 
         self.write("SELECT ")?;

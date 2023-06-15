@@ -36,6 +36,7 @@ mod prisma_15581 {
             runner,
             r#"mutation { createOnetest(data: { reference: 3 }) { reference created_at other } }"#
         );
+
         Ok(())
     }
 
@@ -45,6 +46,7 @@ mod prisma_15581 {
             runner,
             r#"mutation { createOnetest2(data: { reference: 3 }) { reference updated_at other } }"#
         );
+
         Ok(())
     }
 
