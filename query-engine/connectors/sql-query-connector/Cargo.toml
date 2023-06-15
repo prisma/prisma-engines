@@ -5,6 +5,7 @@ version = "0.1.0"
 
 [features]
 vendored-openssl = ["quaint/vendored-openssl"]
+js-drivers = []
 
 [dependencies]
 psl.workspace = true

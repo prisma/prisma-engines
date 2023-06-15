@@ -240,10 +240,31 @@ mod compound_batch {
     // Ensures non compactable batch are not compacted
     #[connector_test(schema(should_batch_schema))]
     async fn should_only_batch_if_possible(runner: Runner) -> TestResult<()> {
+        runner
+            .query(
+                r#"mutation { createOneArtist(data: { firstName: "Musti" lastName: "Naukio", id: 1 }) { firstName }}"#,
+            )
+            .await?
+            .assert_success();
+
+        runner
+            .query(
+                r#"mutation { createOneArtist(data: { firstName: "Naukio" lastName: "Musti", id: 2 }) { firstName }}"#,
+            )
+            .await?
+            .assert_success();
+
         // COMPACT: Queries use compound unique
         let doc = compact_batch(&runner, vec![
             r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}}) {firstName lastName}}"#.to_string(),
             r#"query {findUniqueArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}}) {firstName lastName}}"#.to_string(),
+        ]).await?;
+        assert!(doc.is_compact());
+
+        // COMPACT: Queries use compound uniqueOrThrow
+        let doc = compact_batch(&runner, vec![
+            r#"query {findUniqueArtistOrThrow(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}}) {firstName lastName}}"#.to_string(),
+            r#"query {findUniqueArtistOrThrow(where:{firstName_lastName:{firstName:"Naukio",lastName:"Musti"}}) {firstName lastName}}"#.to_string(),
         ]).await?;
         assert!(doc.is_compact());
 

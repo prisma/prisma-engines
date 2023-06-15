@@ -63,6 +63,7 @@ pub mod filters {
     pub const SEARCH: &str = "search";
     pub const IS_SET: &str = "isSet";
     pub const UNDERSCORE_REF: &str = "_ref";
+    pub const UNDERSCORE_CONTAINER: &str = "_container";
 
     // legacy filter
     pub const NOT_IN: &str = "notIn";

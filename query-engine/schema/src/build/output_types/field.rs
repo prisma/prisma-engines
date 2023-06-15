@@ -122,10 +122,7 @@ where
                 field(
                     cloned_rf.borrowed_name(&ctx.internal_data_model.schema),
                     move || {
-                        let mut args = vec![];
-                        if ctx.has_feature(PreviewFeature::FilteredRelationCount) {
-                            args.push(arguments::where_argument(ctx, &rf.related_model()))
-                        }
+                        let args = vec![arguments::where_argument(ctx, &rf.related_model())];
                         args
                     },
                     type_mapper(ctx, &cloned_rf),
