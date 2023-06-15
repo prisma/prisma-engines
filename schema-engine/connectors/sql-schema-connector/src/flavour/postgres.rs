@@ -34,7 +34,7 @@ struct Params {
 }
 
 /// The specific provider that was requested by the user.
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq)]
 pub(crate) enum PostgresProvider {
     /// Used when `provider = "postgresql"` was specified in the schema.
     PostgreSql,
