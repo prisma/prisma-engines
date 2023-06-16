@@ -41,6 +41,7 @@
       {
         "name": "distinct",
         "typeNames": [
+          "UserScalarFieldEnum",
           "UserScalarFieldEnum[]"
         ]
       }

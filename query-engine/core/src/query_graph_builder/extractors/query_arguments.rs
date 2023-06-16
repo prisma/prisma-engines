@@ -262,6 +262,9 @@ fn extract_distinct(value: ParsedInputValue<'_>) -> QueryGraphBuilderResult<Fiel
                 Ok(field.into())
             })
             .collect::<QueryGraphBuilderResult<Vec<_>>>()?,
+        ParsedInputValue::ScalarField(sf) => {
+            vec![sf.into()]
+        }
         _ => unreachable!(),
     };
 
