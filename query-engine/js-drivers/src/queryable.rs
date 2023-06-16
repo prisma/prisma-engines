@@ -8,6 +8,7 @@ use quaint::{
 };
 
 use napi::JsObject;
+use tracing::{info_span, Instrument};
 
 #[derive(Clone)]
 pub struct JsQueryable {
@@ -42,11 +43,20 @@ impl QuaintQueryable for JsQueryable {
 
     /// Execute a query given as SQL, interpolating the given parameters.
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
-        // Note: we ignore the parameters for now.
-        // Todo: convert napi::Error to quaint::error::Error.
-        let result_set = self.driver.query_raw(Query::from((sql, params))).await.unwrap();
+        let len = params.len();
+        let serialization_span = info_span!("js:query:ser", "length" = %len);
+        let ser_guard = serialization_span.enter();
+        let query = Query::from((sql, params));
+        drop(ser_guard);
 
-        Ok(result_set.into())
+        let query_span = info_span!("js:query", "db.statement" = %sql);
+        // Todo: convert napi::Error to quaint::error::Error.
+        let result_set = self.driver.query_raw(query).instrument(query_span).await.unwrap();
+
+        let len = result_set.len();
+        let deserialization_span = info_span!("js:query:deser", "length" = %len);
+        let _deser_guard = deserialization_span.enter();
+        Ok(ResultSet::from(result_set))
     }
 
     /// Execute a query given as SQL, interpolating the given parameters.
@@ -70,7 +80,17 @@ impl QuaintQueryable for JsQueryable {
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
         // Note: we ignore the parameters for now.
         // Todo: convert napi::Error to quaint::error::Error.
-        let affected_rows = self.driver.execute_raw((sql, params).into()).await.unwrap();
+        let len = params.len();
+        let serialization_span = info_span!("js:query:ser", "length" = %len);
+        let ser_guard = serialization_span.enter();
+        let query = Query::from((sql, params));
+        drop(ser_guard);
+
+        let query_span = info_span!("js:query", "db.statement" = %sql);
+        let affected_rows = self.driver.execute_raw(query).instrument(query_span).await.unwrap();
+
+        let deserialization_span = info_span!("js:query:deser", "length" = 1);
+        let _deser_guard = deserialization_span.enter();
         Ok(affected_rows as u64)
     }
 
