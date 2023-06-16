@@ -117,7 +117,7 @@ pub async fn setup(
 
     let datamodel = opts.schema(false)?;
     let config = &datamodel.configuration;
-    let protocol = opts.engine_protocol(config.preview_features());
+    let protocol = opts.engine_protocol();
     config.validate_that_one_datasource_is_provided()?;
 
     let span = tracing::info_span!("prisma:engine:connect");
