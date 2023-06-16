@@ -118,6 +118,8 @@ pub struct Warnings {
     pub row_level_ttl: Vec<Model>,
     /// Warn about non-default unique deferring setup
     pub non_default_deferring: Vec<ModelAndConstraint>,
+    /// Warning about Expression Indexes.
+    pub expression_indexes: Vec<ModelAndConstraint>,
     /// Warn about comments
     pub objects_with_comments: Vec<Object>,
     /// Warn about fields which point to an empty type.
@@ -421,6 +423,12 @@ impl fmt::Display for Warnings {
         render_warnings(
             "The following models are capped collections, which are not yet fully supported. Read more: https://pris.ly/d/mongodb-capped-collections",
             &self.capped_collection,
+            f
+        )?;
+
+        render_warnings(
+            "These indexes are not supported by Prisma Client, because Prisma currently does not fully support expression indexes. Read more: https://pris.ly/d/expression-indexes",
+            &self.expression_indexes,
             f
         )?;
 
