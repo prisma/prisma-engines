@@ -10,30 +10,30 @@ use quaint::{
 use napi::JsObject;
 
 #[derive(Clone)]
-pub struct Queryable {
+pub struct JsQueryable {
     pub(crate) driver: Driver,
 }
 
-impl Queryable {
+impl JsQueryable {
     pub fn new(driver: Driver) -> Self {
         Self { driver }
     }
 }
 
-impl std::fmt::Display for Queryable {
+impl std::fmt::Display for JsQueryable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "JSQueryable(driver)")
     }
 }
 
-impl std::fmt::Debug for Queryable {
+impl std::fmt::Debug for JsQueryable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "JSQueryable(driver)")
     }
 }
 
 #[async_trait]
-impl QuaintQueryable for Queryable {
+impl QuaintQueryable for JsQueryable {
     /// Execute the given query.
     async fn query(&self, q: QuaintQuery<'_>) -> quaint::Result<ResultSet> {
         let (sql, params) = visitor::Mysql::build(q)?;
@@ -121,9 +121,9 @@ impl QuaintQueryable for Queryable {
     }
 }
 
-impl TransactionCapable for Queryable {}
+impl TransactionCapable for JsQueryable {}
 
-impl From<JsObject> for Queryable {
+impl From<JsObject> for JsQueryable {
     fn from(driver: JsObject) -> Self {
         let driver = driver::reify(driver).unwrap();
         Self { driver }
