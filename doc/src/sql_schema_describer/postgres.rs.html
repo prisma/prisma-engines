@@ -1712,6 +1712,67 @@
 <a href="#1712" id="1712">1712</a>
 <a href="#1713" id="1713">1713</a>
 <a href="#1714" id="1714">1714</a>
+<a href="#1715" id="1715">1715</a>
+<a href="#1716" id="1716">1716</a>
+<a href="#1717" id="1717">1717</a>
+<a href="#1718" id="1718">1718</a>
+<a href="#1719" id="1719">1719</a>
+<a href="#1720" id="1720">1720</a>
+<a href="#1721" id="1721">1721</a>
+<a href="#1722" id="1722">1722</a>
+<a href="#1723" id="1723">1723</a>
+<a href="#1724" id="1724">1724</a>
+<a href="#1725" id="1725">1725</a>
+<a href="#1726" id="1726">1726</a>
+<a href="#1727" id="1727">1727</a>
+<a href="#1728" id="1728">1728</a>
+<a href="#1729" id="1729">1729</a>
+<a href="#1730" id="1730">1730</a>
+<a href="#1731" id="1731">1731</a>
+<a href="#1732" id="1732">1732</a>
+<a href="#1733" id="1733">1733</a>
+<a href="#1734" id="1734">1734</a>
+<a href="#1735" id="1735">1735</a>
+<a href="#1736" id="1736">1736</a>
+<a href="#1737" id="1737">1737</a>
+<a href="#1738" id="1738">1738</a>
+<a href="#1739" id="1739">1739</a>
+<a href="#1740" id="1740">1740</a>
+<a href="#1741" id="1741">1741</a>
+<a href="#1742" id="1742">1742</a>
+<a href="#1743" id="1743">1743</a>
+<a href="#1744" id="1744">1744</a>
+<a href="#1745" id="1745">1745</a>
+<a href="#1746" id="1746">1746</a>
+<a href="#1747" id="1747">1747</a>
+<a href="#1748" id="1748">1748</a>
+<a href="#1749" id="1749">1749</a>
+<a href="#1750" id="1750">1750</a>
+<a href="#1751" id="1751">1751</a>
+<a href="#1752" id="1752">1752</a>
+<a href="#1753" id="1753">1753</a>
+<a href="#1754" id="1754">1754</a>
+<a href="#1755" id="1755">1755</a>
+<a href="#1756" id="1756">1756</a>
+<a href="#1757" id="1757">1757</a>
+<a href="#1758" id="1758">1758</a>
+<a href="#1759" id="1759">1759</a>
+<a href="#1760" id="1760">1760</a>
+<a href="#1761" id="1761">1761</a>
+<a href="#1762" id="1762">1762</a>
+<a href="#1763" id="1763">1763</a>
+<a href="#1764" id="1764">1764</a>
+<a href="#1765" id="1765">1765</a>
+<a href="#1766" id="1766">1766</a>
+<a href="#1767" id="1767">1767</a>
+<a href="#1768" id="1768">1768</a>
+<a href="#1769" id="1769">1769</a>
+<a href="#1770" id="1770">1770</a>
+<a href="#1771" id="1771">1771</a>
+<a href="#1772" id="1772">1772</a>
+<a href="#1773" id="1773">1773</a>
+<a href="#1774" id="1774">1774</a>
+<a href="#1775" id="1775">1775</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Postgres schema description.
 
 </span><span class="kw">mod </span>default;
@@ -1736,6 +1797,7 @@
     any::type_name,
     collections::{BTreeMap, HashMap},
     convert::TryInto,
+    iter::Peekable,
 };
 <span class="kw">use </span>tracing::trace;
 
@@ -1861,6 +1923,7 @@
 </span><span class="kw">pub struct </span>PostgresSchemaExt {
     <span class="kw">pub </span>opclasses: Vec&lt;(IndexColumnId, SQLOperatorClass)&gt;,
     <span class="kw">pub </span>indexes: Vec&lt;(IndexId, SqlIndexAlgorithm)&gt;,
+    <span class="kw">pub </span>expression_indexes: Vec&lt;(TableId, String)&gt;,
     <span class="kw">pub </span>index_null_position: HashMap&lt;IndexColumnId, IndexNullPosition&gt;,
     <span class="kw">pub </span>constraint_options: HashMap&lt;Constraint, BitFlags&lt;ConstraintOption&gt;&gt;,
     <span class="kw">pub </span>table_options: Vec&lt;BTreeMap&lt;String, String&gt;&gt;,
@@ -3018,123 +3081,37 @@
                 <span class="kw-2">&amp;</span>[Array(<span class="prelude-val">Some</span>(namespaces.iter().map(|v| v.as_str().into()).collect()))],
             )
             .<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let </span><span class="kw-2">mut </span>current_index: <span class="prelude-ty">Option</span>&lt;IndexId&gt; = <span class="prelude-val">None</span>;
 
-        <span class="kw">for </span>row <span class="kw">in </span>rows {
-            <span class="kw">let </span>namespace = row.get_expect_string(<span class="string">&quot;namespace&quot;</span>);
-            <span class="kw">let </span>table_name = row.get_expect_string(<span class="string">&quot;table_name&quot;</span>);
-            <span class="kw">let </span>table_id: TableId = <span class="kw">match </span>table_ids.get(<span class="kw-2">&amp;</span>(namespace, table_name)) {
-                <span class="prelude-val">Some</span>(id) =&gt; <span class="kw-2">*</span>id,
-                <span class="prelude-val">None </span>=&gt; <span class="kw">continue</span>,
-            };
+        <span class="kw">let </span><span class="kw-2">mut </span>result_rows = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>index_rows = rows.into_iter().peekable();
 
-            <span class="kw">let </span>column_name = row.get_expect_string(<span class="string">&quot;column_name&quot;</span>);
-            <span class="kw">let </span>column_id = <span class="kw">match </span>sql_schema.walk(table_id).column(<span class="kw-2">&amp;</span>column_name) {
-                <span class="prelude-val">Some</span>(col) =&gt; col.id,
-                <span class="kw">_ </span>=&gt; <span class="kw">continue</span>,
-            };
+        <span class="kw">loop </span>{
+            result_rows.clear();
+            group_next_index(<span class="kw-2">&amp;mut </span>result_rows, <span class="kw-2">&amp;mut </span>index_rows);
 
-            <span class="kw">let </span>index_name = row.get_expect_string(<span class="string">&quot;index_name&quot;</span>);
-            <span class="kw">let </span>is_unique = row.get_expect_bool(<span class="string">&quot;is_unique&quot;</span>);
-            <span class="kw">let </span>is_primary_key = row.get_expect_bool(<span class="string">&quot;is_primary_key&quot;</span>);
-            <span class="kw">let </span>column_index = row.get_expect_i64(<span class="string">&quot;column_index&quot;</span>);
-            <span class="kw">let </span>index_algo = row.get_expect_string(<span class="string">&quot;index_algo&quot;</span>);
+            <span class="kw">if </span>result_rows.is_empty() {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(());
+            }
 
-            <span class="kw">let </span>sort_order = row.get_string(<span class="string">&quot;column_order&quot;</span>).map(|v| <span class="kw">match </span>v.as_ref() {
-                <span class="string">&quot;ASC&quot; </span>=&gt; SQLSortOrder::Asc,
-                <span class="string">&quot;DESC&quot; </span>=&gt; SQLSortOrder::Desc,
-                misc =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected sort order `{misc}`, collation should be ASC, DESC or Null&quot;</span>),
-            });
-
-            <span class="kw">let </span>algorithm = <span class="kw">if </span><span class="self">self</span>.is_cockroach() {
-                <span class="kw">match </span>index_algo.as_str() {
-                    <span class="string">&quot;inverted&quot; </span>=&gt; SqlIndexAlgorithm::Gin,
-                    <span class="kw">_ </span>=&gt; SqlIndexAlgorithm::BTree,
-                }
-            } <span class="kw">else </span>{
-                <span class="kw">match </span>index_algo.as_str() {
-                    <span class="string">&quot;btree&quot; </span>=&gt; SqlIndexAlgorithm::BTree,
-                    <span class="string">&quot;hash&quot; </span>=&gt; SqlIndexAlgorithm::Hash,
-                    <span class="string">&quot;gist&quot; </span>=&gt; SqlIndexAlgorithm::Gist,
-                    <span class="string">&quot;gin&quot; </span>=&gt; SqlIndexAlgorithm::Gin,
-                    <span class="string">&quot;spgist&quot; </span>=&gt; SqlIndexAlgorithm::SpGist,
-                    <span class="string">&quot;brin&quot; </span>=&gt; SqlIndexAlgorithm::Brin,
-                    other =&gt; {
-                        <span class="macro">tracing::warn!</span>(<span class="string">&quot;Unknown index algorithm on {index_name}: {other}&quot;</span>);
-                        SqlIndexAlgorithm::BTree
-                    }
-                }
-            };
-
-            <span class="kw">if </span>column_index == <span class="number">0 </span>{
-                <span class="comment">// new index!
-                </span><span class="kw">let </span>index_id = <span class="kw">if </span>is_primary_key {
-                    sql_schema.push_primary_key(table_id, index_name)
-                } <span class="kw">else if </span>is_unique {
-                    sql_schema.push_unique_constraint(table_id, index_name)
-                } <span class="kw">else </span>{
-                    sql_schema.push_index(table_id, index_name)
+            <span class="comment">// * Expression Indexes
+            </span><span class="kw">if </span>result_rows.iter().any(|row| row.get_string(<span class="string">&quot;column_name&quot;</span>).is_none()) {
+                <span class="kw">let </span>row = result_rows.first().unwrap();
+                <span class="kw">let </span>namespace = row.get_expect_string(<span class="string">&quot;namespace&quot;</span>);
+                <span class="kw">let </span>table_name = row.get_expect_string(<span class="string">&quot;table_name&quot;</span>);
+                <span class="kw">let </span>table_id: TableId = <span class="kw">match </span>table_ids.get(<span class="kw-2">&amp;</span>(namespace, table_name)) {
+                    <span class="prelude-val">Some</span>(id) =&gt; <span class="kw-2">*</span>id,
+                    <span class="prelude-val">None </span>=&gt; <span class="kw">continue</span>,
                 };
 
-                <span class="kw">if </span>is_primary_key || is_unique {
-                    <span class="kw">let </span><span class="kw-2">mut </span>constraint_options = BitFlags::empty();
+                pg_ext
+                    .expression_indexes
+                    .push((table_id, row.get_expect_string(<span class="string">&quot;index_name&quot;</span>)));
 
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="bool-val">true</span>) = row.get_bool(<span class="string">&quot;condeferrable&quot;</span>) {
-                        constraint_options |= ConstraintOption::Deferrable;
-                    }
-
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="bool-val">true</span>) = row.get_bool(<span class="string">&quot;condeferred&quot;</span>) {
-                        constraint_options |= ConstraintOption::Deferred;
-                    }
-
-                    pg_ext
-                        .constraint_options
-                        .insert(Constraint::Index(index_id), constraint_options);
-                }
-
-                current_index = <span class="prelude-val">Some</span>(index_id);
+                <span class="kw">continue</span>;
             }
 
-            <span class="kw">let </span>index_id = current_index.unwrap();
-            <span class="kw">let </span>operator_class = <span class="kw">if </span>!<span class="macro">matches!</span>(algorithm, SqlIndexAlgorithm::BTree | SqlIndexAlgorithm::Hash) {
-                row.get_string(<span class="string">&quot;opclass&quot;</span>)
-                    .map(|c| (c, row.get_bool(<span class="string">&quot;opcdefault&quot;</span>).unwrap_or_default()))
-                    .map(|(c, is_default)| SQLOperatorClass {
-                        kind: SQLOperatorClassKind::from(c.as_str()),
-                        is_default,
-                    })
-            } <span class="kw">else </span>{
-                <span class="prelude-val">None
-            </span>};
-
-            <span class="kw">let </span>index_field_id = sql_schema.push_index_column(IndexColumn {
-                index_id,
-                column_id,
-                sort_order,
-                length: <span class="prelude-val">None</span>,
-            });
-
-            pg_ext.indexes.push((index_id, algorithm));
-
-            <span class="comment">// only enable nulls first/last on Postgres
-            </span><span class="kw">if </span>!<span class="self">self</span>.is_cockroach() &amp;&amp; algorithm == SqlIndexAlgorithm::BTree &amp;&amp; !is_primary_key {
-                <span class="kw">let </span>nulls_first = row.get_expect_bool(<span class="string">&quot;nulls_first&quot;</span>);
-
-                <span class="kw">let </span>position = <span class="kw">if </span>nulls_first {
-                    IndexNullPosition::First
-                } <span class="kw">else </span>{
-                    IndexNullPosition::Last
-                };
-
-                pg_ext.index_null_position.insert(index_field_id, position);
-            }
-
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(opclass) = operator_class {
-                pg_ext.opclasses.push((index_field_id, opclass));
-            }
+            index_from_row(result_rows.drain(..), table_ids, sql_schema, pg_ext, <span class="self">self</span>.circumstances);
         }
-
-        <span class="prelude-val">Ok</span>(())
     }
 
     <span class="kw">async fn </span>get_sequences(<span class="kw-2">&amp;</span><span class="self">self</span>, sql_schema: <span class="kw-2">&amp;</span>SqlSchema, postgres_ext: <span class="kw-2">&amp;mut </span>PostgresSchemaExt) -&gt; DescriberResult&lt;()&gt; {
@@ -3242,6 +3219,151 @@
         }
 
         <span class="prelude-val">Ok</span>(())
+    }
+}
+
+<span class="kw">fn </span>group_next_index&lt;T&gt;(result_rows: <span class="kw-2">&amp;mut </span>Vec&lt;ResultRow&gt;, index_rows: <span class="kw-2">&amp;mut </span>Peekable&lt;T&gt;)
+<span class="kw">where
+    </span>T: Iterator&lt;Item = ResultRow&gt;,
+{
+    <span class="kw">let </span>idx_name = <span class="kw">match </span>index_rows.peek() {
+        <span class="prelude-val">Some</span>(idx_name) =&gt; idx_name.get_expect_string(<span class="string">&quot;index_name&quot;</span>),
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
+    };
+
+    <span class="kw">while let </span><span class="prelude-val">Some</span>(row) = index_rows.peek() {
+        <span class="kw">if </span>row.get_expect_string(<span class="string">&quot;index_name&quot;</span>) == idx_name {
+            result_rows.push(index_rows.next().unwrap());
+        } <span class="kw">else </span>{
+            <span class="kw">return</span>;
+        }
+    }
+}
+
+<span class="kw">fn </span>index_from_row(
+    rows: <span class="kw">impl </span>Iterator&lt;Item = ResultRow&gt;,
+    table_ids: <span class="kw-2">&amp;</span>IndexMap&lt;(String, String), TableId&gt;,
+    sql_schema: <span class="kw-2">&amp;mut </span>SqlSchema,
+    pg_ext: <span class="kw-2">&amp;mut </span>PostgresSchemaExt,
+    circumstances: BitFlags&lt;Circumstances&gt;,
+) {
+    <span class="kw">let </span><span class="kw-2">mut </span>current_index = <span class="prelude-val">None</span>;
+
+    <span class="kw">for </span>row <span class="kw">in </span>rows {
+        <span class="kw">let </span>namespace = row.get_expect_string(<span class="string">&quot;namespace&quot;</span>);
+        <span class="kw">let </span>table_name = row.get_expect_string(<span class="string">&quot;table_name&quot;</span>);
+        <span class="kw">let </span>table_id: TableId = <span class="kw">match </span>table_ids.get(<span class="kw-2">&amp;</span>(namespace, table_name)) {
+            <span class="prelude-val">Some</span>(id) =&gt; <span class="kw-2">*</span>id,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">continue</span>,
+        };
+
+        <span class="kw">let </span>column_name = row.get_expect_string(<span class="string">&quot;column_name&quot;</span>);
+
+        <span class="kw">let </span>column_id = <span class="kw">match </span>sql_schema.walk(table_id).column(<span class="kw-2">&amp;</span>column_name) {
+            <span class="prelude-val">Some</span>(col) =&gt; col.id,
+            <span class="kw">_ </span>=&gt; <span class="kw">continue</span>,
+        };
+
+        <span class="kw">let </span>index_name = row.get_expect_string(<span class="string">&quot;index_name&quot;</span>);
+        <span class="kw">let </span>is_unique = row.get_expect_bool(<span class="string">&quot;is_unique&quot;</span>);
+        <span class="kw">let </span>is_primary_key = row.get_expect_bool(<span class="string">&quot;is_primary_key&quot;</span>);
+        <span class="kw">let </span>column_index = row.get_expect_i64(<span class="string">&quot;column_index&quot;</span>);
+        <span class="kw">let </span>index_algo = row.get_expect_string(<span class="string">&quot;index_algo&quot;</span>);
+
+        <span class="kw">let </span>sort_order = row.get_string(<span class="string">&quot;column_order&quot;</span>).map(|v| <span class="kw">match </span>v.as_ref() {
+            <span class="string">&quot;ASC&quot; </span>=&gt; SQLSortOrder::Asc,
+            <span class="string">&quot;DESC&quot; </span>=&gt; SQLSortOrder::Desc,
+            misc =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected sort order `{misc}`, collation should be ASC, DESC or Null&quot;</span>),
+        });
+
+        <span class="kw">let </span>algorithm = <span class="kw">if </span>circumstances.contains(Circumstances::Cockroach) {
+            <span class="kw">match </span>index_algo.as_str() {
+                <span class="string">&quot;inverted&quot; </span>=&gt; SqlIndexAlgorithm::Gin,
+                <span class="kw">_ </span>=&gt; SqlIndexAlgorithm::BTree,
+            }
+        } <span class="kw">else </span>{
+            <span class="kw">match </span>index_algo.as_str() {
+                <span class="string">&quot;btree&quot; </span>=&gt; SqlIndexAlgorithm::BTree,
+                <span class="string">&quot;hash&quot; </span>=&gt; SqlIndexAlgorithm::Hash,
+                <span class="string">&quot;gist&quot; </span>=&gt; SqlIndexAlgorithm::Gist,
+                <span class="string">&quot;gin&quot; </span>=&gt; SqlIndexAlgorithm::Gin,
+                <span class="string">&quot;spgist&quot; </span>=&gt; SqlIndexAlgorithm::SpGist,
+                <span class="string">&quot;brin&quot; </span>=&gt; SqlIndexAlgorithm::Brin,
+                other =&gt; {
+                    <span class="macro">tracing::warn!</span>(<span class="string">&quot;Unknown index algorithm on {index_name}: {other}&quot;</span>);
+                    SqlIndexAlgorithm::BTree
+                }
+            }
+        };
+
+        <span class="comment">// * Note: Expression Indexes can have 1 &amp; 2
+        </span><span class="kw">if </span>column_index == <span class="number">0 </span>{
+            <span class="comment">// new index!
+            </span><span class="kw">let </span>index_id = <span class="kw">if </span>is_primary_key {
+                sql_schema.push_primary_key(table_id, index_name)
+            } <span class="kw">else if </span>is_unique {
+                sql_schema.push_unique_constraint(table_id, index_name)
+            } <span class="kw">else </span>{
+                sql_schema.push_index(table_id, index_name)
+            };
+
+            <span class="kw">if </span>is_primary_key || is_unique {
+                <span class="kw">let </span><span class="kw-2">mut </span>constraint_options = BitFlags::empty();
+
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="bool-val">true</span>) = row.get_bool(<span class="string">&quot;condeferrable&quot;</span>) {
+                    constraint_options |= ConstraintOption::Deferrable;
+                }
+
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="bool-val">true</span>) = row.get_bool(<span class="string">&quot;condeferred&quot;</span>) {
+                    constraint_options |= ConstraintOption::Deferred;
+                }
+
+                pg_ext
+                    .constraint_options
+                    .insert(Constraint::Index(index_id), constraint_options);
+            }
+
+            current_index = <span class="prelude-val">Some</span>(index_id);
+        }
+
+        <span class="kw">let </span>index_id = current_index.unwrap();
+        <span class="kw">let </span>operator_class = <span class="kw">if </span>!<span class="macro">matches!</span>(algorithm, SqlIndexAlgorithm::BTree | SqlIndexAlgorithm::Hash) {
+            row.get_string(<span class="string">&quot;opclass&quot;</span>)
+                .map(|c| (c, row.get_bool(<span class="string">&quot;opcdefault&quot;</span>).unwrap_or_default()))
+                .map(|(c, is_default)| SQLOperatorClass {
+                    kind: SQLOperatorClassKind::from(c.as_str()),
+                    is_default,
+                })
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>};
+
+        <span class="kw">let </span>index_field_id = sql_schema.push_index_column(IndexColumn {
+            index_id,
+            column_id,
+            sort_order,
+            length: <span class="prelude-val">None</span>,
+        });
+
+        pg_ext.indexes.push((index_id, algorithm));
+
+        <span class="comment">// only enable nulls first/last on Postgres
+        </span><span class="kw">if </span>!circumstances.contains(Circumstances::Cockroach) &amp;&amp; algorithm == SqlIndexAlgorithm::BTree &amp;&amp; !is_primary_key
+        {
+            <span class="kw">let </span>nulls_first = row.get_expect_bool(<span class="string">&quot;nulls_first&quot;</span>);
+
+            <span class="kw">let </span>position = <span class="kw">if </span>nulls_first {
+                IndexNullPosition::First
+            } <span class="kw">else </span>{
+                IndexNullPosition::Last
+            };
+
+            pg_ext.index_null_position.insert(index_field_id, position);
+        }
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(opclass) = operator_class {
+            pg_ext.opclasses.push((index_field_id, opclass));
+        }
     }
 }
 

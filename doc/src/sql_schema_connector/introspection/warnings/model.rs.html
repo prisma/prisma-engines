@@ -127,6 +127,13 @@
 <a href="#127" id="127">127</a>
 <a href="#128" id="128">128</a>
 <a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::introspection::introspection_pair::{DefaultKind, ModelPair};
 <span class="kw">use </span>schema_connector::{warnings <span class="kw">as </span>generators, Warnings};
 
@@ -190,6 +197,13 @@
         warnings.check_constraints.push(generators::ModelAndConstraint {
             model: model.name().to_string(),
             constraint: constraint.to_string(),
+        })
+    }
+
+    <span class="kw">for </span>expr_indx <span class="kw">in </span>model.expression_indexes() {
+        warnings.expression_indexes.push(generators::ModelAndConstraint {
+            model: model.name().to_string(),
+            constraint: expr_indx.to_string(),
         })
     }
 

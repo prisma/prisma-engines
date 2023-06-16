@@ -315,11 +315,29 @@
 <a href="#315" id="315">315</a>
 <a href="#316" id="316">316</a>
 <a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>psl::{
     datamodel_connector::walker_ext_traits::IndexWalkerExt,
     parser_database::walkers,
     schema_ast::ast::{<span class="self">self</span>, WithDocumentation},
 };
+<span class="kw">use </span>sql::postgres::PostgresSchemaExt;
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
 <span class="kw">use </span>std::borrow::Cow;
 
@@ -387,6 +405,22 @@
     <span class="doccomment">/// Whether the model has exclusion constraints.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>adds_exclusion_constraints(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.previous.is_none() &amp;&amp; <span class="self">self</span>.context.flavour.uses_exclude_constraint(<span class="self">self</span>.context, <span class="self">self</span>.next)
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>expression_indexes(<span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>indexes = <span class="prelude-val">None</span>;
+        <span class="kw">if </span><span class="self">self</span>.context.sql_family().is_postgres() {
+            <span class="kw">let </span>data: <span class="kw-2">&amp;</span>PostgresSchemaExt = <span class="self">self</span>.context.sql_schema.downcast_connector_data();
+
+            indexes = <span class="prelude-val">Some</span>(
+                data.expression_indexes
+                    .iter()
+                    .filter(<span class="kw">move </span>|(table_id, _idx)| <span class="kw-2">*</span>table_id == <span class="self">self</span>.next.id)
+                    .map(|(_table_id, idx)| idx.as_str()),
+            );
+        }
+
+        indexes.into_iter().flatten()
     }
 
     <span class="doccomment">/// True, if we add a new model with row level security enabled.

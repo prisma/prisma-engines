@@ -148,6 +148,12 @@
 <a href="#148" id="148">148</a>
 <a href="#149" id="149">149</a>
 <a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Rendering of model blocks.
 
 </span><span class="kw">use super</span>::{id, indexes, relation_field, scalar_field};
@@ -273,6 +279,12 @@
 
     <span class="kw">if </span>model.adds_non_default_null_position() {
         <span class="kw">let </span>docs = <span class="string">&quot;This model contains an index with non-default null sort order and requires additional setup for migrations. Visit https://pris.ly/d/default-index-null-ordering for more info.&quot;</span>;
+
+        rendered.documentation(docs);
+    }
+
+    <span class="kw">if </span>model.expression_indexes().next().is_some() {
+        <span class="kw">let </span>docs = <span class="string">&quot;This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.&quot;</span>;
 
         rendered.documentation(docs);
     }

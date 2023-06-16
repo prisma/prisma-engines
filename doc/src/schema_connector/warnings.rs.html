@@ -695,6 +695,14 @@
 <a href="#695" id="695">695</a>
 <a href="#696" id="696">696</a>
 <a href="#697" id="697">697</a>
+<a href="#698" id="698">698</a>
+<a href="#699" id="699">699</a>
+<a href="#700" id="700">700</a>
+<a href="#701" id="701">701</a>
+<a href="#702" id="702">702</a>
+<a href="#703" id="703">703</a>
+<a href="#704" id="704">704</a>
+<a href="#705" id="705">705</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Warnings generator for Introspection
 
 </span><span class="kw">use </span>std::{collections::BTreeSet, fmt};
@@ -815,6 +823,8 @@
     </span><span class="kw">pub </span>row_level_ttl: Vec&lt;Model&gt;,
     <span class="doccomment">/// Warn about non-default unique deferring setup
     </span><span class="kw">pub </span>non_default_deferring: Vec&lt;ModelAndConstraint&gt;,
+    <span class="doccomment">/// Warning about Expression Indexes.
+    </span><span class="kw">pub </span>expression_indexes: Vec&lt;ModelAndConstraint&gt;,
     <span class="doccomment">/// Warn about comments
     </span><span class="kw">pub </span>objects_with_comments: Vec&lt;Object&gt;,
     <span class="doccomment">/// Warn about fields which point to an empty type.
@@ -1118,6 +1128,12 @@
         render_warnings(
             <span class="string">&quot;The following models are capped collections, which are not yet fully supported. Read more: https://pris.ly/d/mongodb-capped-collections&quot;</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.capped_collection,
+            f
+        )<span class="question-mark">?</span>;
+
+        render_warnings(
+            <span class="string">&quot;These indexes are not supported by Prisma Client, because Prisma currently does not fully support expression indexes. Read more: https://pris.ly/d/expression-indexes&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.expression_indexes,
             f
         )<span class="question-mark">?</span>;
 
