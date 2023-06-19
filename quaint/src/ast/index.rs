@@ -2,7 +2,7 @@ use super::{Column, Table};
 
 /// A definition of a database index.
 ///
-/// Used mainly for the transformation of a `INSERT` into a `MERGE`.
+/// Used mainly for the transformation of a `INSERT` into a `MERGE` and for an `INSERT OUTPUT` on SQL Server.
 #[derive(Debug, PartialEq, Clone)]
 pub enum IndexDefinition<'a> {
     Single(Box<Column<'a>>),

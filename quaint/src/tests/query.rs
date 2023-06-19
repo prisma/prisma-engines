@@ -663,16 +663,21 @@ async fn single_default_value_insert(api: &mut dyn TestApi) -> crate::Result<()>
     Ok(())
 }
 
-#[cfg(any(feature = "mssql", feature = "postgresql", feature = "sqlite"))]
+// #[cfg(any(feature = "mssql", feature = "postgresql", feature = "sqlite"))]
 #[test_each_connector(tags("mssql", "postgresql", "sqlite"))]
 async fn returning_insert(api: &mut dyn TestApi) -> crate::Result<()> {
-    let table = api.get_name();
+    let table_name = api.get_name();
 
     api.conn()
-        .raw_cmd(&format!("CREATE TABLE {table} (id int primary key, name varchar(255))"))
+        .raw_cmd(&format!(
+            "CREATE TABLE {} (id int primary key, name varchar(255))",
+            &table_name
+        ))
         .await?;
 
-    let insert = Insert::single_into(&table).value("id", 1).value("name", "Naukio");
+    let table = Table::from(table_name.clone()).add_unique_index("id");
+
+    let insert = Insert::single_into(table).value("id", 1).value("name", "Naukio");
 
     let res = api
         .conn()
@@ -683,7 +688,7 @@ async fn returning_insert(api: &mut dyn TestApi) -> crate::Result<()> {
         )
         .await;
 
-    api.conn().raw_cmd(&format!("DROP TABLE {table}")).await?;
+    api.conn().raw_cmd(&format!("DROP TABLE {}", &table_name)).await?;
 
     let res = res?;
 
@@ -708,10 +713,11 @@ async fn returning_decimal_insert_with_type_defs(api: &mut dyn TestApi) -> crate
     use std::str::FromStr;
 
     let dec = BigDecimal::from_str("17661757261711787211853")?;
-    let table = api.create_temp_table("id int, val numeric(26,0)").await?;
+    let table_name = api.create_temp_table("id int primary key, val numeric(26,0)").await?;
     let col = Column::from("val").type_family(TypeFamily::Decimal(Some((26, 0))));
 
-    let insert = Insert::single_into(&table).value("id", 2).value(col, dec.clone());
+    let table = Table::from(table_name).add_unique_index("id");
+    let insert = Insert::single_into(table).value("id", 2).value(col, dec.clone());
 
     let res = api
         .conn()
@@ -730,7 +736,7 @@ async fn returning_decimal_insert_with_type_defs(api: &mut dyn TestApi) -> crate
 #[cfg(feature = "mssql")]
 #[test_each_connector(tags("mssql"))]
 async fn returning_constant_nvarchar_insert_with_type_defs(api: &mut dyn TestApi) -> crate::Result<()> {
-    let table = api.create_temp_table("id int, val nvarchar(4000)").await?;
+    let table = api.create_temp_table("id int primary key, val nvarchar(4000)").await?;
     let col = Column::from("val").type_family(TypeFamily::Text(Some(TypeDataLength::Constant(4000))));
 
     let insert = Insert::single_into(&table).value("id", 2).value(col, "meowmeow");
@@ -752,10 +758,11 @@ async fn returning_constant_nvarchar_insert_with_type_defs(api: &mut dyn TestApi
 #[cfg(feature = "mssql")]
 #[test_each_connector(tags("mssql"))]
 async fn returning_max_nvarchar_insert_with_type_defs(api: &mut dyn TestApi) -> crate::Result<()> {
-    let table = api.create_temp_table("id int, val nvarchar(max)").await?;
+    let table = api.create_temp_table("id int primary key, val nvarchar(max)").await?;
+    let table = Table::from(table).add_unique_index("id");
     let col = Column::from("val").type_family(TypeFamily::Text(Some(TypeDataLength::Maximum)));
 
-    let insert = Insert::single_into(&table).value("id", 2).value(col, "meowmeow");
+    let insert = Insert::single_into(table).value("id", 2).value(col, "meowmeow");
 
     let res = api
         .conn()
@@ -774,10 +781,11 @@ async fn returning_max_nvarchar_insert_with_type_defs(api: &mut dyn TestApi) -> 
 #[cfg(feature = "mssql")]
 #[test_each_connector(tags("mssql"))]
 async fn returning_constant_varchar_insert_with_type_defs(api: &mut dyn TestApi) -> crate::Result<()> {
-    let table = api.create_temp_table("id int, val varchar(4000)").await?;
+    let table = api.create_temp_table("id int primary key, val varchar(4000)").await?;
+    let table = Table::from(table).add_unique_index("id");
     let col = Column::from("val").type_family(TypeFamily::Text(Some(TypeDataLength::Constant(4000))));
 
-    let insert = Insert::single_into(&table).value("id", 2).value(col, "meowmeow");
+    let insert = Insert::single_into(table).value("id", 2).value(col, "meowmeow");
 
     let res = api
         .conn()
@@ -796,10 +804,11 @@ async fn returning_constant_varchar_insert_with_type_defs(api: &mut dyn TestApi)
 #[cfg(feature = "mssql")]
 #[test_each_connector(tags("mssql"))]
 async fn returning_max_varchar_insert_with_type_defs(api: &mut dyn TestApi) -> crate::Result<()> {
-    let table = api.create_temp_table("id int, val varchar(max)").await?;
+    let table = api.create_temp_table("id int primary key, val varchar(max)").await?;
+    let table = Table::from(table).add_unique_index("id");
     let col = Column::from("val").type_family(TypeFamily::Text(Some(TypeDataLength::Maximum)));
 
-    let insert = Insert::single_into(&table).value("id", 2).value(col, "meowmeow");
+    let insert = Insert::single_into(table).value("id", 2).value(col, "meowmeow");
 
     let res = api
         .conn()
@@ -965,6 +974,8 @@ async fn single_insert_conflict_do_nothing_with_returning(api: &mut dyn TestApi)
         .conn()
         .insert(insert.on_conflict(OnConflict::DoNothing).returning(vec!["name"]))
         .await?;
+
+    dbg!(&res);
 
     assert_eq!(1, res.len());
     assert_eq!(1, res.columns().len());
