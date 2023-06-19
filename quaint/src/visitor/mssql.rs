@@ -1306,7 +1306,7 @@ mod tests {
         let insert = Insert::single_into("foo").value("bar", "lol");
         let (sql, params) = Mssql::build(Insert::from(insert).returning(vec!["bar"])).unwrap();
 
-        assert_eq!("DECLARE @generated_keys table([bar] NVARCHAR(255)) INSERT INTO [foo] ([bar]) OUTPUT [Inserted].[bar] INTO @generated_keys VALUES (@P1) SELECT [t].[bar] FROM @generated_keys AS g INNER JOIN [foo] AS [t] ON [t].[bar] = [g].[bar] WHERE @@ROWCOUNT > 0", sql);
+        assert_eq!("DECLARE @generated_keys table([bar] NVARCHAR(255)) INSERT INTO [foo] ([bar]) OUTPUT [Inserted].[bar] INTO @generated_keys VALUES (@P1) SELECT [t].[bar] FROM @generated_keys AS g INNER JOIN [foo] AS [t] ON ([t].[bar] = [g].[bar] OR ([t].[bar] IS NULL AND [g].[bar] IS NULL)) WHERE @@ROWCOUNT > 0", sql);
 
         assert_eq!(vec![Value::from("lol")], params);
     }
