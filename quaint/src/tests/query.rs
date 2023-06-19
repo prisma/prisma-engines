@@ -748,7 +748,7 @@ async fn returning_constant_nvarchar_insert_with_type_defs(api: &mut dyn TestApi
     let table_name = api.create_temp_table("id int primary key, val nvarchar(4000)").await?;
     let table = Table::from(&table_name).add_unique_index("id");
     let val_col =
-        Column::from((table.clone(), "val")).type_family(TypeFamily::Text(Some(TypeDataLength::Constant(4000))));
+        Column::from((table.clone(), "val")).type_family(TypeFamily::Text(Some(TypeDataLength::Constant(4000)), None));
     let id_col = Column::from((table.clone(), "id"));
 
     let insert = Insert::single_into(table)
@@ -775,7 +775,8 @@ async fn returning_max_nvarchar_insert_with_type_defs(api: &mut dyn TestApi) -> 
     let table = api.create_temp_table("id int primary key, val nvarchar(max)").await?;
     let table = Table::from(table).add_unique_index("id");
     let id_col = Column::from((table.clone(), "id"));
-    let val_col = Column::from((table.clone(), "val")).type_family(TypeFamily::Text(Some(TypeDataLength::Maximum)));
+    let val_col =
+        Column::from((table.clone(), "val")).type_family(TypeFamily::Text(Some(TypeDataLength::Maximum), None));
 
     let insert = Insert::single_into(table)
         .value(id_col.clone(), 2)
@@ -802,7 +803,7 @@ async fn returning_constant_varchar_insert_with_type_defs(api: &mut dyn TestApi)
     let table = Table::from(table).add_unique_index("id");
     let id_col = Column::from((table.clone(), "id"));
     let val_col =
-        Column::from((table.clone(), "val")).type_family(TypeFamily::Text(Some(TypeDataLength::Constant(4000))));
+        Column::from((table.clone(), "val")).type_family(TypeFamily::Text(Some(TypeDataLength::Constant(4000)), None));
 
     let insert = Insert::single_into(table)
         .value(id_col.clone(), 2)
@@ -828,7 +829,8 @@ async fn returning_max_varchar_insert_with_type_defs(api: &mut dyn TestApi) -> c
     let table = api.create_temp_table("id int primary key, val varchar(max)").await?;
     let table = Table::from(table).add_unique_index("id");
     let id_col = Column::from((table.clone(), "id"));
-    let val_col = Column::from((table.clone(), "val")).type_family(TypeFamily::Text(Some(TypeDataLength::Maximum)));
+    let val_col =
+        Column::from((table.clone(), "val")).type_family(TypeFamily::Text(Some(TypeDataLength::Maximum), None));
 
     let insert = Insert::single_into(table)
         .value(id_col.clone(), 2)
