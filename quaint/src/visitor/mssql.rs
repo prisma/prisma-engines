@@ -1406,7 +1406,7 @@ mod tests {
             OUTPUT [Inserted].[bar],[Inserted].[wtf] INTO @generated_keys;
             SELECT [t].[bar],[t].[wtf] FROM @generated_keys AS g
             INNER JOIN [foo] AS [t]
-            ON ([t].[bar] = [g].[bar] AND [t].[wtf] = [g].[wtf])
+            ON (([t].[bar] = [g].[bar] OR ([t].[bar] IS NULL AND [g].[bar] IS NULL)) AND ([t].[wtf] = [g].[wtf] OR ([t].[wtf] IS NULL AND [g].[wtf] IS NULL)))
             WHERE @@ROWCOUNT > 0
         "
         );
