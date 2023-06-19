@@ -58,7 +58,7 @@ pub(crate) fn create_record(
         None => ParsedInputMap::default(),
     };
 
-    if dbg!(can_use_atomic_create(query_schema, &model, &data_map, &field)) {
+    if can_use_atomic_create(query_schema, &model, &data_map, &field) {
         let create_node = create::atomic_create_record_node(graph, query_schema, model, data_map, field)?;
 
         graph.add_result_node(&create_node);
