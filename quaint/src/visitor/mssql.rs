@@ -7,7 +7,7 @@ use crate::{
         Order, Ordering, Row, Table, TypeDataLength, TypeFamily, Values,
     },
     error::{Error, ErrorKind},
-    prelude::{Aliasable, Average, ConditionTree, IndexDefinition, Query},
+    prelude::{Aliasable, Average, BytesTypeFamily, ConditionTree, IndexDefinition, Query, TextTypeFamily},
     visitor, Value,
 };
 use std::{convert::TryFrom, fmt::Write, iter};
@@ -47,15 +47,18 @@ impl<'a> Mssql<'a> {
 
     fn visit_type_family(&mut self, type_family: TypeFamily) -> visitor::Result {
         match type_family {
-            TypeFamily::Text(len) => {
-                self.write("NVARCHAR(")?;
-                match len {
-                    Some(TypeDataLength::Constant(len)) => self.write(len)?,
-                    Some(TypeDataLength::Maximum) => self.write("MAX")?,
-                    None => self.write(4000)?,
+            TypeFamily::Text(len, family) => match family {
+                Some(TextTypeFamily::Xml) => self.write("XML"),
+                None => {
+                    self.write("NVARCHAR(")?;
+                    match len {
+                        Some(TypeDataLength::Constant(len)) => self.write(len)?,
+                        Some(TypeDataLength::Maximum) => self.write("MAX")?,
+                        None => self.write(4000)?,
+                    }
+                    self.write(")")
                 }
-                self.write(")")
-            }
+            },
             TypeFamily::Int => self.write("BIGINT"),
             TypeFamily::Float => self.write("FLOAT(24)"),
             TypeFamily::Double => self.write("FLOAT(53)"),
@@ -74,15 +77,18 @@ impl<'a> Mssql<'a> {
             TypeFamily::Boolean => self.write("BIT"),
             TypeFamily::Uuid => self.write("UNIQUEIDENTIFIER"),
             TypeFamily::DateTime => self.write("DATETIMEOFFSET"),
-            TypeFamily::Bytes(len) => {
-                self.write("VARBINARY(")?;
-                match len {
-                    Some(TypeDataLength::Constant(len)) => self.write(len)?,
-                    Some(TypeDataLength::Maximum) => self.write("MAX")?,
-                    None => self.write(8000)?,
+            TypeFamily::Bytes(len, family) => match family {
+                Some(BytesTypeFamily::Image) => self.write("Image"),
+                None => {
+                    self.write("VARBINARY(")?;
+                    match len {
+                        Some(TypeDataLength::Constant(len)) => self.write(len)?,
+                        Some(TypeDataLength::Maximum) => self.write("MAX")?,
+                        None => self.write(8000)?,
+                    }
+                    self.write(")")
                 }
-                self.write(")")
-            }
+            },
         }
     }
 

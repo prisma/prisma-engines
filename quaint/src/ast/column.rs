@@ -12,8 +12,18 @@ pub enum TypeDataLength {
 }
 
 #[derive(Debug, Clone, Copy)]
+pub enum TextTypeFamily {
+    Xml,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum BytesTypeFamily {
+    Image,
+}
+
+#[derive(Debug, Clone, Copy)]
 pub enum TypeFamily {
-    Text(Option<TypeDataLength>),
+    Text(Option<TypeDataLength>, Option<TextTypeFamily>),
     Int,
     Float,
     Double,
@@ -21,7 +31,7 @@ pub enum TypeFamily {
     Uuid,
     DateTime,
     Decimal(Option<(u8, u8)>),
-    Bytes(Option<TypeDataLength>),
+    Bytes(Option<TypeDataLength>, Option<BytesTypeFamily>),
 }
 
 /// A column definition.

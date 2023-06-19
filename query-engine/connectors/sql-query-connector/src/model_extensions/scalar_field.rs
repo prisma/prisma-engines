@@ -3,7 +3,7 @@ use prisma_models::{ScalarField, TypeIdentifier};
 use prisma_value::PrismaValue;
 use quaint::{
     ast::Value,
-    prelude::{TypeDataLength, TypeFamily},
+    prelude::{BytesTypeFamily, TextTypeFamily, TypeDataLength, TypeFamily},
 };
 
 pub trait ScalarFieldExt {
@@ -44,12 +44,18 @@ impl ScalarFieldExt for ScalarField {
     }
 
     fn type_family(&self) -> TypeFamily {
-        match self.type_identifier() {
-            TypeIdentifier::String => TypeFamily::Text(parse_scalar_length(self)),
-            TypeIdentifier::Int => TypeFamily::Int,
-            TypeIdentifier::BigInt => TypeFamily::Int,
-            TypeIdentifier::Float => TypeFamily::Double,
-            TypeIdentifier::Decimal => {
+        let nt_name = self.native_type().map(|nt| nt.name());
+
+        match (self.type_identifier(), nt_name) {
+            // A specific XML type is required on SQL Server for INSERT OUTPUT.
+            // As we use a temporary table to store the inserted values and then select them afterward,
+            // the column type in that temporary table cannot be of type VARCHAR without additional casting.
+            (TypeIdentifier::String, Some("Xml")) => TypeFamily::Text(None, Some(TextTypeFamily::Xml)),
+            (TypeIdentifier::String, _) => TypeFamily::Text(parse_scalar_length(self), None),
+            (TypeIdentifier::Int, _) => TypeFamily::Int,
+            (TypeIdentifier::BigInt, _) => TypeFamily::Int,
+            (TypeIdentifier::Float, _) => TypeFamily::Double,
+            (TypeIdentifier::Decimal, _) => {
                 let params = self
                     .native_type()
                     .map(|nt| nt.args().into_iter())
@@ -58,13 +64,17 @@ impl ScalarFieldExt for ScalarField {
 
                 TypeFamily::Decimal(params)
             }
-            TypeIdentifier::Boolean => TypeFamily::Boolean,
-            TypeIdentifier::Enum(_) => TypeFamily::Text(Some(TypeDataLength::Constant(8000))),
-            TypeIdentifier::UUID => TypeFamily::Uuid,
-            TypeIdentifier::Json => TypeFamily::Text(Some(TypeDataLength::Maximum)),
-            TypeIdentifier::DateTime => TypeFamily::DateTime,
-            TypeIdentifier::Bytes => TypeFamily::Text(parse_scalar_length(self)),
-            TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
+            (TypeIdentifier::Boolean, _) => TypeFamily::Boolean,
+            (TypeIdentifier::Enum(_), _) => TypeFamily::Text(Some(TypeDataLength::Constant(8000)), None),
+            (TypeIdentifier::UUID, _) => TypeFamily::Uuid,
+            (TypeIdentifier::Json, _) => TypeFamily::Text(Some(TypeDataLength::Maximum), None),
+            (TypeIdentifier::DateTime, _) => TypeFamily::DateTime,
+            // A specific Image type is required on SQL Server for INSERT OUTPUT.
+            // As we use a temporary table to store the inserted values and then select them afterward,
+            // the column type in that temporary table cannot be of type Bytes without additional casting.
+            (TypeIdentifier::Bytes, Some("Image")) => TypeFamily::Bytes(None, Some(BytesTypeFamily::Image)),
+            (TypeIdentifier::Bytes, _) => TypeFamily::Text(parse_scalar_length(self), None),
+            (TypeIdentifier::Unsupported, _) => unreachable!("No unsupported field should reach that path"),
         }
     }
 }
