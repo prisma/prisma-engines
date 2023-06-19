@@ -125,17 +125,31 @@ impl<'a> Mssql<'a> {
             })
             .collect::<Vec<_>>();
 
+        if unique_cols.is_empty() {
+            let msg = "Table is missing some index definitions in order to render an INSERT OUTPUT.";
+            let kind = ErrorKind::QueryInvalidInput(msg.to_string());
+
+            let mut builder = Error::builder(kind);
+            builder.set_original_message(msg);
+
+            return Err(builder.build());
+        }
+
         // We only use the unique columns to generate the join conditions.
         let join_columns = columns
             .iter()
             .filter(|col| unique_cols.contains(col))
             .collect::<Vec<_>>();
 
-        assert_eq!(
-            join_columns.len(),
-            0,
-            "We could not find any unique columns to join on the temporary table."
-        );
+        if join_columns.is_empty() {
+            let msg = "No unique column could be found in the returning statement. Make sure at least one is present or that the unique column has the same table than the index definition ONE attached to it.";
+            let kind = ErrorKind::QueryInvalidInput(msg.to_string());
+
+            let mut builder = Error::builder(kind);
+            builder.set_original_message(msg);
+
+            return Err(builder.build());
+        }
 
         let join = join_columns
             .iter()
@@ -1326,9 +1340,9 @@ mod tests {
     fn test_returning_insert() {
         let table = Table::from("foo").add_unique_index("bar");
         let insert = Insert::single_into(table).value("bar", "lol");
-        let (sql, params) = Mssql::build(Insert::from(insert).returning(vec!["bar"])).unwrap();
+        let (sql, params) = Mssql::build(Insert::from(insert).returning(vec![("foo", "bar")])).unwrap();
 
-        assert_eq!("DECLARE @generated_keys table([bar] NVARCHAR(255)) INSERT INTO [foo] ([bar]) OUTPUT [Inserted].[bar] INTO @generated_keys VALUES (@P1) SELECT [t].[bar] FROM @generated_keys AS g INNER JOIN [foo] AS [t] ON 1=1 WHERE @@ROWCOUNT > 0", sql);
+        assert_eq!("DECLARE @generated_keys table([bar] NVARCHAR(255)) INSERT INTO [foo] ([bar]) OUTPUT [Inserted].[bar] INTO @generated_keys VALUES (@P1) SELECT [t].[bar] FROM @generated_keys AS g INNER JOIN [foo] AS [t] ON ([t].[bar] = [g].[bar] OR ([t].[bar] IS NULL AND [g].[bar] IS NULL)) WHERE @@ROWCOUNT > 0", sql);
 
         assert_eq!(vec![Value::from("lol")], params);
     }
@@ -1428,7 +1442,7 @@ mod tests {
             OUTPUT [Inserted].[bar],[Inserted].[wtf] INTO @generated_keys;
             SELECT [t].[bar],[t].[wtf] FROM @generated_keys AS g
             INNER JOIN [foo] AS [t]
-            ON (([t].[bar] = [g].[bar] OR ([t].[bar] IS NULL AND [g].[bar] IS NULL)) AND ([t].[wtf] = [g].[wtf] OR ([t].[wtf] IS NULL AND [g].[wtf] IS NULL)))
+            ON ([t].[bar] = [g].[bar] OR ([t].[bar] IS NULL AND [g].[bar] IS NULL))
             WHERE @@ROWCOUNT > 0
         "
         );

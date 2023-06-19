@@ -676,14 +676,18 @@ async fn returning_insert(api: &mut dyn TestApi) -> crate::Result<()> {
         .await?;
 
     let table = Table::from(table_name.clone()).add_unique_index("id");
+    let id_col = Column::from((table.clone(), "id"));
+    let name_col = Column::from((table.clone(), "name"));
 
-    let insert = Insert::single_into(table).value("id", 1).value("name", "Naukio");
+    let insert = Insert::single_into(table)
+        .value(id_col.clone(), 1)
+        .value(name_col.clone(), "Naukio");
 
     let res = api
         .conn()
         .insert(
             Insert::from(insert)
-                .returning(vec!["id", "name"])
+                .returning(vec![id_col, name_col])
                 .comment("this should be ignored"),
         )
         .await;
@@ -701,6 +705,7 @@ async fn returning_insert(api: &mut dyn TestApi) -> crate::Result<()> {
     } else {
         assert_eq!(Some(1), row["id"].as_i32());
     }
+
     assert_eq!(Some("Naukio"), row["name"].as_str());
 
     Ok(())
@@ -714,14 +719,18 @@ async fn returning_decimal_insert_with_type_defs(api: &mut dyn TestApi) -> crate
 
     let dec = BigDecimal::from_str("17661757261711787211853")?;
     let table_name = api.create_temp_table("id int primary key, val numeric(26,0)").await?;
-    let col = Column::from("val").type_family(TypeFamily::Decimal(Some((26, 0))));
-
     let table = Table::from(table_name).add_unique_index("id");
-    let insert = Insert::single_into(table).value("id", 2).value(col, dec.clone());
+
+    let id_col = Column::from((table.clone(), "id"));
+    let val_col = Column::from((table.clone(), "val")).type_family(TypeFamily::Decimal(Some((26, 0))));
+
+    let insert = Insert::single_into(table)
+        .value(id_col.clone(), 2)
+        .value(val_col.clone(), dec.clone());
 
     let res = api
         .conn()
-        .insert(Insert::from(insert).returning(vec!["id", "val"]))
+        .insert(Insert::from(insert).returning(vec![id_col, val_col]))
         .await?;
 
     assert_eq!(1, res.len());
@@ -736,14 +745,19 @@ async fn returning_decimal_insert_with_type_defs(api: &mut dyn TestApi) -> crate
 #[cfg(feature = "mssql")]
 #[test_each_connector(tags("mssql"))]
 async fn returning_constant_nvarchar_insert_with_type_defs(api: &mut dyn TestApi) -> crate::Result<()> {
-    let table = api.create_temp_table("id int primary key, val nvarchar(4000)").await?;
-    let col = Column::from("val").type_family(TypeFamily::Text(Some(TypeDataLength::Constant(4000))));
+    let table_name = api.create_temp_table("id int primary key, val nvarchar(4000)").await?;
+    let table = Table::from(&table_name).add_unique_index("id");
+    let val_col =
+        Column::from((table.clone(), "val")).type_family(TypeFamily::Text(Some(TypeDataLength::Constant(4000))));
+    let id_col = Column::from((table.clone(), "id"));
 
-    let insert = Insert::single_into(&table).value("id", 2).value(col, "meowmeow");
+    let insert = Insert::single_into(table)
+        .value(id_col.clone(), 2)
+        .value(val_col.clone(), "meowmeow");
 
     let res = api
         .conn()
-        .insert(Insert::from(insert).returning(vec!["id", "val"]))
+        .insert(Insert::from(insert).returning(vec![id_col, val_col]))
         .await?;
 
     assert_eq!(1, res.len());
@@ -760,13 +774,16 @@ async fn returning_constant_nvarchar_insert_with_type_defs(api: &mut dyn TestApi
 async fn returning_max_nvarchar_insert_with_type_defs(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_temp_table("id int primary key, val nvarchar(max)").await?;
     let table = Table::from(table).add_unique_index("id");
-    let col = Column::from("val").type_family(TypeFamily::Text(Some(TypeDataLength::Maximum)));
+    let id_col = Column::from((table.clone(), "id"));
+    let val_col = Column::from((table.clone(), "val")).type_family(TypeFamily::Text(Some(TypeDataLength::Maximum)));
 
-    let insert = Insert::single_into(table).value("id", 2).value(col, "meowmeow");
+    let insert = Insert::single_into(table)
+        .value(id_col.clone(), 2)
+        .value(val_col.clone(), "meowmeow");
 
     let res = api
         .conn()
-        .insert(Insert::from(insert).returning(vec!["id", "val"]))
+        .insert(Insert::from(insert).returning(vec![id_col, val_col]))
         .await?;
 
     assert_eq!(1, res.len());
@@ -783,13 +800,17 @@ async fn returning_max_nvarchar_insert_with_type_defs(api: &mut dyn TestApi) -> 
 async fn returning_constant_varchar_insert_with_type_defs(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_temp_table("id int primary key, val varchar(4000)").await?;
     let table = Table::from(table).add_unique_index("id");
-    let col = Column::from("val").type_family(TypeFamily::Text(Some(TypeDataLength::Constant(4000))));
+    let id_col = Column::from((table.clone(), "id"));
+    let val_col =
+        Column::from((table.clone(), "val")).type_family(TypeFamily::Text(Some(TypeDataLength::Constant(4000))));
 
-    let insert = Insert::single_into(table).value("id", 2).value(col, "meowmeow");
+    let insert = Insert::single_into(table)
+        .value(id_col.clone(), 2)
+        .value(val_col.clone(), "meowmeow");
 
     let res = api
         .conn()
-        .insert(Insert::from(insert).returning(vec!["id", "val"]))
+        .insert(Insert::from(insert).returning(vec![id_col, val_col.clone()]))
         .await?;
 
     assert_eq!(1, res.len());
@@ -806,13 +827,16 @@ async fn returning_constant_varchar_insert_with_type_defs(api: &mut dyn TestApi)
 async fn returning_max_varchar_insert_with_type_defs(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_temp_table("id int primary key, val varchar(max)").await?;
     let table = Table::from(table).add_unique_index("id");
-    let col = Column::from("val").type_family(TypeFamily::Text(Some(TypeDataLength::Maximum)));
+    let id_col = Column::from((table.clone(), "id"));
+    let val_col = Column::from((table.clone(), "val")).type_family(TypeFamily::Text(Some(TypeDataLength::Maximum)));
 
-    let insert = Insert::single_into(table).value("id", 2).value(col, "meowmeow");
+    let insert = Insert::single_into(table)
+        .value(id_col.clone(), 2)
+        .value(val_col.clone(), "meowmeow");
 
     let res = api
         .conn()
-        .insert(Insert::from(insert).returning(vec!["id", "val"]))
+        .insert(Insert::from(insert).returning(vec![id_col, val_col]))
         .await?;
 
     assert_eq!(1, res.len());
@@ -820,6 +844,50 @@ async fn returning_max_varchar_insert_with_type_defs(api: &mut dyn TestApi) -> c
     let row = res.get(0).unwrap();
     assert_eq!(Some(2), row["id"].as_i32());
     assert_eq!(Some("meowmeow"), row["val"].as_str());
+
+    Ok(())
+}
+
+#[cfg(feature = "mssql")]
+#[test_each_connector(tags("mssql"))]
+async fn returning_without_unique_column(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_temp_table("id int primary key, val int").await?;
+    let id_col = Column::from((&table, "id"));
+    let val_col = Column::from((&table, "val"));
+
+    let insert = Insert::single_into(&table)
+        .value(id_col.clone(), 2)
+        .value(val_col.clone(), "meowmeow");
+
+    let err = api
+        .conn()
+        .insert(Insert::from(insert.clone()).returning(vec![id_col, val_col.clone()]))
+        .await
+        .unwrap_err();
+
+    // Table is missing index definitions
+    assert!(matches!(err.kind(), ErrorKind::QueryInvalidInput(_)));
+
+    let table = Table::from(&table).add_unique_index("id");
+    let val_col = Column::from((table.clone(), "val"));
+
+    let err = api
+        .conn()
+        .insert(Insert::from(insert.clone()).returning(vec![val_col]))
+        .await
+        .unwrap_err();
+
+    // A unique column is missing in the returning statement.
+    assert!(matches!(err.kind(), ErrorKind::QueryInvalidInput(_)));
+
+    let err = api
+        .conn()
+        .insert(Insert::from(insert).returning(vec!["id", "val"]))
+        .await
+        .unwrap_err();
+
+    // The unique "id" column could not be found because it's not attached to a specific table.
+    assert!(matches!(err.kind(), ErrorKind::QueryInvalidInput(_)));
 
     Ok(())
 }
@@ -972,13 +1040,15 @@ async fn single_insert_conflict_do_nothing_with_returning(api: &mut dyn TestApi)
 
     let res = api
         .conn()
-        .insert(insert.on_conflict(OnConflict::DoNothing).returning(vec!["name"]))
+        .insert(
+            insert
+                .on_conflict(OnConflict::DoNothing)
+                .returning(vec![(&table_name, "id"), (&table_name, "name")]),
+        )
         .await?;
 
-    dbg!(&res);
-
     assert_eq!(1, res.len());
-    assert_eq!(1, res.columns().len());
+    assert_eq!(2, res.columns().len());
 
     let row = res.get(0).unwrap();
     assert_eq!(Some("Belka"), row["name"].as_str());
