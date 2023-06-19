@@ -301,7 +301,7 @@ fn making_an_existing_id_field_autoincrement_works_with_foreign_keys(api: TestAp
 
     // Data to see we don't lose anything in the translation.
     for (i, content) in ["A", "B", "C"].iter().enumerate() {
-        let table = api.render_table_name("Author");
+        let table = api.render_table_name("Author").add_unique_index("id");
         let insert = Insert::single_into(table.clone());
 
         let author_id = api
