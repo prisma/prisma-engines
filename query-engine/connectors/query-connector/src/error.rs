@@ -35,7 +35,11 @@ impl ConnectorError {
                 }))
             }
             ErrorKind::InvalidDatabaseUrl { details, url: _ } => {
+                #[cfg(not(target_arch = "wasm32"))]
                 let details = user_facing_errors::quaint::invalid_connection_string_description(details);
+
+                #[cfg(target_arch = "wasm32")]
+                let details = "Invalid database URL.".to_string();
 
                 Some(KnownError::new(user_facing_errors::common::InvalidConnectionString {
                     details,

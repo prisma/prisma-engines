@@ -19,7 +19,6 @@ async-trait = "0.1"
 query-connector = { path = "../connectors/query-connector" }
 psl.workspace = true
 prisma-models = { path = "../prisma-models" }
-js-drivers = { path = "../js-drivers" }
 
 thiserror = "1"
 connection-string.workspace = true 
@@ -32,6 +31,7 @@ futures = "0.3"
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 napi.workspace = true
 napi-derive.workspace = true
+js-drivers = { path = "../js-drivers" }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3" }
 tracing-futures = "0.2"

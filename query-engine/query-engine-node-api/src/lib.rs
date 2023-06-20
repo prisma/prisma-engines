@@ -1,8 +1,14 @@
 pub mod engine;
-pub mod error;
-pub mod functions;
-pub mod log_callback;
 pub mod logger;
+
+#[cfg(not(target_arch = "wasm32"))]
+pub mod error;
+
+#[cfg(not(target_arch = "wasm32"))]
+pub mod functions;
+
+#[cfg(not(target_arch = "wasm32"))]
+pub mod log_callback;
 
 mod tracer;
 
