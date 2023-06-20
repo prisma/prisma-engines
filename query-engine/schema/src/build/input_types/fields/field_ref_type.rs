@@ -21,7 +21,12 @@ fn field_ref_input_object_type(allow_type: InputType<'_>) -> InputObjectType<'_>
     let ident = Identifier::new_prisma(field_ref_input_type_name(&allow_type));
     let mut object = init_input_object_type(ident);
     object.set_tag(ObjectTag::FieldRefType(Box::new(allow_type)));
-    object.set_fields(|| vec![input_field(filters::UNDERSCORE_REF, vec![InputType::string()], None)]);
+    object.set_fields(|| {
+        vec![
+            input_field(filters::UNDERSCORE_REF, vec![InputType::string()], None),
+            input_field(filters::UNDERSCORE_CONTAINER, vec![InputType::string()], None),
+        ]
+    });
     object
 }
 

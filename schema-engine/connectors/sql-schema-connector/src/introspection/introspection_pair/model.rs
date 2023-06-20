@@ -3,6 +3,7 @@ use psl::{
     parser_database::walkers,
     schema_ast::ast::{self, WithDocumentation},
 };
+use sql::postgres::PostgresSchemaExt;
 use sql_schema_describer as sql;
 use std::borrow::Cow;
 
@@ -70,6 +71,22 @@ impl<'a> ModelPair<'a> {
     /// Whether the model has exclusion constraints.
     pub(crate) fn adds_exclusion_constraints(self) -> bool {
         self.previous.is_none() && self.context.flavour.uses_exclude_constraint(self.context, self.next)
+    }
+
+    pub(crate) fn expression_indexes(self) -> impl Iterator<Item = &'a str> {
+        let mut indexes = None;
+        if self.context.sql_family().is_postgres() {
+            let data: &PostgresSchemaExt = self.context.sql_schema.downcast_connector_data();
+
+            indexes = Some(
+                data.expression_indexes
+                    .iter()
+                    .filter(move |(table_id, _idx)| *table_id == self.next.id)
+                    .map(|(_table_id, idx)| idx.as_str()),
+            );
+        }
+
+        indexes.into_iter().flatten()
     }
 
     /// True, if we add a new model with row level security enabled.

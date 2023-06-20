@@ -11,17 +11,17 @@ mod string_filter {
         setup::test_data_common_types(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { equals: { _ref: "string" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { equals: { _ref: "string", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { equals: { _ref: "string2" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { equals: { _ref: "string2", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { AND: { string: { not: { equals: { _ref: "string2" } } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { AND: { string: { not: { equals: { _ref: "string2", _container: "TestModel" } } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
@@ -33,17 +33,17 @@ mod string_filter {
         test_data_insensitive(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, equals: { _ref: "string" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, equals: { _ref: "string", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, equals: { _ref: "string2" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, equals: { _ref: "string2", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { AND: { string: { mode: insensitive, not: { equals: { _ref: "string2" } } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { AND: { string: { mode: insensitive, not: { equals: { _ref: "string2", _container: "TestModel" } } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
@@ -56,81 +56,81 @@ mod string_filter {
 
         // Gt
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { gt: { _ref: "string" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { gt: { _ref: "string", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string2: { gt: { _ref: "string" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string2: { gt: { _ref: "string", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         // Not gt => lte
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { gt: { _ref: "string" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { gt: { _ref: "string", _container: "TestModel" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { gt: { _ref: "string2" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { gt: { _ref: "string2", _container: "TestModel" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         // Gte
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { gte: { _ref: "string" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { gte: { _ref: "string", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string2: { gte: { _ref: "string" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string2: { gte: { _ref: "string", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         // Not gte => lt
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { gte: { _ref: "string" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { gte: { _ref: "string", _container: "TestModel" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { gte: { _ref: "string2" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { gte: { _ref: "string2", _container: "TestModel" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         // Lt
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { lt: { _ref: "string" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { lt: { _ref: "string", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { lt: { _ref: "string2" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { lt: { _ref: "string2", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         // Not lt => gte
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { lt: { _ref: "string" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { lt: { _ref: "string", _container: "TestModel" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string2: { not: { lt: { _ref: "string" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string2: { not: { lt: { _ref: "string", _container: "TestModel" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         // Lte
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { lte: { _ref: "string" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { lte: { _ref: "string", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { lte: { _ref: "string2" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { lte: { _ref: "string2", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         // Not lte => gt
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { lte: { _ref: "string" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { lte: { _ref: "string", _container: "TestModel" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string2: { not: { lte: { _ref: "string" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string2: { not: { lte: { _ref: "string", _container: "TestModel" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
@@ -144,81 +144,81 @@ mod string_filter {
 
         // Gt
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, gt: { _ref: "string" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, gt: { _ref: "string", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string2: { mode: insensitive, gt: { _ref: "string" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string2: { mode: insensitive, gt: { _ref: "string", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         // Not gt => lte
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { gt: { _ref: "string" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { gt: { _ref: "string", _container: "TestModel" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { gt: { _ref: "string2" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { gt: { _ref: "string2", _container: "TestModel" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         // Gte
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, gte: { _ref: "string" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, gte: { _ref: "string", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string2: { mode: insensitive, gte: { _ref: "string" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string2: { mode: insensitive, gte: { _ref: "string", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         // Not gte => lt
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { gte: { _ref: "string" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { gte: { _ref: "string", _container: "TestModel" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { gte: { _ref: "string2" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { gte: { _ref: "string2", _container: "TestModel" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         // Lt
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, lt: { _ref: "string" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, lt: { _ref: "string", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, lt: { _ref: "string2" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, lt: { _ref: "string2", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         // Not lt => gte
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { lt: { _ref: "string" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { lt: { _ref: "string", _container: "TestModel" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string2: { mode: insensitive, not: { lt: { _ref: "string" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string2: { mode: insensitive, not: { lt: { _ref: "string", _container: "TestModel" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         // Lte
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, lte: { _ref: "string" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, lte: { _ref: "string", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, lte: { _ref: "string2" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, lte: { _ref: "string2", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         // Not lte => gt
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { lte: { _ref: "string" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { lte: { _ref: "string", _container: "TestModel" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string2: { mode: insensitive, not: { lte: { _ref: "string" } }}}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string2: { mode: insensitive, not: { lte: { _ref: "string", _container: "TestModel" } }}}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
@@ -247,61 +247,61 @@ mod string_filter {
 
         // contains
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { contains: { _ref: "string" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { contains: { _ref: "string", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":4},{"id":5}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { contains: { _ref: "string2" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { contains: { _ref: "string2", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":4},{"id":5}]}}"###
         );
 
         // not contains
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { contains: { _ref: "string" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { contains: { _ref: "string", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { contains: { _ref: "string2" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { contains: { _ref: "string2", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         // startsWith
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { startsWith: { _ref: "string" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { startsWith: { _ref: "string", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":4},{"id":5}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { startsWith: { _ref: "string2" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { startsWith: { _ref: "string2", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":4}]}}"###
         );
 
         // not startsWith
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { startsWith: { _ref: "string" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { startsWith: { _ref: "string", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { startsWith: { _ref: "string2" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { startsWith: { _ref: "string2", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2},{"id":5}]}}"###
         );
 
         // endsWith
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { endsWith: { _ref: "string" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { endsWith: { _ref: "string", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":4},{"id":5}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { endsWith: { _ref: "string2" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { endsWith: { _ref: "string2", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":5}]}}"###
         );
 
         // not endsWith
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { endsWith: { _ref: "string" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { endsWith: { _ref: "string", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { endsWith: { _ref: "string2" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { endsWith: { _ref: "string2", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2},{"id":4}]}}"###
         );
 
@@ -330,61 +330,61 @@ mod string_filter {
 
         // contains
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, contains: { _ref: "string" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, contains: { _ref: "string", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":4},{"id":5}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, contains: { _ref: "string2" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, contains: { _ref: "string2", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":4},{"id":5}]}}"###
         );
 
         // not contains
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { contains: { _ref: "string" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { contains: { _ref: "string", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { contains: { _ref: "string2" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { contains: { _ref: "string2", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         // startsWith
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, startsWith: { _ref: "string" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, startsWith: { _ref: "string", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":4},{"id":5}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, startsWith: { _ref: "string2" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, startsWith: { _ref: "string2", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":4}]}}"###
         );
 
         // not startsWith
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { startsWith: { _ref: "string" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { startsWith: { _ref: "string", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { startsWith: { _ref: "string2" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { startsWith: { _ref: "string2", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2},{"id":5}]}}"###
         );
 
         // endsWith
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, endsWith: { _ref: "string" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, endsWith: { _ref: "string", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":4},{"id":5}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, endsWith: { _ref: "string2" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, endsWith: { _ref: "string2", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":5}]}}"###
         );
 
         // not endsWith
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { endsWith: { _ref: "string" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { endsWith: { _ref: "string", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { endsWith: { _ref: "string2" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { endsWith: { _ref: "string2", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2},{"id":4}]}}"###
         );
 
@@ -396,17 +396,17 @@ mod string_filter {
         setup::test_data_common_mixed_types(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { in: { _ref: "string2" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { in: { _ref: "string2", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { notIn: { _ref: "string2" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { notIn: { _ref: "string2", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { in: { _ref: "string2" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { not: { in: { _ref: "string2", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
@@ -418,17 +418,17 @@ mod string_filter {
         test_data_mixed_types_insensitive(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, in: { _ref: "string2" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, in: { _ref: "string2", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, notIn: { _ref: "string2" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, notIn: { _ref: "string2", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { in: { _ref: "string2" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string: { mode: insensitive, not: { in: { _ref: "string2", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
@@ -441,53 +441,53 @@ mod string_filter {
 
         // has
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string_list: { has: { _ref: "string" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string_list: { has: { _ref: "string", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         // not has
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { string_list: { has: { _ref: "string" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { string_list: { has: { _ref: "string", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         // hasSome
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string_list: { hasSome: { _ref: "string_list" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string_list: { hasSome: { _ref: "string_list", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string_list: { hasSome: { _ref: "string_list2" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string_list: { hasSome: { _ref: "string_list2", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         // not hasSome
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { string_list: { hasSome: { _ref: "string_list" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { string_list: { hasSome: { _ref: "string_list", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { string_list: { hasSome: { _ref: "string_list2" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { string_list: { hasSome: { _ref: "string_list2", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
 
         // hasEvery
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string_list: { hasEvery: { _ref: "string_list" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string_list: { hasEvery: { _ref: "string_list", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { string_list: { hasEvery: { _ref: "string_list2" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { string_list: { hasEvery: { _ref: "string_list2", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         // not hasEvery
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { string_list: { hasEvery: { _ref: "string_list" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { string_list: { hasEvery: { _ref: "string_list", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { string_list: { hasEvery: { _ref: "string_list2" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { string_list: { hasEvery: { _ref: "string_list2", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
