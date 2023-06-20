@@ -25,7 +25,7 @@ use tokio_postgres::{
     config::{ChannelBinding, SslMode},
     Client, Config, Statement,
 };
-use url::Url;
+use url::{Host, Url};
 
 pub(crate) const DEFAULT_SCHEMA: &str = "public";
 
@@ -223,11 +223,19 @@ impl PostgresUrl {
     ///
     /// If none of them are set, defaults to `localhost`.
     pub fn host(&self) -> &str {
-        match (self.query_params.host.as_ref(), self.url.host_str()) {
-            (Some(host), _) => host.as_str(),
-            (None, Some("")) => "localhost",
-            (None, None) => "localhost",
-            (None, Some(host)) => host,
+        match (self.query_params.host.as_ref(), self.url.host_str(), self.url.host()) {
+            (Some(host), _, _) => host.as_str(),
+            (None, Some(""), _) => "localhost",
+            (None, None, _) => "localhost",
+            (None, Some(host), Some(Host::Ipv6(_))) => {
+                // The `url` crate may return an IPv6 address in brackets, which must be stripped.
+                if host.starts_with('[') && host.ends_with(']') {
+                    &host[1..host.len() - 1]
+                } else {
+                    host
+                }
+            }
+            (None, Some(host), _) => host,
         }
     }
 
@@ -1140,6 +1148,12 @@ mod tests {
         let url = PostgresUrl::new(Url::parse("postgresql:///dbname").unwrap()).unwrap();
         assert_eq!("dbname", url.dbname());
         assert_eq!("localhost", url.host());
+    }
+
+    #[test]
+    fn should_parse_ipv6_host() {
+        let url = PostgresUrl::new(Url::parse("postgresql://[2001:db8:1234::ffff]:5432/dbname").unwrap()).unwrap();
+        assert_eq!("2001:db8:1234::ffff", url.host());
     }
 
     #[test]
