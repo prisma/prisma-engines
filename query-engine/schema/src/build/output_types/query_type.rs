@@ -34,43 +34,36 @@ pub(crate) fn query_fields(ctx: &QuerySchema) -> Vec<FieldFn> {
 /// Builds a "single" query arity item field (e.g. "user", "post" ...) for given model.
 /// Find one unique semantics.
 fn find_unique_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
-    arguments::where_unique_argument(ctx, model.clone())
-        .map(|arg| {
-            let field_name = format!("findUnique{}", model.name());
+    let model_id = model.id;
+    let cloned_model = model.clone();
 
-            field(
-                field_name,
-                Some(Arc::new(move || vec![arg.clone()])),
-                OutputType::object(objects::model::model_object_type(ctx, model.clone())),
-                Some(QueryInfo {
-                    model: Some(model.id),
-                    tag: QueryTag::FindUnique,
-                }),
-            )
-            .nullable()
-        })
-        .unwrap()
+    field(
+        format!("findUnique{}", model.name()),
+        move || vec![arguments::where_unique_argument(ctx, cloned_model)],
+        OutputType::object(objects::model::model_object_type(ctx, model)),
+        Some(QueryInfo {
+            model: Some(model_id),
+            tag: QueryTag::FindUnique,
+        }),
+    )
+    .nullable()
 }
 
 /// Builds a "single" query arity item field (e.g. "user", "post" ...) for given model
 /// that will throw a NotFoundError if the item is not found
 fn find_unique_or_throw_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
-    arguments::where_unique_argument(ctx, model.clone())
-        .map(move |arg| {
-            let field_name = format!("findUnique{}OrThrow", model.name());
-
-            field(
-                field_name,
-                Some(Arc::new(move || vec![arg.clone()])),
-                OutputType::object(objects::model::model_object_type(ctx, model.clone())),
-                Some(QueryInfo {
-                    model: Some(model.id),
-                    tag: QueryTag::FindUniqueOrThrow,
-                }),
-            )
-            .nullable()
-        })
-        .unwrap()
+    let model_id = model.id;
+    let cloned_model = model.clone();
+    field(
+        format!("findUnique{}OrThrow", model.name()),
+        move || vec![arguments::where_unique_argument(ctx, cloned_model)],
+        OutputType::object(objects::model::model_object_type(ctx, model)),
+        Some(QueryInfo {
+            model: Some(model_id),
+            tag: QueryTag::FindUniqueOrThrow,
+        }),
+    )
+    .nullable()
 }
 
 /// Builds a find first item field for given model.
@@ -80,9 +73,7 @@ fn find_first_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
 
     field(
         field_name,
-        Some(Arc::new(move || {
-            arguments::relation_to_many_selection_arguments(ctx, cloned_model.clone(), true)
-        })),
+        move || arguments::relation_to_many_selection_arguments(ctx, cloned_model, true),
         OutputType::object(objects::model::model_object_type(ctx, model.clone())),
         Some(QueryInfo {
             model: Some(model.id),
@@ -96,16 +87,15 @@ fn find_first_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
 /// not exist
 fn find_first_or_throw_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
     let field_name = format!("findFirst{}OrThrow", model.name());
+    let model_id = model.id;
     let cloned_model = model.clone();
 
     field(
         field_name,
-        Some(Arc::new(move || {
-            arguments::relation_to_many_selection_arguments(ctx, cloned_model.clone(), true)
-        })),
-        OutputType::object(objects::model::model_object_type(ctx, model.clone())),
+        move || arguments::relation_to_many_selection_arguments(ctx, model, true),
+        OutputType::object(objects::model::model_object_type(ctx, cloned_model)),
         Some(QueryInfo {
-            model: Some(model.id),
+            model: Some(model_id),
             tag: QueryTag::FindFirstOrThrow,
         }),
     )
@@ -116,16 +106,14 @@ fn find_first_or_throw_field(ctx: &QuerySchema, model: Model) -> OutputField<'_>
 fn all_items_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
     let field_name = format!("findMany{}", model.name());
     let object_type = objects::model::model_object_type(ctx, model.clone());
-    let cloned_model = model.clone();
+    let model_id = model.id;
 
     field(
         field_name,
-        Some(Arc::new(move || {
-            arguments::relation_to_many_selection_arguments(ctx, cloned_model.clone(), true)
-        })),
+        move || arguments::relation_to_many_selection_arguments(ctx, model, true),
         OutputType::list(InnerOutputType::Object(object_type)),
         Some(QueryInfo {
-            model: Some(model.id),
+            model: Some(model_id),
             tag: QueryTag::FindMany,
         }),
     )
@@ -134,14 +122,13 @@ fn all_items_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
 /// Builds an "aggregate" query field (e.g. "aggregateUser") for given model.
 fn plain_aggregation_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
     let cloned_model = model.clone();
+    let model_id = model.id;
     field(
         format!("aggregate{}", model.name()),
-        Some(Arc::new(move || {
-            arguments::relation_to_many_selection_arguments(ctx, cloned_model.clone(), false)
-        })),
-        OutputType::object(aggregation::plain::aggregation_object_type(ctx, model.clone())),
+        move || arguments::relation_to_many_selection_arguments(ctx, cloned_model, false),
+        OutputType::object(aggregation::plain::aggregation_object_type(ctx, model)),
         Some(QueryInfo {
-            model: Some(model.id),
+            model: Some(model_id),
             tag: QueryTag::Aggregate,
         }),
     )
@@ -150,16 +137,15 @@ fn plain_aggregation_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
 /// Builds a "group by" aggregation query field (e.g. "groupByUser") for given model.
 fn group_by_aggregation_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
     let cloned_model = model.clone();
+    let model_id = model.id;
     field(
         format!("groupBy{}", model.name()),
-        Some(Arc::new(move || {
-            arguments::group_by_arguments(ctx, cloned_model.clone())
-        })),
+        move || arguments::group_by_arguments(ctx, cloned_model),
         OutputType::list(InnerOutputType::Object(
-            aggregation::group_by::group_by_output_object_type(ctx, model.clone()),
+            aggregation::group_by::group_by_output_object_type(ctx, model),
         )),
         Some(QueryInfo {
-            model: Some(model.id),
+            model: Some(model_id),
             tag: QueryTag::GroupBy,
         }),
     )
@@ -170,12 +156,12 @@ fn mongo_aggregate_raw_field<'a>(model: &Model) -> OutputField<'a> {
 
     field(
         field_name,
-        Some(Arc::new(|| {
+        || {
             vec![
                 input_field("pipeline", vec![InputType::list(InputType::json())], None).optional(),
                 input_field("options", vec![InputType::json()], None).optional(),
             ]
-        })),
+        },
         OutputType::non_list(OutputType::json()),
         Some(QueryInfo {
             tag: QueryTag::AggregateRaw,
@@ -189,12 +175,12 @@ fn mongo_find_raw_field<'a>(model: &Model) -> OutputField<'a> {
 
     field(
         field_name,
-        Some(Arc::new(|| {
+        || {
             vec![
                 input_field("filter", vec![InputType::json()], None).optional(),
                 input_field("options", vec![InputType::json()], None).optional(),
             ]
-        })),
+        },
         OutputType::non_list(OutputType::json()),
         Some(QueryInfo {
             tag: QueryTag::FindRaw,

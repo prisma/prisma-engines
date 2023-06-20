@@ -26,7 +26,7 @@ impl QueryDocumentParser {
         &self,
         selections: &[Selection],
         schema_object: &ObjectType<'a>,
-        fields: &dyn Fn(&str) -> Option<OutputField<'a>>,
+        fields: ResolveField<'a, '_>,
         query_schema: &'a QuerySchema,
     ) -> QueryParserResult<ParsedObject<'a>> {
         self.parse_object(
@@ -60,12 +60,7 @@ impl QueryDocumentParser {
             ));
         }
 
-        let adhoc_fields: HashMap<_, _> = if resolve_field.is_none() {
-            (schema_object.get_fields().map(|f| (f.name().clone(), f))).collect()
-        } else {
-            Default::default()
-        };
-        let resolve_adhoc = move |name: &str| adhoc_fields.get(name).cloned();
+        let resolve_adhoc = move |name: &str| schema_object.find_field(name).cloned();
         let resolve_field = resolve_field.unwrap_or(&resolve_adhoc);
 
         selections
@@ -77,7 +72,7 @@ impl QueryDocumentParser {
                         selection_path.clone(),
                         argument_path.clone(),
                         selection,
-                        field.clone(),
+                        field,
                         query_schema,
                     ),
                     None => Err(ValidationError::unknown_selection_field(
@@ -159,7 +154,7 @@ impl QueryDocumentParser {
     ) -> QueryParserResult<Vec<ParsedArgument<'a>>> {
         let arguments: IndexMap<String, InputField<'_>> = schema_field
             .arguments()
-            .map(|arg| (arg.name.clone().into_owned(), arg))
+            .map(|arg| (arg.name.clone().into_owned(), arg.clone()))
             .collect();
 
         for (name, _) in given_arguments {
@@ -168,7 +163,7 @@ impl QueryDocumentParser {
                 return Err(ValidationError::unknown_argument(
                     selection_path.segments(),
                     argument_path.segments(),
-                    conversions::schema_arguments_to_argument_description_vec(schema_field.arguments()),
+                    conversions::schema_arguments_to_argument_description_vec(schema_field.arguments().cloned()),
                 ));
             }
         }
@@ -648,11 +643,12 @@ impl QueryDocumentParser {
         schema_object: &InputObjectType<'a>,
         query_schema: &'a QuerySchema,
     ) -> QueryParserResult<ParsedInputMap<'a>> {
-        let fields = schema_object.get_fields();
-        let valid_field_names: IndexSet<Cow<'_, str>> = fields.clone().map(|field| field.name).collect();
+        let fields = schema_object.get_fields().iter();
+        let valid_field_names: IndexSet<Cow<'_, str>> = fields.clone().map(|field| field.name.clone()).collect();
         let given_field_names: IndexSet<Cow<'_, str>> = object.iter().map(|(k, _)| Cow::Borrowed(k.as_str())).collect();
         let missing_field_names = valid_field_names.difference(&given_field_names);
-        let schema_fields: IndexMap<Cow<'_, str>, InputField<'_>> = fields.map(|f| (f.name.clone(), f)).collect();
+        let schema_fields: IndexMap<Cow<'_, str>, InputField<'_>> =
+            fields.map(|f| (f.name.clone(), f.clone())).collect();
 
         // First, filter-in those fields that are not given but have a default value in the schema.
         // As in practise, it is like if they were given with said default value.
@@ -803,6 +799,7 @@ pub(crate) mod conversions {
         let name = o.name();
         let fields: Vec<validation::OutputTypeDescriptionField> = o
             .get_fields()
+            .iter()
             .map(|field| {
                 let name = field.name();
                 let type_name = to_simplified_output_type_name(field.field_type());
@@ -837,6 +834,7 @@ pub(crate) mod conversions {
         let name = i.identifier.name();
         let fields: Vec<validation::InputTypeDescriptionField> = i
             .get_fields()
+            .iter()
             .map(|field| {
                 let name = field.name.clone();
                 let type_names: Vec<_> = field.field_types().iter().map(to_simplified_input_type_name).collect();

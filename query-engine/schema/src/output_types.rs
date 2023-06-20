@@ -1,5 +1,6 @@
 use super::*;
 use fmt::Debug;
+use once_cell::sync::Lazy;
 use prisma_models::ast::ModelId;
 use std::{borrow::Cow, fmt};
 
@@ -110,10 +111,13 @@ impl<'a> OutputType<'a> {
     }
 }
 
+type OutputObjectFields<'a> =
+    Arc<Lazy<Vec<OutputField<'a>>, Box<dyn FnOnce() -> Vec<OutputField<'a>> + Send + Sync + 'a>>>;
+
 #[derive(Clone)]
 pub struct ObjectType<'a> {
     pub(crate) identifier: Identifier,
-    pub(crate) fields: Arc<dyn Fn() -> Vec<OutputField<'a>> + Send + Sync + 'a>,
+    pub(crate) fields: OutputObjectFields<'a>,
 
     // Object types can directly map to models.
     pub(crate) model: Option<ModelId>,
@@ -130,10 +134,16 @@ impl Debug for ObjectType<'_> {
 }
 
 impl<'a> ObjectType<'a> {
-    pub(crate) fn new(identifier: Identifier, fields: impl Fn() -> Vec<OutputField<'a>> + Send + Sync + 'a) -> Self {
+    pub(crate) fn new(
+        identifier: Identifier,
+        fields: impl FnOnce() -> Vec<OutputField<'a>> + Send + Sync + 'a,
+    ) -> Self {
+        let lazy = Lazy::<Vec<OutputField<'_>>, _>::new(
+            Box::new(fields) as Box<dyn FnOnce() -> Vec<OutputField<'a>> + Send + Sync + 'a>
+        );
         ObjectType {
             identifier,
-            fields: Arc::new(fields),
+            fields: Arc::new(lazy),
             model: None,
             _heh: (),
         }
@@ -147,19 +157,17 @@ impl<'a> ObjectType<'a> {
         self.identifier.name()
     }
 
-    pub fn get_fields_vec(&self) -> Vec<OutputField<'a>> {
-        let fields = &self.fields;
-        fields()
+    pub fn get_fields(&self) -> &[OutputField<'a>] {
+        (*self.fields).as_ref()
     }
 
-    pub fn get_fields(&self) -> impl ExactSizeIterator<Item = OutputField<'a>> {
-        self.get_fields_vec().into_iter()
-    }
-
-    pub fn find_field(&self, name: &str) -> Option<OutputField<'a>> {
-        self.get_fields().find(|f| f.name == name)
+    pub fn find_field(&self, name: &str) -> Option<&OutputField<'a>> {
+        self.get_fields().iter().find(|f| f.name == name)
     }
 }
+
+type OutputFieldArguments<'a> =
+    Option<Arc<Lazy<Vec<InputField<'a>>, Box<dyn FnOnce() -> Vec<InputField<'a>> + Send + Sync + 'a>>>>;
 
 #[derive(Clone)]
 pub struct OutputField<'a> {
@@ -168,7 +176,7 @@ pub struct OutputField<'a> {
 
     /// Arguments are input fields, but positioned in context of an output field
     /// instead of being attached to an input object.
-    pub(super) arguments: Option<Arc<dyn Fn() -> Vec<InputField<'a>> + Send + Sync + 'a>>,
+    pub(super) arguments: OutputFieldArguments<'a>,
 
     /// Indicates the presence of the field on the higher output objects.
     /// States whether or not the field can be null.
@@ -190,8 +198,8 @@ impl<'a> OutputField<'a> {
         &self.name
     }
 
-    pub fn arguments(&self) -> impl Iterator<Item = InputField<'a>> + '_ {
-        self.arguments.as_ref().into_iter().flat_map(|args| args().into_iter())
+    pub fn arguments(&self) -> impl Iterator<Item = &InputField<'a>> + '_ {
+        self.arguments.as_ref().into_iter().flat_map(|args| args.iter())
     }
 
     pub(crate) fn nullable(mut self) -> Self {
@@ -216,7 +224,10 @@ impl<'a> OutputField<'a> {
     }
 
     pub fn is_find_unique(&self) -> bool {
-        matches!(self.query_tag(), Some(&QueryTag::FindUnique))
+        matches!(
+            self.query_tag(),
+            Some(&QueryTag::FindUnique | QueryTag::FindUniqueOrThrow)
+        )
     }
 
     /// Relevant for resolving top level queries.

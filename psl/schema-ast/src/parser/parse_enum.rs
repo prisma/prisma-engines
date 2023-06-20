@@ -24,8 +24,7 @@ pub fn parse_enum(pair: Pair<'_>, doc_comment: Option<Pair<'_>>, diagnostics: &m
                 let mut pending_value_comment = None;
                 inner_span = Some(current.as_span().into());
 
-                let mut items = current.into_inner();
-                while let Some(item) = items.next() {
+                for item in current.into_inner() {
                     match item.as_rule() {
                         Rule::block_attribute => attributes.push(parse_attribute(item, diagnostics)),
                         Rule::enum_value_declaration => {
@@ -34,11 +33,7 @@ pub fn parse_enum(pair: Pair<'_>, doc_comment: Option<Pair<'_>>, diagnostics: &m
                                 Err(err) => diagnostics.push_error(err),
                             }
                         }
-                        Rule::comment_block => {
-                            if let Some(Rule::enum_value_declaration) = items.peek().map(|t| t.as_rule()) {
-                                pending_value_comment = Some(item);
-                            }
-                        }
+                        Rule::comment_block => pending_value_comment = Some(item),
                         Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
                             "This line is not an enum value definition.",
                             item.as_span().into(),

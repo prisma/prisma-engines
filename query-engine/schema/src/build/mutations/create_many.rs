@@ -13,7 +13,7 @@ pub(crate) fn create_many(ctx: &'_ QuerySchema, model: Model) -> OutputField<'_>
 
     field(
         field_name,
-        Some(Arc::new(move || create_many_arguments(ctx, model.clone()))),
+        move || create_many_arguments(ctx, model),
         OutputType::object(objects::affected_records_object_type()),
         Some(QueryInfo {
             model: Some(model_id),
@@ -51,7 +51,7 @@ pub(crate) fn create_many_object_type(
     ));
 
     let mut input_object = init_input_object_type(ident);
-    input_object.fields = Arc::new(move || {
+    input_object.set_fields(move || {
         let mut filtered_fields = filter_create_many_fields(ctx, &model, parent_field.clone());
         let field_mapper = CreateDataInputFieldMapper::new_checked();
         field_mapper.map_all(ctx, &mut filtered_fields)

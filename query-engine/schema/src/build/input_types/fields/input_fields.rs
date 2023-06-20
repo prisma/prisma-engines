@@ -57,7 +57,7 @@ fn nested_create_many_envelope(ctx: &'_ QuerySchema, parent_field: RelationField
     let name = format!("{}Envelope", create_type.identifier.name());
     let ident = Identifier::new_prisma(name);
     let mut input_object = init_input_object_type(ident);
-    input_object.fields = Arc::new(move || {
+    input_object.set_fields(move || {
         let create_many_type = InputType::object(create_type.clone());
         let data_arg = input_field(args::DATA, list_union_type(create_many_type, true), None);
 
@@ -162,7 +162,11 @@ pub(crate) fn nested_disconnect_input_field<'a>(
         (false, false) => {
             let mut types = vec![InputType::boolean()];
 
-            if ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {
+            if ctx.has_feature(PreviewFeature::ExtendedWhereUnique)
+                && (ctx.has_capability(ConnectorCapability::FilteredInlineChildNestedToOneDisconnect)
+                       // If the disconnect happens on the inline side, then we can allow filters
+                    || parent_field.related_field().is_inlined_on_enclosing_model())
+            {
                 types.push(InputType::object(filter_objects::where_object_type(
                     ctx,
                     parent_field.related_model().into(),

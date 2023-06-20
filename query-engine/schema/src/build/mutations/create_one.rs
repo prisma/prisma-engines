@@ -15,9 +15,7 @@ pub(crate) fn create_one(ctx: &'_ QuerySchema, model: Model) -> OutputField<'_> 
 
     field(
         field_name,
-        Some(Arc::new(move || {
-            create_one_arguments(ctx, model.clone()).unwrap_or_default()
-        })),
+        move || create_one_arguments(ctx, model).unwrap_or_default(),
         OutputType::object(objects::model::model_object_type(ctx, cloned_model)),
         Some(QueryInfo {
             model: Some(model_id),
@@ -28,19 +26,23 @@ pub(crate) fn create_one(ctx: &'_ QuerySchema, model: Model) -> OutputField<'_> 
 
 /// Builds "data" argument intended for the create field.
 /// The data argument is not present if no data can be created.
-pub(crate) fn create_one_arguments(ctx: &'_ QuerySchema, model: Model) -> Option<Vec<InputField<'_>>> {
+pub(crate) fn create_one_arguments(ctx: &QuerySchema, model: Model) -> Option<Vec<InputField<'_>>> {
+    let any_field_required = model
+        .fields()
+        .all()
+        .any(|f| f.is_required() && f.as_scalar().map(|f| f.default_value().is_none()).unwrap_or(true));
     let create_types = create_one_input_types(ctx, model, None);
-    Some(vec![input_field(args::DATA, create_types, None).optional()])
+    let field = input_field(args::DATA, create_types, None);
+    Some(vec![field.optional_if(!any_field_required)])
 }
 
 pub(crate) fn create_one_input_types(
-    ctx: &'_ QuerySchema,
+    ctx: &QuerySchema,
     model: Model,
     parent_field: Option<RelationFieldRef>,
 ) -> Vec<InputType<'_>> {
     let checked_input = InputType::object(checked_create_input_type(ctx, model.clone(), parent_field.clone()));
     let unchecked_input = InputType::object(unchecked_create_input_type(ctx, model, parent_field));
-
     vec![checked_input, unchecked_input]
 }
 
@@ -62,7 +64,7 @@ fn checked_create_input_type(
     ));
 
     let mut input_object = init_input_object_type(ident);
-    input_object.fields = Arc::new(move || {
+    input_object.set_fields(move || {
         let mut filtered_fields = filter_checked_create_fields(&model, parent_field.clone());
         let field_mapper = CreateDataInputFieldMapper::new_checked();
         field_mapper.map_all(ctx, &mut filtered_fields)
@@ -88,7 +90,7 @@ fn unchecked_create_input_type(
     ));
 
     let mut input_object = init_input_object_type(ident);
-    input_object.fields = Arc::new(move || {
+    input_object.set_fields(move || {
         let mut filtered_fields = filter_unchecked_create_fields(&model, parent_field.as_ref());
         let field_mapper = CreateDataInputFieldMapper::new_unchecked();
         field_mapper.map_all(ctx, &mut filtered_fields)

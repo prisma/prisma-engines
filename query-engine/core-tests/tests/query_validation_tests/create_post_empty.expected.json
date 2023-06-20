@@ -1,0 +1,143 @@
+{
+  "is_panic": false,
+  "message": "`data`: A value is required but not set",
+  "meta": {
+    "kind": "RequiredArgumentMissing",
+    "inputTypes": [
+      {
+        "kind": "object",
+        "name": "PostCreateInput",
+        "fields": [
+          {
+            "name": "id",
+            "typeNames": [
+              "String"
+            ],
+            "required": false
+          },
+          {
+            "name": "createdAt",
+            "typeNames": [
+              "DateTime"
+            ],
+            "required": false
+          },
+          {
+            "name": "updatedAt",
+            "typeNames": [
+              "DateTime"
+            ],
+            "required": false
+          },
+          {
+            "name": "published",
+            "typeNames": [
+              "Boolean"
+            ],
+            "required": true
+          },
+          {
+            "name": "title",
+            "typeNames": [
+              "String"
+            ],
+            "required": true
+          },
+          {
+            "name": "content",
+            "typeNames": [
+              "String",
+              "Null"
+            ],
+            "required": false
+          },
+          {
+            "name": "author",
+            "typeNames": [
+              "UserCreateNestedOneWithoutPostsInput"
+            ],
+            "required": false
+          },
+          {
+            "name": "Like",
+            "typeNames": [
+              "LikeCreateNestedManyWithoutPostInput"
+            ],
+            "required": false
+          }
+        ]
+      },
+      {
+        "kind": "object",
+        "name": "PostUncheckedCreateInput",
+        "fields": [
+          {
+            "name": "id",
+            "typeNames": [
+              "String"
+            ],
+            "required": false
+          },
+          {
+            "name": "createdAt",
+            "typeNames": [
+              "DateTime"
+            ],
+            "required": false
+          },
+          {
+            "name": "updatedAt",
+            "typeNames": [
+              "DateTime"
+            ],
+            "required": false
+          },
+          {
+            "name": "published",
+            "typeNames": [
+              "Boolean"
+            ],
+            "required": true
+          },
+          {
+            "name": "title",
+            "typeNames": [
+              "String"
+            ],
+            "required": true
+          },
+          {
+            "name": "content",
+            "typeNames": [
+              "String",
+              "Null"
+            ],
+            "required": false
+          },
+          {
+            "name": "authorId",
+            "typeNames": [
+              "String",
+              "Null"
+            ],
+            "required": false
+          },
+          {
+            "name": "Like",
+            "typeNames": [
+              "LikeUncheckedCreateNestedManyWithoutPostInput"
+            ],
+            "required": false
+          }
+        ]
+      }
+    ],
+    "argumentPath": [
+      "data"
+    ],
+    "selectionPath": [
+      "createOnePost"
+    ]
+  },
+  "error_code": "P2012"
+}

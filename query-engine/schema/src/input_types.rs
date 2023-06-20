@@ -1,13 +1,17 @@
 use super::*;
 use fmt::Debug;
+use once_cell::sync::Lazy;
 use prisma_models::{prelude::ParentContainer, DefaultKind};
 use std::{borrow::Cow, boxed::Box, fmt};
+
+type InputObjectFields<'a> =
+    Option<Arc<Lazy<Vec<InputField<'a>>, Box<dyn FnOnce() -> Vec<InputField<'a>> + Send + Sync + 'a>>>>;
 
 #[derive(Clone)]
 pub struct InputObjectType<'a> {
     pub identifier: Identifier,
     pub constraints: InputObjectTypeConstraints<'a>,
-    pub(crate) fields: Arc<dyn Fn() -> Vec<InputField<'a>> + Send + Sync + 'a>,
+    pub(crate) fields: InputObjectFields<'a>,
     pub(crate) tag: Option<ObjectTag<'a>>,
 }
 
@@ -53,17 +57,20 @@ impl Debug for InputObjectType<'_> {
 }
 
 impl<'a> InputObjectType<'a> {
-    pub fn get_fields(&self) -> impl ExactSizeIterator<Item = InputField<'a>> + Clone {
-        let f = &self.fields;
-        f().into_iter()
+    pub fn get_fields(&self) -> &[InputField<'a>] {
+        self.fields.as_ref().map(|f| -> &[_] { f }).unwrap_or(&[])
+    }
+
+    pub(crate) fn set_fields(&mut self, f: impl FnOnce() -> Vec<InputField<'a>> + Send + Sync + 'a) {
+        self.fields = Some(Arc::new(Lazy::new(Box::new(f))));
     }
 
     pub fn tag(&self) -> Option<&ObjectTag<'a>> {
         self.tag.as_ref()
     }
 
-    pub fn find_field(&self, name: &str) -> Option<InputField<'a>> {
-        self.get_fields().find(|f| f.name == name)
+    pub fn find_field(&self, name: &str) -> Option<&InputField<'a>> {
+        self.get_fields().iter().find(|f| f.name == name)
     }
 
     /// Require exactly one field of the possible ones to be in the input.

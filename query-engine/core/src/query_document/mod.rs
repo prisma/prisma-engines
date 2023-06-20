@@ -28,7 +28,10 @@ pub use selection::{In, Selection, SelectionArgument, SelectionSet};
 pub(crate) use parse_ast::*;
 pub(crate) use parser::*;
 
-use crate::query_graph_builder::resolve_compound_field;
+use crate::{
+    query_ast::{QueryOption, QueryOptions},
+    query_graph_builder::resolve_compound_field,
+};
 use prisma_models::Model;
 use schema::{constants::*, QuerySchema};
 use std::collections::HashMap;
@@ -159,12 +162,21 @@ pub struct CompactedDocument {
     pub nested_selection: Vec<String>,
     pub operation: Operation,
     pub keys: Vec<String>,
+    pub original_query_options: crate::QueryOptions,
     name: String,
 }
 
 impl CompactedDocument {
+    pub fn throw_on_empty(&self) -> bool {
+        self.original_query_options.contains(QueryOption::ThrowOnEmpty)
+    }
+
     pub fn single_name(&self) -> String {
-        format!("findUnique{}", self.name)
+        if self.throw_on_empty() {
+            format!("findUnique{}OrThrow", self.name)
+        } else {
+            format!("findUnique{}", self.name)
+        }
     }
 
     pub fn plural_name(&self) -> String {
@@ -187,7 +199,12 @@ impl CompactedDocument {
             // The name of the query should be findManyX if the first query
             // here is findUniqueX. We took care earlier the queries are all the
             // same. Otherwise we fail hard here.
-            let mut builder = Selection::with_name(selections[0].name().replacen("findUnique", "findMany", 1));
+            let mut builder = Selection::with_name(
+                selections[0]
+                    .name()
+                    .replacen("findUnique", "findMany", 1)
+                    .trim_end_matches("OrThrow"),
+            );
 
             // Take the nested selection set from the first query. We took care
             // earlier that all the nested selections are the same in every
@@ -239,7 +256,17 @@ impl CompactedDocument {
             .collect();
 
         // Saving the stub of the query name for later use.
-        let name = selections[0].name().replacen("findUnique", "", 1);
+        let name = selections[0]
+            .name()
+            .replacen("findUnique", "", 1)
+            .trim_end_matches("OrThrow")
+            .to_string();
+
+        let original_query_options = if selections[0].name().ends_with("OrThrow") {
+            QueryOptions::from(QueryOption::ThrowOnEmpty)
+        } else {
+            QueryOptions::none()
+        };
 
         // Convert the selections into a map of arguments. This defines the
         // response order and how we fetch the right data from the response set.
@@ -264,11 +291,12 @@ impl CompactedDocument {
             .collect();
 
         Self {
+            operation: Operation::Read(selection),
             name,
             arguments,
             nested_selection,
             keys,
-            operation: Operation::Read(selection),
+            original_query_options,
         }
     }
 }

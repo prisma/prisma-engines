@@ -1,15 +1,15 @@
-use std::borrow::Cow;
-
 use super::*;
+use once_cell::sync::Lazy;
 use prisma_models::{walkers, DefaultKind};
+use std::borrow::Cow;
 
 /// Input object type convenience wrapper function.
 pub(crate) fn input_object_type<'a>(
     ident: Identifier,
-    fields: impl Fn() -> Vec<InputField<'a>> + Send + Sync + 'a,
+    fields: impl FnOnce() -> Vec<InputField<'a>> + Send + Sync + 'a,
 ) -> InputObjectType<'a> {
     let mut object_type = init_input_object_type(ident);
-    object_type.fields = Arc::new(fields);
+    object_type.set_fields(fields);
     object_type
 }
 
@@ -18,15 +18,13 @@ pub(crate) fn init_input_object_type<'a>(ident: Identifier) -> InputObjectType<'
     InputObjectType {
         identifier: ident,
         constraints: InputObjectTypeConstraints::default(),
-        fields: Arc::new(Vec::new),
+        fields: None,
         tag: None,
     }
 }
 
-/// Field convenience wrapper function.
-pub(crate) fn field<'a, T>(
+pub(crate) fn field_no_arguments<'a, T>(
     name: T,
-    arguments: Option<Arc<dyn Fn() -> Vec<InputField<'a>> + Send + Sync + 'a>>,
     field_type: OutputType<'a>,
     query_info: Option<QueryInfo>,
 ) -> OutputField<'a>
@@ -35,7 +33,28 @@ where
 {
     OutputField {
         name: name.into(),
-        arguments,
+        field_type,
+        arguments: None,
+        is_nullable: false,
+        query_info,
+    }
+}
+
+/// Field convenience wrapper function.
+pub(crate) fn field<'a, T, F: FnOnce() -> Vec<InputField<'a>> + Send + Sync + 'a>(
+    name: T,
+    arguments: F,
+    field_type: OutputType<'a>,
+    query_info: Option<QueryInfo>,
+) -> OutputField<'a>
+where
+    T: Into<Cow<'a, str>>,
+{
+    OutputField {
+        name: name.into(),
+        arguments: Some(Arc::new(Lazy::new(
+            Box::new(arguments) as Box<dyn FnOnce() -> Vec<InputField<'a>> + Send + Sync + 'a>
+        ))),
         field_type,
         query_info,
         is_nullable: false,

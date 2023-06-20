@@ -47,7 +47,7 @@ pub(crate) fn mutation_fields(ctx: &QuerySchema) -> Vec<FieldFn> {
 fn create_execute_raw_field<'a>() -> OutputField<'a> {
     field(
         "executeRaw",
-        Some(Arc::new(|| {
+        || {
             vec![
                 input_field("query", vec![InputType::string()], None),
                 input_field(
@@ -57,7 +57,7 @@ fn create_execute_raw_field<'a>() -> OutputField<'a> {
                 )
                 .optional(),
             ]
-        })),
+        },
         OutputType::non_list(OutputType::json()),
         Some(QueryInfo {
             tag: QueryTag::ExecuteRaw,
@@ -69,7 +69,7 @@ fn create_execute_raw_field<'a>() -> OutputField<'a> {
 fn create_query_raw_field<'a>() -> OutputField<'a> {
     field(
         "queryRaw",
-        Some(Arc::new(|| {
+        || {
             vec![
                 simple_input_field("query", InputType::string(), None),
                 simple_input_field(
@@ -79,7 +79,7 @@ fn create_query_raw_field<'a>() -> OutputField<'a> {
                 )
                 .optional(),
             ]
-        })),
+        },
         OutputType::non_list(OutputType::json()),
         Some(QueryInfo {
             tag: QueryTag::QueryRaw,
@@ -91,9 +91,7 @@ fn create_query_raw_field<'a>() -> OutputField<'a> {
 fn create_mongodb_run_command_raw<'a>() -> OutputField<'a> {
     field(
         "runCommandRaw",
-        Some(Arc::new(|| {
-            vec![simple_input_field("command", InputType::json(), None)]
-        })),
+        || vec![simple_input_field("command", InputType::json(), None)],
         OutputType::non_list(OutputType::json()),
         Some(QueryInfo {
             tag: QueryTag::RunCommandRaw,
@@ -103,35 +101,29 @@ fn create_mongodb_run_command_raw<'a>() -> OutputField<'a> {
 }
 
 /// Builds a delete mutation field (e.g. deleteUser) for given model.
-fn delete_item_field(ctx: &'_ QuerySchema, model: Model) -> OutputField<'_> {
-    arguments::delete_one_arguments(ctx, model.clone())
-        .map(|args| {
-            let field_name = format!("deleteOne{}", model.name());
-
-            field(
-                field_name,
-                Some(Arc::new(move || args.clone())),
-                OutputType::object(objects::model::model_object_type(ctx, model.clone())),
-                Some(QueryInfo {
-                    model: Some(model.id),
-                    tag: QueryTag::DeleteOne,
-                }),
-            )
-            .nullable()
-        })
-        .unwrap()
+fn delete_item_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
+    let cloned_model = model.clone();
+    let model_id = model.id;
+    field(
+        format!("deleteOne{}", model.name()),
+        move || arguments::delete_one_arguments(ctx, cloned_model),
+        OutputType::object(objects::model::model_object_type(ctx, model)),
+        Some(QueryInfo {
+            model: Some(model_id),
+            tag: QueryTag::DeleteOne,
+        }),
+    )
+    .nullable()
 }
 
 /// Builds a delete many mutation field (e.g. deleteManyUsers) for given model.
-fn delete_many_field(ctx: &'_ QuerySchema, model: Model) -> OutputField<'_> {
+fn delete_many_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
     let field_name = format!("deleteMany{}", model.name());
     let cloned_model = model.clone();
 
     field(
         field_name,
-        Some(Arc::new(move || {
-            arguments::delete_many_arguments(ctx, cloned_model.clone())
-        })),
+        move || arguments::delete_many_arguments(ctx, cloned_model),
         OutputType::object(objects::affected_records_object_type()),
         Some(QueryInfo {
             model: Some(model.id),
@@ -141,35 +133,30 @@ fn delete_many_field(ctx: &'_ QuerySchema, model: Model) -> OutputField<'_> {
 }
 
 /// Builds an update mutation field (e.g. updateUser) for given model.
-fn update_item_field(ctx: &'_ QuerySchema, model: Model) -> OutputField<'_> {
-    arguments::update_one_arguments(ctx, model.clone())
-        .map(|args| {
-            let field_name = format!("updateOne{}", model.name());
-
-            field(
-                field_name,
-                Some(Arc::new(move || args.clone())),
-                OutputType::object(objects::model::model_object_type(ctx, model.clone())),
-                Some(QueryInfo {
-                    model: Some(model.id),
-                    tag: QueryTag::UpdateOne,
-                }),
-            )
-            .nullable()
-        })
-        .unwrap()
+fn update_item_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
+    let field_name = format!("updateOne{}", model.name());
+    let model_id = model.id;
+    let cloned_model = model.clone();
+    field(
+        field_name,
+        move || arguments::update_one_arguments(ctx, model),
+        OutputType::object(objects::model::model_object_type(ctx, cloned_model)),
+        Some(QueryInfo {
+            model: Some(model_id),
+            tag: QueryTag::UpdateOne,
+        }),
+    )
+    .nullable()
 }
 
 /// Builds an update many mutation field (e.g. updateManyUsers) for given model.
-fn update_many_field(ctx: &'_ QuerySchema, model: Model) -> OutputField<'_> {
+fn update_many_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
     let field_name = format!("updateMany{}", model.name());
     let cloned_model = model.clone();
 
     field(
         field_name,
-        Some(Arc::new(move || {
-            arguments::update_many_arguments(ctx, cloned_model.clone())
-        })),
+        move || arguments::update_many_arguments(ctx, cloned_model),
         OutputType::object(objects::affected_records_object_type()),
         Some(QueryInfo {
             model: Some(model.id),
@@ -179,20 +166,16 @@ fn update_many_field(ctx: &'_ QuerySchema, model: Model) -> OutputField<'_> {
 }
 
 /// Builds an upsert mutation field (e.g. upsertUser) for given model.
-fn upsert_item_field(ctx: &'_ QuerySchema, model: Model) -> OutputField<'_> {
-    arguments::upsert_arguments(ctx, model.clone())
-        .map(|args| {
-            let field_name = format!("upsertOne{}", model.name());
-
-            field(
-                field_name,
-                Some(Arc::new(move || args.clone())),
-                OutputType::object(objects::model::model_object_type(ctx, model.clone())),
-                Some(QueryInfo {
-                    model: Some(model.id),
-                    tag: QueryTag::UpsertOne,
-                }),
-            )
-        })
-        .unwrap()
+fn upsert_item_field(ctx: &QuerySchema, model: Model) -> OutputField<'_> {
+    let cloned_model = model.clone();
+    let model_id = model.id;
+    field(
+        format!("upsertOne{}", model.name()),
+        move || arguments::upsert_arguments(ctx, model),
+        OutputType::object(objects::model::model_object_type(ctx, cloned_model)),
+        Some(QueryInfo {
+            model: Some(model_id),
+            tag: QueryTag::UpsertOne,
+        }),
+    )
 }
