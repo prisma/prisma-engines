@@ -9,22 +9,22 @@ mod composite_filter {
         setup::test_data_mixed_composite(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTestModel(where: { comp: { is: { string: { equals: { _ref: "string" } } } } }) { id } }"#),
+          run_query!(runner, r#"{ findManyTestModel(where: { comp: { is: { string: { equals: { _ref: "string", _container: "Composite" } } } } }) { id } }"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTestModel(where: { comp: { is: { string: { equals: { _ref: "string2" } } } } }) { id } }"#),
+          run_query!(runner, r#"{ findManyTestModel(where: { comp: { is: { string: { equals: { _ref: "string2", _container: "Composite" } } } } }) { id } }"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTestModel(where: { comp: { isNot: { string: { equals: { _ref: "string" } } } } }) { id } }"#),
+          run_query!(runner, r#"{ findManyTestModel(where: { comp: { isNot: { string: { equals: { _ref: "string", _container: "Composite" } } } } }) { id } }"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTestModel(where: { comp: { isNot: { string: { equals: { _ref: "string2" } } } } }) { id } }"#),
+          run_query!(runner, r#"{ findManyTestModel(where: { comp: { isNot: { string: { equals: { _ref: "string2", _container: "Composite" } } } } }) { id } }"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
@@ -37,61 +37,61 @@ mod composite_filter {
 
         // some
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTestModel(where: { comp_list: { some: { string: { equals: { _ref: "string" } } } } }) { id } }"#),
+          run_query!(runner, r#"{ findManyTestModel(where: { comp_list: { some: { string: { equals: { _ref: "string", _container: "Composite" } } } } }) { id } }"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTestModel(where: { comp_list: { some: { string: { equals: { _ref: "string2" } } } } }) { id } }"#),
+          run_query!(runner, r#"{ findManyTestModel(where: { comp_list: { some: { string: { equals: { _ref: "string2", _container: "Composite" } } } } }) { id } }"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         // not some
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTestModel(where: { NOT: { comp_list: { some: { string: { equals: { _ref: "string" } } } } } }) { id } }"#),
+          run_query!(runner, r#"{ findManyTestModel(where: { NOT: { comp_list: { some: { string: { equals: { _ref: "string", _container: "Composite" } } } } } }) { id } }"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTestModel(where: { NOT: { comp_list: { some: { string: { equals: { _ref: "string2" } } } } } }) { id } }"#),
+          run_query!(runner, r#"{ findManyTestModel(where: { NOT: { comp_list: { some: { string: { equals: { _ref: "string2", _container: "Composite" } } } } } }) { id } }"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         // every
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTestModel(where: { comp_list: { every: { string: { equals: { _ref: "string" } } } } }) { id } }"#),
+          run_query!(runner, r#"{ findManyTestModel(where: { comp_list: { every: { string: { equals: { _ref: "string", _container: "Composite" } } } } }) { id } }"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTestModel(where: { comp_list: { every: { string: { equals: { _ref: "string2" } } } } }) { id } }"#),
+          run_query!(runner, r#"{ findManyTestModel(where: { comp_list: { every: { string: { equals: { _ref: "string2", _container: "Composite" } } } } }) { id } }"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         // not every
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTestModel(where: { NOT: { comp_list: { every: { string: { equals: { _ref: "string" } } } } } }) { id } }"#),
+          run_query!(runner, r#"{ findManyTestModel(where: { NOT: { comp_list: { every: { string: { equals: { _ref: "string", _container: "Composite" } } } } } }) { id } }"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTestModel(where: { NOT: { comp_list: { every: { string: { equals: { _ref: "string2" } } } } } }) { id } }"#),
+          run_query!(runner, r#"{ findManyTestModel(where: { NOT: { comp_list: { every: { string: { equals: { _ref: "string2", _container: "Composite" } } } } } }) { id } }"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         // none
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTestModel(where: { comp_list: { none: { string: { equals: { _ref: "string" } } } } }) { id } }"#),
+          run_query!(runner, r#"{ findManyTestModel(where: { comp_list: { none: { string: { equals: { _ref: "string", _container: "Composite" } } } } }) { id } }"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTestModel(where: { comp_list: { none: { string: { equals: { _ref: "string2" } } } } }) { id } }"#),
+          run_query!(runner, r#"{ findManyTestModel(where: { comp_list: { none: { string: { equals: { _ref: "string2", _container: "Composite" } } } } }) { id } }"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         // not none
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTestModel(where: { NOT: { comp_list: { none: { string: { equals: { _ref: "string" } } } } } }) { id } }"#),
+          run_query!(runner, r#"{ findManyTestModel(where: { NOT: { comp_list: { none: { string: { equals: { _ref: "string", _container: "Composite" } } } } } }) { id } }"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findManyTestModel(where: { NOT: { comp_list: { none: { string: { equals: { _ref: "string2" } } } } } }) { id } }"#),
+          run_query!(runner, r#"{ findManyTestModel(where: { NOT: { comp_list: { none: { string: { equals: { _ref: "string2", _container: "Composite" } } } } } }) { id } }"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 

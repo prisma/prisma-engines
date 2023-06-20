@@ -14,6 +14,7 @@ async fn full_text_functions_filtered_out(api: &mut TestApi) -> TestResult {
     api.database().raw_cmd(&create_idx).await?;
 
     let expected = expect![[r#"
+        /// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
         model A {
           id   Int    @id @default(autoincrement())
           data String

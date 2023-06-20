@@ -201,7 +201,9 @@ impl<'a, 'b> FieldTypeInferrer<'a, 'b> {
 
         match value {
             ArgumentValue::Object(obj) => {
-                let is_field_ref_obj = obj.contains_key(constants::filters::UNDERSCORE_REF) && obj.len() == 1;
+                let is_field_ref_obj = obj.contains_key(constants::filters::UNDERSCORE_REF)
+                    && obj.contains_key(constants::filters::UNDERSCORE_CONTAINER)
+                    && obj.len() == 2;
                 let schema_objects = self.get_object_types();
 
                 match schema_objects {
