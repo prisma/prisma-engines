@@ -1,7 +1,11 @@
+#[cfg(not(target_arch = "wasm32"))]
+use napi::{Env, JsFunction, JsObject, JsUnknown};
+
+#[cfg(not(target_arch = "wasm32"))]
+use napi_derive::napi;
+
 use crate::{error::ApiError, log_callback::LogCallback, logger::Logger};
 use futures::FutureExt;
-use napi::{Env, JsFunction, JsObject, JsUnknown};
-use napi_derive::napi;
 use psl::PreviewFeature;
 use query_core::{
     protocol::EngineProtocol,
@@ -135,6 +139,7 @@ impl Inner {
     }
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 #[napi]
 impl QueryEngine {
     /// Parse a validated datamodel and configuration to allow connecting later on.

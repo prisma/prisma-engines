@@ -1,3 +1,4 @@
+#[cfg(not(target_arch = "wasm32"))]
 extern crate napi_build;
 
 use std::process::Command;
@@ -10,5 +11,7 @@ fn store_git_commit_hash() {
 
 fn main() {
     store_git_commit_hash();
+
+    #[cfg(not(target_arch = "wasm32"))]
     napi_build::setup()
 }

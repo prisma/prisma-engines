@@ -1316,8 +1316,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4eb1a864a501629691edf6c15a593b7a51eebaa1e8468e9ddc623de7c9b58ec6"
 dependencies = [
  "cfg-if",
+ "js-sys",
  "libc",
  "wasi 0.11.0+wasi-snapshot-preview1",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -3313,6 +3315,7 @@ dependencies = [
  "async-trait",
  "connection-string",
  "futures",
+ "getrandom 0.2.7",
  "js-drivers",
  "napi",
  "napi-build",
@@ -3336,6 +3339,7 @@ dependencies = [
  "tracing-subscriber",
  "url",
  "user-facing-errors",
+ "wasm-bindgen",
 ]
 
 [[package]]

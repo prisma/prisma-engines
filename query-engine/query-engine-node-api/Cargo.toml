@@ -16,16 +16,10 @@ js-drivers = ["sql-connector/js-drivers"]
 [dependencies]
 anyhow = "1"
 async-trait = "0.1"
-query-core = { path = "../core" }
-request-handlers = { path = "../request-handlers" }
 query-connector = { path = "../connectors/query-connector" }
-user-facing-errors = { path = "../../libs/user-facing-errors" }
 psl.workspace = true
-sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector" }
 prisma-models = { path = "../prisma-models" }
 js-drivers = { path = "../js-drivers" }
-napi.workspace = true
-napi-derive.workspace = true
 
 thiserror = "1"
 connection-string.workspace = true 
@@ -33,16 +27,27 @@ url = "2"
 serde_json.workspace = true
 serde.workspace = true
 
+futures = "0.3"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+napi.workspace = true
+napi-derive.workspace = true
 tracing = "0.1"
 tracing-subscriber = { version = "0.3" }
 tracing-futures = "0.2"
 tracing-opentelemetry = "0.17.3"
 opentelemetry = { version = "0.17"}
-
+sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector" }
+query-core = { path = "../core" }
+query-engine-metrics = {path = "../metrics"}
+request-handlers = { path = "../request-handlers" }
+user-facing-errors = { path = "../../libs/user-facing-errors" }
 quaint.workspace = true
 tokio.workspace = true
-futures = "0.3"
-query-engine-metrics = {path = "../metrics"}
 
-[build-dependencies]
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = { version = "0.2.84" }
+getrandom = { version = "0.2", features = ["js"] }
+
+[target.'cfg(not(target_arch = "wasm32"))'.build-dependencies]
 napi-build = "1"
