@@ -28,7 +28,7 @@ mod metrics {
 
         match runner.connector_version() {
             Sqlite => assert_eq!(total_queries, 9),
-            SqlServer(_) => assert_eq!(total_queries, 14),
+            SqlServer(_) => assert_eq!(total_queries, 17),
             MongoDb(_) => assert_eq!(total_queries, 5),
             CockroachDb => (), // not deterministic
             MySql(_) => assert_eq!(total_queries, 12),

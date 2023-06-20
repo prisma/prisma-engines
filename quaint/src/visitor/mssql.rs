@@ -7,7 +7,7 @@ use crate::{
         Order, Ordering, Row, Table, TypeDataLength, TypeFamily, Values,
     },
     error::{Error, ErrorKind},
-    prelude::{Aliasable, Average, BytesTypeFamily, ConditionTree, IndexDefinition, Query, TextTypeFamily},
+    prelude::{Aliasable, Average, Query},
     visitor, Value,
 };
 use std::{convert::TryFrom, fmt::Write, iter};
@@ -25,6 +25,7 @@ pub struct Mssql<'a> {
 }
 
 impl<'a> Mssql<'a> {
+    // TODO: figure out that merge shit
     fn visit_returning(&mut self, columns: Vec<Column<'a>>) -> visitor::Result {
         let cols: Vec<_> = columns.into_iter().map(|c| c.table("Inserted")).collect();
 
@@ -47,18 +48,15 @@ impl<'a> Mssql<'a> {
 
     fn visit_type_family(&mut self, type_family: TypeFamily) -> visitor::Result {
         match type_family {
-            TypeFamily::Text(len, family) => match family {
-                Some(TextTypeFamily::Xml) => self.write("XML"),
-                None => {
-                    self.write("NVARCHAR(")?;
-                    match len {
-                        Some(TypeDataLength::Constant(len)) => self.write(len)?,
-                        Some(TypeDataLength::Maximum) => self.write("MAX")?,
-                        None => self.write(4000)?,
-                    }
-                    self.write(")")
+            TypeFamily::Text(len) => {
+                self.write("NVARCHAR(")?;
+                match len {
+                    Some(TypeDataLength::Constant(len)) => self.write(len)?,
+                    Some(TypeDataLength::Maximum) => self.write("MAX")?,
+                    None => self.write(4000)?,
                 }
-            },
+                self.write(")")
+            }
             TypeFamily::Int => self.write("BIGINT"),
             TypeFamily::Float => self.write("FLOAT(24)"),
             TypeFamily::Double => self.write("FLOAT(53)"),
@@ -77,18 +75,15 @@ impl<'a> Mssql<'a> {
             TypeFamily::Boolean => self.write("BIT"),
             TypeFamily::Uuid => self.write("UNIQUEIDENTIFIER"),
             TypeFamily::DateTime => self.write("DATETIMEOFFSET"),
-            TypeFamily::Bytes(len, family) => match family {
-                Some(BytesTypeFamily::Image) => self.write("Image"),
-                None => {
-                    self.write("VARBINARY(")?;
-                    match len {
-                        Some(TypeDataLength::Constant(len)) => self.write(len)?,
-                        Some(TypeDataLength::Maximum) => self.write("MAX")?,
-                        None => self.write(8000)?,
-                    }
-                    self.write(")")
+            TypeFamily::Bytes(len) => {
+                self.write("VARBINARY(")?;
+                match len {
+                    Some(TypeDataLength::Constant(len)) => self.write(len)?,
+                    Some(TypeDataLength::Maximum) => self.write("MAX")?,
+                    None => self.write(8000)?,
                 }
-            },
+                self.write(")")
+            }
         }
     }
 
@@ -122,53 +117,14 @@ impl<'a> Mssql<'a> {
 
     fn select_generated_keys(&mut self, columns: Vec<Column<'a>>, target_table: Table<'a>) -> visitor::Result {
         let col_len = columns.len();
-        let unique_cols = target_table
-            .index_definitions
-            .iter()
-            .flat_map(|idx| match idx {
-                IndexDefinition::Single(col) => vec![&**col],
-                IndexDefinition::Compound(cols) => cols.iter().collect::<Vec<_>>(),
-            })
-            .collect::<Vec<_>>();
 
-        if unique_cols.is_empty() {
-            let msg = "Table is missing some index definitions in order to render an INSERT OUTPUT.";
-            let kind = ErrorKind::QueryInvalidInput(msg.to_string());
-
-            let mut builder = Error::builder(kind);
-            builder.set_original_message(msg);
-
-            return Err(builder.build());
-        }
-
-        // We only use the unique columns to generate the join conditions.
-        let join_columns = columns
-            .iter()
-            .filter(|col| unique_cols.contains(col))
-            .collect::<Vec<_>>();
-
-        if join_columns.is_empty() {
-            let msg = "No unique column could be found in the returning statement. Make sure at least one is present or that the unique column has the same table than the index definition ONE attached to it.";
-            let kind = ErrorKind::QueryInvalidInput(msg.to_string());
-
-            let mut builder = Error::builder(kind);
-            builder.set_original_message(msg);
-
-            return Err(builder.build());
-        }
-
-        let join = join_columns
+        let join = columns
             .iter()
             .fold(JoinData::from(target_table.alias("t")), |acc, col| {
                 let left = Column::from(("t", col.name.to_string()));
                 let right = Column::from(("g", col.name.to_string()));
 
-                // A unique null could be used as join conditions so we always need to check for nullability.
-                // This is safe because a unique null will never be used as single condition to join.
-                acc.on(ConditionTree::Or(vec![
-                    (left.clone()).equals(right.clone()).into(),
-                    ConditionTree::And(vec![left.is_null().into(), right.is_null().into()]).into(),
-                ]))
+                acc.on((left).equals(right))
             });
 
         self.write("SELECT ")?;
@@ -1344,11 +1300,10 @@ mod tests {
     #[test]
     #[cfg(feature = "mssql")]
     fn test_returning_insert() {
-        let table = Table::from("foo").add_unique_index("bar");
-        let insert = Insert::single_into(table).value("bar", "lol");
-        let (sql, params) = Mssql::build(Insert::from(insert).returning(vec![("foo", "bar")])).unwrap();
+        let insert = Insert::single_into("foo").value("bar", "lol");
+        let (sql, params) = Mssql::build(Insert::from(insert).returning(vec!["bar"])).unwrap();
 
-        assert_eq!("DECLARE @generated_keys table([bar] NVARCHAR(255)) INSERT INTO [foo] ([bar]) OUTPUT [Inserted].[bar] INTO @generated_keys VALUES (@P1) SELECT [t].[bar] FROM @generated_keys AS g INNER JOIN [foo] AS [t] ON ([t].[bar] = [g].[bar] OR ([t].[bar] IS NULL AND [g].[bar] IS NULL)) WHERE @@ROWCOUNT > 0", sql);
+        assert_eq!("DECLARE @generated_keys table([bar] NVARCHAR(255)) INSERT INTO [foo] ([bar]) OUTPUT [Inserted].[bar] INTO @generated_keys VALUES (@P1) SELECT [t].[bar] FROM @generated_keys AS g INNER JOIN [foo] AS [t] ON [t].[bar] = [g].[bar] WHERE @@ROWCOUNT > 0", sql);
 
         assert_eq!(vec![Value::from("lol")], params);
     }
@@ -1448,7 +1403,7 @@ mod tests {
             OUTPUT [Inserted].[bar],[Inserted].[wtf] INTO @generated_keys;
             SELECT [t].[bar],[t].[wtf] FROM @generated_keys AS g
             INNER JOIN [foo] AS [t]
-            ON ([t].[bar] = [g].[bar] OR ([t].[bar] IS NULL AND [g].[bar] IS NULL))
+            ON ([t].[bar] = [g].[bar] AND [t].[wtf] = [g].[wtf])
             WHERE @@ROWCOUNT > 0
         "
         );

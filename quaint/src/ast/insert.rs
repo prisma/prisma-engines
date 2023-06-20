@@ -244,8 +244,6 @@ impl<'a> Insert<'a> {
 
     /// Sets the returned columns.
     ///
-    /// On SQL Server, at least one unique column must be returned.
-    ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Postgres}};
     /// # fn main() -> Result<(), quaint::error::Error> {
