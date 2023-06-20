@@ -163,6 +163,12 @@
 <a href="#163" id="163">163</a>
 <a href="#164" id="164">164</a>
 <a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::panic;
 
 <span class="kw">use </span>napi::bindgen_prelude::{FromNapiValue, Promise <span class="kw">as </span>JsPromise, ToNapiValue};
@@ -236,6 +242,12 @@
     <span class="kw">pub </span>column_names: Vec&lt;String&gt;,
     <span class="comment">// Note this might be encoded differently for performance reasons
     </span><span class="kw">pub </span>rows: Vec&lt;Vec&lt;serde_json::Value&gt;&gt;,
+}
+
+<span class="kw">impl </span>JSResultSet {
+    <span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.rows.len()
+    }
 }
 
 <span class="attr">#[napi]

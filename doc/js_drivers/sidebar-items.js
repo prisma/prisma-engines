@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["Queryable"]};
+window.SIDEBAR_ITEMS = {"struct":["JsQueryable"]};
