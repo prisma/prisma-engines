@@ -153,7 +153,7 @@ impl QueryEngine {
 
         #[cfg(feature = "js-drivers")]
         if let Some(driver) = maybe_driver {
-            let queryable = js_drivers::Queryable::from(driver);
+            let queryable = js_drivers::JsQueryable::from(driver);
             sql_connector::register_driver(Arc::new(queryable));
         }
 
