@@ -20,6 +20,8 @@ thiserror = "1"
 tracing = "0.1"
 url = "2"
 connection-string.workspace = true 
+quaint.workspace = true
+once_cell = "1.15"
 
 mongodb-query-connector = { path = "../connectors/mongodb-query-connector", optional = true }
 sql-query-connector = { path = "../connectors/sql-query-connector", optional = true }

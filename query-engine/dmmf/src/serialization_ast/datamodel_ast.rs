@@ -104,4 +104,6 @@ pub struct Enum {
 pub struct EnumValue {
     pub name: String,
     pub db_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub documentation: Option<String>,
 }

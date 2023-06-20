@@ -64,6 +64,13 @@ pub(super) fn generate_warnings(model: ModelPair<'_>, warnings: &mut Warnings) {
         })
     }
 
+    for expr_indx in model.expression_indexes() {
+        warnings.expression_indexes.push(generators::ModelAndConstraint {
+            model: model.name().to_string(),
+            constraint: expr_indx.to_string(),
+        })
+    }
+
     for field in model.scalar_fields() {
         if field.remapped_name_from_psl() {
             let mf = generators::ModelAndField {

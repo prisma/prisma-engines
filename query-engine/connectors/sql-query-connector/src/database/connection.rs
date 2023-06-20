@@ -1,5 +1,5 @@
 use super::{catch, transaction::SqlConnectorTransaction};
-use crate::{database::operations::*, Context, QueryExt, SqlError};
+use crate::{database::operations::*, Context, SqlError};
 use async_trait::async_trait;
 use connector::{ConnectionLike, RelAggregationSelection};
 use connector_interface::{
@@ -10,7 +10,7 @@ use prisma_models::{prelude::*, SelectionResult};
 use prisma_value::PrismaValue;
 use quaint::{
     connector::{IsolationLevel, TransactionCapable},
-    prelude::ConnectionInfo,
+    prelude::{ConnectionInfo, Queryable},
 };
 use std::{collections::HashMap, str::FromStr};
 
@@ -22,7 +22,7 @@ pub(crate) struct SqlConnection<C> {
 
 impl<C> SqlConnection<C>
 where
-    C: QueryExt + Send + Sync + 'static,
+    C: Queryable + TransactionCapable + Send + Sync + 'static,
 {
     pub fn new(inner: C, connection_info: &ConnectionInfo, features: psl::PreviewFeatures) -> Self {
         let connection_info = connection_info.clone();
@@ -35,12 +35,12 @@ where
     }
 }
 
-impl<C> ConnectionLike for SqlConnection<C> where C: QueryExt + TransactionCapable + Send + Sync + 'static {}
+impl<C> ConnectionLike for SqlConnection<C> where C: Queryable + TransactionCapable + Send + Sync + 'static {}
 
 #[async_trait]
 impl<C> Connection for SqlConnection<C>
 where
-    C: QueryExt + TransactionCapable + Send + Sync + 'static,
+    C: Queryable + TransactionCapable + Send + Sync + 'static,
 {
     async fn start_transaction<'a>(
         &'a mut self,
@@ -77,7 +77,7 @@ where
 #[async_trait]
 impl<C> ReadOperations for SqlConnection<C>
 where
-    C: QueryExt + Send + Sync + 'static,
+    C: Queryable + Send + Sync + 'static,
 {
     async fn get_single_record(
         &mut self,
@@ -159,7 +159,7 @@ where
 #[async_trait]
 impl<C> WriteOperations for SqlConnection<C>
 where
-    C: QueryExt + Send + Sync + 'static,
+    C: Queryable + Send + Sync + 'static,
 {
     async fn create_record(
         &mut self,

@@ -1,0 +1,18 @@
+[package]
+name = "js-drivers"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-trait = "0.1"
+once_cell = "1.15"
+serde.workspace = true
+serde_json.workspace = true
+quaint.workspace = true
+
+napi.workspace = true
+napi-derive.workspace = true
+
+[dev-dependencies]
+expect-test = "1"
+tokio.workspace = true

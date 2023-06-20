@@ -11,17 +11,17 @@ mod bytes_filter {
         setup::test_data_common_types(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: { equals: { _ref: "bytes" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: { equals: { _ref: "bytes", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: { equals: { _ref: "bytes2" } }}) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: { equals: { _ref: "bytes2", _container: "TestModel" } }}) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { AND: { bytes: { not: { equals: { _ref: "bytes2" } } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { AND: { bytes: { not: { equals: { _ref: "bytes2", _container: "TestModel" } } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
@@ -33,17 +33,17 @@ mod bytes_filter {
         setup::test_data_common_mixed_types(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: { in: { _ref: "bytes2" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: { in: { _ref: "bytes2", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: { notIn: { _ref: "bytes2" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: { notIn: { _ref: "bytes2", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: { not: { in: { _ref: "bytes2" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bytes: { not: { in: { _ref: "bytes2", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
@@ -56,53 +56,53 @@ mod bytes_filter {
 
         // has
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bytes_list: { has: { _ref: "bytes" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bytes_list: { has: { _ref: "bytes", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         // not has
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { bytes_list: { has: { _ref: "bytes" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { bytes_list: { has: { _ref: "bytes", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
         // hasSome
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bytes_list: { hasSome: { _ref: "bytes_list" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bytes_list: { hasSome: { _ref: "bytes_list", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bytes_list: { hasSome: { _ref: "bytes_list2" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bytes_list: { hasSome: { _ref: "bytes_list2", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
 
         // not hasSome
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { bytes_list: { hasSome: { _ref: "bytes_list" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { bytes_list: { hasSome: { _ref: "bytes_list", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { bytes_list: { hasSome: { _ref: "bytes_list2" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { bytes_list: { hasSome: { _ref: "bytes_list2", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
 
         // hasEvery
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bytes_list: { hasEvery: { _ref: "bytes_list" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bytes_list: { hasEvery: { _ref: "bytes_list", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { bytes_list: { hasEvery: { _ref: "bytes_list2" } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { bytes_list: { hasEvery: { _ref: "bytes_list2", _container: "TestModel" } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":1}]}}"###
         );
 
         // not hasEvery
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { bytes_list: { hasEvery: { _ref: "bytes_list" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { bytes_list: { hasEvery: { _ref: "bytes_list", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[]}}"###
         );
         insta::assert_snapshot!(
-          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { bytes_list: { hasEvery: { _ref: "bytes_list2" } } } }) { id }}"#),
+          run_query!(&runner, r#"query { findManyTestModel(where: { NOT: { bytes_list: { hasEvery: { _ref: "bytes_list2", _container: "TestModel" } } } }) { id }}"#),
           @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
         );
 
