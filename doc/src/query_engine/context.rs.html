@@ -254,7 +254,7 @@
 
     <span class="kw">let </span>datamodel = opts.schema(<span class="bool-val">false</span>)<span class="question-mark">?</span>;
     <span class="kw">let </span>config = <span class="kw-2">&amp;</span>datamodel.configuration;
-    <span class="kw">let </span>protocol = opts.engine_protocol(config.preview_features());
+    <span class="kw">let </span>protocol = opts.engine_protocol();
     config.validate_that_one_datasource_is_provided()<span class="question-mark">?</span>;
 
     <span class="kw">let </span>span = <span class="macro">tracing::info_span!</span>(<span class="string">&quot;prisma:engine:connect&quot;</span>);

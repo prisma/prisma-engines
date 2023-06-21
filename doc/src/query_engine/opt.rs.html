@@ -251,13 +251,7 @@
 <a href="#251" id="251">251</a>
 <a href="#252" id="252">252</a>
 <a href="#253" id="253">253</a>
-<a href="#254" id="254">254</a>
-<a href="#255" id="255">255</a>
-<a href="#256" id="256">256</a>
-<a href="#257" id="257">257</a>
-<a href="#258" id="258">258</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{error::PrismaError, PrismaResult};
-<span class="kw">use </span>psl::{PreviewFeature, PreviewFeatures};
 <span class="kw">use </span>query_core::protocol::EngineProtocol;
 <span class="kw">use </span>serde::Deserialize;
 <span class="kw">use </span>std::{env, ffi::OsStr, fs::File, io::Read};
@@ -466,9 +460,8 @@
         std::env::var(<span class="string">&quot;LOG_QUERIES&quot;</span>).map(|<span class="kw">_</span>| <span class="bool-val">true</span>).unwrap_or(<span class="self">self</span>.log_queries)
     }
 
-    <span class="doccomment">/// The EngineProtocol to use for communication, it will be [EngineProtocol::Json] in case
-    /// the [PreviewFeature::JsonProtocol] flag is set to &quot;json&quot;. Otherwise it will be
-    /// [EngineProtocol::Graphql]
+    <span class="doccomment">/// The EngineProtocol to use for communication, it will be [EngineProtocol::Json] by
+    /// default
     ///
     /// This protocol will determine how the body of an HTTP request made by the client is processed.
     /// [request_handlers::JsonBody] and [request_handlers::GraphqlBody] are in charge
@@ -480,14 +473,11 @@
     /// for submitting the query, this is due to the fact that DMMF is no longer used by the client
     /// to understand which types certain values are. See [query_core::QueryDocumentParser]
     ///
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>engine_protocol(<span class="kw-2">&amp;</span><span class="self">self</span>, preview_features: PreviewFeatures) -&gt; EngineProtocol {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>engine_protocol(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; EngineProtocol {
         <span class="self">self</span>.engine_protocol
             .as_ref()
             .map(EngineProtocol::from)
-            .unwrap_or_else(|| <span class="kw">match </span>preview_features.contains(PreviewFeature::JsonProtocol) {
-                <span class="bool-val">true </span>=&gt; EngineProtocol::Json,
-                <span class="bool-val">false </span>=&gt; EngineProtocol::Graphql,
-            })
+            .unwrap_or(EngineProtocol::Json)
     }
 }
 
