@@ -91,7 +91,6 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
          | ExtendedWhereUnique
          | MultiSchema
          | Views
-         | JsonProtocol
     }),
     deprecated: enumflags2::make_bitflags!(PreviewFeature::{
         AtomicNumberOperations
@@ -122,6 +121,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | ClientExtensions
         | FilteredRelationCount
         | OrderByNulls
+        | JsonProtocol
     }),
     hidden: enumflags2::make_bitflags!(PreviewFeature::{
         NodeDrivers
