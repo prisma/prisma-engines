@@ -43,7 +43,6 @@ pub fn collect_selected_fields(
 pub fn collect_selected_scalars(from_pairs: &[FieldPair<'_>], model: &Model) -> FieldSelection {
     let model_id = model.primary_identifier();
     let selected_fields = pairs_to_scalar_selections(model, from_pairs);
-
     let selection = FieldSelection::new(selected_fields);
 
     model_id.merge(selection)

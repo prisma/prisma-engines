@@ -52,7 +52,7 @@ impl<'a> WriteArgsParser<'a> {
         )
     }
 
-    pub(crate) fn has_nested_create(model: &Model, data_map: &ParsedInputMap<'a>) -> bool {
+    pub(crate) fn has_nested_operation(model: &Model, data_map: &ParsedInputMap<'a>) -> bool {
         data_map
             .iter()
             .any(|(field_name, _)| model.fields().find_from_relation_fields(field_name).is_ok())

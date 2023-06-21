@@ -11,41 +11,6 @@ use schema::{constants::args, QuerySchema};
 use std::convert::TryInto;
 use write_args_parser::*;
 
-fn can_use_atomic_create(
-    query_schema: &QuerySchema,
-    model: &Model,
-    data_map: &ParsedInputMap<'_>,
-    field: &ParsedField<'_>,
-) -> bool {
-    // If the connector does not support RETURNING at all
-    if !query_schema.has_capability(ConnectorCapability::InsertReturning) {
-        return false;
-    }
-
-    // If the incoming query has nested creates
-    if WriteArgsParser::has_nested_create(model, data_map) {
-        return false;
-    }
-
-    let has_relations = field
-        .nested_fields
-        .as_ref()
-        .map(|nested_field| {
-            nested_field
-                .fields
-                .iter()
-                .any(|field| field.parsed_field.nested_fields.is_some())
-        })
-        .unwrap_or(false);
-
-    // If the field selection has relations
-    if has_relations {
-        return false;
-    }
-
-    true
-}
-
 /// Creates a create record query and adds it to the query graph, together with it's nested queries and companion read query.
 pub(crate) fn create_record(
     graph: &mut QueryGraph,
@@ -153,7 +118,8 @@ pub fn create_record_node(
     let selection_order = selected_fields.db_names().collect();
 
     let cr = CreateRecord {
-        name: String::new(), // A create record
+        // A regular create record is never used as a result node. Therefore, it's never serialized, so we don't need a name.
+        name: String::new(),
         model,
         args,
         selected_fields,
@@ -169,7 +135,49 @@ pub fn create_record_node(
     Ok(create_node)
 }
 
-pub fn atomic_create_record_node(
+/// An atomic create is a create performed in a single operation.
+/// It uses `INSERT ... RETURNING` when the connector supports it.
+/// We only perform such create when:
+/// 1. There's no nested operations
+/// 2. The selection set contains no relation
+fn can_use_atomic_create(
+    query_schema: &QuerySchema,
+    model: &Model,
+    data_map: &ParsedInputMap<'_>,
+    field: &ParsedField<'_>,
+) -> bool {
+    // If the connector does not support RETURNING at all
+    if !query_schema.has_capability(ConnectorCapability::InsertReturning) {
+        return false;
+    }
+
+    // If the incoming query has nested creates
+    if WriteArgsParser::has_nested_operation(model, data_map) {
+        return false;
+    }
+
+    let has_relations = field
+        .nested_fields
+        .as_ref()
+        .map(|nested_field| {
+            nested_field
+                .fields
+                .iter()
+                .any(|field| field.parsed_field.nested_fields.is_some())
+        })
+        .unwrap_or(false);
+
+    // If the field selection has relations
+    if has_relations {
+        return false;
+    }
+
+    true
+}
+
+/// Creates a create record query that's done in a single operation and adds it to the query graph.
+/// Translates to an `INSERT ... RETURNING` under the hood.
+fn atomic_create_record_node(
     graph: &mut QueryGraph,
     query_schema: &QuerySchema,
     model: Model,

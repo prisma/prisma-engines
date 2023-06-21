@@ -23,12 +23,12 @@ use user_facing_errors::query_engine::DatabaseConstraint;
 
 async fn generate_id(
     conn: &dyn Queryable,
-    primary_key: &FieldSelection,
+    id_field: &FieldSelection,
     args: &WriteArgs,
     ctx: &Context<'_>,
 ) -> crate::Result<Option<SelectionResult>> {
     // Go through all the values and generate a select statement with the correct MySQL function
-    let (pk_select, need_select) = primary_key
+    let (id_select, need_select) = id_field
         .selections()
         .filter_map(|field| match field {
             SelectedField::Scalar(sf) if sf.default_value().is_some() && !args.has_arg_for(sf.db_name()) => sf
@@ -52,9 +52,9 @@ async fn generate_id(
 
     // db generate values only if needed
     if need_select {
-        let pk_select = pk_select.add_trace_id(ctx.trace_id);
+        let pk_select = id_select.add_trace_id(ctx.trace_id);
         let pk_result = conn.query(pk_select.into()).await?;
-        let result = try_convert(&(primary_key.into()), pk_result)?;
+        let result = try_convert(&(id_field.into()), pk_result)?;
 
         Ok(Some(result))
     } else {
@@ -72,14 +72,14 @@ pub(crate) async fn create_record(
     selected_fields: FieldSelection,
     ctx: &Context<'_>,
 ) -> crate::Result<SingleRecord> {
-    let pk: FieldSelection = model.primary_identifier();
+    let id_field: FieldSelection = model.primary_identifier();
 
     let returned_id = if *sql_family == SqlFamily::Mysql {
-        generate_id(conn, &pk, &args, ctx)
+        generate_id(conn, &id_field, &args, ctx)
             .await?
-            .or_else(|| args.as_selection_result(pk.clone().into()))
+            .or_else(|| args.as_selection_result(ModelProjection::from(id_field)))
     } else {
-        args.as_selection_result(pk.clone().into())
+        args.as_selection_result(ModelProjection::from(id_field))
     };
 
     let args = match returned_id {
