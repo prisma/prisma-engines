@@ -5,7 +5,7 @@ mod first;
 mod many;
 mod one;
 mod related;
-pub mod utils;
+pub(crate) mod utils;
 
 pub(crate) use aggregations::*;
 pub(crate) use first::*;

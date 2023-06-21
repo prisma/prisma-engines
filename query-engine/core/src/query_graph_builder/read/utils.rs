@@ -17,7 +17,6 @@ pub fn collect_selection_order(from: &[FieldPair<'_>]) -> Vec<String> {
 
 /// Creates a `FieldSelection` from a query selection.
 /// Automatically adds model IDs to the selected fields as well.
-/// Unwraps are safe due to query validation.
 pub fn collect_selected_fields(
     from_pairs: &[FieldPair<'_>],
     distinct: Option<FieldSelection>,
@@ -39,7 +38,6 @@ pub fn collect_selected_fields(
 
 /// Creates a `FieldSelection` from a query selection, which contains only scalar fields.
 /// Automatically adds model IDs to the selected fields as well.
-/// Unwraps are safe due to query validation.
 pub fn collect_selected_scalars(from_pairs: &[FieldPair<'_>], model: &Model) -> FieldSelection {
     let model_id = model.primary_identifier();
     let selected_fields = pairs_to_scalar_selections(model, from_pairs);
