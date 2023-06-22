@@ -307,6 +307,8 @@
 <a href="#307" id="307">307</a>
 <a href="#308" id="308">308</a>
 <a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{capitalize, constants::ordering, scalar_filter_name};
 <span class="kw">use </span>prisma_models::{ast::FieldArity, prelude::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
 
@@ -350,7 +352,7 @@
     ToManyCompositeFilterInput(CompositeType),
     ToManyRelationFilterInput(Model),
     ToOneCompositeFilterInput(CompositeType, FieldArity),
-    ToOneRelationFilterInput(Model),
+    ToOneRelationFilterInput(Model, FieldArity),
     TransactionIsolationLevel,
     UncheckedCreateInput(Model, <span class="prelude-ty">Option</span>&lt;RelationField&gt;),
     UncheckedUpdateOneInput(Model, <span class="prelude-ty">Option</span>&lt;RelationField&gt;),
@@ -489,8 +491,10 @@
             IdentifierType::ToManyRelationFilterInput(related_model) =&gt; {
                 <span class="macro">write!</span>(f, <span class="string">&quot;{}ListRelationFilter&quot;</span>, capitalize(related_model.name()))
             }
-            IdentifierType::ToOneRelationFilterInput(related_model) =&gt; {
-                <span class="macro">write!</span>(f, <span class="string">&quot;{}RelationFilter&quot;</span>, capitalize(related_model.name()))
+            IdentifierType::ToOneRelationFilterInput(related_model, arity) =&gt; {
+                <span class="kw">let </span>nullable = <span class="kw">if </span>arity.is_optional() { <span class="string">&quot;Nullable&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
+
+                <span class="macro">write!</span>(f, <span class="string">&quot;{}{}RelationFilter&quot;</span>, capitalize(related_model.name()), nullable)
             }
             IdentifierType::ToOneCompositeFilterInput(ct, arity) =&gt; {
                 <span class="kw">let </span>nullable = <span class="kw">if </span>arity.is_optional() { <span class="string">&quot;Nullable&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
