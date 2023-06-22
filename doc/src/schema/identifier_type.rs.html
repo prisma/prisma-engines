@@ -309,6 +309,16 @@
 <a href="#309" id="309">309</a>
 <a href="#310" id="310">310</a>
 <a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{capitalize, constants::ordering, scalar_filter_name};
 <span class="kw">use </span>prisma_models::{ast::FieldArity, prelude::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
 
@@ -323,6 +333,7 @@
     Mutation,
     CheckedCreateInput(Model, <span class="prelude-ty">Option</span>&lt;RelationField&gt;),
     CheckedUpdateManyInput(Model),
+    UncheckedUpdateManyInput(Model, <span class="prelude-ty">Option</span>&lt;RelationField&gt;),
     CheckedUpdateOneInput(Model, <span class="prelude-ty">Option</span>&lt;RelationField&gt;),
     CompositeCreateEnvelopeInput(CompositeType, FieldArity),
     CompositeCreateInput(CompositeType),
@@ -604,6 +615,15 @@
             IdentifierType::CreateManyInput(model, related_field) =&gt; <span class="kw">match </span>related_field {
                 <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>rf) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}CreateMany{}Input&quot;</span>, model.name(), capitalize(rf.name())),
                 <span class="kw">_ </span>=&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}CreateManyInput&quot;</span>, model.name()),
+            },
+            IdentifierType::UncheckedUpdateManyInput(model, related_field) =&gt; <span class="kw">match </span>related_field {
+                <span class="prelude-val">Some</span>(rf) =&gt; <span class="macro">write!</span>(
+                    f,
+                    <span class="string">&quot;{}UncheckedUpdateManyWithout{}Input&quot;</span>,
+                    model.name(),
+                    capitalize(rf.name())
+                ),
+                <span class="kw">_ </span>=&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}UncheckedUpdateManyInput&quot;</span>, model.name()),
             },
         }
     }
