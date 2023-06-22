@@ -151,24 +151,13 @@ fn can_use_atomic_create(
         return false;
     }
 
-    // If the incoming query has nested creates
+    // If the operation has nested creates
     if WriteArgsParser::has_nested_operation(model, data_map) {
         return false;
     }
 
-    let has_relations = field
-        .nested_fields
-        .as_ref()
-        .map(|nested_field| {
-            nested_field
-                .fields
-                .iter()
-                .any(|field| field.parsed_field.nested_fields.is_some())
-        })
-        .unwrap_or(false);
-
-    // If the field selection has relations
-    if has_relations {
+    // If the operation has nested selection sets
+    if field.has_nested_selection() {
         return false;
     }
 
