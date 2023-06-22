@@ -78,6 +78,9 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Setup upterm session
+        uses: lhotari/action-upterm@v1
+
       - name: "Start ${{ matrix.database.name }} (${{ matrix.engine_protocol }})"
         run: make start-${{ matrix.database.name }}
 
@@ -92,6 +95,3 @@ jobs:
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
-
-      - name: Setup upterm session
-        uses: lhotari/action-upterm@v1
