@@ -1,0 +1,22 @@
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../node_modules/.prisma/client"
+  previewFeatures = ["views"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:dev.db"
+}
+
+model User {
+  id    String  @id @default(uuid())
+}
+
+view IgnoredView {
+  id String @id
+
+  @@ignore
+}
+
+

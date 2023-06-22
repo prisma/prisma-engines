@@ -23,7 +23,7 @@ pub(crate) fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
         .db
         .walk_models()
         .filter(|model| !model.is_ignored())
-        .chain(schema.db.walk_views())
+        .chain(schema.db.walk_views().filter(|view| !view.is_ignored()))
     {
         datamodel.models.push(model_to_dmmf(model));
     }
