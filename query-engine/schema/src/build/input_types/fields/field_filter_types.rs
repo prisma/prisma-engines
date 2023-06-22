@@ -23,7 +23,7 @@ pub(crate) fn get_field_filter_types(
 
         ModelField::Composite(cf) if cf.is_list() => vec![
             InputType::object(to_many_composite_filter_object(ctx, cf.clone())),
-            InputType::list(to_one_composite_filter_shorthand_types(ctx, cf.clone())),
+            InputType::list(to_one_composite_filter_shorthand_types(ctx, cf)),
         ],
 
         ModelField::Composite(cf) => vec![
