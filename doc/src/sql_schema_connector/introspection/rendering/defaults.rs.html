@@ -82,8 +82,6 @@
 <a href="#82" id="82">82</a>
 <a href="#83" id="83">83</a>
 <a href="#84" id="84">84</a>
-<a href="#85" id="85">85</a>
-<a href="#86" id="86">86</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The `@default` attribute rendering.
 
 </span><span class="kw">use </span><span class="kw">crate</span>::introspection::introspection_pair::{DefaultKind, DefaultValuePair};
@@ -156,8 +154,6 @@
                 <span class="kw">let </span>vals = vals.into_iter().map(Value::from).collect();
                 <span class="prelude-val">Some</span>(renderer::DefaultValue::array(vals))
             }
-            DefaultKind::Prisma1Uuid =&gt; <span class="prelude-val">Some</span>(renderer::DefaultValue::function(Function::new(<span class="string">&quot;uuid&quot;</span>))),
-            DefaultKind::Prisma1Cuid =&gt; <span class="prelude-val">Some</span>(renderer::DefaultValue::function(Function::new(<span class="string">&quot;cuid&quot;</span>))),
         },
         <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
     };

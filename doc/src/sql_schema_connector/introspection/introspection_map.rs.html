@@ -325,6 +325,9 @@
 <a href="#325" id="325">325</a>
 <a href="#326" id="326">326</a>
 <a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Matching PSL and database schema information together.
 
 </span><span class="kw">mod </span>relation_names;
@@ -394,7 +397,7 @@
 ) {
     <span class="kw">for </span>table <span class="kw">in </span>sql_schema
         .table_walkers()
-        .filter(|t| !helpers::is_prisma_join_table(<span class="kw-2">*</span>t))
+        .filter(|t| !helpers::is_prisma_m_to_n_relation(<span class="kw-2">*</span>t))
     {
         <span class="kw">let </span>name = map
             .existing_models
@@ -445,7 +448,7 @@
 </span><span class="kw">fn </span>position_inline_relation_fields(sql_schema: <span class="kw-2">&amp;</span>sql::SqlSchema, map: <span class="kw-2">&amp;mut </span>IntrospectionMap&lt;<span class="lifetime">&#39;_</span>&gt;) {
     <span class="kw">for </span>table <span class="kw">in </span>sql_schema
         .table_walkers()
-        .filter(|t| !helpers::is_prisma_join_table(<span class="kw-2">*</span>t))
+        .filter(|t| !helpers::is_prisma_m_to_n_relation(<span class="kw-2">*</span>t))
     {
         <span class="kw">for </span>fk <span class="kw">in </span>table.foreign_keys() {
             map.inline_relation_positions
@@ -461,7 +464,10 @@
 /// join table) are sorted in a specific way. We handle the sorting
 /// here.
 </span><span class="kw">fn </span>position_m2m_relation_fields(sql_schema: <span class="kw-2">&amp;</span>sql::SqlSchema, map: <span class="kw-2">&amp;mut </span>IntrospectionMap&lt;<span class="lifetime">&#39;_</span>&gt;) {
-    <span class="kw">for </span>table <span class="kw">in </span>sql_schema.table_walkers().filter(|t| helpers::is_prisma_join_table(<span class="kw-2">*</span>t)) {
+    <span class="kw">for </span>table <span class="kw">in </span>sql_schema
+        .table_walkers()
+        .filter(|t| helpers::is_prisma_m_to_n_relation(<span class="kw-2">*</span>t))
+    {
         <span class="kw">let </span><span class="kw-2">mut </span>fks = table.foreign_keys();
 
         <span class="kw">if let </span>(<span class="prelude-val">Some</span>(first_fk), <span class="prelude-val">Some</span>(second_fk)) = (fks.next(), fks.next()) {
@@ -641,7 +647,7 @@
 ) {
     map.existing_m2m_relations = sql_schema
         .table_walkers()
-        .filter(|t| helpers::is_prisma_join_table(<span class="kw-2">*</span>t))
+        .filter(|t| helpers::is_prisma_m_to_n_relation(<span class="kw-2">*</span>t))
         .filter_map(|table| {
             prisma_schema
                 .db

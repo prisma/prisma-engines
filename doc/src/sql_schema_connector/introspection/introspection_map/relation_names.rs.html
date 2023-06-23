@@ -300,7 +300,7 @@
 //! introspected schema with as much clarity and as little ambiguity as possible.
 
 </span><span class="kw">use </span><span class="kw">crate</span>::introspection::{
-    datamodel_calculator::DatamodelCalculatorContext, introspection_helpers::is_prisma_join_table,
+    datamodel_calculator::DatamodelCalculatorContext, introspection_helpers::is_prisma_m_to_n_relation,
 };
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
 <span class="kw">use </span>std::{
@@ -372,7 +372,7 @@
     <span class="kw">let </span>ambiguous_relations = find_ambiguous_relations(ctx);
 
     <span class="kw">for </span>table <span class="kw">in </span>ctx.sql_schema.table_walkers() {
-        <span class="kw">if </span>is_prisma_join_table(table) {
+        <span class="kw">if </span>is_prisma_m_to_n_relation(table) {
             <span class="kw">let </span>name = prisma_m2m_relation_name(table, <span class="kw-2">&amp;</span>ambiguous_relations, ctx);
             names.m2m_relation_names.insert(table.id, name);
         } <span class="kw">else </span>{
@@ -473,7 +473,7 @@
     <span class="kw">let </span><span class="kw-2">mut </span>ambiguous_relations = HashSet::new();
 
     <span class="kw">for </span>table <span class="kw">in </span>ctx.sql_schema.table_walkers() {
-        <span class="kw">if </span>is_prisma_join_table(table) {
+        <span class="kw">if </span>is_prisma_m_to_n_relation(table) {
             m2m_relation_ambiguousness(table, <span class="kw-2">&amp;mut </span>ambiguous_relations)
         } <span class="kw">else </span>{
             <span class="kw">for </span>fk <span class="kw">in </span>table.foreign_keys() {
@@ -503,7 +503,7 @@
     }
 
     <span class="comment">// Check for conflicts with another m2m relation.
-    </span><span class="kw">for </span>other_m2m <span class="kw">in </span>table.schema.table_walkers().filter(|t| is_prisma_join_table(<span class="kw-2">*</span>t)) {
+    </span><span class="kw">for </span>other_m2m <span class="kw">in </span>table.schema.table_walkers().filter(|t| is_prisma_m_to_n_relation(<span class="kw-2">*</span>t)) {
         <span class="kw">if </span>other_m2m.id != table.id &amp;&amp; table_ids_for_m2m_relation_table(other_m2m) == tables {
             ambiguous_relations.insert(tables);
         }

@@ -83,7 +83,6 @@
 <a href="#83" id="83">83</a>
 <a href="#84" id="84">84</a>
 <a href="#85" id="85">85</a>
-<a href="#86" id="86">86</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>field_type;
 <span class="kw">mod </span>statistics;
 
@@ -95,7 +94,7 @@
     Database,
 };
 <span class="kw">use </span>mongodb_schema_describer::MongoSchema;
-<span class="kw">use </span>schema_connector::{warnings::Model, IntrospectionContext, IntrospectionResult, Version, Warnings};
+<span class="kw">use </span>schema_connector::{warnings::Model, IntrospectionContext, IntrospectionResult, Warnings};
 <span class="kw">use </span>statistics::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// From the given database, lists all collections as models, and samples
@@ -167,7 +166,6 @@
         is_empty: data_model.is_empty(),
         warnings,
         views: <span class="prelude-val">None</span>,
-        version: Version::NonPrisma,
     })
 }
 </code></pre></div></section></main></body></html>

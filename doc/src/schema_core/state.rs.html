@@ -434,7 +434,6 @@
 <a href="#434" id="434">434</a>
 <a href="#435" id="435">435</a>
 <a href="#436" id="436">436</a>
-<a href="#437" id="437">437</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A container to manage 0 or more migration connectors, based on request contents.
 //!
 //! Why this rather than using connectors directly? We must be able to use the migration engine
@@ -807,7 +806,6 @@
 
                         <span class="prelude-val">Ok</span>(IntrospectResult {
                             datamodel: result.data_model,
-                            version: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, result.version),
                             views,
                             warnings: result.warnings,
                         })

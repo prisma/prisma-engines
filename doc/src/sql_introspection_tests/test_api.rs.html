@@ -437,14 +437,6 @@
 <a href="#437" id="437">437</a>
 <a href="#438" id="438">438</a>
 <a href="#439" id="439">439</a>
-<a href="#440" id="440">440</a>
-<a href="#441" id="441">441</a>
-<a href="#442" id="442">442</a>
-<a href="#443" id="443">443</a>
-<a href="#444" id="444">444</a>
-<a href="#445" id="445">445</a>
-<a href="#446" id="446">446</a>
-<a href="#447" id="447">447</a>
 </pre></div><pre class="rust"><code><span class="kw">pub use </span><span class="kw">super</span>::TestResult;
 <span class="kw">pub use </span>expect_test::expect;
 <span class="kw">pub use </span>indoc::{formatdoc, indoc};
@@ -453,7 +445,6 @@
 <span class="kw">use </span>schema_connector::ConnectorResult;
 <span class="kw">use </span>schema_connector::IntrospectionContext;
 <span class="kw">use </span>schema_connector::IntrospectionResult;
-<span class="kw">use </span>schema_connector::Version;
 <span class="kw">use </span>schema_connector::ViewDefinition;
 <span class="kw">pub use </span>test_macros::test_connector;
 <span class="kw">pub use </span>test_setup::{BitFlags, Capabilities, Tags};
@@ -679,13 +670,6 @@
         <span class="kw">let </span>warnings = introspection_result.warnings.unwrap_or_default();
 
         <span class="prelude-val">Ok</span>(warnings)
-    }
-
-    <span class="kw">pub async fn </span>introspect_version(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Version&gt; {
-        <span class="kw">let </span>previous_schema = psl::validate(<span class="self">self</span>.pure_config().into());
-        <span class="kw">let </span>introspection_result = <span class="self">self</span>.test_introspect_internal(previous_schema, <span class="bool-val">false</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(introspection_result.version)
     }
 
     <span class="kw">pub async fn </span>introspection_warnings(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {

@@ -152,41 +152,9 @@
 <a href="#152" id="152">152</a>
 <a href="#153" id="153">153</a>
 <a href="#154" id="154">154</a>
-<a href="#155" id="155">155</a>
-<a href="#156" id="156">156</a>
-<a href="#157" id="157">157</a>
-<a href="#158" id="158">158</a>
-<a href="#159" id="159">159</a>
-<a href="#160" id="160">160</a>
-<a href="#161" id="161">161</a>
-<a href="#162" id="162">162</a>
-<a href="#163" id="163">163</a>
-<a href="#164" id="164">164</a>
-<a href="#165" id="165">165</a>
-<a href="#166" id="166">166</a>
-<a href="#167" id="167">167</a>
-<a href="#168" id="168">168</a>
-<a href="#169" id="169">169</a>
-<a href="#170" id="170">170</a>
-<a href="#171" id="171">171</a>
-<a href="#172" id="172">172</a>
-<a href="#173" id="173">173</a>
-<a href="#174" id="174">174</a>
-<a href="#175" id="175">175</a>
-<a href="#176" id="176">176</a>
-<a href="#177" id="177">177</a>
-<a href="#178" id="178">178</a>
-<a href="#179" id="179">179</a>
-<a href="#180" id="180">180</a>
-<a href="#181" id="181">181</a>
-<a href="#182" id="182">182</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>either::Either;
 <span class="kw">use </span>prisma_value::PrismaValue;
-<span class="kw">use </span>psl::{
-    builtin_connectors::{MySqlType, PostgresType},
-    datamodel_connector::constraint_names::ConstraintNames,
-    parser_database::walkers,
-};
+<span class="kw">use </span>psl::{datamodel_connector::constraint_names::ConstraintNames, parser_database::walkers};
 <span class="kw">use </span>sql::postgres::PostgresSchemaExt;
 <span class="kw">use </span>sql_schema_describer <span class="kw">as </span>sql;
 <span class="kw">use </span>std::{borrow::Cow, fmt};
@@ -203,8 +171,6 @@
     Uuid,
     Cuid,
     Nanoid(<span class="prelude-ty">Option</span>&lt;u8&gt;),
-    Prisma1Uuid,
-    Prisma1Cuid,
     Now,
     String(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str),
     StringList(Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;),
@@ -314,28 +280,6 @@
                     });
 
                     <span class="prelude-val">Some</span>(DefaultKind::Nanoid(length))
-                }
-                <span class="prelude-val">None </span><span class="kw">if </span><span class="self">self</span>.context.version.is_prisma1() &amp;&amp; <span class="self">self</span>.context.sql_family.is_postgres() =&gt; {
-                    <span class="kw">let </span>native_type: <span class="kw-2">&amp;</span>PostgresType = <span class="self">self</span>.next.column_type().native_type.as_ref()<span class="question-mark">?</span>.downcast_ref();
-
-                    <span class="kw">if </span>native_type == <span class="kw-2">&amp;</span>PostgresType::VarChar(<span class="prelude-val">Some</span>(<span class="number">25</span>)) {
-                        <span class="prelude-val">Some</span>(DefaultKind::Prisma1Cuid)
-                    } <span class="kw">else if </span>native_type == <span class="kw-2">&amp;</span>PostgresType::VarChar(<span class="prelude-val">Some</span>(<span class="number">36</span>)) {
-                        <span class="prelude-val">Some</span>(DefaultKind::Prisma1Uuid)
-                    } <span class="kw">else </span>{
-                        <span class="prelude-val">None
-                    </span>}
-                }
-                <span class="prelude-val">None </span><span class="kw">if </span><span class="self">self</span>.context.version.is_prisma1() &amp;&amp; <span class="self">self</span>.context.sql_family.is_mysql() =&gt; {
-                    <span class="kw">let </span>native_type: <span class="kw-2">&amp;</span>MySqlType = <span class="self">self</span>.next.column_type().native_type.as_ref()<span class="question-mark">?</span>.downcast_ref();
-
-                    <span class="kw">if </span>native_type == <span class="kw-2">&amp;</span>MySqlType::Char(<span class="number">25</span>) {
-                        <span class="prelude-val">Some</span>(DefaultKind::Prisma1Cuid)
-                    } <span class="kw">else if </span>native_type == <span class="kw-2">&amp;</span>MySqlType::Char(<span class="number">36</span>) {
-                        <span class="prelude-val">Some</span>(DefaultKind::Prisma1Uuid)
-                    } <span class="kw">else </span>{
-                        <span class="prelude-val">None
-                    </span>}
                 }
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             },
