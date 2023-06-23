@@ -78,4 +78,5 @@ jobs:
           CLICOLOR_FORCE: 1
 
       - name: Setup upterm session
+        continue-on-error: true
         uses: lhotari/action-upterm@v1
