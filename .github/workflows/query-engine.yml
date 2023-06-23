@@ -81,6 +81,9 @@ jobs:
         if: failure()
         uses: jwalton/gh-docker-logs@v2
 
+      - run: docker inspect $(docker ps -q)
+        if: failure()
+
       # - name: Setup upterm session
       #   continue-on-error: true
       #   uses: lhotari/action-upterm@v1
