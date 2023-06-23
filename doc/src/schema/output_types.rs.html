@@ -446,8 +446,8 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>.name
     }
 
-    <span class="kw">pub fn </span>arguments(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>InputField&lt;<span class="lifetime">&#39;a</span>&gt;&gt; + <span class="lifetime">&#39;_ </span>{
-        <span class="self">self</span>.arguments.as_ref().into_iter().flat_map(|args| args.iter())
+    <span class="kw">pub fn </span>arguments(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[InputField&lt;<span class="lifetime">&#39;a</span>&gt;] {
+        <span class="self">self</span>.arguments.as_ref().map(|f| (<span class="kw-2">**</span>f).as_slice()).unwrap_or(<span class="kw-2">&amp;</span>[])
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nullable(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{

@@ -112,7 +112,7 @@
     }
 
     <span class="kw">fn </span>render_output_field(<span class="kw-2">&amp;</span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>OutputField&lt;<span class="lifetime">&#39;a</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
-        <span class="kw">let </span>rendered_args = <span class="self">self</span>.render_arguments(field.arguments(), ctx);
+        <span class="kw">let </span>rendered_args = <span class="self">self</span>.render_arguments(field.arguments().iter(), ctx);
         <span class="kw">let </span>rendered_args = <span class="kw">if </span>rendered_args.is_empty() {
             <span class="string">&quot;&quot;</span>.into()
         } <span class="kw">else if </span>rendered_args.len() &gt; <span class="number">1 </span>{

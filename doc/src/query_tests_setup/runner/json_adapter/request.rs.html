@@ -269,10 +269,6 @@
 <a href="#269" id="269">269</a>
 <a href="#270" id="270">270</a>
 <a href="#271" id="271">271</a>
-<a href="#272" id="272">272</a>
-<a href="#273" id="273">273</a>
-<a href="#274" id="274">274</a>
-<a href="#275" id="275">275</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::TestResult;
 <span class="kw">use </span>indexmap::IndexMap;
 <span class="kw">use </span>itertools::Itertools;
@@ -315,16 +311,15 @@
 }
 
 <span class="kw">fn </span>graphql_selection_to_json_field_query(<span class="kw-2">mut </span>selection: Selection, schema_field: <span class="kw-2">&amp;</span>OutputField&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; FieldQuery {
-    <span class="kw">let </span>args = schema_field.arguments().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
     FieldQuery {
-        arguments: graphql_args_to_json_args(<span class="kw-2">&amp;mut </span>selection, args.as_slice()),
+        arguments: graphql_args_to_json_args(<span class="kw-2">&amp;mut </span>selection, schema_field.arguments()),
         selection: graphql_selection_to_json_selection(selection, schema_field),
     }
 }
 
 <span class="kw">fn </span>graphql_args_to_json_args(
     selection: <span class="kw-2">&amp;mut </span>Selection,
-    args_fields: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>InputField&lt;<span class="lifetime">&#39;_</span>&gt;],
+    args_fields: <span class="kw-2">&amp;</span>[InputField&lt;<span class="lifetime">&#39;_</span>&gt;],
 ) -&gt; <span class="prelude-ty">Option</span>&lt;IndexMap&lt;String, JsonValue&gt;&gt; {
     <span class="kw">if </span>selection.arguments().is_empty() {
         <span class="kw">return </span><span class="prelude-val">None</span>;
@@ -334,11 +329,8 @@
 
     <span class="kw">for </span>(arg_name, arg_value) <span class="kw">in </span>selection.arguments().iter().cloned() {
         <span class="kw">let </span>arg_field = args_fields.iter().find(|arg_field| arg_field.name == arg_name);
-
-        <span class="kw">let </span>inferrer = FieldTypeInferrer::from_field(arg_field.copied()).infer(<span class="kw-2">&amp;</span>arg_value);
-
+        <span class="kw">let </span>inferrer = FieldTypeInferrer::from_field(arg_field).infer(<span class="kw-2">&amp;</span>arg_value);
         <span class="kw">let </span>json = arg_value_to_json(arg_value, inferrer);
-
         args.insert(arg_name, json);
     }
 
