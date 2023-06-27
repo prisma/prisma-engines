@@ -21,12 +21,12 @@ pub struct SubmittedQueryInfo {
 
 #[derive(Serialize)]
 pub struct SlowQuery {
-    sql: RawQuery,
-    prisma_queries: Vec<PrismaQuery>,
-    mean_exec_time: f64,
-    num_executions: u64,
-    query_plan: QueryPlan,
-    additional_info: serde_json::Value,
+    pub(crate) sql: RawQuery,
+    pub(crate) prisma_queries: Vec<PrismaQuery>,
+    pub(crate) mean_exec_time: f64,
+    pub(crate) num_executions: u32,
+    pub(crate) query_plan: QueryPlan,
+    pub(crate) additional_info: serde_json::Value,
 }
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Deserialize, Serialize)]
