@@ -30,7 +30,7 @@ async fn slow_queries(stats: web::Data<pg::Stats>, args: web::Query<SlowQueriesA
     let threshold = args.threshold.unwrap_or(100.0);
     let k = args.k.unwrap_or(10);
 
-    match stats.slow_queries(threshold, k).await {
+    match stats.slow_queries(KB.clone(), threshold, k).await {
         Ok(queries) => HttpResponse::Ok()
             .content_type(ContentType::json())
             .body(serde_json::to_string(&queries).unwrap()),
@@ -47,8 +47,11 @@ async fn submit_query(info: web::Json<SubmittedQueryInfo>) -> impl Responder {
 }
 
 #[post("/clear-stats")]
-async fn clear_stats(_: web::Data<pg::Stats>) -> impl Responder {
-    HttpResponse::NotFound()
+async fn clear_stats(stats: web::Data<pg::Stats>) -> impl Responder {
+    match stats.__exec_query("SELECT pg_stat_statements_reset()").await {
+        Ok(_) => HttpResponse::Ok().finish(),
+        Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
+    }
 }
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -72,7 +75,7 @@ async fn main() -> std::io::Result<()> {
 
     info!("Listening on :{}", port);
 
-    let conn = pg::Stats::init(&database_url, KB.clone());
+    let conn = pg::Stats::init(&database_url);
 
     let result = HttpServer::new(move || {
         App::new()

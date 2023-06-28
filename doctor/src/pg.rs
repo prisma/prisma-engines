@@ -1,4 +1,5 @@
 use deadpool_postgres::{Manager, PoolError};
+use log::debug;
 use regex::Regex;
 use serde_json::json;
 use std::str::FromStr;
@@ -12,11 +13,10 @@ use crate::{
 #[derive(Clone)]
 pub struct Stats {
     pool: deadpool_postgres::Pool,
-    kb: KnowledgeBase,
 }
 
 impl Stats {
-    pub fn init(database_url: &str, kb: KnowledgeBase) -> Stats {
+    pub fn init(database_url: &str) -> Stats {
         let config = tokio_postgres::Config::from_str(database_url).unwrap();
 
         let manager_config = deadpool_postgres::ManagerConfig {
@@ -24,10 +24,10 @@ impl Stats {
         };
         let manager = Manager::from_config(config, tokio_postgres::NoTls, manager_config);
         let pool = deadpool_postgres::Pool::new(manager, num_cpus::get());
-        Stats { pool, kb }
+        Stats { pool }
     }
 
-    pub async fn slow_queries(&self, threshold: f64, k: i64) -> Result<Vec<SlowQuery>, PoolError> {
+    pub async fn slow_queries(&self, kb: KnowledgeBase, threshold: f64, k: i64) -> Result<Vec<SlowQuery>, PoolError> {
         let conn = self.pool.get().await?;
         let stmt = conn
             .prepare(
@@ -55,20 +55,32 @@ impl Stats {
         let slow_queries = rows
             .into_iter()
             .filter_map(|row| {
+                debug!("Fetching row from slow queries: {:?}", row);
                 let query: String = row.get("query");
                 let mean_exec_time: f64 = row.get("mean_exec_time");
-                let calls: u32 = row.get("calls");
-                self.hidrate_slow_query(query, calls, mean_exec_time)
+                let num_executions: i64 = row.get("calls");
+                let record = self.hidrate_slow_query(kb.clone(), query, num_executions, mean_exec_time);
+                debug!("Hidrated slow query: {:?}", record);
+                record
             })
             .collect();
 
         Ok(slow_queries)
     }
 
-    fn hidrate_slow_query(&self, log_query: String, num_executions: u32, mean_exec_time: f64) -> Option<SlowQuery> {
+    fn hidrate_slow_query(
+        &self,
+        kb: KnowledgeBase,
+        log_query: String,
+        num_executions: i64,
+        mean_exec_time: f64,
+    ) -> Option<SlowQuery> {
+        debug!("Hidrating slow query: {:?}", log_query);
+
         if let Some(tag) = Self::extract_tag(&log_query) {
-            let (sql, prisma_queries) = self.kb.get_tagged(tag);
-            Some(SlowQuery {
+            debug!("Fetching from knowledge base for tag: {:?}", tag);
+
+            kb.get_tagged(tag).map(|(sql, prisma_queries)| SlowQuery {
                 sql,
                 prisma_queries,
                 mean_exec_time,
@@ -87,6 +99,13 @@ impl Stats {
         // Find the comment match
         let matches = comment_regex.captures(query);
         matches.map(|captures| captures.name("tag").unwrap().as_str().to_string())
+    }
+
+    pub async fn __exec_query(&self, sql: &str) -> Result<(), PoolError> {
+        let conn = self.pool.get().await?;
+        debug!("Executing query: {:?}", sql);
+        conn.execute(sql, &[]).await?;
+        Ok(())
     }
 }
 

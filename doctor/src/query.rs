@@ -1,5 +1,6 @@
 use std::ops::ControlFlow;
 
+use log::debug;
 use serde::{Deserialize, Serialize};
 use sqlparser::{
     ast::{VisitMut, VisitorMut},
@@ -12,21 +13,21 @@ pub type PrismaQuery = String;
 pub type QueryPlan = String;
 pub type Tag = String;
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct SubmittedQueryInfo {
     pub raw_query: RawQuery,
     pub tag: Tag,
     pub prisma_query: PrismaQuery,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct SlowQuery {
-    pub(crate) sql: RawQuery,
-    pub(crate) prisma_queries: Vec<PrismaQuery>,
-    pub(crate) mean_exec_time: f64,
-    pub(crate) num_executions: u32,
-    pub(crate) query_plan: QueryPlan,
-    pub(crate) additional_info: serde_json::Value,
+    pub sql: RawQuery,
+    pub prisma_queries: Vec<PrismaQuery>,
+    pub mean_exec_time: f64,
+    pub num_executions: i64,
+    pub query_plan: QueryPlan,
+    pub additional_info: serde_json::Value,
 }
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Deserialize, Serialize)]
@@ -38,12 +39,13 @@ impl RawQueryShape {
         let mut ast = Parser::parse_sql(&dialect, sql).unwrap();
         ast.visit(&mut ValueRewriter);
 
-        let sql = ast
+        let shape = ast
             .iter_mut()
             .map(|s| s.to_string())
             .collect::<Vec<String>>()
             .join("\n");
-        Self(format!("{sql}"))
+        debug!("transforming sql into shape: ({}) -> ({})", sql, shape);
+        RawQueryShape(shape)
     }
 }
 

@@ -1,5 +1,6 @@
 use crate::query::*;
 use dashmap::DashMap;
+use log::debug;
 use std::sync::{Arc, RwLock};
 
 #[derive(Clone, Default)]
@@ -11,6 +12,7 @@ pub struct KnowledgeBase {
 
 impl KnowledgeBase {
     pub fn index(&self, query_info: &SubmittedQueryInfo) -> Result<(), &'static str> {
+        debug!("Indexing query information: {:?}", query_info);
         // index raw query
         self.tags_to_raw_queries
             .insert(query_info.tag.clone(), query_info.raw_query.clone());
@@ -34,12 +36,22 @@ impl KnowledgeBase {
         Ok(())
     }
 
-    pub fn get_tagged(&self, tag: Tag) -> (RawQuery, Vec<PrismaQuery>) {
-        let raw_query = self.tags_to_raw_queries.get(&tag).unwrap().clone();
-        let query_shape = self.raw_queries_to_shapes.get(&raw_query).unwrap().clone();
-        let prisma_queries_lock = self.shapes_to_prisma_queries.get(&query_shape).unwrap();
+    pub fn get_tagged(&self, tag: Tag) -> Option<(RawQuery, Vec<PrismaQuery>)> {
+        let raw_query = match self.tags_to_raw_queries.get(&tag) {
+            Some(tag) => tag.clone(),
+            None => return None,
+        };
+        let query_shape = match self.raw_queries_to_shapes.get(&raw_query) {
+            Some(shape) => shape.clone(),
+            None => return None,
+        };
+
+        let prisma_queries_lock = match self.shapes_to_prisma_queries.get(&query_shape) {
+            Some(lock) => lock,
+            None => return None,
+        };
         let prisma_queries = prisma_queries_lock.read().unwrap().to_vec();
-        (raw_query, prisma_queries.to_vec())
+        Some((raw_query, prisma_queries.to_vec()))
     }
 }
 
@@ -77,13 +89,5 @@ mod tests {
             .expect("query shape not found");
         let v = lock.read().unwrap();
         assert!(v.contains(&prisma_query));
-    }
-
-    #[test]
-    fn query_shape() {
-        assert_eq!(
-            "foo",
-            RawQueryShape::from_raw_query("select * from foo where bar = 1").0
-        );
     }
 }

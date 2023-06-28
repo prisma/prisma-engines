@@ -19,4 +19,15 @@ serde_json = "1.0"
 sqlparser = { version = "0.35.0", features = ["serde", "visitor"] }
 tokio-postgres = "0.7.8"
 
+[dev-dependencies]
+actix-rt = "2"
+reqwest = { version = "0.11", features = ["blocking", "json"] }
+
+[lib]
+name = "doctor_lib"
+path = "src/lib.rs"
+
+[[bin]]
+name = "doctor"
+
 [workspace]
