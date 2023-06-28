@@ -2,7 +2,11 @@ mod kb;
 mod pg;
 mod query;
 
-use actix_web::{get, http::header::ContentType, post, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{
+    get, http::header::ContentType, middleware::Logger, post, web, App, HttpResponse, HttpServer, Responder,
+};
+use env_logger::Env;
+use log::{info, warn};
 use once_cell::sync::Lazy;
 
 use kb::KnowledgeBase;
@@ -46,10 +50,28 @@ async fn submit_query(info: web::Json<SubmittedQueryInfo>) -> impl Responder {
 async fn clear_stats(_: web::Data<pg::Stats>) -> impl Responder {
     HttpResponse::NotFound()
 }
-
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    env_logger::init_from_env(Env::default().default_filter_or("debug"));
+
+    let database_url = match std::env::var("DATABASE_URL") {
+        Ok(url) => url,
+        Err(_) => {
+            warn!("DATABASE_URL not set, defaulting to postgresql://postgres:prisma@localhost:5432");
+            String::from("postgresql://postgres:prisma@localhost:5432")
+        }
+    };
+
+    let port: u16 = match std::env::var("PORT") {
+        Ok(port) => port.parse::<u16>().expect("🚨  PORT must be a number"),
+        Err(_) => {
+            warn!("PORT not set, defaulting to 8080");
+            8080
+        }
+    };
+
+    info!("Listening on :{}", port);
+
     let conn = pg::Stats::init(&database_url, KB.clone());
 
     let result = HttpServer::new(move || {
@@ -58,12 +80,13 @@ async fn main() -> std::io::Result<()> {
             .service(slow_queries)
             .service(submit_query)
             .service(clear_stats)
+            .wrap(Logger::default())
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind(("127.0.0.1", port))?
     .run()
     .await;
 
-    println!("🧑‍🔬 Stopping");
+    info!("Stopping");
 
     result
 }
