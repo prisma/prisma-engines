@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+cd $(dirname $0)
+
+export QE_LOG_LEVEL=TRACE
+export RUST_LOG_FORMAT=text
+export LOG_QUERIES=y
+export RUST_BACKTRACE=1
+export PRISMA_CLIENT_ENGINE_TYPE=binary
+export PRISMA_DML_PATH="/Users/miguel/GitHub/prisma/prisma-engines/doctor_repro/prisma/schema.prisma"
+
+../target/debug/query-engine --enable-raw-queries --port 57581
