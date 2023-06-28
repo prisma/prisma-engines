@@ -1,5 +1,6 @@
 mod conversion;
 mod error;
+mod utils;
 
 use crate::{
     ast::{Query, Value},
@@ -13,6 +14,7 @@ use lru_cache::LruCache;
 use native_tls::{Certificate, Identity, TlsConnector};
 use percent_encoding::percent_decode;
 use postgres_native_tls::MakeTlsConnector;
+use serde_json::json;
 use std::{
     borrow::{Borrow, Cow},
     fmt::{Debug, Display},
@@ -25,6 +27,7 @@ use tokio_postgres::{
     config::{ChannelBinding, SslMode},
     Client, Config, Statement,
 };
+use tracing::log::{info, warn};
 use url::Url;
 
 pub(crate) const DEFAULT_SCHEMA: &str = "public";
@@ -33,6 +36,8 @@ pub(crate) const DEFAULT_SCHEMA: &str = "public";
 /// Cargo feature.
 #[cfg(feature = "expose-drivers")]
 pub use tokio_postgres;
+
+use self::utils::SubmittedQueryInfo;
 
 use super::IsolationLevel;
 
@@ -771,11 +776,37 @@ impl Queryable for PostgreSql {
         &self,
         sql: &str,
         params: &[Value<'_>],
-        _prisma_query: Option<String>,
+        prisma_query: Option<String>,
     ) -> crate::Result<ResultSet> {
         self.check_bind_variables_len(params)?;
 
-        metrics::query("postgres.query_raw", sql, params, move || async move {
+        // if prisma query is given, transform it to a shape, hash it and generate the tag
+        let tagged_sql = if let Some(q) = prisma_query {
+            let (shape, tag) = utils::generate_shape_and_tag(&q);
+            let tagged = format!("{} /* doctor_id: {} */", sql, tag);
+            info!("Tagged query: {}", tagged);
+
+            let info = SubmittedQueryInfo {
+                raw_query: sql.to_string(),
+                prisma_query: shape.clone(),
+                tag: tag.clone(),
+            };
+
+            reqwest::Client::new()
+                .post(format!("http://localhost:{}/submit-query", 8080))
+                .body(json!(info).to_string())
+                .header("Content-Type", "application/json")
+                .send()
+                .await
+                .unwrap();
+
+            tagged
+        } else {
+            warn!("No prisma query given, this should not happen");
+            sql.to_string()
+        };
+
+        metrics::query("postgres.query_raw", &tagged_sql, params, move || async move {
             let stmt = self.fetch_cached(sql, &[]).await?;
 
             if stmt.params().len() != params.len() {

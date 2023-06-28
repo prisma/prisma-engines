@@ -2269,7 +2269,7 @@ dependencies = [
  "saturating",
  "serde",
  "serde_json",
- "sha1",
+ "sha1 0.10.4",
  "sha2 0.10.5",
  "smallvec",
  "subprocess",
@@ -3160,6 +3160,7 @@ dependencies = [
  "either",
  "futures",
  "hex",
+ "indexmap",
  "libsqlite3-sys",
  "lru-cache",
  "metrics 0.18.1",
@@ -3170,8 +3171,11 @@ dependencies = [
  "percent-encoding",
  "postgres-native-tls",
  "postgres-types",
+ "reqwest",
  "rusqlite",
+ "serde",
  "serde_json",
+ "sha1 0.6.1",
  "sqlformat",
  "thiserror",
  "tiberius",
@@ -4100,6 +4104,15 @@ dependencies = [
 
 [[package]]
 name = "sha1"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c1da05c97445caa12d05e848c4a4fcbbea29e748ac28f7e80e9b010392063770"
+dependencies = [
+ "sha1_smol",
+]
+
+[[package]]
+name = "sha1"
 version = "0.10.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "006769ba83e921b3085caa8334186b00cf92b4cb1a6cf4632fbccc8eff5c7549"
@@ -4108,6 +4121,12 @@ dependencies = [
  "cpufeatures",
  "digest 0.10.3",
 ]
+
+[[package]]
+name = "sha1_smol"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ae1a47186c03a32177042e55dbc5fd5aee900b8e0069a8d70fba96a9375cd012"
 
 [[package]]
 name = "sha2"
