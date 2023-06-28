@@ -17,6 +17,7 @@ pub(crate) async fn get_single_record(
     selected_fields: &ModelProjection,
     aggr_selections: &[RelAggregationSelection],
     ctx: &Context<'_>,
+    prisma_query: Option<String>,
 ) -> crate::Result<Option<SingleRecord>> {
     let query = read::get_records(model, selected_fields.as_columns(ctx), aggr_selections, filter, ctx);
 
@@ -35,7 +36,7 @@ pub(crate) async fn get_single_record(
 
     let meta = column_metadata::create(field_names.as_slice(), idents.as_slice());
 
-    let record = (match conn.find(query, meta.as_slice(), ctx).await {
+    let record = (match conn.find(query, meta.as_slice(), ctx, prisma_query).await {
         Ok(result) => Ok(Some(result)),
         Err(_e @ SqlError::RecordNotFoundForWhere(_)) => Ok(None),
         Err(_e @ SqlError::RecordDoesNotExist) => Ok(None),
@@ -54,6 +55,7 @@ pub(crate) async fn get_many_records(
     selected_fields: &ModelProjection,
     aggr_selections: &[RelAggregationSelection],
     ctx: &Context<'_>,
+    prisma_query: Option<String>,
 ) -> crate::Result<ManyRecords> {
     let reversed = query_arguments.needs_reversed_order();
 
@@ -106,7 +108,7 @@ pub(crate) async fn get_many_records(
             for args in batches.into_iter() {
                 let query = read::get_records(model, selected_fields.as_columns(ctx), aggr_selections, args, ctx);
 
-                futures.push(conn.filter(query.into(), meta.as_slice(), ctx));
+                futures.push(conn.filter(query.into(), meta.as_slice(), ctx, prisma_query.clone()));
             }
 
             while let Some(result) = futures.next().await {
@@ -128,7 +130,11 @@ pub(crate) async fn get_many_records(
                 ctx,
             );
 
-            for item in conn.filter(query.into(), meta.as_slice(), ctx).await?.into_iter() {
+            for item in conn
+                .filter(query.into(), meta.as_slice(), ctx, prisma_query)
+                .await?
+                .into_iter()
+            {
                 records.push(Record::from(item))
             }
         }
@@ -146,6 +152,7 @@ pub(crate) async fn get_related_m2m_record_ids(
     from_field: &RelationFieldRef,
     from_record_ids: &[SelectionResult],
     ctx: &Context<'_>,
+    prisma_query: Option<String>,
 ) -> crate::Result<Vec<(SelectionResult, SelectionResult)>> {
     let mut idents = vec![];
     idents.extend(ModelProjection::from(from_field.model().primary_identifier()).type_identifiers_with_arities());
@@ -182,7 +189,7 @@ pub(crate) async fn get_related_m2m_record_ids(
 
     // first parent id, then child id
     Ok(conn
-        .filter(select.into(), meta.as_slice(), ctx)
+        .filter(select.into(), meta.as_slice(), ctx, prisma_query.clone())
         .await?
         .into_iter()
         .map(|row| {
@@ -218,11 +225,22 @@ pub(crate) async fn aggregate(
     group_by: Vec<ScalarFieldRef>,
     having: Option<Filter>,
     ctx: &Context<'_>,
+    prisma_query: Option<String>,
 ) -> crate::Result<Vec<AggregationRow>> {
     if !group_by.is_empty() {
-        group_by_aggregate(conn, model, query_arguments, selections, group_by, having, ctx).await
+        group_by_aggregate(
+            conn,
+            model,
+            query_arguments,
+            selections,
+            group_by,
+            having,
+            ctx,
+            prisma_query,
+        )
+        .await
     } else {
-        plain_aggregate(conn, model, query_arguments, selections, ctx)
+        plain_aggregate(conn, model, query_arguments, selections, ctx, prisma_query)
             .await
             .map(|v| vec![v])
     }
@@ -234,6 +252,7 @@ async fn plain_aggregate(
     query_arguments: QueryArguments,
     selections: Vec<AggregationSelection>,
     ctx: &Context<'_>,
+    prisma_query: Option<String>,
 ) -> crate::Result<Vec<AggregationResult>> {
     let query = read::aggregate(model, &selections, query_arguments, ctx);
 
@@ -245,7 +264,7 @@ async fn plain_aggregate(
 
     let meta = column_metadata::create_anonymous(&idents);
 
-    let mut rows = conn.filter(query.into(), meta.as_slice(), ctx).await?;
+    let mut rows = conn.filter(query.into(), meta.as_slice(), ctx, prisma_query).await?;
     let row = rows
         .pop()
         .expect("Expected exactly one return row for aggregation query.");
@@ -261,6 +280,7 @@ async fn group_by_aggregate(
     group_by: Vec<ScalarFieldRef>,
     having: Option<Filter>,
     ctx: &Context<'_>,
+    prisma_query: Option<String>,
 ) -> crate::Result<Vec<AggregationRow>> {
     let query = read::group_by_aggregate(model, query_arguments, &selections, group_by, having, ctx);
 
@@ -271,7 +291,7 @@ async fn group_by_aggregate(
         .collect();
 
     let meta = column_metadata::create_anonymous(&idents);
-    let rows = conn.filter(query.into(), meta.as_slice(), ctx).await?;
+    let rows = conn.filter(query.into(), meta.as_slice(), ctx, prisma_query).await?;
 
     Ok(rows
         .into_iter()

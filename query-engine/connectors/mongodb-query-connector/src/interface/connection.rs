@@ -179,6 +179,7 @@ impl ReadOperations for MongoDbConnection {
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
         _trace_id: Option<String>,
+        _prisma_query: Option<String>,
     ) -> connector_interface::Result<Option<SingleRecord>> {
         catch(async move {
             read::get_single_record(
@@ -201,6 +202,7 @@ impl ReadOperations for MongoDbConnection {
         selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
         _trace_id: Option<String>,
+        _prisma_query: Option<String>,
     ) -> connector_interface::Result<ManyRecords> {
         catch(async move {
             read::get_many_records(
@@ -221,6 +223,7 @@ impl ReadOperations for MongoDbConnection {
         from_field: &RelationFieldRef,
         from_record_ids: &[SelectionResult],
         _trace_id: Option<String>,
+        _prisma_query: Option<String>,
     ) -> connector_interface::Result<Vec<(SelectionResult, SelectionResult)>> {
         catch(async move {
             read::get_related_m2m_record_ids(&self.database, &mut self.session, from_field, from_record_ids).await
@@ -236,6 +239,7 @@ impl ReadOperations for MongoDbConnection {
         group_by: Vec<ScalarFieldRef>,
         having: Option<connector_interface::Filter>,
         _trace_id: Option<String>,
+        _prisma_query: Option<String>,
     ) -> connector_interface::Result<Vec<connector_interface::AggregationRow>> {
         catch(async move {
             aggregate::aggregate(

@@ -232,6 +232,7 @@ pub trait ReadOperations {
         selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
         trace_id: Option<String>,
+        prisma_query: Option<String>,
     ) -> crate::Result<Option<SingleRecord>>;
 
     /// Gets multiple records from the database.
@@ -247,6 +248,7 @@ pub trait ReadOperations {
         selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
         trace_id: Option<String>,
+        prisma_query: Option<String>,
     ) -> crate::Result<ManyRecords>;
 
     /// Retrieves pairs of IDs that belong together from a intermediate join
@@ -261,6 +263,7 @@ pub trait ReadOperations {
         from_field: &RelationFieldRef,
         from_record_ids: &[SelectionResult],
         trace_id: Option<String>,
+        prisma_query: Option<String>,
     ) -> crate::Result<Vec<(SelectionResult, SelectionResult)>>;
 
     /// Aggregates records for a specific model based on the given selections.
@@ -276,6 +279,7 @@ pub trait ReadOperations {
         group_by: Vec<ScalarFieldRef>,
         having: Option<Filter>,
         trace_id: Option<String>,
+        prisma_query: Option<String>,
     ) -> crate::Result<Vec<AggregationRow>>;
 }
 

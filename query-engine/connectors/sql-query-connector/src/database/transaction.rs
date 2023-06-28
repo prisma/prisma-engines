@@ -70,6 +70,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
         trace_id: Option<String>,
+        prisma_query: Option<String>,
     ) -> connector::Result<Option<SingleRecord>> {
         catch(self.connection_info.clone(), async move {
             let ctx = Context::new(&self.connection_info, trace_id.as_deref());
@@ -80,6 +81,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
                 &selected_fields.into(),
                 aggr_selections,
                 &ctx,
+                prisma_query,
             )
             .await
         })
@@ -93,6 +95,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
         trace_id: Option<String>,
+        prisma_query: Option<String>,
     ) -> connector::Result<ManyRecords> {
         catch(self.connection_info.clone(), async move {
             let ctx = Context::new(&self.connection_info, trace_id.as_deref());
@@ -103,6 +106,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
                 &selected_fields.into(),
                 aggr_selections,
                 &ctx,
+                prisma_query,
             )
             .await
         })
@@ -114,10 +118,11 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
         from_field: &RelationFieldRef,
         from_record_ids: &[SelectionResult],
         trace_id: Option<String>,
+        prisma_query: Option<String>,
     ) -> connector::Result<Vec<(SelectionResult, SelectionResult)>> {
         catch(self.connection_info.clone(), async move {
             let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            read::get_related_m2m_record_ids(&self.inner, from_field, from_record_ids, &ctx).await
+            read::get_related_m2m_record_ids(&self.inner, from_field, from_record_ids, &ctx, prisma_query).await
         })
         .await
     }
@@ -130,10 +135,21 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
         group_by: Vec<ScalarFieldRef>,
         having: Option<Filter>,
         trace_id: Option<String>,
+        prisma_query: Option<String>,
     ) -> connector::Result<Vec<AggregationRow>> {
         catch(self.connection_info.clone(), async move {
             let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            read::aggregate(&self.inner, model, query_arguments, selections, group_by, having, &ctx).await
+            read::aggregate(
+                &self.inner,
+                model,
+                query_arguments,
+                selections,
+                group_by,
+                having,
+                &ctx,
+                prisma_query,
+            )
+            .await
         })
         .await
     }

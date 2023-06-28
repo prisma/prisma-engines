@@ -32,7 +32,7 @@ pub(crate) async fn native_upsert(
         .returning(selected_fields.as_columns(ctx))
         .into();
 
-    let result_set = conn.query(query).await?;
+    let result_set = conn.query(query, None).await?;
 
     let row = result_set.into_single()?;
     let record = Record::from(row.to_sql_row(&meta)?);

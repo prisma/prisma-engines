@@ -49,30 +49,40 @@ pub enum RuntimeConnection {
 
 #[async_trait]
 impl Queryable for RuntimeConnection {
-    async fn query(&self, q: Query<'_>) -> quaint::Result<quaint::prelude::ResultSet> {
+    async fn query(&self, q: Query<'_>, prisma_query: Option<String>) -> quaint::Result<quaint::prelude::ResultSet> {
         match self {
-            Self::Rust(conn) => conn.query(q).await,
+            Self::Rust(conn) => conn.query(q, prisma_query).await,
 
             #[cfg(feature = "js-drivers")]
-            Self::Js(conn) => conn.query(q).await,
+            Self::Js(conn) => conn.query(q, prisma_query).await,
         }
     }
 
-    async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<quaint::prelude::ResultSet> {
+    async fn query_raw(
+        &self,
+        sql: &str,
+        params: &[Value<'_>],
+        prisma_query: Option<String>,
+    ) -> quaint::Result<quaint::prelude::ResultSet> {
         match self {
-            Self::Rust(conn) => conn.query_raw(sql, params).await,
+            Self::Rust(conn) => conn.query_raw(sql, params, prisma_query).await,
 
             #[cfg(feature = "js-drivers")]
-            Self::Js(conn) => conn.query_raw(sql, params).await,
+            Self::Js(conn) => conn.query_raw(sql, params, prisma_query).await,
         }
     }
 
-    async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<quaint::prelude::ResultSet> {
+    async fn query_raw_typed(
+        &self,
+        sql: &str,
+        params: &[Value<'_>],
+        prisma_query: Option<String>,
+    ) -> quaint::Result<quaint::prelude::ResultSet> {
         match self {
-            Self::Rust(conn) => conn.query_raw_typed(sql, params).await,
+            Self::Rust(conn) => conn.query_raw_typed(sql, params, prisma_query).await,
 
             #[cfg(feature = "js-drivers")]
-            Self::Js(conn) => conn.query_raw_typed(sql, params).await,
+            Self::Js(conn) => conn.query_raw_typed(sql, params, prisma_query).await,
         }
     }
 

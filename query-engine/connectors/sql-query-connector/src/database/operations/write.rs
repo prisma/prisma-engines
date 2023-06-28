@@ -51,7 +51,7 @@ async fn generate_id(
     // db generate values only if needed
     if need_select {
         let pk_select = pk_select.add_trace_id(ctx.trace_id);
-        let pk_result = conn.query(pk_select.into()).await?;
+        let pk_result = conn.query(pk_select.into(), None).await?;
         let result = try_convert(&(primary_key.into()), pk_result)?;
 
         Ok(Some(result))
@@ -304,7 +304,7 @@ pub(crate) async fn update_record(
     // This is to match the behaviour expected but it seems a bit strange to me
     // This comes across as if the update happened even if it didn't
     if args.args.is_empty() {
-        let ids: Vec<SelectionResult> = conn.filter_selectors(model, record_filter.clone(), ctx).await?;
+        let ids: Vec<SelectionResult> = conn.filter_selectors(model, record_filter.clone(), ctx, None).await?;
 
         return Ok(ids);
     }
@@ -324,7 +324,7 @@ async fn update_records_from_ids_and_filter(
     ctx: &Context<'_>,
 ) -> crate::Result<(usize, Vec<SelectionResult>)> {
     let filter_condition = record_filter.clone().filter.aliased_condition_from(None, false, ctx);
-    let ids: Vec<SelectionResult> = conn.filter_selectors(model, record_filter, ctx).await?;
+    let ids: Vec<SelectionResult> = conn.filter_selectors(model, record_filter, ctx, None).await?;
 
     if ids.is_empty() {
         return Ok((0, Vec::new()));
@@ -396,7 +396,7 @@ pub(crate) async fn delete_records(
     ctx: &Context<'_>,
 ) -> crate::Result<usize> {
     let filter_condition = record_filter.clone().filter.aliased_condition_from(None, false, ctx);
-    let ids = conn.filter_selectors(model, record_filter, ctx).await?;
+    let ids = conn.filter_selectors(model, record_filter, ctx, None).await?;
     let ids: Vec<&SelectionResult> = ids.iter().collect();
     let count = ids.len();
 
@@ -425,7 +425,7 @@ pub(crate) async fn m2m_connect(
     ctx: &Context<'_>,
 ) -> crate::Result<()> {
     let query = write::create_relation_table_records(field, parent_id, child_ids, ctx);
-    conn.query(query).await?;
+    conn.query(query, None).await?;
 
     Ok(())
 }

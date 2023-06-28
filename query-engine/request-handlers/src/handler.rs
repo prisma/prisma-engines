@@ -19,6 +19,7 @@ pub struct RequestHandler<'a> {
     executor: &'a (dyn QueryExecutor + Send + Sync + 'a),
     query_schema: &'a QuerySchemaRef,
     engine_protocol: EngineProtocol,
+    prisma_query: Option<String>,
 }
 
 impl<'a> fmt::Debug for RequestHandler<'a> {
@@ -28,6 +29,20 @@ impl<'a> fmt::Debug for RequestHandler<'a> {
 }
 
 impl<'a> RequestHandler<'a> {
+    pub fn with_prisma_query(
+        executor: &'a (dyn QueryExecutor + Send + Sync + 'a),
+        query_schema: &'a QuerySchemaRef,
+        engine_protocol: EngineProtocol,
+        prisma_query: String,
+    ) -> Self {
+        Self {
+            executor,
+            query_schema,
+            engine_protocol,
+            prisma_query: Some(prisma_query),
+        }
+    }
+
     pub fn new(
         executor: &'a (dyn QueryExecutor + Send + Sync + 'a),
         query_schema: &'a QuerySchemaRef,
@@ -37,6 +52,7 @@ impl<'a> RequestHandler<'a> {
             executor,
             query_schema,
             engine_protocol,
+            prisma_query: None,
         }
     }
 
@@ -83,6 +99,7 @@ impl<'a> RequestHandler<'a> {
             self.query_schema.clone(),
             trace_id,
             self.engine_protocol,
+            self.prisma_query.clone(),
         ))
         .catch_unwind()
         .await
@@ -208,6 +225,7 @@ impl<'a> RequestHandler<'a> {
                 self.query_schema.clone(),
                 trace_id,
                 self.engine_protocol,
+                self.prisma_query.clone(),
             )
             .await
     }

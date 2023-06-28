@@ -73,20 +73,30 @@ impl<'a> Transaction<'a> {
 
 #[async_trait]
 impl<'a> Queryable for Transaction<'a> {
-    async fn query(&self, q: Query<'_>) -> crate::Result<ResultSet> {
-        self.inner.query(q).await
+    async fn query(&self, q: Query<'_>, prisma_query: Option<String>) -> crate::Result<ResultSet> {
+        self.inner.query(q, prisma_query).await
     }
 
     async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {
         self.inner.execute(q).await
     }
 
-    async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
-        self.inner.query_raw(sql, params).await
+    async fn query_raw(
+        &self,
+        sql: &str,
+        params: &[Value<'_>],
+        prisma_query: Option<String>,
+    ) -> crate::Result<ResultSet> {
+        self.inner.query_raw(sql, params, prisma_query).await
     }
 
-    async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
-        self.inner.query_raw_typed(sql, params).await
+    async fn query_raw_typed(
+        &self,
+        sql: &str,
+        params: &[Value<'_>],
+        prisma_query: Option<String>,
+    ) -> crate::Result<ResultSet> {
+        self.inner.query_raw_typed(sql, params, prisma_query).await
     }
 
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {

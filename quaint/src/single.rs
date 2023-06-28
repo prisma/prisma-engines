@@ -193,16 +193,26 @@ impl Quaint {
 
 #[async_trait]
 impl Queryable for Quaint {
-    async fn query(&self, q: ast::Query<'_>) -> crate::Result<connector::ResultSet> {
-        self.inner.query(q).await
+    async fn query(&self, q: ast::Query<'_>, prisma_query: Option<String>) -> crate::Result<connector::ResultSet> {
+        self.inner.query(q, prisma_query).await
     }
 
-    async fn query_raw(&self, sql: &str, params: &[ast::Value<'_>]) -> crate::Result<connector::ResultSet> {
-        self.inner.query_raw(sql, params).await
+    async fn query_raw(
+        &self,
+        sql: &str,
+        params: &[ast::Value<'_>],
+        prisma_query: Option<String>,
+    ) -> crate::Result<connector::ResultSet> {
+        self.inner.query_raw(sql, params, prisma_query).await
     }
 
-    async fn query_raw_typed(&self, sql: &str, params: &[ast::Value<'_>]) -> crate::Result<connector::ResultSet> {
-        self.inner.query_raw_typed(sql, params).await
+    async fn query_raw_typed(
+        &self,
+        sql: &str,
+        params: &[ast::Value<'_>],
+        prisma_query: Option<String>,
+    ) -> crate::Result<connector::ResultSet> {
+        self.inner.query_raw_typed(sql, params, prisma_query).await
     }
 
     async fn execute(&self, q: ast::Query<'_>) -> crate::Result<u64> {

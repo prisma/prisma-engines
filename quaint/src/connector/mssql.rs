@@ -335,12 +335,12 @@ impl Mssql {
 
 #[async_trait]
 impl Queryable for Mssql {
-    async fn query(&self, q: Query<'_>) -> crate::Result<ResultSet> {
+    async fn query(&self, q: Query<'_>, prisma_query: Option<String>) -> crate::Result<ResultSet> {
         let (sql, params) = visitor::Mssql::build(q)?;
-        self.query_raw(&sql, &params[..]).await
+        self.query_raw(&sql, &params[..], prisma_query).await
     }
 
-    async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
+    async fn query_raw(&self, sql: &str, params: &[Value<'_>], _: Option<String>) -> crate::Result<ResultSet> {
         metrics::query("mssql.query_raw", sql, params, move || async move {
             let mut client = self.client.lock().await;
 
@@ -381,8 +381,13 @@ impl Queryable for Mssql {
         .await
     }
 
-    async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
-        self.query_raw(sql, params).await
+    async fn query_raw_typed(
+        &self,
+        sql: &str,
+        params: &[Value<'_>],
+        prisma_query: Option<String>,
+    ) -> crate::Result<ResultSet> {
+        self.query_raw(sql, params, prisma_query).await
     }
 
     async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {
@@ -421,7 +426,7 @@ impl Queryable for Mssql {
 
     async fn version(&self) -> crate::Result<Option<String>> {
         let query = r#"SELECT @@VERSION AS version"#;
-        let rows = self.query_raw(query, &[]).await?;
+        let rows = self.query_raw(query, &[], None).await?;
 
         let version_string = rows
             .get(0)

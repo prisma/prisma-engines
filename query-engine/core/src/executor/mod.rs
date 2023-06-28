@@ -36,6 +36,7 @@ pub trait QueryExecutor: TransactionManager {
         query_schema: QuerySchemaRef,
         trace_id: Option<String>,
         engine_protocol: EngineProtocol,
+        prisma_query: Option<String>,
     ) -> crate::Result<ResponseData>;
 
     /// Executes a collection of operations as either a fanout of individual operations (non-transactional), or in series (transactional).
@@ -52,6 +53,7 @@ pub trait QueryExecutor: TransactionManager {
         query_schema: QuerySchemaRef,
         trace_id: Option<String>,
         engine_protocol: EngineProtocol,
+        prisma_query: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>>;
 
     fn primary_connector(&self) -> &(dyn Connector + Send + Sync);

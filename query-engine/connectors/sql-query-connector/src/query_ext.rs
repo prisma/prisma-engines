@@ -23,6 +23,7 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
         q: Query<'_>,
         idents: &[ColumnMetadata<'_>],
         ctx: &Context<'_>,
+        prisma_query: Option<String>,
     ) -> crate::Result<Vec<SqlRow>> {
         let span = info_span!("filter read query");
 
@@ -39,7 +40,7 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
             (q, _) => q,
         };
 
-        let result_set = self.query(q).instrument(span).await?;
+        let result_set = self.query(q, prisma_query).instrument(span).await?;
 
         let mut sql_rows = Vec::new();
 
@@ -58,7 +59,7 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
         let query = inputs.remove("query").unwrap().into_string().unwrap();
         let params = inputs.remove("parameters").unwrap().into_list().unwrap();
         let params = params.into_iter().map(convert_lossy).collect_vec();
-        let result_set = AssertUnwindSafe(self.query_raw_typed(&query, &params))
+        let result_set = AssertUnwindSafe(self.query_raw_typed(&query, &params, None))
             .catch_unwind()
             .await??;
 
@@ -97,8 +98,14 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
         Ok(changes as usize)
     }
 
-    async fn find(&self, q: Select<'_>, meta: &[ColumnMetadata<'_>], ctx: &Context<'_>) -> crate::Result<SqlRow> {
-        self.filter(q.limit(1).into(), meta, ctx)
+    async fn find(
+        &self,
+        q: Select<'_>,
+        meta: &[ColumnMetadata<'_>],
+        ctx: &Context<'_>,
+        prisma_query: Option<String>,
+    ) -> crate::Result<SqlRow> {
+        self.filter(q.limit(1).into(), meta, ctx, prisma_query)
             .await?
             .into_iter()
             .next()
@@ -110,11 +117,12 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
         model: &Model,
         record_filter: RecordFilter,
         ctx: &Context<'_>,
+        prisma_query: Option<String>,
     ) -> crate::Result<Vec<SelectionResult>> {
         if let Some(selectors) = record_filter.selectors {
             Ok(selectors)
         } else {
-            self.filter_ids(model, record_filter.filter, ctx).await
+            self.filter_ids(model, record_filter.filter, ctx, prisma_query).await
         }
     }
 
@@ -123,6 +131,7 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
         model: &Model,
         filter: Filter,
         ctx: &Context<'_>,
+        prisma_query: Option<String>,
     ) -> crate::Result<Vec<SelectionResult>> {
         let model_id: ModelProjection = model.primary_identifier().into();
         let id_cols: Vec<Column<'static>> = model_id.as_columns(ctx).collect();
@@ -133,7 +142,7 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
             .add_trace_id(ctx.trace_id)
             .so_that(filter.aliased_condition_from(None, false, ctx));
 
-        self.select_ids(select, model_id, ctx).await
+        self.select_ids(select, model_id, ctx, prisma_query).await
     }
 
     async fn select_ids(
@@ -141,6 +150,7 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
         select: Select<'_>,
         model_id: ModelProjection,
         ctx: &Context<'_>,
+        prisma_query: Option<String>,
     ) -> crate::Result<Vec<SelectionResult>> {
         let idents: Vec<_> = model_id
             .fields()
@@ -155,7 +165,7 @@ impl<Q: Queryable + ?Sized> QueryExt for Q {
         let meta = column_metadata::create(field_names.as_slice(), &idents);
 
         // TODO: Add tracing
-        let mut rows = self.filter(select.into(), &meta, ctx).await?;
+        let mut rows = self.filter(select.into(), &meta, ctx, prisma_query).await?;
         let mut result = Vec::new();
 
         for row in rows.drain(0..) {
@@ -179,6 +189,7 @@ pub(crate) trait QueryExt {
         q: Query<'_>,
         idents: &[ColumnMetadata<'_>],
         ctx: &Context<'_>,
+        prisma_query: Option<String>,
     ) -> crate::Result<Vec<SqlRow>>;
 
     /// Execute a singular SQL query in the database, returning an arbitrary
@@ -197,7 +208,13 @@ pub(crate) trait QueryExt {
     ) -> std::result::Result<usize, crate::error::RawError>;
 
     /// Select one row from the database.
-    async fn find(&self, q: Select<'_>, meta: &[ColumnMetadata<'_>], ctx: &Context<'_>) -> crate::Result<SqlRow>;
+    async fn find(
+        &self,
+        q: Select<'_>,
+        meta: &[ColumnMetadata<'_>],
+        ctx: &Context<'_>,
+        prisma_query: Option<String>,
+    ) -> crate::Result<SqlRow>;
 
     /// Process the record filter and either return directly with precomputed values,
     /// or fetch IDs from the database.
@@ -206,16 +223,23 @@ pub(crate) trait QueryExt {
         model: &Model,
         record_filter: RecordFilter,
         ctx: &Context<'_>,
+        prisma_query: Option<String>,
     ) -> crate::Result<Vec<SelectionResult>>;
 
     /// Read the all columns as a (primary) identifier.
-    async fn filter_ids(&self, model: &Model, filter: Filter, ctx: &Context<'_>)
-        -> crate::Result<Vec<SelectionResult>>;
+    async fn filter_ids(
+        &self,
+        model: &Model,
+        filter: Filter,
+        ctx: &Context<'_>,
+        prisma_query: Option<String>,
+    ) -> crate::Result<Vec<SelectionResult>>;
 
     async fn select_ids(
         &self,
         select: Select<'_>,
         model_id: ModelProjection,
         ctx: &Context<'_>,
+        prisma_query: Option<String>,
     ) -> crate::Result<Vec<SelectionResult>>;
 }

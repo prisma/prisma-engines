@@ -2,6 +2,7 @@
 
 pub mod cli;
 pub mod context;
+pub mod doctor;
 pub mod error;
 pub mod features;
 pub mod logger;

@@ -12,13 +12,14 @@ pub(crate) fn execute<'conn>(
     query: ReadQuery,
     parent_result: Option<&'conn ManyRecords>,
     trace_id: Option<String>,
+    prisma_query: Option<String>,
 ) -> BoxFuture<'conn, InterpretationResult<QueryResult>> {
     let fut = async move {
         match query {
-            ReadQuery::RecordQuery(q) => read_one(tx, q, trace_id).await,
-            ReadQuery::ManyRecordsQuery(q) => read_many(tx, q, trace_id).await,
-            ReadQuery::RelatedRecordsQuery(q) => read_related(tx, q, parent_result, trace_id).await,
-            ReadQuery::AggregateRecordsQuery(q) => aggregate(tx, q, trace_id).await,
+            ReadQuery::RecordQuery(q) => read_one(tx, q, trace_id, prisma_query).await,
+            ReadQuery::ManyRecordsQuery(q) => read_many(tx, q, trace_id, prisma_query).await,
+            ReadQuery::RelatedRecordsQuery(q) => read_related(tx, q, parent_result, trace_id, prisma_query).await,
+            ReadQuery::AggregateRecordsQuery(q) => aggregate(tx, q, trace_id, prisma_query).await,
         }
     };
 
@@ -30,6 +31,7 @@ fn read_one(
     tx: &mut dyn ConnectionLike,
     query: RecordQuery,
     trace_id: Option<String>,
+    prisma_query: Option<String>,
 ) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
     let fut = async move {
         let model = query.model;
@@ -41,6 +43,7 @@ fn read_one(
                 &query.selected_fields,
                 &query.aggregation_selections,
                 trace_id,
+                prisma_query.clone(),
             )
             .await?;
 
@@ -49,7 +52,7 @@ fn read_one(
                 let scalars: ManyRecords = record.into();
                 let (scalars, aggregation_rows) =
                     extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections);
-                let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
+                let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars), prisma_query).await?;
 
                 Ok(RecordSelection {
                     name: query.name,
@@ -88,6 +91,7 @@ fn read_many(
     tx: &mut dyn ConnectionLike,
     mut query: ManyRecordsQuery,
     trace_id: Option<String>,
+    prisma_query: Option<String>,
 ) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
     let processor = if query.args.requires_inmemory_processing() {
         Some(InMemoryRecordProcessor::new_from_query_args(&mut query.args))
@@ -103,6 +107,7 @@ fn read_many(
                 &query.selected_fields,
                 &query.aggregation_selections,
                 trace_id,
+                prisma_query.clone(),
             )
             .await?;
 
@@ -117,7 +122,7 @@ fn read_many(
         if scalars.records.is_empty() && query.options.contains(QueryOption::ThrowOnEmpty) {
             record_not_found()
         } else {
-            let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
+            let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars), prisma_query).await?;
             Ok(RecordSelection {
                 name: query.name,
                 fields: query.selection_order,
@@ -139,13 +144,14 @@ fn read_related<'conn>(
     mut query: RelatedRecordsQuery,
     parent_result: Option<&'conn ManyRecords>,
     trace_id: Option<String>,
+    prisma_query: Option<String>,
 ) -> BoxFuture<'conn, InterpretationResult<QueryResult>> {
     let fut = async move {
         let relation = query.parent_field.relation();
         let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
 
         let (scalars, aggregation_rows) = if relation.is_many_to_many() {
-            nested_read::m2m(tx, &query, parent_result, processor, trace_id).await?
+            nested_read::m2m(tx, &query, parent_result, processor, trace_id, prisma_query.clone()).await?
         } else {
             nested_read::one2m(
                 tx,
@@ -157,11 +163,12 @@ fn read_related<'conn>(
                 query.aggregation_selections,
                 processor,
                 trace_id,
+                prisma_query.clone(),
             )
             .await?
         };
         let model = query.parent_field.related_model();
-        let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
+        let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars), prisma_query).await?;
 
         Ok(RecordSelection {
             name: query.name,
@@ -181,6 +188,7 @@ async fn aggregate(
     tx: &mut dyn ConnectionLike,
     query: AggregateRecordsQuery,
     trace_id: Option<String>,
+    prisma_query: Option<String>,
 ) -> InterpretationResult<QueryResult> {
     let selection_order = query.selection_order;
 
@@ -192,6 +200,7 @@ async fn aggregate(
             query.group_by,
             query.having,
             trace_id,
+            prisma_query,
         )
         .await?;
 
@@ -205,6 +214,7 @@ fn process_nested<'conn>(
     tx: &'conn mut dyn ConnectionLike,
     nested: Vec<ReadQuery>,
     parent_result: Option<&'conn ManyRecords>,
+    prisma_query: Option<String>,
 ) -> BoxFuture<'conn, InterpretationResult<Vec<QueryResult>>> {
     let fut = async move {
         let results = if matches!(parent_result, Some(parent_records) if parent_records.records.is_empty()) {
@@ -215,7 +225,7 @@ fn process_nested<'conn>(
             let mut nested_results = Vec::with_capacity(nested.len());
 
             for query in nested {
-                let result = execute(tx, query, parent_result, None).await?;
+                let result = execute(tx, query, parent_result, None, prisma_query.clone()).await?;
                 nested_results.push(result);
             }
 

@@ -761,13 +761,18 @@ impl TransactionCapable for PostgreSql {}
 
 #[async_trait]
 impl Queryable for PostgreSql {
-    async fn query(&self, q: Query<'_>) -> crate::Result<ResultSet> {
+    async fn query(&self, q: Query<'_>, prisma_query: Option<String>) -> crate::Result<ResultSet> {
         let (sql, params) = visitor::Postgres::build(q)?;
 
-        self.query_raw(sql.as_str(), &params[..]).await
+        self.query_raw(sql.as_str(), &params[..], prisma_query).await
     }
 
-    async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
+    async fn query_raw(
+        &self,
+        sql: &str,
+        params: &[Value<'_>],
+        prisma_query: Option<String>,
+    ) -> crate::Result<ResultSet> {
         self.check_bind_variables_len(params)?;
 
         metrics::query("postgres.query_raw", sql, params, move || async move {
@@ -797,7 +802,12 @@ impl Queryable for PostgreSql {
         .await
     }
 
-    async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
+    async fn query_raw_typed(
+        &self,
+        sql: &str,
+        params: &[Value<'_>],
+        prisma_query: Option<String>,
+    ) -> crate::Result<ResultSet> {
         self.check_bind_variables_len(params)?;
 
         metrics::query("postgres.query_raw", sql, params, move || async move {
@@ -891,7 +901,7 @@ impl Queryable for PostgreSql {
 
     async fn version(&self) -> crate::Result<Option<String>> {
         let query = r#"SELECT version()"#;
-        let rows = self.query_raw(query, &[]).await?;
+        let rows = self.query_raw(query, &[], None).await?;
 
         let version_string = rows
             .get(0)

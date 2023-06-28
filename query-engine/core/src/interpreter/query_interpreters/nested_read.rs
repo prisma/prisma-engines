@@ -13,6 +13,7 @@ pub(crate) async fn m2m(
     parent_result: Option<&ManyRecords>,
     processor: InMemoryRecordProcessor,
     trace_id: Option<String>,
+    prisma_query: Option<String>,
 ) -> InterpretationResult<(ManyRecords, Option<Vec<RelAggregationRow>>)> {
     let parent_field = &query.parent_field;
     let child_link_id = parent_field.related_field().linking_fields();
@@ -33,7 +34,7 @@ pub(crate) async fn m2m(
     }
 
     let ids = tx
-        .get_related_m2m_record_ids(&query.parent_field, &parent_ids, trace_id.clone())
+        .get_related_m2m_record_ids(&query.parent_field, &parent_ids, trace_id.clone(), prisma_query.clone())
         .await?;
     if ids.is_empty() {
         return Ok((ManyRecords::empty(&query.selected_fields), None));
@@ -72,6 +73,7 @@ pub(crate) async fn m2m(
                 &query.selected_fields,
                 &query.aggregation_selections,
                 trace_id.clone(),
+                prisma_query.clone(),
             )
             .await?
         };
@@ -143,6 +145,7 @@ pub async fn one2m(
     aggr_selections: Vec<RelAggregationSelection>,
     processor: InMemoryRecordProcessor,
     trace_id: Option<String>,
+    prisma_query: Option<String>,
 ) -> InterpretationResult<(ManyRecords, Option<Vec<RelAggregationRow>>)> {
     let parent_model_id = parent_field.model().primary_identifier();
     let parent_link_id = parent_field.linking_fields();
@@ -204,6 +207,7 @@ pub async fn one2m(
             selected_fields,
             &aggr_selections,
             trace_id,
+            prisma_query,
         )
         .await?
     };

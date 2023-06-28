@@ -26,6 +26,7 @@ impl<'conn, 'schema> QueryPipeline<'conn, 'schema> {
         mut self,
         query_schema: &'schema QuerySchema,
         trace_id: Option<String>,
+        prisma_query: Option<String>,
     ) -> crate::Result<ResponseData> {
         let serializer = self.serializer;
         let expr = Expressionista::translate(self.graph)?;
@@ -34,7 +35,7 @@ impl<'conn, 'schema> QueryPipeline<'conn, 'schema> {
 
         let result = self
             .interpreter
-            .interpret(expr, Env::default(), 0, trace_id)
+            .interpret(expr, Env::default(), 0, trace_id, prisma_query)
             .instrument(span)
             .await;
 

@@ -2,8 +2,10 @@ pub mod graphql;
 pub mod json;
 
 use query_core::{protocol::EngineProtocol, schema::QuerySchemaRef, QueryDocument};
+use serde::Serialize;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
+#[serde(untagged)]
 pub enum RequestBody {
     Graphql(graphql::GraphqlBody),
     Json(json::JsonBody),

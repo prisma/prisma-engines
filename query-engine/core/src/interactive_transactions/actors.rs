@@ -89,6 +89,7 @@ impl<'a> ITXServer<'a> {
             conn.as_connection_like(),
             operation,
             traceparent,
+            None,
         )
         .instrument(span)
         .await
@@ -107,6 +108,7 @@ impl<'a> ITXServer<'a> {
             conn.as_connection_like(),
             operations,
             traceparent,
+            None,
         )
         .instrument(span)
         .await

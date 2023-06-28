@@ -49,6 +49,7 @@ where
         query_schema: QuerySchemaRef,
         trace_id: Option<String>,
         engine_protocol: EngineProtocol,
+        prisma_query: Option<String>,
     ) -> crate::Result<ResponseData> {
         // If a Tx id is provided, execute on that one. Else execute normally as a single operation.
         if let Some(tx_id) = tx_id {
@@ -61,6 +62,7 @@ where
                     operation,
                     trace_id,
                     self.force_transactions,
+                    prisma_query,
                 )
                 .await
             })
@@ -88,6 +90,7 @@ where
         query_schema: QuerySchemaRef,
         trace_id: Option<String>,
         engine_protocol: EngineProtocol,
+        prisma_query: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
         if let Some(tx_id) = tx_id {
             let batch_isolation_level = transaction.and_then(|t| t.isolation_level());
@@ -108,7 +111,13 @@ where
 
             let results = request_context::with_request_context(
                 engine_protocol,
-                execute_many_operations(query_schema, tx.as_connection_like(), &operations, trace_id),
+                execute_many_operations(
+                    query_schema,
+                    tx.as_connection_like(),
+                    &operations,
+                    trace_id,
+                    prisma_query,
+                ),
             )
             .await;
 
@@ -128,6 +137,7 @@ where
                     trace_id,
                     self.force_transactions,
                     engine_protocol,
+                    prisma_query,
                 )
                 .await
             })

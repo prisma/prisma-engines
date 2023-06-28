@@ -18,10 +18,15 @@ pub trait ToColumnNames {
 #[async_trait]
 pub trait Queryable: Send + Sync {
     /// Execute the given query.
-    async fn query(&self, q: Query<'_>) -> crate::Result<ResultSet>;
+    async fn query(&self, q: Query<'_>, prisma_query: Option<String>) -> crate::Result<ResultSet>;
 
     /// Execute a query given as SQL, interpolating the given parameters.
-    async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet>;
+    async fn query_raw(
+        &self,
+        sql: &str,
+        params: &[Value<'_>],
+        prisma_query: Option<String>,
+    ) -> crate::Result<ResultSet>;
 
     /// Execute a query given as SQL, interpolating the given parameters.
     ///
@@ -29,7 +34,12 @@ pub trait Queryable: Send + Sync {
     /// instead of letting Postgres infer them based on their usage in the SQL query.
     ///
     /// NOTE: This method will eventually be removed & merged into Queryable::query_raw().
-    async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet>;
+    async fn query_raw_typed(
+        &self,
+        sql: &str,
+        params: &[Value<'_>],
+        prisma_query: Option<String>,
+    ) -> crate::Result<ResultSet>;
 
     /// Execute the given query, returning the number of affected rows.
     async fn execute(&self, q: Query<'_>) -> crate::Result<u64>;
@@ -61,13 +71,13 @@ pub trait Queryable: Send + Sync {
     fn is_healthy(&self) -> bool;
 
     /// Execute a `SELECT` query.
-    async fn select(&self, q: Select<'_>) -> crate::Result<ResultSet> {
-        self.query(q.into()).await
+    async fn select(&self, q: Select<'_>, prisma_query: Option<String>) -> crate::Result<ResultSet> {
+        self.query(q.into(), prisma_query).await
     }
 
     /// Execute an `INSERT` query.
     async fn insert(&self, q: Insert<'_>) -> crate::Result<ResultSet> {
-        self.query(q.into()).await
+        self.query(q.into(), None).await
     }
 
     /// Execute an `UPDATE` query, returning the number of affected rows.
@@ -77,7 +87,7 @@ pub trait Queryable: Send + Sync {
 
     /// Execute a `DELETE` query, returning the number of affected rows.
     async fn delete(&self, q: Delete<'_>) -> crate::Result<()> {
-        self.query(q.into()).await?;
+        self.query(q.into(), None).await?;
         Ok(())
     }
 

@@ -1,4 +1,5 @@
 use crate::context::PrismaContext;
+use crate::doctor;
 use crate::features::Feature;
 use crate::{opt::PrismaOpt, PrismaResult};
 use hyper::service::{make_service_fn, service_fn};
@@ -178,12 +179,21 @@ async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
     let body_start = req.into_body();
     // block and buffer request until the request has completed
     let full_body = hyper::body::to_bytes(body_start).await?;
+
     let serialized_body = RequestBody::try_from_slice(full_body.as_ref(), cx.engine_protocol());
 
     let work = async move {
         match serialized_body {
             Ok(body) => {
-                let handler = RequestHandler::new(cx.executor(), cx.query_schema(), cx.engine_protocol());
+                // transform the query into a prisma representation
+                let prisma_query = doctor::to_prisma_query(&body);
+
+                let handler = RequestHandler::with_prisma_query(
+                    cx.executor(),
+                    cx.query_schema(),
+                    cx.engine_protocol(),
+                    prisma_query,
+                );
                 let mut result = handler.handle(body, tx_id, traceparent).instrument(span).await;
 
                 if let telemetry::capturing::Capturer::Enabled(capturer) = &capture_config {

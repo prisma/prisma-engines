@@ -171,12 +171,13 @@ impl<'conn> QueryInterpreter<'conn> {
         env: Env,
         level: usize,
         trace_id: Option<String>,
+        prisma_query: Option<String>,
     ) -> BoxFuture<'_, InterpretationResult<ExpressionResult>> {
         match exp {
             Expression::Func { func } => {
                 let expr = func(env.clone());
 
-                Box::pin(async move { self.interpret(expr?, env, level, trace_id).await })
+                Box::pin(async move { self.interpret(expr?, env, level, trace_id, prisma_query).await })
             }
 
             Expression::Sequence { seq } if seq.is_empty() => Box::pin(async { Ok(ExpressionResult::Empty) }),
@@ -188,7 +189,10 @@ impl<'conn> QueryInterpreter<'conn> {
                     let mut results = Vec::with_capacity(seq.len());
 
                     for expr in seq {
-                        results.push(self.interpret(expr, env.clone(), level + 1, trace_id.clone()).await?);
+                        results.push(
+                            self.interpret(expr, env.clone(), level + 1, trace_id.clone(), prisma_query.clone())
+                                .await?,
+                        );
                     }
 
                     // Last result gets returned
@@ -208,7 +212,13 @@ impl<'conn> QueryInterpreter<'conn> {
                         self.log_line(level + 1, || format!("bind {} ", &binding.name));
 
                         let result = self
-                            .interpret(binding.expr, env.clone(), level + 2, trace_id.clone())
+                            .interpret(
+                                binding.expr,
+                                env.clone(),
+                                level + 2,
+                                trace_id.clone(),
+                                prisma_query.clone(),
+                            )
                             .await?;
                         inner_env.insert(binding.name, result);
                     }
@@ -220,7 +230,8 @@ impl<'conn> QueryInterpreter<'conn> {
                         Expression::Sequence { seq: expressions }
                     };
 
-                    self.interpret(next_expression, inner_env, level + 1, trace_id).await
+                    self.interpret(next_expression, inner_env, level + 1, trace_id, prisma_query)
+                        .await
                 })
             }
 
@@ -229,7 +240,7 @@ impl<'conn> QueryInterpreter<'conn> {
                     Query::Read(read) => {
                         self.log_line(level, || format!("READ {read}"));
                         let span = info_span!("prisma:engine:read-execute");
-                        Ok(read::execute(self.conn, read, None, trace_id)
+                        Ok(read::execute(self.conn, read, None, trace_id, prisma_query)
                             .instrument(span)
                             .await
                             .map(ExpressionResult::Query)?)
@@ -271,11 +282,23 @@ impl<'conn> QueryInterpreter<'conn> {
                 self.log_line(level, || "IF");
 
                 if func() {
-                    self.interpret(Expression::Sequence { seq: then }, env, level + 1, trace_id)
-                        .await
+                    self.interpret(
+                        Expression::Sequence { seq: then },
+                        env,
+                        level + 1,
+                        trace_id,
+                        prisma_query,
+                    )
+                    .await
                 } else {
-                    self.interpret(Expression::Sequence { seq: elze }, env, level + 1, trace_id)
-                        .await
+                    self.interpret(
+                        Expression::Sequence { seq: elze },
+                        env,
+                        level + 1,
+                        trace_id,
+                        prisma_query,
+                    )
+                    .await
                 }
             }),
 
