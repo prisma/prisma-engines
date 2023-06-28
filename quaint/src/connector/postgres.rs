@@ -771,7 +771,7 @@ impl Queryable for PostgreSql {
         &self,
         sql: &str,
         params: &[Value<'_>],
-        prisma_query: Option<String>,
+        _prisma_query: Option<String>,
     ) -> crate::Result<ResultSet> {
         self.check_bind_variables_len(params)?;
 
@@ -806,7 +806,7 @@ impl Queryable for PostgreSql {
         &self,
         sql: &str,
         params: &[Value<'_>],
-        prisma_query: Option<String>,
+        _prisma_query: Option<String>,
     ) -> crate::Result<ResultSet> {
         self.check_bind_variables_len(params)?;
 
