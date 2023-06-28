@@ -1,0 +1,28 @@
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../node_modules/.prisma/client"
+  previewFeatures = ["jsonProtocol"]
+  engineType      = "binary"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://postgres:prisma@localhost:5432"
+}
+
+model User {
+  id       Int     @id
+  username String? @db.VarChar(255)
+  posts    Post[]
+
+  @@map("users")
+}
+
+model Post {
+  post_id      Int     @id
+  post_content String? @db.VarChar(255)
+  user_id      Int?
+  user         User?   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("posts")
+}

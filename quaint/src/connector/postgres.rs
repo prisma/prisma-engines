@@ -806,8 +806,8 @@ impl Queryable for PostgreSql {
             sql.to_string()
         };
 
-        metrics::query("postgres.query_raw", &tagged_sql, params, move || async move {
-            let stmt = self.fetch_cached(sql, &[]).await?;
+        metrics::query("postgres.query_raw", sql, params, move || async move {
+            let stmt = self.fetch_cached(&tagged_sql, &[]).await?;
 
             if stmt.params().len() != params.len() {
                 let kind = ErrorKind::IncorrectNumberOfParameters {
@@ -837,12 +837,37 @@ impl Queryable for PostgreSql {
         &self,
         sql: &str,
         params: &[Value<'_>],
-        _prisma_query: Option<String>,
+        prisma_query: Option<String>,
     ) -> crate::Result<ResultSet> {
         self.check_bind_variables_len(params)?;
 
+        let tagged_sql = if let Some(q) = prisma_query {
+            let (shape, tag) = utils::generate_shape_and_tag(&q);
+            let tagged = format!("{} /* doctor_id: {} */", sql, tag);
+            info!("Tagged query: {}", tagged);
+
+            let info = SubmittedQueryInfo {
+                raw_query: sql.to_string(),
+                prisma_query: shape.clone(),
+                tag: tag.clone(),
+            };
+
+            reqwest::Client::new()
+                .post(format!("http://localhost:{}/submit-query", 8080))
+                .body(json!(info).to_string())
+                .header("Content-Type", "application/json")
+                .send()
+                .await
+                .unwrap();
+
+            tagged
+        } else {
+            warn!("No prisma query given, this should not happen");
+            sql.to_string()
+        };
+
         metrics::query("postgres.query_raw", sql, params, move || async move {
-            let stmt = self.fetch_cached(sql, params).await?;
+            let stmt = self.fetch_cached(&tagged_sql, params).await?;
 
             if stmt.params().len() != params.len() {
                 let kind = ErrorKind::IncorrectNumberOfParameters {
