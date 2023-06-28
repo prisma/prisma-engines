@@ -1,0 +1,4 @@
+#!/bin/bash
+cd $(dirname $0)
+docker compose -f ../docker-compose.doctor.yml up -d
+open http://localhost:8080/slow-queries

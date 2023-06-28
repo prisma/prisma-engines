@@ -1,0 +1,33 @@
+version: "3"
+services:
+  db:
+    image: postgres:15
+    restart: always
+    command: postgres -c 'config_file=/etc/postgresql/postgresql.conf'
+    environment:
+      POSTGRES_PASSWORD: "prisma"
+      POSTGRES_HOST_AUTH_METHOD: "md5"
+      POSTGRES_INITDB_ARGS: "--auth-host=md5"
+    volumes:
+      - "./docker/doctor/db/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d"
+      - "./docker/doctor/db/conf/postgresql.conf:/etc/postgresql/postgresql.conf"
+    ports:
+      - "5432:5432"
+    networks:
+      - doctor
+
+  doctor:
+    build:
+      context: .
+      dockerfile: ./docker/doctor/doctor/Dockerfile
+      args:
+        - db_url=postgres://postgres:prisma@db:5432
+    ports:
+      - "8080:8080"
+    networks:
+      - doctor
+    depends_on:
+      - db
+
+networks:
+  doctor: null

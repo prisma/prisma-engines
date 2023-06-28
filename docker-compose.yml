@@ -110,22 +110,6 @@ services:
     networks:
       - databases
 
-  postgres-doctor:
-    image: postgres:15
-    restart: always
-    command: postgres -c 'config_file=/etc/postgresql/postgresql.conf'
-    environment:
-      POSTGRES_PASSWORD: "prisma"
-      POSTGRES_HOST_AUTH_METHOD: "md5"
-      POSTGRES_INITDB_ARGS: "--auth-host=md5"
-    volumes:
-      - "./docker/postgres-doctor/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d"
-      - "./docker/postgres-doctor/conf/postgresql.conf:/etc/postgresql/postgresql.conf"
-    ports:
-      - "5432:5432"
-    networks:
-      - databases
-
   postgres15:
     image: postgres:15
     restart: always
@@ -260,7 +244,7 @@ services:
       - "1434:1433"
     networks:
       - databases
-      
+
   mssql-2019:
     image: mcr.microsoft.com/mssql/server:2019-latest
     restart: always
