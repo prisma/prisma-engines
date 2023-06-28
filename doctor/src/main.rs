@@ -22,7 +22,7 @@ async fn index_health() -> impl Responder {
 #[derive(serde::Deserialize)]
 struct SlowQueriesArgs {
     threshold: Option<f64>,
-    k: Option<i32>,
+    k: Option<i64>,
 }
 
 #[get("/slow-queries")]

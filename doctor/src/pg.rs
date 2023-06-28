@@ -27,7 +27,7 @@ impl Stats {
         Stats { pool, kb }
     }
 
-    pub async fn slow_queries(&self, threshold: f64, k: i32) -> Result<Vec<SlowQuery>, PoolError> {
+    pub async fn slow_queries(&self, threshold: f64, k: i64) -> Result<Vec<SlowQuery>, PoolError> {
         let conn = self.pool.get().await?;
         let stmt = conn
             .prepare(
@@ -44,7 +44,7 @@ impl Stats {
                         ORDER BY mean_exec_time DESC 
                         LIMIT $2
                     ) as q
-                    WHERE q.avg > $1;
+                    WHERE q.mean_exec_time > $1;
                 "#,
             )
             .await?;
