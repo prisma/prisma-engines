@@ -17,6 +17,8 @@ CREATE EXTENSION pg_stat_statements;
 -- Insert random data into the "users" table
 INSERT INTO users (id, username)
 SELECT generate_series(1, 1000000), 'User ' || generate_series(1, 1000000);
+INSERT INTO users (id, username) VALUES(1000001, 'Tyler')
+INSERT INTO users (id, username) VALUES(1000002, 'Miguel')
 
 -- Insert random data into the "posts" table
 INSERT INTO posts (post_id, post_content, user_id)
