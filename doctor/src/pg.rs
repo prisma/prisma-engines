@@ -85,6 +85,7 @@ impl Stats {
 
             if let Some((sql, prisma_queries)) = kb.get_tagged(tag) {
                 let query_plan = self.explain(&sql).await;
+                let query_plan_json = self.explain_json(&sql).await;
 
                 return Some(SlowQuery {
                     sql,
@@ -92,6 +93,7 @@ impl Stats {
                     mean_exec_time,
                     num_executions,
                     query_plan,
+                    query_plan_json,
                     additional_info: json!({}),
                 });
             }
@@ -112,11 +114,24 @@ impl Stats {
         let conn = self.pool.get().await.unwrap();
         debug!("Explaining query: {:?}", sql);
 
+        let stmt = format!("EXPLAIN {sql}");
+
+        let rows = conn.query(&stmt, &[]).await.unwrap();
+        rows.iter()
+            .map(|r| r.get::<usize, &str>(0))
+            .collect::<Vec<&str>>()
+            .join("\n")
+    }
+
+    async fn explain_json(&self, sql: &str) -> String {
+        let conn = self.pool.get().await.unwrap();
+        debug!("Explaining query: {:?}", sql);
+
         let stmt = format!("EXPLAIN (FORMAT JSON) {sql}");
 
         let rows = conn.query(&stmt, &[]).await.unwrap();
-        let row: serde_json::Value = rows[0].get(0);
-        serde_json::to_string_pretty(&row).unwrap()
+        let json: serde_json::Value = rows[0].get(0);
+        serde_json::to_string_pretty(&json).unwrap()
     }
 
     pub async fn __exec_query(&self, sql: &str) -> Result<(), PoolError> {

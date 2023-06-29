@@ -27,6 +27,7 @@ pub struct SlowQuery {
     pub mean_exec_time: f64,
     pub num_executions: i64,
     pub query_plan: QueryPlan,
+    pub query_plan_json: QueryPlan,
     pub additional_info: serde_json::Value,
 }
 
