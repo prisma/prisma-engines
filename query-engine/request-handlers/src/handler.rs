@@ -33,13 +33,13 @@ impl<'a> RequestHandler<'a> {
         executor: &'a (dyn QueryExecutor + Send + Sync + 'a),
         query_schema: &'a QuerySchemaRef,
         engine_protocol: EngineProtocol,
-        prisma_query: String,
+        prisma_query: Option<String>,
     ) -> Self {
         Self {
             executor,
             query_schema,
             engine_protocol,
-            prisma_query: Some(prisma_query),
+            prisma_query,
         }
     }
 

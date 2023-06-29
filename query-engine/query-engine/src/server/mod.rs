@@ -186,7 +186,7 @@ async fn request_handler(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<R
         match serialized_body {
             Ok(body) => {
                 // transform the query into a prisma representation
-                let prisma_query = doctor::to_prisma_query(&body);
+                let prisma_query = doctor::to_prisma_query(body.clone().into_doc(cx.query_schema()).unwrap());
 
                 let handler = RequestHandler::with_prisma_query(
                     cx.executor(),

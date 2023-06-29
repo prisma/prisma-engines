@@ -8,7 +8,7 @@ use tracing::info_span;
 
 use super::protocol_adapter::JsonProtocolAdapter;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", untagged)]
 pub enum JsonBody {
     Single(JsonSingleQuery),
@@ -45,7 +45,7 @@ impl JsonBody {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct JsonSingleQuery {
     pub model_name: Option<String>,
@@ -63,25 +63,25 @@ impl JsonSingleQuery {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct JsonBatchQuery {
     pub batch: Vec<JsonSingleQuery>,
     pub transaction: Option<BatchTransactionOption>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct BatchTransactionOption {
     pub isolation_level: Option<String>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct FieldQuery {
     pub arguments: Option<IndexMap<String, serde_json::Value>>,
     pub selection: SelectionSet,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Action(QueryTag);
 
 impl Action {
@@ -103,7 +103,7 @@ impl std::fmt::Display for Action {
 const ALL_SCALARS: &str = "$scalars";
 const ALL_COMPOSITES: &str = "$composites";
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct SelectionSet(IndexMap<String, SelectionSetValue>);
 
 impl SelectionSet {
@@ -132,7 +132,7 @@ impl SelectionSet {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase", untagged)]
 pub enum SelectionSetValue {
     Shorthand(bool),
