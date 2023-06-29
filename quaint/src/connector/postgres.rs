@@ -786,19 +786,23 @@ impl Queryable for PostgreSql {
             let tagged = format!("{} /* doctor_id: {} */", sql, tag);
             info!("Tagged query: {}", tagged);
 
+            let interpolated_string = interpolate(sql, params);
+
             let info = SubmittedQueryInfo {
-                raw_query: sql.to_string(),
+                raw_query: interpolated_string,
                 prisma_query: shape.clone(),
                 tag: tag.clone(),
             };
 
-            reqwest::Client::new()
-                .post(format!("http://localhost:{}/submit-query", 8080))
-                .body(json!(info).to_string())
-                .header("Content-Type", "application/json")
-                .send()
-                .await
-                .unwrap();
+            tokio::task::spawn(async move {
+                reqwest::Client::new()
+                    .post(format!("http://localhost:{}/submit-query", 8080))
+                    .body(json!(info).to_string())
+                    .header("Content-Type", "application/json")
+                    .send()
+                    .await
+                    .unwrap()
+            });
 
             tagged
         } else {
@@ -846,19 +850,23 @@ impl Queryable for PostgreSql {
             let tagged = format!("{} /* doctor_id: {} */", sql, tag);
             info!("Tagged query: {}", tagged);
 
+            let interpolated_string = interpolate(sql, params);
+
             let info = SubmittedQueryInfo {
-                raw_query: sql.to_string(),
+                raw_query: interpolated_string,
                 prisma_query: shape.clone(),
                 tag: tag.clone(),
             };
 
-            reqwest::Client::new()
-                .post(format!("http://localhost:{}/submit-query", 8080))
-                .body(json!(info).to_string())
-                .header("Content-Type", "application/json")
-                .send()
-                .await
-                .unwrap();
+            tokio::task::spawn(async move {
+                reqwest::Client::new()
+                    .post(format!("http://localhost:{}/submit-query", 8080))
+                    .body(json!(info).to_string())
+                    .header("Content-Type", "application/json")
+                    .send()
+                    .await
+                    .unwrap()
+            });
 
             tagged
         } else {
@@ -992,6 +1000,57 @@ impl Queryable for PostgreSql {
     fn requires_isolation_first(&self) -> bool {
         false
     }
+}
+
+fn interpolate(sql: &str, params: &[Value<'_>]) -> String {
+    let mut i = 1;
+    let mut result = sql.to_string();
+    for param in params {
+        let str = match param {
+            Value::Int32(o) => match o {
+                Some(i) => format!("{i}"),
+                None => "NULL".to_string(),
+            },
+            Value::Int64(o) => match o {
+                Some(i) => format!("{i}"),
+                None => "NULL".to_string(),
+            },
+            Value::Float(o) => match o {
+                Some(i) => format!("{i}"),
+                None => "NULL".to_string(),
+            },
+            Value::Double(o) => match o {
+                Some(i) => format!("{i}"),
+                None => "NULL".to_string(),
+            },
+            Value::Text(o) => match o {
+                Some(i) => format!("'{i}'"),
+                None => "NULL".to_string(),
+            },
+            Value::Enum(_) => todo!(),
+            Value::Bytes(_) => todo!(),
+            Value::Boolean(o) => match o {
+                Some(i) => format!("{i}"),
+                None => "NULL".to_string(),
+            },
+            Value::Char(o) => match o {
+                Some(i) => format!("'{i}'"),
+                None => "NULL".to_string(),
+            },
+            Value::Array(_) => todo!(),
+            Value::Numeric(_) => todo!(),
+            Value::Json(_) => todo!(),
+            Value::Xml(_) => todo!(),
+            Value::Uuid(_) => todo!(),
+            Value::DateTime(_) => todo!(),
+            Value::Date(_) => todo!(),
+            Value::Time(_) => todo!(),
+        };
+
+        result = result.replace(&format!("${}", i), &str);
+        i += 1;
+    }
+    result
 }
 
 /// Sorted list of CockroachDB's reserved keywords.

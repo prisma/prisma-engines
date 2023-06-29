@@ -52,23 +52,26 @@ impl Stats {
         let threshold: &(dyn ToSql + Sync) = &threshold;
         let n: &(dyn ToSql + Sync) = &k;
         let rows = conn.query(&stmt, &[threshold, n]).await?;
-        let slow_queries = rows
-            .into_iter()
-            .filter_map(|row| {
-                debug!("Fetching row from slow queries: {:?}", row);
-                let query: String = row.get("query");
-                let mean_exec_time: f64 = row.get("mean_exec_time");
-                let num_executions: i64 = row.get("calls");
-                let record = self.hidrate_slow_query(kb.clone(), query, num_executions, mean_exec_time);
+
+        let mut slow_queries = Vec::new();
+        for row in rows.iter() {
+            debug!("Fetching row from slow queries: {:?}", row);
+            let query: String = row.get("query");
+            let mean_exec_time: f64 = row.get("mean_exec_time");
+            let num_executions: i64 = row.get("calls");
+            if let Some(record) = self
+                .hidrate_slow_query(kb.clone(), query, num_executions, mean_exec_time)
+                .await
+            {
                 debug!("Hidrated slow query: {:?}", record);
-                record
-            })
-            .collect();
+                slow_queries.push(record);
+            }
+        }
 
         Ok(slow_queries)
     }
 
-    fn hidrate_slow_query(
+    async fn hidrate_slow_query(
         &self,
         kb: KnowledgeBase,
         log_query: String,
@@ -80,17 +83,21 @@ impl Stats {
         if let Some(tag) = Self::extract_tag(&log_query) {
             debug!("Fetching from knowledge base for tag: {:?}", tag);
 
-            kb.get_tagged(tag).map(|(sql, prisma_queries)| SlowQuery {
-                sql,
-                prisma_queries,
-                mean_exec_time,
-                num_executions,
-                query_plan: "".to_string(),
-                additional_info: json!({}),
-            })
-        } else {
-            None
+            if let Some((sql, prisma_queries)) = kb.get_tagged(tag) {
+                let query_plan = self.explain(&sql).await;
+
+                return Some(SlowQuery {
+                    sql,
+                    prisma_queries,
+                    mean_exec_time,
+                    num_executions,
+                    query_plan,
+                    additional_info: json!({}),
+                });
+            }
         }
+
+        None
     }
 
     fn extract_tag(query: &str) -> Option<Tag> {
@@ -99,6 +106,17 @@ impl Stats {
         // Find the comment match
         let matches = comment_regex.captures(query);
         matches.map(|captures| captures.name("tag").unwrap().as_str().to_string())
+    }
+
+    async fn explain(&self, sql: &str) -> String {
+        let conn = self.pool.get().await.unwrap();
+        debug!("Explaining query: {:?}", sql);
+
+        let stmt = format!("EXPLAIN (FORMAT JSON) {sql}");
+
+        let rows = conn.query(&stmt, &[]).await.unwrap();
+        let row: serde_json::Value = rows[0].get(0);
+        serde_json::to_string_pretty(&row).unwrap()
     }
 
     pub async fn __exec_query(&self, sql: &str) -> Result<(), PoolError> {
