@@ -1,11 +1,14 @@
 use crate::query::*;
 use dashmap::DashMap;
 use log::debug;
-use std::sync::{Arc, RwLock};
+use std::{
+    collections::HashSet,
+    sync::{Arc, RwLock},
+};
 
 #[derive(Clone, Default)]
 pub struct KnowledgeBase {
-    shapes_to_prisma_queries: Arc<DashMap<RawQueryShape, RwLock<Vec<PrismaQuery>>>>,
+    shapes_to_prisma_queries: Arc<DashMap<RawQueryShape, RwLock<HashSet<PrismaQuery>>>>,
     tags_to_raw_queries: Arc<DashMap<Tag, RawQuery>>,
     raw_queries_to_shapes: Arc<DashMap<RawQuery, RawQueryShape>>,
 }
@@ -25,13 +28,15 @@ impl KnowledgeBase {
 
         if let Some(v) = self.shapes_to_prisma_queries.get(&query_shape) {
             if let Ok(mut v) = v.try_write() {
-                v.push(query_info.prisma_query.clone());
+                v.insert(query_info.prisma_query.clone());
             } else {
                 return Err("There was a problem indexing the query");
             }
         } else {
-            self.shapes_to_prisma_queries
-                .insert(query_shape, RwLock::new(vec![query_info.prisma_query.clone()]));
+            self.shapes_to_prisma_queries.insert(
+                query_shape,
+                RwLock::new(HashSet::from_iter(vec![query_info.prisma_query.clone()])),
+            );
         }
         Ok(())
     }
@@ -50,8 +55,10 @@ impl KnowledgeBase {
             Some(lock) => lock,
             None => return None,
         };
-        let prisma_queries = prisma_queries_lock.read().unwrap().to_vec();
-        Some((raw_query, prisma_queries.to_vec()))
+        let prisma_queries = prisma_queries_lock.read().unwrap();
+        let prisma_queries = prisma_queries.iter().map(|a| a.clone()).collect::<Vec<_>>();
+
+        Some((raw_query, prisma_queries))
     }
 }
 
