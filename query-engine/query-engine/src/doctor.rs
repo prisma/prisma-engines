@@ -36,18 +36,50 @@ fn render_arguments(arguments: &[(String, ArgumentValue)]) -> String {
 
 fn render_value(val: &ArgumentValue) -> String {
     match val {
-        ArgumentValue::Scalar(_) => "?".to_string(),
+        ArgumentValue::Scalar(s) => render_prisma_value(s),
+
         ArgumentValue::Object(vo) | ArgumentValue::FieldRef(vo) => {
             let mut result = String::new();
             for (i, (key, value)) in vo.iter().enumerate() {
                 if i > 0 {
                     result.push_str(", ");
                 }
-                result.push_str(&format!("{}: {}", key, render_value(&value)));
+                if key.eq("in") {
+                    result.push_str(&format!("{}: {}", key, "?"));
+                } else {
+                    result.push_str(&format!("{}: {}", key, render_value(&value)));
+                }
             }
             format!("{{ {} }}", result)
         }
-        ArgumentValue::List(_) => "?".to_string(),
+        ArgumentValue::List(l) => {
+            let mut result = String::new();
+            for (i, value) in l.iter().enumerate() {
+                if i > 0 {
+                    result.push_str(", ");
+                }
+                result.push_str(&format!("{}", render_value(&value)));
+            }
+            format!("[ {} ]", result)
+        }
+    }
+}
+
+fn render_prisma_value(s: &prisma_value::PrismaValue) -> String {
+    match s {
+        prisma_value::PrismaValue::Enum(e) => format!("'{}'", e),
+        prisma_value::PrismaValue::Null => "NULL".to_owned(),
+        prisma_value::PrismaValue::Object(s) => {
+            let mut result = String::new();
+            for (i, (key, value)) in s.iter().enumerate() {
+                if i > 0 {
+                    result.push_str(", ");
+                }
+                result.push_str(&format!("{}: {}", key, render_prisma_value(&value)));
+            }
+            format!("{{ {} }}", result)
+        }
+        _ => "?".to_owned(),
     }
 }
 

@@ -3273,6 +3273,7 @@ dependencies = [
  "mongodb-query-connector",
  "opentelemetry",
  "opentelemetry-otlp",
+ "prisma-value",
  "psl",
  "quaint",
  "query-connector",
