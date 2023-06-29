@@ -10,19 +10,21 @@ datasource db {
   url      = "postgresql://postgres:prisma@localhost:5432"
 }
 
-model User {
-  id       Int     @id
-  username String? @db.VarChar(255)
-  posts    Post[]
+model Purchase {
+  purchase_id Int     @id
+  item        String  @db.VarChar(255)
+  price       Decimal @default(0) @db.Decimal
+  user_id     Int?
+  users       User?   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-  @@map("users")
+  @@map("purchases")
 }
 
-model Post {
-  post_id      Int     @id
-  post_content String? @db.VarChar(255)
-  user_id      Int?
-  user         User?   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model User {
+  id              Int        @id
+  username        String     @db.VarChar(255)
+  latest_purchase DateTime?  @default(now()) @db.Timestamp(6)
+  purchases       Purchase[]
 
-  @@map("posts")
+  @@map("users")
 }

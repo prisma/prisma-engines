@@ -23,13 +23,19 @@ async function main() {
         },
     } as any);
 
-    const tees = await prisma.user.findMany({ where: { username: { startsWith: "T" } } })
-    console.log(tees);
+    const start = Date.now();
+    const last_seen = await prisma.user.findMany({ orderBy: { latest_purchase: 'desc' }, take: 5 })
+    const names = last_seen?.map((u) => u.username || "Mysterious User");
+    console.log("Latest buyers", names);
 
-    const first = await prisma.user.findFirst({ orderBy: { username: 'desc' } })
-    console.log(first);
+    const sum = await prisma.purchase.aggregate({ _sum: { price: true }, where: { users: { username: { in: names } } } })
+    console.log("... They spent $", sum._sum, "in purchases");
+    console.log(`Debug: queries took: ${Date.now() - start} ms`);
 }
 
 void main().catch(async (e) => {
     console.log("Error propagated to main", e)
+
 })
+
+
