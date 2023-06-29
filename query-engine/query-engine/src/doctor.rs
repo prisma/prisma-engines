@@ -37,7 +37,7 @@ fn render_arguments(arguments: &[(String, ArgumentValue)]) -> String {
 fn render_value(val: &ArgumentValue) -> String {
     match val {
         ArgumentValue::Scalar(_) => "?".to_string(),
-        ArgumentValue::Object(vo) => {
+        ArgumentValue::Object(vo) | ArgumentValue::FieldRef(vo) => {
             let mut result = String::new();
             for (i, (key, value)) in vo.iter().enumerate() {
                 if i > 0 {
@@ -48,7 +48,6 @@ fn render_value(val: &ArgumentValue) -> String {
             format!("{{ {} }}", result)
         }
         ArgumentValue::List(_) => "?".to_string(),
-        ArgumentValue::FieldRef(_) => "?".to_string(),
     }
 }
 
