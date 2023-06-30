@@ -68,7 +68,7 @@
 <span class="kw">use </span>jsonrpc_core::{types::error::Error <span class="kw">as </span>JsonRpcError, IoHandler, Params};
 <span class="kw">use </span>std::sync::Arc;
 
-<span class="doccomment">/// Initialize a JSON-RPC ready migration engine API.
+<span class="doccomment">/// Initialize a JSON-RPC ready schema engine API.
 </span><span class="kw">pub fn </span>rpc_api(prisma_schema: <span class="prelude-ty">Option</span>&lt;String&gt;, host: Arc&lt;<span class="kw">dyn </span>schema_connector::ConnectorHost&gt;) -&gt; IoHandler {
     <span class="kw">let </span><span class="kw-2">mut </span>io_handler = IoHandler::default();
     <span class="kw">let </span>api = Arc::new(<span class="kw">crate</span>::state::EngineState::new(prisma_schema, <span class="prelude-val">Some</span>(host)));

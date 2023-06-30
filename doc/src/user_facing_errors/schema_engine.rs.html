@@ -297,6 +297,7 @@
 <a href="#297" id="297">297</a>
 <a href="#298" id="298">298</a>
 <a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::Serialize;
 <span class="kw">use </span>user_facing_error_macros::<span class="kw-2">*</span>;
 
@@ -308,13 +309,14 @@
 }
 
 <span class="doccomment">/// [spec](https://github.com/prisma/specs/tree/master/errors#p3001-destructive-migration-detected)
+/// No longer used.
 </span><span class="attr">#[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = <span class="string">&quot;P3001&quot;</span>,
-    message = <span class="string">&quot;Migration possible with destructive changes and possible data loss: {migration_engine_destructive_details}&quot;
+    message = <span class="string">&quot;Migration possible with destructive changes and possible data loss: {destructive_details}&quot;
 </span>)]
 </span><span class="kw">pub struct </span>DestructiveMigrationDetected {
-    <span class="kw">pub </span>migration_engine_destructive_details: String,
+    <span class="kw">pub </span>destructive_details: String,
 }
 
 <span class="attr">#[derive(Debug, UserFacingError, Serialize)]
@@ -390,7 +392,7 @@
         <span class="kw">let </span>blocked: Vec&lt;<span class="kw">_</span>&gt; = <span class="self">self</span>.features.iter().map(|s| <span class="macro">format!</span>(<span class="string">&quot;`{s}`&quot;</span>)).collect();
 
         <span class="macro">format!</span>(
-            <span class="string">&quot;Some of the requested preview features are not yet allowed in migration engine. Please remove them from your data model before using migrations. (blocked: {list_of_blocked_features})&quot;</span>,
+            <span class="string">&quot;Some of the requested preview features are not yet allowed in schema engine. Please remove them from your data model before using migrations. (blocked: {list_of_blocked_features})&quot;</span>,
             list_of_blocked_features = blocked.join(<span class="string">&quot;, &quot;</span>),
         )
     }

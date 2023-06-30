@@ -73,11 +73,11 @@
 <a href="#73" id="73">73</a>
 <a href="#74" id="74">74</a>
 <a href="#75" id="75">75</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! The external facing programmatic API to the migration engine.
+</pre></div><pre class="rust"><code><span class="doccomment">//! The external facing programmatic API to the schema engine.
 
 </span><span class="kw">use crate</span>::{commands, json_rpc::types::<span class="kw-2">*</span>, CoreResult};
 
-<span class="doccomment">/// The programmatic, generic, fantastic migration engine API.
+<span class="doccomment">/// The programmatic, generic, fantastic schema engine API.
 </span><span class="attr">#[async_trait::async_trait]
 </span><span class="kw">pub trait </span>GenericApi: Send + Sync + <span class="lifetime">&#39;static </span>{
     <span class="doccomment">/// Return the database version as a string.

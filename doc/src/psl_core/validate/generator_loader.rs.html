@@ -162,25 +162,10 @@
 <a href="#162" id="162">162</a>
 <a href="#163" id="163">163</a>
 <a href="#164" id="164">164</a>
-<a href="#165" id="165">165</a>
-<a href="#166" id="166">166</a>
-<a href="#167" id="167">167</a>
-<a href="#168" id="168">168</a>
-<a href="#169" id="169">169</a>
-<a href="#170" id="170">170</a>
-<a href="#171" id="171">171</a>
-<a href="#172" id="172">172</a>
-<a href="#173" id="173">173</a>
-<a href="#174" id="174">174</a>
-<a href="#175" id="175">175</a>
-<a href="#176" id="176">176</a>
-<a href="#177" id="177">177</a>
-<a href="#178" id="178">178</a>
-<a href="#179" id="179">179</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::WithSpan,
     common::{FeatureMap, PreviewFeature, ALL_PREVIEW_FEATURES},
-    configuration::{Generator, StringFromEnvVar},
+    configuration::{Generator, GeneratorConfigValue, StringFromEnvVar},
     diagnostics::<span class="kw-2">*</span>,
 };
 <span class="kw">use </span>enumflags2::BitFlags;
@@ -194,17 +179,10 @@
 <span class="kw">const </span>PROVIDER_KEY: <span class="kw-2">&amp;</span>str = <span class="string">&quot;provider&quot;</span>;
 <span class="kw">const </span>OUTPUT_KEY: <span class="kw-2">&amp;</span>str = <span class="string">&quot;output&quot;</span>;
 <span class="kw">const </span>BINARY_TARGETS_KEY: <span class="kw-2">&amp;</span>str = <span class="string">&quot;binaryTargets&quot;</span>;
-<span class="kw">const </span>EXPERIMENTAL_FEATURES_KEY: <span class="kw-2">&amp;</span>str = <span class="string">&quot;experimentalFeatures&quot;</span>;
 <span class="kw">const </span>PREVIEW_FEATURES_KEY: <span class="kw-2">&amp;</span>str = <span class="string">&quot;previewFeatures&quot;</span>;
 <span class="kw">const </span>ENGINE_TYPE_KEY: <span class="kw-2">&amp;</span>str = <span class="string">&quot;engineType&quot;</span>;
 
-<span class="kw">const </span>FIRST_CLASS_PROPERTIES: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str] = <span class="kw-2">&amp;</span>[
-    PROVIDER_KEY,
-    OUTPUT_KEY,
-    BINARY_TARGETS_KEY,
-    EXPERIMENTAL_FEATURES_KEY,
-    PREVIEW_FEATURES_KEY,
-];
+<span class="kw">const </span>FIRST_CLASS_PROPERTIES: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str] = <span class="kw-2">&amp;</span>[PROVIDER_KEY, OUTPUT_KEY, BINARY_TARGETS_KEY, PREVIEW_FEATURES_KEY];
 
 <span class="doccomment">/// Load and validate Generators defined in an AST.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>load_generators_from_ast(ast_schema: <span class="kw-2">&amp;</span>ast::SchemaAst, diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics) -&gt; Vec&lt;Generator&gt; {
@@ -266,7 +244,7 @@
         .get(OUTPUT_KEY)
         .and_then(|v| StringFromEnvVar::coerce(v, diagnostics));
 
-    <span class="kw">let </span><span class="kw-2">mut </span>properties: HashMap&lt;String, String&gt; = HashMap::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>properties = HashMap::new();
 
     <span class="kw">let </span>binary_targets = args
         .get(BINARY_TARGETS_KEY)
@@ -276,7 +254,6 @@
     <span class="comment">// for compatibility reasons we still accept the old experimental key
     </span><span class="kw">let </span>preview_features = args
         .get(PREVIEW_FEATURES_KEY)
-        .or_else(|| args.get(EXPERIMENTAL_FEATURES_KEY))
         .and_then(|v| coerce_array(v, <span class="kw-2">&amp;</span>coerce::string, diagnostics).map(|arr| (arr, v.span())))
         .map(|(arr, span)| parse_and_validate_preview_features(arr, <span class="kw-2">&amp;</span>ALL_PREVIEW_FEATURES, span, diagnostics));
 
@@ -287,13 +264,7 @@
         }
 
         <span class="kw">let </span>value = <span class="kw">match </span><span class="kw-2">&amp;</span>prop.value {
-            <span class="prelude-val">Some</span>(val) =&gt; <span class="kw">match </span>val {
-                ast::Expression::NumericValue(val, <span class="kw">_</span>) =&gt; val.clone(),
-                ast::Expression::StringValue(val, <span class="kw">_</span>) =&gt; val.clone(),
-                ast::Expression::ConstantValue(val, <span class="kw">_</span>) =&gt; val.clone(),
-                ast::Expression::Function(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; String::from(<span class="string">&quot;(function)&quot;</span>),
-                ast::Expression::Array(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; String::from(<span class="string">&quot;(array)&quot;</span>),
-            },
+            <span class="prelude-val">Some</span>(val) =&gt; GeneratorConfigValue::from(val),
             <span class="prelude-val">None </span>=&gt; {
                 diagnostics.push_error(DatamodelError::new_config_property_missing_value_error(
                     <span class="kw-2">&amp;</span>prop.name.name,
@@ -301,7 +272,6 @@
                     <span class="string">&quot;generator&quot;</span>,
                     prop.span,
                 ));
-
                 <span class="kw">continue</span>;
             }
         };

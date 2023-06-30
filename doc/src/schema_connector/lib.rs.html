@@ -39,7 +39,7 @@
 <a href="#39" id="39">39</a>
 </pre></div><pre class="rust"><code><span class="attr">#![deny(rust_2018_idioms, unsafe_code, missing_docs)]
 
-</span><span class="doccomment">//! This crate defines the API exposed by the connectors to the migration engine core. The entry point for this API is the [MigrationConnector](trait.MigrationConnector.html) trait.
+</span><span class="doccomment">//! This crate defines the API exposed by the connectors to the schema engine core. The entry point for this API is the [MigrationConnector](trait.MigrationConnector.html) trait.
 
 </span><span class="kw">mod </span>checksum;
 <span class="kw">mod </span>connector_host;
@@ -51,15 +51,15 @@
 <span class="kw">mod </span>introspection_context;
 <span class="kw">mod </span>introspection_result;
 <span class="kw">mod </span>migration;
-<span class="kw">mod </span>migration_connector;
 <span class="kw">mod </span>migration_persistence;
 <span class="kw">mod </span>namespaces;
+<span class="kw">mod </span>schema_connector;
 
 <span class="kw">pub mod </span>migrations_directory;
 <span class="kw">pub mod </span>warnings;
 
-<span class="kw">pub use </span><span class="kw">crate</span>::migration_connector::SchemaConnector;
 <span class="kw">pub use </span><span class="kw">crate</span>::namespaces::Namespaces;
+<span class="kw">pub use </span><span class="kw">crate</span>::schema_connector::SchemaConnector;
 <span class="kw">pub use </span>connector_host::{ConnectorHost, EmptyHost};
 <span class="kw">pub use </span>connector_params::ConnectorParams;
 <span class="kw">pub use </span>database_schema::DatabaseSchema;

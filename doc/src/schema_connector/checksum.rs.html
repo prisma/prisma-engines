@@ -155,7 +155,7 @@
         .chain(once_with(|| compute_checksum(<span class="kw-2">&amp;</span>script.replace(<span class="string">&#39;\n&#39;</span>, <span class="string">&quot;\r\n&quot;</span>))));
 
     script_checksums.any(|script_checksum| {
-        <span class="comment">// Due to an omission in a previous version of the migration engine,
+        <span class="comment">// Due to an omission in a previous version of the schema engine,
         // some migrations tables will have old migrations with checksum strings
         // that have not been zero-padded.
         //
@@ -207,7 +207,7 @@
         checksum_string
     }
 
-    <span class="comment">// Due to an omission in a previous version of the migration engine,
+    <span class="comment">// Due to an omission in a previous version of the schema engine,
     // some migrations tables will have old migrations with checksum strings
     // that have not been zero-padded.
     //

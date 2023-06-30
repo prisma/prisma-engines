@@ -198,7 +198,18 @@
 <a href="#198" id="198">198</a>
 <a href="#199" id="199">199</a>
 <a href="#200" id="200">200</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::value::{Array, Documentation, Env, Text};
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::value::{Array, Documentation, Env, Text, Value};
 <span class="kw">use </span>psl::PreviewFeature;
 <span class="kw">use </span>std::{borrow::Cow, fmt};
 
@@ -211,7 +222,7 @@
     preview_features: <span class="prelude-ty">Option</span>&lt;Array&lt;Text&lt;PreviewFeature&gt;&gt;&gt;,
     binary_targets: Array&lt;Env&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     documentation: <span class="prelude-ty">Option</span>&lt;Documentation&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
-    config: Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, Text&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;)&gt;,
+    config: Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, Value&lt;<span class="lifetime">&#39;a</span>&gt;)&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Generator&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -285,8 +296,7 @@
         <span class="self">self</span>.documentation = <span class="prelude-val">Some</span>(Documentation(docs.into()));
     }
 
-    <span class="doccomment">/// Add a custom config value to the block. For now we support any
-    /// key/value pairs, and the value must be text.
+    <span class="doccomment">/// Add a custom config value to the block.
     ///
     /// ```ignore
     /// generator js {
@@ -296,8 +306,8 @@
     /// //^^^^^^ key
     /// }
     /// ```
-    </span><span class="kw">pub fn </span>push_config_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, val: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
-        <span class="self">self</span>.config.push((key, Text(val)));
+    </span><span class="kw">pub fn </span>push_config_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, val: <span class="kw">impl </span>Into&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) {
+        <span class="self">self</span>.config.push((key, val.into()));
     }
 
     <span class="doccomment">/// Create a rendering from a PSL generator.
@@ -309,11 +319,7 @@
 
         <span class="kw">let </span>binary_targets: Vec&lt;Env&lt;<span class="lifetime">&#39;_</span>&gt;&gt; = psl_gen.binary_targets.iter().map(Env::from).collect();
 
-        <span class="kw">let </span>config = psl_gen
-            .config
-            .iter()
-            .map(|(k, v)| (k.as_str(), Text(v.as_str())))
-            .collect();
+        <span class="kw">let </span>config = psl_gen.config.iter().map(|(k, v)| (k.as_str(), v.into())).collect();
 
         <span class="self">Self </span>{
             name: <span class="kw-2">&amp;</span>psl_gen.name,
@@ -379,6 +385,20 @@
         generator.push_config_value(<span class="string">&quot;customValue&quot;</span>, <span class="string">&quot;meow&quot;</span>);
         generator.push_config_value(<span class="string">&quot;otherValue&quot;</span>, <span class="string">&quot;purr&quot;</span>);
 
+        generator.push_config_value(<span class="string">&quot;customFeatures&quot;</span>, <span class="macro">vec!</span>[Value::from(<span class="string">&quot;enums&quot;</span>), Value::from(<span class="string">&quot;models&quot;</span>)]);
+        generator.push_config_value(
+            <span class="string">&quot;afterGenerate&quot;</span>,
+            <span class="macro">vec!</span>[
+                Value::from(<span class="string">&quot;lambda&quot;</span>),
+                Vec::&lt;Value&gt;::new().into(),
+                <span class="macro">vec!</span>[
+                    Value::from(<span class="string">&quot;print&quot;</span>),
+                    <span class="macro">vec!</span>[Value::from(<span class="string">&quot;quote&quot;</span>), Value::from(<span class="string">&quot;done!&quot;</span>)].into(),
+                ]
+                .into(),
+            ],
+        );
+
         <span class="kw">let </span>expected = <span class="macro">expect!</span>[[<span class="string">r#&quot;
             /// Here comes the sun.
             ///
@@ -391,6 +411,8 @@
               binaryTargets   = [env(&quot;BINARY TARGET&quot;)]
               customValue     = &quot;meow&quot;
               otherValue      = &quot;purr&quot;
+              customFeatures  = [&quot;enums&quot;, &quot;models&quot;]
+              afterGenerate   = [&quot;lambda&quot;, [], [&quot;print&quot;, [&quot;quote&quot;, &quot;done!&quot;]]]
             }
         &quot;#</span>]];
 

@@ -93,6 +93,8 @@
 <a href="#93" id="93">93</a>
 <a href="#94" id="94">94</a>
 <a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
 </pre></div><pre class="rust"><code><span class="attr">#![doc = <span class="macro">include_str!</span>(<span class="string">&quot;../README.md&quot;</span>)]
 #![deny(rust_2018_idioms, unsafe_code)]
 #![allow(clippy::derive_partial_eq_without_eq)]
@@ -110,7 +112,9 @@
 
 <span class="kw">pub use crate</span>::{
     common::{PreviewFeature, PreviewFeatures, ALL_PREVIEW_FEATURES},
-    configuration::{Configuration, Datasource, DatasourceConnectorData, Generator, StringFromEnvVar},
+    configuration::{
+        Configuration, Datasource, DatasourceConnectorData, Generator, GeneratorConfigValue, StringFromEnvVar,
+    },
     reformat::reformat,
 };
 <span class="kw">pub use </span>diagnostics;

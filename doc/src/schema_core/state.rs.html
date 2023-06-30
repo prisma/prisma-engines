@@ -434,9 +434,9 @@
 <a href="#434" id="434">434</a>
 <a href="#435" id="435">435</a>
 <a href="#436" id="436">436</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! A container to manage 0 or more migration connectors, based on request contents.
+</pre></div><pre class="rust"><code><span class="doccomment">//! A container to manage 0 or more schema connectors, based on request contents.
 //!
-//! Why this rather than using connectors directly? We must be able to use the migration engine
+//! Why this rather than using connectors directly? We must be able to use the schema engine
 //! without a valid schema or database connection for commands like createDatabase and diff.
 
 </span><span class="kw">use crate</span>::{api::GenericApi, commands, json_rpc::types::<span class="kw-2">*</span>, CoreError, CoreResult};
@@ -447,7 +447,7 @@
 <span class="kw">use </span>tokio::sync::{mpsc, Mutex};
 <span class="kw">use </span>tracing_futures::Instrument;
 
-<span class="doccomment">/// The container for the state of the migration engine. It can contain one or more connectors
+<span class="doccomment">/// The container for the state of the schema engine. It can contain one or more connectors
 /// corresponding to a database to be reached or that we are already connected to.
 ///
 /// The general mechanism is that we match a single url or prisma schema to a single connector in
@@ -519,7 +519,7 @@
                 response_sender
                     .send(output)
                     .map_err(|<span class="kw">_</span>| ())
-                    .expect(<span class="string">&quot;failed to send back response in migration-engine state&quot;</span>);
+                    .expect(<span class="string">&quot;failed to send back response in schema-engine state&quot;</span>);
             })
         });
 
@@ -557,7 +557,7 @@
                 response_sender
                     .send(output)
                     .map_err(|<span class="kw">_</span>| ())
-                    .expect(<span class="string">&quot;failed to send back response in migration-engine state&quot;</span>);
+                    .expect(<span class="string">&quot;failed to send back response in schema-engine state&quot;</span>);
             })
         });
 

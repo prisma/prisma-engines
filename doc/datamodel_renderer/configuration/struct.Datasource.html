@@ -8,8 +8,8 @@
   </span>url      = env(<span class="string">&quot;DATABASE_URL&quot;</span>)
 <span class="comment">//                ^^^^^^^^^^^^ url
 </span>}</code></pre></div>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.shadow_database_url" class="method"><a class="srclink rightside" href="../../src/datamodel_renderer/configuration/datasource.rs.html#57-59">source</a><h4 class="code-header">pub fn <a href="#method.shadow_database_url" class="fn">shadow_database_url</a>(&amp;mut self, url: impl <a class="trait" href="https://doc.rust-lang.org/1.70.0/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="enum" href="../value/enum.Env.html" title="enum datamodel_renderer::value::Env">Env</a>&lt;'a&gt;&gt;)</h4></section></summary><div class="docblock"><p>Used for migration engine to reflect the contents of
-migrations directory to diff against the actual database.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.shadow_database_url" class="method"><a class="srclink rightside" href="../../src/datamodel_renderer/configuration/datasource.rs.html#57-59">source</a><h4 class="code-header">pub fn <a href="#method.shadow_database_url" class="fn">shadow_database_url</a>(&amp;mut self, url: impl <a class="trait" href="https://doc.rust-lang.org/1.70.0/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="enum" href="../value/enum.Env.html" title="enum datamodel_renderer::value::Env">Env</a>&lt;'a&gt;&gt;)</h4></section></summary><div class="docblock"><p>Used for schema engine to reflect the contents of migrations directory
+to diff against the actual database.</p>
 
 <div class="example-wrap ignore"><a href="#" class="tooltip" title="This example is not tested">ⓘ</a><pre class="rust rust-example-rendered"><code>datasource db {
   provider          = <span class="string">&quot;postgresql&quot;

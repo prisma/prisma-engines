@@ -332,7 +332,7 @@
 </pre></div><pre class="rust"><code><span class="attr">#![deny(missing_docs)]
 
 </span><span class="doccomment">//! A TestApi that is initialized without IO or async code and can instantiate
-//! multiple migration engines.
+//! multiple schema engines.
 
 </span><span class="kw">pub use </span>test_macros::test_connector;
 <span class="kw">pub use </span>test_setup::sqlite_test_url;
@@ -494,7 +494,7 @@
         <span class="self">self</span>.tags().contains(Tags::LowerCasesTableNames)
     }
 
-    <span class="doccomment">/// Instantiate a new migration engine for the current database.
+    <span class="doccomment">/// Instantiate a new schema engine for the current database.
     </span><span class="kw">pub fn </span>new_engine(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; EngineTestApi {
         <span class="kw">let </span>shadow_db = <span class="self">self</span>.args.shadow_database_url().as_ref().map(ToString::to_string);
         <span class="self">self</span>.new_engine_with_connection_strings(<span class="self">self</span>.connection_string.clone(), shadow_db)
@@ -595,7 +595,7 @@
     }
 }
 
-<span class="doccomment">/// A wrapper around a migration engine instance optimized for convenience in
+<span class="doccomment">/// A wrapper around a schema engine instance optimized for convenience in
 /// writing tests.
 </span><span class="kw">pub struct </span>EngineTestApi {
     <span class="kw">pub</span>(<span class="kw">crate</span>) connector: SqlSchemaConnector,
