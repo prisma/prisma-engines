@@ -1,10 +1,6 @@
 use either::Either;
 use prisma_value::PrismaValue;
-use psl::{
-    builtin_connectors::{MySqlType, PostgresType},
-    datamodel_connector::constraint_names::ConstraintNames,
-    parser_database::walkers,
-};
+use psl::{datamodel_connector::constraint_names::ConstraintNames, parser_database::walkers};
 use sql::postgres::PostgresSchemaExt;
 use sql_schema_describer as sql;
 use std::{borrow::Cow, fmt};
@@ -21,8 +17,6 @@ pub(crate) enum DefaultKind<'a> {
     Uuid,
     Cuid,
     Nanoid(Option<u8>),
-    Prisma1Uuid,
-    Prisma1Cuid,
     Now,
     String(&'a str),
     StringList(Vec<&'a str>),
@@ -132,28 +126,6 @@ impl<'a> DefaultValuePair<'a> {
                     });
 
                     Some(DefaultKind::Nanoid(length))
-                }
-                None if self.context.version.is_prisma1() && self.context.sql_family.is_postgres() => {
-                    let native_type: &PostgresType = self.next.column_type().native_type.as_ref()?.downcast_ref();
-
-                    if native_type == &PostgresType::VarChar(Some(25)) {
-                        Some(DefaultKind::Prisma1Cuid)
-                    } else if native_type == &PostgresType::VarChar(Some(36)) {
-                        Some(DefaultKind::Prisma1Uuid)
-                    } else {
-                        None
-                    }
-                }
-                None if self.context.version.is_prisma1() && self.context.sql_family.is_mysql() => {
-                    let native_type: &MySqlType = self.next.column_type().native_type.as_ref()?.downcast_ref();
-
-                    if native_type == &MySqlType::Char(25) {
-                        Some(DefaultKind::Prisma1Cuid)
-                    } else if native_type == &MySqlType::Char(36) {
-                        Some(DefaultKind::Prisma1Uuid)
-                    } else {
-                        None
-                    }
                 }
                 _ => None,
             },
