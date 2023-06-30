@@ -1,7 +1,7 @@
 use crate::{
     ast::WithSpan,
     common::{FeatureMap, PreviewFeature, ALL_PREVIEW_FEATURES},
-    configuration::{Generator, StringFromEnvVar},
+    configuration::{Generator, GeneratorConfigValue, StringFromEnvVar},
     diagnostics::*,
 };
 use enumflags2::BitFlags;
@@ -87,7 +87,7 @@ fn lift_generator(ast_generator: &ast::GeneratorConfig, diagnostics: &mut Diagno
         .get(OUTPUT_KEY)
         .and_then(|v| StringFromEnvVar::coerce(v, diagnostics));
 
-    let mut properties: HashMap<String, String> = HashMap::new();
+    let mut properties = HashMap::new();
 
     let binary_targets = args
         .get(BINARY_TARGETS_KEY)
@@ -108,13 +108,7 @@ fn lift_generator(ast_generator: &ast::GeneratorConfig, diagnostics: &mut Diagno
         }
 
         let value = match &prop.value {
-            Some(val) => match val {
-                ast::Expression::NumericValue(val, _) => val.clone(),
-                ast::Expression::StringValue(val, _) => val.clone(),
-                ast::Expression::ConstantValue(val, _) => val.clone(),
-                ast::Expression::Function(_, _, _) => String::from("(function)"),
-                ast::Expression::Array(_, _) => String::from("(array)"),
-            },
+            Some(val) => GeneratorConfigValue::from(val),
             None => {
                 diagnostics.push_error(DatamodelError::new_config_property_missing_value_error(
                     &prop.name.name,
@@ -122,7 +116,6 @@ fn lift_generator(ast_generator: &ast::GeneratorConfig, diagnostics: &mut Diagno
                     "generator",
                     prop.span,
                 ));
-
                 continue;
             }
         };
