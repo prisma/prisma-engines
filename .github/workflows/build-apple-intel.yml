@@ -43,7 +43,7 @@ jobs:
         with:
           name: binaries
           path: |
-            ${{ github.workspace }}/target/release/migration-engine
+            ${{ github.workspace }}/target/release/schema-engine
             ${{ github.workspace }}/target/release/prisma-fmt
             ${{ github.workspace }}/target/release/query-engine
             ${{ github.workspace }}/target/release/libquery_engine.dylib
