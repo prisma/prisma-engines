@@ -104,8 +104,8 @@ pub(crate) fn relation_to_many_selection_arguments(
     ];
 
     if include_distinct {
-        let input_type = InputType::list(InputType::Enum(model_field_enum(&model)));
-        args.push(input_field(args::DISTINCT, vec![input_type], None).optional());
+        let input_types = list_union_type(InputType::Enum(model_field_enum(&model)), true);
+        args.push(input_field(args::DISTINCT, input_types, None).optional());
     }
 
     args

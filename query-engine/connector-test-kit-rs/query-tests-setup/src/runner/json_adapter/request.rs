@@ -40,16 +40,15 @@ impl JsonRequest {
 }
 
 fn graphql_selection_to_json_field_query(mut selection: Selection, schema_field: &OutputField<'_>) -> FieldQuery {
-    let args = schema_field.arguments().collect::<Vec<_>>();
     FieldQuery {
-        arguments: graphql_args_to_json_args(&mut selection, args.as_slice()),
+        arguments: graphql_args_to_json_args(&mut selection, schema_field.arguments()),
         selection: graphql_selection_to_json_selection(selection, schema_field),
     }
 }
 
 fn graphql_args_to_json_args(
     selection: &mut Selection,
-    args_fields: &[&InputField<'_>],
+    args_fields: &[InputField<'_>],
 ) -> Option<IndexMap<String, JsonValue>> {
     if selection.arguments().is_empty() {
         return None;
@@ -59,11 +58,8 @@ fn graphql_args_to_json_args(
 
     for (arg_name, arg_value) in selection.arguments().iter().cloned() {
         let arg_field = args_fields.iter().find(|arg_field| arg_field.name == arg_name);
-
-        let inferrer = FieldTypeInferrer::from_field(arg_field.copied()).infer(&arg_value);
-
+        let inferrer = FieldTypeInferrer::from_field(arg_field).infer(&arg_value);
         let json = arg_value_to_json(arg_value, inferrer);
-
         args.insert(arg_name, json);
     }
 
@@ -201,7 +197,9 @@ impl<'a, 'b> FieldTypeInferrer<'a, 'b> {
 
         match value {
             ArgumentValue::Object(obj) => {
-                let is_field_ref_obj = obj.contains_key(constants::filters::UNDERSCORE_REF) && obj.len() == 1;
+                let is_field_ref_obj = obj.contains_key(constants::filters::UNDERSCORE_REF)
+                    && obj.contains_key(constants::filters::UNDERSCORE_CONTAINER)
+                    && obj.len() == 2;
                 let schema_objects = self.get_object_types();
 
                 match schema_objects {

@@ -23,10 +23,7 @@ pub(crate) fn get_field_filter_types(
 
         ModelField::Composite(cf) if cf.is_list() => vec![
             InputType::object(to_many_composite_filter_object(ctx, cf.clone())),
-            InputType::list(to_one_composite_filter_shorthand_types(ctx, cf.clone())),
-            // The object (aka shorthand) syntax is only supported because the client used to expose all
-            // list input types as T | T[]. Consider removing it one day.
-            to_one_composite_filter_shorthand_types(ctx, cf),
+            InputType::list(to_one_composite_filter_shorthand_types(ctx, cf)),
         ],
 
         ModelField::Composite(cf) => vec![
@@ -82,23 +79,23 @@ fn to_many_relation_filter_object(ctx: &'_ QuerySchema, rf: RelationFieldRef) ->
 }
 
 fn to_one_relation_filter_object(ctx: &'_ QuerySchema, rf: RelationFieldRef) -> InputObjectType<'_> {
-    // TODO: The ToOneRelationFilterInput is currently broken as it does not take nullability into account.
-    // TODO: This means that the first relation field to be traversed will set the nullability for all other relation field that points to the same related model.
-    let ident = Identifier::new_prisma(IdentifierType::ToOneRelationFilterInput(rf.related_model()));
+    let ident = Identifier::new_prisma(IdentifierType::ToOneRelationFilterInput(rf.related_model(), rf.arity()));
 
     let mut object = init_input_object_type(ident);
     object.set_tag(ObjectTag::RelationEnvelope);
     object.set_fields(move || {
         let related_input_type = filter_objects::where_object_type(ctx, rf.related_model().into());
+
         vec![
             simple_input_field(filters::IS, InputType::object(related_input_type.clone()), None)
                 .optional()
-                .nullable(),
+                .nullable_if(!rf.is_required()),
             simple_input_field(filters::IS_NOT, InputType::object(related_input_type), None)
                 .optional()
-                .nullable(),
+                .nullable_if(!rf.is_required()),
         ]
     });
+
     object
 }
 
@@ -150,11 +147,9 @@ fn to_many_composite_filter_object(ctx: &'_ QuerySchema, cf: CompositeFieldRef) 
         let composite_equals_object = filter_objects::composite_equality_object(ctx, cf.clone());
 
         let mut fields = vec![
-            input_field(
+            simple_input_field(
                 filters::EQUALS,
-                // The object (aka shorthand) syntax is only supported because the client used to expose all
-                // list input types as T | T[]. Consider removing it one day.
-                list_union_type(InputType::object(composite_equals_object), true),
+                InputType::list(InputType::object(composite_equals_object)),
                 None,
             )
             .optional(),
@@ -386,16 +381,13 @@ fn inclusion_filters<'a>(
     mapped_type: InputType<'a>,
     nullable: bool,
 ) -> impl Iterator<Item = InputField<'a>> {
-    let input_type = InputType::list(mapped_type.clone());
+    let input_type = InputType::list(mapped_type);
 
-    let mut field_types: Vec<InputType<'_>> = if ctx.has_capability(ConnectorCapability::ScalarLists) {
+    let field_types: Vec<InputType<'_>> = if ctx.has_capability(ConnectorCapability::ScalarLists) {
         input_type.with_field_ref_input(ctx)
     } else {
         vec![input_type]
     };
-
-    // Allow for scalar shorthand too: { in: 2 } <=> { in: [2] }
-    field_types.push(mapped_type);
 
     vec![
         input_field(filters::IN, field_types.clone(), None)

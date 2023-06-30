@@ -20,7 +20,10 @@ mod value;
 mod value_ext;
 
 use self::{column_metadata::*, context::Context, filter_conversion::*, query_ext::QueryExt, row::*};
+use quaint::prelude::Queryable;
 
+#[cfg(feature = "js-drivers")]
+pub use database::js::register_driver;
 pub use database::{FromSource, Mssql, Mysql, PostgreSql, Sqlite};
 pub use error::SqlError;
 

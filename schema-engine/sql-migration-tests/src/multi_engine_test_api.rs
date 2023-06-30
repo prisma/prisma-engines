@@ -1,7 +1,7 @@
 #![deny(missing_docs)]
 
 //! A TestApi that is initialized without IO or async code and can instantiate
-//! multiple migration engines.
+//! multiple schema engines.
 
 pub use test_macros::test_connector;
 pub use test_setup::sqlite_test_url;
@@ -163,7 +163,7 @@ impl TestApi {
         self.tags().contains(Tags::LowerCasesTableNames)
     }
 
-    /// Instantiate a new migration engine for the current database.
+    /// Instantiate a new schema engine for the current database.
     pub fn new_engine(&self) -> EngineTestApi {
         let shadow_db = self.args.shadow_database_url().as_ref().map(ToString::to_string);
         self.new_engine_with_connection_strings(self.connection_string.clone(), shadow_db)
@@ -264,7 +264,7 @@ impl TestApi {
     }
 }
 
-/// A wrapper around a migration engine instance optimized for convenience in
+/// A wrapper around a schema engine instance optimized for convenience in
 /// writing tests.
 pub struct EngineTestApi {
     pub(crate) connector: SqlSchemaConnector,

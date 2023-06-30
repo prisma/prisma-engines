@@ -86,15 +86,11 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
          | FullTextIndex
          | Tracing
          | Metrics
-         | OrderByNulls
-         | FilteredRelationCount
          | FieldReference
          | PostgresqlExtensions
          | ExtendedWhereUnique
-         | ClientExtensions
          | MultiSchema
          | Views
-         | JsonProtocol
     }),
     deprecated: enumflags2::make_bitflags!(PreviewFeature::{
         AtomicNumberOperations
@@ -122,6 +118,10 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | ImprovedQueryRaw
         | DataProxy
         | InteractiveTransactions
+        | ClientExtensions
+        | FilteredRelationCount
+        | OrderByNulls
+        | JsonProtocol
     }),
     hidden: enumflags2::make_bitflags!(PreviewFeature::{
         NodeDrivers

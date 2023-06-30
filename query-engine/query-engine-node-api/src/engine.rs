@@ -1,6 +1,6 @@
 use crate::{error::ApiError, log_callback::LogCallback, logger::Logger};
 use futures::FutureExt;
-use napi::{Env, JsFunction, JsUnknown};
+use napi::{Env, JsFunction, JsObject, JsUnknown};
 use napi_derive::napi;
 use psl::PreviewFeature;
 use query_core::{
@@ -138,10 +138,24 @@ impl Inner {
 #[napi]
 impl QueryEngine {
     /// Parse a validated datamodel and configuration to allow connecting later on.
+    /// Note: any new method added to this struct should be added to
+    /// `query_engine_node_api::node_drivers::engine::QueryEngineNodeDrivers` as well.
+    /// Unfortunately the `#[napi]` macro does not support deriving traits.
     #[napi(constructor)]
-    pub fn new(napi_env: Env, options: JsUnknown, callback: JsFunction) -> napi::Result<Self> {
+    pub fn new(
+        napi_env: Env,
+        options: JsUnknown,
+        callback: JsFunction,
+        maybe_driver: Option<JsObject>,
+    ) -> napi::Result<Self> {
         let log_callback = LogCallback::new(napi_env, callback)?;
         log_callback.unref(&napi_env)?;
+
+        #[cfg(feature = "js-drivers")]
+        if let Some(driver) = maybe_driver {
+            let queryable = js_drivers::JsQueryable::from(driver);
+            sql_connector::register_driver(Arc::new(queryable));
+        }
 
         let ConstructorOptions {
             datamodel,
@@ -178,13 +192,7 @@ impl QueryEngine {
 
         let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics);
         let enable_tracing = config.preview_features().contains(PreviewFeature::Tracing);
-        let engine_protocol =
-            engine_protocol.unwrap_or_else(
-                || match config.preview_features().contains(PreviewFeature::JsonProtocol) {
-                    true => EngineProtocol::Json,
-                    false => EngineProtocol::Graphql,
-                },
-            );
+        let engine_protocol = engine_protocol.unwrap_or(EngineProtocol::Json);
 
         let builder = EngineBuilder {
             schema: Arc::new(schema),
@@ -309,6 +317,8 @@ impl QueryEngine {
         async_panic_to_js_error(async {
             let span = tracing::info_span!("prisma:engine:disconnect");
             let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+
+            // TODO: when using Node Drivers, we need to call Driver::close() here.
 
             async {
                 let mut inner = self.inner.write().await;
