@@ -205,92 +205,92 @@
 
 <span class="comment">// (Usually) Append-only list of features.
 </span><span class="macro">features!</span>(
-    ConnectOrCreate,
-    TransactionApi,
-    NativeTypes,
-    GroupBy,
-    CreateMany,
-    AtomicNumberOperations,
     AggregateApi,
-    Middlewares,
-    Distinct,
-    UncheckedScalarInputs,
-    MicrosoftSqlServer,
-    OrderByRelation,
-    MongoDb,
-    NApi,
-    SelectRelationCount,
-    OrderByAggregateGroup,
-    FilterJson,
-    ReferentialIntegrity,
-    ReferentialActions,
-    InteractiveTransactions,
-    NamedConstraints,
-    FullTextSearch,
-    FullTextIndex,
-    DataProxy,
-    ExtendedIndexes,
-    Cockroachdb,
-    Tracing,
-    ImprovedQueryRaw,
-    Metrics,
-    OrderByNulls,
-    MultiSchema,
-    FilteredRelationCount,
-    FieldReference,
-    PostgresqlExtensions,
+    AtomicNumberOperations,
     ClientExtensions,
+    Cockroachdb,
+    ConnectOrCreate,
+    CreateMany,
+    DataProxy,
     Deno,
+    Distinct,
+    ExtendedIndexes,
     ExtendedWhereUnique,
-    Views,
+    FieldReference,
+    FilteredRelationCount,
+    FilterJson,
+    FullTextIndex,
+    FullTextSearch,
+    GroupBy,
+    ImprovedQueryRaw,
+    InteractiveTransactions,
     JsonProtocol,
+    Metrics,
+    MicrosoftSqlServer,
+    Middlewares,
+    MongoDb,
+    MultiSchema,
+    NamedConstraints,
+    NApi,
+    NativeTypes,
     NodeDrivers,
+    OrderByAggregateGroup,
+    OrderByNulls,
+    OrderByRelation,
+    PostgresqlExtensions,
+    ReferentialActions,
+    ReferentialIntegrity,
+    SelectRelationCount,
+    Tracing,
+    TransactionApi,
+    UncheckedScalarInputs,
+    Views,
 );
 
 <span class="doccomment">/// Generator preview features
 </span><span class="kw">pub const </span>ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
     active: <span class="macro">enumflags2::make_bitflags!</span>(PreviewFeature::{
         Deno
-         | FullTextSearch
-         | FullTextIndex
-         | Tracing
-         | Metrics
-         | FieldReference
-         | PostgresqlExtensions
          | ExtendedWhereUnique
+         | FullTextIndex
+         | FullTextSearch
+         | Metrics
          | MultiSchema
+         | PostgresqlExtensions
+         | Tracing
          | Views
     }),
     deprecated: <span class="macro">enumflags2::make_bitflags!</span>(PreviewFeature::{
         AtomicNumberOperations
         | AggregateApi
+        | ClientExtensions
         | Cockroachdb
-        | ExtendedIndexes
-        | FilterJson
-        | Middlewares
-        | NamedConstraints
-        | NativeTypes
-        | Distinct
         | ConnectOrCreate
-        | TransactionApi
-        | UncheckedScalarInputs
-        | GroupBy
         | CreateMany
+        | DataProxy
+        | Distinct
+        | ExtendedIndexes
+        | FieldReference
+        | FilteredRelationCount
+        | FilterJson
+        | GroupBy
+        | ImprovedQueryRaw
+        | InteractiveTransactions
+        | JsonProtocol
         | MicrosoftSqlServer
-        | SelectRelationCount
+        | Middlewares
         | MongoDb
+        | NamedConstraints
+        | NApi
+        | NativeTypes
         | OrderByAggregateGroup
+        | OrderByNulls
         | OrderByRelation
         | ReferentialActions
         | ReferentialIntegrity
-        | NApi
-        | ImprovedQueryRaw
-        | DataProxy
-        | InteractiveTransactions
-        | ClientExtensions
-        | FilteredRelationCount
-        | OrderByNulls
-        | JsonProtocol
+        | SelectRelationCount
+        | TransactionApi
+        | UncheckedScalarInputs
     }),
     hidden: <span class="macro">enumflags2::make_bitflags!</span>(PreviewFeature::{
         NodeDrivers
