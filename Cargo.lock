@@ -2969,15 +2969,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "prisma-fmt-build"
-version = "0.1.0"
-dependencies = [
- "prisma-fmt",
- "wasm-bindgen",
- "wasm-logger",
-]
-
-[[package]]
 name = "prisma-models"
 version = "0.0.0"
 dependencies = [
@@ -2990,6 +2981,15 @@ dependencies = [
  "psl",
  "thiserror",
  "uuid 1.1.2",
+]
+
+[[package]]
+name = "prisma-schema-build"
+version = "0.1.0"
+dependencies = [
+ "prisma-fmt",
+ "wasm-bindgen",
+ "wasm-logger",
 ]
 
 [[package]]
