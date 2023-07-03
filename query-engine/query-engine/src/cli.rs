@@ -57,13 +57,12 @@ impl CliCommand {
                 }))),
                 CliOpt::ExecuteRequest(input) => {
                     let schema = opts.schema(false)?;
-                    let features = schema.configuration.preview_features();
 
                     Ok(Some(CliCommand::ExecuteRequest(ExecuteRequest {
                         query: input.query.clone(),
                         enable_raw_queries: opts.enable_raw_queries,
                         schema,
-                        engine_protocol: opts.engine_protocol(features),
+                        engine_protocol: opts.engine_protocol(),
                     })))
                 }
                 CliOpt::DebugPanic(input) => Ok(Some(CliCommand::DebugPanic(DebugPanicRequest {

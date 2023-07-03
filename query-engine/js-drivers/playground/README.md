@@ -1,4 +1,4 @@
-# @prisma/nodejs-playground
+# @prisma/jsdrivers-playground
 
 This is a playground for testing the `libquery` client with the experimental Node.js drivers.
 It contains a subset of `@prisma/client`, plus a handy [`index.ts`](./src/index.ts) file with a `main` function.

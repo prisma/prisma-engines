@@ -1,6 +1,6 @@
 import { setTimeout } from 'node:timers/promises'
 
-import { Closeable, Queryable, ResultSet } from '../engines/types/Library'
+import { Closeable, ColumnType, Query, Queryable, ResultSet } from '../engines/types/Library'
 
 class MockSQL implements Queryable, Closeable {
   private maybeVersion?: string
@@ -38,19 +38,20 @@ class MockSQL implements Queryable, Closeable {
   /**
    * Execute a query given as SQL, interpolating the given parameters.
    */
-  async queryRaw(query: string): Promise<ResultSet> {
-    console.log('[nodejs] calling queryRaw', query)
+  async queryRaw(params: Query): Promise<ResultSet> {
+    console.log('[nodejs] calling queryRaw', params)
     await setTimeout(100)
-    
+
     const resultSet: ResultSet = {
-      columns: ['id', 'firstname', 'company_id'],
+      columnNames: ['id', 'firstname', 'company_id'],
+      columnTypes: [ColumnType.Int64, ColumnType.Text, ColumnType.Int64],
       rows: [
-        ['1', 'Alberto', '1'],
-        ['2', 'Tom', '1'],
+        [1, 'Alberto', 1],
+        [2, 'Tom', 1],
       ],
     }
     console.log('[nodejs] resultSet', resultSet)
-    
+
     return resultSet
   }
 
@@ -59,8 +60,8 @@ class MockSQL implements Queryable, Closeable {
    * returning the number of affected rows.
    * Note: Queryable expects a u64, but napi.rs only supports u32.
    */
-  async executeRaw(query: string): Promise<number> {
-    console.log('[nodejs] calling executeRaw', query)
+  async executeRaw(params: Query): Promise<number> {
+    console.log('[nodejs] calling executeRaw', params)
     await setTimeout(100)
 
     const affectedRows = 32

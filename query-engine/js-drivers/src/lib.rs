@@ -1,15 +1,8 @@
-//! Query Engine JavaScript Driver
-//!
+//! Query Engine Node.js Driver
 //! This crate is responsible for defining a `Queryable` + `TransactionCapable` + `Send` + `Sync` implementation that
-//! uses an external driver provided by the client and exposed via FFI (or even RPC).
+//! uses functions exposed by Node.js drivers via N-API.
 //!
-//! For the [`Driver`] implementation which uses functions exposed by Node.js drivers via N-API,
-//! see the `nodejs_drivers` module in the `query-engine-node-api` crate.
 
 mod driver;
 mod queryable;
-
-pub use driver::{Driver, Error, Result, ResultSet};
-pub use queryable::install_driver;
-pub use queryable::installed_driver;
-pub use queryable::Queryable;
+pub use queryable::JsQueryable;

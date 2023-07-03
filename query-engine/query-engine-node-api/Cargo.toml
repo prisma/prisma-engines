@@ -11,7 +11,7 @@ name = "query_engine"
 [features]
 default = ["js-drivers"]
 vendored-openssl = ["sql-connector/vendored-openssl"]
-js-drivers = ["sql-connector/js-drivers", "request-handlers/js-drivers"]
+js-drivers = ["sql-connector/js-drivers"]
 
 [dependencies]
 anyhow = "1"
@@ -24,9 +24,8 @@ psl.workspace = true
 sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector" }
 prisma-models = { path = "../prisma-models" }
 js-drivers = { path = "../js-drivers" }
-
-napi = { version = "2.12.4", default-features = false, features = ["napi8", "tokio_rt", "serde-json"] }
-napi-derive = "2.12.3"
+napi.workspace = true
+napi-derive.workspace = true
 
 thiserror = "1"
 connection-string.workspace = true 

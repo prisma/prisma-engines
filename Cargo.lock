@@ -542,6 +542,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "context"
+version = "0.1.0"
+
+[[package]]
 name = "convert_case"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1641,10 +1645,15 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "expect-test",
+ "napi",
+ "napi-derive",
  "once_cell",
  "quaint",
  "serde",
+ "serde_json",
  "tokio",
+ "tracing",
+ "tracing-core",
 ]
 
 [[package]]
@@ -2315,10 +2324,11 @@ checksum = "ebd4419172727423cf30351406c54f6cc1b354a2cfb4f1dba3e6cd07f6d5522b"
 
 [[package]]
 name = "napi-derive"
-version = "2.12.3"
+version = "2.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "af2ac63101a19228b0881694cac07468d642fd10e4f943a9c9feebeebf1a4787"
+checksum = "da1c6a8fa84d549aa8708fcd062372bf8ec6e849de39016ab921067d21bde367"
 dependencies = [
+ "cfg-if",
  "convert_case",
  "napi-derive-backend",
  "proc-macro2",
@@ -2328,9 +2338,9 @@ dependencies = [
 
 [[package]]
 name = "napi-derive-backend"
-version = "1.0.49"
+version = "1.0.52"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0e32b5bc4d803e40b783b0aa3fe488eac8711cfaa4c5c9915293dfd3d0b99925"
+checksum = "20bbc7c69168d06a848f925ec5f0e0997f98e8c8d4f2cc30157f0da51c009e17"
 dependencies = [
  "convert_case",
  "once_cell",
@@ -3587,7 +3597,6 @@ dependencies = [
  "indexmap",
  "insta",
  "itertools",
- "js-drivers",
  "mongodb-query-connector",
  "once_cell",
  "prisma-models",
@@ -4278,7 +4287,6 @@ dependencies = [
  "cuid",
  "futures",
  "itertools",
- "js-drivers",
  "once_cell",
  "opentelemetry",
  "prisma-models",

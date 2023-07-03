@@ -1,8 +1,7 @@
-use crate::{error::ApiError, log_callback::LogCallback, logger::Logger, nodejs_drivers::NodejsDriver};
+use crate::{error::ApiError, log_callback::LogCallback, logger::Logger};
 use futures::FutureExt;
 use napi::{Env, JsFunction, JsObject, JsUnknown};
 use napi_derive::napi;
-
 use psl::PreviewFeature;
 use query_core::{
     protocol::EngineProtocol,
@@ -147,15 +146,15 @@ impl QueryEngine {
         napi_env: Env,
         options: JsUnknown,
         callback: JsFunction,
-        fn_ctx: Option<JsObject>,
+        maybe_driver: Option<JsObject>,
     ) -> napi::Result<Self> {
         let log_callback = LogCallback::new(napi_env, callback)?;
         log_callback.unref(&napi_env)?;
 
-        // Initialize the global NODEJS_QUERYABLE from fn_ctx.
-        // This implies that there can only be one QueryEngine instance per process.
-        if let Some(ctx) = fn_ctx {
-            js_drivers::install_driver(Arc::new(NodejsDriver::reify(ctx)?));
+        #[cfg(feature = "js-drivers")]
+        if let Some(driver) = maybe_driver {
+            let queryable = js_drivers::JsQueryable::from(driver);
+            sql_connector::register_driver(Arc::new(queryable));
         }
 
         let ConstructorOptions {
@@ -193,13 +192,7 @@ impl QueryEngine {
 
         let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics);
         let enable_tracing = config.preview_features().contains(PreviewFeature::Tracing);
-        let engine_protocol =
-            engine_protocol.unwrap_or_else(
-                || match config.preview_features().contains(PreviewFeature::JsonProtocol) {
-                    true => EngineProtocol::Json,
-                    false => EngineProtocol::Graphql,
-                },
-            );
+        let engine_protocol = engine_protocol.unwrap_or(EngineProtocol::Json);
 
         let builder = EngineBuilder {
             schema: Arc::new(schema),

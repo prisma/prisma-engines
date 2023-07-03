@@ -3,7 +3,7 @@ use connector::{
     ConditionListValue, ConditionValue, Filter, JsonCompare, JsonFilterPath, JsonTargetType, ScalarCompare,
     ScalarListCompare,
 };
-use prisma_models::{Field, PrismaValue, ScalarFieldRef, TypeIdentifier};
+use prisma_models::{prelude::ParentContainer, Field, PrismaValue, ScalarFieldRef, TypeIdentifier};
 use schema::constants::{aggregations, filters, json_null};
 use std::convert::TryInto;
 
@@ -98,8 +98,7 @@ impl<'a> ScalarFilterParser<'a> {
                         PrismaValue::Null => field.equals(value),
                         PrismaValue::List(values) => field.is_in(values),
 
-                        val if self.reverse() => field.not_in(vec![val]),
-                        val => field.is_in(vec![val]),
+                        _ => unreachable!(), // Validation guarantees this.
                     },
                     ConditionValue::FieldRef(field_ref) if self.reverse() => field.not_in(field_ref),
                     ConditionValue::FieldRef(field_ref) => field.is_in(field_ref),
@@ -120,8 +119,7 @@ impl<'a> ScalarFilterParser<'a> {
                         PrismaValue::Null => field.not_equals(value),
                         PrismaValue::List(values) => field.not_in(values),
 
-                        val if self.reverse() => field.is_in(vec![val]),
-                        val => field.not_in(vec![val]),
+                        _ => unreachable!(), // Validation guarantees this.
                     },
                     ConditionValue::FieldRef(field_ref) if self.reverse() => field.is_in(field_ref),
                     ConditionValue::FieldRef(field_ref) => field.not_in(field_ref),
@@ -430,6 +428,44 @@ impl<'a> ScalarFilterParser<'a> {
                 let field_ref_name = map.remove(filters::UNDERSCORE_REF).unwrap();
                 let field_ref_name = PrismaValue::try_from(field_ref_name)?.into_string().unwrap();
                 let field_ref = field.container().find_field(&field_ref_name);
+
+                let container_ref_name = map.remove(filters::UNDERSCORE_CONTAINER).unwrap();
+                let container_ref_name = PrismaValue::try_from(container_ref_name)?.into_string().unwrap();
+
+                if container_ref_name != field.container().name() {
+                    let expected_container_type = if field.container().is_model() {
+                        "model"
+                    } else {
+                        "composite type"
+                    };
+
+                    let container_ref = field
+                        .dm
+                        .models()
+                        .map(ParentContainer::from)
+                        .chain(field.dm.composite_types().map(ParentContainer::from))
+                        .find(|container| container.name() == container_ref_name)
+                        .ok_or_else(|| {
+                            QueryGraphBuilderError::InputError(format!(
+                                "Model or composite type {} used for field ref {} does not exist.",
+                                container_ref_name, field_ref_name
+                            ))
+                        })?;
+
+                    let found_container_type = if container_ref.is_model() {
+                        "model"
+                    } else {
+                        "composite type"
+                    };
+
+                    return Err(QueryGraphBuilderError::InputError(format!(
+                        "Expected a referenced scalar field of {} {}, but found a field of {} {}.",
+                        expected_container_type,
+                        field.container().name(),
+                        found_container_type,
+                        container_ref_name
+                    )));
+                }
 
                 match field_ref {
                     Some(Field::Scalar(field_ref))

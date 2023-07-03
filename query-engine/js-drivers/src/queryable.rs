@@ -1,88 +1,49 @@
-use std::sync::Arc;
-
+use crate::driver::{self, Driver, JSResultSet, Query};
 use async_trait::async_trait;
-
-use crate::driver::Driver;
-
+use napi::JsObject;
 use quaint::{
     connector::IsolationLevel,
-    prelude::{Query, Queryable as QuaintQueryable, TransactionCapable},
+    prelude::{Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable},
     visitor::{self, Visitor},
     Value,
 };
+use tracing::{info_span, Instrument};
 
 #[derive(Clone)]
-pub struct Queryable {
-    /// A driver trait object wrapped in an [`Arc`].
-    ///
-    /// We need dynamic dispatch to ensure that the `js-drivers` crate and its users like
-    /// `sql-query-connector` can be compiled separately from the concrete driver implementations,
-    /// and that the former do not depend on the latter.
-    ///
-    /// When the Node.js driver implementation was a part of this crate, and `Queryable` used the
-    /// concrete type and not a trait object, this made it not possible to compile the `js-drivers`
-    /// as part of the Query Engine binary, since it would then fail with linker errors due to
-    /// missing N-API symbols. Although a cargo feature was introduced for conditional compilation,
-    /// due to shared dependencies it was still only possible to compile the Query Engine binary
-    /// and the Node-API library separately but not together. While workarounds exist, like marking
-    /// unknown symbols as weak symbols, they are platform (and linker) dependent and have other
-    /// drawbacks.
-    ///
-    /// It should also be possible to parametrise `Queryable` with a generic type parameter for the
-    /// [`Driver`] implementation and use static dispatch, if we want to eliminate the indirection
-    /// here as a future optimisation. This will require changes downstream in the Query Engine
-    /// code, as well as in how the `Driver` implementation is registered and stored.
-    ///
-    /// As for the type of the pointer, `Arc` provides the most straightforward way to allow the
-    /// `Queryable` to be cloned. If we want to use `Box` in the future, that is also possible with
-    /// a custom clone implementation (`dyn Driver` is not clonable by itself since it's a DST),
-    /// however even a cloned `Driver` would currently share state on the JavaScript side.
-    pub(crate) driver: Arc<dyn Driver>,
+pub struct JsQueryable {
+    pub(crate) driver: Driver,
 }
 
-impl Queryable {
-    pub fn new(driver: Arc<dyn Driver>) -> Self {
+impl JsQueryable {
+    pub fn new(driver: Driver) -> Self {
         Self { driver }
     }
 }
 
-impl std::fmt::Display for Queryable {
+impl std::fmt::Display for JsQueryable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "JSQueryable(driver)")
     }
 }
 
-impl std::fmt::Debug for Queryable {
+impl std::fmt::Debug for JsQueryable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "JSQueryable(driver)")
     }
 }
 
 #[async_trait]
-impl QuaintQueryable for Queryable {
+impl QuaintQueryable for JsQueryable {
     /// Execute the given query.
-    async fn query(&self, q: Query<'_>) -> quaint::Result<quaint::prelude::ResultSet> {
+    async fn query(&self, q: QuaintQuery<'_>) -> quaint::Result<ResultSet> {
         let (sql, params) = visitor::Mysql::build(q)?;
-        println!("JSQueryable::query()");
         self.query_raw(&sql, &params).await
     }
 
     /// Execute a query given as SQL, interpolating the given parameters.
-    async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<quaint::prelude::ResultSet> {
-        println!("JSQueryable::query_raw({}, {:?})", &sql, params);
-
-        // Note: we ignore the parameters for now.
-        // Todo: convert napi::Error to quaint::error::Error.
-        let result_set = self.driver.query_raw(sql.to_string()).await.unwrap();
-
-        Ok(quaint::prelude::ResultSet::new(
-            result_set.columns,
-            result_set
-                .rows
-                .into_iter()
-                .map(|row| row.into_iter().map(quaint::Value::text).collect())
-                .collect(),
-        ))
+    async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
+        let span = info_span!("js:query", user_facing = true);
+        self.do_query_raw(sql, params).instrument(span).await
     }
 
     /// Execute a query given as SQL, interpolating the given parameters.
@@ -91,14 +52,12 @@ impl QuaintQueryable for Queryable {
     /// instead of letting Postgres infer them based on their usage in the SQL query.
     ///
     /// NOTE: This method will eventually be removed & merged into Queryable::query_raw().
-    async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<quaint::prelude::ResultSet> {
-        println!("JSQueryable::query_raw()");
+    async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
         self.query_raw(sql, params).await
     }
 
     /// Execute the given query, returning the number of affected rows.
-    async fn execute(&self, q: Query<'_>) -> quaint::Result<u64> {
-        println!("JSQueryable::execute()");
+    async fn execute(&self, q: QuaintQuery<'_>) -> quaint::Result<u64> {
         let (sql, params) = visitor::Mysql::build(q)?;
         self.execute_raw(&sql, &params).await
     }
@@ -106,12 +65,8 @@ impl QuaintQueryable for Queryable {
     /// Execute a query given as SQL, interpolating the given parameters and
     /// returning the number of affected rows.
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
-        println!("JSQueryable::execute_raw({}, {:?})", &sql, &params);
-
-        // Note: we ignore the parameters for now.
-        // Todo: convert napi::Error to quaint::error::Error.
-        let affected_rows = self.driver.execute_raw(sql.to_string()).await.unwrap();
-        Ok(affected_rows as u64)
+        let span = info_span!("js:query", user_facing = true);
+        self.do_execute_raw(sql, params).instrument(span).await
     }
 
     /// Execute a query given as SQL, interpolating the given parameters and
@@ -122,14 +77,12 @@ impl QuaintQueryable for Queryable {
     ///
     /// NOTE: This method will eventually be removed & merged into Queryable::query_raw().
     async fn execute_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
-        println!("JSQueryable::execute_raw_typed({}, {:?})", &sql, &params);
         self.execute_raw(sql, params).await
     }
 
     /// Run a command in the database, for queries that can't be run using
     /// prepared statements.
     async fn raw_cmd(&self, cmd: &str) -> quaint::Result<()> {
-        println!("JSQueryable::raw_cmdx({})", &cmd);
         self.execute_raw(cmd, &[]).await?;
 
         Ok(())
@@ -140,7 +93,6 @@ impl QuaintQueryable for Queryable {
     /// example. The version string is returned directly without any form of
     /// parsing or normalization.
     async fn version(&self) -> quaint::Result<Option<String>> {
-        println!("JSQueryable::version()");
         // Todo: convert napi::Error to quaint::error::Error.
         let version = self.driver.version().await.unwrap();
         Ok(version)
@@ -164,21 +116,51 @@ impl QuaintQueryable for Queryable {
     }
 }
 
-impl TransactionCapable for Queryable {}
+impl JsQueryable {
+    async fn build_query(sql: &str, values: &[quaint::Value<'_>]) -> Query {
+        let sql: String = sql.to_string();
+        let args = values.iter().map(|v| v.clone().into()).collect();
+        Query { sql, args }
+    }
 
-// Global JSQueryable instance serving as a proxy to the driver implemented by NodeJSFunctionContext
-//
-// It´s unlikely that we swap implementations, nor in production code, nor in test doubles, so relying
-// on a global instance is fine.
-static QUERYABLE: once_cell::sync::OnceCell<Queryable> = once_cell::sync::OnceCell::new();
+    async fn transform_result_set(result_set: JSResultSet) -> quaint::Result<ResultSet> {
+        Ok(ResultSet::from(result_set))
+    }
 
-pub fn install_driver(driver: Arc<dyn Driver>) {
-    let queryable = Queryable::new(driver);
-    QUERYABLE
-        .set(queryable)
-        .expect("Already initialized global instance of JSQueryable");
+    async fn do_query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
+        let len = params.len();
+        let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
+        let query = Self::build_query(sql, params).instrument(serialization_span).await;
+
+        // Todo: convert napi::Error to quaint::error::Error.
+        let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);
+        let result_set = self.driver.query_raw(query).instrument(sql_span).await.unwrap();
+
+        let len = result_set.len();
+        let deserialization_span = info_span!("js:query:result", user_facing = true, "length" = %len);
+        Self::transform_result_set(result_set)
+            .instrument(deserialization_span)
+            .await
+    }
+
+    async fn do_execute_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
+        let len = params.len();
+        let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
+        let query = Self::build_query(sql, params).instrument(serialization_span).await;
+
+        // Todo: convert napi::Error to quaint::error::Error.
+        let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);
+        let affected_rows = self.driver.execute_raw(query).instrument(sql_span).await.unwrap();
+
+        Ok(affected_rows as u64)
+    }
 }
 
-pub fn installed_driver() -> Option<&'static Queryable> {
-    QUERYABLE.get()
+impl TransactionCapable for JsQueryable {}
+
+impl From<JsObject> for JsQueryable {
+    fn from(driver: JsObject) -> Self {
+        let driver = driver::reify(driver).unwrap();
+        Self { driver }
+    }
 }
