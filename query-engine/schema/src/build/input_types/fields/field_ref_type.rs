@@ -2,16 +2,12 @@ use super::*;
 use constants::filters;
 
 pub(crate) trait WithFieldRefInputExt<'a> {
-    fn with_field_ref_input(self, ctx: &'a QuerySchema) -> Vec<InputType<'a>>;
+    fn with_field_ref_input(self) -> Vec<InputType<'a>>;
 }
 
 impl<'a> WithFieldRefInputExt<'a> for InputType<'a> {
-    fn with_field_ref_input(self, ctx: &'a QuerySchema) -> Vec<InputType<'a>> {
-        let mut field_types = vec![self.clone()];
-
-        if ctx.has_feature(PreviewFeature::FieldReference) {
-            field_types.push(InputType::object(field_ref_input_object_type(self)));
-        }
+    fn with_field_ref_input(self) -> Vec<InputType<'a>> {
+        let field_types = vec![self.clone(), InputType::object(field_ref_input_object_type(self))];
 
         field_types
     }

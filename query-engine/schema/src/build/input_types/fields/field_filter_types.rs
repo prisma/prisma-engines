@@ -181,16 +181,16 @@ fn scalar_list_filter_type(ctx: &'_ QuerySchema, sf: ScalarFieldRef) -> InputObj
     object.set_fields(move || {
         let mapped_nonlist_type = map_scalar_input_type(ctx, sf.type_identifier(), false);
         let mapped_list_type = InputType::list(mapped_nonlist_type.clone());
-        let mut fields: Vec<_> = equality_filters(ctx, mapped_list_type.clone(), !sf.is_required()).collect();
+        let mut fields: Vec<_> = equality_filters(mapped_list_type.clone(), !sf.is_required()).collect();
 
-        let mapped_nonlist_type_with_field_ref_input = mapped_nonlist_type.with_field_ref_input(ctx);
+        let mapped_nonlist_type_with_field_ref_input = mapped_nonlist_type.with_field_ref_input();
         fields.push(
             input_field(filters::HAS, mapped_nonlist_type_with_field_ref_input, None)
                 .optional()
                 .nullable_if(!sf.is_required()),
         );
 
-        let mapped_list_type_with_field_ref_input = mapped_list_type.with_field_ref_input(ctx);
+        let mapped_list_type_with_field_ref_input = mapped_list_type.with_field_ref_input();
         fields.push(input_field(filters::HAS_EVERY, mapped_list_type_with_field_ref_input.clone(), None).optional());
         fields.push(input_field(filters::HAS_SOME, mapped_list_type_with_field_ref_input, None).optional());
         fields.push(simple_input_field(filters::IS_EMPTY, InputType::boolean(), None).optional());
@@ -224,20 +224,18 @@ fn full_scalar_filter_type(
     object.set_fields(move || {
         let mapped_scalar_type = map_scalar_input_type(ctx, typ, list);
         let mut fields: Vec<_> = match typ {
-            TypeIdentifier::String | TypeIdentifier::UUID => {
-                equality_filters(ctx, mapped_scalar_type.clone(), nullable)
-                    .chain(inclusion_filters(ctx, mapped_scalar_type.clone(), nullable))
-                    .chain(alphanumeric_filters(ctx, mapped_scalar_type.clone()))
-                    .chain(string_filters(ctx, type_name.as_ref(), mapped_scalar_type.clone()))
-                    .chain(query_mode_field(ctx, nested))
-                    .collect()
-            }
+            TypeIdentifier::String | TypeIdentifier::UUID => equality_filters(mapped_scalar_type.clone(), nullable)
+                .chain(inclusion_filters(ctx, mapped_scalar_type.clone(), nullable))
+                .chain(alphanumeric_filters(ctx, mapped_scalar_type.clone()))
+                .chain(string_filters(ctx, type_name.as_ref(), mapped_scalar_type.clone()))
+                .chain(query_mode_field(ctx, nested))
+                .collect(),
 
             TypeIdentifier::Int
             | TypeIdentifier::BigInt
             | TypeIdentifier::Float
             | TypeIdentifier::DateTime
-            | TypeIdentifier::Decimal => equality_filters(ctx, mapped_scalar_type.clone(), nullable)
+            | TypeIdentifier::Decimal => equality_filters(mapped_scalar_type.clone(), nullable)
                 .chain(inclusion_filters(ctx, mapped_scalar_type.clone(), nullable))
                 .chain(alphanumeric_filters(ctx, mapped_scalar_type.clone()))
                 .collect(),
@@ -260,13 +258,11 @@ fn full_scalar_filter_type(
                 filters
             }
 
-            TypeIdentifier::Boolean => equality_filters(ctx, mapped_scalar_type.clone(), nullable).collect(),
+            TypeIdentifier::Boolean => equality_filters(mapped_scalar_type.clone(), nullable).collect(),
 
-            TypeIdentifier::Bytes | TypeIdentifier::Enum(_) => {
-                equality_filters(ctx, mapped_scalar_type.clone(), nullable)
-                    .chain(inclusion_filters(ctx, mapped_scalar_type.clone(), nullable))
-                    .collect()
-            }
+            TypeIdentifier::Bytes | TypeIdentifier::Enum(_) => equality_filters(mapped_scalar_type.clone(), nullable)
+                .chain(inclusion_filters(ctx, mapped_scalar_type.clone(), nullable))
+                .collect(),
 
             TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
         };
@@ -341,12 +337,8 @@ fn is_set_input_field<'a>() -> InputField<'a> {
     simple_input_field(filters::IS_SET, InputType::boolean(), None).optional()
 }
 
-fn equality_filters<'a>(
-    ctx: &'a QuerySchema,
-    mapped_type: InputType<'a>,
-    nullable: bool,
-) -> impl Iterator<Item = InputField<'a>> {
-    let types = mapped_type.with_field_ref_input(ctx);
+fn equality_filters(mapped_type: InputType<'_>, nullable: bool) -> impl Iterator<Item = InputField<'_>> {
+    let types = mapped_type.with_field_ref_input();
 
     std::iter::once(
         input_field(filters::EQUALS, types, None)
@@ -362,12 +354,12 @@ fn json_equality_filters<'a>(
 ) -> impl Iterator<Item = InputField<'a>> {
     let field = if ctx.has_capability(ConnectorCapability::AdvancedJsonNullability) {
         let enum_type = json_null_filter_enum();
-        let mut field_types = mapped_type.with_field_ref_input(ctx);
+        let mut field_types = mapped_type.with_field_ref_input();
         field_types.push(InputType::Enum(enum_type));
 
         input_field(filters::EQUALS, field_types, None).optional()
     } else {
-        let inner = mapped_type.with_field_ref_input(ctx);
+        let inner = mapped_type.with_field_ref_input();
         input_field(filters::EQUALS, inner, None)
             .optional()
             .nullable_if(nullable)
@@ -384,7 +376,7 @@ fn inclusion_filters<'a>(
     let input_type = InputType::list(mapped_type);
 
     let field_types: Vec<InputType<'_>> = if ctx.has_capability(ConnectorCapability::ScalarLists) {
-        input_type.with_field_ref_input(ctx)
+        input_type.with_field_ref_input()
     } else {
         vec![input_type]
     };
@@ -405,7 +397,7 @@ fn alphanumeric_filters<'a>(ctx: &'a QuerySchema, mapped_type: InputType<'a>) ->
     // for both database without splitting them into their own connectors.
     let field_types =
         if !mapped_type.is_json() || ctx.has_capability(ConnectorCapability::JsonFilteringAlphanumericFieldRef) {
-            mapped_type.with_field_ref_input(ctx)
+            mapped_type.with_field_ref_input()
         } else {
             vec![mapped_type]
         };
@@ -424,7 +416,7 @@ fn string_filters<'a>(
     input_object_type_name: &str,
     mapped_type: InputType<'a>,
 ) -> impl Iterator<Item = InputField<'a>> {
-    let field_types = mapped_type.clone().with_field_ref_input(ctx);
+    let field_types = mapped_type.clone().with_field_ref_input();
 
     let string_filters = ctx.connector.string_filters(input_object_type_name);
     let mut string_filters: Vec<_> = string_filters
@@ -449,8 +441,8 @@ fn json_filters(ctx: &'_ QuerySchema) -> impl Iterator<Item = InputField<'_>> {
     } else {
         unreachable!()
     };
-    let string_with_field_ref_input = InputType::string().with_field_ref_input(ctx);
-    let json_with_field_ref_input = InputType::json().with_field_ref_input(ctx);
+    let string_with_field_ref_input = InputType::string().with_field_ref_input();
+    let json_with_field_ref_input = InputType::json().with_field_ref_input();
 
     vec![
         simple_input_field(filters::PATH, path_type, None).optional(),
@@ -525,14 +517,14 @@ fn not_filter_field<'a>(
         // Json is not nullable on dbs with `AdvancedJsonNullability`, only by proxy through an enum.
         TypeIdentifier::Json if has_adv_json => {
             let enum_type = json_null_filter_enum();
-            let mut field_types = mapped_scalar_type.with_field_ref_input(ctx);
+            let mut field_types = mapped_scalar_type.with_field_ref_input();
             field_types.push(InputType::Enum(enum_type));
 
             input_field(filters::NOT_LOWERCASE, field_types, None).optional()
         }
 
         TypeIdentifier::Json => {
-            let ty = mapped_scalar_type.with_field_ref_input(ctx);
+            let ty = mapped_scalar_type.with_field_ref_input();
             input_field(filters::NOT_LOWERCASE, ty, None)
                 .optional()
                 .nullable_if(is_nullable)
