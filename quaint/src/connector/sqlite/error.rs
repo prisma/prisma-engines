@@ -210,7 +210,7 @@ impl From<rusqlite::Error> for Error {
                     let kind = ErrorKind::ColumnNotFound { column };
 
                     let mut builder = Error::builder(kind);
-                    builder.set_original_code(format!("{extended_code}"));
+                    builder.set_original_code(extended_code.to_string());
                     builder.set_original_message(d);
 
                     builder.build()
@@ -218,7 +218,7 @@ impl From<rusqlite::Error> for Error {
                 _ => {
                     let description = msg.clone();
                     let mut builder = Error::builder(ErrorKind::QueryError(e.into()));
-                    builder.set_original_code(format!("{extended_code}"));
+                    builder.set_original_code(extended_code.to_string());
                     builder.set_original_message(description);
 
                     builder.build()
