@@ -5,4 +5,4 @@
 
 mod driver;
 mod queryable;
-pub use queryable::Queryable;
+pub use queryable::JsQueryable;

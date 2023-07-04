@@ -15,7 +15,9 @@ mod validate;
 
 pub use crate::{
     common::{PreviewFeature, PreviewFeatures, ALL_PREVIEW_FEATURES},
-    configuration::{Configuration, Datasource, DatasourceConnectorData, Generator, StringFromEnvVar},
+    configuration::{
+        Configuration, Datasource, DatasourceConnectorData, Generator, GeneratorConfigValue, StringFromEnvVar,
+    },
     reformat::reformat,
 };
 pub use diagnostics;

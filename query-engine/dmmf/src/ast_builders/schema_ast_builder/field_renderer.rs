@@ -21,7 +21,11 @@ pub(super) fn render_input_field<'a>(input_field: &InputField<'a>, ctx: &mut Ren
 }
 
 pub(super) fn render_output_field<'a>(field: &OutputField<'a>, ctx: &mut RenderContext<'a>) -> DmmfOutputField {
-    let rendered_inputs = field.arguments().map(|arg| render_input_field(arg, ctx)).collect();
+    let rendered_inputs = field
+        .arguments()
+        .iter()
+        .map(|arg| render_input_field(arg, ctx))
+        .collect();
     let output_type = render_output_type(field.field_type(), ctx);
 
     let output_field = DmmfOutputField {

@@ -553,6 +553,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "context"
+version = "0.1.0"
+
+[[package]]
 name = "convert_case"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1668,6 +1672,8 @@ dependencies = [
  "serde",
  "serde_json",
  "tokio",
+ "tracing",
+ "tracing-core",
 ]
 
 [[package]]
@@ -2983,15 +2989,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "prisma-fmt-build"
-version = "0.1.0"
-dependencies = [
- "prisma-fmt",
- "wasm-bindgen",
- "wasm-logger",
-]
-
-[[package]]
 name = "prisma-models"
 version = "0.0.0"
 dependencies = [
@@ -3004,6 +3001,15 @@ dependencies = [
  "psl",
  "thiserror",
  "uuid 1.1.2",
+]
+
+[[package]]
+name = "prisma-schema-build"
+version = "0.1.0"
+dependencies = [
+ "prisma-fmt",
+ "wasm-bindgen",
+ "wasm-logger",
 ]
 
 [[package]]

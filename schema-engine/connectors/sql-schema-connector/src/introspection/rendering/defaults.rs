@@ -70,8 +70,6 @@ pub(crate) fn render(default: DefaultValuePair<'_>) -> Option<renderer::DefaultV
                 let vals = vals.into_iter().map(Value::from).collect();
                 Some(renderer::DefaultValue::array(vals))
             }
-            DefaultKind::Prisma1Uuid => Some(renderer::DefaultValue::function(Function::new("uuid"))),
-            DefaultKind::Prisma1Cuid => Some(renderer::DefaultValue::function(Function::new("cuid"))),
         },
         None => None,
     };

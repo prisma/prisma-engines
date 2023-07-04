@@ -5,5 +5,4 @@ mod introspection_map;
 mod introspection_pair;
 mod rendering;
 mod sanitize_datamodel_names;
-mod version_checker;
 mod warnings;

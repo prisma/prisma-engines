@@ -1,4 +1,4 @@
-/// A boxed migration, opaque to the migration engine core. The connectors are
+/// A boxed migration, opaque to the schema engine core. The connectors are
 /// sole responsible for producing and understanding migrations — the core just
 /// orchestrates.
 pub struct Migration(Box<dyn std::any::Any + Send + Sync>);

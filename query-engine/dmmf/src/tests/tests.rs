@@ -9,6 +9,15 @@ fn sqlite_ignore() {
     assert_eq!(dmmf.mappings.model_operations.len(), 1);
 }
 
+#[test]
+fn views_ignore() {
+    let dmmf = dmmf_from_schema(include_str!("./test-schemas/views_ignore.prisma"));
+
+    // The Ignored view is ignored.
+    assert_eq!(dmmf.data_model.models.len(), 1);
+    assert_eq!(dmmf.mappings.model_operations.len(), 1);
+}
+
 fn assert_comment(actual: Option<&String>, expected: &str) {
     assert!(actual.is_some_and(|c| c.as_str() == expected))
 }

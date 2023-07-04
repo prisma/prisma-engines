@@ -1,11 +1,11 @@
 { config, pkgs, self', ... }:
 
 # This is an impure build for prisma/prisma. We need this because of the way we
-# pakage `prisma-fmt-wasm` and the fact that there's no `pnpm2nix`.
+# package `prisma-schema-wasm` and the fact that there's no `pnpm2nix`.
 # See https://zimbatm.com/notes/nix-packaging-the-heretic-way for more details
 # on impure builds.
 let
-  fmt-wasm = self'.packages.prisma-fmt-wasm;
+  schema-wasm = self'.packages.prisma-schema-wasm;
   version = "4.11.0";
 in
 {
@@ -30,8 +30,8 @@ in
       patchShebangs .
 
       # Remove prisma-fmt and copy it over from our local build.
-      rm node_modules/prisma/build/prisma_fmt_build_bg.wasm
-      cp ${fmt-wasm}/src/prisma_fmt_build_bg.wasm node_modules/prisma/build/prisma_fmt_build_bg.wasm
+      rm node_modules/prisma/build/prisma_schema_build_bg.wasm
+      cp ${schema-wasm}/src/prisma_schema_build_bg.wasm node_modules/prisma/build/prisma_schema_build_bg.wasm
 
       # Copy node_modules and everything else.
       mkdir -p $out/share
