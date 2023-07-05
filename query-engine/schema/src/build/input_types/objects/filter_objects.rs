@@ -82,29 +82,25 @@ pub(crate) fn where_unique_object_type(ctx: &'_ QuerySchema, model: Model) -> In
     let mut input_object = init_input_object_type(ident);
     input_object.set_tag(ObjectTag::WhereInputType(ParentContainer::Model(model.clone())));
 
-    if ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {
-        // Concatenated list of uniques/@@unique/@@id fields on which the input type constraints should be applied (that at least one of them is set).
-        let constrained_fields: Vec<_> = {
-            let walker = ctx.internal_data_model.walk(model.id);
+    // Concatenated list of uniques/@@unique/@@id fields on which the input type constraints should be applied (that at least one of them is set).
+    let constrained_fields: Vec<_> = {
+        let walker = ctx.internal_data_model.walk(model.id);
 
-            walker
-                .primary_key()
-                .map(compound_id_field_name)
-                .into_iter()
-                .chain(
-                    walker
-                        .indexes()
-                        .filter(|idx| idx.is_unique())
-                        .map(compound_index_field_name),
-                )
-                .collect()
-        };
+        walker
+            .primary_key()
+            .map(compound_id_field_name)
+            .into_iter()
+            .chain(
+                walker
+                    .indexes()
+                    .filter(|idx| idx.is_unique())
+                    .map(compound_index_field_name),
+            )
+            .collect()
+    };
 
-        input_object.require_at_least_one_field();
-        input_object.apply_constraints_on_fields(constrained_fields);
-    } else {
-        input_object.require_exactly_one_field();
-    }
+    input_object.require_at_least_one_field();
+    input_object.apply_constraints_on_fields(constrained_fields);
 
     input_object.set_fields(move || {
         // Split unique & ID fields vs all the other fields
@@ -183,14 +179,12 @@ pub(crate) fn where_unique_object_type(ctx: &'_ QuerySchema, model: Model) -> In
         );
         fields.extend(compound_id_field);
 
-        if ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {
-            fields.extend(boolean_operators.into_iter());
-            fields.extend(
-                rest_fields
-                    .into_iter()
-                    .map(|f| input_fields::filter_input_field(ctx, f, false)),
-            );
-        }
+        fields.extend(boolean_operators.into_iter());
+        fields.extend(
+            rest_fields
+                .into_iter()
+                .map(|f| input_fields::filter_input_field(ctx, f, false)),
+        );
 
         assert!(!fields.is_empty(), "where objects cannot be empty");
 

@@ -82,7 +82,6 @@ features!(
 pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
     active: enumflags2::make_bitflags!(PreviewFeature::{
         Deno
-         | ExtendedWhereUnique
          | FullTextIndex
          | FullTextSearch
          | Metrics
@@ -101,6 +100,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | DataProxy
         | Distinct
         | ExtendedIndexes
+        | ExtendedWhereUnique
         | FieldReference
         | FilteredRelationCount
         | FilterJson
