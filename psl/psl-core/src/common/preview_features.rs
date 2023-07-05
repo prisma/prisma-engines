@@ -100,6 +100,7 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | DataProxy
         | Distinct
         | ExtendedIndexes
+        | ExtendedWhereUnique
         | FieldReference
         | FilteredRelationCount
         | FilterJson
@@ -121,7 +122,6 @@ pub const ALL_PREVIEW_FEATURES: FeatureMap = FeatureMap {
         | SelectRelationCount
         | TransactionApi
         | UncheckedScalarInputs
-        | ExtendedWhereUnique
     }),
     hidden: enumflags2::make_bitflags!(PreviewFeature::{
         NodeDrivers
