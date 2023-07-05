@@ -1251,8 +1251,8 @@ fn unsupported_types_in_an_index() {
     let expect = expect![[r#"
         *** WARNING ***
 
-        These fields are not supported by the Prisma Client, because Prisma currently does not support their types:
-          - Model: "A", field: "data", type: "JavaScriptCode"
+        These fields are not supported by Prisma Client, because Prisma currently does not support their types:
+          - Model: "A", field: "data", original data type: "JavaScriptCode"
     "#]];
 
     res.expect_warnings(&expect);

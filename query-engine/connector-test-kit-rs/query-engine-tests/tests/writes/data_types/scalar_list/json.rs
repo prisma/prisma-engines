@@ -180,6 +180,36 @@ mod json {
         Ok(())
     }
 
+    #[connector_test]
+    async fn push_json_protocol(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1 }"#).await?;
+
+        if runner.protocol().is_json() {
+            let query = r#"{
+            "modelName": "ScalarModel",
+            "action": "updateOne",
+            "query": {
+              "arguments": {
+                "where": { "id": 1 },
+                "data": {
+                  "jsons":  { "push": [{ "$type": "Json", "value": "1" }, { "$type": "Json", "value": "true" }] }
+                }
+              },
+              "selection": { "$scalars": true }
+            }
+          }"#;
+
+            let res = runner.query_json(query).await?;
+
+            insta::assert_snapshot!(
+              res.to_string(),
+              @r###"{"data":{"updateOneScalarModel":{"id":1,"jsons":[{"$type":"Json","value":"1"},{"$type":"Json","value":"true"}]}}}"###
+            );
+        }
+
+        Ok(())
+    }
+
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
             .query(format!("mutation {{ createOneScalarModel(data: {data}) {{ id }} }}"))

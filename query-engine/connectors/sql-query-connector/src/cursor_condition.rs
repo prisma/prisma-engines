@@ -199,7 +199,7 @@ struct CursorOrderForeignKey {
 /// ```
 pub(crate) fn build(
     query_arguments: &QueryArguments,
-    model: &ModelRef,
+    model: &Model,
     order_by_defs: &[OrderByDefinition],
     ctx: &Context<'_>,
 ) -> ConditionTree<'static> {
@@ -218,7 +218,7 @@ pub(crate) fn build(
             let cursor_condition = cursor_row.clone().equals(cursor_values.clone());
 
             // Orderings for this query. Influences which fields we need to fetch for comparing order fields.
-            let mut definitions = order_definitions(query_arguments, model, &order_by_defs, ctx);
+            let mut definitions = order_definitions(query_arguments, model, order_by_defs, ctx);
 
             // Subquery to find the value of the order field(s) that we need for comparison.
             let order_subquery = Select::from_table(model.as_table(ctx)).so_that(cursor_condition);
@@ -247,7 +247,7 @@ pub(crate) fn build(
                     let mut and_conditions = Vec::with_capacity(head.len() + 1);
 
                     for order_definition in head {
-                        and_conditions.push(map_equality_condition(&order_subquery, &order_definition));
+                        and_conditions.push(map_equality_condition(&order_subquery, order_definition));
                     }
 
                     let order_definition = tail.first().unwrap();
@@ -279,7 +279,7 @@ pub(crate) fn build(
                         // but everything else must come strictly "after" the cursor.
                         and_conditions.push(map_orderby_condition(
                             &order_subquery,
-                            &order_definition,
+                            order_definition,
                             reverse,
                             true,
                             ctx,
@@ -287,7 +287,7 @@ pub(crate) fn build(
                     } else {
                         and_conditions.push(map_orderby_condition(
                             &order_subquery,
-                            &order_definition,
+                            order_definition,
                             reverse,
                             false,
                             ctx,
@@ -412,7 +412,7 @@ fn map_equality_condition(
 
 fn order_definitions(
     query_arguments: &QueryArguments,
-    model: &ModelRef,
+    model: &Model,
     order_by_defs: &[OrderByDefinition],
     ctx: &Context<'_>,
 ) -> Vec<CursorOrderDefinition> {
@@ -519,7 +519,7 @@ fn cursor_order_def_relevance(order_by: &OrderByRelevance, order_by_def: &OrderB
 }
 
 fn foreign_keys_from_order_path(path: &[OrderByHop], joins: &[AliasedJoin]) -> Option<Vec<CursorOrderForeignKey>> {
-    let (before_last_hop, last_hop) = take_last_two_elem(&path);
+    let (before_last_hop, last_hop) = take_last_two_elem(path);
 
     last_hop.map(|hop| {
         match hop {

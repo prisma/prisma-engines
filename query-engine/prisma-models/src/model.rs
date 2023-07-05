@@ -2,7 +2,6 @@ use crate::prelude::*;
 use psl::{parser_database::walkers, schema_ast::ast};
 
 pub type Model = crate::Zipper<ast::ModelId>;
-pub type ModelRef = Model;
 
 impl Model {
     pub fn name(&self) -> &str {
@@ -30,8 +29,8 @@ impl Model {
         FieldSelection::from(fields)
     }
 
-    pub fn fields(&self) -> Fields {
-        Fields::new(self.clone())
+    pub fn fields(&self) -> Fields<'_> {
+        Fields::new(self)
     }
 
     pub fn supports_create_operation(&self) -> bool {
@@ -54,6 +53,9 @@ impl Model {
     }
 
     pub fn unique_indexes(&self) -> impl Iterator<Item = walkers::IndexWalker<'_>> {
-        self.walker().indexes().filter(|idx| idx.is_unique())
+        self.walker()
+            .indexes()
+            .filter(|idx| idx.is_unique())
+            .filter(|index| !index.fields().any(|f| f.is_unsupported()))
     }
 }

@@ -1,16 +1,62 @@
 //! Warnings generator for Introspection
 
-use std::fmt;
+use std::{collections::BTreeSet, fmt};
+
+/// A group of warnings that can be grouped by a key, which depends on the concretely
+/// instantiated type T.
+struct GroupBy<'a, T>(&'a Vec<T>);
+
+impl fmt::Display for GroupBy<'_, ModelAndField> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        display_list(self.0, "Model", |mf| &mf.model, |mf| &mf.field, f)
+    }
+}
+
+impl fmt::Display for GroupBy<'_, ViewAndField> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        display_list(self.0, "View", |vf| &vf.view, |vf| &vf.field, f)
+    }
+}
+
+impl fmt::Display for GroupBy<'_, TypeAndField> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        display_list(self.0, "Composite type", |cf| &cf.composite_type, |cf| &cf.field, f)
+    }
+}
+
+fn display_list<T: Ord>(
+    items: &[T],
+    group_name: &str,
+    project_key: fn(&T) -> &str,
+    project_field: fn(&T) -> &str,
+    f: &mut fmt::Formatter<'_>,
+) -> fmt::Result {
+    let sorted: BTreeSet<_> = items.iter().collect();
+    let mut sorted = sorted.into_iter().peekable();
+    let mut key = None;
+    let close = |f: &mut fmt::Formatter<'_>| f.write_str("]\n");
+
+    while let Some(next) = sorted.next() {
+        if Some(project_key(next)) != key {
+            write!(f, r#"  - {group_name}: "{}", field(s): ["#, project_key(next))?;
+            key = Some(project_key(next));
+        }
+
+        write!(f, r#""{}""#, project_field(next))?;
+        match sorted.peek() {
+            Some(vf) if Some(project_key(vf)) != key => close(f)?,
+            None => close(f)?,
+            Some(_) => f.write_str(", ")?,
+        }
+    }
+    Ok(())
+}
 
 /// Collections used for warning generation. These should be preferred
 /// over directly creating warnings from the code, to prevent spamming
 /// the user.
 #[derive(Debug, Default, PartialEq)]
 pub struct Warnings {
-    /// Fields that are using Prisma 1 UUID defaults.
-    pub prisma_1_uuid_defaults: Vec<ModelAndField>,
-    /// Fields that are using Prisma 1 CUID defaults.
-    pub prisma_1_cuid_defaults: Vec<ModelAndField>,
     /// Fields having an empty name.
     pub fields_with_empty_names_in_model: Vec<ModelAndField>,
     /// Fields having an empty name.
@@ -68,6 +114,8 @@ pub struct Warnings {
     pub row_level_ttl: Vec<Model>,
     /// Warn about non-default unique deferring setup
     pub non_default_deferring: Vec<ModelAndConstraint>,
+    /// Warning about Expression Indexes.
+    pub expression_indexes: Vec<ModelAndConstraint>,
     /// Warn about comments
     pub objects_with_comments: Vec<Object>,
     /// Warn about fields which point to an empty type.
@@ -82,6 +130,10 @@ pub struct Warnings {
     pub undecided_types_in_models: Vec<ModelAndFieldAndType>,
     /// Warn about undecided types in a composite type.
     pub undecided_types_in_types: Vec<TypeAndFieldAndType>,
+    /// Warning about JSONSchema on a model.
+    pub json_schema_defined: Vec<Model>,
+    /// Warning about JSONSchema on a model.
+    pub capped_collection: Vec<Model>,
 }
 
 impl Warnings {
@@ -93,11 +145,6 @@ impl Warnings {
     /// True if we have no warnings
     pub fn is_empty(&self) -> bool {
         self == &Self::default()
-    }
-
-    /// True, if the datamodel has Prisma 1 style defaults
-    pub fn uses_prisma_1_defaults(&self) -> bool {
-        !self.prisma_1_uuid_defaults.is_empty() || !self.prisma_1_cuid_defaults.is_empty()
     }
 }
 
@@ -122,31 +169,33 @@ impl fmt::Display for Warnings {
             Ok(())
         }
 
-        render_warnings(
-            "These id fields had a `@default(uuid())` added because we believe the schema was created by Prisma 1:",
-            &self.prisma_1_uuid_defaults,
-            f,
-        )?;
+        fn render_warnings_grouped<'a, T>(msg: &str, items: &'a Vec<T>, f: &mut fmt::Formatter<'_>) -> fmt::Result
+        where
+            GroupBy<'a, T>: fmt::Display,
+        {
+            if items.is_empty() {
+                return Ok(());
+            }
 
-        render_warnings(
-            "These id fields had a `@default(cuid())` added because we believe the schema was created by Prisma 1:",
-            &self.prisma_1_cuid_defaults,
-            f,
-        )?;
+            f.write_str("\n")?;
+            f.write_str(msg)?;
+            f.write_str("\n")?;
+            fmt::Display::fmt(&GroupBy(items), f)
+        }
 
-        render_warnings(
+        render_warnings_grouped(
             "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:",
             &self.fields_with_empty_names_in_model,
             f
         )?;
 
-        render_warnings(
+        render_warnings_grouped(
             "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:",
             &self.fields_with_empty_names_in_view,
             f
         )?;
 
-        render_warnings(
+        render_warnings_grouped(
             "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute:",
             &self.fields_with_empty_names_in_type,
             f
@@ -177,13 +226,13 @@ impl fmt::Display for Warnings {
         )?;
 
         render_warnings(
-            "The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client:",
+            "The following models were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client:",
             &self.models_without_identifiers,
             f
         )?;
 
         render_warnings(
-            "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers",
+            "The following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers",
             &self.views_without_identifiers,
             f
         )?;
@@ -201,19 +250,19 @@ impl fmt::Display for Warnings {
         )?;
 
         render_warnings(
-            "These fields are not supported by the Prisma Client, because Prisma currently does not support their types:",
+            "These fields are not supported by Prisma Client, because Prisma currently does not support their types:",
             &self.unsupported_types_in_model,
             f,
         )?;
 
         render_warnings(
-            "These fields are not supported by the Prisma Client, because Prisma currently does not support their types:",
+            "These fields are not supported by Prisma Client, because Prisma currently does not support their types:",
             &self.unsupported_types_in_view,
             f,
         )?;
 
         render_warnings(
-            "These fields are not supported by the Prisma Client, because Prisma currently does not support their types:",
+            "These fields are not supported by Prisma Client, because Prisma currently does not support their types:",
             &self.unsupported_types_in_type,
             f,
         )?;
@@ -279,13 +328,13 @@ impl fmt::Display for Warnings {
         )?;
 
         render_warnings(
-            "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/postgres-check-constraints",
+            "These constraints are not supported by Prisma Client, because Prisma currently does not fully support check constraints. Read more: https://pris.ly/d/check-constraints",
             &self.check_constraints,
             f,
         )?;
 
         render_warnings(
-            "These constraints are not supported by the Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/postgres-exclusion-constraints",
+            "These constraints are not supported by Prisma Client, because Prisma currently does not fully support exclusion constraints. Read more: https://pris.ly/d/exclusion-constraints",
             &self.exclusion_constraints,
             f,
         )?;
@@ -344,6 +393,24 @@ impl fmt::Display for Warnings {
             f,
         )?;
 
+        render_warnings(
+            "The following models have a JSON Schema defined in the database, which is not yet fully supported. Read more: https://pris.ly/d/mongodb-json-schema",
+            &self.json_schema_defined,
+            f
+        )?;
+
+        render_warnings(
+            "The following models are capped collections, which are not yet fully supported. Read more: https://pris.ly/d/mongodb-capped-collections",
+            &self.capped_collection,
+            f
+        )?;
+
+        render_warnings(
+            "These indexes are not supported by Prisma Client, because Prisma currently does not fully support expression indexes. Read more: https://pris.ly/d/expression-indexes",
+            &self.expression_indexes,
+            f
+        )?;
+
         Ok(())
     }
 }
@@ -388,7 +455,7 @@ impl fmt::Display for Enum {
 }
 
 /// A field in a model that triggered a warning.
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Debug, PartialOrd, Ord, Eq)]
 pub struct ModelAndField {
     /// The name of the model
     pub model: String,
@@ -403,7 +470,7 @@ impl fmt::Display for ModelAndField {
 }
 
 /// A field in a type that triggered a warning.
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Debug, PartialOrd, Eq, Ord)]
 pub struct TypeAndField {
     /// The name of the model
     pub composite_type: String,
@@ -422,7 +489,7 @@ impl fmt::Display for TypeAndField {
 }
 
 /// A field in a view that triggered a warning.
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Debug, PartialOrd, Ord, Eq)]
 pub struct ViewAndField {
     /// The name of the view
     pub view: String,
@@ -481,7 +548,7 @@ impl fmt::Display for ModelAndFieldAndType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            r#"Model: "{}", field: "{}", type: "{}""#,
+            r#"Model: "{}", field: "{}", original data type: "{}""#,
             self.model, self.field, self.r#type
         )
     }
@@ -502,7 +569,7 @@ impl fmt::Display for ViewAndFieldAndType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            r#"View: "{}", field: "{}", type: "{}""#,
+            r#"View: "{}", field: "{}", original data type: "{}""#,
             self.view, self.field, self.r#type
         )
     }
@@ -523,7 +590,7 @@ impl fmt::Display for TypeAndFieldAndType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            r#"Composite type: "{}", field: "{}", type: "{}""#,
+            r#"Composite type: "{}", field: "{}", chosen data type: "{}""#,
             self.composite_type, self.field, self.r#type
         )
     }

@@ -112,7 +112,7 @@ impl<'a> ITXServer<'a> {
         .await
     }
 
-    pub async fn commit(&mut self) -> crate::Result<()> {
+    pub(crate) async fn commit(&mut self) -> crate::Result<()> {
         if let CachedTx::Open(_) = self.cached_tx {
             let open_tx = self.cached_tx.as_open()?;
             trace!("[{}] committing.", self.id.to_string());
@@ -123,7 +123,7 @@ impl<'a> ITXServer<'a> {
         Ok(())
     }
 
-    pub async fn rollback(&mut self, was_timeout: bool) -> crate::Result<()> {
+    pub(crate) async fn rollback(&mut self, was_timeout: bool) -> crate::Result<()> {
         debug!("[{}] rolling back, was timed out = {was_timeout}", self.name());
         if let CachedTx::Open(_) = self.cached_tx {
             let open_tx = self.cached_tx.as_open()?;
@@ -140,7 +140,7 @@ impl<'a> ITXServer<'a> {
         Ok(())
     }
 
-    pub fn name(&self) -> String {
+    pub(crate) fn name(&self) -> String {
         format!("itx-{:?}", self.id.to_string())
     }
 }
@@ -152,7 +152,7 @@ pub struct ITXClient {
 }
 
 impl ITXClient {
-    pub async fn commit(&self) -> crate::Result<()> {
+    pub(crate) async fn commit(&self) -> crate::Result<()> {
         let msg = self.send_and_receive(TxOpRequestMsg::Commit).await?;
 
         if let TxOpResponse::Committed(resp) = msg {
@@ -163,7 +163,7 @@ impl ITXClient {
         }
     }
 
-    pub async fn rollback(&self) -> crate::Result<()> {
+    pub(crate) async fn rollback(&self) -> crate::Result<()> {
         let msg = self.send_and_receive(TxOpRequestMsg::Rollback).await?;
 
         if let TxOpResponse::RolledBack(resp) = msg {
@@ -184,7 +184,7 @@ impl ITXClient {
         }
     }
 
-    pub async fn batch_execute(
+    pub(crate) async fn batch_execute(
         &self,
         operations: Vec<Operation>,
         traceparent: Option<String>,

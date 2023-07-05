@@ -21,7 +21,7 @@ pub async fn execute_single_operation(
 ) -> crate::Result<ResponseData> {
     let operation_timer = Instant::now();
 
-    let (graph, serializer) = build_graph(query_schema.clone(), operation.clone())?;
+    let (graph, serializer) = build_graph(&query_schema, operation.clone())?;
     let result = execute_on(conn, graph, serializer, query_schema.as_ref(), trace_id).await;
 
     histogram!(PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, operation_timer.elapsed());
@@ -37,7 +37,7 @@ pub async fn execute_many_operations(
 ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
     let queries = operations
         .iter()
-        .map(|operation| build_graph(query_schema.clone(), operation.clone()))
+        .map(|operation| build_graph(&query_schema, operation.clone()))
         .collect::<std::result::Result<Vec<_>, _>>()?;
 
     let mut results = Vec::with_capacity(queries.len());
@@ -153,7 +153,7 @@ async fn execute_self_contained(
         )
         .await
     } else {
-        let (graph, serializer) = build_graph(query_schema.clone(), operation)?;
+        let (graph, serializer) = build_graph(&query_schema, operation)?;
 
         execute_self_contained_without_retry(conn, graph, serializer, force_transactions, &query_schema, trace_id).await
     };
@@ -163,12 +163,12 @@ async fn execute_self_contained(
     result
 }
 
-async fn execute_self_contained_without_retry(
+async fn execute_self_contained_without_retry<'a>(
     mut conn: Box<dyn Connection>,
     graph: QueryGraph,
-    serializer: IrSerializer,
+    serializer: IrSerializer<'a>,
     force_transactions: bool,
-    query_schema: &QuerySchema,
+    query_schema: &'a QuerySchema,
     trace_id: Option<String>,
 ) -> crate::Result<ResponseData> {
     if force_transactions || graph.needs_transaction() {
@@ -193,7 +193,7 @@ async fn execute_self_contained_with_retry(
     retry_timeout: Instant,
     trace_id: Option<String>,
 ) -> crate::Result<ResponseData> {
-    let (graph, serializer) = build_graph(query_schema.clone(), operation.clone())?;
+    let (graph, serializer) = build_graph(&query_schema, operation.clone())?;
 
     if force_transactions || graph.needs_transaction() {
         let res = execute_in_tx(conn, graph, serializer, query_schema.as_ref(), trace_id.clone()).await;
@@ -203,7 +203,7 @@ async fn execute_self_contained_with_retry(
         }
 
         loop {
-            let (graph, serializer) = build_graph(query_schema.clone(), operation.clone())?;
+            let (graph, serializer) = build_graph(&query_schema, operation.clone())?;
             let res = execute_in_tx(conn, graph, serializer, query_schema.as_ref(), trace_id.clone()).await;
 
             if is_transient_error(&res) && retry_timeout.elapsed() < MAX_TX_TIMEOUT_RETRY_LIMIT {
@@ -225,11 +225,11 @@ async fn execute_self_contained_with_retry(
     }
 }
 
-async fn execute_in_tx(
+async fn execute_in_tx<'a>(
     conn: &mut Box<dyn Connection>,
     graph: QueryGraph,
-    serializer: IrSerializer,
-    query_schema: &QuerySchema,
+    serializer: IrSerializer<'a>,
+    query_schema: &'a QuerySchema,
     trace_id: Option<String>,
 ) -> crate::Result<ResponseData> {
     let mut tx = conn.start_transaction(None).await?;
@@ -252,11 +252,11 @@ async fn execute_in_tx(
 }
 
 // Simplest execution on anything that's a ConnectionLike. Caller decides handling of connections and transactions.
-async fn execute_on(
+async fn execute_on<'a>(
     conn: &mut dyn ConnectionLike,
     graph: QueryGraph,
-    serializer: IrSerializer,
-    query_schema: &QuerySchema,
+    serializer: IrSerializer<'a>,
+    query_schema: &'a QuerySchema,
     trace_id: Option<String>,
 ) -> crate::Result<ResponseData> {
     increment_counter!(PRISMA_CLIENT_QUERIES_TOTAL);
@@ -267,7 +267,7 @@ async fn execute_on(
         .await
 }
 
-fn build_graph(query_schema: QuerySchemaRef, operation: Operation) -> crate::Result<(QueryGraph, IrSerializer)> {
+fn build_graph(query_schema: &QuerySchema, operation: Operation) -> crate::Result<(QueryGraph, IrSerializer<'_>)> {
     let (query_graph, serializer) = QueryGraphBuilder::new(query_schema).build(operation)?;
 
     Ok((query_graph, serializer))

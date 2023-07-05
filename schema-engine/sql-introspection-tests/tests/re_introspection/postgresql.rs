@@ -190,7 +190,7 @@ async fn ignore_docs_only_added_once(api: &mut TestApi) -> TestResult {
     api.raw_cmd(setup).await;
 
     let input_dm = indoc! {r#"
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model A {
           id Int?
 
@@ -199,7 +199,7 @@ async fn ignore_docs_only_added_once(api: &mut TestApi) -> TestResult {
     "#};
 
     let expectation = expect![[r#"
-        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
         model A {
           id Int?
 
@@ -254,5 +254,31 @@ async fn reserved_name_docs_are_only_added_once(api: &mut TestApi) -> TestResult
 
     api.expect_re_introspect_warnings(input_dm, expectation).await;
 
+    Ok(())
+}
+
+#[test_connector(tags(Postgres))]
+async fn re_introspecting_uuid_default_on_uuid_typed_pk_field(api: &mut TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TABLE "mymodel" (
+            id UUID PRIMARY KEY
+        );
+    "#};
+
+    let prisma_schema = r#"
+        model mymodel {
+            id String @id @default(uuid()) @db.Uuid
+        }
+    "#;
+
+    api.raw_cmd(setup).await;
+
+    let expected = expect![[r#"
+        model mymodel {
+          id String @id @default(uuid()) @db.Uuid
+        }
+    "#]];
+
+    api.expect_re_introspected_datamodel(prisma_schema, expected).await;
     Ok(())
 }

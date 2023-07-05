@@ -3,16 +3,15 @@ use crate::{
     filter_conversion::AliasedCondition,
     model_extensions::AsColumns,
     query_builder::write::{build_update_and_set_query, create_record},
-    query_ext::QueryExt,
     row::ToSqlRow,
-    Context,
+    Context, Queryable,
 };
 use connector_interface::NativeUpsert;
 use prisma_models::{ModelProjection, Record, SingleRecord};
 use quaint::prelude::{OnConflict, Query};
 
 pub(crate) async fn native_upsert(
-    conn: &dyn QueryExt,
+    conn: &dyn Queryable,
     upsert: NativeUpsert,
     ctx: &Context<'_>,
 ) -> crate::Result<SingleRecord> {
@@ -25,7 +24,7 @@ pub(crate) async fn native_upsert(
     let where_condition = upsert.filter().aliased_condition_from(None, false, ctx);
     let update = build_update_and_set_query(upsert.model(), upsert.update().clone(), ctx).so_that(where_condition);
 
-    let insert = create_record(&upsert.model(), upsert.create().clone(), ctx);
+    let insert = create_record(upsert.model(), upsert.create().clone(), ctx);
 
     let constraints: Vec<_> = upsert.unique_constraints().as_columns(ctx).collect();
     let query: Query = insert

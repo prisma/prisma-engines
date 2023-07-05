@@ -69,7 +69,6 @@ async fn mysql(
     url: &str,
     features: PreviewFeatures,
 ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync>> {
-    trace!("Loading MySQL query connector...");
     let mysql = Mysql::from_source(source, url, features).await?;
     trace!("Loaded MySQL query connector.");
     Ok(sql_executor(mysql, false))

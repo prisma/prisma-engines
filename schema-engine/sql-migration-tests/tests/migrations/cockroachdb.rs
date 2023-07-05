@@ -1383,6 +1383,5 @@ fn cockroach_introspection_with_postgres_provider_works() {
     }))
     .unwrap();
 
-    assert_eq!(result.version, "NonPrisma");
     assert!(result.datamodel.contains("@db.VarChar(32)"));
 }

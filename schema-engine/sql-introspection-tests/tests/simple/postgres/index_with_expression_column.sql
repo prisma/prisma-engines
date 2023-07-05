@@ -20,9 +20,6 @@ CREATE INDEX index_communication_channels_on_path_and_path_type ON communication
 CREATE UNIQUE INDEX index_communication_channels_on_user_id_and_path_and_path_type ON communication_channels (user_id, lower((path)::text), path_type);
 CREATE INDEX index_communication_channels_on_confirmation_code ON communication_channels (confirmation_code);
 
-
-
-
 /*
 generator js {
   provider = "prisma-client-js"
@@ -33,7 +30,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model communication_channels {
   id                BigInt
   path              String  @db.VarChar(255)

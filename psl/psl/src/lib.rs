@@ -15,6 +15,7 @@ pub use psl_core::{
     Datasource,
     DatasourceConnectorData,
     Generator,
+    GeneratorConfigValue,
     PreviewFeature,
     PreviewFeatures,
     StringFromEnvVar,

@@ -29,7 +29,14 @@ pub async fn listen(cx: Arc<PrismaContext>, opts: &PrismaOpt) -> PrismaResult<()
 
     let server = Server::bind(&addr).tcp_nodelay(true).serve(query_engine);
 
-    info!("Started query engine http server on http://{}", addr);
+    // Note: we call `server.local_addr()` instead of reusing original `addr` because it may contain port 0 to request
+    // the OS to assign a free port automatically, and we want to print the address which is actually in use.
+    info!(
+        ip = %server.local_addr().ip(),
+        port = %server.local_addr().port(),
+        "Started query engine http server on http://{}",
+        server.local_addr()
+    );
 
     if let Err(e) = server.await {
         eprintln!("server error: {e}");
@@ -38,7 +45,7 @@ pub async fn listen(cx: Arc<PrismaContext>, opts: &PrismaOpt) -> PrismaResult<()
     Ok(())
 }
 
-pub async fn routes(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+pub(crate) async fn routes(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     let start = Instant::now();
 
     if req.method() == Method::POST && req.uri().path().starts_with("/transaction") {
@@ -62,7 +69,7 @@ pub async fn routes(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Respon
             .unwrap(),
 
         (&Method::GET, "/sdl") => {
-            let schema = render_graphql_schema(cx.query_schema().clone());
+            let schema = render_graphql_schema(cx.query_schema());
 
             Response::builder()
                 .status(StatusCode::OK)
@@ -72,7 +79,7 @@ pub async fn routes(cx: Arc<PrismaContext>, req: Request<Body>) -> Result<Respon
         }
 
         (&Method::GET, "/dmmf") => {
-            let schema = dmmf::render_dmmf(Arc::clone(cx.query_schema()));
+            let schema = dmmf::render_dmmf(cx.query_schema());
 
             Response::builder()
                 .status(StatusCode::OK)

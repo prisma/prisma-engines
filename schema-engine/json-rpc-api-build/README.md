@@ -1,7 +1,7 @@
-# migration-engine/json-rpc-api-build
+# schema-engine/json-rpc-api-build
 
 The build script implementation for generating documentation and types from the
-migration engine JSON-RPC API reference.
+schema engine JSON-RPC API reference.
 
 The `methods` folder contains the API definition. This should be considered as
 a _contract_ with the TypeScript CLI.

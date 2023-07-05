@@ -8,7 +8,7 @@ use crate::{
     Context, DatamodelError, StringId,
 };
 use reserved_model_names::{validate_enum_name, validate_model_name};
-use std::collections::{BTreeMap, HashMap, HashSet};
+use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
 
 /// Resolved names for use in the validation process.
 #[derive(Default)]
@@ -19,7 +19,7 @@ pub(super) struct Names {
     pub(super) generators: HashMap<StringId, TopId>,
     /// Datasources have their own namespace.
     pub(super) datasources: HashMap<StringId, TopId>,
-    pub(super) model_fields: BTreeMap<(ast::ModelId, StringId), ast::FieldId>,
+    pub(super) model_fields: HashMap<(ast::ModelId, StringId), ast::FieldId>,
     pub(super) composite_type_fields: HashMap<(ast::CompositeTypeId, StringId), ast::FieldId>,
 }
 
@@ -32,7 +32,7 @@ pub(super) struct Names {
 /// - Model fields for each model
 /// - Enum variants for each enum
 pub(super) fn resolve_names(ctx: &mut Context<'_>) {
-    let mut tmp_names: HashSet<&str> = HashSet::new(); // throwaway container for duplicate checking
+    let mut tmp_names: HashSet<&str> = HashSet::default(); // throwaway container for duplicate checking
     let mut names = Names::default();
 
     for (top_id, top) in ctx.ast.iter_tops() {

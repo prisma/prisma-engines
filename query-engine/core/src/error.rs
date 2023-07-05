@@ -8,7 +8,6 @@ use user_facing_errors::UnknownError;
 #[error(
     "Error converting field \"{field}\" of expected non-nullable type \"{expected_type}\", found incompatible value of \"{found}\"."
 )]
-
 pub struct FieldConversionError {
     pub field: String,
     pub expected_type: String,
@@ -16,7 +15,7 @@ pub struct FieldConversionError {
 }
 
 impl FieldConversionError {
-    pub fn create(field: String, expected_type: String, found: String) -> CoreError {
+    pub(crate) fn create(field: String, expected_type: String, found: String) -> CoreError {
         CoreError::FieldConversionError(Self {
             field,
             expected_type,

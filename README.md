@@ -46,7 +46,7 @@ published on our fabulous repo page.
 
 **Prerequisites:**
 
-- Installed the stable Rust toolchain, at least version 1.52.0. You can get the
+- Installed the latest stable version of the Rust toolchain. You can get the
   toolchain at [rustup](https://rustup.rs/) or the package manager of your
   choice.
 - Linux only: OpenSSL is required to be installed.
@@ -68,13 +68,11 @@ Depending on how you invoked `cargo` in the previous step, you can find the
 compiled binaries inside the repository root in the `target/debug` (without
 `--release`) or `target/release` directories (with `--release`):
 
-| Prisma Component     | Path to Binary                                   |
-| -------------------- | ------------------------------------------------ |
-| Query Engine         | `./target/[debug\|release]/query-engine`         |
-| Schema Engine        | `./target/[debug\|release]/migration-engine`(*)  |
-| Prisma Format        | `./target/[debug\|release]/prisma-fmt`           |
-
-(*) Will be renamed to schema-engine in Prisma 5.
+| Prisma Component | Path to Binary                            |
+| ---------------- | ----------------------------------------- |
+| Query Engine     | `./target/[debug\|release]/query-engine`  |
+| Schema Engine    | `./target/[debug\|release]/schema-engine` |
+| Prisma Format    | `./target/[debug\|release]/prisma-fmt`    |
 
 ## Prisma Schema Language
 
@@ -99,7 +97,7 @@ description of what it does:
     returns GraphQL responses, and
 - handles all connections and communication with the native databases.
 
-When used through the Prisma Client, there are two ways for the Query Engine to
+When used through Prisma Client, there are two ways for the Query Engine to
 be executed:
 - as a binary, downloaded during installation, launched at runtime;
     communication happens via HTTP (`./query-engine/query-engine`)
@@ -165,7 +163,7 @@ The engine uses:
 ## Prisma format
 
 Prisma format can format prisma schema files. It also comes as a WASM module via
-a node package. You can read more [here](./prisma-fmt-wasm/README.md).
+a node package. You can read more [here](./prisma-schema-wasm/README.md).
 
 ## Debugging
 
@@ -227,8 +225,8 @@ the correct values for the following variables:
 - `WORKSPACE_ROOT` should point to the root directory of `prisma-engines` project.
 - `PRISMA_BINARY_PATH` is usually
   `%WORKSPACE_ROOT%\target\release\query-engine.exe`.
-- `MIGRATION_ENGINE_BINARY_PATH` should be
-  `%WORKSPACE_ROOT%\target\release\migration-engine.exe`.
+- `SCHEMA_ENGINE_BINARY_PATH` should be
+  `%WORKSPACE_ROOT%\target\release\schema-engine.exe`.
 
 Other variables may or may not be useful.
 

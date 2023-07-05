@@ -50,7 +50,7 @@ impl Connection for MongoDbConnection {
 impl WriteOperations for MongoDbConnection {
     async fn create_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         args: WriteArgs,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<SelectionResult> {
@@ -59,7 +59,7 @@ impl WriteOperations for MongoDbConnection {
 
     async fn create_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         args: Vec<WriteArgs>,
         skip_duplicates: bool,
         _trace_id: Option<String>,
@@ -72,7 +72,7 @@ impl WriteOperations for MongoDbConnection {
 
     async fn update_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: connector_interface::RecordFilter,
         args: WriteArgs,
         _trace_id: Option<String>,
@@ -95,7 +95,7 @@ impl WriteOperations for MongoDbConnection {
 
     async fn update_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: connector_interface::RecordFilter,
         args: WriteArgs,
         _trace_id: Option<String>,
@@ -117,7 +117,7 @@ impl WriteOperations for MongoDbConnection {
 
     async fn delete_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: connector_interface::RecordFilter,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<usize> {
@@ -154,7 +154,7 @@ impl WriteOperations for MongoDbConnection {
 
     async fn query_raw(
         &mut self,
-        model: Option<&ModelRef>,
+        model: Option<&Model>,
         inputs: HashMap<String, PrismaValue>,
         query_type: Option<String>,
     ) -> connector_interface::Result<serde_json::Value> {
@@ -174,7 +174,7 @@ impl WriteOperations for MongoDbConnection {
 impl ReadOperations for MongoDbConnection {
     async fn get_single_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         filter: &connector_interface::Filter,
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
@@ -196,7 +196,7 @@ impl ReadOperations for MongoDbConnection {
 
     async fn get_many_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         query_arguments: connector_interface::QueryArguments,
         selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
@@ -230,7 +230,7 @@ impl ReadOperations for MongoDbConnection {
 
     async fn aggregate_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         query_arguments: connector_interface::QueryArguments,
         selections: Vec<connector_interface::AggregationSelection>,
         group_by: Vec<ScalarFieldRef>,

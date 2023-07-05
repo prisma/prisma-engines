@@ -12,12 +12,12 @@ use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Tags, 
 use url::Url;
 use user_facing_errors::{common::DatabaseDoesNotExist, UserFacingError};
 
-fn migration_engine_bin_path() -> &'static str {
-    env!("CARGO_BIN_EXE_migration-engine")
+fn schema_engine_bin_path() -> &'static str {
+    env!("CARGO_BIN_EXE_schema-engine")
 }
 
 fn run(args: &[&str]) -> Output {
-    Command::new(migration_engine_bin_path())
+    Command::new(schema_engine_bin_path())
         .arg("cli")
         .args(args)
         .env("RUST_LOG", "INFO")
@@ -312,7 +312,7 @@ fn basic_jsonrpc_roundtrip_works(_api: TestApi) {
     fs::create_dir_all(&tmpdir).unwrap();
     fs::write(&tmpfile, datamodel).unwrap();
 
-    let mut command = Command::new(migration_engine_bin_path());
+    let mut command = Command::new(schema_engine_bin_path());
     command.arg("--datamodel").arg(&tmpfile).env("RUST_LOG", "info");
 
     with_child_process(command, |process| {
@@ -347,7 +347,7 @@ fn introspect_sqlite_empty_database() {
 
     fs::File::create(tmpdir.path().join("dev.db")).unwrap();
 
-    let mut command = Command::new(migration_engine_bin_path());
+    let mut command = Command::new(schema_engine_bin_path());
     command.env(
         "TEST_DATABASE_URL",
         format!("file:{}/dev.db", tmpdir.path().to_string_lossy()),
@@ -394,7 +394,7 @@ fn introspect_sqlite_invalid_empty_database() {
 
     fs::File::create(tmpdir.path().join("dev.db")).unwrap();
 
-    let mut command = Command::new(migration_engine_bin_path());
+    let mut command = Command::new(schema_engine_bin_path());
     command.env(
         "TEST_DATABASE_URL",
         format!("file:{}/dev.db", tmpdir.path().to_string_lossy()),
@@ -449,7 +449,7 @@ fn execute_postgres(api: TestApi) {
     let schema_path = tmpdir.path().join("prisma.schema");
     fs::write(&schema_path, schema).unwrap();
 
-    let command = Command::new(migration_engine_bin_path());
+    let command = Command::new(schema_engine_bin_path());
 
     with_child_process(command, |process| {
         let stdin = process.stdin.as_mut().unwrap();
@@ -512,7 +512,7 @@ fn introspect_postgres(api: TestApi) {
     let schema_path = tmpdir.path().join("prisma.schema");
     fs::write(&schema_path, schema).unwrap();
 
-    let command = Command::new(migration_engine_bin_path());
+    let command = Command::new(schema_engine_bin_path());
 
     with_child_process(command, |process| {
         let stdin = process.stdin.as_mut().unwrap();
@@ -577,7 +577,7 @@ fn introspect_postgres(api: TestApi) {
         stdout.read_line(&mut response).unwrap();
 
         let expected = expect![[r#"
-            {"jsonrpc":"2.0","result":{"datamodel":"generator js {\n  provider        = \"prisma-client-js\"\n  previewFeatures = [\"views\"]\n}\n\ndatasource db {\n  provider = \"postgres\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n\nmodel A {\n  id   Int     @id @default(autoincrement())\n  data String?\n}\n\n/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.\nview B {\n  col Int?\n\n  @@ignore\n}\n","version":"NonPrisma","views":[{"definition":"SELECT\n  1 AS col;","name":"B","schema":"public"}],"warnings":"*** WARNING ***\n\nThe following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers\n  - \"B\"\n"},"id":1}
+            {"jsonrpc":"2.0","result":{"datamodel":"generator js {\n  provider        = \"prisma-client-js\"\n  previewFeatures = [\"views\"]\n}\n\ndatasource db {\n  provider = \"postgres\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n\nmodel A {\n  id   Int     @id @default(autoincrement())\n  data String?\n}\n\n/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.\nview B {\n  col Int?\n\n  @@ignore\n}\n","views":[{"definition":"SELECT\n  1 AS col;","name":"B","schema":"public"}],"warnings":"*** WARNING ***\n\nThe following views were ignored as they do not have a valid unique identifier or id. This is currently not supported by Prisma Client. Please refer to the documentation on defining unique identifiers in views: https://pris.ly/d/view-identifiers\n  - \"B\"\n"},"id":1}
         "#]];
 
         expected.assert_eq(&response);
@@ -599,7 +599,7 @@ fn introspect_e2e() {
     "#;
     fs::File::create(tmpdir.path().join("dev.db")).unwrap();
 
-    let mut command = Command::new(migration_engine_bin_path());
+    let mut command = Command::new(schema_engine_bin_path());
 
     command.env(
         "TEST_DATABASE_URL",
@@ -629,6 +629,6 @@ fn introspect_e2e() {
 
         dbg!("response: {:?}", &response);
 
-        assert!(response.starts_with(r##"{"jsonrpc":"2.0","result":{"datamodel":"datasource db {\n  provider = \"sqlite\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n","version":"NonPrisma","warnings":[]},"##));
+        assert!(response.starts_with(r##"{"jsonrpc":"2.0","result":{"datamodel":"datasource db {\n  provider = \"sqlite\"\n  url      = env(\"TEST_DATABASE_URL\")\n}\n","warnings":[]},"##));
     });
 }

@@ -3,14 +3,15 @@ The test kit is a (currently incomplete) port of the Scala test kit, located in 
 It's fully focused on integration testing the query engine through request-response assertions.
 
 ## Test organization
-The test kit is a combination of three crates, from which two are "lower level" crates that are only required to make it work, whereas only one is important if you only want to author tests. The three-crate approach is required to prevent circular dependencies between the crates (arrow = depends-on):
+
+The test kit is a combination of three crates, from which two are "lower level" crates that are only required to make it work, whereas only one is important if you only want to author tests.
 ```
                ┌────────────────────┐
            ┌───│ query-engine-tests │───┐
            │   └────────────────────┘   │
            ▼                            ▼
 ┌────────────────────┐       ┌────────────────────┐
-│ query-test-macros  │──────▶│ query-tests-setup  │
+│ query-test-macros  │       │ query-tests-setup  │
 └────────────────────┘       └────────────────────┘
 ```
 

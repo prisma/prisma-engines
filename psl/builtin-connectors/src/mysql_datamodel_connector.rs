@@ -54,6 +54,7 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     ImplicitManyToManyRelation |
     DecimalType |
     OrderByNullsFirstLast |
+    FilteredInlineChildNestedToOneDisconnect |
     SupportsTxIsolationReadUncommitted |
     SupportsTxIsolationReadCommitted |
     SupportsTxIsolationRepeatableRead |
@@ -83,6 +84,10 @@ impl Connector for MySqlDatamodelConnector {
 
     fn name(&self) -> &str {
         "MySQL"
+    }
+
+    fn is_provider(&self, name: &str) -> bool {
+        name == "mysql" || name == "@prisma/mysql"
     }
 
     fn capabilities(&self) -> ConnectorCapabilities {

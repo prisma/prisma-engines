@@ -26,7 +26,7 @@ impl ReadQuery {
         }
     }
 
-    pub fn model(&self) -> ModelRef {
+    pub fn model(&self) -> Model {
         match self {
             ReadQuery::RecordQuery(x) => x.model.clone(),
             ReadQuery::ManyRecordsQuery(x) => x.model.clone(),
@@ -144,7 +144,7 @@ impl QueryOptions {
 pub struct RecordQuery {
     pub name: String,
     pub alias: Option<String>,
-    pub model: ModelRef,
+    pub model: Model,
     pub filter: Option<Filter>,
     pub selected_fields: FieldSelection,
     pub(crate) nested: Vec<ReadQuery>,
@@ -157,7 +157,7 @@ pub struct RecordQuery {
 pub struct ManyRecordsQuery {
     pub name: String,
     pub alias: Option<String>,
-    pub model: ModelRef,
+    pub model: Model,
     pub args: QueryArguments,
     pub selected_fields: FieldSelection,
     pub(crate) nested: Vec<ReadQuery>,
@@ -186,7 +186,7 @@ pub struct RelatedRecordsQuery {
 pub struct AggregateRecordsQuery {
     pub name: String,
     pub alias: Option<String>,
-    pub model: ModelRef,
+    pub model: Model,
     pub selection_order: Vec<(String, Option<Vec<String>>)>,
     pub args: QueryArguments,
     pub selectors: Vec<AggregationSelection>,

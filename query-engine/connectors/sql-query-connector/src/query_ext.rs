@@ -9,25 +9,15 @@ use itertools::Itertools;
 use opentelemetry::trace::TraceContextExt;
 use opentelemetry::trace::TraceFlags;
 use prisma_models::*;
-use quaint::{
-    ast::*,
-    connector::{self, Queryable},
-    pooled::PooledConnection,
-};
+use quaint::{ast::*, connector::Queryable};
 use serde_json::{Map, Value};
 use std::{collections::HashMap, panic::AssertUnwindSafe};
 use tracing::{info_span, Span};
 use tracing_futures::Instrument;
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
-impl<'t> QueryExt for connector::Transaction<'t> {}
-impl QueryExt for PooledConnection {}
-
-/// An extension trait for Quaint's `Queryable`, offering certain Prisma-centric
-/// database operations on top of `Queryable`.
 #[async_trait]
-pub(crate) trait QueryExt: Queryable + Send + Sync {
-    /// Filter and map the resulting types with the given identifiers.
+impl<Q: Queryable + ?Sized> QueryExt for Q {
     async fn filter(
         &self,
         q: Query<'_>,
@@ -60,8 +50,6 @@ pub(crate) trait QueryExt: Queryable + Send + Sync {
         Ok(sql_rows)
     }
 
-    /// Execute a singular SQL query in the database, returning an arbitrary
-    /// JSON `Value` as a result.
     async fn raw_json<'a>(
         &'a self,
         mut inputs: HashMap<String, PrismaValue>,
@@ -93,8 +81,6 @@ pub(crate) trait QueryExt: Queryable + Send + Sync {
         Ok(Value::Array(result))
     }
 
-    /// Execute a singular SQL query in the database, returning the number of
-    /// affected rows.
     async fn raw_count<'a>(
         &'a self,
         mut inputs: HashMap<String, PrismaValue>,
@@ -111,7 +97,6 @@ pub(crate) trait QueryExt: Queryable + Send + Sync {
         Ok(changes as usize)
     }
 
-    /// Select one row from the database.
     async fn find(&self, q: Select<'_>, meta: &[ColumnMetadata<'_>], ctx: &Context<'_>) -> crate::Result<SqlRow> {
         self.filter(q.limit(1).into(), meta, ctx)
             .await?
@@ -120,11 +105,9 @@ pub(crate) trait QueryExt: Queryable + Send + Sync {
             .ok_or(SqlError::RecordDoesNotExist)
     }
 
-    /// Process the record filter and either return directly with precomputed values,
-    /// or fetch IDs from the database.
     async fn filter_selectors(
         &self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: RecordFilter,
         ctx: &Context<'_>,
     ) -> crate::Result<Vec<SelectionResult>> {
@@ -135,10 +118,9 @@ pub(crate) trait QueryExt: Queryable + Send + Sync {
         }
     }
 
-    /// Read the all columns as a (primary) identifier.
     async fn filter_ids(
         &self,
-        model: &ModelRef,
+        model: &Model,
         filter: Filter,
         ctx: &Context<'_>,
     ) -> crate::Result<Vec<SelectionResult>> {
@@ -185,4 +167,55 @@ pub(crate) trait QueryExt: Queryable + Send + Sync {
 
         Ok(result)
     }
+}
+
+/// An extension trait for Quaint's `Queryable`, offering certain Prisma-centric
+/// database operations on top of `Queryable`.
+#[async_trait]
+pub(crate) trait QueryExt {
+    /// Filter and map the resulting types with the given identifiers.
+    async fn filter(
+        &self,
+        q: Query<'_>,
+        idents: &[ColumnMetadata<'_>],
+        ctx: &Context<'_>,
+    ) -> crate::Result<Vec<SqlRow>>;
+
+    /// Execute a singular SQL query in the database, returning an arbitrary
+    /// JSON `Value` as a result.
+    async fn raw_json<'a>(
+        &'a self,
+        mut inputs: HashMap<String, PrismaValue>,
+    ) -> std::result::Result<Value, crate::error::RawError>;
+
+    /// Execute a singular SQL query in the database, returning the number of
+    /// affected rows.
+    async fn raw_count<'a>(
+        &'a self,
+        mut inputs: HashMap<String, PrismaValue>,
+        _features: psl::PreviewFeatures,
+    ) -> std::result::Result<usize, crate::error::RawError>;
+
+    /// Select one row from the database.
+    async fn find(&self, q: Select<'_>, meta: &[ColumnMetadata<'_>], ctx: &Context<'_>) -> crate::Result<SqlRow>;
+
+    /// Process the record filter and either return directly with precomputed values,
+    /// or fetch IDs from the database.
+    async fn filter_selectors(
+        &self,
+        model: &Model,
+        record_filter: RecordFilter,
+        ctx: &Context<'_>,
+    ) -> crate::Result<Vec<SelectionResult>>;
+
+    /// Read the all columns as a (primary) identifier.
+    async fn filter_ids(&self, model: &Model, filter: Filter, ctx: &Context<'_>)
+        -> crate::Result<Vec<SelectionResult>>;
+
+    async fn select_ids(
+        &self,
+        select: Select<'_>,
+        model_id: ModelProjection,
+        ctx: &Context<'_>,
+    ) -> crate::Result<Vec<SelectionResult>>;
 }

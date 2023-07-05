@@ -1,6 +1,6 @@
 use crate::{error::ApiError, log_callback::LogCallback, logger::Logger};
 use futures::FutureExt;
-use napi::{Env, JsFunction, JsUnknown};
+use napi::{Env, JsFunction, JsObject, JsUnknown};
 use napi_derive::napi;
 use psl::PreviewFeature;
 use query_core::{
@@ -138,10 +138,24 @@ impl Inner {
 #[napi]
 impl QueryEngine {
     /// Parse a validated datamodel and configuration to allow connecting later on.
+    /// Note: any new method added to this struct should be added to
+    /// `query_engine_node_api::node_drivers::engine::QueryEngineNodeDrivers` as well.
+    /// Unfortunately the `#[napi]` macro does not support deriving traits.
     #[napi(constructor)]
-    pub fn new(napi_env: Env, options: JsUnknown, callback: JsFunction) -> napi::Result<Self> {
+    pub fn new(
+        napi_env: Env,
+        options: JsUnknown,
+        callback: JsFunction,
+        maybe_driver: Option<JsObject>,
+    ) -> napi::Result<Self> {
         let log_callback = LogCallback::new(napi_env, callback)?;
         log_callback.unref(&napi_env)?;
+
+        #[cfg(feature = "js-drivers")]
+        if let Some(driver) = maybe_driver {
+            let queryable = js_drivers::JsQueryable::from(driver);
+            sql_connector::register_driver(Arc::new(queryable));
+        }
 
         let ConstructorOptions {
             datamodel,
@@ -178,13 +192,7 @@ impl QueryEngine {
 
         let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics);
         let enable_tracing = config.preview_features().contains(PreviewFeature::Tracing);
-        let engine_protocol =
-            engine_protocol.unwrap_or_else(
-                || match config.preview_features().contains(PreviewFeature::JsonProtocol) {
-                    true => EngineProtocol::Json,
-                    false => EngineProtocol::Graphql,
-                },
-            );
+        let engine_protocol = engine_protocol.unwrap_or(EngineProtocol::Json);
 
         let builder = EngineBuilder {
             schema: Arc::new(schema),
@@ -257,18 +265,24 @@ impl QueryEngine {
                     let executor = load_executor(data_source, preview_features, &url).await?;
                     let connector = executor.primary_connector();
 
-                    connector.get_connection().await?;
+                    let conn_span = tracing::info_span!(
+                        "prisma:engine:connection",
+                        user_facing = true,
+                        "db.type" = connector.name(),
+                    );
+
+                    connector.get_connection().instrument(conn_span).await?;
 
                     crate::Result::<_>::Ok(executor)
                 };
 
-                let query_schema_fut = tokio::runtime::Handle::current().spawn_blocking(move || {
-                    // Build internal data model
-                    let internal_data_model = prisma_models::convert(arced_schema_2);
-
-                    let enable_raw_queries = true;
-                    schema::build(internal_data_model, enable_raw_queries)
-                });
+                let query_schema_span = tracing::info_span!("prisma:engine:schema");
+                let query_schema_fut = tokio::runtime::Handle::current()
+                    .spawn_blocking(move || {
+                        let enable_raw_queries = true;
+                        schema::build(arced_schema_2, enable_raw_queries)
+                    })
+                    .instrument(query_schema_span);
 
                 let (query_schema, executor) = tokio::join!(query_schema_fut, executor_fut);
 
@@ -303,6 +317,8 @@ impl QueryEngine {
         async_panic_to_js_error(async {
             let span = tracing::info_span!("prisma:engine:disconnect");
             let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+
+            // TODO: when using Node Drivers, we need to call Driver::close() here.
 
             async {
                 let mut inner = self.inner.write().await;
@@ -412,13 +428,26 @@ impl QueryEngine {
     }
 
     #[napi]
-    pub async fn dmmf(&self) -> napi::Result<String> {
+    pub async fn dmmf(&self, trace: String) -> napi::Result<String> {
         async_panic_to_js_error(async {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
-            let dmmf = dmmf::render_dmmf(engine.query_schema.clone());
 
-            Ok(serde_json::to_string(&dmmf)?)
+            let dispatcher = self.logger.dispatcher();
+
+            tracing::dispatcher::with_default(&dispatcher, || {
+                let span = tracing::info_span!("prisma:engine:dmmf");
+                let _ = telemetry::helpers::set_parent_context_from_json_str(&span, &trace);
+                let _guard = span.enter();
+                let dmmf = dmmf::render_dmmf(&engine.query_schema);
+
+                let json = {
+                    let _span = tracing::info_span!("prisma:engine:dmmf_to_json").entered();
+                    serde_json::to_string(&dmmf)?
+                };
+
+                Ok(json)
+            })
         })
         .await
     }
@@ -451,7 +480,7 @@ impl QueryEngine {
             let inner = self.inner.read().await;
             let engine = inner.as_engine()?;
 
-            Ok(render_graphql_schema(engine.query_schema().clone()))
+            Ok(render_graphql_schema(engine.query_schema()))
         })
         .await
     }

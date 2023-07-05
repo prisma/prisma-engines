@@ -129,7 +129,7 @@ impl IntoBson for (&MongoDbType, PrismaValue) {
     fn into_bson(self) -> crate::Result<Bson> {
         Ok(match self {
             // ObjectId
-            (MongoDbType::ObjectId, PrismaValue::String(s)) => Bson::ObjectId(ObjectId::parse_str(&s)?),
+            (MongoDbType::ObjectId, PrismaValue::String(s)) => Bson::ObjectId(ObjectId::parse_str(s)?),
             (MongoDbType::ObjectId, PrismaValue::Bytes(b)) => {
                 if b.len() != 12 {
                     return Err(MongoError::MalformedObjectId(format!(
@@ -271,7 +271,6 @@ impl IntoBson for (&TypeIdentifier, PrismaValue) {
             ),
 
             // Unhandled mappings
-            (TypeIdentifier::Xml, _) => return Err(MongoError::Unsupported("Mongo doesn't support XML.".to_owned())),
             (TypeIdentifier::Unsupported, _) => unreachable!("Unsupported types should never hit the connector."),
 
             (ident, val) => {

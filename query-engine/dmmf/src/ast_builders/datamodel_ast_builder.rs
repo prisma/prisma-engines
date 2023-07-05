@@ -8,7 +8,7 @@ use psl::{
     schema_ast::ast::WithDocumentation,
 };
 
-pub fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
+pub(crate) fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
     let mut datamodel = Datamodel {
         models: Vec::with_capacity(schema.db.models_count()),
         enums: Vec::with_capacity(schema.db.enums_count()),
@@ -23,7 +23,7 @@ pub fn schema_to_dmmf(schema: &psl::ValidatedSchema) -> Datamodel {
         .db
         .walk_models()
         .filter(|model| !model.is_ignored())
-        .chain(schema.db.walk_views())
+        .chain(schema.db.walk_views().filter(|view| !view.is_ignored()))
     {
         datamodel.models.push(model_to_dmmf(model));
     }
@@ -54,6 +54,7 @@ fn enum_value_to_dmmf(en: walkers::EnumValueWalker<'_>) -> EnumValue {
     EnumValue {
         name: en.name().to_owned(),
         db_name: en.mapped_name().map(ToOwned::to_owned),
+        documentation: en.documentation().map(ToOwned::to_owned),
     }
 }
 
@@ -67,7 +68,7 @@ fn composite_type_to_dmmf(ct: walkers::CompositeTypeWalker<'_>) -> Model {
             .map(composite_type_field_to_dmmf)
             .collect(),
         is_generated: None,
-        documentation: None,
+        documentation: ct.ast_composite_type().documentation().map(ToOwned::to_owned),
         primary_key: None,
         unique_fields: Vec::new(),
         unique_indexes: Vec::new(),
@@ -105,7 +106,7 @@ fn composite_type_field_to_dmmf(field: walkers::CompositeTypeFieldWalker<'_>) ->
         },
         is_generated: None,
         is_updated_at: None,
-        documentation: None,
+        documentation: field.documentation().map(ToOwned::to_owned),
     }
 }
 
@@ -263,7 +264,6 @@ fn prisma_value_to_serde(value: &PrismaValue) -> serde_json::Value {
         PrismaValue::Null => serde_json::Value::Null,
         PrismaValue::Uuid(val) => serde_json::Value::String(val.to_string()),
         PrismaValue::Json(val) => serde_json::Value::String(val.to_string()),
-        PrismaValue::Xml(val) => serde_json::Value::String(val.to_string()),
         PrismaValue::List(value_vec) => serde_json::Value::Array(value_vec.iter().map(prisma_value_to_serde).collect()),
         PrismaValue::Bytes(b) => serde_json::Value::String(encode_bytes(b)),
         PrismaValue::Object(pairs) => {

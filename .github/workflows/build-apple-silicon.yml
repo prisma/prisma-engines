@@ -45,7 +45,7 @@ jobs:
         with:
           name: binaries
           path: |
-            ${{ github.workspace }}/target/aarch64-apple-darwin/release/migration-engine
+            ${{ github.workspace }}/target/aarch64-apple-darwin/release/schema-engine
             ${{ github.workspace }}/target/aarch64-apple-darwin/release/prisma-fmt
             ${{ github.workspace }}/target/aarch64-apple-darwin/release/query-engine
             ${{ github.workspace }}/target/aarch64-apple-darwin/release/libquery_engine.dylib

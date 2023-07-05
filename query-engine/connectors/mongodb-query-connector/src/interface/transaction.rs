@@ -71,7 +71,7 @@ impl<'conn> Transaction for MongoDbTransaction<'conn> {
 impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
     async fn create_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         args: connector_interface::WriteArgs,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<SelectionResult> {
@@ -83,7 +83,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
 
     async fn create_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         args: Vec<connector_interface::WriteArgs>,
         skip_duplicates: bool,
         _trace_id: Option<String>,
@@ -103,7 +103,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
 
     async fn update_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: connector_interface::RecordFilter,
         args: connector_interface::WriteArgs,
         _trace_id: Option<String>,
@@ -125,7 +125,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
 
     async fn update_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: connector_interface::RecordFilter,
         args: connector_interface::WriteArgs,
         _trace_id: Option<String>,
@@ -147,7 +147,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
 
     async fn delete_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         record_filter: connector_interface::RecordFilter,
         _trace_id: Option<String>,
     ) -> connector_interface::Result<usize> {
@@ -218,7 +218,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
 
     async fn query_raw(
         &mut self,
-        model: Option<&ModelRef>,
+        model: Option<&Model>,
         inputs: HashMap<String, PrismaValue>,
         query_type: Option<String>,
     ) -> connector_interface::Result<serde_json::Value> {
@@ -240,7 +240,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
 impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
     async fn get_single_record(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         filter: &connector_interface::Filter,
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
@@ -262,7 +262,7 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
 
     async fn get_many_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         query_arguments: connector_interface::QueryArguments,
         selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
@@ -302,7 +302,7 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
 
     async fn aggregate_records(
         &mut self,
-        model: &ModelRef,
+        model: &Model,
         query_arguments: connector_interface::QueryArguments,
         selections: Vec<connector_interface::AggregationSelection>,
         group_by: Vec<ScalarFieldRef>,

@@ -7,14 +7,14 @@ use prisma_models::prelude::*;
 pub async fn aggregate<'conn>(
     database: &Database,
     session: &mut ClientSession,
-    model: &ModelRef,
+    model: &Model,
     query_arguments: QueryArguments,
     selections: Vec<AggregationSelection>,
     group_by: Vec<ScalarFieldRef>,
     having: Option<Filter>,
 ) -> crate::Result<Vec<AggregationRow>> {
     let is_group_by = !group_by.is_empty();
-    let coll = database.collection(&model.db_name());
+    let coll = database.collection(model.db_name());
 
     let query = MongoReadQueryBuilder::from_args(query_arguments)?
         .with_groupings(group_by, &selections, having)?
@@ -88,7 +88,7 @@ fn to_aggregation_rows(
         let mut id_key_doc = doc.remove(group_by::UNDERSCORE_ID).unwrap();
 
         for selection in selections.iter() {
-            let selection_meta = output_meta::from_aggregation_selection(&selection);
+            let selection_meta = output_meta::from_aggregation_selection(selection);
 
             match selection {
                 // All flat selection can only be in the _id part of the result doc.
@@ -101,7 +101,7 @@ fn to_aggregation_rows(
                 AggregationSelection::Count { all, fields } => {
                     if *all {
                         let meta = selection_meta.get("all").unwrap();
-                        let field_val = value_from_bson(doc.remove("count_all").unwrap(), &meta)?;
+                        let field_val = value_from_bson(doc.remove("count_all").unwrap(), meta)?;
 
                         row.push(AggregationResult::Count(None, field_val));
                     }
@@ -109,7 +109,7 @@ fn to_aggregation_rows(
                     for field in fields {
                         let meta = selection_meta.get(field.db_name()).unwrap();
                         let bson = doc.remove(&format!("count_{}", field.db_name())).unwrap();
-                        let field_val = value_from_bson(bson, &meta)?;
+                        let field_val = value_from_bson(bson, meta)?;
 
                         row.push(AggregationResult::Count(Some(field.clone()), field_val));
                     }

@@ -16,10 +16,9 @@ pub(crate) fn parse_composite_type(
     let pair_span = pair.as_span();
     let mut name: Option<ast::Identifier> = None;
     let mut fields: Vec<ast::Field> = vec![];
-    let mut pairs = pair.into_inner();
     let mut inner_span: Option<Span> = None;
 
-    while let Some(current) = pairs.next() {
+    for current in pair.into_inner() {
         match current.as_rule() {
             Rule::BLOCK_OPEN | Rule::BLOCK_CLOSE => {}
             Rule::TYPE_KEYWORD => (),
@@ -105,11 +104,7 @@ pub(crate) fn parse_composite_type(
                             }
                             Err(err) => diagnostics.push_error(err),
                         },
-                        Rule::comment_block => {
-                            if let Some(Rule::field_declaration) = pairs.peek().map(|p| p.as_rule()) {
-                                pending_field_comment = Some(item);
-                            }
-                        }
+                        Rule::comment_block => pending_field_comment = Some(item),
                         Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
                             "This line is not a valid field or attribute definition.",
                             item.as_span().into(),
