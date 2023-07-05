@@ -162,10 +162,9 @@ pub(crate) fn nested_disconnect_input_field<'a>(
         (false, false) => {
             let mut types = vec![InputType::boolean()];
 
-            if ctx.has_feature(PreviewFeature::ExtendedWhereUnique)
-                && (ctx.has_capability(ConnectorCapability::FilteredInlineChildNestedToOneDisconnect)
+            if ctx.has_capability(ConnectorCapability::FilteredInlineChildNestedToOneDisconnect)
                        // If the disconnect happens on the inline side, then we can allow filters
-                    || parent_field.related_field().is_inlined_on_enclosing_model())
+                    || parent_field.related_field().is_inlined_on_enclosing_model()
             {
                 types.push(InputType::object(filter_objects::where_object_type(
                     ctx,
@@ -187,14 +186,13 @@ pub(crate) fn nested_delete_input_field<'a>(
     match (parent_field.is_list(), parent_field.is_required()) {
         (true, _) => Some(where_unique_input_field(ctx, operations::DELETE, parent_field)),
         (false, false) => {
-            let mut types = vec![InputType::boolean()];
-
-            if ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {
-                types.push(InputType::object(filter_objects::where_object_type(
+            let types = vec![
+                InputType::boolean(),
+                InputType::object(filter_objects::where_object_type(
                     ctx,
                     parent_field.related_model().into(),
-                )));
-            }
+                )),
+            ];
 
             Some(input_field(operations::DELETE, types, None).optional())
         }
@@ -216,7 +214,7 @@ pub(crate) fn nested_update_input_field(ctx: &'_ QuerySchema, parent_field: Rela
             update_one_objects::update_one_where_combination_object(ctx, update_shorthand_types.clone(), &parent_field);
 
         list_union_object_type(to_many_update_full_type, true)
-    } else if ctx.has_feature(PreviewFeature::ExtendedWhereUnique) {
+    } else {
         let to_one_update_full_type = update_one_objects::update_to_one_rel_where_combination_object(
             ctx,
             update_shorthand_types.clone(),
@@ -227,8 +225,6 @@ pub(crate) fn nested_update_input_field(ctx: &'_ QuerySchema, parent_field: Rela
         to_one_types.append(&mut update_shorthand_types);
 
         to_one_types
-    } else {
-        update_shorthand_types
     };
 
     input_field(operations::UPDATE, update_types, None).optional()
