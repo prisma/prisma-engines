@@ -1,5 +1,5 @@
 use crate::error::*;
-use libsqlite3_sys as ffi;
+use rusqlite::ffi;
 use rusqlite::types::FromSqlError;
 
 impl From<rusqlite::Error> for Error {
@@ -199,6 +199,32 @@ impl From<rusqlite::Error> for Error {
                     builder.build()
                 }
             },
+
+            rusqlite::Error::SqlInputError {
+                error: ffi::Error { extended_code, .. },
+                ref msg,
+                ..
+            } => match msg {
+                d if d.starts_with("no such column: ") => {
+                    let column = d.split("no such column: ").last().into();
+                    let kind = ErrorKind::ColumnNotFound { column };
+
+                    let mut builder = Error::builder(kind);
+                    builder.set_original_code(extended_code.to_string());
+                    builder.set_original_message(d);
+
+                    builder.build()
+                }
+                _ => {
+                    let description = msg.clone();
+                    let mut builder = Error::builder(ErrorKind::QueryError(e.into()));
+                    builder.set_original_code(extended_code.to_string());
+                    builder.set_original_message(description);
+
+                    builder.build()
+                }
+            },
+
             e => Error::builder(ErrorKind::QueryError(e.into())).build(),
         }
     }

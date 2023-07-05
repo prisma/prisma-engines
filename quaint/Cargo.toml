@@ -64,7 +64,7 @@ mssql = ["tiberius", "uuid", "chrono", "tokio-util", "tokio/time", "tokio/net", 
 mysql = ["mysql_async", "tokio/time", "lru-cache"]
 pooled = ["mobc"]
 serde-support = ["serde", "chrono/serde"]
-sqlite = ["rusqlite", "libsqlite3-sys", "tokio/sync"]
+sqlite = ["rusqlite", "tokio/sync"]
 bigdecimal = ["bigdecimal_"]
 fmt-sql = ["sqlformat"]
 
@@ -115,14 +115,8 @@ optional = true
 branch = "vendored-openssl"
 
 [dependencies.rusqlite]
-version = "0.25"
+version = "0.29"
 features = ["chrono", "bundled", "column_decltype"]
-optional = true
-
-[dependencies.libsqlite3-sys]
-version = "0.22"
-default-features = false
-features = ["bundled"]
 optional = true
 
 [target.'cfg(not(any(target_os = "macos", target_os = "ios")))'.dependencies.tiberius]
