@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/3ygaf6wwr9d8r0529il4m7wxn6hg2b6k-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rusqlite-0.25.4/src/util/sqlite_string.rs`."><title>sqlite_string.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rusqlite" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rusqlite/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnsihxmfi8pvl7n3q6k0f21yqpflag7z-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rusqlite-0.29.0/src/util/sqlite_string.rs`."><title>sqlite_string.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rusqlite" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rusqlite/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -232,15 +232,10 @@
 <a href="#232" id="232">232</a>
 <a href="#233" id="233">233</a>
 <a href="#234" id="234">234</a>
-<a href="#235" id="235">235</a>
-<a href="#236" id="236">236</a>
 </pre></div><pre class="rust"><code><span class="comment">// This is used when either vtab or modern-sqlite is on. Different methods are
 // used in each feature. Avoid having to track this for each function. We will
 // still warn for anything that&#39;s not used by either, though.
-</span><span class="attr">#![cfg_attr(
-    not(all(feature = <span class="string">&quot;vtab&quot;</span>, feature = <span class="string">&quot;modern-sqlite&quot;</span>)),
-    allow(dead_code)
-)]
+</span><span class="attr">#![cfg_attr(not(feature = <span class="string">&quot;vtab&quot;</span>), allow(dead_code))]
 </span><span class="kw">use </span><span class="kw">crate</span>::ffi;
 <span class="kw">use </span>std::marker::PhantomData;
 <span class="kw">use </span>std::os::raw::{c_char, c_int};
@@ -274,7 +269,7 @@
 
 </span><span class="kw">impl </span>SqliteMallocString {
     <span class="doccomment">/// SAFETY: Caller must be certain that `m` a nul-terminated c string
-    /// allocated by sqlite3_malloc, and that SQLite expects us to free it!
+    /// allocated by `sqlite3_malloc`, and that SQLite expects us to free it!
     </span><span class="attr">#[inline]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>from_raw_nonnull(ptr: NonNull&lt;c_char&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
@@ -284,7 +279,7 @@
     }
 
     <span class="doccomment">/// SAFETY: Caller must be certain that `m` a nul-terminated c string
-    /// allocated by sqlite3_malloc, and that SQLite expects us to free it!
+    /// allocated by `sqlite3_malloc`, and that SQLite expects us to free it!
     </span><span class="attr">#[inline]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>from_raw(ptr: <span class="kw-2">*mut </span>c_char) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
         NonNull::new(ptr).map(|p| <span class="self">Self</span>::from_raw_nonnull(p))
@@ -331,13 +326,13 @@
     /// If `s` contains internal NULs, we&#39;ll replace them with
     /// `NUL_REPLACE_CHAR`.
     ///
-    /// Except for debug_asserts which may trigger during testing, this function
-    /// never panics. If we hit integer overflow or the allocation fails, we
-    /// call `handle_alloc_error` which aborts the program after calling a
-    /// global hook.
+    /// Except for `debug_assert`s which may trigger during testing, this
+    /// function never panics. If we hit integer overflow or the allocation
+    /// fails, we call `handle_alloc_error` which aborts the program after
+    /// calling a global hook.
     ///
     /// This means it&#39;s safe to use in extern &quot;C&quot; functions even outside of
-    /// catch_unwind.
+    /// `catch_unwind`.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
         <span class="kw">use </span>std::convert::TryFrom;
         <span class="kw">let </span>s = <span class="kw">if </span>s.as_bytes().contains(<span class="kw-2">&amp;</span><span class="number">0</span>) {
@@ -356,7 +351,7 @@
                     <span class="comment">// `&gt;` because we added 1.
                     </span><span class="macro">debug_assert!</span>(len_to_alloc &gt; <span class="number">0</span>);
                     <span class="macro">debug_assert_eq!</span>((len_to_alloc - <span class="number">1</span>) <span class="kw">as </span>usize, src_len);
-                    NonNull::new(ffi::sqlite3_malloc(len_to_alloc) <span class="kw">as </span><span class="kw-2">*mut </span>c_char)
+                    NonNull::new(ffi::sqlite3_malloc(len_to_alloc).cast::&lt;c_char&gt;())
                 })
                 .unwrap_or_else(|| {
                     <span class="kw">use </span>std::alloc::{handle_alloc_error, Layout};
@@ -370,11 +365,12 @@
                     //   (everything is aligned to 1)
                     // - `size` is also never zero, although this function doesn&#39;t actually require
                     //   it now.
-                    </span><span class="kw">let </span>layout = Layout::from_size_align_unchecked(s.len().saturating_add(<span class="number">1</span>), <span class="number">1</span>);
+                    </span><span class="kw">let </span>len = s.len().saturating_add(<span class="number">1</span>).min(isize::MAX <span class="kw">as </span>usize);
+                    <span class="kw">let </span>layout = Layout::from_size_align_unchecked(len, <span class="number">1</span>);
                     <span class="comment">// Note: This call does not return.
                     </span>handle_alloc_error(layout);
                 });
-            <span class="kw">let </span>buf: <span class="kw-2">*mut </span>c_char = res_ptr.as_ptr() <span class="kw">as </span><span class="kw-2">*mut </span>c_char;
+            <span class="kw">let </span>buf: <span class="kw-2">*mut </span>c_char = res_ptr.as_ptr().cast::&lt;c_char&gt;();
             src_ptr.copy_to_nonoverlapping(buf, src_len);
             buf.add(src_len).write(<span class="number">0</span>);
             <span class="macro">debug_assert_eq!</span>(std::ffi::CStr::from_ptr(res_ptr.as_ptr()).to_bytes(), bytes);
@@ -450,7 +446,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>v = <span class="macro">vec!</span>[];
         <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">1000 </span>{
             v.push(SqliteMallocString::from_str(<span class="kw-2">&amp;</span>i.to_string()).into_raw());
-            v.push(SqliteMallocString::from_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;abc {} 😀&quot;</span>, i)).into_raw());
+            v.push(SqliteMallocString::from_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;abc {i} 😀&quot;</span>)).into_raw());
         }
         <span class="kw">unsafe </span>{
             <span class="kw">for </span>(i, s) <span class="kw">in </span>v.chunks_mut(<span class="number">2</span>).enumerate() {
@@ -462,7 +458,7 @@
                 );
                 <span class="macro">assert_eq!</span>(
                     std::ffi::CStr::from_ptr(s1).to_str().unwrap(),
-                    <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;abc {} 😀&quot;</span>, i)
+                    <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;abc {i} 😀&quot;</span>)
                 );
                 <span class="kw">let _ </span>= SqliteMallocString::from_raw(s0).unwrap();
                 <span class="kw">let _ </span>= SqliteMallocString::from_raw(s1).unwrap();

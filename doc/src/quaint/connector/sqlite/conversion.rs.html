@@ -306,6 +306,7 @@
 <a href="#306" id="306">306</a>
 <a href="#307" id="307">307</a>
 <a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::convert::TryFrom;
 
 <span class="kw">use crate</span>::{
@@ -440,9 +441,10 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; GetRow <span class="kw">for </span>SqliteRow&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">fn </span>get_result_row(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;Value&lt;<span class="lifetime">&#39;static</span>&gt;&gt;&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>row = Vec::with_capacity(<span class="self">self</span>.columns().len());
+        <span class="kw">let </span>statement = <span class="self">self</span>.as_ref();
+        <span class="kw">let </span><span class="kw-2">mut </span>row = Vec::with_capacity(statement.columns().len());
 
-        <span class="kw">for </span>(i, column) <span class="kw">in </span><span class="self">self</span>.columns().iter().enumerate() {
+        <span class="kw">for </span>(i, column) <span class="kw">in </span>statement.columns().iter().enumerate() {
             <span class="kw">let </span>pv = <span class="kw">match </span><span class="self">self</span>.get_ref_unwrap(i) {
                 ValueRef::Null =&gt; <span class="kw">match </span>column {
                     <span class="comment">// NOTE: A value without decl_type would be Int32(None)
@@ -549,8 +551,8 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ToColumnNames <span class="kw">for </span>SqliteRows&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="kw">fn </span>to_column_names(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;String&gt; {
-        <span class="kw">match </span><span class="self">self</span>.column_names() {
-            <span class="prelude-val">Some</span>(columns) =&gt; columns.into_iter().map(|c| c.into()).collect(),
+        <span class="kw">match </span><span class="self">self</span>.as_ref() {
+            <span class="prelude-val">Some</span>(statement) =&gt; statement.column_names().into_iter().map(|c| c.into()).collect(),
             <span class="prelude-val">None </span>=&gt; <span class="macro">vec!</span>[],
         }
     }

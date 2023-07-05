@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/3ygaf6wwr9d8r0529il4m7wxn6hg2b6k-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rusqlite-0.25.4/src/row.rs`."><title>row.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rusqlite" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnsihxmfi8pvl7n3q6k0f21yqpflag7z-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rusqlite-0.29.0/src/row.rs`."><title>row.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rusqlite" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -555,6 +555,34 @@
 <a href="#555" id="555">555</a>
 <a href="#556" id="556">556</a>
 <a href="#557" id="557">557</a>
+<a href="#558" id="558">558</a>
+<a href="#559" id="559">559</a>
+<a href="#560" id="560">560</a>
+<a href="#561" id="561">561</a>
+<a href="#562" id="562">562</a>
+<a href="#563" id="563">563</a>
+<a href="#564" id="564">564</a>
+<a href="#565" id="565">565</a>
+<a href="#566" id="566">566</a>
+<a href="#567" id="567">567</a>
+<a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
+<a href="#570" id="570">570</a>
+<a href="#571" id="571">571</a>
+<a href="#572" id="572">572</a>
+<a href="#573" id="573">573</a>
+<a href="#574" id="574">574</a>
+<a href="#575" id="575">575</a>
+<a href="#576" id="576">576</a>
+<a href="#577" id="577">577</a>
+<a href="#578" id="578">578</a>
+<a href="#579" id="579">579</a>
+<a href="#580" id="580">580</a>
+<a href="#581" id="581">581</a>
+<a href="#582" id="582">582</a>
+<a href="#583" id="583">583</a>
+<a href="#584" id="584">584</a>
+<a href="#585" id="585">585</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>fallible_iterator::FallibleIterator;
 <span class="kw">use </span>fallible_streaming_iterator::FallibleStreamingIterator;
 <span class="kw">use </span>std::convert;
@@ -635,6 +663,12 @@
     {
         AndThenRows { rows: <span class="self">self</span>, map: f }
     }
+
+    <span class="doccomment">/// Give access to the underlying statement
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Statement&lt;<span class="lifetime">&#39;stmt</span>&gt;&gt; {
+        <span class="self">self</span>.stmt
+    }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;stmt</span>&gt; Rows&lt;<span class="lifetime">&#39;stmt</span>&gt; {
@@ -708,7 +742,7 @@
         <span class="self">self</span>.rows
             .next()
             .transpose()
-            .map(|row_result| row_result.and_then(|row| (map)(<span class="kw-2">&amp;</span>row)))
+            .map(|row_result| row_result.and_then(map))
     }
 }
 
@@ -722,7 +756,7 @@
 
 <span class="kw">impl</span>&lt;T, E, F&gt; Iterator <span class="kw">for </span>AndThenRows&lt;<span class="lifetime">&#39;_</span>, F&gt;
 <span class="kw">where
-    </span>E: convert::From&lt;Error&gt;,
+    </span>E: From&lt;Error&gt;,
     F: FnMut(<span class="kw-2">&amp;</span>Row&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;T, E&gt;,
 {
     <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;T, E&gt;;
@@ -733,13 +767,13 @@
         <span class="self">self</span>.rows
             .next()
             .transpose()
-            .map(|row_result| row_result.map_err(E::from).and_then(|row| (map)(<span class="kw-2">&amp;</span>row)))
+            .map(|row_result| row_result.map_err(E::from).and_then(map))
     }
 }
 
 <span class="doccomment">/// `FallibleStreamingIterator` differs from the standard library&#39;s `Iterator`
 /// in two ways:
-/// * each call to `next` (sqlite3_step) can fail.
+/// * each call to `next` (`sqlite3_step`) can fail.
 /// * returned `Row` is valid until `next` is called again or `Statement` is
 ///   reset or finalized.
 ///
@@ -761,8 +795,8 @@
 
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>advance(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">match </span><span class="self">self</span>.stmt {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>stmt) =&gt; <span class="kw">match </span>stmt.step() {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(stmt) = <span class="self">self</span>.stmt {
+            <span class="kw">match </span>stmt.step() {
                 <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) =&gt; {
                     <span class="self">self</span>.row = <span class="prelude-val">Some</span>(Row { stmt });
                     <span class="prelude-val">Ok</span>(())
@@ -777,11 +811,10 @@
                     <span class="self">self</span>.row = <span class="prelude-val">None</span>;
                     <span class="prelude-val">Err</span>(e)
                 }
-            },
-            <span class="prelude-val">None </span>=&gt; {
-                <span class="self">self</span>.row = <span class="prelude-val">None</span>;
-                <span class="prelude-val">Ok</span>(())
             }
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.row = <span class="prelude-val">None</span>;
+            <span class="prelude-val">Ok</span>(())
         }
     }
 
@@ -840,20 +873,11 @@
             ),
             FromSqlError::OutOfRange(i) =&gt; Error::IntegralValueOutOfRange(idx, i),
             FromSqlError::Other(err) =&gt; {
-                Error::FromSqlConversionFailure(idx <span class="kw">as </span>usize, value.data_type(), err)
+                Error::FromSqlConversionFailure(idx, value.data_type(), err)
             }
-            <span class="attr">#[cfg(feature = <span class="string">&quot;i128_blob&quot;</span>)]
-            </span>FromSqlError::InvalidI128Size(<span class="kw">_</span>) =&gt; Error::InvalidColumnType(
-                idx,
-                <span class="self">self</span>.stmt.column_name_unwrap(idx).into(),
-                value.data_type(),
-            ),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-            </span>FromSqlError::InvalidUuidSize(<span class="kw">_</span>) =&gt; Error::InvalidColumnType(
-                idx,
-                <span class="self">self</span>.stmt.column_name_unwrap(idx).into(),
-                value.data_type(),
-            ),
+            FromSqlError::InvalidBlobSize { .. } =&gt; {
+                Error::FromSqlConversionFailure(idx, value.data_type(), Box::new(err))
+            }
         })
     }
 
@@ -899,19 +923,51 @@
     </span><span class="kw">pub fn </span>get_ref_unwrap&lt;I: RowIndex&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: I) -&gt; ValueRef&lt;<span class="lifetime">&#39;_</span>&gt; {
         <span class="self">self</span>.get_ref(idx).unwrap()
     }
+}
 
-    <span class="doccomment">/// Renamed to [`get_ref`](Row::get_ref).
-    </span><span class="attr">#[deprecated = <span class="string">&quot;Use [`get_ref`](Row::get_ref) instead.&quot;</span>]
-    #[inline]
-    </span><span class="kw">pub fn </span>get_raw_checked&lt;I: RowIndex&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: I) -&gt; <span class="prelude-ty">Result</span>&lt;ValueRef&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
-        <span class="self">self</span>.get_ref(idx)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;stmt</span>&gt; AsRef&lt;Statement&lt;<span class="lifetime">&#39;stmt</span>&gt;&gt; <span class="kw">for </span>Row&lt;<span class="lifetime">&#39;stmt</span>&gt; {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Statement&lt;<span class="lifetime">&#39;stmt</span>&gt; {
+        <span class="self">self</span>.stmt
     }
+}
 
-    <span class="doccomment">/// Renamed to [`get_ref_unwrap`](Row::get_ref_unwrap).
-    </span><span class="attr">#[deprecated = <span class="string">&quot;Use [`get_ref_unwrap`](Row::get_ref_unwrap) instead.&quot;</span>]
-    #[inline]
-    </span><span class="kw">pub fn </span>get_raw&lt;I: RowIndex&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: I) -&gt; ValueRef&lt;<span class="lifetime">&#39;_</span>&gt; {
-        <span class="self">self</span>.get_ref_unwrap(idx)
+<span class="doccomment">/// Debug `Row` like an ordered `Map&lt;Result&lt;&amp;str&gt;, Result&lt;(Type, ValueRef)&gt;&gt;`
+/// with column name as key except that for `Type::Blob` only its size is
+/// printed (not its content).
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;stmt</span>&gt; std::fmt::Debug <span class="kw">for </span>Row&lt;<span class="lifetime">&#39;stmt</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="kw">let </span><span class="kw-2">mut </span>dm = f.debug_map();
+        <span class="kw">for </span>c <span class="kw">in </span><span class="number">0</span>..<span class="self">self</span>.stmt.column_count() {
+            <span class="kw">let </span>name = <span class="self">self</span>.stmt.column_name(c);
+            dm.key(<span class="kw-2">&amp;</span>name);
+            <span class="kw">let </span>value = <span class="self">self</span>.get_ref(c);
+            <span class="kw">match </span>value {
+                <span class="prelude-val">Ok</span>(value) =&gt; {
+                    <span class="kw">let </span>dt = value.data_type();
+                    <span class="kw">match </span>value {
+                        ValueRef::Null =&gt; {
+                            dm.value(<span class="kw-2">&amp;</span>(dt, ()));
+                        }
+                        ValueRef::Integer(i) =&gt; {
+                            dm.value(<span class="kw-2">&amp;</span>(dt, i));
+                        }
+                        ValueRef::Real(f) =&gt; {
+                            dm.value(<span class="kw-2">&amp;</span>(dt, f));
+                        }
+                        ValueRef::Text(s) =&gt; {
+                            dm.value(<span class="kw-2">&amp;</span>(dt, String::from_utf8_lossy(s)));
+                        }
+                        ValueRef::Blob(b) =&gt; {
+                            dm.value(<span class="kw-2">&amp;</span>(dt, b.len()));
+                        }
+                    }
+                }
+                <span class="prelude-val">Err</span>(<span class="kw-2">ref </span>_err) =&gt; {
+                    dm.value(<span class="kw-2">&amp;</span>value);
+                }
+            }
+        }
+        dm.finish()
     }
 }
 
@@ -946,7 +1002,7 @@
 <span class="kw">impl </span>RowIndex <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>str {
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>idx(<span class="kw-2">&amp;</span><span class="self">self</span>, stmt: <span class="kw-2">&amp;</span>Statement&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;usize&gt; {
-        stmt.column_index(<span class="kw-2">*</span><span class="self">self</span>)
+        stmt.column_index(<span class="self">self</span>)
     }
 }
 
@@ -1003,7 +1059,7 @@
         <span class="kw">let </span>val = conn.query_row(<span class="string">&quot;SELECT a FROM test&quot;</span>, [], |row| &lt;(u32,)&gt;::try_from(row))<span class="question-mark">?</span>;
         <span class="macro">assert_eq!</span>(val, (<span class="number">42</span>,));
         <span class="kw">let </span>fail = conn.query_row(<span class="string">&quot;SELECT a FROM test&quot;</span>, [], |row| &lt;(u32, u32)&gt;::try_from(row));
-        <span class="macro">assert!</span>(fail.is_err());
+        fail.unwrap_err();
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -1021,7 +1077,7 @@
         <span class="kw">let </span>fail = conn.query_row(<span class="string">&quot;SELECT a, b FROM test&quot;</span>, [], |row| {
             &lt;(u32, u32, u32)&gt;::try_from(row)
         });
-        <span class="macro">assert!</span>(fail.is_err());
+        fail.unwrap_err();
         <span class="prelude-val">Ok</span>(())
     }
 

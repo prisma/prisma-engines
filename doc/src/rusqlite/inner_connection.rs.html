@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/3ygaf6wwr9d8r0529il4m7wxn6hg2b6k-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rusqlite-0.25.4/src/inner_connection.rs`."><title>inner_connection.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rusqlite" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnsihxmfi8pvl7n3q6k0f21yqpflag7z-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rusqlite-0.29.0/src/inner_connection.rs`."><title>inner_connection.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rusqlite" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -438,6 +438,11 @@
 <a href="#438" id="438">438</a>
 <a href="#439" id="439">439</a>
 <a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::ffi::CStr;
 <span class="kw">use </span>std::os::raw::{c_char, c_int};
 <span class="attr">#[cfg(feature = <span class="string">&quot;load_extension&quot;</span>)]
@@ -450,10 +455,9 @@
 <span class="kw">use </span><span class="kw">super</span>::ffi;
 <span class="kw">use </span><span class="kw">super</span>::str_for_sqlite;
 <span class="kw">use super</span>::{Connection, InterruptHandle, OpenFlags, <span class="prelude-ty">Result</span>};
-<span class="kw">use </span><span class="kw">crate</span>::error::{error_from_handle, error_from_sqlite_code, Error};
+<span class="kw">use </span><span class="kw">crate</span>::error::{error_from_handle, error_from_sqlite_code, error_with_offset, Error};
 <span class="kw">use </span><span class="kw">crate</span>::raw_statement::RawStatement;
 <span class="kw">use </span><span class="kw">crate</span>::statement::Statement;
-<span class="kw">use </span><span class="kw">crate</span>::unlock_notify;
 <span class="kw">use </span><span class="kw">crate</span>::version::version_number;
 
 <span class="kw">pub struct </span>InnerConnection {
@@ -466,15 +470,19 @@
     // interrupt would only acquire the lock after the query&#39;s completion.
     </span>interrupt_lock: Arc&lt;Mutex&lt;<span class="kw-2">*mut </span>ffi::sqlite3&gt;&gt;,
     <span class="attr">#[cfg(feature = <span class="string">&quot;hooks&quot;</span>)]
-    </span><span class="kw">pub </span>free_commit_hook: <span class="prelude-ty">Option</span>&lt;<span class="kw">unsafe fn</span>(<span class="kw-2">*mut </span>::std::os::raw::c_void)&gt;,
+    </span><span class="kw">pub </span>free_commit_hook: <span class="prelude-ty">Option</span>&lt;<span class="kw">unsafe fn</span>(<span class="kw-2">*mut </span>std::os::raw::c_void)&gt;,
     <span class="attr">#[cfg(feature = <span class="string">&quot;hooks&quot;</span>)]
-    </span><span class="kw">pub </span>free_rollback_hook: <span class="prelude-ty">Option</span>&lt;<span class="kw">unsafe fn</span>(<span class="kw-2">*mut </span>::std::os::raw::c_void)&gt;,
+    </span><span class="kw">pub </span>free_rollback_hook: <span class="prelude-ty">Option</span>&lt;<span class="kw">unsafe fn</span>(<span class="kw-2">*mut </span>std::os::raw::c_void)&gt;,
     <span class="attr">#[cfg(feature = <span class="string">&quot;hooks&quot;</span>)]
-    </span><span class="kw">pub </span>free_update_hook: <span class="prelude-ty">Option</span>&lt;<span class="kw">unsafe fn</span>(<span class="kw-2">*mut </span>::std::os::raw::c_void)&gt;,
+    </span><span class="kw">pub </span>free_update_hook: <span class="prelude-ty">Option</span>&lt;<span class="kw">unsafe fn</span>(<span class="kw-2">*mut </span>std::os::raw::c_void)&gt;,
     <span class="attr">#[cfg(feature = <span class="string">&quot;hooks&quot;</span>)]
     </span><span class="kw">pub </span>progress_handler: <span class="prelude-ty">Option</span>&lt;Box&lt;<span class="kw">dyn </span>FnMut() -&gt; bool + Send&gt;&gt;,
+    <span class="attr">#[cfg(feature = <span class="string">&quot;hooks&quot;</span>)]
+    </span><span class="kw">pub </span>authorizer: <span class="prelude-ty">Option</span>&lt;<span class="kw">crate</span>::hooks::BoxedAuthorizer&gt;,
     owned: bool,
 }
+
+<span class="kw">unsafe impl </span>Send <span class="kw">for </span>InnerConnection {}
 
 <span class="kw">impl </span>InnerConnection {
     <span class="attr">#[allow(clippy::mutex_atomic)]
@@ -491,6 +499,8 @@
             </span>free_update_hook: <span class="prelude-val">None</span>,
             <span class="attr">#[cfg(feature = <span class="string">&quot;hooks&quot;</span>)]
             </span>progress_handler: <span class="prelude-val">None</span>,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;hooks&quot;</span>)]
+            </span>authorizer: <span class="prelude-val">None</span>,
             owned,
         }
     }
@@ -500,19 +510,17 @@
         flags: OpenFlags,
         vfs: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>CStr&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;InnerConnection&gt; {
-        <span class="attr">#[cfg(not(feature = <span class="string">&quot;bundled&quot;</span>))]
-        </span>ensure_valid_sqlite_version();
         ensure_safe_sqlite_threading_mode()<span class="question-mark">?</span>;
 
         <span class="comment">// Replicate the check for sane open flags from SQLite, because the check in
         // SQLite itself wasn&#39;t added until version 3.7.3.
-        </span><span class="macro">debug_assert_eq!</span>(<span class="number">1 </span>&lt;&lt; OpenFlags::SQLITE_OPEN_READ_ONLY.bits, <span class="number">0x02</span>);
-        <span class="macro">debug_assert_eq!</span>(<span class="number">1 </span>&lt;&lt; OpenFlags::SQLITE_OPEN_READ_WRITE.bits, <span class="number">0x04</span>);
+        </span><span class="macro">debug_assert_eq!</span>(<span class="number">1 </span>&lt;&lt; OpenFlags::SQLITE_OPEN_READ_ONLY.bits(), <span class="number">0x02</span>);
+        <span class="macro">debug_assert_eq!</span>(<span class="number">1 </span>&lt;&lt; OpenFlags::SQLITE_OPEN_READ_WRITE.bits(), <span class="number">0x04</span>);
         <span class="macro">debug_assert_eq!</span>(
-            <span class="number">1 </span>&lt;&lt; (OpenFlags::SQLITE_OPEN_READ_WRITE | OpenFlags::SQLITE_OPEN_CREATE).bits,
+            <span class="number">1 </span>&lt;&lt; (OpenFlags::SQLITE_OPEN_READ_WRITE | OpenFlags::SQLITE_OPEN_CREATE).bits(),
             <span class="number">0x40
         </span>);
-        <span class="kw">if </span>(<span class="number">1 </span>&lt;&lt; (flags.bits &amp; <span class="number">0x7</span>)) &amp; <span class="number">0x46 </span>== <span class="number">0 </span>{
+        <span class="kw">if </span>(<span class="number">1 </span>&lt;&lt; (flags.bits() &amp; <span class="number">0x7</span>)) &amp; <span class="number">0x46 </span>== <span class="number">0 </span>{
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::SqliteFailure(
                 ffi::Error::new(ffi::SQLITE_MISUSE),
                 <span class="prelude-val">None</span>,
@@ -542,7 +550,7 @@
                     {
                         e = Error::SqliteFailure(
                             ffi::Error::new(r),
-                            <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;{}: {}&quot;</span>, msg, c_path.to_string_lossy())),
+                            <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;{msg}: {}&quot;</span>, c_path.to_string_lossy())),
                         );
                     }
                     ffi::sqlite3_close(db);
@@ -572,7 +580,7 @@
     }
 
     <span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>decode_result(<span class="kw-2">&amp;mut </span><span class="self">self</span>, code: c_int) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub fn </span>decode_result(<span class="kw-2">&amp;</span><span class="self">self</span>, code: c_int) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">unsafe </span>{ InnerConnection::decode_result_raw(<span class="self">self</span>.db(), code) }
     }
 
@@ -622,34 +630,31 @@
 
     <span class="attr">#[inline]
     #[cfg(feature = <span class="string">&quot;load_extension&quot;</span>)]
-    </span><span class="kw">pub fn </span>enable_load_extension(<span class="kw-2">&amp;mut </span><span class="self">self</span>, onoff: c_int) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span>r = <span class="kw">unsafe </span>{ ffi::sqlite3_enable_load_extension(<span class="self">self</span>.db, onoff) };
+    </span><span class="kw">pub unsafe fn </span>enable_load_extension(<span class="kw-2">&amp;mut </span><span class="self">self</span>, onoff: c_int) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>r = ffi::sqlite3_enable_load_extension(<span class="self">self</span>.db, onoff);
         <span class="self">self</span>.decode_result(r)
     }
 
     <span class="attr">#[cfg(feature = <span class="string">&quot;load_extension&quot;</span>)]
-    </span><span class="kw">pub fn </span>load_extension(<span class="kw-2">&amp;</span><span class="self">self</span>, dylib_path: <span class="kw-2">&amp;</span>Path, entry_point: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub unsafe fn </span>load_extension(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        dylib_path: <span class="kw-2">&amp;</span>Path,
+        entry_point: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>dylib_str = <span class="kw">super</span>::path_to_cstring(dylib_path)<span class="question-mark">?</span>;
-        <span class="kw">unsafe </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>errmsg: <span class="kw-2">*mut </span>c_char = ptr::null_mut();
-            <span class="kw">let </span>r = <span class="kw">if let </span><span class="prelude-val">Some</span>(entry_point) = entry_point {
-                <span class="kw">let </span>c_entry = <span class="kw">crate</span>::str_to_cstring(entry_point)<span class="question-mark">?</span>;
-                ffi::sqlite3_load_extension(
-                    <span class="self">self</span>.db,
-                    dylib_str.as_ptr(),
-                    c_entry.as_ptr(),
-                    <span class="kw-2">&amp;mut </span>errmsg,
-                )
-            } <span class="kw">else </span>{
-                ffi::sqlite3_load_extension(<span class="self">self</span>.db, dylib_str.as_ptr(), ptr::null(), <span class="kw-2">&amp;mut </span>errmsg)
-            };
-            <span class="kw">if </span>r == ffi::SQLITE_OK {
-                <span class="prelude-val">Ok</span>(())
-            } <span class="kw">else </span>{
-                <span class="kw">let </span>message = <span class="kw">super</span>::errmsg_to_string(errmsg);
-                ffi::sqlite3_free(errmsg <span class="kw">as </span><span class="kw-2">*mut </span>::std::os::raw::c_void);
-                <span class="prelude-val">Err</span>(error_from_sqlite_code(r, <span class="prelude-val">Some</span>(message)))
-            }
+        <span class="kw">let </span><span class="kw-2">mut </span>errmsg: <span class="kw-2">*mut </span>c_char = ptr::null_mut();
+        <span class="kw">let </span>r = <span class="kw">if let </span><span class="prelude-val">Some</span>(entry_point) = entry_point {
+            <span class="kw">let </span>c_entry = <span class="kw">crate</span>::str_to_cstring(entry_point)<span class="question-mark">?</span>;
+            ffi::sqlite3_load_extension(<span class="self">self</span>.db, dylib_str.as_ptr(), c_entry.as_ptr(), <span class="kw-2">&amp;mut </span>errmsg)
+        } <span class="kw">else </span>{
+            ffi::sqlite3_load_extension(<span class="self">self</span>.db, dylib_str.as_ptr(), ptr::null(), <span class="kw-2">&amp;mut </span>errmsg)
+        };
+        <span class="kw">if </span>r == ffi::SQLITE_OK {
+            <span class="prelude-val">Ok</span>(())
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>message = <span class="kw">super</span>::errmsg_to_string(errmsg);
+            ffi::sqlite3_free(errmsg.cast::&lt;std::os::raw::c_void&gt;());
+            <span class="prelude-val">Err</span>(error_from_sqlite_code(r, <span class="prelude-val">Some</span>(message)))
         }
     }
 
@@ -662,38 +667,43 @@
         <span class="kw">let </span><span class="kw-2">mut </span>c_stmt = ptr::null_mut();
         <span class="kw">let </span>(c_sql, len, <span class="kw">_</span>) = str_for_sqlite(sql.as_bytes())<span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>c_tail = ptr::null();
-        <span class="kw">let </span>r = <span class="kw">unsafe </span>{
-            <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;unlock_notify&quot;</span>) {
-                <span class="kw">let </span><span class="kw-2">mut </span>rc;
-                <span class="kw">loop </span>{
-                    rc = ffi::sqlite3_prepare_v2(
-                        <span class="self">self</span>.db(),
-                        c_sql,
-                        len,
-                        <span class="kw-2">&amp;mut </span>c_stmt <span class="kw">as </span><span class="kw-2">*mut *mut </span>ffi::sqlite3_stmt,
-                        <span class="kw-2">&amp;mut </span>c_tail <span class="kw">as </span><span class="kw-2">*mut *const </span>c_char,
-                    );
-                    <span class="kw">if </span>!unlock_notify::is_locked(<span class="self">self</span>.db, rc) {
-                        <span class="kw">break</span>;
-                    }
-                    rc = unlock_notify::wait_for_unlock_notify(<span class="self">self</span>.db);
-                    <span class="kw">if </span>rc != ffi::SQLITE_OK {
-                        <span class="kw">break</span>;
-                    }
-                }
-                rc
-            } <span class="kw">else </span>{
-                ffi::sqlite3_prepare_v2(
+        <span class="comment">// TODO sqlite3_prepare_v3 (https://sqlite.org/c3ref/c_prepare_normalize.html) // 3.20.0, #728
+        </span><span class="attr">#[cfg(not(feature = <span class="string">&quot;unlock_notify&quot;</span>))]
+        </span><span class="kw">let </span>r = <span class="kw">unsafe </span>{
+            ffi::sqlite3_prepare_v2(
+                <span class="self">self</span>.db(),
+                c_sql,
+                len,
+                <span class="kw-2">&amp;mut </span>c_stmt <span class="kw">as </span><span class="kw-2">*mut *mut </span>ffi::sqlite3_stmt,
+                <span class="kw-2">&amp;mut </span>c_tail <span class="kw">as </span><span class="kw-2">*mut *const </span>c_char,
+            )
+        };
+        <span class="attr">#[cfg(feature = <span class="string">&quot;unlock_notify&quot;</span>)]
+        </span><span class="kw">let </span>r = <span class="kw">unsafe </span>{
+            <span class="kw">use </span><span class="kw">crate</span>::unlock_notify;
+            <span class="kw">let </span><span class="kw-2">mut </span>rc;
+            <span class="kw">loop </span>{
+                rc = ffi::sqlite3_prepare_v2(
                     <span class="self">self</span>.db(),
                     c_sql,
                     len,
                     <span class="kw-2">&amp;mut </span>c_stmt <span class="kw">as </span><span class="kw-2">*mut *mut </span>ffi::sqlite3_stmt,
                     <span class="kw-2">&amp;mut </span>c_tail <span class="kw">as </span><span class="kw-2">*mut *const </span>c_char,
-                )
+                );
+                <span class="kw">if </span>!unlock_notify::is_locked(<span class="self">self</span>.db, rc) {
+                    <span class="kw">break</span>;
+                }
+                rc = unlock_notify::wait_for_unlock_notify(<span class="self">self</span>.db);
+                <span class="kw">if </span>rc != ffi::SQLITE_OK {
+                    <span class="kw">break</span>;
+                }
             }
+            rc
         };
         <span class="comment">// If there is an error, *ppStmt is set to NULL.
-        </span><span class="self">self</span>.decode_result(r)<span class="question-mark">?</span>;
+        </span><span class="kw">if </span>r != ffi::SQLITE_OK {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="kw">unsafe </span>{ error_with_offset(<span class="self">self</span>.db, r, sql) });
+        }
         <span class="comment">// If the input text contains no SQL (if the input is an empty string or a
         // comment) then *ppStmt is set to NULL.
         </span><span class="kw">let </span>c_stmt: <span class="kw-2">*mut </span>ffi::sqlite3_stmt = c_stmt;
@@ -714,8 +724,15 @@
     }
 
     <span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>changes(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; usize {
-        <span class="kw">unsafe </span>{ ffi::sqlite3_changes(<span class="self">self</span>.db()) <span class="kw">as </span>usize }
+    </span><span class="kw">pub fn </span>changes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="attr">#[cfg(not(feature = <span class="string">&quot;modern_sqlite&quot;</span>))]
+        </span><span class="kw">unsafe </span>{
+            ffi::sqlite3_changes(<span class="self">self</span>.db()) <span class="kw">as </span>u64
+        }
+        <span class="attr">#[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)] </span><span class="comment">// 3.37.0
+        </span><span class="kw">unsafe </span>{
+            ffi::sqlite3_changes64(<span class="self">self</span>.db()) <span class="kw">as </span>u64
+        }
     }
 
     <span class="attr">#[inline]
@@ -723,8 +740,7 @@
         <span class="kw">unsafe </span>{ ffi::sqlite3_get_autocommit(<span class="self">self</span>.db()) != <span class="number">0 </span>}
     }
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)] </span><span class="comment">// 3.8.6
-    </span><span class="kw">pub fn </span>is_busy(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+    <span class="kw">pub fn </span>is_busy(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">let </span>db = <span class="self">self</span>.db();
         <span class="kw">unsafe </span>{
             <span class="kw">let </span><span class="kw-2">mut </span>stmt = ffi::sqlite3_next_stmt(db, ptr::null_mut());
@@ -738,74 +754,70 @@
         <span class="bool-val">false
     </span>}
 
+    <span class="kw">pub fn </span>cache_flush(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">crate</span>::error::check(<span class="kw">unsafe </span>{ ffi::sqlite3_db_cacheflush(<span class="self">self</span>.db()) })
+    }
+
     <span class="attr">#[cfg(not(feature = <span class="string">&quot;hooks&quot;</span>))]
     #[inline]
     </span><span class="kw">fn </span>remove_hooks(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {}
+
+    <span class="kw">pub fn </span>db_readonly(<span class="kw-2">&amp;</span><span class="self">self</span>, db_name: <span class="kw">super</span>::DatabaseName&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;bool&gt; {
+        <span class="kw">let </span>name = db_name.as_cstring()<span class="question-mark">?</span>;
+        <span class="kw">let </span>r = <span class="kw">unsafe </span>{ ffi::sqlite3_db_readonly(<span class="self">self</span>.db, name.as_ptr()) };
+        <span class="kw">match </span>r {
+            <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
+            <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
+            -<span class="number">1 </span>=&gt; <span class="prelude-val">Err</span>(Error::SqliteFailure(
+                ffi::Error::new(ffi::SQLITE_MISUSE),
+                <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;{db_name:?} is not the name of a database&quot;</span>)),
+            )),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(error_from_sqlite_code(
+                r,
+                <span class="prelude-val">Some</span>(<span class="string">&quot;Unexpected result&quot;</span>.to_owned()),
+            )),
+        }
+    }
+
+    <span class="attr">#[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)] </span><span class="comment">// 3.37.0
+    </span><span class="kw">pub fn </span>txn_state(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        db_name: <span class="prelude-ty">Option</span>&lt;<span class="kw">super</span>::DatabaseName&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw">super</span>::transaction::TransactionState&gt; {
+        <span class="kw">let </span>r = <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>name) = db_name {
+            <span class="kw">let </span>name = name.as_cstring()<span class="question-mark">?</span>;
+            <span class="kw">unsafe </span>{ ffi::sqlite3_txn_state(<span class="self">self</span>.db, name.as_ptr()) }
+        } <span class="kw">else </span>{
+            <span class="kw">unsafe </span>{ ffi::sqlite3_txn_state(<span class="self">self</span>.db, ptr::null()) }
+        };
+        <span class="kw">match </span>r {
+            <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="kw">super</span>::transaction::TransactionState::None),
+            <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="kw">super</span>::transaction::TransactionState::Read),
+            <span class="number">2 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="kw">super</span>::transaction::TransactionState::Write),
+            -<span class="number">1 </span>=&gt; <span class="prelude-val">Err</span>(Error::SqliteFailure(
+                ffi::Error::new(ffi::SQLITE_MISUSE),
+                <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;{db_name:?} is not the name of a valid schema&quot;</span>)),
+            )),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(error_from_sqlite_code(
+                r,
+                <span class="prelude-val">Some</span>(<span class="string">&quot;Unexpected result&quot;</span>.to_owned()),
+            )),
+        }
+    }
+
+    <span class="attr">#[inline]
+    #[cfg(feature = <span class="string">&quot;release_memory&quot;</span>)]
+    </span><span class="kw">pub fn </span>release_memory(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.decode_result(<span class="kw">unsafe </span>{ ffi::sqlite3_db_release_memory(<span class="self">self</span>.db) })
+    }
 }
 
 <span class="kw">impl </span>Drop <span class="kw">for </span>InnerConnection {
     <span class="attr">#[allow(unused_must_use)]
     #[inline]
     </span><span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="kw">use </span>std::thread::panicking;
-
-        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.close() {
-            <span class="kw">if </span>panicking() {
-                <span class="macro">eprintln!</span>(<span class="string">&quot;Error while closing SQLite connection: {:?}&quot;</span>, e);
-            } <span class="kw">else </span>{
-                <span class="macro">panic!</span>(<span class="string">&quot;Error while closing SQLite connection: {:?}&quot;</span>, e);
-            }
-        }
+        <span class="self">self</span>.close();
     }
-}
-
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;bundled&quot;</span>))]
-</span><span class="kw">static </span>SQLITE_VERSION_CHECK: std::sync::Once = std::sync::Once::new();
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;bundled&quot;</span>))]
-</span><span class="kw">pub static </span>BYPASS_VERSION_CHECK: AtomicBool = AtomicBool::new(<span class="bool-val">false</span>);
-
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;bundled&quot;</span>))]
-</span><span class="kw">fn </span>ensure_valid_sqlite_version() {
-    <span class="kw">use </span><span class="kw">crate</span>::version::version;
-
-    SQLITE_VERSION_CHECK.call_once(|| {
-        <span class="kw">let </span>version_number = version_number();
-
-        <span class="comment">// Check our hard floor.
-        </span><span class="kw">if </span>version_number &lt; <span class="number">3_006_008 </span>{
-            <span class="macro">panic!</span>(<span class="string">&quot;rusqlite requires SQLite 3.6.8 or newer&quot;</span>);
-        }
-
-        <span class="comment">// Check that the major version number for runtime and buildtime match.
-        </span><span class="kw">let </span>buildtime_major = ffi::SQLITE_VERSION_NUMBER / <span class="number">1_000_000</span>;
-        <span class="kw">let </span>runtime_major = version_number / <span class="number">1_000_000</span>;
-        <span class="kw">if </span>buildtime_major != runtime_major {
-            <span class="macro">panic!</span>(
-                <span class="string">&quot;rusqlite was built against SQLite {} but is running with SQLite {}&quot;</span>,
-                str::from_utf8(ffi::SQLITE_VERSION).unwrap(),
-                version()
-            );
-        }
-
-        <span class="kw">if </span>BYPASS_VERSION_CHECK.load(Ordering::Relaxed) {
-            <span class="kw">return</span>;
-        }
-
-        <span class="comment">// Check that the runtime version number is compatible with the version number
-        // we found at build-time.
-        </span><span class="kw">if </span>version_number &lt; ffi::SQLITE_VERSION_NUMBER {
-            <span class="macro">panic!</span>(
-                <span class="string">&quot;\
-rusqlite was built against SQLite {} but the runtime SQLite version is {}. To fix this, either:
-* Recompile rusqlite and link against the SQLite version you are using at runtime, or
-* Call rusqlite::bypass_sqlite_version_check() prior to your first connection attempt. Doing this
-  means you&#39;re sure everything will work correctly even though the runtime version is older than
-  the version we found at build time.&quot;</span>,
-                str::from_utf8(ffi::SQLITE_VERSION).unwrap(),
-                version()
-            );
-        }
-    });
 }
 
 <span class="attr">#[cfg(not(any(target_arch = <span class="string">&quot;wasm32&quot;</span>)))]
@@ -822,7 +834,7 @@ rusqlite was built against SQLite {} but the runtime SQLite version is {}. To fi
 
 <span class="attr">#[cfg(not(any(target_arch = <span class="string">&quot;wasm32&quot;</span>)))]
 </span><span class="kw">fn </span>ensure_safe_sqlite_threading_mode() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-    <span class="comment">// Ensure SQLite was compiled in thredsafe mode.
+    <span class="comment">// Ensure SQLite was compiled in threadsafe mode.
     </span><span class="kw">if unsafe </span>{ ffi::sqlite3_threadsafe() == <span class="number">0 </span>} {
         <span class="kw">return </span><span class="prelude-val">Err</span>(Error::SqliteSingleThreadedMode);
     }
@@ -864,15 +876,13 @@ rusqlite was built against SQLite {} but the runtime SQLite version is {}. To fi
             }
 
             <span class="kw">unsafe </span>{
-                <span class="kw">if </span>ffi::sqlite3_config(ffi::SQLITE_CONFIG_MULTITHREAD) != ffi::SQLITE_OK || ffi::sqlite3_initialize() != ffi::SQLITE_OK {
-                    <span class="macro">panic!</span>(
+                <span class="macro">assert!</span>(ffi::sqlite3_config(ffi::SQLITE_CONFIG_MULTITHREAD) == ffi::SQLITE_OK &amp;&amp; ffi::sqlite3_initialize() == ffi::SQLITE_OK,
                         <span class="string">&quot;Could not ensure safe initialization of SQLite.\n\
                          To fix this, either:\n\
                          * Upgrade SQLite to at least version 3.7.0\n\
                          * Ensure that SQLite has been initialized in Multi-thread or Serialized mode and call\n\
                            rusqlite::bypass_sqlite_initialization() prior to your first connection attempt.&quot;
                     </span>);
-                }
             }
         });
         <span class="prelude-val">Ok</span>(())

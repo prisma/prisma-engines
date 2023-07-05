@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/3ygaf6wwr9d8r0529il4m7wxn6hg2b6k-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/libsqlite3-sys-0.22.2/src/error.rs`."><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="libsqlite3_sys" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../libsqlite3_sys/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnsihxmfi8pvl7n3q6k0f21yqpflag7z-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/libsqlite3-sys-0.26.0/src/error.rs`."><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="libsqlite3_sys" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../libsqlite3_sys/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -269,47 +269,6 @@
 <a href="#269" id="269">269</a>
 <a href="#270" id="270">270</a>
 <a href="#271" id="271">271</a>
-<a href="#272" id="272">272</a>
-<a href="#273" id="273">273</a>
-<a href="#274" id="274">274</a>
-<a href="#275" id="275">275</a>
-<a href="#276" id="276">276</a>
-<a href="#277" id="277">277</a>
-<a href="#278" id="278">278</a>
-<a href="#279" id="279">279</a>
-<a href="#280" id="280">280</a>
-<a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
-<a href="#283" id="283">283</a>
-<a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
-<a href="#286" id="286">286</a>
-<a href="#287" id="287">287</a>
-<a href="#288" id="288">288</a>
-<a href="#289" id="289">289</a>
-<a href="#290" id="290">290</a>
-<a href="#291" id="291">291</a>
-<a href="#292" id="292">292</a>
-<a href="#293" id="293">293</a>
-<a href="#294" id="294">294</a>
-<a href="#295" id="295">295</a>
-<a href="#296" id="296">296</a>
-<a href="#297" id="297">297</a>
-<a href="#298" id="298">298</a>
-<a href="#299" id="299">299</a>
-<a href="#300" id="300">300</a>
-<a href="#301" id="301">301</a>
-<a href="#302" id="302">302</a>
-<a href="#303" id="303">303</a>
-<a href="#304" id="304">304</a>
-<a href="#305" id="305">305</a>
-<a href="#306" id="306">306</a>
-<a href="#307" id="307">307</a>
-<a href="#308" id="308">308</a>
-<a href="#309" id="309">309</a>
-<a href="#310" id="310">310</a>
-<a href="#311" id="311">311</a>
-<a href="#312" id="312">312</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::error;
 <span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::os::raw::c_int;
@@ -375,7 +334,8 @@
 }
 
 <span class="kw">impl </span>Error {
-    <span class="kw">pub fn </span>new(result_code: c_int) -&gt; Error {
+    <span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>new(result_code: c_int) -&gt; Error {
         <span class="kw">let </span>code = <span class="kw">match </span>result_code &amp; <span class="number">0xff </span>{
             <span class="kw">super</span>::SQLITE_INTERNAL =&gt; ErrorCode::InternalMalfunction,
             <span class="kw">super</span>::SQLITE_PERM =&gt; ErrorCode::PermissionDenied,
@@ -433,77 +393,34 @@
 // so we don&#39;t have to worry about which version of SQLite added which
 // constants, and we only use them to implement code_to_str below.
 
-</span><span class="kw">const </span>SQLITE_NOTICE: c_int = <span class="number">27</span>;
-<span class="kw">const </span>SQLITE_WARNING: c_int = <span class="number">28</span>;
-
-<span class="comment">// Extended result codes.
+// Extended result codes.
 
 </span><span class="kw">const </span>SQLITE_ERROR_MISSING_COLLSEQ: c_int = <span class="kw">super</span>::SQLITE_ERROR | (<span class="number">1 </span>&lt;&lt; <span class="number">8</span>);
 <span class="kw">const </span>SQLITE_ERROR_RETRY: c_int = <span class="kw">super</span>::SQLITE_ERROR | (<span class="number">2 </span>&lt;&lt; <span class="number">8</span>);
 <span class="kw">const </span>SQLITE_ERROR_SNAPSHOT: c_int = <span class="kw">super</span>::SQLITE_ERROR | (<span class="number">3 </span>&lt;&lt; <span class="number">8</span>);
 
-<span class="kw">const </span>SQLITE_IOERR_SHMOPEN: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">18 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_IOERR_SHMSIZE: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">19 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_IOERR_SHMLOCK: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">20 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_IOERR_SHMMAP: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">21 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_IOERR_SEEK: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">22 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_IOERR_DELETE_NOENT: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">23 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_IOERR_MMAP: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">24 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_IOERR_GETTEMPPATH: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">25 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_IOERR_CONVPATH: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">26 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_IOERR_VNODE: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">27 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_IOERR_AUTH: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">28 </span>&lt;&lt; <span class="number">8</span>);
 <span class="kw">const </span>SQLITE_IOERR_BEGIN_ATOMIC: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">29 </span>&lt;&lt; <span class="number">8</span>);
 <span class="kw">const </span>SQLITE_IOERR_COMMIT_ATOMIC: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">30 </span>&lt;&lt; <span class="number">8</span>);
 <span class="kw">const </span>SQLITE_IOERR_ROLLBACK_ATOMIC: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">31 </span>&lt;&lt; <span class="number">8</span>);
 <span class="kw">const </span>SQLITE_IOERR_DATA: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">32 </span>&lt;&lt; <span class="number">8</span>);
 
-<span class="kw">const </span>SQLITE_LOCKED_SHAREDCACHE: c_int = <span class="kw">super</span>::SQLITE_LOCKED | (<span class="number">1 </span>&lt;&lt; <span class="number">8</span>);
 <span class="kw">const </span>SQLITE_LOCKED_VTAB: c_int = <span class="kw">super</span>::SQLITE_LOCKED | (<span class="number">2 </span>&lt;&lt; <span class="number">8</span>);
 
-<span class="kw">const </span>SQLITE_BUSY_RECOVERY: c_int = <span class="kw">super</span>::SQLITE_BUSY | (<span class="number">1 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_BUSY_SNAPSHOT: c_int = <span class="kw">super</span>::SQLITE_BUSY | (<span class="number">2 </span>&lt;&lt; <span class="number">8</span>);
 <span class="kw">const </span>SQLITE_BUSY_TIMEOUT: c_int = <span class="kw">super</span>::SQLITE_BUSY | (<span class="number">3 </span>&lt;&lt; <span class="number">8</span>);
 
-<span class="kw">const </span>SQLITE_CANTOPEN_NOTEMPDIR: c_int = <span class="kw">super</span>::SQLITE_CANTOPEN | (<span class="number">1 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_CANTOPEN_ISDIR: c_int = <span class="kw">super</span>::SQLITE_CANTOPEN | (<span class="number">2 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_CANTOPEN_FULLPATH: c_int = <span class="kw">super</span>::SQLITE_CANTOPEN | (<span class="number">3 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_CANTOPEN_CONVPATH: c_int = <span class="kw">super</span>::SQLITE_CANTOPEN | (<span class="number">4 </span>&lt;&lt; <span class="number">8</span>);
 <span class="kw">const </span>SQLITE_CANTOPEN_SYMLINK: c_int = <span class="kw">super</span>::SQLITE_CANTOPEN | (<span class="number">6 </span>&lt;&lt; <span class="number">8</span>);
 
-<span class="kw">const </span>SQLITE_CORRUPT_VTAB: c_int = <span class="kw">super</span>::SQLITE_CORRUPT | (<span class="number">1 </span>&lt;&lt; <span class="number">8</span>);
 <span class="kw">const </span>SQLITE_CORRUPT_SEQUENCE: c_int = <span class="kw">super</span>::SQLITE_CORRUPT | (<span class="number">2 </span>&lt;&lt; <span class="number">8</span>);
 <span class="kw">const </span>SQLITE_CORRUPT_INDEX: c_int = <span class="kw">super</span>::SQLITE_CORRUPT | (<span class="number">3 </span>&lt;&lt; <span class="number">8</span>);
 
-<span class="kw">const </span>SQLITE_READONLY_RECOVERY: c_int = <span class="kw">super</span>::SQLITE_READONLY | (<span class="number">1 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_READONLY_CANTLOCK: c_int = <span class="kw">super</span>::SQLITE_READONLY | (<span class="number">2 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_READONLY_ROLLBACK: c_int = <span class="kw">super</span>::SQLITE_READONLY | (<span class="number">3 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_READONLY_DBMOVED: c_int = <span class="kw">super</span>::SQLITE_READONLY | (<span class="number">4 </span>&lt;&lt; <span class="number">8</span>);
 <span class="kw">const </span>SQLITE_READONLY_CANTINIT: c_int = <span class="kw">super</span>::SQLITE_READONLY | (<span class="number">5 </span>&lt;&lt; <span class="number">8</span>);
 <span class="kw">const </span>SQLITE_READONLY_DIRECTORY: c_int = <span class="kw">super</span>::SQLITE_READONLY | (<span class="number">6 </span>&lt;&lt; <span class="number">8</span>);
 
-<span class="kw">const </span>SQLITE_ABORT_ROLLBACK: c_int = <span class="kw">super</span>::SQLITE_ABORT | (<span class="number">2 </span>&lt;&lt; <span class="number">8</span>);
-
-<span class="kw">const </span>SQLITE_CONSTRAINT_CHECK: c_int = <span class="kw">super</span>::SQLITE_CONSTRAINT | (<span class="number">1 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_CONSTRAINT_COMMITHOOK: c_int = <span class="kw">super</span>::SQLITE_CONSTRAINT | (<span class="number">2 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_CONSTRAINT_FOREIGNKEY: c_int = <span class="kw">super</span>::SQLITE_CONSTRAINT | (<span class="number">3 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_CONSTRAINT_FUNCTION: c_int = <span class="kw">super</span>::SQLITE_CONSTRAINT | (<span class="number">4 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_CONSTRAINT_NOTNULL: c_int = <span class="kw">super</span>::SQLITE_CONSTRAINT | (<span class="number">5 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_CONSTRAINT_PRIMARYKEY: c_int = <span class="kw">super</span>::SQLITE_CONSTRAINT | (<span class="number">6 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_CONSTRAINT_TRIGGER: c_int = <span class="kw">super</span>::SQLITE_CONSTRAINT | (<span class="number">7 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_CONSTRAINT_UNIQUE: c_int = <span class="kw">super</span>::SQLITE_CONSTRAINT | (<span class="number">8 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_CONSTRAINT_VTAB: c_int = <span class="kw">super</span>::SQLITE_CONSTRAINT | (<span class="number">9 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_CONSTRAINT_ROWID: c_int = <span class="kw">super</span>::SQLITE_CONSTRAINT | (<span class="number">10 </span>&lt;&lt; <span class="number">8</span>);
 <span class="kw">const </span>SQLITE_CONSTRAINT_PINNED: c_int = <span class="kw">super</span>::SQLITE_CONSTRAINT | (<span class="number">11 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_CONSTRAINT_DATATYPE: c_int = <span class="kw">super</span>::SQLITE_CONSTRAINT | (<span class="number">12 </span>&lt;&lt; <span class="number">8</span>);
 
-<span class="kw">const </span>SQLITE_NOTICE_RECOVER_WAL: c_int = SQLITE_NOTICE | (<span class="number">1 </span>&lt;&lt; <span class="number">8</span>);
-<span class="kw">const </span>SQLITE_NOTICE_RECOVER_ROLLBACK: c_int = SQLITE_NOTICE | (<span class="number">2 </span>&lt;&lt; <span class="number">8</span>);
-
-<span class="kw">const </span>SQLITE_WARNING_AUTOINDEX: c_int = SQLITE_WARNING | (<span class="number">1 </span>&lt;&lt; <span class="number">8</span>);
-
-<span class="kw">const </span>SQLITE_AUTH_USER: c_int = <span class="kw">super</span>::SQLITE_AUTH | (<span class="number">1 </span>&lt;&lt; <span class="number">8</span>);
-
-<span class="kw">pub fn </span>code_to_str(code: c_int) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+<span class="attr">#[must_use]
+</span><span class="kw">pub fn </span>code_to_str(code: c_int) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
     <span class="kw">match </span>code {
         <span class="kw">super</span>::SQLITE_OK        =&gt; <span class="string">&quot;Successful result&quot;</span>,
         <span class="kw">super</span>::SQLITE_ERROR     =&gt; <span class="string">&quot;SQL error or missing database&quot;</span>,
@@ -532,8 +449,8 @@
         <span class="kw">super</span>::SQLITE_FORMAT    =&gt; <span class="string">&quot;Auxiliary database format error&quot;</span>,
         <span class="kw">super</span>::SQLITE_RANGE     =&gt; <span class="string">&quot;2nd parameter to sqlite3_bind out of range&quot;</span>,
         <span class="kw">super</span>::SQLITE_NOTADB    =&gt; <span class="string">&quot;File opened that is not a database file&quot;</span>,
-        SQLITE_NOTICE    =&gt; <span class="string">&quot;Notifications from sqlite3_log()&quot;</span>,
-        SQLITE_WARNING   =&gt; <span class="string">&quot;Warnings from sqlite3_log()&quot;</span>,
+        <span class="kw">super</span>::SQLITE_NOTICE    =&gt; <span class="string">&quot;Notifications from sqlite3_log()&quot;</span>,
+        <span class="kw">super</span>::SQLITE_WARNING   =&gt; <span class="string">&quot;Warnings from sqlite3_log()&quot;</span>,
         <span class="kw">super</span>::SQLITE_ROW       =&gt; <span class="string">&quot;sqlite3_step() has another row ready&quot;</span>,
         <span class="kw">super</span>::SQLITE_DONE      =&gt; <span class="string">&quot;sqlite3_step() has finished executing&quot;</span>,
 
@@ -558,66 +475,67 @@
         <span class="kw">super</span>::SQLITE_IOERR_LOCK              =&gt; <span class="string">&quot;I/O error in the advisory file locking layer&quot;</span>,
         <span class="kw">super</span>::SQLITE_IOERR_CLOSE             =&gt; <span class="string">&quot;I/O error within the xClose method&quot;</span>,
         <span class="kw">super</span>::SQLITE_IOERR_DIR_CLOSE         =&gt; <span class="string">&quot;SQLITE_IOERR_DIR_CLOSE&quot;</span>, <span class="comment">// no longer used
-        </span>SQLITE_IOERR_SHMOPEN           =&gt; <span class="string">&quot;I/O error within the xShmMap method (trying to open a new shared-memory segment)&quot;</span>,
-        SQLITE_IOERR_SHMSIZE           =&gt; <span class="string">&quot;I/O error within the xShmMap method (trying to resize an existing shared-memory segment)&quot;</span>,
-        SQLITE_IOERR_SHMLOCK           =&gt; <span class="string">&quot;SQLITE_IOERR_SHMLOCK&quot;</span>, <span class="comment">// no longer used
-        </span>SQLITE_IOERR_SHMMAP            =&gt; <span class="string">&quot;I/O error within the xShmMap method (trying to map a shared-memory segment into process address space)&quot;</span>,
-        SQLITE_IOERR_SEEK              =&gt; <span class="string">&quot;I/O error within the xRead or xWrite (trying to seek within a file)&quot;</span>,
-        SQLITE_IOERR_DELETE_NOENT      =&gt; <span class="string">&quot;File being deleted does not exist&quot;</span>,
-        SQLITE_IOERR_MMAP              =&gt; <span class="string">&quot;I/O error while trying to map or unmap part of the database file into process address space&quot;</span>,
-        SQLITE_IOERR_GETTEMPPATH       =&gt; <span class="string">&quot;VFS is unable to determine a suitable directory for temporary files&quot;</span>,
-        SQLITE_IOERR_CONVPATH          =&gt; <span class="string">&quot;cygwin_conv_path() system call failed&quot;</span>,
-        SQLITE_IOERR_VNODE             =&gt; <span class="string">&quot;SQLITE_IOERR_VNODE&quot;</span>, <span class="comment">// not documented?
-        </span>SQLITE_IOERR_AUTH              =&gt; <span class="string">&quot;SQLITE_IOERR_AUTH&quot;</span>,
+        </span><span class="kw">super</span>::SQLITE_IOERR_SHMOPEN           =&gt; <span class="string">&quot;I/O error within the xShmMap method (trying to open a new shared-memory segment)&quot;</span>,
+        <span class="kw">super</span>::SQLITE_IOERR_SHMSIZE           =&gt; <span class="string">&quot;I/O error within the xShmMap method (trying to resize an existing shared-memory segment)&quot;</span>,
+        <span class="kw">super</span>::SQLITE_IOERR_SHMLOCK           =&gt; <span class="string">&quot;SQLITE_IOERR_SHMLOCK&quot;</span>, <span class="comment">// no longer used
+        </span><span class="kw">super</span>::SQLITE_IOERR_SHMMAP            =&gt; <span class="string">&quot;I/O error within the xShmMap method (trying to map a shared-memory segment into process address space)&quot;</span>,
+        <span class="kw">super</span>::SQLITE_IOERR_SEEK              =&gt; <span class="string">&quot;I/O error within the xRead or xWrite (trying to seek within a file)&quot;</span>,
+        <span class="kw">super</span>::SQLITE_IOERR_DELETE_NOENT      =&gt; <span class="string">&quot;File being deleted does not exist&quot;</span>,
+        <span class="kw">super</span>::SQLITE_IOERR_MMAP              =&gt; <span class="string">&quot;I/O error while trying to map or unmap part of the database file into process address space&quot;</span>,
+        <span class="kw">super</span>::SQLITE_IOERR_GETTEMPPATH       =&gt; <span class="string">&quot;VFS is unable to determine a suitable directory for temporary files&quot;</span>,
+        <span class="kw">super</span>::SQLITE_IOERR_CONVPATH          =&gt; <span class="string">&quot;cygwin_conv_path() system call failed&quot;</span>,
+        <span class="kw">super</span>::SQLITE_IOERR_VNODE             =&gt; <span class="string">&quot;SQLITE_IOERR_VNODE&quot;</span>, <span class="comment">// not documented?
+        </span><span class="kw">super</span>::SQLITE_IOERR_AUTH              =&gt; <span class="string">&quot;SQLITE_IOERR_AUTH&quot;</span>,
         SQLITE_IOERR_BEGIN_ATOMIC      =&gt; <span class="string">&quot;SQLITE_IOERR_BEGIN_ATOMIC&quot;</span>,
         SQLITE_IOERR_COMMIT_ATOMIC     =&gt; <span class="string">&quot;SQLITE_IOERR_COMMIT_ATOMIC&quot;</span>,
         SQLITE_IOERR_ROLLBACK_ATOMIC   =&gt; <span class="string">&quot;SQLITE_IOERR_ROLLBACK_ATOMIC&quot;</span>,
         SQLITE_IOERR_DATA   =&gt; <span class="string">&quot;SQLITE_IOERR_DATA&quot;</span>,
 
-        SQLITE_LOCKED_SHAREDCACHE      =&gt; <span class="string">&quot;Locking conflict due to another connection with a shared cache&quot;</span>,
+        <span class="kw">super</span>::SQLITE_LOCKED_SHAREDCACHE      =&gt; <span class="string">&quot;Locking conflict due to another connection with a shared cache&quot;</span>,
         SQLITE_LOCKED_VTAB             =&gt; <span class="string">&quot;SQLITE_LOCKED_VTAB&quot;</span>,
 
-        SQLITE_BUSY_RECOVERY           =&gt; <span class="string">&quot;Another process is recovering a WAL mode database file&quot;</span>,
-        SQLITE_BUSY_SNAPSHOT           =&gt; <span class="string">&quot;Cannot promote read transaction to write transaction because of writes by another connection&quot;</span>,
+        <span class="kw">super</span>::SQLITE_BUSY_RECOVERY           =&gt; <span class="string">&quot;Another process is recovering a WAL mode database file&quot;</span>,
+        <span class="kw">super</span>::SQLITE_BUSY_SNAPSHOT           =&gt; <span class="string">&quot;Cannot promote read transaction to write transaction because of writes by another connection&quot;</span>,
         SQLITE_BUSY_TIMEOUT           =&gt; <span class="string">&quot;SQLITE_BUSY_TIMEOUT&quot;</span>,
 
-        SQLITE_CANTOPEN_NOTEMPDIR      =&gt; <span class="string">&quot;SQLITE_CANTOPEN_NOTEMPDIR&quot;</span>, <span class="comment">// no longer used
-        </span>SQLITE_CANTOPEN_ISDIR          =&gt; <span class="string">&quot;Attempted to open directory as file&quot;</span>,
-        SQLITE_CANTOPEN_FULLPATH       =&gt; <span class="string">&quot;Unable to convert filename into full pathname&quot;</span>,
-        SQLITE_CANTOPEN_CONVPATH       =&gt; <span class="string">&quot;cygwin_conv_path() system call failed&quot;</span>,
+        <span class="kw">super</span>::SQLITE_CANTOPEN_NOTEMPDIR      =&gt; <span class="string">&quot;SQLITE_CANTOPEN_NOTEMPDIR&quot;</span>, <span class="comment">// no longer used
+        </span><span class="kw">super</span>::SQLITE_CANTOPEN_ISDIR          =&gt; <span class="string">&quot;Attempted to open directory as file&quot;</span>,
+        <span class="kw">super</span>::SQLITE_CANTOPEN_FULLPATH       =&gt; <span class="string">&quot;Unable to convert filename into full pathname&quot;</span>,
+        <span class="kw">super</span>::SQLITE_CANTOPEN_CONVPATH       =&gt; <span class="string">&quot;cygwin_conv_path() system call failed&quot;</span>,
         SQLITE_CANTOPEN_SYMLINK       =&gt; <span class="string">&quot;SQLITE_CANTOPEN_SYMLINK&quot;</span>,
 
-        SQLITE_CORRUPT_VTAB            =&gt; <span class="string">&quot;Content in the virtual table is corrupt&quot;</span>,
+        <span class="kw">super</span>::SQLITE_CORRUPT_VTAB            =&gt; <span class="string">&quot;Content in the virtual table is corrupt&quot;</span>,
         SQLITE_CORRUPT_SEQUENCE        =&gt; <span class="string">&quot;SQLITE_CORRUPT_SEQUENCE&quot;</span>,
         SQLITE_CORRUPT_INDEX        =&gt; <span class="string">&quot;SQLITE_CORRUPT_INDEX&quot;</span>,
 
-        SQLITE_READONLY_RECOVERY       =&gt; <span class="string">&quot;WAL mode database file needs recovery (requires write access)&quot;</span>,
-        SQLITE_READONLY_CANTLOCK       =&gt; <span class="string">&quot;Shared-memory file associated with WAL mode database is read-only&quot;</span>,
-        SQLITE_READONLY_ROLLBACK       =&gt; <span class="string">&quot;Database has hot journal that must be rolled back (requires write access)&quot;</span>,
-        SQLITE_READONLY_DBMOVED        =&gt; <span class="string">&quot;Database cannot be modified because database file has moved&quot;</span>,
+        <span class="kw">super</span>::SQLITE_READONLY_RECOVERY       =&gt; <span class="string">&quot;WAL mode database file needs recovery (requires write access)&quot;</span>,
+        <span class="kw">super</span>::SQLITE_READONLY_CANTLOCK       =&gt; <span class="string">&quot;Shared-memory file associated with WAL mode database is read-only&quot;</span>,
+        <span class="kw">super</span>::SQLITE_READONLY_ROLLBACK       =&gt; <span class="string">&quot;Database has hot journal that must be rolled back (requires write access)&quot;</span>,
+        <span class="kw">super</span>::SQLITE_READONLY_DBMOVED        =&gt; <span class="string">&quot;Database cannot be modified because database file has moved&quot;</span>,
         SQLITE_READONLY_CANTINIT       =&gt; <span class="string">&quot;SQLITE_READONLY_CANTINIT&quot;</span>,
         SQLITE_READONLY_DIRECTORY      =&gt; <span class="string">&quot;SQLITE_READONLY_DIRECTORY&quot;</span>,
 
-        SQLITE_ABORT_ROLLBACK          =&gt; <span class="string">&quot;Transaction was rolled back&quot;</span>,
+        <span class="kw">super</span>::SQLITE_ABORT_ROLLBACK          =&gt; <span class="string">&quot;Transaction was rolled back&quot;</span>,
 
-        SQLITE_CONSTRAINT_CHECK        =&gt; <span class="string">&quot;A CHECK constraint failed&quot;</span>,
-        SQLITE_CONSTRAINT_COMMITHOOK   =&gt; <span class="string">&quot;Commit hook caused rollback&quot;</span>,
-        SQLITE_CONSTRAINT_FOREIGNKEY   =&gt; <span class="string">&quot;Foreign key constraint failed&quot;</span>,
-        SQLITE_CONSTRAINT_FUNCTION     =&gt; <span class="string">&quot;Error returned from extension function&quot;</span>,
-        SQLITE_CONSTRAINT_NOTNULL      =&gt; <span class="string">&quot;A NOT NULL constraint failed&quot;</span>,
-        SQLITE_CONSTRAINT_PRIMARYKEY   =&gt; <span class="string">&quot;A PRIMARY KEY constraint failed&quot;</span>,
-        SQLITE_CONSTRAINT_TRIGGER      =&gt; <span class="string">&quot;A RAISE function within a trigger fired&quot;</span>,
-        SQLITE_CONSTRAINT_UNIQUE       =&gt; <span class="string">&quot;A UNIQUE constraint failed&quot;</span>,
-        SQLITE_CONSTRAINT_VTAB         =&gt; <span class="string">&quot;An application-defined virtual table error occurred&quot;</span>,
-        SQLITE_CONSTRAINT_ROWID        =&gt; <span class="string">&quot;A non-unique rowid occurred&quot;</span>,
+        <span class="kw">super</span>::SQLITE_CONSTRAINT_CHECK        =&gt; <span class="string">&quot;A CHECK constraint failed&quot;</span>,
+        <span class="kw">super</span>::SQLITE_CONSTRAINT_COMMITHOOK   =&gt; <span class="string">&quot;Commit hook caused rollback&quot;</span>,
+        <span class="kw">super</span>::SQLITE_CONSTRAINT_FOREIGNKEY   =&gt; <span class="string">&quot;Foreign key constraint failed&quot;</span>,
+        <span class="kw">super</span>::SQLITE_CONSTRAINT_FUNCTION     =&gt; <span class="string">&quot;Error returned from extension function&quot;</span>,
+        <span class="kw">super</span>::SQLITE_CONSTRAINT_NOTNULL      =&gt; <span class="string">&quot;A NOT NULL constraint failed&quot;</span>,
+        <span class="kw">super</span>::SQLITE_CONSTRAINT_PRIMARYKEY   =&gt; <span class="string">&quot;A PRIMARY KEY constraint failed&quot;</span>,
+        <span class="kw">super</span>::SQLITE_CONSTRAINT_TRIGGER      =&gt; <span class="string">&quot;A RAISE function within a trigger fired&quot;</span>,
+        <span class="kw">super</span>::SQLITE_CONSTRAINT_UNIQUE       =&gt; <span class="string">&quot;A UNIQUE constraint failed&quot;</span>,
+        <span class="kw">super</span>::SQLITE_CONSTRAINT_VTAB         =&gt; <span class="string">&quot;An application-defined virtual table error occurred&quot;</span>,
+        <span class="kw">super</span>::SQLITE_CONSTRAINT_ROWID        =&gt; <span class="string">&quot;A non-unique rowid occurred&quot;</span>,
         SQLITE_CONSTRAINT_PINNED        =&gt; <span class="string">&quot;SQLITE_CONSTRAINT_PINNED&quot;</span>,
+        SQLITE_CONSTRAINT_DATATYPE        =&gt; <span class="string">&quot;SQLITE_CONSTRAINT_DATATYPE&quot;</span>,
 
-        SQLITE_NOTICE_RECOVER_WAL      =&gt; <span class="string">&quot;A WAL mode database file was recovered&quot;</span>,
-        SQLITE_NOTICE_RECOVER_ROLLBACK =&gt; <span class="string">&quot;Hot journal was rolled back&quot;</span>,
+        <span class="kw">super</span>::SQLITE_NOTICE_RECOVER_WAL      =&gt; <span class="string">&quot;A WAL mode database file was recovered&quot;</span>,
+        <span class="kw">super</span>::SQLITE_NOTICE_RECOVER_ROLLBACK =&gt; <span class="string">&quot;Hot journal was rolled back&quot;</span>,
 
-        SQLITE_WARNING_AUTOINDEX       =&gt; <span class="string">&quot;Automatic indexing used - database might benefit from additional indexes&quot;</span>,
+        <span class="kw">super</span>::SQLITE_WARNING_AUTOINDEX       =&gt; <span class="string">&quot;Automatic indexing used - database might benefit from additional indexes&quot;</span>,
 
-        SQLITE_AUTH_USER               =&gt; <span class="string">&quot;SQLITE_AUTH_USER&quot;</span>, <span class="comment">// not documented?
+        <span class="kw">super</span>::SQLITE_AUTH_USER               =&gt; <span class="string">&quot;SQLITE_AUTH_USER&quot;</span>, <span class="comment">// not documented?
 
         </span><span class="kw">_ </span>=&gt; <span class="string">&quot;Unknown error code&quot;</span>,
     }

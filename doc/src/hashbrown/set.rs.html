@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/3ygaf6wwr9d8r0529il4m7wxn6hg2b6k-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/hashbrown-0.12.3/src/set.rs`."><title>set.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="hashbrown" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../hashbrown/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnsihxmfi8pvl7n3q6k0f21yqpflag7z-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/hashbrown-0.13.2/src/set.rs`."><title>set.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="hashbrown" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../hashbrown/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2788,9 +2788,109 @@
 <a href="#2788" id="2788">2788</a>
 <a href="#2789" id="2789">2789</a>
 <a href="#2790" id="2790">2790</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::TryReserveError;
+<a href="#2791" id="2791">2791</a>
+<a href="#2792" id="2792">2792</a>
+<a href="#2793" id="2793">2793</a>
+<a href="#2794" id="2794">2794</a>
+<a href="#2795" id="2795">2795</a>
+<a href="#2796" id="2796">2796</a>
+<a href="#2797" id="2797">2797</a>
+<a href="#2798" id="2798">2798</a>
+<a href="#2799" id="2799">2799</a>
+<a href="#2800" id="2800">2800</a>
+<a href="#2801" id="2801">2801</a>
+<a href="#2802" id="2802">2802</a>
+<a href="#2803" id="2803">2803</a>
+<a href="#2804" id="2804">2804</a>
+<a href="#2805" id="2805">2805</a>
+<a href="#2806" id="2806">2806</a>
+<a href="#2807" id="2807">2807</a>
+<a href="#2808" id="2808">2808</a>
+<a href="#2809" id="2809">2809</a>
+<a href="#2810" id="2810">2810</a>
+<a href="#2811" id="2811">2811</a>
+<a href="#2812" id="2812">2812</a>
+<a href="#2813" id="2813">2813</a>
+<a href="#2814" id="2814">2814</a>
+<a href="#2815" id="2815">2815</a>
+<a href="#2816" id="2816">2816</a>
+<a href="#2817" id="2817">2817</a>
+<a href="#2818" id="2818">2818</a>
+<a href="#2819" id="2819">2819</a>
+<a href="#2820" id="2820">2820</a>
+<a href="#2821" id="2821">2821</a>
+<a href="#2822" id="2822">2822</a>
+<a href="#2823" id="2823">2823</a>
+<a href="#2824" id="2824">2824</a>
+<a href="#2825" id="2825">2825</a>
+<a href="#2826" id="2826">2826</a>
+<a href="#2827" id="2827">2827</a>
+<a href="#2828" id="2828">2828</a>
+<a href="#2829" id="2829">2829</a>
+<a href="#2830" id="2830">2830</a>
+<a href="#2831" id="2831">2831</a>
+<a href="#2832" id="2832">2832</a>
+<a href="#2833" id="2833">2833</a>
+<a href="#2834" id="2834">2834</a>
+<a href="#2835" id="2835">2835</a>
+<a href="#2836" id="2836">2836</a>
+<a href="#2837" id="2837">2837</a>
+<a href="#2838" id="2838">2838</a>
+<a href="#2839" id="2839">2839</a>
+<a href="#2840" id="2840">2840</a>
+<a href="#2841" id="2841">2841</a>
+<a href="#2842" id="2842">2842</a>
+<a href="#2843" id="2843">2843</a>
+<a href="#2844" id="2844">2844</a>
+<a href="#2845" id="2845">2845</a>
+<a href="#2846" id="2846">2846</a>
+<a href="#2847" id="2847">2847</a>
+<a href="#2848" id="2848">2848</a>
+<a href="#2849" id="2849">2849</a>
+<a href="#2850" id="2850">2850</a>
+<a href="#2851" id="2851">2851</a>
+<a href="#2852" id="2852">2852</a>
+<a href="#2853" id="2853">2853</a>
+<a href="#2854" id="2854">2854</a>
+<a href="#2855" id="2855">2855</a>
+<a href="#2856" id="2856">2856</a>
+<a href="#2857" id="2857">2857</a>
+<a href="#2858" id="2858">2858</a>
+<a href="#2859" id="2859">2859</a>
+<a href="#2860" id="2860">2860</a>
+<a href="#2861" id="2861">2861</a>
+<a href="#2862" id="2862">2862</a>
+<a href="#2863" id="2863">2863</a>
+<a href="#2864" id="2864">2864</a>
+<a href="#2865" id="2865">2865</a>
+<a href="#2866" id="2866">2866</a>
+<a href="#2867" id="2867">2867</a>
+<a href="#2868" id="2868">2868</a>
+<a href="#2869" id="2869">2869</a>
+<a href="#2870" id="2870">2870</a>
+<a href="#2871" id="2871">2871</a>
+<a href="#2872" id="2872">2872</a>
+<a href="#2873" id="2873">2873</a>
+<a href="#2874" id="2874">2874</a>
+<a href="#2875" id="2875">2875</a>
+<a href="#2876" id="2876">2876</a>
+<a href="#2877" id="2877">2877</a>
+<a href="#2878" id="2878">2878</a>
+<a href="#2879" id="2879">2879</a>
+<a href="#2880" id="2880">2880</a>
+<a href="#2881" id="2881">2881</a>
+<a href="#2882" id="2882">2882</a>
+<a href="#2883" id="2883">2883</a>
+<a href="#2884" id="2884">2884</a>
+<a href="#2885" id="2885">2885</a>
+<a href="#2886" id="2886">2886</a>
+<a href="#2887" id="2887">2887</a>
+<a href="#2888" id="2888">2888</a>
+<a href="#2889" id="2889">2889</a>
+</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;raw&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::raw::RawTable;
+<span class="kw">use crate</span>::{Equivalent, TryReserveError};
 <span class="kw">use </span>alloc::borrow::ToOwned;
-<span class="kw">use </span>core::borrow::Borrow;
 <span class="kw">use </span>core::fmt;
 <span class="kw">use </span>core::hash::{BuildHasher, Hash};
 <span class="kw">use </span>core::iter::{Chain, FromIterator, FusedIterator};
@@ -2925,6 +3025,18 @@
     /// The hash set is initially created with a capacity of 0, so it will not allocate until it
     /// is first inserted into.
     ///
+    /// # HashDoS resistance
+    ///
+    /// The `hash_builder` normally use a fixed key by default and that does
+    /// not allow the `HashSet` to be protected against attacks such as [`HashDoS`].
+    /// Users who require HashDoS resistance should explicitly use
+    /// [`ahash::RandomState`] or [`std::collections::hash_map::RandomState`]
+    /// as the hasher when creating a [`HashSet`], for example with
+    /// [`with_hasher`](HashSet::with_hasher) method.
+    ///
+    /// [`HashDoS`]: https://en.wikipedia.org/wiki/Collision_attack
+    /// [`std::collections::hash_map::RandomState`]: https://doc.rust-lang.org/std/collections/hash_map/struct.RandomState.html
+    ///
     /// # Examples
     ///
     /// ```
@@ -2942,6 +3054,18 @@
     ///
     /// The hash set will be able to hold at least `capacity` elements without
     /// reallocating. If `capacity` is 0, the hash set will not allocate.
+    ///
+    /// # HashDoS resistance
+    ///
+    /// The `hash_builder` normally use a fixed key by default and that does
+    /// not allow the `HashSet` to be protected against attacks such as [`HashDoS`].
+    /// Users who require HashDoS resistance should explicitly use
+    /// [`ahash::RandomState`] or [`std::collections::hash_map::RandomState`]
+    /// as the hasher when creating a [`HashSet`], for example with
+    /// [`with_capacity_and_hasher`](HashSet::with_capacity_and_hasher) method.
+    ///
+    /// [`HashDoS`]: https://en.wikipedia.org/wiki/Collision_attack
+    /// [`std::collections::hash_map::RandomState`]: https://doc.rust-lang.org/std/collections/hash_map/struct.RandomState.html
     ///
     /// # Examples
     ///
@@ -2965,6 +3089,18 @@
     /// The hash set is initially created with a capacity of 0, so it will not allocate until it
     /// is first inserted into.
     ///
+    /// # HashDoS resistance
+    ///
+    /// The `hash_builder` normally use a fixed key by default and that does
+    /// not allow the `HashSet` to be protected against attacks such as [`HashDoS`].
+    /// Users who require HashDoS resistance should explicitly use
+    /// [`ahash::RandomState`] or [`std::collections::hash_map::RandomState`]
+    /// as the hasher when creating a [`HashSet`], for example with
+    /// [`with_hasher_in`](HashSet::with_hasher_in) method.
+    ///
+    /// [`HashDoS`]: https://en.wikipedia.org/wiki/Collision_attack
+    /// [`std::collections::hash_map::RandomState`]: https://doc.rust-lang.org/std/collections/hash_map/struct.RandomState.html
+    ///
     /// # Examples
     ///
     /// ```
@@ -2982,6 +3118,18 @@
     ///
     /// The hash set will be able to hold at least `capacity` elements without
     /// reallocating. If `capacity` is 0, the hash set will not allocate.
+    ///
+    /// # HashDoS resistance
+    ///
+    /// The `hash_builder` normally use a fixed key by default and that does
+    /// not allow the `HashSet` to be protected against attacks such as [`HashDoS`].
+    /// Users who require HashDoS resistance should explicitly use
+    /// [`ahash::RandomState`] or [`std::collections::hash_map::RandomState`]
+    /// as the hasher when creating a [`HashSet`], for example with
+    /// [`with_capacity_and_hasher_in`](HashSet::with_capacity_and_hasher_in) method.
+    ///
+    /// [`HashDoS`]: https://en.wikipedia.org/wiki/Collision_attack
+    /// [`std::collections::hash_map::RandomState`]: https://doc.rust-lang.org/std/collections/hash_map/struct.RandomState.html
     ///
     /// # Examples
     ///
@@ -3176,16 +3324,23 @@
     <span class="doccomment">/// Creates a new empty hash set which will use the given hasher to hash
     /// keys.
     ///
-    /// The hash set is also created with the default initial capacity.
+    /// The hash set is initially created with a capacity of 0, so it will not
+    /// allocate until it is first inserted into.
     ///
-    /// Warning: `hasher` is normally randomly generated, and
-    /// is designed to allow `HashSet`s to be resistant to attacks that
-    /// cause many collisions and very poor performance. Setting it
-    /// manually using this function can expose a DoS attack vector.
+    /// # HashDoS resistance
+    ///
+    /// The `hash_builder` normally use a fixed key by default and that does
+    /// not allow the `HashSet` to be protected against attacks such as [`HashDoS`].
+    /// Users who require HashDoS resistance should explicitly use
+    /// [`ahash::RandomState`] or [`std::collections::hash_map::RandomState`]
+    /// as the hasher when creating a [`HashSet`].
     ///
     /// The `hash_builder` passed should implement the [`BuildHasher`] trait for
-    /// the HashMap to be useful, see its documentation for details.
+    /// the HashSet to be useful, see its documentation for details.
     ///
+    /// [`HashDoS`]: https://en.wikipedia.org/wiki/Collision_attack
+    /// [`std::collections::hash_map::RandomState`]: https://doc.rust-lang.org/std/collections/hash_map/struct.RandomState.html
+    /// [`BuildHasher`]: https://doc.rust-lang.org/std/hash/trait.BuildHasher.html
     ///
     /// # Examples
     ///
@@ -3197,8 +3352,6 @@
     /// let mut set = HashSet::with_hasher(s);
     /// set.insert(2);
     /// ```
-    ///
-    /// [`BuildHasher`]: ../../std/hash/trait.BuildHasher.html
     </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;inline-more&quot;</span>, inline)]
     </span><span class="kw">pub const fn </span>with_hasher(hasher: S) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
@@ -3212,13 +3365,20 @@
     /// The hash set will be able to hold at least `capacity` elements without
     /// reallocating. If `capacity` is 0, the hash set will not allocate.
     ///
-    /// Warning: `hasher` is normally randomly generated, and
-    /// is designed to allow `HashSet`s to be resistant to attacks that
-    /// cause many collisions and very poor performance. Setting it
-    /// manually using this function can expose a DoS attack vector.
+    /// # HashDoS resistance
+    ///
+    /// The `hash_builder` normally use a fixed key by default and that does
+    /// not allow the `HashSet` to be protected against attacks such as [`HashDoS`].
+    /// Users who require HashDoS resistance should explicitly use
+    /// [`ahash::RandomState`] or [`std::collections::hash_map::RandomState`]
+    /// as the hasher when creating a [`HashSet`].
     ///
     /// The `hash_builder` passed should implement the [`BuildHasher`] trait for
-    /// the HashMap to be useful, see its documentation for details.
+    /// the HashSet to be useful, see its documentation for details.
+    ///
+    /// [`HashDoS`]: https://en.wikipedia.org/wiki/Collision_attack
+    /// [`std::collections::hash_map::RandomState`]: https://doc.rust-lang.org/std/collections/hash_map/struct.RandomState.html
+    /// [`BuildHasher`]: https://doc.rust-lang.org/std/hash/trait.BuildHasher.html
     ///
     /// # Examples
     ///
@@ -3230,8 +3390,6 @@
     /// let mut set = HashSet::with_capacity_and_hasher(10, s);
     /// set.insert(1);
     /// ```
-    ///
-    /// [`BuildHasher`]: ../../std/hash/trait.BuildHasher.html
     </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;inline-more&quot;</span>, inline)]
     </span><span class="kw">pub fn </span>with_capacity_and_hasher(capacity: usize, hasher: S) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
@@ -3253,12 +3411,23 @@
     <span class="doccomment">/// Creates a new empty hash set which will use the given hasher to hash
     /// keys.
     ///
-    /// The hash set is also created with the default initial capacity.
+    /// The hash set is initially created with a capacity of 0, so it will not
+    /// allocate until it is first inserted into.
     ///
-    /// Warning: `hasher` is normally randomly generated, and
-    /// is designed to allow `HashSet`s to be resistant to attacks that
-    /// cause many collisions and very poor performance. Setting it
-    /// manually using this function can expose a DoS attack vector.
+    /// # HashDoS resistance
+    ///
+    /// The `hash_builder` normally use a fixed key by default and that does
+    /// not allow the `HashSet` to be protected against attacks such as [`HashDoS`].
+    /// Users who require HashDoS resistance should explicitly use
+    /// [`ahash::RandomState`] or [`std::collections::hash_map::RandomState`]
+    /// as the hasher when creating a [`HashSet`].
+    ///
+    /// The `hash_builder` passed should implement the [`BuildHasher`] trait for
+    /// the HashSet to be useful, see its documentation for details.
+    ///
+    /// [`HashDoS`]: https://en.wikipedia.org/wiki/Collision_attack
+    /// [`std::collections::hash_map::RandomState`]: https://doc.rust-lang.org/std/collections/hash_map/struct.RandomState.html
+    /// [`BuildHasher`]: https://doc.rust-lang.org/std/hash/trait.BuildHasher.html
     ///
     /// # Examples
     ///
@@ -3271,7 +3440,7 @@
     /// set.insert(2);
     /// ```
     </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;inline-more&quot;</span>, inline)]
-    </span><span class="kw">pub fn </span>with_hasher_in(hasher: S, alloc: A) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub const fn </span>with_hasher_in(hasher: S, alloc: A) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             map: HashMap::with_hasher_in(hasher, alloc),
         }
@@ -3283,10 +3452,20 @@
     /// The hash set will be able to hold at least `capacity` elements without
     /// reallocating. If `capacity` is 0, the hash set will not allocate.
     ///
-    /// Warning: `hasher` is normally randomly generated, and
-    /// is designed to allow `HashSet`s to be resistant to attacks that
-    /// cause many collisions and very poor performance. Setting it
-    /// manually using this function can expose a DoS attack vector.
+    /// # HashDoS resistance
+    ///
+    /// The `hash_builder` normally use a fixed key by default and that does
+    /// not allow the `HashSet` to be protected against attacks such as [`HashDoS`].
+    /// Users who require HashDoS resistance should explicitly use
+    /// [`ahash::RandomState`] or [`std::collections::hash_map::RandomState`]
+    /// as the hasher when creating a [`HashSet`].
+    ///
+    /// The `hash_builder` passed should implement the [`BuildHasher`] trait for
+    /// the HashSet to be useful, see its documentation for details.
+    ///
+    /// [`HashDoS`]: https://en.wikipedia.org/wiki/Collision_attack
+    /// [`std::collections::hash_map::RandomState`]: https://doc.rust-lang.org/std/collections/hash_map/struct.RandomState.html
+    /// [`BuildHasher`]: https://doc.rust-lang.org/std/hash/trait.BuildHasher.html
     ///
     /// # Examples
     ///
@@ -3337,7 +3516,12 @@
     ///
     /// # Panics
     ///
-    /// Panics if the new allocation size overflows `usize`.
+    /// Panics if the new capacity exceeds [`isize::MAX`] bytes and [`abort`] the program
+    /// in case of allocation error. Use [`try_reserve`](HashSet::try_reserve) instead
+    /// if you want to handle memory allocation failure.
+    ///
+    /// [`isize::MAX`]: https://doc.rust-lang.org/std/primitive.isize.html
+    /// [`abort`]: https://doc.rust-lang.org/alloc/alloc/fn.handle_alloc_error.html
     ///
     /// # Examples
     ///
@@ -3563,8 +3747,7 @@
     </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;inline-more&quot;</span>, inline)]
     </span><span class="kw">pub fn </span>contains&lt;Q: <span class="question-mark">?</span>Sized&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>Q) -&gt; bool
     <span class="kw">where
-        </span>T: Borrow&lt;Q&gt;,
-        Q: Hash + Eq,
+        </span>Q: Hash + Equivalent&lt;T&gt;,
     {
         <span class="self">self</span>.map.contains_key(value)
     }
@@ -3590,8 +3773,7 @@
     </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;inline-more&quot;</span>, inline)]
     </span><span class="kw">pub fn </span>get&lt;Q: <span class="question-mark">?</span>Sized&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>Q) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>T&gt;
     <span class="kw">where
-        </span>T: Borrow&lt;Q&gt;,
-        Q: Hash + Eq,
+        </span>Q: Hash + Equivalent&lt;T&gt;,
     {
         <span class="comment">// Avoid `Option::map` because it bloats LLVM IR.
         </span><span class="kw">match </span><span class="self">self</span>.map.get_key_value(value) {
@@ -3646,8 +3828,7 @@
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>get_or_insert_owned&lt;Q: <span class="question-mark">?</span>Sized&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>Q) -&gt; <span class="kw-2">&amp;</span>T
     <span class="kw">where
-        </span>T: Borrow&lt;Q&gt;,
-        Q: Hash + Eq + ToOwned&lt;Owned = T&gt;,
+        </span>Q: Hash + Equivalent&lt;T&gt; + ToOwned&lt;Owned = T&gt;,
     {
         <span class="comment">// Although the raw entry gives us `&amp;mut T`, we only return `&amp;T` to be consistent with
         // `get`. Key mutation is &quot;raw&quot; because you&#39;re not supposed to affect `Eq` or `Hash`.
@@ -3679,8 +3860,7 @@
     </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;inline-more&quot;</span>, inline)]
     </span><span class="kw">pub fn </span>get_or_insert_with&lt;Q: <span class="question-mark">?</span>Sized, F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>Q, f: F) -&gt; <span class="kw-2">&amp;</span>T
     <span class="kw">where
-        </span>T: Borrow&lt;Q&gt;,
-        Q: Hash + Eq,
+        </span>Q: Hash + Equivalent&lt;T&gt;,
         F: FnOnce(<span class="kw-2">&amp;</span>Q) -&gt; T,
     {
         <span class="comment">// Although the raw entry gives us `&amp;mut T`, we only return `&amp;T` to be consistent with
@@ -3896,8 +4076,7 @@
     </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;inline-more&quot;</span>, inline)]
     </span><span class="kw">pub fn </span>remove&lt;Q: <span class="question-mark">?</span>Sized&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>Q) -&gt; bool
     <span class="kw">where
-        </span>T: Borrow&lt;Q&gt;,
-        Q: Hash + Eq,
+        </span>Q: Hash + Equivalent&lt;T&gt;,
     {
         <span class="self">self</span>.map.remove(value).is_some()
     }
@@ -3923,14 +4102,33 @@
     </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;inline-more&quot;</span>, inline)]
     </span><span class="kw">pub fn </span>take&lt;Q: <span class="question-mark">?</span>Sized&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>Q) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt;
     <span class="kw">where
-        </span>T: Borrow&lt;Q&gt;,
-        Q: Hash + Eq,
+        </span>Q: Hash + Equivalent&lt;T&gt;,
     {
         <span class="comment">// Avoid `Option::map` because it bloats LLVM IR.
         </span><span class="kw">match </span><span class="self">self</span>.map.remove_entry(value) {
             <span class="prelude-val">Some</span>((k, <span class="kw">_</span>)) =&gt; <span class="prelude-val">Some</span>(k),
             <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
         }
+    }
+
+    <span class="doccomment">/// Returns a mutable reference to the [`RawTable`] used underneath [`HashSet`].
+    /// This function is only available if the `raw` feature of the crate is enabled.
+    ///
+    /// # Note
+    ///
+    /// Calling this function is safe, but using the raw hash table API may require
+    /// unsafe functions or blocks.
+    ///
+    /// `RawTable` API gives the lowest level of control under the set that can be useful
+    /// for extending the HashSet&#39;s API, but may lead to *[undefined behavior]*.
+    ///
+    /// [`HashSet`]: struct.HashSet.html
+    /// [`RawTable`]: crate::raw::RawTable
+    /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;raw&quot;</span>)]
+    #[cfg_attr(feature = <span class="string">&quot;inline-more&quot;</span>, inline)]
+    </span><span class="kw">pub fn </span>raw_table(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>RawTable&lt;(T, ()), A&gt; {
+        <span class="self">self</span>.map.raw_table()
     }
 }
 
@@ -5485,7 +5683,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>a = HashSet::new();
         a.insert(<span class="number">1</span>);
 
-        a.extend(<span class="kw-2">&amp;</span>[<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]);
+        a.extend([<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]);
 
         <span class="macro">assert_eq!</span>(a.len(), <span class="number">4</span>);
         <span class="macro">assert!</span>(a.contains(<span class="kw-2">&amp;</span><span class="number">1</span>));

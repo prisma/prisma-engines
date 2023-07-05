@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/3ygaf6wwr9d8r0529il4m7wxn6hg2b6k-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rusqlite-0.25.4/src/raw_statement.rs`."><title>raw_statement.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rusqlite" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnsihxmfi8pvl7n3q6k0f21yqpflag7z-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rusqlite-0.29.0/src/raw_statement.rs`."><title>raw_statement.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rusqlite" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -218,11 +218,30 @@
 <a href="#218" id="218">218</a>
 <a href="#219" id="219">219</a>
 <a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::ffi;
-<span class="kw">use </span><span class="kw">super</span>::unlock_notify;
 <span class="kw">use </span><span class="kw">super</span>::StatementStatus;
-<span class="attr">#[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::util::SqliteMallocString;
+<span class="kw">use </span><span class="kw">crate</span>::util::ParamIndexCache;
+<span class="kw">use </span><span class="kw">crate</span>::util::SqliteMallocString;
 <span class="kw">use </span>std::ffi::CStr;
 <span class="kw">use </span>std::os::raw::c_int;
 <span class="kw">use </span>std::ptr;
@@ -234,7 +253,7 @@
     ptr: <span class="kw-2">*mut </span>ffi::sqlite3_stmt,
     tail: usize,
     <span class="comment">// Cached indices of named parameters, computed on the fly.
-    </span>cache: <span class="kw">crate</span>::util::ParamIndexCache,
+    </span>cache: ParamIndexCache,
     <span class="comment">// Cached SQL (trimmed) that we use as the key when we&#39;re in the statement
     // cache. This is None for statements which didn&#39;t come from the statement
     // cache.
@@ -254,7 +273,7 @@
         RawStatement {
             ptr: stmt,
             tail,
-            cache: Default::default(),
+            cache: ParamIndexCache::default(),
             statement_cache_key: <span class="prelude-val">None</span>,
         }
     }
@@ -321,25 +340,38 @@
         }
     }
 
-    <span class="attr">#[cfg_attr(not(feature = <span class="string">&quot;unlock_notify&quot;</span>), inline)]
+    <span class="attr">#[inline]
+    #[cfg(not(feature = <span class="string">&quot;unlock_notify&quot;</span>))]
     </span><span class="kw">pub fn </span>step(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; c_int {
-        <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;unlock_notify&quot;</span>) {
-            <span class="kw">let </span>db = <span class="kw">unsafe </span>{ ffi::sqlite3_db_handle(<span class="self">self</span>.ptr) };
-            <span class="kw">let </span><span class="kw-2">mut </span>rc;
-            <span class="kw">loop </span>{
-                rc = <span class="kw">unsafe </span>{ ffi::sqlite3_step(<span class="self">self</span>.ptr) };
-                <span class="kw">if unsafe </span>{ !unlock_notify::is_locked(db, rc) } {
-                    <span class="kw">break</span>;
+        <span class="kw">unsafe </span>{ ffi::sqlite3_step(<span class="self">self</span>.ptr) }
+    }
+
+    <span class="attr">#[cfg(feature = <span class="string">&quot;unlock_notify&quot;</span>)]
+    </span><span class="kw">pub fn </span>step(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; c_int {
+        <span class="kw">use </span><span class="kw">crate</span>::unlock_notify;
+        <span class="kw">let </span><span class="kw-2">mut </span>db = ptr::null_mut::&lt;ffi::sqlite3&gt;();
+        <span class="kw">loop </span>{
+            <span class="kw">unsafe </span>{
+                <span class="kw">let </span><span class="kw-2">mut </span>rc = ffi::sqlite3_step(<span class="self">self</span>.ptr);
+                <span class="comment">// Bail out early for success and errors unrelated to locking. We
+                // still need check `is_locked` after this, but checking now lets us
+                // avoid one or two (admittedly cheap) calls into SQLite that we
+                // don&#39;t need to make.
+                </span><span class="kw">if </span>(rc &amp; <span class="number">0xff</span>) != ffi::SQLITE_LOCKED {
+                    <span class="kw">break </span>rc;
                 }
-                rc = <span class="kw">unsafe </span>{ unlock_notify::wait_for_unlock_notify(db) };
+                <span class="kw">if </span>db.is_null() {
+                    db = ffi::sqlite3_db_handle(<span class="self">self</span>.ptr);
+                }
+                <span class="kw">if </span>!unlock_notify::is_locked(db, rc) {
+                    <span class="kw">break </span>rc;
+                }
+                rc = unlock_notify::wait_for_unlock_notify(db);
                 <span class="kw">if </span>rc != ffi::SQLITE_OK {
-                    <span class="kw">break</span>;
+                    <span class="kw">break </span>rc;
                 }
                 <span class="self">self</span>.reset();
             }
-            rc
-        } <span class="kw">else </span>{
-            <span class="kw">unsafe </span>{ ffi::sqlite3_step(<span class="self">self</span>.ptr) }
         }
     }
 
@@ -377,9 +409,11 @@
     }
 
     <span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>clear_bindings(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; c_int {
-        <span class="kw">unsafe </span>{ ffi::sqlite3_clear_bindings(<span class="self">self</span>.ptr) }
-    }
+    </span><span class="kw">pub fn </span>clear_bindings(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{
+            ffi::sqlite3_clear_bindings(<span class="self">self</span>.ptr);
+        } <span class="comment">// rc is always SQLITE_OK
+    </span>}
 
     <span class="attr">#[inline]
     </span><span class="kw">pub fn </span>sql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>CStr&gt; {
@@ -404,13 +438,11 @@
 
     <span class="comment">// does not work for PRAGMA
     </span><span class="attr">#[inline]
-    #[cfg(all(feature = <span class="string">&quot;extra_check&quot;</span>, feature = <span class="string">&quot;modern_sqlite&quot;</span>))] </span><span class="comment">// 3.7.4
     </span><span class="kw">pub fn </span>readonly(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">unsafe </span>{ ffi::sqlite3_stmt_readonly(<span class="self">self</span>.ptr) != <span class="number">0 </span>}
     }
 
     <span class="attr">#[inline]
-    #[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)] </span><span class="comment">// 3.14.0
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>expanded_sql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;SqliteMallocString&gt; {
         <span class="kw">unsafe </span>{ SqliteMallocString::from_raw(ffi::sqlite3_expanded_sql(<span class="self">self</span>.ptr)) }
     }
@@ -431,7 +463,15 @@
     </span><span class="kw">pub fn </span>tail(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.tail
     }
-}
+
+    <span class="attr">#[inline]
+    #[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)] </span><span class="comment">// 3.28.0
+    </span><span class="kw">pub fn </span>is_explain(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="kw">unsafe </span>{ ffi::sqlite3_stmt_isexplain(<span class="self">self</span>.ptr) }
+    }
+
+    <span class="comment">// TODO sqlite3_normalized_sql (https://sqlite.org/c3ref/expanded_sql.html) // 3.27.0 + SQLITE_ENABLE_NORMALIZE
+</span>}
 
 <span class="kw">impl </span>Drop <span class="kw">for </span>RawStatement {
     <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {

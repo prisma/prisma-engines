@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/3ygaf6wwr9d8r0529il4m7wxn6hg2b6k-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rusqlite-0.25.4/src/pragma.rs`."><title>pragma.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rusqlite" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnsihxmfi8pvl7n3q6k0f21yqpflag7z-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rusqlite-0.29.0/src/pragma.rs`."><title>pragma.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rusqlite" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -439,6 +439,21 @@
 <a href="#439" id="439">439</a>
 <a href="#440" id="440">440</a>
 <a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
+<a href="#450" id="450">450</a>
+<a href="#451" id="451">451</a>
+<a href="#452" id="452">452</a>
+<a href="#453" id="453">453</a>
+<a href="#454" id="454">454</a>
+<a href="#455" id="455">455</a>
+<a href="#456" id="456">456</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Pragma helpers
 
 </span><span class="kw">use </span>std::ops::Deref;
@@ -478,7 +493,7 @@
         } <span class="kw">else </span>{
             <span class="prelude-val">Err</span>(Error::SqliteFailure(
                 ffi::Error::new(ffi::SQLITE_MISUSE),
-                <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;Invalid keyword \&quot;{}\&quot;&quot;</span>, keyword)),
+                <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;Invalid keyword \&quot;{keyword}\&quot;&quot;</span>)),
             ))
         }
     }
@@ -508,14 +523,14 @@
             </span>ToSqlOutput::ZeroBlob(<span class="kw">_</span>) =&gt; {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(Error::SqliteFailure(
                     ffi::Error::new(ffi::SQLITE_MISUSE),
-                    <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;Unsupported value \&quot;{:?}\&quot;&quot;</span>, value)),
+                    <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;Unsupported value \&quot;{value:?}\&quot;&quot;</span>)),
                 ));
             }
             <span class="attr">#[cfg(feature = <span class="string">&quot;array&quot;</span>)]
             </span>ToSqlOutput::Array(<span class="kw">_</span>) =&gt; {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(Error::SqliteFailure(
                     ffi::Error::new(ffi::SQLITE_MISUSE),
-                    <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;Unsupported value \&quot;{:?}\&quot;&quot;</span>, value)),
+                    <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;Unsupported value \&quot;{value:?}\&quot;&quot;</span>)),
                 ));
             }
         };
@@ -533,7 +548,7 @@
             <span class="kw">_ </span>=&gt; {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(Error::SqliteFailure(
                     ffi::Error::new(ffi::SQLITE_MISUSE),
-                    <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;Unsupported value \&quot;{:?}\&quot;&quot;</span>, value)),
+                    <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;Unsupported value \&quot;{value:?}\&quot;&quot;</span>)),
                 ));
             }
         };
@@ -584,7 +599,7 @@
             </span><span class="kw">if </span>ch == quote {
                 <span class="self">self</span>.buf.push(ch);
             }
-            <span class="self">self</span>.buf.push(ch)
+            <span class="self">self</span>.buf.push(ch);
         }
         <span class="self">self</span>.buf.push(quote);
     }
@@ -639,7 +654,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>rows = stmt.query([])<span class="question-mark">?</span>;
         <span class="kw">while let </span><span class="prelude-val">Some</span>(result_row) = rows.next()<span class="question-mark">? </span>{
             <span class="kw">let </span>row = result_row;
-            f(<span class="kw-2">&amp;</span>row)<span class="question-mark">?</span>;
+            f(row)<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
@@ -652,16 +667,17 @@
     /// (e.g. `integrity_check`).
     ///
     /// Prefer [PRAGMA function](https://sqlite.org/pragma.html#pragfunc) introduced in SQLite 3.20:
-    /// `SELECT * FROM pragma_table_info(?);`
-    </span><span class="kw">pub fn </span>pragma&lt;F&gt;(
+    /// `SELECT * FROM pragma_table_info(?1);`
+    </span><span class="kw">pub fn </span>pragma&lt;F, V&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         schema_name: <span class="prelude-ty">Option</span>&lt;DatabaseName&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
         pragma_name: <span class="kw-2">&amp;</span>str,
-        pragma_value: <span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql,
+        pragma_value: V,
         <span class="kw-2">mut </span>f: F,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;
     <span class="kw">where
         </span>F: FnMut(<span class="kw-2">&amp;</span>Row&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;,
+        V: ToSql,
     {
         <span class="kw">let </span><span class="kw-2">mut </span>sql = Sql::new();
         sql.push_pragma(schema_name, pragma_name)<span class="question-mark">?</span>;
@@ -669,13 +685,13 @@
         // or it may be separated from the pragma name by an equal sign.
         // The two syntaxes yield identical results.
         </span>sql.open_brace();
-        sql.push_value(pragma_value)<span class="question-mark">?</span>;
+        sql.push_value(<span class="kw-2">&amp;</span>pragma_value)<span class="question-mark">?</span>;
         sql.close_brace();
         <span class="kw">let </span><span class="kw-2">mut </span>stmt = <span class="self">self</span>.prepare(<span class="kw-2">&amp;</span>sql)<span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>rows = stmt.query([])<span class="question-mark">?</span>;
         <span class="kw">while let </span><span class="prelude-val">Some</span>(result_row) = rows.next()<span class="question-mark">? </span>{
             <span class="kw">let </span>row = result_row;
-            f(<span class="kw-2">&amp;</span>row)<span class="question-mark">?</span>;
+            f(row)<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
@@ -684,34 +700,14 @@
     ///
     /// Some pragmas will return the updated value which cannot be retrieved
     /// with this method.
-    </span><span class="kw">pub fn </span>pragma_update(
+    </span><span class="kw">pub fn </span>pragma_update&lt;V&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         schema_name: <span class="prelude-ty">Option</span>&lt;DatabaseName&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
         pragma_name: <span class="kw-2">&amp;</span>str,
-        pragma_value: <span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>sql = Sql::new();
-        sql.push_pragma(schema_name, pragma_name)<span class="question-mark">?</span>;
-        <span class="comment">// The argument may be either in parentheses
-        // or it may be separated from the pragma name by an equal sign.
-        // The two syntaxes yield identical results.
-        </span>sql.push_equal_sign();
-        sql.push_value(pragma_value)<span class="question-mark">?</span>;
-        <span class="self">self</span>.execute_batch(<span class="kw-2">&amp;</span>sql)
-    }
-
-    <span class="doccomment">/// Set a new value to `pragma_name` and return the updated value.
-    ///
-    /// Only few pragmas automatically return the updated value.
-    </span><span class="kw">pub fn </span>pragma_update_and_check&lt;F, T&gt;(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        schema_name: <span class="prelude-ty">Option</span>&lt;DatabaseName&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
-        pragma_name: <span class="kw-2">&amp;</span>str,
-        pragma_value: <span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql,
-        f: F,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;
+        pragma_value: V,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;
     <span class="kw">where
-        </span>F: FnOnce(<span class="kw-2">&amp;</span>Row&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;,
+        </span>V: ToSql,
     {
         <span class="kw">let </span><span class="kw-2">mut </span>sql = Sql::new();
         sql.push_pragma(schema_name, pragma_name)<span class="question-mark">?</span>;
@@ -719,7 +715,31 @@
         // or it may be separated from the pragma name by an equal sign.
         // The two syntaxes yield identical results.
         </span>sql.push_equal_sign();
-        sql.push_value(pragma_value)<span class="question-mark">?</span>;
+        sql.push_value(<span class="kw-2">&amp;</span>pragma_value)<span class="question-mark">?</span>;
+        <span class="self">self</span>.execute_batch(<span class="kw-2">&amp;</span>sql)
+    }
+
+    <span class="doccomment">/// Set a new value to `pragma_name` and return the updated value.
+    ///
+    /// Only few pragmas automatically return the updated value.
+    </span><span class="kw">pub fn </span>pragma_update_and_check&lt;F, T, V&gt;(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        schema_name: <span class="prelude-ty">Option</span>&lt;DatabaseName&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+        pragma_name: <span class="kw-2">&amp;</span>str,
+        pragma_value: V,
+        f: F,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;
+    <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;</span>Row&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;,
+        V: ToSql,
+    {
+        <span class="kw">let </span><span class="kw-2">mut </span>sql = Sql::new();
+        sql.push_pragma(schema_name, pragma_name)<span class="question-mark">?</span>;
+        <span class="comment">// The argument may be either in parentheses
+        // or it may be separated from the pragma name by an equal sign.
+        // The two syntaxes yield identical results.
+        </span>sql.push_equal_sign();
+        sql.push_value(<span class="kw-2">&amp;</span>pragma_value)<span class="question-mark">?</span>;
         <span class="self">self</span>.query_row(<span class="kw-2">&amp;</span>sql, [], f)
     }
 }
@@ -739,15 +759,15 @@
 </span>}
 
 <span class="kw">fn </span>is_identifier_start(c: char) -&gt; bool {
-    (<span class="string">&#39;A&#39;</span>..=<span class="string">&#39;Z&#39;</span>).contains(<span class="kw-2">&amp;</span>c) || c == <span class="string">&#39;_&#39; </span>|| (<span class="string">&#39;a&#39;</span>..=<span class="string">&#39;z&#39;</span>).contains(<span class="kw-2">&amp;</span>c) || c &gt; <span class="string">&#39;\x7F&#39;
+    c.is_ascii_uppercase() || c == <span class="string">&#39;_&#39; </span>|| c.is_ascii_lowercase() || c &gt; <span class="string">&#39;\x7F&#39;
 </span>}
 
 <span class="kw">fn </span>is_identifier_continue(c: char) -&gt; bool {
     c == <span class="string">&#39;$&#39;
-        </span>|| (<span class="string">&#39;0&#39;</span>..=<span class="string">&#39;9&#39;</span>).contains(<span class="kw-2">&amp;</span>c)
-        || (<span class="string">&#39;A&#39;</span>..=<span class="string">&#39;Z&#39;</span>).contains(<span class="kw-2">&amp;</span>c)
+        </span>|| c.is_ascii_digit()
+        || c.is_ascii_uppercase()
         || c == <span class="string">&#39;_&#39;
-        </span>|| (<span class="string">&#39;a&#39;</span>..=<span class="string">&#39;z&#39;</span>).contains(<span class="kw-2">&amp;</span>c)
+        </span>|| c.is_ascii_lowercase()
         || c &gt; <span class="string">&#39;\x7F&#39;
 </span>}
 
@@ -769,10 +789,7 @@
     #[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)]
     </span><span class="kw">fn </span>pragma_func_query_value() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
-        <span class="kw">let </span>user_version: i32 =
-            db.query_row(<span class="string">&quot;SELECT user_version FROM pragma_user_version&quot;</span>, [], |row| {
-                row.get(<span class="number">0</span>)
-            })<span class="question-mark">?</span>;
+        <span class="kw">let </span>user_version: i32 = db.one_column(<span class="string">&quot;SELECT user_version FROM pragma_user_version&quot;</span>)<span class="question-mark">?</span>;
         <span class="macro">assert_eq!</span>(<span class="number">0</span>, user_version);
         <span class="prelude-val">Ok</span>(())
     }
@@ -805,7 +822,7 @@
     </span><span class="kw">fn </span>pragma() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>columns = Vec::new();
-        db.pragma(<span class="prelude-val">None</span>, <span class="string">&quot;table_info&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;sqlite_master&quot;</span>, |row| {
+        db.pragma(<span class="prelude-val">None</span>, <span class="string">&quot;table_info&quot;</span>, <span class="string">&quot;sqlite_master&quot;</span>, |row| {
             <span class="kw">let </span>column: String = row.get(<span class="number">1</span>)<span class="question-mark">?</span>;
             columns.push(column);
             <span class="prelude-val">Ok</span>(())
@@ -818,7 +835,7 @@
     #[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)]
     </span><span class="kw">fn </span>pragma_func() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
-        <span class="kw">let </span><span class="kw-2">mut </span>table_info = db.prepare(<span class="string">&quot;SELECT * FROM pragma_table_info(?)&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>table_info = db.prepare(<span class="string">&quot;SELECT * FROM pragma_table_info(?1)&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>columns = Vec::new();
         <span class="kw">let </span><span class="kw-2">mut </span>rows = table_info.query([<span class="string">&quot;sqlite_master&quot;</span>])<span class="question-mark">?</span>;
 
@@ -834,15 +851,28 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>pragma_update() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
-        db.pragma_update(<span class="prelude-val">None</span>, <span class="string">&quot;user_version&quot;</span>, <span class="kw-2">&amp;</span><span class="number">1</span>)
+        db.pragma_update(<span class="prelude-val">None</span>, <span class="string">&quot;user_version&quot;</span>, <span class="number">1</span>)
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>pragma_update_and_check() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
         <span class="kw">let </span>journal_mode: String =
-            db.pragma_update_and_check(<span class="prelude-val">None</span>, <span class="string">&quot;journal_mode&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;OFF&quot;</span>, |row| row.get(<span class="number">0</span>))<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;off&quot;</span>, <span class="kw-2">&amp;</span>journal_mode);
+            db.pragma_update_and_check(<span class="prelude-val">None</span>, <span class="string">&quot;journal_mode&quot;</span>, <span class="string">&quot;OFF&quot;</span>, |row| row.get(<span class="number">0</span>))<span class="question-mark">?</span>;
+        <span class="macro">assert!</span>(
+            journal_mode == <span class="string">&quot;off&quot; </span>|| journal_mode == <span class="string">&quot;memory&quot;</span>,
+            <span class="string">&quot;mode: {:?}&quot;</span>,
+            journal_mode,
+        );
+        <span class="comment">// Sanity checks to ensure the move to a generic `ToSql` wasn&#39;t breaking
+        </span><span class="kw">let </span>mode =
+            db.pragma_update_and_check(<span class="prelude-val">None</span>, <span class="string">&quot;journal_mode&quot;</span>, <span class="string">&quot;OFF&quot;</span>, |row| row.get::&lt;<span class="kw">_</span>, String&gt;(<span class="number">0</span>))<span class="question-mark">?</span>;
+        <span class="macro">assert!</span>(mode == <span class="string">&quot;off&quot; </span>|| mode == <span class="string">&quot;memory&quot;</span>, <span class="string">&quot;mode: {:?}&quot;</span>, mode);
+
+        <span class="kw">let </span>param: <span class="kw-2">&amp;</span><span class="kw">dyn </span><span class="kw">crate</span>::ToSql = <span class="kw-2">&amp;</span><span class="string">&quot;OFF&quot;</span>;
+        <span class="kw">let </span>mode =
+            db.pragma_update_and_check(<span class="prelude-val">None</span>, <span class="string">&quot;journal_mode&quot;</span>, param, |row| row.get::&lt;<span class="kw">_</span>, String&gt;(<span class="number">0</span>))<span class="question-mark">?</span>;
+        <span class="macro">assert!</span>(mode == <span class="string">&quot;off&quot; </span>|| mode == <span class="string">&quot;memory&quot;</span>, <span class="string">&quot;mode: {:?}&quot;</span>, mode);
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -871,7 +901,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>locking_mode() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
-        <span class="kw">let </span>r = db.pragma_update(<span class="prelude-val">None</span>, <span class="string">&quot;locking_mode&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;exclusive&quot;</span>);
+        <span class="kw">let </span>r = db.pragma_update(<span class="prelude-val">None</span>, <span class="string">&quot;locking_mode&quot;</span>, <span class="string">&quot;exclusive&quot;</span>);
         <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;extra_check&quot;</span>) {
             r.unwrap_err();
         } <span class="kw">else </span>{

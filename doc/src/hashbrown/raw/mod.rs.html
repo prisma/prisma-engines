@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/3ygaf6wwr9d8r0529il4m7wxn6hg2b6k-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/hashbrown-0.12.3/src/raw/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="hashbrown" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../hashbrown/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnsihxmfi8pvl7n3q6k0f21yqpflag7z-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/hashbrown-0.13.2/src/raw/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="hashbrown" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../hashbrown/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2458,6 +2458,64 @@
 <a href="#2458" id="2458">2458</a>
 <a href="#2459" id="2459">2459</a>
 <a href="#2460" id="2460">2460</a>
+<a href="#2461" id="2461">2461</a>
+<a href="#2462" id="2462">2462</a>
+<a href="#2463" id="2463">2463</a>
+<a href="#2464" id="2464">2464</a>
+<a href="#2465" id="2465">2465</a>
+<a href="#2466" id="2466">2466</a>
+<a href="#2467" id="2467">2467</a>
+<a href="#2468" id="2468">2468</a>
+<a href="#2469" id="2469">2469</a>
+<a href="#2470" id="2470">2470</a>
+<a href="#2471" id="2471">2471</a>
+<a href="#2472" id="2472">2472</a>
+<a href="#2473" id="2473">2473</a>
+<a href="#2474" id="2474">2474</a>
+<a href="#2475" id="2475">2475</a>
+<a href="#2476" id="2476">2476</a>
+<a href="#2477" id="2477">2477</a>
+<a href="#2478" id="2478">2478</a>
+<a href="#2479" id="2479">2479</a>
+<a href="#2480" id="2480">2480</a>
+<a href="#2481" id="2481">2481</a>
+<a href="#2482" id="2482">2482</a>
+<a href="#2483" id="2483">2483</a>
+<a href="#2484" id="2484">2484</a>
+<a href="#2485" id="2485">2485</a>
+<a href="#2486" id="2486">2486</a>
+<a href="#2487" id="2487">2487</a>
+<a href="#2488" id="2488">2488</a>
+<a href="#2489" id="2489">2489</a>
+<a href="#2490" id="2490">2490</a>
+<a href="#2491" id="2491">2491</a>
+<a href="#2492" id="2492">2492</a>
+<a href="#2493" id="2493">2493</a>
+<a href="#2494" id="2494">2494</a>
+<a href="#2495" id="2495">2495</a>
+<a href="#2496" id="2496">2496</a>
+<a href="#2497" id="2497">2497</a>
+<a href="#2498" id="2498">2498</a>
+<a href="#2499" id="2499">2499</a>
+<a href="#2500" id="2500">2500</a>
+<a href="#2501" id="2501">2501</a>
+<a href="#2502" id="2502">2502</a>
+<a href="#2503" id="2503">2503</a>
+<a href="#2504" id="2504">2504</a>
+<a href="#2505" id="2505">2505</a>
+<a href="#2506" id="2506">2506</a>
+<a href="#2507" id="2507">2507</a>
+<a href="#2508" id="2508">2508</a>
+<a href="#2509" id="2509">2509</a>
+<a href="#2510" id="2510">2510</a>
+<a href="#2511" id="2511">2511</a>
+<a href="#2512" id="2512">2512</a>
+<a href="#2513" id="2513">2513</a>
+<a href="#2514" id="2514">2514</a>
+<a href="#2515" id="2515">2515</a>
+<a href="#2516" id="2516">2516</a>
+<a href="#2517" id="2517">2517</a>
+<a href="#2518" id="2518">2518</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::alloc::alloc::{handle_alloc_error, Layout};
 <span class="kw">use </span><span class="kw">crate</span>::scopeguard::{guard, ScopeGuard};
 <span class="kw">use </span><span class="kw">crate</span>::TryReserveError;
@@ -2594,6 +2652,13 @@
     </span>hash <span class="kw">as </span>usize
 }
 
+<span class="comment">// Constant for h2 function that grabing the top 7 bits of the hash.
+</span><span class="kw">const </span>MIN_HASH_LEN: usize = <span class="kw">if </span>mem::size_of::&lt;usize&gt;() &lt; mem::size_of::&lt;u64&gt;() {
+    mem::size_of::&lt;usize&gt;()
+} <span class="kw">else </span>{
+    mem::size_of::&lt;u64&gt;()
+};
+
 <span class="doccomment">/// Secondary hash function, saved in the low 7 bits of the control byte.
 </span><span class="attr">#[inline]
 #[allow(clippy::cast_possible_truncation)]
@@ -2601,8 +2666,8 @@
     <span class="comment">// Grab the top 7 bits of the hash. While the hash is normally a full 64-bit
     // value, some hash functions (such as FxHash) produce a usize result
     // instead, which means that the top 32 bits are 0 on 32-bit platforms.
-    </span><span class="kw">let </span>hash_len = usize::min(mem::size_of::&lt;usize&gt;(), mem::size_of::&lt;u64&gt;());
-    <span class="kw">let </span>top7 = hash &gt;&gt; (hash_len * <span class="number">8 </span>- <span class="number">7</span>);
+    // So we use MIN_HASH_LEN constant to handle this.
+    </span><span class="kw">let </span>top7 = hash &gt;&gt; (MIN_HASH_LEN * <span class="number">8 </span>- <span class="number">7</span>);
     (top7 &amp; <span class="number">0x7f</span>) <span class="kw">as </span>u8 <span class="comment">// truncation
 </span>}
 
@@ -2690,11 +2755,15 @@
 
 <span class="kw">impl </span>TableLayout {
     <span class="attr">#[inline]
-    </span><span class="kw">fn </span>new&lt;T&gt;() -&gt; <span class="self">Self </span>{
+    </span><span class="kw">const fn </span>new&lt;T&gt;() -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>layout = Layout::new::&lt;T&gt;();
         <span class="self">Self </span>{
             size: layout.size(),
-            ctrl_align: usize::max(layout.align(), Group::WIDTH),
+            ctrl_align: <span class="kw">if </span>layout.align() &gt; Group::WIDTH {
+                layout.align()
+            } <span class="kw">else </span>{
+                Group::WIDTH
+            },
         }
     }
 
@@ -2708,21 +2777,17 @@
             size.checked_mul(buckets)<span class="question-mark">?</span>.checked_add(ctrl_align - <span class="number">1</span>)<span class="question-mark">? </span>&amp; !(ctrl_align - <span class="number">1</span>);
         <span class="kw">let </span>len = ctrl_offset.checked_add(buckets + Group::WIDTH)<span class="question-mark">?</span>;
 
+        <span class="comment">// We need an additional check to ensure that the allocation doesn&#39;t
+        // exceed `isize::MAX` (https://github.com/rust-lang/rust/pull/95295).
+        </span><span class="kw">if </span>len &gt; isize::MAX <span class="kw">as </span>usize - (ctrl_align - <span class="number">1</span>) {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
+        }
+
         <span class="prelude-val">Some</span>((
             <span class="kw">unsafe </span>{ Layout::from_size_align_unchecked(len, ctrl_align) },
             ctrl_offset,
         ))
     }
-}
-
-<span class="doccomment">/// Returns a Layout which describes the allocation required for a hash table,
-/// and the offset of the control bytes in the allocation.
-/// (the offset is also one past last element of buckets)
-///
-/// Returns `None` if an overflow occurs.
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;inline-more&quot;</span>, inline)]
-</span><span class="kw">fn </span>calculate_layout&lt;T&gt;(buckets: usize) -&gt; <span class="prelude-ty">Option</span>&lt;(Layout, usize)&gt; {
-    TableLayout::new::&lt;T&gt;().calculate_layout_for(buckets)
 }
 
 <span class="doccomment">/// A reference to a hash table bucket containing a `T`.
@@ -2750,9 +2815,11 @@
 }
 
 <span class="kw">impl</span>&lt;T&gt; Bucket&lt;T&gt; {
+    <span class="kw">const </span>IS_ZERO_SIZED_TYPE: bool = mem::size_of::&lt;T&gt;() == <span class="number">0</span>;
+
     <span class="attr">#[inline]
     </span><span class="kw">unsafe fn </span>from_base_index(base: NonNull&lt;T&gt;, index: usize) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>ptr = <span class="kw">if </span>mem::size_of::&lt;T&gt;() == <span class="number">0 </span>{
+        <span class="kw">let </span>ptr = <span class="kw">if </span><span class="self">Self</span>::IS_ZERO_SIZED_TYPE {
             <span class="comment">// won&#39;t overflow because index must be less than length
             </span>(index + <span class="number">1</span>) <span class="kw">as </span><span class="kw-2">*mut </span>T
         } <span class="kw">else </span>{
@@ -2764,7 +2831,7 @@
     }
     <span class="attr">#[inline]
     </span><span class="kw">unsafe fn </span>to_base_index(<span class="kw-2">&amp;</span><span class="self">self</span>, base: NonNull&lt;T&gt;) -&gt; usize {
-        <span class="kw">if </span>mem::size_of::&lt;T&gt;() == <span class="number">0 </span>{
+        <span class="kw">if </span><span class="self">Self</span>::IS_ZERO_SIZED_TYPE {
             <span class="self">self</span>.ptr.as_ptr() <span class="kw">as </span>usize - <span class="number">1
         </span>} <span class="kw">else </span>{
             offset_from(base.as_ptr(), <span class="self">self</span>.ptr.as_ptr())
@@ -2772,7 +2839,7 @@
     }
     <span class="attr">#[inline]
     </span><span class="kw">pub fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>T {
-        <span class="kw">if </span>mem::size_of::&lt;T&gt;() == <span class="number">0 </span>{
+        <span class="kw">if </span><span class="self">Self</span>::IS_ZERO_SIZED_TYPE {
             <span class="comment">// Just return an arbitrary ZST pointer which is properly aligned
             </span>mem::align_of::&lt;T&gt;() <span class="kw">as </span><span class="kw-2">*mut </span>T
         } <span class="kw">else </span>{
@@ -2781,7 +2848,7 @@
     }
     <span class="attr">#[inline]
     </span><span class="kw">unsafe fn </span>next_n(<span class="kw-2">&amp;</span><span class="self">self</span>, offset: usize) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>ptr = <span class="kw">if </span>mem::size_of::&lt;T&gt;() == <span class="number">0 </span>{
+        <span class="kw">let </span>ptr = <span class="kw">if </span><span class="self">Self</span>::IS_ZERO_SIZED_TYPE {
             (<span class="self">self</span>.ptr.as_ptr() <span class="kw">as </span>usize + offset) <span class="kw">as </span><span class="kw-2">*mut </span>T
         } <span class="kw">else </span>{
             <span class="self">self</span>.ptr.as_ptr().sub(offset)
@@ -2791,15 +2858,15 @@
         }
     }
     <span class="attr">#[cfg_attr(feature = <span class="string">&quot;inline-more&quot;</span>, inline)]
-    </span><span class="kw">pub unsafe fn </span>drop(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>drop(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.as_ptr().drop_in_place();
     }
     <span class="attr">#[inline]
-    </span><span class="kw">pub unsafe fn </span>read(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; T {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>read(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; T {
         <span class="self">self</span>.as_ptr().read()
     }
     <span class="attr">#[inline]
-    </span><span class="kw">pub unsafe fn </span>write(<span class="kw-2">&amp;</span><span class="self">self</span>, val: T) {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>write(<span class="kw-2">&amp;</span><span class="self">self</span>, val: T) {
         <span class="self">self</span>.as_ptr().write(val);
     }
     <span class="attr">#[inline]
@@ -2873,6 +2940,9 @@
 }
 
 <span class="kw">impl</span>&lt;T, A: Allocator + Clone&gt; RawTable&lt;T, A&gt; {
+    <span class="kw">const </span>TABLE_LAYOUT: TableLayout = TableLayout::new::&lt;T&gt;();
+    <span class="kw">const </span>DATA_NEEDS_DROP: bool = mem::needs_drop::&lt;T&gt;();
+
     <span class="doccomment">/// Creates a new empty hash table without allocating any memory, using the
     /// given allocator.
     ///
@@ -2880,7 +2950,7 @@
     /// leave the data pointer dangling since that bucket is never written to
     /// due to our load factor forcing us to always have at least 1 free bucket.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>new_in(alloc: A) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub const fn </span>new_in(alloc: A) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             table: RawTableInner::new_in(alloc),
             marker: PhantomData,
@@ -2901,7 +2971,7 @@
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             table: RawTableInner::new_uninitialized(
                 alloc,
-                TableLayout::new::&lt;T&gt;(),
+                <span class="self">Self</span>::TABLE_LAYOUT,
                 buckets,
                 fallibility,
             )<span class="question-mark">?</span>,
@@ -2919,7 +2989,7 @@
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             table: RawTableInner::fallible_with_capacity(
                 alloc,
-                TableLayout::new::&lt;T&gt;(),
+                <span class="self">Self</span>::TABLE_LAYOUT,
                 capacity,
                 fallibility,
             )<span class="question-mark">?</span>,
@@ -2953,7 +3023,7 @@
     <span class="doccomment">/// Deallocates the table without dropping any entries.
     </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;inline-more&quot;</span>, inline)]
     </span><span class="kw">unsafe fn </span>free_buckets(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="self">self</span>.table.free_buckets(TableLayout::new::&lt;T&gt;());
+        <span class="self">self</span>.table.free_buckets(<span class="self">Self</span>::TABLE_LAYOUT);
     }
 
     <span class="doccomment">/// Returns pointer to one past last element of data table.
@@ -2967,6 +3037,19 @@
     #[cfg(feature = <span class="string">&quot;nightly&quot;</span>)]
     </span><span class="kw">pub unsafe fn </span>data_start(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>T {
         <span class="self">self</span>.data_end().as_ptr().wrapping_sub(<span class="self">self</span>.buckets())
+    }
+
+    <span class="doccomment">/// Return the information about memory allocated by the table.
+    ///
+    /// `RawTable` allocates single memory block to store both data and metadata.
+    /// This function returns allocation size and alignment and the beginning of the area.
+    /// These are the arguments which will be passed to `dealloc` when the table is dropped.
+    ///
+    /// This function might be useful for memory profiling.
+    </span><span class="attr">#[inline]
+    #[cfg(feature = <span class="string">&quot;raw&quot;</span>)]
+    </span><span class="kw">pub fn </span>allocation_info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (NonNull&lt;u8&gt;, Layout) {
+        <span class="self">self</span>.table.allocation_info_or_zero(<span class="self">Self</span>::TABLE_LAYOUT)
     }
 
     <span class="doccomment">/// Returns the index of a bucket from a `Bucket`.
@@ -2985,8 +3068,7 @@
 
     <span class="doccomment">/// Erases an element from the table without dropping it.
     </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;inline-more&quot;</span>, inline)]
-    #[deprecated(since = <span class="string">&quot;0.8.1&quot;</span>, note = <span class="string">&quot;use erase or remove instead&quot;</span>)]
-    </span><span class="kw">pub unsafe fn </span>erase_no_drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>, item: <span class="kw-2">&amp;</span>Bucket&lt;T&gt;) {
+    </span><span class="kw">unsafe fn </span>erase_no_drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>, item: <span class="kw-2">&amp;</span>Bucket&lt;T&gt;) {
         <span class="kw">let </span>index = <span class="self">self</span>.bucket_index(item);
         <span class="self">self</span>.table.erase(index);
     }
@@ -2994,7 +3076,6 @@
     <span class="doccomment">/// Erases an element from the table, dropping it in place.
     </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;inline-more&quot;</span>, inline)]
     #[allow(clippy::needless_pass_by_value)]
-    #[allow(deprecated)]
     </span><span class="kw">pub unsafe fn </span>erase(<span class="kw-2">&amp;mut </span><span class="self">self</span>, item: Bucket&lt;T&gt;) {
         <span class="comment">// Erase the element from the table first since drop might panic.
         </span><span class="self">self</span>.erase_no_drop(<span class="kw-2">&amp;</span>item);
@@ -3020,7 +3101,6 @@
     <span class="doccomment">/// Removes an element from the table, returning it.
     </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;inline-more&quot;</span>, inline)]
     #[allow(clippy::needless_pass_by_value)]
-    #[allow(deprecated)]
     </span><span class="kw">pub unsafe fn </span>remove(<span class="kw-2">&amp;mut </span><span class="self">self</span>, item: Bucket&lt;T&gt;) -&gt; T {
         <span class="self">self</span>.erase_no_drop(<span class="kw-2">&amp;</span>item);
         item.read()
@@ -3053,7 +3133,7 @@
     }
 
     <span class="kw">unsafe fn </span>drop_elements(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="kw">if </span>mem::needs_drop::&lt;T&gt;() &amp;&amp; !<span class="self">self</span>.is_empty() {
+        <span class="kw">if </span><span class="self">Self</span>::DATA_NEEDS_DROP &amp;&amp; !<span class="self">self</span>.is_empty() {
             <span class="kw">for </span>item <span class="kw">in </span><span class="self">self</span>.iter() {
                 item.drop();
             }
@@ -3141,8 +3221,8 @@
                 additional,
                 <span class="kw-2">&amp;</span>|table, index| hasher(table.bucket::&lt;T&gt;(index).as_ref()),
                 fallibility,
-                TableLayout::new::&lt;T&gt;(),
-                <span class="kw">if </span>mem::needs_drop::&lt;T&gt;() {
+                <span class="self">Self</span>::TABLE_LAYOUT,
+                <span class="kw">if </span><span class="self">Self</span>::DATA_NEEDS_DROP {
                     <span class="prelude-val">Some</span>(mem::transmute(ptr::drop_in_place::&lt;T&gt; <span class="kw">as unsafe fn</span>(<span class="kw-2">*mut </span>T)))
                 } <span class="kw">else </span>{
                     <span class="prelude-val">None
@@ -3164,7 +3244,7 @@
                 capacity,
                 <span class="kw-2">&amp;</span>|table, index| hasher(table.bucket::&lt;T&gt;(index).as_ref()),
                 fallibility,
-                TableLayout::new::&lt;T&gt;(),
+                <span class="self">Self</span>::TABLE_LAYOUT,
             )
         }
     }
@@ -3256,7 +3336,7 @@
     {
         <span class="kw">let </span>index = <span class="self">self</span>.bucket_index(<span class="kw-2">&amp;</span>bucket);
         <span class="kw">let </span>old_ctrl = <span class="kw-2">*</span><span class="self">self</span>.table.ctrl(index);
-        <span class="macro">debug_assert!</span>(is_full(old_ctrl));
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.is_bucket_full(index));
         <span class="kw">let </span>old_growth_left = <span class="self">self</span>.table.growth_left;
         <span class="kw">let </span>item = <span class="self">self</span>.remove(bucket);
         <span class="kw">if let </span><span class="prelude-val">Some</span>(new_item) = f(item) {
@@ -3388,6 +3468,16 @@
         <span class="self">self</span>.table.bucket_mask + <span class="number">1
     </span>}
 
+    <span class="doccomment">/// Checks whether the bucket at `index` is full.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure `index` is less than the number of buckets.
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub unsafe fn </span>is_bucket_full(<span class="kw-2">&amp;</span><span class="self">self</span>, index: usize) -&gt; bool {
+        <span class="self">self</span>.table.is_bucket_full(index)
+    }
+
     <span class="doccomment">/// Returns an iterator over every element in the table. It is up to
     /// the caller to ensure that the `RawTable` outlives the `RawIter`.
     /// Because we cannot make the `next` method unsafe on the `RawIter`
@@ -3471,10 +3561,11 @@
             <span class="prelude-val">None
         </span>} <span class="kw">else </span>{
             <span class="comment">// Avoid `Option::unwrap_or_else` because it bloats LLVM IR.
-            </span><span class="kw">let </span>(layout, ctrl_offset) = <span class="kw">match </span>calculate_layout::&lt;T&gt;(<span class="self">self</span>.table.buckets()) {
-                <span class="prelude-val">Some</span>(lco) =&gt; lco,
-                <span class="prelude-val">None </span>=&gt; <span class="kw">unsafe </span>{ hint::unreachable_unchecked() },
-            };
+            </span><span class="kw">let </span>(layout, ctrl_offset) =
+                <span class="kw">match </span><span class="self">Self</span>::TABLE_LAYOUT.calculate_layout_for(<span class="self">self</span>.table.buckets()) {
+                    <span class="prelude-val">Some</span>(lco) =&gt; lco,
+                    <span class="prelude-val">None </span>=&gt; <span class="kw">unsafe </span>{ hint::unreachable_unchecked() },
+                };
             <span class="prelude-val">Some</span>((
                 <span class="kw">unsafe </span>{ NonNull::new_unchecked(<span class="self">self</span>.table.ctrl.as_ptr().sub(ctrl_offset)) },
                 layout,
@@ -3527,15 +3618,6 @@
             <span class="prelude-val">Some</span>(lco) =&gt; lco,
             <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(fallibility.capacity_overflow()),
         };
-
-        <span class="comment">// We need an additional check to ensure that the allocation doesn&#39;t
-        // exceed `isize::MAX`. We can skip this check on 64-bit systems since
-        // such allocations will never succeed anyways.
-        //
-        // This mirrors what Vec does in the standard library.
-        </span><span class="kw">if </span>mem::size_of::&lt;usize&gt;() &lt; <span class="number">8 </span>&amp;&amp; layout.size() &gt; isize::MAX <span class="kw">as </span>usize {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(fallibility.capacity_overflow());
-        }
 
         <span class="kw">let </span>ptr: NonNull&lt;u8&gt; = <span class="kw">match </span>do_alloc(<span class="kw-2">&amp;</span>alloc, layout) {
             <span class="prelude-val">Ok</span>(block) =&gt; block.cast(),
@@ -3608,7 +3690,7 @@
                     // table. This second scan is guaranteed to find an empty
                     // slot (due to the load factor) before hitting the trailing
                     // control bytes (containing EMPTY).
-                    </span><span class="kw">if </span>unlikely(is_full(<span class="kw-2">*</span><span class="self">self</span>.ctrl(result))) {
+                    </span><span class="kw">if </span>unlikely(<span class="self">self</span>.is_bucket_full(result)) {
                         <span class="macro">debug_assert!</span>(<span class="self">self</span>.bucket_mask &lt; Group::WIDTH);
                         <span class="macro">debug_assert_ne!</span>(probe_seq.pos, <span class="number">0</span>);
                         <span class="kw">return </span>Group::load_aligned(<span class="self">self</span>.ctrl(<span class="number">0</span>))
@@ -3625,7 +3707,7 @@
 
     <span class="doccomment">/// Searches for an element in the table. This uses dynamic dispatch to reduce the amount of
     /// code generated, but it is eliminated by LLVM optimizations.
-    </span><span class="attr">#[inline]
+    </span><span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>find_inner(<span class="kw-2">&amp;</span><span class="self">self</span>, hash: u64, eq: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>FnMut(usize) -&gt; bool) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
         <span class="kw">let </span>h2_hash = h2(hash);
         <span class="kw">let </span><span class="kw-2">mut </span>probe_seq = <span class="self">self</span>.probe_seq(hash);
@@ -3789,6 +3871,17 @@
         <span class="self">self</span>.bucket_mask + <span class="number">1
     </span>}
 
+    <span class="doccomment">/// Checks whether the bucket at `index` is full.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure `index` is less than the number of buckets.
+    </span><span class="attr">#[inline]
+    </span><span class="kw">unsafe fn </span>is_bucket_full(<span class="kw-2">&amp;</span><span class="self">self</span>, index: usize) -&gt; bool {
+        <span class="macro">debug_assert!</span>(index &lt; <span class="self">self</span>.buckets());
+        is_full(<span class="kw-2">*</span><span class="self">self</span>.ctrl(index))
+    }
+
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>num_ctrl_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.bucket_mask + <span class="number">1 </span>+ Group::WIDTH
@@ -3887,7 +3980,7 @@
 
         <span class="comment">// Copy all elements to the new table.
         </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="self">self</span>.buckets() {
-            <span class="kw">if </span>!is_full(<span class="kw-2">*</span><span class="self">self</span>.ctrl(i)) {
+            <span class="kw">if </span>!<span class="self">self</span>.is_bucket_full(i) {
                 <span class="kw">continue</span>;
             }
 
@@ -3967,7 +4060,6 @@
 
                 <span class="comment">// Search for a suitable place to put it
                 </span><span class="kw">let </span>new_i = guard.find_insert_slot(hash);
-                <span class="kw">let </span>new_i_p = guard.bucket_ptr(new_i, size_of);
 
                 <span class="comment">// Probing works by scanning through all of the control
                 // bytes in groups, which may not be aligned to the group
@@ -3978,6 +4070,8 @@
                     guard.set_ctrl_h2(i, hash);
                     <span class="kw">continue </span><span class="lifetime">&#39;outer</span>;
                 }
+
+                <span class="kw">let </span>new_i_p = guard.bucket_ptr(new_i, size_of);
 
                 <span class="comment">// We are moving the current item to a new position. Write
                 // our H2 to the control byte of the new position.
@@ -4007,15 +4101,35 @@
 
     <span class="attr">#[inline]
     </span><span class="kw">unsafe fn </span>free_buckets(<span class="kw-2">&amp;mut </span><span class="self">self</span>, table_layout: TableLayout) {
+        <span class="kw">let </span>(ptr, layout) = <span class="self">self</span>.allocation_info(table_layout);
+        <span class="self">self</span>.alloc.deallocate(ptr, layout);
+    }
+
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>allocation_info(<span class="kw-2">&amp;</span><span class="self">self</span>, table_layout: TableLayout) -&gt; (NonNull&lt;u8&gt;, Layout) {
+        <span class="macro">debug_assert!</span>(
+            !<span class="self">self</span>.is_empty_singleton(),
+            <span class="string">&quot;this function can only be called on non-empty tables&quot;
+        </span>);
+
         <span class="comment">// Avoid `Option::unwrap_or_else` because it bloats LLVM IR.
         </span><span class="kw">let </span>(layout, ctrl_offset) = <span class="kw">match </span>table_layout.calculate_layout_for(<span class="self">self</span>.buckets()) {
             <span class="prelude-val">Some</span>(lco) =&gt; lco,
-            <span class="prelude-val">None </span>=&gt; hint::unreachable_unchecked(),
+            <span class="prelude-val">None </span>=&gt; <span class="kw">unsafe </span>{ hint::unreachable_unchecked() },
         };
-        <span class="self">self</span>.alloc.deallocate(
-            NonNull::new_unchecked(<span class="self">self</span>.ctrl.as_ptr().sub(ctrl_offset)),
+        (
+            <span class="kw">unsafe </span>{ NonNull::new_unchecked(<span class="self">self</span>.ctrl.as_ptr().sub(ctrl_offset)) },
             layout,
-        );
+        )
+    }
+
+    <span class="attr">#[cfg(feature = <span class="string">&quot;raw&quot;</span>)]
+    </span><span class="kw">fn </span>allocation_info_or_zero(<span class="kw-2">&amp;</span><span class="self">self</span>, table_layout: TableLayout) -&gt; (NonNull&lt;u8&gt;, Layout) {
+        <span class="kw">if </span><span class="self">self</span>.is_empty_singleton() {
+            (NonNull::dangling(), Layout::new::&lt;()&gt;())
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.allocation_info(table_layout)
+        }
     }
 
     <span class="doccomment">/// Marks all table buckets as empty without dropping their contents.
@@ -4032,7 +4146,7 @@
 
     <span class="attr">#[inline]
     </span><span class="kw">unsafe fn </span>erase(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) {
-        <span class="macro">debug_assert!</span>(is_full(<span class="kw-2">*</span><span class="self">self</span>.ctrl(index)));
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.is_bucket_full(index));
         <span class="kw">let </span>index_before = index.wrapping_sub(Group::WIDTH) &amp; <span class="self">self</span>.bucket_mask;
         <span class="kw">let </span>empty_before = Group::load(<span class="self">self</span>.ctrl(index_before)).match_empty();
         <span class="kw">let </span>empty_after = Group::load(<span class="self">self</span>.ctrl(index)).match_empty();
@@ -4180,9 +4294,9 @@
         // to make sure we drop only the elements that have been
         // cloned so far.
         </span><span class="kw">let </span><span class="kw-2">mut </span>guard = guard((<span class="number">0</span>, <span class="kw-2">&amp;mut *</span><span class="self">self</span>), |(index, self_)| {
-            <span class="kw">if </span>mem::needs_drop::&lt;T&gt;() &amp;&amp; !self_.is_empty() {
+            <span class="kw">if </span><span class="self">Self</span>::DATA_NEEDS_DROP &amp;&amp; !self_.is_empty() {
                 <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..=<span class="kw-2">*</span>index {
-                    <span class="kw">if </span>is_full(<span class="kw-2">*</span>self_.table.ctrl(i)) {
+                    <span class="kw">if </span>self_.is_bucket_full(i) {
                         self_.bucket(i).drop();
                     }
                 }
@@ -4468,6 +4582,8 @@
 }
 
 <span class="kw">impl</span>&lt;T&gt; RawIter&lt;T&gt; {
+    <span class="kw">const </span>DATA_NEEDS_DROP: bool = mem::needs_drop::&lt;T&gt;();
+
     <span class="doccomment">/// Refresh the iterator so that it reflects a removal from the given bucket.
     ///
     /// For the iterator to remain valid, this method must be called once
@@ -4585,7 +4701,7 @@
     }
 
     <span class="kw">unsafe fn </span>drop_elements(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="kw">if </span>mem::needs_drop::&lt;T&gt;() &amp;&amp; <span class="self">self</span>.len() != <span class="number">0 </span>{
+        <span class="kw">if </span><span class="self">Self</span>::DATA_NEEDS_DROP &amp;&amp; <span class="self">self</span>.len() != <span class="number">0 </span>{
             <span class="kw">for </span>item <span class="kw">in </span><span class="self">self </span>{
                 item.drop();
             }

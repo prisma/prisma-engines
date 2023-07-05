@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/3ygaf6wwr9d8r0529il4m7wxn6hg2b6k-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rusqlite-0.25.4/src/statement.rs`."><title>statement.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rusqlite" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnsihxmfi8pvl7n3q6k0f21yqpflag7z-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rusqlite-0.29.0/src/statement.rs`."><title>statement.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rusqlite" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1354,85 +1354,12 @@
 <a href="#1354" id="1354">1354</a>
 <a href="#1355" id="1355">1355</a>
 <a href="#1356" id="1356">1356</a>
-<a href="#1357" id="1357">1357</a>
-<a href="#1358" id="1358">1358</a>
-<a href="#1359" id="1359">1359</a>
-<a href="#1360" id="1360">1360</a>
-<a href="#1361" id="1361">1361</a>
-<a href="#1362" id="1362">1362</a>
-<a href="#1363" id="1363">1363</a>
-<a href="#1364" id="1364">1364</a>
-<a href="#1365" id="1365">1365</a>
-<a href="#1366" id="1366">1366</a>
-<a href="#1367" id="1367">1367</a>
-<a href="#1368" id="1368">1368</a>
-<a href="#1369" id="1369">1369</a>
-<a href="#1370" id="1370">1370</a>
-<a href="#1371" id="1371">1371</a>
-<a href="#1372" id="1372">1372</a>
-<a href="#1373" id="1373">1373</a>
-<a href="#1374" id="1374">1374</a>
-<a href="#1375" id="1375">1375</a>
-<a href="#1376" id="1376">1376</a>
-<a href="#1377" id="1377">1377</a>
-<a href="#1378" id="1378">1378</a>
-<a href="#1379" id="1379">1379</a>
-<a href="#1380" id="1380">1380</a>
-<a href="#1381" id="1381">1381</a>
-<a href="#1382" id="1382">1382</a>
-<a href="#1383" id="1383">1383</a>
-<a href="#1384" id="1384">1384</a>
-<a href="#1385" id="1385">1385</a>
-<a href="#1386" id="1386">1386</a>
-<a href="#1387" id="1387">1387</a>
-<a href="#1388" id="1388">1388</a>
-<a href="#1389" id="1389">1389</a>
-<a href="#1390" id="1390">1390</a>
-<a href="#1391" id="1391">1391</a>
-<a href="#1392" id="1392">1392</a>
-<a href="#1393" id="1393">1393</a>
-<a href="#1394" id="1394">1394</a>
-<a href="#1395" id="1395">1395</a>
-<a href="#1396" id="1396">1396</a>
-<a href="#1397" id="1397">1397</a>
-<a href="#1398" id="1398">1398</a>
-<a href="#1399" id="1399">1399</a>
-<a href="#1400" id="1400">1400</a>
-<a href="#1401" id="1401">1401</a>
-<a href="#1402" id="1402">1402</a>
-<a href="#1403" id="1403">1403</a>
-<a href="#1404" id="1404">1404</a>
-<a href="#1405" id="1405">1405</a>
-<a href="#1406" id="1406">1406</a>
-<a href="#1407" id="1407">1407</a>
-<a href="#1408" id="1408">1408</a>
-<a href="#1409" id="1409">1409</a>
-<a href="#1410" id="1410">1410</a>
-<a href="#1411" id="1411">1411</a>
-<a href="#1412" id="1412">1412</a>
-<a href="#1413" id="1413">1413</a>
-<a href="#1414" id="1414">1414</a>
-<a href="#1415" id="1415">1415</a>
-<a href="#1416" id="1416">1416</a>
-<a href="#1417" id="1417">1417</a>
-<a href="#1418" id="1418">1418</a>
-<a href="#1419" id="1419">1419</a>
-<a href="#1420" id="1420">1420</a>
-<a href="#1421" id="1421">1421</a>
-<a href="#1422" id="1422">1422</a>
-<a href="#1423" id="1423">1423</a>
-<a href="#1424" id="1424">1424</a>
-<a href="#1425" id="1425">1425</a>
-<a href="#1426" id="1426">1426</a>
-<a href="#1427" id="1427">1427</a>
-<a href="#1428" id="1428">1428</a>
-<a href="#1429" id="1429">1429</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::iter::IntoIterator;
 <span class="kw">use </span>std::os::raw::{c_int, c_void};
 <span class="attr">#[cfg(feature = <span class="string">&quot;array&quot;</span>)]
 </span><span class="kw">use </span>std::rc::Rc;
 <span class="kw">use </span>std::slice::from_raw_parts;
-<span class="kw">use </span>std::{convert, fmt, mem, ptr, str};
+<span class="kw">use </span>std::{fmt, mem, ptr, str};
 
 <span class="kw">use </span><span class="kw">super</span>::ffi;
 <span class="kw">use super</span>::{len_as_c_int, str_for_sqlite};
@@ -1462,17 +1389,45 @@
     /// ```rust,no_run
     /// # use rusqlite::{Connection, Result, params};
     /// fn update_rows(conn: &amp;Connection) -&gt; Result&lt;()&gt; {
-    ///     let mut stmt = conn.prepare(&quot;UPDATE foo SET bar = &#39;baz&#39; WHERE qux = ?&quot;)?;
+    ///     let mut stmt = conn.prepare(&quot;UPDATE foo SET bar = ?1 WHERE qux = ?2&quot;)?;
+    ///     // For a single parameter, or a parameter where all the values have
+    ///     // the same type, just passing an array is simplest.
+    ///     stmt.execute([2i32])?;
     ///     // The `rusqlite::params!` macro is mostly useful when the parameters do not
     ///     // all have the same type, or if there are more than 32 parameters
-    ///     // at once.
+    ///     // at once, but it can be used in other cases.
     ///     stmt.execute(params![1i32])?;
     ///     // However, it&#39;s not required, many cases are fine as:
     ///     stmt.execute(&amp;[&amp;2i32])?;
     ///     // Or even:
     ///     stmt.execute([2i32])?;
+    ///     // If you really want to, this is an option as well.
+    ///     stmt.execute((2i32,))?;
     ///     Ok(())
     /// }
+    /// ```
+    ///
+    /// #### Heterogeneous positional parameters
+    ///
+    /// ```
+    /// use rusqlite::{Connection, Result};
+    /// fn store_file(conn: &amp;Connection, path: &amp;str, data: &amp;[u8]) -&gt; Result&lt;()&gt; {
+    ///     # // no need to do it for real.
+    ///     # fn sha256(_: &amp;[u8]) -&gt; [u8; 32] { [0; 32] }
+    ///     let query = &quot;INSERT OR REPLACE INTO files(path, hash, data) VALUES (?1, ?2, ?3)&quot;;
+    ///     let mut stmt = conn.prepare_cached(query)?;
+    ///     let hash: [u8; 32] = sha256(data);
+    ///     // The easiest way to pass positional parameters of have several
+    ///     // different types is by using a tuple.
+    ///     stmt.execute((path, hash, data))?;
+    ///     // Using the `params!` macro also works, and supports longer parameter lists:
+    ///     stmt.execute(rusqlite::params![path, hash, data])?;
+    ///     Ok(())
+    /// }
+    /// # let c = Connection::open_in_memory().unwrap();
+    /// # c.execute_batch(&quot;CREATE TABLE files(path TEXT PRIMARY KEY, hash BLOB, data BLOB)&quot;).unwrap();
+    /// # store_file(&amp;c, &quot;foo/bar.txt&quot;, b&quot;bibble&quot;).unwrap();
+    /// # store_file(&amp;c, &quot;foo/baz.txt&quot;, b&quot;bobble&quot;).unwrap();
     /// ```
     ///
     /// ### Use with named parameters
@@ -1484,7 +1439,7 @@
     ///     // The `rusqlite::named_params!` macro (like `params!`) is useful for heterogeneous
     ///     // sets of parameters (where all parameters are not the same type), or for queries
     ///     // with many (more than 32) statically known parameters.
-    ///     stmt.execute(named_params!{ &quot;:key&quot;: &quot;one&quot;, &quot;:val&quot;: 2 })?;
+    ///     stmt.execute(named_params! { &quot;:key&quot;: &quot;one&quot;, &quot;:val&quot;: 2 })?;
     ///     // However, named parameters can also be passed like:
     ///     stmt.execute(&amp;[(&quot;:key&quot;, &quot;three&quot;), (&quot;:val&quot;, &quot;four&quot;)])?;
     ///     // Or even: (note that a &amp;T is required for the value type, currently)
@@ -1515,30 +1470,6 @@
         <span class="self">self</span>.execute_with_bound_parameters()
     }
 
-    <span class="doccomment">/// Execute the prepared statement with named parameter(s).
-    ///
-    /// Note: This function is deprecated in favor of [`Statement::execute`],
-    /// which can now take named parameters directly.
-    ///
-    /// If any parameters that were in the prepared statement are not included
-    /// in `params`, they will continue to use the most-recently bound value
-    /// from a previous call to `execute_named`, or `NULL` if they have never
-    /// been bound.
-    ///
-    /// On success, returns the number of rows that were changed or inserted or
-    /// deleted (via `sqlite3_changes`).
-    ///
-    /// # Failure
-    ///
-    /// Will return `Err` if binding parameters fails, the executed statement
-    /// returns rows (in which case `query` should be used instead), or the
-    /// underlying SQLite call fails.
-    </span><span class="attr">#[deprecated = <span class="string">&quot;You can use `execute` with named params now.&quot;</span>]
-    #[inline]
-    </span><span class="kw">pub fn </span>execute_named(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql)]) -&gt; <span class="prelude-ty">Result</span>&lt;usize&gt; {
-        <span class="self">self</span>.execute(params)
-    }
-
     <span class="doccomment">/// Execute an INSERT and return the ROWID.
     ///
     /// # Note
@@ -1564,8 +1495,8 @@
     <span class="doccomment">/// Execute the prepared statement, returning a handle to the resulting
     /// rows.
     ///
-    /// Due to lifetime restricts, the rows handle returned by `query` does not
-    /// implement the `Iterator` trait. Consider using
+    /// Due to lifetime restrictions, the rows handle returned by `query` does
+    /// not implement the `Iterator` trait. Consider using
     /// [`query_map`](Statement::query_map) or
     /// [`query_and_then`](Statement::query_and_then) instead, which do.
     ///
@@ -1593,7 +1524,7 @@
     /// ```rust,no_run
     /// # use rusqlite::{Connection, Result};
     /// fn query(conn: &amp;Connection, name: &amp;str) -&gt; Result&lt;()&gt; {
-    ///     let mut stmt = conn.prepare(&quot;SELECT * FROM test where name = ?&quot;)?;
+    ///     let mut stmt = conn.prepare(&quot;SELECT * FROM test where name = ?1&quot;)?;
     ///     let mut rows = stmt.query(rusqlite::params![name])?;
     ///     while let Some(row) = rows.next()? {
     ///         // ...
@@ -1602,12 +1533,12 @@
     /// }
     /// ```
     ///
-    /// Or, equivalently (but without the [`params!`] macro).
+    /// Or, equivalently (but without the [`crate::params!`] macro).
     ///
     /// ```rust,no_run
     /// # use rusqlite::{Connection, Result};
     /// fn query(conn: &amp;Connection, name: &amp;str) -&gt; Result&lt;()&gt; {
-    ///     let mut stmt = conn.prepare(&quot;SELECT * FROM test where name = ?&quot;)?;
+    ///     let mut stmt = conn.prepare(&quot;SELECT * FROM test where name = ?1&quot;)?;
     ///     let mut rows = stmt.query([name])?;
     ///     while let Some(row) = rows.next()? {
     ///         // ...
@@ -1637,7 +1568,7 @@
     /// # use rusqlite::{Connection, Result, named_params};
     /// fn query(conn: &amp;Connection) -&gt; Result&lt;()&gt; {
     ///     let mut stmt = conn.prepare(&quot;SELECT * FROM test where name = :name&quot;)?;
-    ///     let mut rows = stmt.query(named_params!{ &quot;:name&quot;: &quot;one&quot; })?;
+    ///     let mut rows = stmt.query(named_params! { &quot;:name&quot;: &quot;one&quot; })?;
     ///     while let Some(row) = rows.next()? {
     ///         // ...
     ///     }
@@ -1652,25 +1583,6 @@
     </span><span class="kw">pub fn </span>query&lt;P: Params&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: P) -&gt; <span class="prelude-ty">Result</span>&lt;Rows&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
         params.__bind_in(<span class="self">self</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(Rows::new(<span class="self">self</span>))
-    }
-
-    <span class="doccomment">/// Execute the prepared statement with named parameter(s), returning a
-    /// handle for the resulting rows.
-    ///
-    /// Note: This function is deprecated in favor of [`Statement::query`],
-    /// which can now take named parameters directly.
-    ///
-    /// If any parameters that were in the prepared statement are not included
-    /// in `params`, they will continue to use the most-recently bound value
-    /// from a previous call to `query_named`, or `NULL` if they have never been
-    /// bound.
-    ///
-    /// # Failure
-    ///
-    /// Will return `Err` if binding parameters fails.
-    </span><span class="attr">#[deprecated = <span class="string">&quot;You can use `query` with named params now.&quot;</span>]
-    </span><span class="kw">pub fn </span>query_named(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql)]) -&gt; <span class="prelude-ty">Result</span>&lt;Rows&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
-        <span class="self">self</span>.query(params)
     }
 
     <span class="doccomment">/// Executes the prepared statement and maps a function over the resulting
@@ -1727,36 +1639,6 @@
         <span class="self">self</span>.query(params).map(|rows| rows.mapped(f))
     }
 
-    <span class="doccomment">/// Execute the prepared statement with named parameter(s), returning an
-    /// iterator over the result of calling the mapping function over the
-    /// query&#39;s rows.
-    ///
-    /// Note: This function is deprecated in favor of [`Statement::query_map`],
-    /// which can now take named parameters directly.
-    ///
-    /// If any parameters that were in the prepared statement
-    /// are not included in `params`, they will continue to use the
-    /// most-recently bound value from a previous call to `query_named`,
-    /// or `NULL` if they have never been bound.
-    ///
-    /// `f` is used to transform the _streaming_ iterator into a _standard_
-    /// iterator.
-    ///
-    /// ## Failure
-    ///
-    /// Will return `Err` if binding parameters fails.
-    </span><span class="attr">#[deprecated = <span class="string">&quot;You can use `query_map` with named params now.&quot;</span>]
-    </span><span class="kw">pub fn </span>query_map_named&lt;T, F&gt;(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        params: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql)],
-        f: F,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;MappedRows&lt;<span class="lifetime">&#39;_</span>, F&gt;&gt;
-    <span class="kw">where
-        </span>F: FnMut(<span class="kw-2">&amp;</span>Row&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;,
-    {
-        <span class="self">self</span>.query_map(params, f)
-    }
-
     <span class="doccomment">/// Executes the prepared statement and maps a function over the resulting
     /// rows, where the function returns a `Result` with `Error` type
     /// implementing `std::convert::From&lt;Error&gt;` (so errors can be unified).
@@ -1775,13 +1657,12 @@
     ///
     /// fn name_to_person(name: String) -&gt; Result&lt;Person&gt; {
     ///     // ... check for valid name
-    ///     Ok(Person { name: name })
+    ///     Ok(Person { name })
     /// }
     ///
     /// fn get_names(conn: &amp;Connection) -&gt; Result&lt;Vec&lt;Person&gt;&gt; {
     ///     let mut stmt = conn.prepare(&quot;SELECT name FROM people WHERE id = :id&quot;)?;
-    ///     let rows =
-    ///         stmt.query_and_then(&amp;[(&quot;:id&quot;, &quot;one&quot;)], |row| name_to_person(row.get(0)?))?;
+    ///     let rows = stmt.query_and_then(&amp;[(&quot;:id&quot;, &quot;one&quot;)], |row| name_to_person(row.get(0)?))?;
     ///
     ///     let mut persons = Vec::new();
     ///     for person_result in rows {
@@ -1797,7 +1678,7 @@
     /// ```rust,no_run
     /// # use rusqlite::{Connection, Result};
     /// fn get_names(conn: &amp;Connection) -&gt; Result&lt;Vec&lt;String&gt;&gt; {
-    ///     let mut stmt = conn.prepare(&quot;SELECT name FROM people WHERE id = ?&quot;)?;
+    ///     let mut stmt = conn.prepare(&quot;SELECT name FROM people WHERE id = ?1&quot;)?;
     ///     let rows = stmt.query_and_then([&quot;one&quot;], |row| row.get::&lt;_, String&gt;(0))?;
     ///
     ///     let mut persons = Vec::new();
@@ -1816,39 +1697,10 @@
     </span><span class="kw">pub fn </span>query_and_then&lt;T, E, P, F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: P, f: F) -&gt; <span class="prelude-ty">Result</span>&lt;AndThenRows&lt;<span class="lifetime">&#39;_</span>, F&gt;&gt;
     <span class="kw">where
         </span>P: Params,
-        E: convert::From&lt;Error&gt;,
+        E: From&lt;Error&gt;,
         F: FnMut(<span class="kw-2">&amp;</span>Row&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;T, E&gt;,
     {
         <span class="self">self</span>.query(params).map(|rows| rows.and_then(f))
-    }
-
-    <span class="doccomment">/// Execute the prepared statement with named parameter(s), returning an
-    /// iterator over the result of calling the mapping function over the
-    /// query&#39;s rows.
-    ///
-    /// Note: This function is deprecated in favor of
-    /// [`Statement::query_and_then`], which can now take named parameters
-    /// directly.
-    ///
-    /// If any parameters that were in the prepared statement are not included
-    /// in `params`, they will continue to use the most-recently bound value
-    /// from a previous call to `query_named`, or `NULL` if they have never been
-    /// bound.
-    ///
-    /// ## Failure
-    ///
-    /// Will return `Err` if binding parameters fails.
-    </span><span class="attr">#[deprecated = <span class="string">&quot;You can use `query_and_then` with named params now.&quot;</span>]
-    </span><span class="kw">pub fn </span>query_and_then_named&lt;T, E, F&gt;(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        params: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql)],
-        f: F,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;AndThenRows&lt;<span class="lifetime">&#39;_</span>, F&gt;&gt;
-    <span class="kw">where
-        </span>E: convert::From&lt;Error&gt;,
-        F: FnMut(<span class="kw-2">&amp;</span>Row&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;T, E&gt;,
-    {
-        <span class="self">self</span>.query_and_then(params, f)
     }
 
     <span class="doccomment">/// Return `true` if a query in the SQL statement it executes returns one
@@ -1882,35 +1734,7 @@
     {
         <span class="kw">let </span><span class="kw-2">mut </span>rows = <span class="self">self</span>.query(params)<span class="question-mark">?</span>;
 
-        rows.get_expected_row().and_then(|r| f(<span class="kw-2">&amp;</span>r))
-    }
-
-    <span class="doccomment">/// Convenience method to execute a query with named parameter(s) that is
-    /// expected to return a single row.
-    ///
-    /// Note: This function is deprecated in favor of
-    /// [`Statement::query_and_then`], which can now take named parameters
-    /// directly.
-    ///
-    /// If the query returns more than one row, all rows except the first are
-    /// ignored.
-    ///
-    /// Returns `Err(QueryReturnedNoRows)` if no results are returned. If the
-    /// query truly is optional, you can call
-    /// [`.optional()`](crate::OptionalExtension::optional) on the result of
-    /// this to get a `Result&lt;Option&lt;T&gt;&gt;` (requires that the trait
-    /// `rusqlite::OptionalExtension` is imported).
-    ///
-    /// # Failure
-    ///
-    /// Will return `Err` if `sql` cannot be converted to a C-compatible string
-    /// or if the underlying SQLite call fails.
-    </span><span class="attr">#[deprecated = <span class="string">&quot;You can use `query_row` with named params now.&quot;</span>]
-    </span><span class="kw">pub fn </span>query_row_named&lt;T, F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql)], f: F) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;
-    <span class="kw">where
-        </span>F: FnOnce(<span class="kw-2">&amp;</span>Row&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;,
-    {
-        <span class="self">self</span>.query_row(params, f)
+        rows.get_expected_row().and_then(f)
     }
 
     <span class="doccomment">/// Consumes the statement.
@@ -1997,6 +1821,16 @@
     }
 
     <span class="attr">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>ensure_parameter_count(<span class="kw-2">&amp;</span><span class="self">self</span>, n: usize) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>count = <span class="self">self</span>.parameter_count();
+        <span class="kw">if </span>count != n {
+            <span class="prelude-val">Err</span>(Error::InvalidParameterCount(n, count))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Ok</span>(())
+        }
+    }
+
+    <span class="attr">#[inline]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>bind_parameters_named&lt;T: <span class="question-mark">?</span>Sized + ToSql&gt;(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         params: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>T)],
@@ -2036,9 +1870,14 @@
     /// - binding named and positional parameters in the same query.
     /// - separating parameter binding from query execution.
     ///
-    /// Statements that have had their parameters bound this way should be
-    /// queried or executed by [`Statement::raw_query`] or
-    /// [`Statement::raw_execute`]. Other functions are not guaranteed to work.
+    /// In general, statements that have had *any* parameters bound this way
+    /// should have *all* parameters bound this way, and be queried or executed
+    /// by [`Statement::raw_query`] or [`Statement::raw_execute`], other usage
+    /// is unsupported and will likely, probably in surprising ways.
+    ///
+    /// That is: Do not mix the &quot;raw&quot; statement functions with the rest of the
+    /// API, or the results may be surprising, and may even change in future
+    /// versions without comment.
     ///
     /// # Example
     ///
@@ -2114,7 +1953,8 @@
 
             <span class="attr">#[cfg(feature = <span class="string">&quot;blob&quot;</span>)]
             </span>ToSqlOutput::ZeroBlob(len) =&gt; {
-                <span class="kw">return </span><span class="self">self
+                <span class="comment">// TODO sqlite3_bind_zeroblob64 // 3.8.11
+                </span><span class="kw">return </span><span class="self">self
                     </span>.conn
                     .decode_result(<span class="kw">unsafe </span>{ ffi::sqlite3_bind_zeroblob(ptr, col <span class="kw">as </span>c_int, len) });
             }
@@ -2137,17 +1977,19 @@
             ValueRef::Real(r) =&gt; <span class="kw">unsafe </span>{ ffi::sqlite3_bind_double(ptr, col <span class="kw">as </span>c_int, r) },
             ValueRef::Text(s) =&gt; <span class="kw">unsafe </span>{
                 <span class="kw">let </span>(c_str, len, destructor) = str_for_sqlite(s)<span class="question-mark">?</span>;
-                ffi::sqlite3_bind_text(ptr, col <span class="kw">as </span>c_int, c_str, len, destructor)
+                <span class="comment">// TODO sqlite3_bind_text64 // 3.8.7
+                </span>ffi::sqlite3_bind_text(ptr, col <span class="kw">as </span>c_int, c_str, len, destructor)
             },
             ValueRef::Blob(b) =&gt; <span class="kw">unsafe </span>{
                 <span class="kw">let </span>length = len_as_c_int(b.len())<span class="question-mark">?</span>;
                 <span class="kw">if </span>length == <span class="number">0 </span>{
                     ffi::sqlite3_bind_zeroblob(ptr, col <span class="kw">as </span>c_int, <span class="number">0</span>)
                 } <span class="kw">else </span>{
-                    ffi::sqlite3_bind_blob(
+                    <span class="comment">// TODO sqlite3_bind_blob64 // 3.8.7
+                    </span>ffi::sqlite3_bind_blob(
                         ptr,
                         col <span class="kw">as </span>c_int,
-                        b.as_ptr() <span class="kw">as </span><span class="kw-2">*const </span>c_void,
+                        b.as_ptr().cast::&lt;c_void&gt;(),
                         length,
                         ffi::SQLITE_TRANSIENT(),
                     )
@@ -2162,7 +2004,7 @@
         <span class="kw">let </span>r = <span class="self">self</span>.stmt.step();
         <span class="self">self</span>.stmt.reset();
         <span class="kw">match </span>r {
-            ffi::SQLITE_DONE =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.conn.changes()),
+            ffi::SQLITE_DONE =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.conn.changes() <span class="kw">as </span>usize),
             ffi::SQLITE_ROW =&gt; <span class="prelude-val">Err</span>(Error::ExecuteReturnedResults),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(<span class="self">self</span>.conn.decode_result(r).unwrap_err()),
         }
@@ -2175,21 +2017,11 @@
         <span class="self">self</span>.conn.decode_result(stmt.finalize())
     }
 
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;modern_sqlite&quot;</span>, feature = <span class="string">&quot;extra_check&quot;</span>))]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;extra_check&quot;</span>)]
     #[inline]
     </span><span class="kw">fn </span>check_update(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="comment">// sqlite3_column_count works for DML but not for DDL (ie ALTER)
         </span><span class="kw">if </span><span class="self">self</span>.column_count() &gt; <span class="number">0 </span>&amp;&amp; <span class="self">self</span>.stmt.readonly() {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::ExecuteReturnedResults);
-        }
-        <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="attr">#[cfg(all(not(feature = <span class="string">&quot;modern_sqlite&quot;</span>), feature = <span class="string">&quot;extra_check&quot;</span>))]
-    #[inline]
-    </span><span class="kw">fn </span>check_update(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="comment">// sqlite3_column_count works for DML but not for DDL (ie ALTER)
-        </span><span class="kw">if </span><span class="self">self</span>.column_count() &gt; <span class="number">0 </span>{
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::ExecuteReturnedResults);
         }
         <span class="prelude-val">Ok</span>(())
@@ -2204,7 +2036,6 @@
 
     <span class="doccomment">/// Returns a string containing the SQL text of prepared statement with
     /// bound parameters expanded.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)]
     </span><span class="kw">pub fn </span>expanded_sql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
         <span class="self">self</span>.stmt
             .expanded_sql()
@@ -2222,6 +2053,22 @@
     </span><span class="doccomment">/// returning the value it had before resetting.
     </span><span class="kw">pub fn </span>reset_status(<span class="kw-2">&amp;</span><span class="self">self</span>, status: StatementStatus) -&gt; i32 {
         <span class="self">self</span>.stmt.get_status(status, <span class="bool-val">true</span>)
+    }
+
+    <span class="doccomment">/// Returns 1 if the prepared statement is an EXPLAIN statement,
+    /// or 2 if the statement is an EXPLAIN QUERY PLAN,
+    /// or 0 if it is an ordinary statement or a NULL pointer.
+    </span><span class="attr">#[inline]
+    #[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)] </span><span class="comment">// 3.28.0
+    </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)))]
+    </span><span class="kw">pub fn </span>is_explain(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="self">self</span>.stmt.is_explain()
+    }
+
+    <span class="doccomment">/// Returns true if the statement is read only.
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub fn </span>readonly(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.stmt.readonly()
     }
 
     <span class="attr">#[cfg(feature = <span class="string">&quot;extra_check&quot;</span>)]
@@ -2249,6 +2096,11 @@
         <span class="kw">let </span><span class="kw-2">mut </span>stmt = RawStatement::new(ptr::null_mut(), <span class="number">0</span>);
         mem::swap(<span class="kw-2">&amp;mut </span>stmt, <span class="kw-2">&amp;mut </span><span class="self">self</span>.stmt);
         stmt
+    }
+
+    <span class="doccomment">/// Reset all bindings
+    </span><span class="kw">pub fn </span>clear_bindings(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.stmt.clear_bindings()
     }
 }
 
@@ -2304,7 +2156,7 @@
                         !text.is_null(),
                         <span class="string">&quot;unexpected SQLITE_TEXT column type with NULL data&quot;
                     </span>);
-                    from_raw_parts(text <span class="kw">as </span><span class="kw-2">*const </span>u8, len <span class="kw">as </span>usize)
+                    from_raw_parts(text.cast::&lt;u8&gt;(), len <span class="kw">as </span>usize)
                 };
 
                 ValueRef::Text(s)
@@ -2326,7 +2178,7 @@
                         !blob.is_null(),
                         <span class="string">&quot;unexpected SQLITE_BLOB column type with NULL data&quot;
                     </span>);
-                    ValueRef::Blob(<span class="kw">unsafe </span>{ from_raw_parts(blob <span class="kw">as </span><span class="kw-2">*const </span>u8, len <span class="kw">as </span>usize) })
+                    ValueRef::Blob(<span class="kw">unsafe </span>{ from_raw_parts(blob.cast::&lt;u8&gt;(), len <span class="kw">as </span>usize) })
                 } <span class="kw">else </span>{
                     <span class="comment">// The return value from sqlite3_column_blob() for a zero-length BLOB
                     // is a NULL pointer.
@@ -2371,11 +2223,15 @@
     </span>AutoIndex = <span class="number">3</span>,
     <span class="doccomment">/// Equivalent to SQLITE_STMTSTATUS_VM_STEP
     </span>VmStep = <span class="number">4</span>,
-    <span class="doccomment">/// Equivalent to SQLITE_STMTSTATUS_REPREPARE
+    <span class="doccomment">/// Equivalent to SQLITE_STMTSTATUS_REPREPARE (3.20.0)
     </span>RePrepare = <span class="number">5</span>,
-    <span class="doccomment">/// Equivalent to SQLITE_STMTSTATUS_RUN
+    <span class="doccomment">/// Equivalent to SQLITE_STMTSTATUS_RUN (3.20.0)
     </span>Run = <span class="number">6</span>,
-    <span class="doccomment">/// Equivalent to SQLITE_STMTSTATUS_MEMUSED
+    <span class="doccomment">/// Equivalent to SQLITE_STMTSTATUS_FILTER_MISS
+    </span>FilterMiss = <span class="number">7</span>,
+    <span class="doccomment">/// Equivalent to SQLITE_STMTSTATUS_FILTER_HIT
+    </span>FilterHit = <span class="number">8</span>,
+    <span class="doccomment">/// Equivalent to SQLITE_STMTSTATUS_MEMUSED (3.20.0)
     </span>MemUsed = <span class="number">99</span>,
 }
 
@@ -2385,13 +2241,12 @@
     <span class="kw">use crate</span>::{params_from_iter, Connection, Error, <span class="prelude-ty">Result</span>};
 
     <span class="attr">#[test]
-    #[allow(deprecated)]
     </span><span class="kw">fn </span>test_execute_named() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
         db.execute_batch(<span class="string">&quot;CREATE TABLE foo(x INTEGER)&quot;</span>)<span class="question-mark">?</span>;
 
         <span class="macro">assert_eq!</span>(
-            db.execute_named(<span class="string">&quot;INSERT INTO foo(x) VALUES (:x)&quot;</span>, <span class="kw-2">&amp;</span>[(<span class="string">&quot;:x&quot;</span>, <span class="kw-2">&amp;</span><span class="number">1i32</span>)])<span class="question-mark">?</span>,
+            db.execute(<span class="string">&quot;INSERT INTO foo(x) VALUES (:x)&quot;</span>, <span class="kw-2">&amp;</span>[(<span class="string">&quot;:x&quot;</span>, <span class="kw-2">&amp;</span><span class="number">1i32</span>)])<span class="question-mark">?</span>,
             <span class="number">1
         </span>);
         <span class="macro">assert_eq!</span>(
@@ -2408,7 +2263,7 @@
 
         <span class="macro">assert_eq!</span>(
             <span class="number">6i32</span>,
-            db.query_row_named::&lt;i32, <span class="kw">_</span>&gt;(
+            db.query_row::&lt;i32, <span class="kw">_</span>, <span class="kw">_</span>&gt;(
                 <span class="string">&quot;SELECT SUM(x) FROM foo WHERE x &gt; :x&quot;</span>,
                 <span class="kw-2">&amp;</span>[(<span class="string">&quot;:x&quot;</span>, <span class="kw-2">&amp;</span><span class="number">0i32</span>)],
                 |r| r.get(<span class="number">0</span>)
@@ -2426,7 +2281,6 @@
     }
 
     <span class="attr">#[test]
-    #[allow(deprecated)]
     </span><span class="kw">fn </span>test_stmt_execute_named() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
         <span class="kw">let </span>sql = <span class="string">&quot;CREATE TABLE test (id INTEGER PRIMARY KEY NOT NULL, name TEXT NOT NULL, flag \
@@ -2434,13 +2288,9 @@
         db.execute_batch(sql)<span class="question-mark">?</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>stmt = db.prepare(<span class="string">&quot;INSERT INTO test (name) VALUES (:name)&quot;</span>)<span class="question-mark">?</span>;
-        stmt.execute_named(<span class="kw-2">&amp;</span>[(<span class="string">&quot;:name&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;one&quot;</span>)])<span class="question-mark">?</span>;
+        stmt.execute(<span class="kw-2">&amp;</span>[(<span class="string">&quot;:name&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;one&quot;</span>)])<span class="question-mark">?</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>stmt = db.prepare(<span class="string">&quot;SELECT COUNT(*) FROM test WHERE name = :name&quot;</span>)<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(
-            <span class="number">1i32</span>,
-            stmt.query_row_named::&lt;i32, <span class="kw">_</span>&gt;(<span class="kw-2">&amp;</span>[(<span class="string">&quot;:name&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;one&quot;</span>)], |r| r.get(<span class="number">0</span>))<span class="question-mark">?
-        </span>);
         <span class="macro">assert_eq!</span>(
             <span class="number">1i32</span>,
             stmt.query_row::&lt;i32, <span class="kw">_</span>, <span class="kw">_</span>&gt;(<span class="kw-2">&amp;</span>[(<span class="string">&quot;:name&quot;</span>, <span class="string">&quot;one&quot;</span>)], |r| r.get(<span class="number">0</span>))<span class="question-mark">?
@@ -2449,7 +2299,6 @@
     }
 
     <span class="attr">#[test]
-    #[allow(deprecated)]
     </span><span class="kw">fn </span>test_query_named() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
         <span class="kw">let </span>sql = <span class="string">r#&quot;
@@ -2459,24 +2308,13 @@
         db.execute_batch(sql)<span class="question-mark">?</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>stmt = db.prepare(<span class="string">&quot;SELECT id FROM test where name = :name&quot;</span>)<span class="question-mark">?</span>;
-        <span class="comment">// legacy `_named` api
-        </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>rows = stmt.query_named(<span class="kw-2">&amp;</span>[(<span class="string">&quot;:name&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;one&quot;</span>)])<span class="question-mark">?</span>;
-            <span class="kw">let </span>id: <span class="prelude-ty">Result</span>&lt;i32&gt; = rows.next()<span class="question-mark">?</span>.unwrap().get(<span class="number">0</span>);
-            <span class="macro">assert_eq!</span>(<span class="prelude-val">Ok</span>(<span class="number">1</span>), id);
-        }
-
-        <span class="comment">// plain api
-        </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>rows = stmt.query(<span class="kw-2">&amp;</span>[(<span class="string">&quot;:name&quot;</span>, <span class="string">&quot;one&quot;</span>)])<span class="question-mark">?</span>;
-            <span class="kw">let </span>id: <span class="prelude-ty">Result</span>&lt;i32&gt; = rows.next()<span class="question-mark">?</span>.unwrap().get(<span class="number">0</span>);
-            <span class="macro">assert_eq!</span>(<span class="prelude-val">Ok</span>(<span class="number">1</span>), id);
-        }
+        <span class="kw">let </span><span class="kw-2">mut </span>rows = stmt.query(<span class="kw-2">&amp;</span>[(<span class="string">&quot;:name&quot;</span>, <span class="string">&quot;one&quot;</span>)])<span class="question-mark">?</span>;
+        <span class="kw">let </span>id: <span class="prelude-ty">Result</span>&lt;i32&gt; = rows.next()<span class="question-mark">?</span>.unwrap().get(<span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Ok</span>(<span class="number">1</span>), id);
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="attr">#[test]
-    #[allow(deprecated)]
     </span><span class="kw">fn </span>test_query_map_named() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
         <span class="kw">let </span>sql = <span class="string">r#&quot;
@@ -2486,61 +2324,13 @@
         db.execute_batch(sql)<span class="question-mark">?</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>stmt = db.prepare(<span class="string">&quot;SELECT id FROM test where name = :name&quot;</span>)<span class="question-mark">?</span>;
-        <span class="comment">// legacy `_named` api
-        </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>rows = stmt.query_map_named(<span class="kw-2">&amp;</span>[(<span class="string">&quot;:name&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;one&quot;</span>)], |row| {
-                <span class="kw">let </span>id: <span class="prelude-ty">Result</span>&lt;i32&gt; = row.get(<span class="number">0</span>);
-                id.map(|i| <span class="number">2 </span>* i)
-            })<span class="question-mark">?</span>;
-
-            <span class="kw">let </span>doubled_id: i32 = rows.next().unwrap()<span class="question-mark">?</span>;
-            <span class="macro">assert_eq!</span>(<span class="number">2</span>, doubled_id);
-        }
-        <span class="comment">// plain api
-        </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>rows = stmt.query_map(<span class="kw-2">&amp;</span>[(<span class="string">&quot;:name&quot;</span>, <span class="string">&quot;one&quot;</span>)], |row| {
-                <span class="kw">let </span>id: <span class="prelude-ty">Result</span>&lt;i32&gt; = row.get(<span class="number">0</span>);
-                id.map(|i| <span class="number">2 </span>* i)
-            })<span class="question-mark">?</span>;
-
-            <span class="kw">let </span>doubled_id: i32 = rows.next().unwrap()<span class="question-mark">?</span>;
-            <span class="macro">assert_eq!</span>(<span class="number">2</span>, doubled_id);
-        }
-        <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="attr">#[test]
-    #[allow(deprecated)]
-    </span><span class="kw">fn </span>test_query_and_then_named() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
-        <span class="kw">let </span>sql = <span class="string">r#&quot;
-        CREATE TABLE test (id INTEGER PRIMARY KEY NOT NULL, name TEXT NOT NULL, flag INTEGER);
-        INSERT INTO test(id, name) VALUES (1, &quot;one&quot;);
-        INSERT INTO test(id, name) VALUES (2, &quot;one&quot;);
-        &quot;#</span>;
-        db.execute_batch(sql)<span class="question-mark">?</span>;
-
-        <span class="kw">let </span><span class="kw-2">mut </span>stmt = db.prepare(<span class="string">&quot;SELECT id FROM test where name = :name ORDER BY id ASC&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let </span><span class="kw-2">mut </span>rows = stmt.query_and_then_named(<span class="kw-2">&amp;</span>[(<span class="string">&quot;:name&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;one&quot;</span>)], |row| {
-            <span class="kw">let </span>id: i32 = row.get(<span class="number">0</span>)<span class="question-mark">?</span>;
-            <span class="kw">if </span>id == <span class="number">1 </span>{
-                <span class="prelude-val">Ok</span>(id)
-            } <span class="kw">else </span>{
-                <span class="prelude-val">Err</span>(Error::SqliteSingleThreadedMode)
-            }
+        <span class="kw">let </span><span class="kw-2">mut </span>rows = stmt.query_map(<span class="kw-2">&amp;</span>[(<span class="string">&quot;:name&quot;</span>, <span class="string">&quot;one&quot;</span>)], |row| {
+            <span class="kw">let </span>id: <span class="prelude-ty">Result</span>&lt;i32&gt; = row.get(<span class="number">0</span>);
+            id.map(|i| <span class="number">2 </span>* i)
         })<span class="question-mark">?</span>;
 
-        <span class="comment">// first row should be Ok
-        </span><span class="kw">let </span>doubled_id: i32 = rows.next().unwrap()<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="number">1</span>, doubled_id);
-
-        <span class="comment">// second row should be Err
-        </span><span class="attr">#[allow(clippy::match_wild_err_arm)]
-        </span><span class="kw">match </span>rows.next().unwrap() {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;invalid Ok&quot;</span>),
-            <span class="prelude-val">Err</span>(Error::SqliteSingleThreadedMode) =&gt; (),
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;invalid Err&quot;</span>),
-        }
+        <span class="kw">let </span>doubled_id: i32 = rows.next().unwrap()<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(<span class="number">2</span>, doubled_id);
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -2579,17 +2369,15 @@
     }
 
     <span class="attr">#[test]
-    #[allow(deprecated)]
     </span><span class="kw">fn </span>test_unbound_parameters_are_null() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
         <span class="kw">let </span>sql = <span class="string">&quot;CREATE TABLE test (x TEXT, y TEXT)&quot;</span>;
         db.execute_batch(sql)<span class="question-mark">?</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>stmt = db.prepare(<span class="string">&quot;INSERT INTO test (x, y) VALUES (:x, :y)&quot;</span>)<span class="question-mark">?</span>;
-        stmt.execute_named(<span class="kw-2">&amp;</span>[(<span class="string">&quot;:x&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;one&quot;</span>)])<span class="question-mark">?</span>;
+        stmt.execute(<span class="kw-2">&amp;</span>[(<span class="string">&quot;:x&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;one&quot;</span>)])<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>result: <span class="prelude-ty">Option</span>&lt;String&gt; =
-            db.query_row(<span class="string">&quot;SELECT y FROM test WHERE x = &#39;one&#39;&quot;</span>, [], |row| row.get(<span class="number">0</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>result: <span class="prelude-ty">Option</span>&lt;String&gt; = db.one_column(<span class="string">&quot;SELECT y FROM test WHERE x = &#39;one&#39;&quot;</span>)<span class="question-mark">?</span>;
         <span class="macro">assert!</span>(result.is_none());
         <span class="prelude-val">Ok</span>(())
     }
@@ -2635,8 +2423,7 @@
         stmt.execute(<span class="kw-2">&amp;</span>[(<span class="string">&quot;:x&quot;</span>, <span class="string">&quot;one&quot;</span>)])<span class="question-mark">?</span>;
         stmt.execute(<span class="kw-2">&amp;</span>[(<span class="string">&quot;:y&quot;</span>, <span class="string">&quot;two&quot;</span>)])<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>result: String =
-            db.query_row(<span class="string">&quot;SELECT x FROM test WHERE y = &#39;two&#39;&quot;</span>, [], |row| row.get(<span class="number">0</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>result: String = db.one_column(<span class="string">&quot;SELECT x FROM test WHERE y = &#39;two&#39;&quot;</span>)<span class="question-mark">?</span>;
         <span class="macro">assert_eq!</span>(result, <span class="string">&quot;one&quot;</span>);
         <span class="prelude-val">Ok</span>(())
     }
@@ -2645,7 +2432,7 @@
     </span><span class="kw">fn </span>test_insert() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
         db.execute_batch(<span class="string">&quot;CREATE TABLE foo(x INTEGER UNIQUE)&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let </span><span class="kw-2">mut </span>stmt = db.prepare(<span class="string">&quot;INSERT OR IGNORE INTO foo (x) VALUES (?)&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>stmt = db.prepare(<span class="string">&quot;INSERT OR IGNORE INTO foo (x) VALUES (?1)&quot;</span>)<span class="question-mark">?</span>;
         <span class="macro">assert_eq!</span>(stmt.insert([<span class="number">1i32</span>])<span class="question-mark">?</span>, <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(stmt.insert([<span class="number">2i32</span>])<span class="question-mark">?</span>, <span class="number">2</span>);
         <span class="kw">match </span>stmt.insert([<span class="number">1i32</span>]).unwrap_err() {
@@ -2685,10 +2472,45 @@
                    INSERT INTO foo VALUES(2);
                    END;&quot;</span>;
         db.execute_batch(sql)<span class="question-mark">?</span>;
-        <span class="kw">let </span><span class="kw-2">mut </span>stmt = db.prepare(<span class="string">&quot;SELECT 1 FROM foo WHERE x = ?&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>stmt = db.prepare(<span class="string">&quot;SELECT 1 FROM foo WHERE x = ?1&quot;</span>)<span class="question-mark">?</span>;
         <span class="macro">assert!</span>(stmt.exists([<span class="number">1i32</span>])<span class="question-mark">?</span>);
         <span class="macro">assert!</span>(stmt.exists([<span class="number">2i32</span>])<span class="question-mark">?</span>);
         <span class="macro">assert!</span>(!stmt.exists([<span class="number">0i32</span>])<span class="question-mark">?</span>);
+        <span class="prelude-val">Ok</span>(())
+    }
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_tuple_params() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
+        <span class="kw">let </span>s = db.query_row(<span class="string">&quot;SELECT printf(&#39;[%s]&#39;, ?1)&quot;</span>, (<span class="string">&quot;abc&quot;</span>,), |r| {
+            r.get::&lt;<span class="kw">_</span>, String&gt;(<span class="number">0</span>)
+        })<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(s, <span class="string">&quot;[abc]&quot;</span>);
+        <span class="kw">let </span>s = db.query_row(
+            <span class="string">&quot;SELECT printf(&#39;%d %s %d&#39;, ?1, ?2, ?3)&quot;</span>,
+            (<span class="number">1i32</span>, <span class="string">&quot;abc&quot;</span>, <span class="number">2i32</span>),
+            |r| r.get::&lt;<span class="kw">_</span>, String&gt;(<span class="number">0</span>),
+        )<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(s, <span class="string">&quot;1 abc 2&quot;</span>);
+        <span class="kw">let </span>s = db.query_row(
+            <span class="string">&quot;SELECT printf(&#39;%d %s %d %d&#39;, ?1, ?2, ?3, ?4)&quot;</span>,
+            (<span class="number">1</span>, <span class="string">&quot;abc&quot;</span>, <span class="number">2i32</span>, <span class="number">4i64</span>),
+            |r| r.get::&lt;<span class="kw">_</span>, String&gt;(<span class="number">0</span>),
+        )<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(s, <span class="string">&quot;1 abc 2 4&quot;</span>);
+        <span class="attr">#[rustfmt::skip]
+        </span><span class="kw">let </span>bigtup = (
+            <span class="number">0</span>, <span class="string">&quot;a&quot;</span>, <span class="number">1</span>, <span class="string">&quot;b&quot;</span>, <span class="number">2</span>, <span class="string">&quot;c&quot;</span>, <span class="number">3</span>, <span class="string">&quot;d&quot;</span>,
+            <span class="number">4</span>, <span class="string">&quot;e&quot;</span>, <span class="number">5</span>, <span class="string">&quot;f&quot;</span>, <span class="number">6</span>, <span class="string">&quot;g&quot;</span>, <span class="number">7</span>, <span class="string">&quot;h&quot;</span>,
+        );
+        <span class="kw">let </span>query = <span class="string">&quot;SELECT printf(
+            &#39;%d %s | %d %s | %d %s | %d %s || %d %s | %d %s | %d %s | %d %s&#39;,
+            ?1, ?2, ?3, ?4,
+            ?5, ?6, ?7, ?8,
+            ?9, ?10, ?11, ?12,
+            ?13, ?14, ?15, ?16
+        )&quot;</span>;
+        <span class="kw">let </span>s = db.query_row(query, bigtup, |r| r.get::&lt;<span class="kw">_</span>, String&gt;(<span class="number">0</span>))<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(s, <span class="string">&quot;0 a | 1 b | 2 c | 3 d || 4 e | 5 f | 6 g | 7 h&quot;</span>);
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -2701,7 +2523,7 @@
                    INSERT INTO foo VALUES(2, 4);
                    END;&quot;</span>;
         db.execute_batch(sql)<span class="question-mark">?</span>;
-        <span class="kw">let </span><span class="kw-2">mut </span>stmt = db.prepare(<span class="string">&quot;SELECT y FROM foo WHERE x = ?&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>stmt = db.prepare(<span class="string">&quot;SELECT y FROM foo WHERE x = ?1&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>y: <span class="prelude-ty">Result</span>&lt;i64&gt; = stmt.query_row([<span class="number">1i32</span>], |r| r.get(<span class="number">0</span>));
         <span class="macro">assert_eq!</span>(<span class="number">3i64</span>, y<span class="question-mark">?</span>);
         <span class="prelude-val">Ok</span>(())
@@ -2736,10 +2558,9 @@
     }
 
     <span class="attr">#[test]
-    #[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)]
     </span><span class="kw">fn </span>test_expanded_sql() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
-        <span class="kw">let </span>stmt = db.prepare(<span class="string">&quot;SELECT ?&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>stmt = db.prepare(<span class="string">&quot;SELECT ?1&quot;</span>)<span class="question-mark">?</span>;
         stmt.bind_parameter(<span class="kw-2">&amp;</span><span class="number">1</span>, <span class="number">1</span>)<span class="question-mark">?</span>;
         <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;SELECT 1&quot;</span>.to_owned()), stmt.expanded_sql());
         <span class="prelude-val">Ok</span>(())
@@ -2751,7 +2572,7 @@
         <span class="comment">// dynamic slice:
         </span>db.query_row(
             <span class="string">&quot;SELECT ?1, ?2, ?3&quot;</span>,
-            <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="number">1u8 </span><span class="kw">as </span><span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql, <span class="kw-2">&amp;</span><span class="string">&quot;one&quot;</span>, <span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="string">&quot;one&quot;</span>)],
+            [<span class="kw-2">&amp;</span><span class="number">1u8 </span><span class="kw">as </span><span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql, <span class="kw-2">&amp;</span><span class="string">&quot;one&quot;</span>, <span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="string">&quot;one&quot;</span>)],
             |row| row.get::&lt;<span class="kw">_</span>, u8&gt;(<span class="number">0</span>),
         )<span class="question-mark">?</span>;
         <span class="comment">// existing collection:
@@ -2803,10 +2624,10 @@
         <span class="kw">let </span>conn = Connection::open_in_memory()<span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>stmt = conn.prepare(<span class="string">&quot;&quot;</span>)<span class="question-mark">?</span>;
         <span class="macro">assert_eq!</span>(<span class="number">0</span>, stmt.column_count());
-        <span class="macro">assert!</span>(stmt.parameter_index(<span class="string">&quot;test&quot;</span>).is_ok());
-        <span class="macro">assert!</span>(stmt.step().is_err());
+        stmt.parameter_index(<span class="string">&quot;test&quot;</span>).unwrap();
+        stmt.step().unwrap_err();
         stmt.reset();
-        <span class="macro">assert!</span>(stmt.execute([]).is_err());
+        stmt.execute([]).unwrap_err();
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -2836,13 +2657,13 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_utf16_conversion() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
-        db.pragma_update(<span class="prelude-val">None</span>, <span class="string">&quot;encoding&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;UTF-16le&quot;</span>)<span class="question-mark">?</span>;
+        db.pragma_update(<span class="prelude-val">None</span>, <span class="string">&quot;encoding&quot;</span>, <span class="string">&quot;UTF-16le&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>encoding: String = db.pragma_query_value(<span class="prelude-val">None</span>, <span class="string">&quot;encoding&quot;</span>, |row| row.get(<span class="number">0</span>))<span class="question-mark">?</span>;
         <span class="macro">assert_eq!</span>(<span class="string">&quot;UTF-16le&quot;</span>, encoding);
         db.execute_batch(<span class="string">&quot;CREATE TABLE foo(x TEXT)&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>expected = <span class="string">&quot;テスト&quot;</span>;
-        db.execute(<span class="string">&quot;INSERT INTO foo(x) VALUES (?)&quot;</span>, <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>expected])<span class="question-mark">?</span>;
-        <span class="kw">let </span>actual: String = db.query_row(<span class="string">&quot;SELECT x FROM foo&quot;</span>, [], |row| row.get(<span class="number">0</span>))<span class="question-mark">?</span>;
+        db.execute(<span class="string">&quot;INSERT INTO foo(x) VALUES (?1)&quot;</span>, [<span class="kw-2">&amp;</span>expected])<span class="question-mark">?</span>;
+        <span class="kw">let </span>actual: String = db.one_column(<span class="string">&quot;SELECT x FROM foo&quot;</span>)<span class="question-mark">?</span>;
         <span class="macro">assert_eq!</span>(expected, actual);
         <span class="prelude-val">Ok</span>(())
     }
@@ -2851,8 +2672,41 @@
     </span><span class="kw">fn </span>test_nul_byte() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
         <span class="kw">let </span>expected = <span class="string">&quot;a\x00b&quot;</span>;
-        <span class="kw">let </span>actual: String = db.query_row(<span class="string">&quot;SELECT ?&quot;</span>, [expected], |row| row.get(<span class="number">0</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>actual: String = db.query_row(<span class="string">&quot;SELECT ?1&quot;</span>, [expected], |row| row.get(<span class="number">0</span>))<span class="question-mark">?</span>;
         <span class="macro">assert_eq!</span>(expected, actual);
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="attr">#[test]
+    #[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)]
+    </span><span class="kw">fn </span>is_explain() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
+        <span class="kw">let </span>stmt = db.prepare(<span class="string">&quot;SELECT 1;&quot;</span>)<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, stmt.is_explain());
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>readonly() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
+        <span class="kw">let </span>stmt = db.prepare(<span class="string">&quot;SELECT 1;&quot;</span>)<span class="question-mark">?</span>;
+        <span class="macro">assert!</span>(stmt.readonly());
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="attr">#[test]
+    #[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)] </span><span class="comment">// SQLite &gt;= 3.38.0
+    </span><span class="kw">fn </span>test_error_offset() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">use </span><span class="kw">crate</span>::ffi::ErrorCode;
+        <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
+        <span class="kw">let </span>r = db.execute_batch(<span class="string">&quot;SELECT CURRENT_TIMESTANP;&quot;</span>);
+        <span class="kw">match </span>r.unwrap_err() {
+            Error::SqlInputError { error, offset, .. } =&gt; {
+                <span class="macro">assert_eq!</span>(error.code, ErrorCode::Unknown);
+                <span class="macro">assert_eq!</span>(offset, <span class="number">7</span>);
+            }
+            err =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, err),
+        }
         <span class="prelude-val">Ok</span>(())
     }
 }

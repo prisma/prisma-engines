@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/3ygaf6wwr9d8r0529il4m7wxn6hg2b6k-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rusqlite-0.25.4/src/config.rs`."><title>config.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rusqlite" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnsihxmfi8pvl7n3q6k0f21yqpflag7z-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rusqlite-0.29.0/src/config.rs`."><title>config.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rusqlite" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -151,10 +151,14 @@
 <a href="#151" id="151">151</a>
 <a href="#152" id="152">152</a>
 <a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Configure database connections
 
 </span><span class="kw">use </span>std::os::raw::c_int;
 
+<span class="kw">use </span><span class="kw">crate</span>::error::check;
 <span class="kw">use </span><span class="kw">crate</span>::ffi;
 <span class="kw">use crate</span>::{Connection, <span class="prelude-ty">Result</span>};
 
@@ -168,12 +172,12 @@
     <span class="comment">//SQLITE_DBCONFIG_MAINDBNAME = 1000, /* const char* */
     //SQLITE_DBCONFIG_LOOKASIDE = 1001,  /* void* int int */
     </span><span class="doccomment">/// Enable or disable the enforcement of foreign key constraints.
-    </span>SQLITE_DBCONFIG_ENABLE_FKEY = <span class="number">1002</span>,
+    </span>SQLITE_DBCONFIG_ENABLE_FKEY = ffi::SQLITE_DBCONFIG_ENABLE_FKEY,
     <span class="doccomment">/// Enable or disable triggers.
-    </span>SQLITE_DBCONFIG_ENABLE_TRIGGER = <span class="number">1003</span>,
+    </span>SQLITE_DBCONFIG_ENABLE_TRIGGER = ffi::SQLITE_DBCONFIG_ENABLE_TRIGGER,
     <span class="doccomment">/// Enable or disable the fts3_tokenizer() function which is part of the
     /// FTS3 full-text search engine extension.
-    </span>SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER = <span class="number">1004</span>, <span class="comment">// 3.12.0
+    </span>SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER = ffi::SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER, <span class="comment">// 3.12.0
     //SQLITE_DBCONFIG_ENABLE_LOAD_EXTENSION = 1005,
     </span><span class="doccomment">/// In WAL mode, enable or disable the checkpoint operation before closing
     /// the connection.
@@ -183,7 +187,9 @@
     </span><span class="doccomment">/// Includes or excludes output for any operations performed by trigger
     /// programs from the output of EXPLAIN QUERY PLAN commands.
     </span>SQLITE_DBCONFIG_TRIGGER_EQP = <span class="number">1008</span>, <span class="comment">// 3.22.0
-    //SQLITE_DBCONFIG_RESET_DATABASE = 1009,
+    </span><span class="doccomment">/// Activates or deactivates the &quot;reset&quot; flag for a database connection.
+    /// Run VACUUM with this flag set to reset the database.
+    </span>SQLITE_DBCONFIG_RESET_DATABASE = <span class="number">1009</span>, <span class="comment">// 3.24.0
     </span><span class="doccomment">/// Activates or deactivates the &quot;defensive&quot; flag for a database connection.
     </span>SQLITE_DBCONFIG_DEFENSIVE = <span class="number">1010</span>, <span class="comment">// 3.26.0
     </span><span class="doccomment">/// Activates or deactivates the &quot;writable_schema&quot; flag.
@@ -216,58 +222,58 @@
 <span class="kw">impl </span>Connection {
     <span class="doccomment">/// Returns the current value of a `config`.
     ///
-    /// - SQLITE_DBCONFIG_ENABLE_FKEY: return `false` or `true` to indicate
+    /// - `SQLITE_DBCONFIG_ENABLE_FKEY`: return `false` or `true` to indicate
     ///   whether FK enforcement is off or on
-    /// - SQLITE_DBCONFIG_ENABLE_TRIGGER: return `false` or `true` to indicate
+    /// - `SQLITE_DBCONFIG_ENABLE_TRIGGER`: return `false` or `true` to indicate
     ///   whether triggers are disabled or enabled
-    /// - SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER: return `false` or `true` to
-    ///   indicate whether fts3_tokenizer are disabled or enabled
-    /// - SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE: return `false` to indicate
+    /// - `SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER`: return `false` or `true` to
+    ///   indicate whether `fts3_tokenizer` are disabled or enabled
+    /// - `SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE`: return `false` to indicate
     ///   checkpoints-on-close are not disabled or `true` if they are
-    /// - SQLITE_DBCONFIG_ENABLE_QPSG: return `false` or `true` to indicate
+    /// - `SQLITE_DBCONFIG_ENABLE_QPSG`: return `false` or `true` to indicate
     ///   whether the QPSG is disabled or enabled
-    /// - SQLITE_DBCONFIG_TRIGGER_EQP: return `false` to indicate
+    /// - `SQLITE_DBCONFIG_TRIGGER_EQP`: return `false` to indicate
     ///   output-for-trigger are not disabled or `true` if it is
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>db_config(<span class="kw-2">&amp;</span><span class="self">self</span>, config: DbConfig) -&gt; <span class="prelude-ty">Result</span>&lt;bool&gt; {
         <span class="kw">let </span>c = <span class="self">self</span>.db.borrow();
         <span class="kw">unsafe </span>{
             <span class="kw">let </span><span class="kw-2">mut </span>val = <span class="number">0</span>;
-            <span class="macro">check!</span>(ffi::sqlite3_db_config(
+            check(ffi::sqlite3_db_config(
                 c.db(),
                 config <span class="kw">as </span>c_int,
                 -<span class="number">1</span>,
-                <span class="kw-2">&amp;mut </span>val
-            ));
+                <span class="kw-2">&amp;mut </span>val,
+            ))<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(val != <span class="number">0</span>)
         }
     }
 
     <span class="doccomment">/// Make configuration changes to a database connection
     ///
-    /// - SQLITE_DBCONFIG_ENABLE_FKEY: `false` to disable FK enforcement, `true`
-    ///   to enable FK enforcement
-    /// - SQLITE_DBCONFIG_ENABLE_TRIGGER: `false` to disable triggers, `true` to
-    ///   enable triggers
-    /// - SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER: `false` to disable
-    ///   fts3_tokenizer(), `true` to enable fts3_tokenizer()
-    /// - SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE: `false` (the default) to enable
+    /// - `SQLITE_DBCONFIG_ENABLE_FKEY`: `false` to disable FK enforcement,
+    ///   `true` to enable FK enforcement
+    /// - `SQLITE_DBCONFIG_ENABLE_TRIGGER`: `false` to disable triggers, `true`
+    ///   to enable triggers
+    /// - `SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER`: `false` to disable
+    ///   `fts3_tokenizer()`, `true` to enable `fts3_tokenizer()`
+    /// - `SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE`: `false` (the default) to enable
     ///   checkpoints-on-close, `true` to disable them
-    /// - SQLITE_DBCONFIG_ENABLE_QPSG: `false` to disable the QPSG, `true` to
+    /// - `SQLITE_DBCONFIG_ENABLE_QPSG`: `false` to disable the QPSG, `true` to
     ///   enable QPSG
-    /// - SQLITE_DBCONFIG_TRIGGER_EQP: `false` to disable output for trigger
+    /// - `SQLITE_DBCONFIG_TRIGGER_EQP`: `false` to disable output for trigger
     ///   programs, `true` to enable it
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>set_db_config(<span class="kw-2">&amp;</span><span class="self">self</span>, config: DbConfig, new_val: bool) -&gt; <span class="prelude-ty">Result</span>&lt;bool&gt; {
         <span class="kw">let </span>c = <span class="self">self</span>.db.borrow_mut();
         <span class="kw">unsafe </span>{
             <span class="kw">let </span><span class="kw-2">mut </span>val = <span class="number">0</span>;
-            <span class="macro">check!</span>(ffi::sqlite3_db_config(
+            check(ffi::sqlite3_db_config(
                 c.db(),
                 config <span class="kw">as </span>c_int,
-                <span class="kw">if </span>new_val { <span class="number">1 </span>} <span class="kw">else </span>{ <span class="number">0 </span>},
-                <span class="kw-2">&amp;mut </span>val
-            ));
+                new_val <span class="kw">as </span>c_int,
+                <span class="kw-2">&amp;mut </span>val,
+            ))<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(val != <span class="number">0</span>)
         }
     }

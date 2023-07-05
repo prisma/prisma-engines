@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/3ygaf6wwr9d8r0529il4m7wxn6hg2b6k-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/ahash-0.7.6/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ahash" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../ahash/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnsihxmfi8pvl7n3q6k0f21yqpflag7z-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/ahash-0.8.3/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ahash" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../ahash/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -261,89 +261,345 @@
 <a href="#261" id="261">261</a>
 <a href="#262" id="262">262</a>
 <a href="#263" id="263">263</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! AHash is a hashing algorithm is intended to be a high performance, (hardware specific), keyed hash function.
-//! This can be seen as a DOS resistant alternative to `FxHash`, or a fast equivalent to `SipHash`.
-//! It provides a high speed hash algorithm, but where the result is not predictable without knowing a Key.
-//! This allows it to be used in a `HashMap` without allowing for the possibility that an malicious user can
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
+<a href="#352" id="352">352</a>
+<a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
+<a href="#362" id="362">362</a>
+<a href="#363" id="363">363</a>
+<a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+</pre></div><pre class="rust"><code><span class="doccomment">//! AHash is a high performance keyed hash function.
+//!
+//! It quickly provides a high quality hash where the result is not predictable without knowing the Key.
+//! AHash works with `HashMap` to hash keys, but without allowing for the possibility that an malicious user can
 //! induce a collision.
 //!
 //! # How aHash works
 //!
-//! aHash uses the hardware AES instruction on x86 processors to provide a keyed hash function.
-//! aHash is not a cryptographically secure hash.
+//! When it is available aHash uses the hardware AES instructions to provide a keyed hash function.
+//! When it is not, aHash falls back on a slightly slower alternative algorithm.
 //!
-//! # Example
-//! ```
-//! use ahash::{AHasher, RandomState};
-//! use std::collections::HashMap;
-//!
-//! let mut map: HashMap&lt;i32, i32, RandomState&gt; = HashMap::default();
-//! map.insert(12, 34);
-//! ```
-//! For convinence wrappers called `AHashMap` and `AHashSet` are also provided.
-//! These to the same thing with slightly less typing.
-//! ```ignore
-//! use ahash::AHashMap;
-//!
-//! let mut map: AHashMap&lt;i32, i32&gt; = AHashMap::with_capacity(4);
-//! map.insert(12, 34);
-//! map.insert(56, 78);
-//! ```
-</span><span class="attr">#![deny(clippy::correctness, clippy::complexity, clippy::perf)]
+//! Because aHash does not have a fixed standard for its output, it is able to improve over time.
+//! But this also means that different computers or computers using different versions of ahash may observe different
+//! hash values for the same input.
+</span><span class="attr">#![cfg_attr(
+    all(feature = <span class="string">&quot;std&quot;</span>, any(feature = <span class="string">&quot;compile-time-rng&quot;</span>, feature = <span class="string">&quot;runtime-rng&quot;</span>, feature = <span class="string">&quot;no-rng&quot;</span>)),
+    doc = <span class="string">r##&quot;
+# Basic Usage
+AHash provides an implementation of the [Hasher] trait.
+To construct a HashMap using aHash as its hasher do the following:
+```
+use ahash::{AHasher, RandomState};
+use std::collections::HashMap;
+
+let mut map: HashMap&lt;i32, i32, RandomState&gt; = HashMap::default();
+map.insert(12, 34);
+```
+
+### Randomness
+
+The above requires a source of randomness to generate keys for the hashmap. By default this obtained from the OS.
+It is also possible to have randomness supplied via the `compile-time-rng` flag, or manually.
+
+### If randomess is not available
+
+[AHasher::default()] can be used to hash using fixed keys. This works with
+[BuildHasherDefault](std::hash::BuildHasherDefault). For example:
+
+```
+use std::hash::BuildHasherDefault;
+use std::collections::HashMap;
+use ahash::AHasher;
+
+let mut m: HashMap&lt;_, _, BuildHasherDefault&lt;AHasher&gt;&gt; = HashMap::default();
+ # m.insert(12, 34);
+```
+It is also possible to instantiate [RandomState] directly:
+
+```
+use ahash::HashMap;
+use ahash::RandomState;
+
+let mut m = HashMap::with_hasher(RandomState::with_seed(42));
+ # m.insert(1, 2);
+```
+Or for uses besides a hashhmap:
+```
+use std::hash::BuildHasher;
+use ahash::RandomState;
+
+let hash_builder = RandomState::with_seed(42);
+let hash = hash_builder.hash_one(&quot;Some Data&quot;);
+```
+There are several constructors for [RandomState] with different ways to supply seeds.
+
+# Convenience wrappers
+
+For convenience, both new-type wrappers and type aliases are provided.
+
+The new type wrappers are called called `AHashMap` and `AHashSet`.
+```
+use ahash::AHashMap;
+
+let mut map: AHashMap&lt;i32, i32&gt; = AHashMap::new();
+map.insert(12, 34);
+```
+This avoids the need to type &quot;RandomState&quot;. (For convience `From`, `Into`, and `Deref` are provided).
+
+# Aliases
+
+For even less typing and better interop with existing libraries (such as rayon) which require a `std::collection::HashMap` ,
+the type aliases [HashMap], [HashSet] are provided.
+
+```
+use ahash::{HashMap, HashMapExt};
+
+let mut map: HashMap&lt;i32, i32&gt; = HashMap::new();
+map.insert(12, 34);
+```
+Note the import of [HashMapExt]. This is needed for the constructor.
+
+&quot;##
+</span>)]
+#![deny(clippy::correctness, clippy::complexity, clippy::perf)]
 #![allow(clippy::pedantic, clippy::cast_lossless, clippy::unreadable_literal)]
 #![cfg_attr(all(not(test), not(feature = <span class="string">&quot;std&quot;</span>)), no_std)]
 #![cfg_attr(feature = <span class="string">&quot;specialize&quot;</span>, feature(min_specialization))]
+#![cfg_attr(feature = <span class="string">&quot;specialize&quot;</span>, feature(build_hasher_simple_hash_one))]
 #![cfg_attr(feature = <span class="string">&quot;stdsimd&quot;</span>, feature(stdsimd))]
 
 #[macro_use]
 </span><span class="kw">mod </span>convert;
 
-<span class="attr">#[cfg(any(
-    all(any(target_arch = <span class="string">&quot;x86&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>), target_feature = <span class="string">&quot;aes&quot;</span>, not(miri)),
-    all(any(target_arch = <span class="string">&quot;arm&quot;</span>, target_arch = <span class="string">&quot;aarch64&quot;</span>), target_feature = <span class="string">&quot;crypto&quot;</span>, not(miri), feature = <span class="string">&quot;stdsimd&quot;</span>)
-))]
-</span><span class="kw">mod </span>aes_hash;
 <span class="kw">mod </span>fallback_hash;
+
+<span class="macro">cfg_if::cfg_if! </span>{
+    <span class="kw">if </span><span class="attr">#[cfg(any(
+            all(any(target_arch = <span class="string">&quot;x86&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>), target_feature = <span class="string">&quot;aes&quot;</span>, not(miri)),
+            all(any(target_arch = <span class="string">&quot;arm&quot;</span>, target_arch = <span class="string">&quot;aarch64&quot;</span>),
+                any(target_feature = <span class="string">&quot;aes&quot;</span>, target_feature = <span class="string">&quot;crypto&quot;</span>),
+                not(miri),
+                feature = <span class="string">&quot;stdsimd&quot;</span>)
+            ))] </span>{
+        <span class="kw">mod </span>aes_hash;
+        <span class="kw">pub use </span><span class="kw">crate</span>::aes_hash::AHasher;
+    } <span class="kw">else </span>{
+        <span class="kw">pub use </span><span class="kw">crate</span>::fallback_hash::AHasher;
+    }
+}
+
+<span class="macro">cfg_if::cfg_if! </span>{
+    <span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)] </span>{
+        <span class="kw">mod </span>hash_map;
+        <span class="kw">mod </span>hash_set;
+
+        <span class="kw">pub use </span><span class="kw">crate</span>::hash_map::AHashMap;
+        <span class="kw">pub use </span><span class="kw">crate</span>::hash_set::AHashSet;
+
+        <span class="doccomment">/// [Hasher]: std::hash::Hasher
+        /// [HashMap]: std::collections::HashMap
+        /// Type alias for [HashMap]&lt;K, V, ahash::RandomState&gt;
+        </span><span class="kw">pub type </span>HashMap&lt;K, V&gt; = std::collections::HashMap&lt;K, V, <span class="kw">crate</span>::RandomState&gt;;
+
+        <span class="doccomment">/// Type alias for [HashSet]&lt;K, ahash::RandomState&gt;
+        </span><span class="kw">pub type </span>HashSet&lt;K&gt; = std::collections::HashSet&lt;K, <span class="kw">crate</span>::RandomState&gt;;
+    }
+}
+
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>hash_quality_test;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-</span><span class="kw">mod </span>hash_map;
-<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-</span><span class="kw">mod </span>hash_set;
 <span class="kw">mod </span>operations;
-<span class="kw">mod </span>random_state;
+<span class="kw">pub mod </span>random_state;
 <span class="kw">mod </span>specialize;
 
-<span class="attr">#[cfg(any(
-    all(any(target_arch = <span class="string">&quot;x86&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>), target_feature = <span class="string">&quot;aes&quot;</span>, not(miri)),
-    all(any(target_arch = <span class="string">&quot;arm&quot;</span>, target_arch = <span class="string">&quot;aarch64&quot;</span>), target_feature = <span class="string">&quot;crypto&quot;</span>, not(miri), feature = <span class="string">&quot;stdsimd&quot;</span>)
-))]
-</span><span class="kw">pub use </span><span class="kw">crate</span>::aes_hash::AHasher;
-
-<span class="attr">#[cfg(not(any(
-    all(any(target_arch = <span class="string">&quot;x86&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>), target_feature = <span class="string">&quot;aes&quot;</span>, not(miri)),
-    all(any(target_arch = <span class="string">&quot;arm&quot;</span>, target_arch = <span class="string">&quot;aarch64&quot;</span>), target_feature = <span class="string">&quot;crypto&quot;</span>, not(miri), feature = <span class="string">&quot;stdsimd&quot;</span>)
-)))]
-</span><span class="kw">pub use </span><span class="kw">crate</span>::fallback_hash::AHasher;
 <span class="kw">pub use </span><span class="kw">crate</span>::random_state::RandomState;
 
-<span class="kw">pub use </span><span class="kw">crate</span>::specialize::CallHasher;
-
-<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-</span><span class="kw">pub use </span><span class="kw">crate</span>::hash_map::AHashMap;
-<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-</span><span class="kw">pub use </span><span class="kw">crate</span>::hash_set::AHashSet;
 <span class="kw">use </span>core::hash::BuildHasher;
 <span class="kw">use </span>core::hash::Hash;
 <span class="kw">use </span>core::hash::Hasher;
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="doccomment">/// A convenience trait that can be used together with the type aliases defined to
+/// get access to the `new()` and `with_capacity()` methods for the HashMap type alias.
+</span><span class="kw">pub trait </span>HashMapExt {
+    <span class="doccomment">/// Constructs a new HashMap
+    </span><span class="kw">fn </span>new() -&gt; <span class="self">Self</span>;
+    <span class="doccomment">/// Constructs a new HashMap with a given initial capacity
+    </span><span class="kw">fn </span>with_capacity(capacity: usize) -&gt; <span class="self">Self</span>;
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="doccomment">/// A convenience trait that can be used together with the type aliases defined to
+/// get access to the `new()` and `with_capacity()` methods for the HashSet type aliases.
+</span><span class="kw">pub trait </span>HashSetExt {
+    <span class="doccomment">/// Constructs a new HashSet
+    </span><span class="kw">fn </span>new() -&gt; <span class="self">Self</span>;
+    <span class="doccomment">/// Constructs a new HashSet with a given initial capacity
+    </span><span class="kw">fn </span>with_capacity(capacity: usize) -&gt; <span class="self">Self</span>;
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">impl</span>&lt;K, V, S&gt; HashMapExt <span class="kw">for </span>std::collections::HashMap&lt;K, V, S&gt;
+<span class="kw">where
+    </span>S: BuildHasher + Default,
+{
+    <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+        std::collections::HashMap::with_hasher(S::default())
+    }
+
+    <span class="kw">fn </span>with_capacity(capacity: usize) -&gt; <span class="self">Self </span>{
+        std::collections::HashMap::with_capacity_and_hasher(capacity, S::default())
+    }
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">impl</span>&lt;K, S&gt; HashSetExt <span class="kw">for </span>std::collections::HashSet&lt;K, S&gt;
+<span class="kw">where
+    </span>S: BuildHasher + Default,
+{
+    <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+        std::collections::HashSet::with_hasher(S::default())
+    }
+
+    <span class="kw">fn </span>with_capacity(capacity: usize) -&gt; <span class="self">Self </span>{
+        std::collections::HashSet::with_capacity_and_hasher(capacity, S::default())
+    }
+}
 
 <span class="doccomment">/// Provides a default [Hasher] with fixed keys.
 /// This is typically used in conjunction with [BuildHasherDefault] to create
 /// [AHasher]s in order to hash the keys of the map.
 ///
 /// Generally it is preferable to use [RandomState] instead, so that different
-/// hashmaps will have different keys. However if fixed keys are desireable this
+/// hashmaps will have different keys. However if fixed keys are desirable this
 /// may be used instead.
 ///
 /// # Example
@@ -457,9 +713,22 @@
 #[cfg(test)]
 </span><span class="kw">mod </span>test {
     <span class="kw">use </span><span class="kw">crate</span>::convert::Convert;
+    <span class="kw">use </span><span class="kw">crate</span>::specialize::CallHasher;
     <span class="kw">use crate</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span>std::collections::HashMap;
     <span class="kw">use </span>std::hash::Hash;
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_ahash_alias_map_construction() {
+        <span class="kw">let </span><span class="kw-2">mut </span>map = <span class="kw">super</span>::HashMap::with_capacity(<span class="number">1234</span>);
+        map.insert(<span class="number">1</span>, <span class="string">&quot;test&quot;</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_ahash_alias_set_construction() {
+        <span class="kw">let </span><span class="kw-2">mut </span>set = <span class="kw">super</span>::HashSet::with_capacity(<span class="number">1234</span>);
+        set.insert(<span class="number">1</span>);
+    }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_default_builder() {
@@ -482,7 +751,6 @@
         <span class="macro">assert_eq!</span>(bytes, <span class="number">0x6464646464646464</span>);
     }
 
-
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_non_zero() {
         <span class="kw">let </span><span class="kw-2">mut </span>hasher1 = AHasher::new_with_keys(<span class="number">0</span>, <span class="number">0</span>);
@@ -504,7 +772,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_non_zero_specialized() {
-        <span class="kw">let </span>hasher_build = RandomState::with_seeds(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>);
+        <span class="kw">let </span>hasher_build = RandomState::with_seeds(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);
 
         <span class="kw">let </span>h1 = str::get_hash(<span class="string">&quot;foo&quot;</span>, <span class="kw-2">&amp;</span>hasher_build);
         <span class="kw">let </span>h2 = str::get_hash(<span class="string">&quot;bar&quot;</span>, <span class="kw-2">&amp;</span>hasher_build);

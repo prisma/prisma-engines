@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/3ygaf6wwr9d8r0529il4m7wxn6hg2b6k-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rusqlite-0.25.4/src/types/from_sql.rs`."><title>from_sql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rusqlite" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rusqlite/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnsihxmfi8pvl7n3q6k0f21yqpflag7z-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rusqlite-0.29.0/src/types/from_sql.rs`."><title>from_sql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rusqlite" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rusqlite/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -267,6 +267,13 @@
 <a href="#267" id="267">267</a>
 <a href="#268" id="268">268</a>
 <a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{Value, ValueRef};
 <span class="kw">use </span>std::convert::TryInto;
 <span class="kw">use </span>std::error::Error;
@@ -284,16 +291,14 @@
     /// requested type.
     </span>OutOfRange(i64),
 
-    <span class="doccomment">/// `feature = &quot;i128_blob&quot;` Error returned when reading an `i128` from a
-    /// blob with a size other than 16. Only available when the `i128_blob`
-    /// feature is enabled.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;i128_blob&quot;</span>)]
-    </span>InvalidI128Size(usize),
-
-    <span class="doccomment">/// `feature = &quot;uuid&quot;` Error returned when reading a `uuid` from a blob with
-    /// a size other than 16. Only available when the `uuid` feature is enabled.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-    </span>InvalidUuidSize(usize),
+    <span class="doccomment">/// Error when the blob result returned by SQLite cannot be stored into the
+    /// requested type due to a size mismatch.
+    </span>InvalidBlobSize {
+        <span class="doccomment">/// The expected size of the blob.
+        </span>expected_size: usize,
+        <span class="doccomment">/// The actual size of the blob that was returned.
+        </span>blob_size: usize,
+    },
 
     <span class="doccomment">/// An error case available for implementors of the [`FromSql`] trait.
     </span>Other(Box&lt;<span class="kw">dyn </span>Error + Send + Sync + <span class="lifetime">&#39;static</span>&gt;),
@@ -304,10 +309,16 @@
         <span class="kw">match </span>(<span class="self">self</span>, other) {
             (FromSqlError::InvalidType, FromSqlError::InvalidType) =&gt; <span class="bool-val">true</span>,
             (FromSqlError::OutOfRange(n1), FromSqlError::OutOfRange(n2)) =&gt; n1 == n2,
-            <span class="attr">#[cfg(feature = <span class="string">&quot;i128_blob&quot;</span>)]
-            </span>(FromSqlError::InvalidI128Size(s1), FromSqlError::InvalidI128Size(s2)) =&gt; s1 == s2,
-            <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-            </span>(FromSqlError::InvalidUuidSize(s1), FromSqlError::InvalidUuidSize(s2)) =&gt; s1 == s2,
+            (
+                FromSqlError::InvalidBlobSize {
+                    expected_size: es1,
+                    blob_size: bs1,
+                },
+                FromSqlError::InvalidBlobSize {
+                    expected_size: es2,
+                    blob_size: bs2,
+                },
+            ) =&gt; es1 == es2 &amp;&amp; bs1 == bs2,
             (..) =&gt; <span class="bool-val">false</span>,
         }
     }
@@ -317,14 +328,16 @@
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
             FromSqlError::InvalidType =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Invalid type&quot;</span>),
-            FromSqlError::OutOfRange(i) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Value {} out of range&quot;</span>, i),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;i128_blob&quot;</span>)]
-            </span>FromSqlError::InvalidI128Size(s) =&gt; {
-                <span class="macro">write!</span>(f, <span class="string">&quot;Cannot read 128bit value out of {} byte blob&quot;</span>, s)
-            }
-            <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-            </span>FromSqlError::InvalidUuidSize(s) =&gt; {
-                <span class="macro">write!</span>(f, <span class="string">&quot;Cannot read UUID value out of {} byte blob&quot;</span>, s)
+            FromSqlError::OutOfRange(i) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Value {i} out of range&quot;</span>),
+            FromSqlError::InvalidBlobSize {
+                expected_size,
+                blob_size,
+            } =&gt; {
+                <span class="macro">write!</span>(
+                    f,
+                    <span class="string">&quot;Cannot read {} byte value out of {} byte blob&quot;</span>,
+                    expected_size, blob_size
+                )
             }
             FromSqlError::Other(<span class="kw-2">ref </span>err) =&gt; err.fmt(f),
         }
@@ -440,37 +453,38 @@
 <span class="kw">impl </span>FromSql <span class="kw">for </span>Vec&lt;u8&gt; {
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>column_result(value: ValueRef&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; FromSqlResult&lt;<span class="self">Self</span>&gt; {
-        value.as_blob().map(|b| b.to_vec())
+        value.as_blob().map(&lt;[u8]&gt;::to_vec)
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;i128_blob&quot;</span>)]
-</span><span class="kw">impl </span>FromSql <span class="kw">for </span>i128 {
+<span class="kw">impl</span>&lt;<span class="kw">const </span>N: usize&gt; FromSql <span class="kw">for </span>[u8; N] {
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>column_result(value: ValueRef&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; FromSqlResult&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">use </span>byteorder::{BigEndian, ByteOrder};
-
-        value.as_blob().and_then(|bytes| {
-            <span class="kw">if </span>bytes.len() == <span class="number">16 </span>{
-                <span class="prelude-val">Ok</span>(BigEndian::read_i128(bytes) ^ (<span class="number">1i128 </span>&lt;&lt; <span class="number">127</span>))
-            } <span class="kw">else </span>{
-                <span class="prelude-val">Err</span>(FromSqlError::InvalidI128Size(bytes.len()))
-            }
+        <span class="kw">let </span>slice = value.as_blob()<span class="question-mark">?</span>;
+        slice.try_into().map_err(|<span class="kw">_</span>| FromSqlError::InvalidBlobSize {
+            expected_size: N,
+            blob_size: slice.len(),
         })
     }
 }
 
+<span class="attr">#[cfg(feature = <span class="string">&quot;i128_blob&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;i128_blob&quot;</span>)))]
+</span><span class="kw">impl </span>FromSql <span class="kw">for </span>i128 {
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>column_result(value: ValueRef&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; FromSqlResult&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>bytes = &lt;[u8; <span class="number">16</span>]&gt;::column_result(value)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(i128::from_be_bytes(bytes) ^ (<span class="number">1_i128 </span>&lt;&lt; <span class="number">127</span>))
+    }
+}
+
 <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;uuid&quot;</span>)))]
 </span><span class="kw">impl </span>FromSql <span class="kw">for </span>uuid::Uuid {
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>column_result(value: ValueRef&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; FromSqlResult&lt;<span class="self">Self</span>&gt; {
-        value
-            .as_blob()
-            .and_then(|bytes| {
-                uuid::Builder::from_slice(bytes)
-                    .map_err(|<span class="kw">_</span>| FromSqlError::InvalidUuidSize(bytes.len()))
-            })
-            .map(|<span class="kw-2">mut </span>builder| builder.build())
+        <span class="kw">let </span>bytes = &lt;[u8; <span class="number">16</span>]&gt;::column_result(value)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(uuid::Uuid::from_u128(u128::from_be_bytes(bytes)))
     }
 }
 
@@ -502,11 +516,11 @@
 
         <span class="kw">fn </span>check_ranges&lt;T&gt;(db: <span class="kw-2">&amp;</span>Connection, out_of_range: <span class="kw-2">&amp;</span>[i64], in_range: <span class="kw-2">&amp;</span>[i64])
         <span class="kw">where
-            </span>T: Into&lt;i64&gt; + FromSql + ::std::fmt::Debug,
+            </span>T: Into&lt;i64&gt; + FromSql + std::fmt::Debug,
         {
             <span class="kw">for </span>n <span class="kw">in </span>out_of_range {
                 <span class="kw">let </span>err = db
-                    .query_row(<span class="string">&quot;SELECT ?&quot;</span>, <span class="kw-2">&amp;</span>[n], |r| r.get::&lt;<span class="kw">_</span>, T&gt;(<span class="number">0</span>))
+                    .query_row(<span class="string">&quot;SELECT ?1&quot;</span>, [n], |r| r.get::&lt;<span class="kw">_</span>, T&gt;(<span class="number">0</span>))
                     .unwrap_err();
                 <span class="kw">match </span>err {
                     Error::IntegralValueOutOfRange(<span class="kw">_</span>, value) =&gt; <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>n, value),
@@ -516,7 +530,7 @@
             <span class="kw">for </span>n <span class="kw">in </span>in_range {
                 <span class="macro">assert_eq!</span>(
                     <span class="kw-2">*</span>n,
-                    db.query_row(<span class="string">&quot;SELECT ?&quot;</span>, <span class="kw-2">&amp;</span>[n], |r| r.get::&lt;<span class="kw">_</span>, T&gt;(<span class="number">0</span>))
+                    db.query_row(<span class="string">&quot;SELECT ?1&quot;</span>, [n], |r| r.get::&lt;<span class="kw">_</span>, T&gt;(<span class="number">0</span>))
                         .unwrap()
                         .into()
                 );

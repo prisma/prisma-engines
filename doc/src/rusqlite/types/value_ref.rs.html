@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/3ygaf6wwr9d8r0529il4m7wxn6hg2b6k-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rusqlite-0.25.4/src/types/value_ref.rs`."><title>value_ref.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rusqlite" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rusqlite/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnsihxmfi8pvl7n3q6k0f21yqpflag7z-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rusqlite-0.29.0/src/types/value_ref.rs`."><title>value_ref.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rusqlite" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rusqlite/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -181,6 +181,86 @@
 <a href="#181" id="181">181</a>
 <a href="#182" id="182">182</a>
 <a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{Type, Value};
 <span class="kw">use </span><span class="kw">crate</span>::types::{FromSqlError, FromSqlResult};
 
@@ -205,6 +285,7 @@
 <span class="kw">impl </span>ValueRef&lt;<span class="lifetime">&#39;_</span>&gt; {
     <span class="doccomment">/// Returns SQLite fundamental datatype.
     </span><span class="attr">#[inline]
+    #[must_use]
     </span><span class="kw">pub fn </span>data_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Type {
         <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
             ValueRef::Null =&gt; Type::Null,
@@ -228,6 +309,19 @@
         }
     }
 
+    <span class="doccomment">/// If `self` is case `Null` returns None.
+    /// If `self` is case `Integer`, returns the integral value.
+    /// Otherwise returns [`Err(Error::InvalidColumnType)`](crate::Error::
+    /// InvalidColumnType).
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub fn </span>as_i64_or_null(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FromSqlResult&lt;<span class="prelude-ty">Option</span>&lt;i64&gt;&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            ValueRef::Null =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            ValueRef::Integer(i) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(i)),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(FromSqlError::InvalidType),
+        }
+    }
+
     <span class="doccomment">/// If `self` is case `Real`, returns the floating point value. Otherwise,
     /// returns [`Err(Error::InvalidColumnType)`](crate::Error::
     /// InvalidColumnType).
@@ -235,6 +329,19 @@
     </span><span class="kw">pub fn </span>as_f64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FromSqlResult&lt;f64&gt; {
         <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
             ValueRef::Real(f) =&gt; <span class="prelude-val">Ok</span>(f),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(FromSqlError::InvalidType),
+        }
+    }
+
+    <span class="doccomment">/// If `self` is case `Null` returns None.
+    /// If `self` is case `Real`, returns the floating point value.
+    /// Otherwise returns [`Err(Error::InvalidColumnType)`](crate::Error::
+    /// InvalidColumnType).
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub fn </span>as_f64_or_null(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FromSqlResult&lt;<span class="prelude-ty">Option</span>&lt;f64&gt;&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            ValueRef::Null =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            ValueRef::Real(f) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(f)),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(FromSqlError::InvalidType),
         }
     }
@@ -251,12 +358,62 @@
         }
     }
 
+    <span class="doccomment">/// If `self` is case `Null` returns None.
+    /// If `self` is case `Text`, returns the string value.
+    /// Otherwise returns [`Err(Error::InvalidColumnType)`](crate::Error::
+    /// InvalidColumnType).
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub fn </span>as_str_or_null(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FromSqlResult&lt;<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            ValueRef::Null =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            ValueRef::Text(t) =&gt; std::str::from_utf8(t)
+                .map_err(|e| FromSqlError::Other(Box::new(e)))
+                .map(<span class="prelude-val">Some</span>),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(FromSqlError::InvalidType),
+        }
+    }
+
     <span class="doccomment">/// If `self` is case `Blob`, returns the byte slice. Otherwise, returns
     /// [`Err(Error::InvalidColumnType)`](crate::Error::InvalidColumnType).
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>as_blob(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FromSqlResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt; {
         <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
             ValueRef::Blob(b) =&gt; <span class="prelude-val">Ok</span>(b),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(FromSqlError::InvalidType),
+        }
+    }
+
+    <span class="doccomment">/// If `self` is case `Null` returns None.
+    /// If `self` is case `Blob`, returns the byte slice.
+    /// Otherwise returns [`Err(Error::InvalidColumnType)`](crate::Error::
+    /// InvalidColumnType).
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub fn </span>as_blob_or_null(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FromSqlResult&lt;<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt;&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            ValueRef::Null =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            ValueRef::Blob(b) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(b)),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(FromSqlError::InvalidType),
+        }
+    }
+
+    <span class="doccomment">/// Returns the byte slice that makes up this ValueRef if it&#39;s either
+    /// [`ValueRef::Blob`] or [`ValueRef::Text`].
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub fn </span>as_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FromSqlResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            ValueRef::Text(s) | ValueRef::Blob(s) =&gt; <span class="prelude-val">Ok</span>(s),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(FromSqlError::InvalidType),
+        }
+    }
+
+    <span class="doccomment">/// If `self` is case `Null` returns None.
+    /// If `self` is [`ValueRef::Blob`] or [`ValueRef::Text`] returns the byte
+    /// slice that makes up this value
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub fn </span>as_bytes_or_null(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FromSqlResult&lt;<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt;&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            ValueRef::Null =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            ValueRef::Text(s) | ValueRef::Blob(s) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(s)),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(FromSqlError::InvalidType),
         }
     }
@@ -335,7 +492,7 @@
                     !text.is_null(),
                     <span class="string">&quot;unexpected SQLITE_TEXT value type with NULL data&quot;
                 </span>);
-                <span class="kw">let </span>s = from_raw_parts(text <span class="kw">as </span><span class="kw-2">*const </span>u8, len <span class="kw">as </span>usize);
+                <span class="kw">let </span>s = from_raw_parts(text.cast::&lt;u8&gt;(), len <span class="kw">as </span>usize);
                 ValueRef::Text(s)
             }
             ffi::SQLITE_BLOB =&gt; {
@@ -353,7 +510,7 @@
                         !blob.is_null(),
                         <span class="string">&quot;unexpected SQLITE_BLOB value type with NULL data&quot;
                     </span>);
-                    ValueRef::Blob(from_raw_parts(blob <span class="kw">as </span><span class="kw-2">*const </span>u8, len <span class="kw">as </span>usize))
+                    ValueRef::Blob(from_raw_parts(blob.cast::&lt;u8&gt;(), len <span class="kw">as </span>usize))
                 } <span class="kw">else </span>{
                     <span class="comment">// The return value from sqlite3_value_blob() for a zero-length BLOB
                     // is a NULL pointer.
@@ -363,5 +520,8 @@
             <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;sqlite3_value_type returned invalid value&quot;</span>),
         }
     }
-}
+
+    <span class="comment">// TODO sqlite3_value_nochange // 3.22.0 &amp; VTab xUpdate
+    // TODO sqlite3_value_frombind // 3.28.0
+</span>}
 </code></pre></div></section></main></body></html>

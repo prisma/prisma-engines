@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/3ygaf6wwr9d8r0529il4m7wxn6hg2b6k-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rusqlite-0.25.4/src/error.rs`."><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rusqlite" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnsihxmfi8pvl7n3q6k0f21yqpflag7z-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rusqlite-0.29.0/src/error.rs`."><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rusqlite" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -358,9 +358,94 @@
 <a href="#358" id="358">358</a>
 <a href="#359" id="359">359</a>
 <a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
+<a href="#362" id="362">362</a>
+<a href="#363" id="363">363</a>
+<a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
+<a href="#408" id="408">408</a>
+<a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
+<a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::types::FromSqlError;
 <span class="kw">use </span><span class="kw">crate</span>::types::Type;
-<span class="kw">use crate</span>::{errmsg_to_string, ffi};
+<span class="kw">use crate</span>::{errmsg_to_string, ffi, <span class="prelude-ty">Result</span>};
 <span class="kw">use </span>std::error;
 <span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::os::raw::c_int;
@@ -394,7 +479,7 @@
 
     <span class="doccomment">/// Error converting a string to a C-compatible string because it contained
     /// an embedded nul.
-    </span>NulError(::std::ffi::NulError),
+    </span>NulError(std::ffi::NulError),
 
     <span class="doccomment">/// Error when using SQL named parameters and passing a parameter name not
     /// present in the SQL.
@@ -432,15 +517,18 @@
     /// [`functions::Context::get`](crate::functions::Context::get) when the
     /// function argument cannot be converted to the requested type.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;functions&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;functions&quot;</span>)))]
     </span>InvalidFunctionParameterType(usize, Type),
     <span class="doccomment">/// Error returned by [`vtab::Values::get`](crate::vtab::Values::get) when
     /// the filter argument cannot be converted to the requested type.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;vtab&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;vtab&quot;</span>)))]
     </span>InvalidFilterParameterType(usize, Type),
 
     <span class="doccomment">/// An error case available for implementors of custom user functions (e.g.,
     /// [`create_scalar_function`](crate::Connection::create_scalar_function)).
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;functions&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;functions&quot;</span>)))]
     #[allow(dead_code)]
     </span>UserFunctionError(Box&lt;<span class="kw">dyn </span>error::Error + Send + Sync + <span class="lifetime">&#39;static</span>&gt;),
 
@@ -454,11 +542,13 @@
     <span class="doccomment">/// An error case available for implementors of custom modules (e.g.,
     /// [`create_module`](crate::Connection::create_module)).
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;vtab&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;vtab&quot;</span>)))]
     #[allow(dead_code)]
     </span>ModuleError(String),
 
     <span class="doccomment">/// An unwinding panic occurs in an UDF (user-defined function).
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;functions&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;functions&quot;</span>)))]
     </span>UnwindingPanic,
 
     <span class="doccomment">/// An error returned when
@@ -466,6 +556,7 @@
     /// retrieve data of a different type than what had been stored using
     /// [`Context::set_aux`](crate::functions::Context::set_aux).
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;functions&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;functions&quot;</span>)))]
     </span>GetAuxWrongType,
 
     <span class="doccomment">/// Error when the SQL contains multiple statements.
@@ -480,7 +571,21 @@
     /// [`Blob::raw_read_at_exact`](crate::blob::Blob::raw_read_at_exact) will
     /// return it if the blob has insufficient data.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;blob&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;blob&quot;</span>)))]
     </span>BlobSizeError,
+    <span class="doccomment">/// Error referencing a specific token in the input SQL
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)] </span><span class="comment">// 3.38.0
+    </span><span class="attr">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)))]
+    </span>SqlInputError {
+        <span class="doccomment">/// error code
+        </span>error: ffi::Error,
+        <span class="doccomment">/// error message
+        </span>msg: String,
+        <span class="doccomment">/// SQL input
+        </span>sql: String,
+        <span class="doccomment">/// byte offset of the start of invalid token
+        </span>offset: c_int,
+    },
 }
 
 <span class="kw">impl </span>PartialEq <span class="kw">for </span>Error {
@@ -525,6 +630,21 @@
             }
             <span class="attr">#[cfg(feature = <span class="string">&quot;blob&quot;</span>)]
             </span>(Error::BlobSizeError, Error::BlobSizeError) =&gt; <span class="bool-val">true</span>,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)]
+            </span>(
+                Error::SqlInputError {
+                    error: e1,
+                    msg: m1,
+                    sql: s1,
+                    offset: o1,
+                },
+                Error::SqlInputError {
+                    error: e2,
+                    msg: m2,
+                    sql: s2,
+                    offset: o2,
+                },
+            ) =&gt; e1 == e2 &amp;&amp; m1 == m2 &amp;&amp; s1 == s2 &amp;&amp; o1 == o2,
             (..) =&gt; <span class="bool-val">false</span>,
         }
     }
@@ -537,14 +657,14 @@
     }
 }
 
-<span class="kw">impl </span>From&lt;::std::ffi::NulError&gt; <span class="kw">for </span>Error {
+<span class="kw">impl </span>From&lt;std::ffi::NulError&gt; <span class="kw">for </span>Error {
     <span class="attr">#[cold]
-    </span><span class="kw">fn </span>from(err: ::std::ffi::NulError) -&gt; Error {
+    </span><span class="kw">fn </span>from(err: std::ffi::NulError) -&gt; Error {
         Error::NulError(err)
     }
 }
 
-<span class="kw">const </span>UNKNOWN_COLUMN: usize = std::usize::MAX;
+<span class="kw">const </span>UNKNOWN_COLUMN: usize = usize::MAX;
 
 <span class="doccomment">/// The conversion isn&#39;t precise, but it&#39;s convenient to have it
 /// to allow use of `get_raw(…).as_…()?` in callbacks that take `Error`.
@@ -555,12 +675,7 @@
         // context.
         </span><span class="kw">match </span>err {
             FromSqlError::OutOfRange(val) =&gt; Error::IntegralValueOutOfRange(UNKNOWN_COLUMN, val),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;i128_blob&quot;</span>)]
-            </span>FromSqlError::InvalidI128Size(<span class="kw">_</span>) =&gt; {
-                Error::FromSqlConversionFailure(UNKNOWN_COLUMN, Type::Blob, Box::new(err))
-            }
-            <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
-            </span>FromSqlError::InvalidUuidSize(<span class="kw">_</span>) =&gt; {
+            FromSqlError::InvalidBlobSize { .. } =&gt; {
                 Error::FromSqlConversionFailure(UNKNOWN_COLUMN, Type::Blob, Box::new(err))
             }
             FromSqlError::Other(source) =&gt; {
@@ -575,7 +690,7 @@
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
             Error::SqliteFailure(<span class="kw-2">ref </span>err, <span class="prelude-val">None</span>) =&gt; err.fmt(f),
-            Error::SqliteFailure(<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>s)) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, s),
+            Error::SqliteFailure(<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>s)) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{s}&quot;</span>),
             Error::SqliteSingleThreadedMode =&gt; <span class="macro">write!</span>(
                 f,
                 <span class="string">&quot;SQLite was compiled or configured for single-threaded use only&quot;
@@ -593,21 +708,21 @@
             }
             Error::IntegralValueOutOfRange(col, val) =&gt; {
                 <span class="kw">if </span>col != UNKNOWN_COLUMN {
-                    <span class="macro">write!</span>(f, <span class="string">&quot;Integer {} out of range at index {}&quot;</span>, val, col)
+                    <span class="macro">write!</span>(f, <span class="string">&quot;Integer {val} out of range at index {col}&quot;</span>)
                 } <span class="kw">else </span>{
-                    <span class="macro">write!</span>(f, <span class="string">&quot;Integer {} out of range&quot;</span>, val)
+                    <span class="macro">write!</span>(f, <span class="string">&quot;Integer {val} out of range&quot;</span>)
                 }
             }
             Error::Utf8Error(<span class="kw-2">ref </span>err) =&gt; err.fmt(f),
             Error::NulError(<span class="kw-2">ref </span>err) =&gt; err.fmt(f),
-            Error::InvalidParameterName(<span class="kw-2">ref </span>name) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Invalid parameter name: {}&quot;</span>, name),
+            Error::InvalidParameterName(<span class="kw-2">ref </span>name) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Invalid parameter name: {name}&quot;</span>),
             Error::InvalidPath(<span class="kw-2">ref </span>p) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Invalid path: {}&quot;</span>, p.to_string_lossy()),
             Error::ExecuteReturnedResults =&gt; {
                 <span class="macro">write!</span>(f, <span class="string">&quot;Execute returned results - did you mean to call query?&quot;</span>)
             }
             Error::QueryReturnedNoRows =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Query returned no rows&quot;</span>),
-            Error::InvalidColumnIndex(i) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Invalid column index: {}&quot;</span>, i),
-            Error::InvalidColumnName(<span class="kw-2">ref </span>name) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Invalid column name: {}&quot;</span>, name),
+            Error::InvalidColumnIndex(i) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Invalid column index: {i}&quot;</span>),
+            Error::InvalidColumnName(<span class="kw-2">ref </span>name) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Invalid column name: {name}&quot;</span>),
             Error::InvalidColumnType(i, <span class="kw-2">ref </span>name, <span class="kw-2">ref </span>t) =&gt; <span class="macro">write!</span>(
                 f,
                 <span class="string">&quot;Invalid column type {} at index: {}, name: {}&quot;</span>,
@@ -618,30 +733,36 @@
                 <span class="string">&quot;Wrong number of parameters passed to query. Got {}, needed {}&quot;</span>,
                 i1, n1
             ),
-            Error::StatementChangedRows(i) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Query changed {} rows&quot;</span>, i),
+            Error::StatementChangedRows(i) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Query changed {i} rows&quot;</span>),
 
             <span class="attr">#[cfg(feature = <span class="string">&quot;functions&quot;</span>)]
             </span>Error::InvalidFunctionParameterType(i, <span class="kw-2">ref </span>t) =&gt; {
-                <span class="macro">write!</span>(f, <span class="string">&quot;Invalid function parameter type {} at index {}&quot;</span>, t, i)
+                <span class="macro">write!</span>(f, <span class="string">&quot;Invalid function parameter type {t} at index {i}&quot;</span>)
             }
             <span class="attr">#[cfg(feature = <span class="string">&quot;vtab&quot;</span>)]
             </span>Error::InvalidFilterParameterType(i, <span class="kw-2">ref </span>t) =&gt; {
-                <span class="macro">write!</span>(f, <span class="string">&quot;Invalid filter parameter type {} at index {}&quot;</span>, t, i)
+                <span class="macro">write!</span>(f, <span class="string">&quot;Invalid filter parameter type {t} at index {i}&quot;</span>)
             }
             <span class="attr">#[cfg(feature = <span class="string">&quot;functions&quot;</span>)]
             </span>Error::UserFunctionError(<span class="kw-2">ref </span>err) =&gt; err.fmt(f),
             Error::ToSqlConversionFailure(<span class="kw-2">ref </span>err) =&gt; err.fmt(f),
             Error::InvalidQuery =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Query is not read-only&quot;</span>),
             <span class="attr">#[cfg(feature = <span class="string">&quot;vtab&quot;</span>)]
-            </span>Error::ModuleError(<span class="kw-2">ref </span>desc) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, desc),
+            </span>Error::ModuleError(<span class="kw-2">ref </span>desc) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{desc}&quot;</span>),
             <span class="attr">#[cfg(feature = <span class="string">&quot;functions&quot;</span>)]
             </span>Error::UnwindingPanic =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;unwinding panic&quot;</span>),
             <span class="attr">#[cfg(feature = <span class="string">&quot;functions&quot;</span>)]
             </span>Error::GetAuxWrongType =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;get_aux called with wrong type&quot;</span>),
             Error::MultipleStatement =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Multiple statements provided&quot;</span>),
-
             <span class="attr">#[cfg(feature = <span class="string">&quot;blob&quot;</span>)]
             </span>Error::BlobSizeError =&gt; <span class="string">&quot;Blob size is insufficient&quot;</span>.fmt(f),
+            <span class="attr">#[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)]
+            </span>Error::SqlInputError {
+                <span class="kw-2">ref </span>msg,
+                offset,
+                <span class="kw-2">ref </span>sql,
+                ..
+            } =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{msg} in {sql} at offset {offset}&quot;</span>),
         }
     }
 }
@@ -689,7 +810,27 @@
 
             <span class="attr">#[cfg(feature = <span class="string">&quot;blob&quot;</span>)]
             </span>Error::BlobSizeError =&gt; <span class="prelude-val">None</span>,
+            <span class="attr">#[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)]
+            </span>Error::SqlInputError { <span class="kw-2">ref </span>error, .. } =&gt; <span class="prelude-val">Some</span>(error),
         }
+    }
+}
+
+<span class="kw">impl </span>Error {
+    <span class="doccomment">/// Returns the underlying SQLite error if this is [`Error::SqliteFailure`].
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub fn </span>sqlite_error(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ffi::Error&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::SqliteFailure(error, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(error),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="doccomment">/// Returns the underlying SQLite error code if this is
+    /// [`Error::SqliteFailure`].
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub fn </span>sqlite_error_code(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ffi::ErrorCode&gt; {
+        <span class="self">self</span>.sqlite_error().map(|error| error.code)
     }
 }
 
@@ -697,7 +838,8 @@
 
 </span><span class="attr">#[cold]
 </span><span class="kw">pub fn </span>error_from_sqlite_code(code: c_int, message: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; Error {
-    Error::SqliteFailure(ffi::Error::new(code), message)
+    <span class="comment">// TODO sqlite3_error_offset // 3.38.0, #1130
+    </span>Error::SqliteFailure(ffi::Error::new(code), message)
 }
 
 <span class="attr">#[cold]
@@ -710,12 +852,40 @@
     error_from_sqlite_code(code, message)
 }
 
-<span class="macro">macro_rules! </span>check {
-    (<span class="macro-nonterminal">$funcall</span>:expr) =&gt; {{
-        <span class="kw">let </span>rc = <span class="macro-nonterminal">$funcall</span>;
-        <span class="kw">if </span>rc != <span class="kw">crate</span>::ffi::SQLITE_OK {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="kw">crate</span>::error::error_from_sqlite_code(rc, <span class="prelude-val">None</span>).into());
+<span class="attr">#[cold]
+#[cfg(not(feature = <span class="string">&quot;modern_sqlite&quot;</span>))] </span><span class="comment">// SQLite &gt;= 3.38.0
+</span><span class="kw">pub unsafe fn </span>error_with_offset(db: <span class="kw-2">*mut </span>ffi::sqlite3, code: c_int, _sql: <span class="kw-2">&amp;</span>str) -&gt; Error {
+    error_from_handle(db, code)
+}
+
+<span class="attr">#[cold]
+#[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)] </span><span class="comment">// SQLite &gt;= 3.38.0
+</span><span class="kw">pub unsafe fn </span>error_with_offset(db: <span class="kw-2">*mut </span>ffi::sqlite3, code: c_int, sql: <span class="kw-2">&amp;</span>str) -&gt; Error {
+    <span class="kw">if </span>db.is_null() {
+        error_from_sqlite_code(code, <span class="prelude-val">None</span>)
+    } <span class="kw">else </span>{
+        <span class="kw">let </span>error = ffi::Error::new(code);
+        <span class="kw">let </span>msg = errmsg_to_string(ffi::sqlite3_errmsg(db));
+        <span class="kw">if </span>ffi::ErrorCode::Unknown == error.code {
+            <span class="kw">let </span>offset = ffi::sqlite3_error_offset(db);
+            <span class="kw">if </span>offset &gt;= <span class="number">0 </span>{
+                <span class="kw">return </span>Error::SqlInputError {
+                    error,
+                    msg,
+                    sql: sql.to_owned(),
+                    offset,
+                };
+            }
         }
-    }};
+        Error::SqliteFailure(error, <span class="prelude-val">Some</span>(msg))
+    }
+}
+
+<span class="kw">pub fn </span>check(code: c_int) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    <span class="kw">if </span>code != <span class="kw">crate</span>::ffi::SQLITE_OK {
+        <span class="prelude-val">Err</span>(error_from_sqlite_code(code, <span class="prelude-val">None</span>))
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Ok</span>(())
+    }
 }
 </code></pre></div></section></main></body></html>

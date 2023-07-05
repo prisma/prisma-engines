@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/3ygaf6wwr9d8r0529il4m7wxn6hg2b6k-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rusqlite-0.25.4/src/types/to_sql.rs`."><title>to_sql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rusqlite" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rusqlite/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnsihxmfi8pvl7n3q6k0f21yqpflag7z-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/rusqlite-0.29.0/src/types/to_sql.rs`."><title>to_sql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rusqlite" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../rusqlite/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -406,6 +406,27 @@
 <a href="#406" id="406">406</a>
 <a href="#407" id="407">407</a>
 <a href="#408" id="408">408</a>
+<a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
+<a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{Null, Value, ValueRef};
 <span class="attr">#[cfg(feature = <span class="string">&quot;array&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::vtab::array::Array;
@@ -424,13 +445,15 @@
     <span class="doccomment">/// An owned SQLite-representable value.
     </span>Owned(Value),
 
-    <span class="doccomment">/// `feature = &quot;blob&quot;` A BLOB of the given length that is filled with
+    <span class="doccomment">/// A BLOB of the given length that is filled with
     /// zeroes.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;blob&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;blob&quot;</span>)))]
     </span>ZeroBlob(i32),
 
     <span class="doccomment">/// `feature = &quot;array&quot;`
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;array&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;array&quot;</span>)))]
     </span>Array(Array),
 }
 
@@ -478,9 +501,11 @@
 // `i128` needs in `Into&lt;Value&gt;`, but it&#39;s probably fine for the moment, and not
 // worth adding another case to Value.
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;i128_blob&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;i128_blob&quot;</span>)))]
 </span><span class="macro">from_value!</span>(i128);
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;uuid&quot;</span>)))]
 </span><span class="macro">from_value!</span>(uuid::Uuid);
 
 <span class="kw">impl </span>ToSql <span class="kw">for </span>ToSqlOutput&lt;<span class="lifetime">&#39;_</span>&gt; {
@@ -570,9 +595,11 @@
 <span class="macro">to_sql_self!</span>(f64);
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;i128_blob&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;i128_blob&quot;</span>)))]
 </span><span class="macro">to_sql_self!</span>(i128);
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;uuid&quot;</span>)))]
 </span><span class="macro">to_sql_self!</span>(uuid::Uuid);
 
 <span class="macro">macro_rules! </span>to_sql_self_fallible(
@@ -626,6 +653,13 @@
     }
 }
 
+<span class="kw">impl</span>&lt;<span class="kw">const </span>N: usize&gt; ToSql <span class="kw">for </span>[u8; N] {
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>to_sql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ToSqlOutput&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="prelude-val">Ok</span>(ToSqlOutput::from(<span class="kw-2">&amp;</span><span class="self">self</span>[..]))
+    }
+}
+
 <span class="kw">impl </span>ToSql <span class="kw">for </span>[u8] {
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>to_sql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ToSqlOutput&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
@@ -668,15 +702,24 @@
     }
 
     <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_u8_array() {
+        <span class="kw">let </span>a: [u8; <span class="number">99</span>] = [<span class="number">0u8</span>; <span class="number">99</span>];
+        <span class="kw">let </span>_a: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql] = <span class="macro">crate::params!</span>[a];
+        <span class="kw">let </span>r = ToSql::to_sql(<span class="kw-2">&amp;</span>a);
+
+        r.unwrap();
+    }
+
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>test_cow_str() {
         <span class="kw">use </span>std::borrow::Cow;
         <span class="kw">let </span>s = <span class="string">&quot;str&quot;</span>;
         <span class="kw">let </span>cow: Cow&lt;str&gt; = Cow::Borrowed(s);
         <span class="kw">let </span>r = cow.to_sql();
-        <span class="macro">assert!</span>(r.is_ok());
+        r.unwrap();
         <span class="kw">let </span>cow: Cow&lt;str&gt; = Cow::Owned::&lt;str&gt;(String::from(s));
         <span class="kw">let </span>r = cow.to_sql();
-        <span class="macro">assert!</span>(r.is_ok());
+        r.unwrap();
         <span class="comment">// Ensure this compiles.
         </span><span class="kw">let </span>_p: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql] = <span class="macro">crate::params!</span>[cow];
     }
@@ -687,7 +730,7 @@
         <span class="kw">let </span>_s: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql] = <span class="macro">crate::params!</span>[s];
         <span class="kw">let </span>r = ToSql::to_sql(<span class="kw-2">&amp;</span>s);
 
-        <span class="macro">assert!</span>(r.is_ok());
+        r.unwrap();
     }
 
     <span class="attr">#[test]
@@ -696,7 +739,7 @@
         <span class="kw">let </span>_s: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql] = <span class="macro">crate::params!</span>[s];
         <span class="kw">let </span>r = s.to_sql();
 
-        <span class="macro">assert!</span>(r.is_ok());
+        r.unwrap();
     }
 
     <span class="attr">#[test]
@@ -705,7 +748,7 @@
         <span class="kw">let </span>_s: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql] = <span class="macro">crate::params!</span>[s];
         <span class="kw">let </span>r = ToSql::to_sql(<span class="kw-2">&amp;</span>s);
 
-        <span class="macro">assert!</span>(r.is_ok());
+        r.unwrap();
     }
 
     <span class="attr">#[test]
@@ -717,48 +760,47 @@
         <span class="kw">let </span>s: Rc&lt;Box&lt;str&gt;&gt; = Rc::new(source_str.clone());
         <span class="kw">let </span>_s: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql] = <span class="macro">crate::params!</span>[s];
         <span class="kw">let </span>r = s.to_sql();
-        <span class="macro">assert!</span>(r.is_ok());
+        r.unwrap();
 
         <span class="kw">let </span>s: Arc&lt;Box&lt;str&gt;&gt; = Arc::new(source_str.clone());
         <span class="kw">let </span>_s: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql] = <span class="macro">crate::params!</span>[s];
         <span class="kw">let </span>r = s.to_sql();
-        <span class="macro">assert!</span>(r.is_ok());
+        r.unwrap();
 
         <span class="kw">let </span>s: Arc&lt;str&gt; = Arc::from(<span class="kw-2">&amp;*</span>source_str);
         <span class="kw">let </span>_s: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql] = <span class="macro">crate::params!</span>[s];
         <span class="kw">let </span>r = s.to_sql();
-        <span class="macro">assert!</span>(r.is_ok());
+        r.unwrap();
 
         <span class="kw">let </span>s: Arc&lt;<span class="kw">dyn </span>ToSql&gt; = Arc::new(source_str.clone());
         <span class="kw">let </span>_s: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql] = <span class="macro">crate::params!</span>[s];
         <span class="kw">let </span>r = s.to_sql();
-        <span class="macro">assert!</span>(r.is_ok());
+        r.unwrap();
 
         <span class="kw">let </span>s: Rc&lt;str&gt; = Rc::from(<span class="kw-2">&amp;*</span>source_str);
         <span class="kw">let </span>_s: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql] = <span class="macro">crate::params!</span>[s];
         <span class="kw">let </span>r = s.to_sql();
-        <span class="macro">assert!</span>(r.is_ok());
+        r.unwrap();
 
         <span class="kw">let </span>s: Rc&lt;<span class="kw">dyn </span>ToSql&gt; = Rc::new(source_str);
         <span class="kw">let </span>_s: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql] = <span class="macro">crate::params!</span>[s];
         <span class="kw">let </span>r = s.to_sql();
-        <span class="macro">assert!</span>(r.is_ok());
+        r.unwrap();
     }
 
     <span class="attr">#[cfg(feature = <span class="string">&quot;i128_blob&quot;</span>)]
     #[test]
     </span><span class="kw">fn </span>test_i128() -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
         <span class="kw">use </span><span class="kw">crate</span>::Connection;
-        <span class="kw">use </span>std::i128;
         <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
         db.execute_batch(<span class="string">&quot;CREATE TABLE foo (i128 BLOB, desc TEXT)&quot;</span>)<span class="question-mark">?</span>;
         db.execute(
             <span class="string">&quot;
             INSERT INTO foo(i128, desc) VALUES
-                (?, &#39;zero&#39;),
-                (?, &#39;neg one&#39;), (?, &#39;neg two&#39;),
-                (?, &#39;pos one&#39;), (?, &#39;pos two&#39;),
-                (?, &#39;min&#39;), (?, &#39;max&#39;)&quot;</span>,
+                (?1, &#39;zero&#39;),
+                (?2, &#39;neg one&#39;), (?3, &#39;neg two&#39;),
+                (?4, &#39;pos one&#39;), (?5, &#39;pos two&#39;),
+                (?6, &#39;min&#39;), (?7, &#39;max&#39;)&quot;</span>,
             [<span class="number">0i128</span>, -<span class="number">1i128</span>, -<span class="number">2i128</span>, <span class="number">1i128</span>, <span class="number">2i128</span>, i128::MIN, i128::MAX],
         )<span class="question-mark">?</span>;
 
@@ -797,11 +839,11 @@
         <span class="kw">let </span>id = Uuid::new_v4();
 
         db.execute(
-            <span class="string">&quot;INSERT INTO foo (id, label) VALUES (?, ?)&quot;</span>,
+            <span class="string">&quot;INSERT INTO foo (id, label) VALUES (?1, ?2)&quot;</span>,
             <span class="macro">params!</span>[id, <span class="string">&quot;target&quot;</span>],
         )<span class="question-mark">?</span>;
 
-        <span class="kw">let </span><span class="kw-2">mut </span>stmt = db.prepare(<span class="string">&quot;SELECT id, label FROM foo WHERE id = ?&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>stmt = db.prepare(<span class="string">&quot;SELECT id, label FROM foo WHERE id = ?1&quot;</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>rows = stmt.query(<span class="macro">params!</span>[id])<span class="question-mark">?</span>;
         <span class="kw">let </span>row = rows.next()<span class="question-mark">?</span>.unwrap();

@@ -94,6 +94,9 @@
 <a href="#94" id="94">94</a>
 <a href="#95" id="95">95</a>
 <a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! All the quaint-wrangling for the sqlite connector should happen here.
 
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>quaint::connector::rusqlite;
@@ -173,12 +176,15 @@
     <span class="macro">tracing::debug!</span>(query_type = <span class="string">&quot;raw_cmd&quot;</span>, sql = script);
     <span class="kw">let </span>conn = conn.<span class="number">0</span>.lock().unwrap();
     conn.execute_batch(script).map_err(|sqlite_error: rusqlite::Error| {
-        <span class="kw">let </span>database_error_code =
-            <span class="kw">if let </span>rusqlite::Error::SqliteFailure(rusqlite::ffi::Error { code: <span class="kw">_</span>, extended_code }, <span class="kw">_</span>) = sqlite_error {
-                extended_code.to_string()
-            } <span class="kw">else </span>{
-                <span class="string">&quot;none&quot;</span>.to_owned()
-            };
+        <span class="kw">let </span>database_error_code = <span class="kw">match </span>sqlite_error {
+            rusqlite::Error::SqliteFailure(rusqlite::ffi::Error { extended_code, .. }, <span class="kw">_</span>)
+            | rusqlite::Error::SqlInputError {
+                error: rusqlite::ffi::Error { extended_code, .. },
+                ..
+            } =&gt; extended_code.to_string(),
+            <span class="kw">_ </span>=&gt; <span class="string">&quot;none&quot;</span>.to_owned(),
+        };
+
         ConnectorError::user_facing(ApplyMigrationError {
             migration_name: migration_name.to_owned(),
             database_error_code,
