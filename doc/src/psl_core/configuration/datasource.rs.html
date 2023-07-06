@@ -291,6 +291,7 @@
 <a href="#291" id="291">291</a>
 <a href="#292" id="292">292</a>
 <a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     configuration::StringFromEnvVar,
     datamodel_connector::{Connector, ConnectorCapabilities, RelationMode},
@@ -396,7 +397,8 @@
                 <span class="kw">let </span>s = <span class="macro">indoc::formatdoc! </span>{<span class="string">&quot;
                     {err_str}
 
-                    To use a URL with protocol `prisma://` the Data Proxy must be enabled via `prisma generate --data-proxy`.
+                    To use a URL with protocol `prisma://`, you need to either enable Accelerate or the Data Proxy.
+                    Enable Accelerate via `prisma generate --accelerate` or the Data Proxy via `prisma generate --data-proxy.`
 
                     More information about Data Proxy: https://pris.ly/d/data-proxy
                 &quot;</span>};
