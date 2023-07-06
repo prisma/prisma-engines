@@ -194,7 +194,8 @@ fn must_error_if_prisma_protocol_is_used_for_mysql() {
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating datasource `myds`: the URL must start with the protocol `mysql://`.
 
-        To use a URL with protocol `prisma://` the Data Proxy must be enabled via `prisma generate --data-proxy`.
+        To use a URL with protocol `prisma://`, you need to either enable Accelerate or the Data Proxy.
+        Enable Accelerate via `prisma generate --accelerate` or the Data Proxy via `prisma generate --data-proxy.`
 
         More information about Data Proxy: https://pris.ly/d/data-proxy
         [0m
@@ -874,7 +875,8 @@ fn load_url_should_not_work_with_proxy_url() {
     let expectation = expect!([r#"
         [1;91merror[0m: [1mError validating datasource `myds`: the URL must start with the protocol `postgresql://` or `postgres://`.
 
-        To use a URL with protocol `prisma://` the Data Proxy must be enabled via `prisma generate --data-proxy`.
+        To use a URL with protocol `prisma://`, you need to either enable Accelerate or the Data Proxy.
+        Enable Accelerate via `prisma generate --accelerate` or the Data Proxy via `prisma generate --data-proxy.`
 
         More information about Data Proxy: https://pris.ly/d/data-proxy
         [0m
