@@ -489,5 +489,8 @@ model m1 {
     }))
     .unwrap_err();
 
-    assert!(&err.to_string().starts_with(r#"The `mysql` database is a system database, it should not be altered with prisma migrate. Please connect to another database."#));
+    let err_msg = err.message().unwrap();
+    let expected = expect!["multiSchema migrations and introspection are not implemented on MySQL yet"];
+
+    expected.assert_eq(err_msg);
 }

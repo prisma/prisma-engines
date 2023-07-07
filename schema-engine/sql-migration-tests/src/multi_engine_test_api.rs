@@ -210,6 +210,11 @@ impl TestApi {
         self.args.tags()
     }
 
+    /// Return the provider for the datasource block in the schema.
+    pub fn provider(&self) -> &str {
+        self.args.provider()
+    }
+
     /// The name of the test function, as a string.
     pub fn test_fn_name(&self) -> &str {
         self.args.test_function_name()

@@ -11,7 +11,7 @@ use sql_schema_describer::{ColumnTypeFamily, ForeignKeyAction};
 use std::fmt::Write as _;
 
 #[test_connector(tags(CockroachDb))]
-fn db_push_on_cockroach_db_with_postgres_provider_works(api: TestApi) {
+fn db_push_on_cockroach_db_with_postgres_provider_fails(api: TestApi) {
     let schema = format!(
         r#"
         datasource mypg {{
@@ -28,22 +28,20 @@ fn db_push_on_cockroach_db_with_postgres_provider_works(api: TestApi) {
     );
 
     let connector = schema_core::schema_api(Some(schema.clone()), None).unwrap();
-    let output = tok(connector.schema_push(schema_core::json_rpc::types::SchemaPushInput {
+    let error = tok(connector.schema_push(schema_core::json_rpc::types::SchemaPushInput {
         force: false,
         schema: schema.clone(),
     }))
-    .unwrap();
+    .unwrap_err()
+    .message()
+    .unwrap()
+    .to_owned();
 
-    assert!(output.warnings.is_empty());
-    assert!(output.unexecutable.is_empty());
-    assert!(output.executed_steps > 0);
+    let expected_err = expect![
+        r#"You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`."#
+    ];
 
-    let output =
-        tok(connector.schema_push(schema_core::json_rpc::types::SchemaPushInput { force: false, schema })).unwrap();
-
-    assert!(output.warnings.is_empty());
-    assert!(output.unexecutable.is_empty());
-    assert_eq!(output.executed_steps, 0);
+    expected_err.assert_eq(&error);
 }
 
 #[test_connector(tags(CockroachDb))]
@@ -427,37 +425,8 @@ fn typescript_starter_schema_with_native_types_is_idempotent(api: TestApi) {
         .assert_no_steps();
 }
 
-// We will want to validate this in the future: https://github.com/prisma/prisma/issues/13222
-//
-// #[test_connector(tags(CockroachDb))]
-// fn connecting_to_a_cockroachdb_database_with_the_postgresql_connector_fails(_api: TestApi) {
-//     let dm = r#"
-//         datasource crdb {
-//             provider = "postgresql"
-//             url = env("TEST_DATABASE_URL")
-//         }
-
-//     "#;
-
-//     let engine = schema_core::migration_api(None, None).unwrap();
-//     let err = tok(
-//         engine.ensure_connection_validity(schema_core::json_rpc::types::EnsureConnectionValidityParams {
-//             datasource: schema_core::json_rpc::types::DatasourceParam::SchemaString(SchemaContainer {
-//                 schema: dm.to_owned(),
-//             }),
-//         }),
-//     )
-//     .unwrap_err()
-//     .to_string();
-
-//     let expected_error = expect![[r#"
-//         You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`.
-//     "#]];
-//     expected_error.assert_eq(&err);
-// }
-
 #[test_connector(tags(CockroachDb))]
-fn connecting_to_a_cockroachdb_database_with_the_postgresql_connector_says_nothing(_api: TestApi) {
+fn connecting_to_a_cockroachdb_database_with_the_postgresql_connector_fails(_api: TestApi) {
     let dm = r#"
         datasource crdb {
             provider = "postgresql"
@@ -466,15 +435,20 @@ fn connecting_to_a_cockroachdb_database_with_the_postgresql_connector_says_nothi
     "#;
 
     let engine = schema_core::schema_api(None, None).unwrap();
-
-    tok(
+    let err = tok(
         engine.ensure_connection_validity(schema_core::json_rpc::types::EnsureConnectionValidityParams {
             datasource: schema_core::json_rpc::types::DatasourceParam::SchemaString(SchemaContainer {
                 schema: dm.to_owned(),
             }),
         }),
     )
-    .unwrap();
+    .unwrap_err()
+    .to_string();
+
+    let expected_error = expect![[r#"
+        You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`.
+    "#]];
+    expected_error.assert_eq(&err);
 }
 
 #[test_connector(tags(CockroachDb))]
@@ -1330,11 +1304,11 @@ fn schema_from_introspection_docs_works(api: TestApi) {
 }
 
 #[test]
-fn cockroach_introspection_with_postgres_provider_works() {
+fn cockroach_introspection_with_postgres_provider_fails() {
     let test_db = test_setup::only!(CockroachDb);
     let (_, url_str) = tok(test_setup::postgres::create_postgres_database(
         test_db.url(),
-        "cockroach_introspection_with_postgres_provider_works",
+        "cockroach_introspection_with_postgres_provider_fails",
     ))
     .unwrap();
 
@@ -1375,13 +1349,20 @@ fn cockroach_introspection_with_postgres_provider_works() {
         "#,
     };
 
-    let result = tok(me.introspect(schema_core::json_rpc::types::IntrospectParams {
+    let error = tok(me.introspect(schema_core::json_rpc::types::IntrospectParams {
         composite_type_depth: -1,
         force: false,
         schema,
         schemas: None,
     }))
-    .unwrap();
+    .unwrap_err()
+    .message()
+    .unwrap()
+    .to_owned();
 
-    assert!(result.datamodel.contains("@db.VarChar(32)"));
+    let expected_err = expect![
+        r#"You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`."#
+    ];
+
+    expected_err.assert_eq(&error);
 }
