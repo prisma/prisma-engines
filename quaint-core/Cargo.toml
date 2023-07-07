@@ -1,0 +1,26 @@
+[package]
+name = "quaint-core"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+async-trait = "0.1"
+thiserror = "1.0"
+serde_json = { version = "1.0.48", optional = false, features = ["float_roundtrip"] }
+either = { version = "1.6", optional = false }
+base64 = { version = "0.12.3", optional = false }
+serde = { version = "1.0", optional = false, features = ["derive"] }
+
+# https://github.com/chronotope/chrono/issues/364
+chrono = { version = "=0.4.9", optional = false, default-features = false }
+
+[dependencies.bigdecimal]
+version = "0.3"
+optional = false
+package = "bigdecimal"
+
+[dependencies.uuid]
+version = "1"
+optional = false

@@ -35,6 +35,7 @@ members = [
 # All path dependencies residing in the workspace directory automatically become members.
 # The following shouldn't be considered members but embedded dependencies.
 exclude = [
+  "quaint-core",
   "quaint",
   "quaint/test-macros",
   "quaint/test-setup"
