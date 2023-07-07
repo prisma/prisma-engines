@@ -437,6 +437,17 @@
 <a href="#437" id="437">437</a>
 <a href="#438" id="438">438</a>
 <a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
+<a href="#450" id="450">450</a>
 </pre></div><pre class="rust"><code><span class="kw">pub use </span><span class="kw">super</span>::TestResult;
 <span class="kw">pub use </span>expect_test::expect;
 <span class="kw">pub use </span>indoc::{formatdoc, indoc};
@@ -512,19 +523,30 @@
             me.set_params(params).unwrap();
 
             (Quaint::new(<span class="kw-2">&amp;</span>cs).<span class="kw">await</span>.unwrap(), cs, me)
-        } <span class="kw">else if </span>tags.contains(Tags::Postgres) {
+        } <span class="kw">else if </span>tags.contains(Tags::Postgres) &amp;&amp; !tags.contains(Tags::CockroachDb) {
             <span class="kw">let </span>(<span class="kw">_</span>, q, cs) = args.create_postgres_database().<span class="kw">await</span>;
-            <span class="kw">if </span>tags.contains(Tags::CockroachDb) {
-                q.raw_cmd(
-                    <span class="string">r#&quot;
-                    SET default_int_size = 4;
-                    &quot;#</span>,
-                )
-                .<span class="kw">await
-                </span>.unwrap();
-            }
-
             <span class="kw">let </span><span class="kw-2">mut </span>me = SqlSchemaConnector::new_postgres();
+
+            <span class="kw">let </span>params = ConnectorParams {
+                connection_string: cs.to_owned(),
+                preview_features,
+                shadow_database_connection_string: <span class="prelude-val">None</span>,
+            };
+            me.set_params(params).unwrap();
+
+            (q, cs, me)
+        } <span class="kw">else if </span>tags.contains(Tags::CockroachDb) {
+            <span class="kw">let </span>(<span class="kw">_</span>, q, cs) = args.create_postgres_database().<span class="kw">await</span>;
+
+            q.raw_cmd(
+                <span class="string">r#&quot;
+                SET default_int_size = 4;
+                &quot;#</span>,
+            )
+            .<span class="kw">await
+            </span>.unwrap();
+
+            <span class="kw">let </span><span class="kw-2">mut </span>me = SqlSchemaConnector::new_cockroach();
 
             <span class="kw">let </span>params = ConnectorParams {
                 connection_string: cs.to_owned(),

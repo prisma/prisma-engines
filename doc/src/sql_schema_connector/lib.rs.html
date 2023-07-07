@@ -396,6 +396,17 @@
 <a href="#396" id="396">396</a>
 <a href="#397" id="397">397</a>
 <a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
+<a href="#408" id="408">408</a>
+<a href="#409" id="409">409</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The SQL migration connector.
 
 </span><span class="attr">#![deny(rust_2018_idioms, unsafe_code, missing_docs)]
@@ -435,7 +446,7 @@
     <span class="doccomment">/// Initialize a PostgreSQL migration connector.
     </span><span class="kw">pub fn </span>new_postgres() -&gt; <span class="self">Self </span>{
         SqlSchemaConnector {
-            flavour: Box::&lt;PostgresFlavour&gt;::default(),
+            flavour: Box::new(PostgresFlavour::new_postgres()),
             host: Arc::new(EmptyHost),
         }
     }
@@ -444,6 +455,17 @@
     </span><span class="kw">pub fn </span>new_cockroach() -&gt; <span class="self">Self </span>{
         SqlSchemaConnector {
             flavour: Box::new(PostgresFlavour::new_cockroach()),
+            host: Arc::new(EmptyHost),
+        }
+    }
+
+    <span class="doccomment">/// Initialize a PostgreSQL-like schema connector.
+    ///
+    /// Use [`Self::new_postgres()`] or [`Self::new_cockroach()`] instead when the provider is
+    /// explicitly specified by user or already known otherwise.
+    </span><span class="kw">pub fn </span>new_postgres_like() -&gt; <span class="self">Self </span>{
+        SqlSchemaConnector {
+            flavour: Box::&lt;PostgresFlavour&gt;::default(),
             host: Arc::new(EmptyHost),
         }
     }

@@ -648,6 +648,26 @@
 <a href="#648" id="648">648</a>
 <a href="#649" id="649">649</a>
 <a href="#650" id="650">650</a>
+<a href="#651" id="651">651</a>
+<a href="#652" id="652">652</a>
+<a href="#653" id="653">653</a>
+<a href="#654" id="654">654</a>
+<a href="#655" id="655">655</a>
+<a href="#656" id="656">656</a>
+<a href="#657" id="657">657</a>
+<a href="#658" id="658">658</a>
+<a href="#659" id="659">659</a>
+<a href="#660" id="660">660</a>
+<a href="#661" id="661">661</a>
+<a href="#662" id="662">662</a>
+<a href="#663" id="663">663</a>
+<a href="#664" id="664">664</a>
+<a href="#665" id="665">665</a>
+<a href="#666" id="666">666</a>
+<a href="#667" id="667">667</a>
+<a href="#668" id="668">668</a>
+<a href="#669" id="669">669</a>
+<a href="#670" id="670">670</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>connection;
 <span class="kw">mod </span>shadow_db;
 
@@ -683,18 +703,25 @@ SET enable_experimental_alter_column_type_general = true;
     url: PostgresUrl,
 }
 
+<span class="doccomment">/// The specific provider that was requested by the user.
+</span><span class="attr">#[derive(Clone, Copy, PartialEq)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>PostgresProvider {
+    <span class="doccomment">/// Used when `provider = &quot;postgresql&quot;` was specified in the schema.
+    </span>PostgreSql,
+    <span class="doccomment">/// Used when `provider = &quot;cockroachdb&quot;` was specified in the schema.
+    </span>CockroachDb,
+    <span class="doccomment">/// Used when there is no schema but only the connection string to the database.
+    </span>Unspecified,
+}
+
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>PostgresFlavour {
     state: State,
-    <span class="doccomment">/// Should only be set in the constructor.
-    </span>is_cockroach: bool,
+    provider: PostgresProvider,
 }
 
 <span class="kw">impl </span>Default <span class="kw">for </span>PostgresFlavour {
     <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        PostgresFlavour {
-            state: State::Initial,
-            is_cockroach: <span class="bool-val">false</span>,
-        }
+        PostgresFlavour::new_unspecified()
     }
 }
 
@@ -705,10 +732,24 @@ SET enable_experimental_alter_column_type_general = true;
 }
 
 <span class="kw">impl </span>PostgresFlavour {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_postgres() -&gt; <span class="self">Self </span>{
+        PostgresFlavour {
+            state: State::Initial,
+            provider: PostgresProvider::PostgreSql,
+        }
+    }
+
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_cockroach() -&gt; <span class="self">Self </span>{
         PostgresFlavour {
             state: State::Initial,
-            is_cockroach: <span class="bool-val">true</span>,
+            provider: PostgresProvider::CockroachDb,
+        }
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_unspecified() -&gt; <span class="self">Self </span>{
+        PostgresFlavour {
+            state: State::Initial,
+            provider: PostgresProvider::Unspecified,
         }
     }
 
@@ -720,7 +761,7 @@ SET enable_experimental_alter_column_type_general = true;
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_cockroachdb(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.is_cockroach
+        <span class="self">self</span>.provider == PostgresProvider::CockroachDb
             || <span class="self">self
                 </span>.circumstances()
                 .map(|c| c.contains(Circumstances::IsCockroachDb))
@@ -765,11 +806,10 @@ SET enable_experimental_alter_column_type_general = true;
     }
 
     <span class="kw">fn </span>connector_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
-        <span class="kw">if </span><span class="self">self</span>.is_cockroach {
-            <span class="string">&quot;cockroachdb&quot;
-        </span>} <span class="kw">else </span>{
-            <span class="string">&quot;postgresql&quot;
-        </span>}
+        <span class="kw">match </span><span class="self">self</span>.provider {
+            PostgresProvider::PostgreSql | PostgresProvider::Unspecified =&gt; <span class="string">&quot;postgresql&quot;</span>,
+            PostgresProvider::CockroachDb =&gt; <span class="string">&quot;cockroachdb&quot;</span>,
+        }
     }
 
     <span class="kw">fn </span>table_names(<span class="kw-2">&amp;mut </span><span class="self">self</span>, namespaces: <span class="prelude-ty">Option</span>&lt;Namespaces&gt;) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;Vec&lt;String&gt;&gt;&gt; {
@@ -1167,8 +1207,7 @@ SET enable_experimental_alter_column_type_general = true;
     </span>CanPartitionTables,
 }
 
-<span class="attr">#[allow(clippy::needless_collect)] </span><span class="comment">// clippy is wrong
-</span><span class="kw">fn </span>disable_postgres_statement_cache(url: <span class="kw-2">&amp;mut </span>Url) -&gt; ConnectorResult&lt;()&gt; {
+<span class="kw">fn </span>disable_postgres_statement_cache(url: <span class="kw-2">&amp;mut </span>Url) -&gt; ConnectorResult&lt;()&gt; {
     <span class="kw">let </span>params: Vec&lt;(String, String)&gt; = url.query_pairs().map(|(k, v)| (k.to_string(), v.to_string())).collect();
 
     url.query_pairs_mut().clear();
@@ -1203,9 +1242,9 @@ SET enable_experimental_alter_column_type_general = true;
         };
 
         <span class="kw">let </span><span class="kw-2">mut </span>circumstances = BitFlags::&lt;Circumstances&gt;::default();
-        <span class="kw">let </span>provider_is_cockroachdb = flavour.is_cockroach;
+        <span class="kw">let </span>provider = flavour.provider;
 
-        <span class="kw">if </span>provider_is_cockroachdb {
+        <span class="kw">if </span>provider == PostgresProvider::CockroachDb {
             circumstances |= Circumstances::IsCockroachDb;
         }
 
@@ -1231,18 +1270,19 @@ SET enable_experimental_alter_column_type_general = true;
                         <span class="prelude-val">Some</span>((version, version_num)) =&gt; {
                             <span class="kw">let </span>db_is_cockroach = version.contains(<span class="string">&quot;CockroachDB&quot;</span>);
 
-                            <span class="comment">// We will want to validate this in the future: https://github.com/prisma/prisma/issues/13222
-                            // if db_is_cockroach &amp;&amp; !provider_is_cockroachdb  {
-                            //     let msg = &quot;You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`.&quot;;
+                            <span class="kw">if </span>db_is_cockroach &amp;&amp; provider == PostgresProvider::PostgreSql  {
+                                <span class="kw">let </span>msg = <span class="string">&quot;You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`.&quot;</span>;
 
-                            //     return Err(ConnectorError::from_msg(msg.to_owned()));
-                            // }
+                                <span class="kw">return </span><span class="prelude-val">Err</span>(ConnectorError::from_msg(msg.to_owned()));
+                            }
 
-                            </span><span class="kw">if </span>!db_is_cockroach &amp;&amp; provider_is_cockroachdb {
+                            <span class="kw">if </span>!db_is_cockroach &amp;&amp; provider == PostgresProvider::CockroachDb {
                                 <span class="kw">let </span>msg = <span class="string">&quot;You are trying to connect to a PostgreSQL database, but the provider in your Prisma schema is `cockroachdb`. Please change it to `postgresql`.&quot;</span>;
 
                                 <span class="kw">return </span><span class="prelude-val">Err</span>(ConnectorError::from_msg(msg.to_owned()));
-                            } <span class="kw">else if </span>db_is_cockroach {
+                            }
+
+                            <span class="kw">if </span>db_is_cockroach {
                                 circumstances |= Circumstances::IsCockroachDb;
                                 connection.raw_cmd(COCKROACHDB_PRELUDE, <span class="kw-2">&amp;</span>params.url).<span class="kw">await</span><span class="question-mark">?</span>;
                             } <span class="kw">else if </span>version_num &gt;= <span class="number">100000 </span>{

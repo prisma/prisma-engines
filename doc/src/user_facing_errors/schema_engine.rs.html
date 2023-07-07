@@ -298,6 +298,16 @@
 <a href="#298" id="298">298</a>
 <a href="#299" id="299">299</a>
 <a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::Serialize;
 <span class="kw">use </span>user_facing_error_macros::<span class="kw-2">*</span>;
 
@@ -535,16 +545,26 @@
     <span class="kw">pub </span>database_error: String,
 }
 
-<span class="attr">#[derive(Debug, Serialize, UserFacingError)]
-#[user_facing(
-    code = <span class="string">&quot;P3019&quot;</span>,
-    message = <span class="string">&quot;The datasource provider `{provider}` specified in your schema does not match the one specified in the migration_lock.toml, `{expected_provider}`. Please remove your current migration directory and start a new migration history with prisma migrate dev. Read more: https://pris.ly/d/migrate-provider-switch&quot;
-</span>)]
+<span class="attr">#[derive(Debug, Serialize)]
 </span><span class="kw">pub struct </span>ProviderSwitchedError {
     <span class="doccomment">/// The provider specified in the schema.
     </span><span class="kw">pub </span>provider: String,
     <span class="doccomment">/// The provider from migrate.lock
     </span><span class="kw">pub </span>expected_provider: String,
+}
+
+<span class="kw">impl </span><span class="kw">crate</span>::UserFacingError <span class="kw">for </span>ProviderSwitchedError {
+    <span class="kw">const </span>ERROR_CODE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;P3019&quot;</span>;
+
+    <span class="kw">fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="kw">let </span>provider = <span class="kw-2">&amp;</span><span class="self">self</span>.provider;
+        <span class="kw">let </span>expected_provider = <span class="kw-2">&amp;</span><span class="self">self</span>.expected_provider;
+
+        <span class="kw">match </span>(provider.as_str(), expected_provider.as_str()) {
+            (<span class="string">&quot;cockroachdb&quot;</span>, <span class="string">&quot;postgresql&quot;</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;The datasource provider `{provider}` specified in your schema does not match the one specified in the migration_lock.toml, `{expected_provider}`. If the database you have been using with the existing migrations is CockroachDB and you are switching from `postgresql` to `cockroachdb` provider in the schema as instructed by another error message by Prisma, then you can safely change the saved provider in the `migration_lock.toml` file in the migrations directory. Your migration history and your data will stay intact. Otherwise, if you are switching from a PostgreSQL database to a CockroachDB database, please remove your current migration directory and start a new migration history with prisma migrate dev. Read more: https://pris.ly/d/migrate-provider-switch&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;The datasource provider `{provider}` specified in your schema does not match the one specified in the migration_lock.toml, `{expected_provider}`. Please remove your current migration directory and start a new migration history with prisma migrate dev. Read more: https://pris.ly/d/migrate-provider-switch&quot;</span>)
+        }
+    }
 }
 
 <span class="attr">#[derive(Debug, SimpleUserFacingError)]

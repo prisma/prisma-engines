@@ -67,20 +67,6 @@
 <a href="#67" id="67">67</a>
 <a href="#68" id="68">68</a>
 <a href="#69" id="69">69</a>
-<a href="#70" id="70">70</a>
-<a href="#71" id="71">71</a>
-<a href="#72" id="72">72</a>
-<a href="#73" id="73">73</a>
-<a href="#74" id="74">74</a>
-<a href="#75" id="75">75</a>
-<a href="#76" id="76">76</a>
-<a href="#77" id="77">77</a>
-<a href="#78" id="78">78</a>
-<a href="#79" id="79">79</a>
-<a href="#80" id="80">80</a>
-<a href="#81" id="81">81</a>
-<a href="#82" id="82">82</a>
-<a href="#83" id="83">83</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{json_rpc::types::<span class="kw-2">*</span>, parse_schema, CoreResult};
 <span class="kw">use </span>psl::parser_database::SourceFile;
 <span class="kw">use </span>schema_connector::{ConnectorError, DiffTarget, SchemaConnector};
@@ -96,20 +82,6 @@
     <span class="kw">if let </span><span class="prelude-val">Some</span>(err) = connector.check_database_version_compatibility(<span class="kw-2">&amp;</span>datamodel) {
         <span class="kw">return </span><span class="prelude-val">Err</span>(ConnectorError::user_facing(err));
     };
-
-    <span class="comment">// FIXME: The reason we connect here is that some relevant bits of information about the
-    // database used in diffing come from connecting to the database and reading its version.
-    // Concretely: with a schema with `provider = &quot;postgresql&quot;` and a connection string for a
-    // CockroachDb database, `connector` here doesn&#39;t have context yet on the database and
-    // generates a SqlSchema with PostgreSQL native types, instead of CockroachDB native types.
-    //
-    // So depending on the order in which `from` and `to` schemas are constructed, the type of the
-    // native types could be inconsistent between `from` and `to`. As of this comment, the only
-    // case we are aware of is users using a postgres Prisma schema with a cockroachdb database.
-    //
-    // We should consider requiring using `provider = &quot;cockroachdb&quot;` with cockroach databases (and
-    // disallow `provider = &quot;postgresql&quot;`).
-    </span>connector.ensure_connection_validity().<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="kw">let </span>to = connector
         .database_schema_from_diff_target(DiffTarget::Datamodel(source), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)

@@ -242,7 +242,7 @@
                 preview_features,
                 shadow_database_connection_string,
             };
-            <span class="kw">let </span><span class="kw-2">mut </span>connector = SqlSchemaConnector::new_postgres();
+            <span class="kw">let </span><span class="kw-2">mut </span>connector = SqlSchemaConnector::new_postgres_like();
             connector.set_params(params)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(Box::new(connector))
         }
