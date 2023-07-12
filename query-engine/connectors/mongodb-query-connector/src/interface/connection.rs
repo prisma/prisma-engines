@@ -52,8 +52,10 @@ impl WriteOperations for MongoDbConnection {
         &mut self,
         model: &Model,
         args: WriteArgs,
+        // The field selection on a create is never used on MongoDB as it cannot return more than the ID.
+        _selected_fields: FieldSelection,
         _trace_id: Option<String>,
-    ) -> connector_interface::Result<SelectionResult> {
+    ) -> connector_interface::Result<SingleRecord> {
         catch(async move { write::create_record(&self.database, &mut self.session, model, args).await }).await
     }
 

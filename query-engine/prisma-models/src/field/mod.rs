@@ -77,13 +77,6 @@ impl Field {
         }
     }
 
-    pub fn try_into_scalar(self) -> Option<ScalarFieldRef> {
-        match self {
-            Field::Scalar(scalar) => Some(scalar),
-            _ => None,
-        }
-    }
-
     pub fn is_required(&self) -> bool {
         match self {
             Field::Scalar(ref sf) => sf.is_required(),

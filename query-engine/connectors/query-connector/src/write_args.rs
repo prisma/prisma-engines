@@ -409,7 +409,7 @@ impl WriteArgs {
         }
     }
 
-    pub fn as_record_projection(&self, model_projection: ModelProjection) -> Option<SelectionResult> {
+    pub fn as_selection_result(&self, model_projection: ModelProjection) -> Option<SelectionResult> {
         let pairs: Vec<_> = model_projection
             .scalar_fields()
             .map(|field| {

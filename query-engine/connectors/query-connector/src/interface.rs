@@ -286,8 +286,9 @@ pub trait WriteOperations {
         &mut self,
         model: &Model,
         args: WriteArgs,
+        selected_fields: FieldSelection,
         trace_id: Option<String>,
-    ) -> crate::Result<SelectionResult>;
+    ) -> crate::Result<SingleRecord>;
 
     /// Inserts many records at once into the database.
     async fn create_records(

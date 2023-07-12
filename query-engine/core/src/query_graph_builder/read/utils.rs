@@ -4,7 +4,7 @@ use connector::RelAggregationSelection;
 use prisma_models::prelude::*;
 use schema::constants::{aggregations::*, args};
 
-pub(crate) fn collect_selection_order(from: &[FieldPair<'_>]) -> Vec<String> {
+pub fn collect_selection_order(from: &[FieldPair<'_>]) -> Vec<String> {
     from.iter()
         .map(|pair| {
             pair.parsed_field
@@ -17,8 +17,7 @@ pub(crate) fn collect_selection_order(from: &[FieldPair<'_>]) -> Vec<String> {
 
 /// Creates a `FieldSelection` from a query selection.
 /// Automatically adds model IDs to the selected fields as well.
-/// Unwraps are safe due to query validation.
-pub(crate) fn collect_selected_fields(
+pub fn collect_selected_fields(
     from_pairs: &[FieldPair<'_>],
     distinct: Option<FieldSelection>,
     model: &Model,
@@ -35,6 +34,30 @@ pub(crate) fn collect_selected_fields(
     } else {
         selection
     }
+}
+
+/// Creates a `FieldSelection` from a query selection, which contains only scalar fields.
+/// Automatically adds model IDs to the selected fields as well.
+pub fn collect_selected_scalars(from_pairs: &[FieldPair<'_>], model: &Model) -> FieldSelection {
+    let model_id = model.primary_identifier();
+    let selected_fields = pairs_to_scalar_selections(model, from_pairs);
+    let selection = FieldSelection::new(selected_fields);
+
+    model_id.merge(selection)
+}
+
+fn pairs_to_scalar_selections<T>(parent: T, pairs: &[FieldPair<'_>]) -> Vec<SelectedField>
+where
+    T: Into<ParentContainer>,
+{
+    let parent: ParentContainer = parent.into();
+
+    pairs
+        .iter()
+        .filter_map(|pair| parent.find_field(&pair.parsed_field.name))
+        .filter_map(|field| field.into_scalar())
+        .map(SelectedField::from)
+        .collect()
 }
 
 fn pairs_to_selections<T>(parent: T, pairs: &[FieldPair<'_>]) -> Vec<SelectedField>

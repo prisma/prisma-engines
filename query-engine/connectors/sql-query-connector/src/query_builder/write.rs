@@ -7,7 +7,12 @@ use tracing::Span;
 
 /// `INSERT` a new record to the database. Resulting an `INSERT` ast and an
 /// optional `RecordProjection` if available from the arguments or model.
-pub(crate) fn create_record(model: &Model, mut args: WriteArgs, ctx: &Context<'_>) -> Insert<'static> {
+pub(crate) fn create_record(
+    model: &Model,
+    mut args: WriteArgs,
+    selected_fields: &ModelProjection,
+    ctx: &Context<'_>,
+) -> Insert<'static> {
     let fields: Vec<_> = model
         .fields()
         .scalar()
@@ -27,7 +32,7 @@ pub(crate) fn create_record(model: &Model, mut args: WriteArgs, ctx: &Context<'_
         });
 
     Insert::from(insert)
-        .returning(ModelProjection::from(model.primary_identifier()).as_columns(ctx))
+        .returning(selected_fields.as_columns(ctx))
         .append_trace(&Span::current())
         .add_trace_id(ctx.trace_id)
 }
