@@ -902,7 +902,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>as_record_projection(<span class="kw-2">&amp;</span><span class="self">self</span>, model_projection: ModelProjection) -&gt; <span class="prelude-ty">Option</span>&lt;SelectionResult&gt; {
+    <span class="kw">pub fn </span>as_selection_result(<span class="kw-2">&amp;</span><span class="self">self</span>, model_projection: ModelProjection) -&gt; <span class="prelude-ty">Option</span>&lt;SelectionResult&gt; {
         <span class="kw">let </span>pairs: Vec&lt;<span class="kw">_</span>&gt; = model_projection
             .scalar_fields()
             .map(|field| {

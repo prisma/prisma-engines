@@ -116,6 +116,88 @@
 <a href="#116" id="116">116</a>
 <a href="#117" id="117">117</a>
 <a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     query_ast::<span class="kw-2">*</span>,
@@ -124,6 +206,7 @@
 };
 <span class="kw">use </span>connector::IntoFilter;
 <span class="kw">use </span>prisma_models::Model;
+<span class="kw">use </span>psl::datamodel_connector::ConnectorCapability;
 <span class="kw">use </span>schema::{constants::args, QuerySchema};
 <span class="kw">use </span>std::convert::TryInto;
 <span class="kw">use </span>write_args_parser::<span class="kw-2">*</span>;
@@ -135,41 +218,47 @@
     model: Model,
     <span class="kw-2">mut </span>field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; QueryGraphBuilderResult&lt;()&gt; {
-    graph.flag_transactional();
-
     <span class="kw">let </span>data_map = <span class="kw">match </span>field.arguments.lookup(args::DATA) {
         <span class="prelude-val">Some</span>(data) =&gt; data.value.try_into()<span class="question-mark">?</span>,
         <span class="prelude-val">None </span>=&gt; ParsedInputMap::default(),
     };
 
-    <span class="kw">let </span>create_node = create::create_record_node(graph, query_schema, model.clone(), data_map)<span class="question-mark">?</span>;
+    <span class="kw">if </span>can_use_atomic_create(query_schema, <span class="kw-2">&amp;</span>model, <span class="kw-2">&amp;</span>data_map, <span class="kw-2">&amp;</span>field) {
+        <span class="kw">let </span>create_node = create::atomic_create_record_node(graph, query_schema, model, data_map, field)<span class="question-mark">?</span>;
 
-    <span class="comment">// Follow-up read query on the write
-    </span><span class="kw">let </span>read_query = read::find_unique(field, model.clone())<span class="question-mark">?</span>;
-    <span class="kw">let </span>read_node = graph.create_node(Query::Read(read_query));
+        graph.add_result_node(<span class="kw-2">&amp;</span>create_node);
+    } <span class="kw">else </span>{
+        graph.flag_transactional();
 
-    graph.add_result_node(<span class="kw-2">&amp;</span>read_node);
-    graph.create_edge(
-        <span class="kw-2">&amp;</span>create_node,
-        <span class="kw-2">&amp;</span>read_node,
-        QueryGraphDependency::ProjectedDataDependency(
-            model.primary_identifier(),
-            Box::new(<span class="kw">move </span>|<span class="kw-2">mut </span>read_node, <span class="kw-2">mut </span>parent_ids| {
-                <span class="kw">let </span>parent_id = <span class="kw">match </span>parent_ids.pop() {
-                    <span class="prelude-val">Some</span>(pid) =&gt; <span class="prelude-val">Ok</span>(pid),
-                    <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::AssertionError(
-                        <span class="string">&quot;Expected a valid parent ID to be present for create follow-up read query.&quot;</span>.to_string(),
-                    )),
-                }<span class="question-mark">?</span>;
+        <span class="kw">let </span>create_node = create::create_record_node(graph, query_schema, model.clone(), data_map)<span class="question-mark">?</span>;
 
-                <span class="kw">if let </span>Node::Query(Query::Read(ReadQuery::RecordQuery(<span class="kw-2">ref mut </span>rq))) = read_node {
-                    rq.add_filter(parent_id.filter());
-                };
+        <span class="comment">// Follow-up read query on the write
+        </span><span class="kw">let </span>read_query = read::find_unique(field, model.clone())<span class="question-mark">?</span>;
+        <span class="kw">let </span>read_node = graph.create_node(Query::Read(read_query));
 
-                <span class="prelude-val">Ok</span>(read_node)
-            }),
-        ),
-    )<span class="question-mark">?</span>;
+        graph.add_result_node(<span class="kw-2">&amp;</span>read_node);
+        graph.create_edge(
+            <span class="kw-2">&amp;</span>create_node,
+            <span class="kw-2">&amp;</span>read_node,
+            QueryGraphDependency::ProjectedDataDependency(
+                model.primary_identifier(),
+                Box::new(<span class="kw">move </span>|<span class="kw-2">mut </span>read_node, <span class="kw-2">mut </span>parent_ids| {
+                    <span class="kw">let </span>parent_id = <span class="kw">match </span>parent_ids.pop() {
+                        <span class="prelude-val">Some</span>(pid) =&gt; <span class="prelude-val">Ok</span>(pid),
+                        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::AssertionError(
+                            <span class="string">&quot;Expected a valid parent ID to be present for create follow-up read query.&quot;</span>.to_string(),
+                        )),
+                    }<span class="question-mark">?</span>;
+
+                    <span class="kw">if let </span>Node::Query(Query::Read(ReadQuery::RecordQuery(<span class="kw-2">ref mut </span>rq))) = read_node {
+                        rq.add_filter(parent_id.filter());
+                    };
+
+                    <span class="prelude-val">Ok</span>(read_node)
+                }),
+            ),
+        )<span class="question-mark">?</span>;
+    }
 
     <span class="prelude-val">Ok</span>(())
 }
@@ -225,7 +314,82 @@
 
     args.add_datetimes(<span class="kw-2">&amp;</span>model);
 
-    <span class="kw">let </span>cr = CreateRecord { model, args };
+    <span class="kw">let </span>selected_fields = model.primary_identifier();
+    <span class="kw">let </span>selection_order = selected_fields.db_names().collect();
+
+    <span class="kw">let </span>cr = CreateRecord {
+        <span class="comment">// A regular create record is never used as a result node. Therefore, it&#39;s never serialized, so we don&#39;t need a name.
+        </span>name: String::new(),
+        model,
+        args,
+        selected_fields,
+        selection_order,
+    };
+
+    <span class="kw">let </span>create_node = graph.create_node(Query::Write(WriteQuery::CreateRecord(cr)));
+
+    <span class="kw">for </span>(relation_field, data_map) <span class="kw">in </span>create_args.nested {
+        nested::connect_nested_query(graph, query_schema, create_node, relation_field, data_map)<span class="question-mark">?</span>;
+    }
+
+    <span class="prelude-val">Ok</span>(create_node)
+}
+
+<span class="doccomment">/// An atomic create is a create performed in a single operation.
+/// It uses `INSERT ... RETURNING` when the connector supports it.
+/// We only perform such create when:
+/// 1. There&#39;s no nested operations
+/// 2. The selection set contains no relation
+</span><span class="kw">fn </span>can_use_atomic_create(
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
+    model: <span class="kw-2">&amp;</span>Model,
+    data_map: <span class="kw-2">&amp;</span>ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt;,
+    field: <span class="kw-2">&amp;</span>ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;,
+) -&gt; bool {
+    <span class="comment">// If the connector does not support RETURNING at all
+    </span><span class="kw">if </span>!query_schema.has_capability(ConnectorCapability::InsertReturning) {
+        <span class="kw">return </span><span class="bool-val">false</span>;
+    }
+
+    <span class="comment">// If the operation has nested creates
+    </span><span class="kw">if </span>WriteArgsParser::has_nested_operation(model, data_map) {
+        <span class="kw">return </span><span class="bool-val">false</span>;
+    }
+
+    <span class="comment">// If the operation has nested selection sets
+    </span><span class="kw">if </span>field.has_nested_selection() {
+        <span class="kw">return </span><span class="bool-val">false</span>;
+    }
+
+    <span class="bool-val">true
+</span>}
+
+<span class="doccomment">/// Creates a create record query that&#39;s done in a single operation and adds it to the query graph.
+/// Translates to an `INSERT ... RETURNING` under the hood.
+</span><span class="kw">fn </span>atomic_create_record_node(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
+    model: Model,
+    data_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt;,
+    field: ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;,
+) -&gt; QueryGraphBuilderResult&lt;NodeRef&gt; {
+    <span class="kw">let </span>create_args = WriteArgsParser::from(<span class="kw-2">&amp;</span>model, data_map)<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>args = create_args.args;
+
+    <span class="kw">let </span>nested_fields = field.nested_fields.unwrap().fields;
+    <span class="kw">let </span>selection_order: Vec&lt;String&gt; = read::utils::collect_selection_order(<span class="kw-2">&amp;</span>nested_fields);
+    <span class="kw">let </span>selected_fields = read::utils::collect_selected_scalars(<span class="kw-2">&amp;</span>nested_fields, <span class="kw-2">&amp;</span>model);
+
+    args.add_datetimes(<span class="kw-2">&amp;</span>model);
+
+    <span class="kw">let </span>cr = CreateRecord {
+        name: field.name.clone(),
+        model,
+        args,
+        selected_fields,
+        selection_order,
+    };
+
     <span class="kw">let </span>create_node = graph.create_node(Query::Write(WriteQuery::CreateRecord(cr)));
 
     <span class="kw">for </span>(relation_field, data_map) <span class="kw">in </span>create_args.nested {

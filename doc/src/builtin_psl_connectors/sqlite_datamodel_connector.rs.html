@@ -126,6 +126,9 @@
 <a href="#126" id="126">126</a>
 <a href="#127" id="127">127</a>
 <a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>enumflags2::BitFlags;
 <span class="kw">use </span>psl_core::{
     datamodel_connector::{
@@ -153,7 +156,10 @@
     SupportsTxIsolationSerializable |
     NativeUpsert |
     FilteredInlineChildNestedToOneDisconnect
-});
+    <span class="comment">// InsertReturning - While SQLite does support RETURNING, it does not return column information on the way back from the database.
+    // This column type information is necessary in order to preserve consistency for some data types such as int, where values could overflow.
+    // Since we care to stay consistent with reads, it is not enabled.
+</span>});
 
 <span class="kw">pub struct </span>SqliteDatamodelConnector;
 

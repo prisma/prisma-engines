@@ -371,6 +371,7 @@
 <a href="#371" id="371">371</a>
 <a href="#372" id="372">372</a>
 <a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{coerce_null_to_zero_value, Filter, NativeUpsert, QueryArguments, WriteArgs};
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>prisma_models::{ast::FieldArity, <span class="kw-2">*</span>};
@@ -659,8 +660,9 @@
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         model: <span class="kw-2">&amp;</span>Model,
         args: WriteArgs,
+        selected_fields: FieldSelection,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    ) -&gt; <span class="kw">crate</span>::Result&lt;SelectionResult&gt;;
+    ) -&gt; <span class="kw">crate</span>::Result&lt;SingleRecord&gt;;
 
     <span class="doccomment">/// Inserts many records at once into the database.
     </span><span class="kw">async fn </span>create_records(

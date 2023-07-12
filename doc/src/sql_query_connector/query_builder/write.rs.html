@@ -240,6 +240,11 @@
 <a href="#240" id="240">240</a>
 <a href="#241" id="241">241</a>
 <a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{model_extensions::<span class="kw-2">*</span>, sql_trace::SqlTraceComment, Context};
 <span class="kw">use </span>connector_interface::{DatasourceFieldName, ScalarWriteOperation, WriteArgs};
 <span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
@@ -249,7 +254,12 @@
 
 <span class="doccomment">/// `INSERT` a new record to the database. Resulting an `INSERT` ast and an
 /// optional `RecordProjection` if available from the arguments or model.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_record(model: <span class="kw-2">&amp;</span>Model, <span class="kw-2">mut </span>args: WriteArgs, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Insert&lt;<span class="lifetime">&#39;static</span>&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_record(
+    model: <span class="kw-2">&amp;</span>Model,
+    <span class="kw-2">mut </span>args: WriteArgs,
+    selected_fields: <span class="kw-2">&amp;</span>ModelProjection,
+    ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+) -&gt; Insert&lt;<span class="lifetime">&#39;static</span>&gt; {
     <span class="kw">let </span>fields: Vec&lt;<span class="kw">_</span>&gt; = model
         .fields()
         .scalar()
@@ -269,7 +279,7 @@
         });
 
     Insert::from(insert)
-        .returning(ModelProjection::from(model.primary_identifier()).as_columns(ctx))
+        .returning(selected_fields.as_columns(ctx))
         .append_trace(<span class="kw-2">&amp;</span>Span::current())
         .add_trace_id(ctx.trace_id)
 }

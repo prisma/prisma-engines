@@ -246,13 +246,6 @@
 <a href="#246" id="246">246</a>
 <a href="#247" id="247">247</a>
 <a href="#248" id="248">248</a>
-<a href="#249" id="249">249</a>
-<a href="#250" id="250">250</a>
-<a href="#251" id="251">251</a>
-<a href="#252" id="252">252</a>
-<a href="#253" id="253">253</a>
-<a href="#254" id="254">254</a>
-<a href="#255" id="255">255</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>composite;
 <span class="kw">mod </span>relation;
 <span class="kw">mod </span>scalar;
@@ -329,13 +322,6 @@
             Field::Scalar(<span class="kw-2">ref </span>sf) =&gt; sf.is_list(),
             Field::Relation(<span class="kw-2">ref </span>rf) =&gt; rf.is_list(),
             Field::Composite(<span class="kw-2">ref </span>cf) =&gt; cf.is_list(),
-        }
-    }
-
-    <span class="kw">pub fn </span>try_into_scalar(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ScalarFieldRef&gt; {
-        <span class="kw">match </span><span class="self">self </span>{
-            Field::Scalar(scalar) =&gt; <span class="prelude-val">Some</span>(scalar),
-            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 

@@ -520,6 +520,9 @@
 <a href="#520" id="520">520</a>
 <a href="#521" id="521">521</a>
 <a href="#522" id="522">522</a>
+<a href="#523" id="523">523</a>
+<a href="#524" id="524">524</a>
+<a href="#525" id="525">525</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     error::{DecorateErrorWithFieldInformationExtension, MongoError},
@@ -549,7 +552,7 @@
     session: <span class="kw-2">&amp;mut </span>ClientSession,
     model: <span class="kw-2">&amp;</span>Model,
     <span class="kw-2">mut </span>args: WriteArgs,
-) -&gt; <span class="kw">crate</span>::Result&lt;SelectionResult&gt; {
+) -&gt; <span class="kw">crate</span>::Result&lt;SingleRecord&gt; {
     <span class="kw">let </span>coll = database.collection::&lt;Document&gt;(model.db_name());
 
     <span class="kw">let </span>span = <span class="macro">info_span!</span>(
@@ -594,7 +597,10 @@
     .<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="kw">let </span>id_value = value_from_bson(insert_result.inserted_id, <span class="kw-2">&amp;</span>id_meta)<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(SelectionResult::from((id_field, id_value)))
+    <span class="prelude-val">Ok</span>(SingleRecord {
+        record: Record::new(<span class="macro">vec!</span>[id_value]),
+        field_names: <span class="macro">vec!</span>[id_field.db_name().to_owned()],
+    })
 }
 
 <span class="kw">pub async fn </span>create_records&lt;<span class="lifetime">&#39;conn</span>&gt;(

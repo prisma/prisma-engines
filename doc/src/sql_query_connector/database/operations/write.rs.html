@@ -465,8 +465,31 @@
 <a href="#465" id="465">465</a>
 <a href="#466" id="466">466</a>
 <a href="#467" id="467">467</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::filter_conversion::AliasedCondition;
+<a href="#468" id="468">468</a>
+<a href="#469" id="469">469</a>
+<a href="#470" id="470">470</a>
+<a href="#471" id="471">471</a>
+<a href="#472" id="472">472</a>
+<a href="#473" id="473">473</a>
+<a href="#474" id="474">474</a>
+<a href="#475" id="475">475</a>
+<a href="#476" id="476">476</a>
+<a href="#477" id="477">477</a>
+<a href="#478" id="478">478</a>
+<a href="#479" id="479">479</a>
+<a href="#480" id="480">480</a>
+<a href="#481" id="481">481</a>
+<a href="#482" id="482">482</a>
+<a href="#483" id="483">483</a>
+<a href="#484" id="484">484</a>
+<a href="#485" id="485">485</a>
+<a href="#486" id="486">486</a>
+<a href="#487" id="487">487</a>
+<a href="#488" id="488">488</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::column_metadata;
+<span class="kw">use </span><span class="kw">crate</span>::filter_conversion::AliasedCondition;
 <span class="kw">use </span><span class="kw">crate</span>::query_builder::write::{build_update_and_set_query, chunk_update_with_ids};
+<span class="kw">use </span><span class="kw">crate</span>::row::ToSqlRow;
 <span class="kw">use crate</span>::{
     error::SqlError, model_extensions::<span class="kw-2">*</span>, query_builder::write, sql_trace::SqlTraceComment, Context, QueryExt,
     Queryable,
@@ -488,15 +511,15 @@
 
 <span class="kw">async fn </span>generate_id(
     conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Queryable,
-    primary_key: <span class="kw-2">&amp;</span>FieldSelection,
+    id_field: <span class="kw-2">&amp;</span>FieldSelection,
     args: <span class="kw-2">&amp;</span>WriteArgs,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;SelectionResult&gt;&gt; {
     <span class="comment">// Go through all the values and generate a select statement with the correct MySQL function
-    </span><span class="kw">let </span>(pk_select, need_select) = primary_key
+    </span><span class="kw">let </span>(id_select, need_select) = id_field
         .selections()
         .filter_map(|field| <span class="kw">match </span>field {
-            SelectedField::Scalar(x) <span class="kw">if </span>x.default_value().is_some() &amp;&amp; !args.has_arg_for(x.db_name()) =&gt; x
+            SelectedField::Scalar(sf) <span class="kw">if </span>sf.default_value().is_some() &amp;&amp; !args.has_arg_for(sf.db_name()) =&gt; sf
                 .default_value()
                 .unwrap()
                 .to_dbgenerated_func()
@@ -517,9 +540,9 @@
 
     <span class="comment">// db generate values only if needed
     </span><span class="kw">if </span>need_select {
-        <span class="kw">let </span>pk_select = pk_select.add_trace_id(ctx.trace_id);
+        <span class="kw">let </span>pk_select = id_select.add_trace_id(ctx.trace_id);
         <span class="kw">let </span>pk_result = conn.query(pk_select.into()).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let </span>result = try_convert(<span class="kw-2">&amp;</span>(primary_key.into()), pk_result)<span class="question-mark">?</span>;
+        <span class="kw">let </span>result = try_convert(<span class="kw-2">&amp;</span>(id_field.into()), pk_result)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(result))
     } <span class="kw">else </span>{
@@ -534,17 +557,18 @@
     sql_family: <span class="kw-2">&amp;</span>SqlFamily,
     model: <span class="kw-2">&amp;</span>Model,
     <span class="kw-2">mut </span>args: WriteArgs,
+    selected_fields: FieldSelection,
     ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
-) -&gt; <span class="kw">crate</span>::Result&lt;SelectionResult&gt; {
-    <span class="kw">let </span>pk = model.primary_identifier();
+) -&gt; <span class="kw">crate</span>::Result&lt;SingleRecord&gt; {
+    <span class="kw">let </span>id_field: FieldSelection = model.primary_identifier();
 
     <span class="kw">let </span>returned_id = <span class="kw">if </span><span class="kw-2">*</span>sql_family == SqlFamily::Mysql {
-        generate_id(conn, <span class="kw-2">&amp;</span>pk, <span class="kw-2">&amp;</span>args, ctx).<span class="kw">await</span><span class="question-mark">?
-    </span>} <span class="kw">else </span>{
-        args.as_record_projection(pk.clone().into())
+        generate_id(conn, <span class="kw-2">&amp;</span>id_field, <span class="kw-2">&amp;</span>args, ctx)
+            .<span class="kw">await</span><span class="question-mark">?
+            </span>.or_else(|| args.as_selection_result(ModelProjection::from(id_field)))
+    } <span class="kw">else </span>{
+        args.as_selection_result(ModelProjection::from(id_field))
     };
-
-    <span class="kw">let </span>returned_id = returned_id.or_else(|| args.as_record_projection(pk.clone().into()));
 
     <span class="kw">let </span>args = <span class="kw">match </span>returned_id {
         <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>pk) <span class="kw">if </span><span class="kw-2">*</span>sql_family == SqlFamily::Mysql =&gt; {
@@ -558,7 +582,7 @@
         <span class="kw">_ </span>=&gt; args,
     };
 
-    <span class="kw">let </span>insert = write::create_record(model, args, ctx);
+    <span class="kw">let </span>insert = write::create_record(model, args, <span class="kw-2">&amp;</span>ModelProjection::from(<span class="kw-2">&amp;</span>selected_fields), ctx);
 
     <span class="kw">let </span>result_set = <span class="kw">match </span>conn.insert(insert).<span class="kw">await </span>{
         <span class="prelude-val">Ok</span>(id) =&gt; id,
@@ -604,16 +628,34 @@
     };
 
     <span class="kw">match </span>(returned_id, result_set.len(), result_set.last_insert_id()) {
-        <span class="comment">// All values provided in the write arrghs
-        </span>(<span class="prelude-val">Some</span>(identifier), <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if </span>!identifier.misses_autogen_value() =&gt; <span class="prelude-val">Ok</span>(identifier),
-
         <span class="comment">// with a working RETURNING statement
-        </span>(<span class="kw">_</span>, n, <span class="kw">_</span>) <span class="kw">if </span>n &gt; <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(try_convert(<span class="kw-2">&amp;</span>model.primary_identifier().into(), result_set)<span class="question-mark">?</span>),
+        </span>(<span class="kw">_</span>, n, <span class="kw">_</span>) <span class="kw">if </span>n &gt; <span class="number">0 </span>=&gt; {
+            <span class="kw">let </span>row = result_set.into_single()<span class="question-mark">?</span>;
+            <span class="kw">let </span>field_names: Vec&lt;<span class="kw">_</span>&gt; = selected_fields.db_names().collect();
+            <span class="kw">let </span>idents = ModelProjection::from(<span class="kw-2">&amp;</span>selected_fields).type_identifiers_with_arities();
+            <span class="kw">let </span>meta = column_metadata::create(<span class="kw-2">&amp;</span>field_names, <span class="kw-2">&amp;</span>idents);
+            <span class="kw">let </span>sql_row = row.to_sql_row(<span class="kw-2">&amp;</span>meta)<span class="question-mark">?</span>;
+            <span class="kw">let </span>record = Record::from(sql_row);
+
+            <span class="prelude-val">Ok</span>(SingleRecord { record, field_names })
+        }
+
+        <span class="comment">// All values provided in the write args
+        </span>(<span class="prelude-val">Some</span>(identifier), <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if </span>!identifier.misses_autogen_value() =&gt; {
+            <span class="kw">let </span>field_names = identifier.db_names().map(ToOwned::to_owned).collect();
+            <span class="kw">let </span>record = Record::from(identifier);
+
+            <span class="prelude-val">Ok</span>(SingleRecord { record, field_names })
+        }
 
         <span class="comment">// We have an auto-incremented id that we got from MySQL or SQLite
         </span>(<span class="prelude-val">Some</span>(<span class="kw-2">mut </span>identifier), <span class="kw">_</span>, <span class="prelude-val">Some</span>(num)) <span class="kw">if </span>identifier.misses_autogen_value() =&gt; {
             identifier.add_autogen_value(num <span class="kw">as </span>i64);
-            <span class="prelude-val">Ok</span>(identifier)
+
+            <span class="kw">let </span>field_names = identifier.db_names().map(ToOwned::to_owned).collect();
+            <span class="kw">let </span>record = Record::from(identifier);
+
+            <span class="prelude-val">Ok</span>(SingleRecord { record, field_names })
         }
 
         (<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Could not figure out an ID in create&quot;</span>),

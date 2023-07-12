@@ -36,8 +36,6 @@
 <a href="#36" id="36">36</a>
 <a href="#37" id="37">37</a>
 <a href="#38" id="38">38</a>
-<a href="#39" id="39">39</a>
-<a href="#40" id="40">40</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     column_metadata,
     filter_conversion::AliasedCondition,
@@ -64,18 +62,16 @@
     <span class="kw">let </span>where_condition = upsert.filter().aliased_condition_from(<span class="prelude-val">None</span>, <span class="bool-val">false</span>, ctx);
     <span class="kw">let </span>update = build_update_and_set_query(upsert.model(), upsert.update().clone(), ctx).so_that(where_condition);
 
-    <span class="kw">let </span>insert = create_record(upsert.model(), upsert.create().clone(), ctx);
+    <span class="kw">let </span>insert = create_record(upsert.model(), upsert.create().clone(), <span class="kw-2">&amp;</span>selected_fields, ctx);
 
     <span class="kw">let </span>constraints: Vec&lt;<span class="kw">_</span>&gt; = upsert.unique_constraints().as_columns(ctx).collect();
-    <span class="kw">let </span>query: Query = insert
-        .on_conflict(OnConflict::Update(update, constraints))
-        .returning(selected_fields.as_columns(ctx))
-        .into();
+    <span class="kw">let </span>query: Query = insert.on_conflict(OnConflict::Update(update, constraints)).into();
 
     <span class="kw">let </span>result_set = conn.query(query).<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="kw">let </span>row = result_set.into_single()<span class="question-mark">?</span>;
     <span class="kw">let </span>record = Record::from(row.to_sql_row(<span class="kw-2">&amp;</span>meta)<span class="question-mark">?</span>);
+
     <span class="prelude-val">Ok</span>(SingleRecord { record, field_names })
 }
 </code></pre></div></section></main></body></html>

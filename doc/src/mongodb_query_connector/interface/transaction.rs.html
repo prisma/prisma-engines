@@ -324,6 +324,8 @@
 <a href="#324" id="324">324</a>
 <a href="#325" id="325">325</a>
 <a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     error::MongoError,
@@ -399,8 +401,10 @@
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         model: <span class="kw-2">&amp;</span>Model,
         args: connector_interface::WriteArgs,
+        <span class="comment">// The field selection on a create is never used on MongoDB as it cannot return more than the ID.
+        </span>_selected_fields: FieldSelection,
         _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    ) -&gt; connector_interface::Result&lt;SelectionResult&gt; {
+    ) -&gt; connector_interface::Result&lt;SingleRecord&gt; {
         catch(<span class="kw">async move </span>{
             write::create_record(<span class="kw-2">&amp;</span><span class="self">self</span>.connection.database, <span class="kw-2">&amp;mut </span><span class="self">self</span>.connection.session, model, args).<span class="kw">await
         </span>})

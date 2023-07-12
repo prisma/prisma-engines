@@ -681,6 +681,7 @@
 <a href="#681" id="681">681</a>
 <a href="#682" id="682">682</a>
 <a href="#683" id="683">683</a>
+<a href="#684" id="684">684</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>datasource;
 <span class="kw">mod </span>native_types;
 <span class="kw">mod </span>validations;
@@ -745,7 +746,8 @@
     SupportsTxIsolationReadCommitted |
     SupportsTxIsolationRepeatableRead |
     SupportsTxIsolationSerializable |
-    NativeUpsert
+    NativeUpsert |
+    InsertReturning
 });
 
 <span class="kw">pub struct </span>PostgresDatamodelConnector;

@@ -141,6 +141,18 @@
 <a href="#141" id="141">141</a>
 <a href="#142" id="142">142</a>
 <a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Parsed query document tree. Naming is WIP.
 //! Structures represent parsed and validated parts of the query document, used by the query builders.
 </span><span class="kw">use </span><span class="kw">crate</span>::QueryParserResult;
@@ -249,6 +261,18 @@
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update_arg(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; QueryParserResult&lt;<span class="prelude-ty">Option</span>&lt;ParsedInputMap&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; {
         <span class="self">self</span>.look_arg(<span class="string">&quot;update&quot;</span>)
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_nested_selection(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.nested_fields
+            .as_ref()
+            .map(|nested_field| {
+                nested_field
+                    .fields
+                    .iter()
+                    .any(|field| field.parsed_field.nested_fields.is_some())
+            })
+            .unwrap_or(<span class="bool-val">false</span>)
     }
 
     <span class="kw">fn </span>look_arg(<span class="kw-2">&amp;mut </span><span class="self">self</span>, arg_name: <span class="kw-2">&amp;</span>str) -&gt; QueryParserResult&lt;<span class="prelude-ty">Option</span>&lt;ParsedInputMap&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; {

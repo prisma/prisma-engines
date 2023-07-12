@@ -289,6 +289,15 @@
 <a href="#289" id="289">289</a>
 <a href="#290" id="290">290</a>
 <a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{catch, transaction::SqlConnectorTransaction};
 <span class="kw">use crate</span>::{database::operations::<span class="kw-2">*</span>, Context, SqlError};
 <span class="kw">use </span>async_trait::async_trait;
@@ -456,11 +465,20 @@
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         model: <span class="kw-2">&amp;</span>Model,
         args: WriteArgs,
+        selected_fields: FieldSelection,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    ) -&gt; connector::Result&lt;SelectionResult&gt; {
+    ) -&gt; connector::Result&lt;SingleRecord&gt; {
         catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
             <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
-            write::create_record(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info.sql_family(), model, args, <span class="kw-2">&amp;</span>ctx).<span class="kw">await
+            write::create_record(
+                <span class="kw-2">&amp;</span><span class="self">self</span>.inner,
+                <span class="kw-2">&amp;</span><span class="self">self</span>.connection_info.sql_family(),
+                model,
+                args,
+                selected_fields,
+                <span class="kw-2">&amp;</span>ctx,
+            )
+            .<span class="kw">await
         </span>})
         .<span class="kw">await
     </span>}

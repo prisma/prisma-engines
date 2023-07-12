@@ -105,6 +105,7 @@
 <a href="#105" id="105">105</a>
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::{fmt, str::FromStr};
 
 <span class="doccomment">/// Not all Databases are created equal. Hence connectors for our datasources support different capabilities.
@@ -207,7 +208,8 @@
     SupportsTxIsolationRepeatableRead,
     SupportsTxIsolationSerializable,
     SupportsTxIsolationSnapshot,
-    NativeUpsert
+    NativeUpsert,
+    InsertReturning
 );
 
 <span class="doccomment">/// Contains all capabilities that the connector is able to serve.

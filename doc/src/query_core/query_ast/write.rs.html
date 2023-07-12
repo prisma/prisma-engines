@@ -318,6 +318,9 @@
 <a href="#318" id="318">318</a>
 <a href="#319" id="319">319</a>
 <a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Write query AST
 </span><span class="kw">use super</span>::{FilteredNestedMutation, FilteredQuery};
 <span class="kw">use crate</span>::{RecordQuery, ToGraphviz};
@@ -500,8 +503,11 @@
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>CreateRecord {
+    <span class="kw">pub </span>name: String,
     <span class="kw">pub </span>model: Model,
     <span class="kw">pub </span>args: WriteArgs,
+    <span class="kw">pub </span>selected_fields: FieldSelection,
+    <span class="kw">pub </span>selection_order: Vec&lt;String&gt;,
 }
 
 <span class="attr">#[derive(Debug, Clone)]

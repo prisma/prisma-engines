@@ -156,6 +156,13 @@
 <a href="#156" id="156">156</a>
 <a href="#157" id="157">157</a>
 <a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     interpreter::{InterpretationResult, InterpreterError},
     query_ast::<span class="kw-2">*</span>,
@@ -201,9 +208,16 @@
     q: CreateRecord,
     trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
 ) -&gt; InterpretationResult&lt;QueryResult&gt; {
-    <span class="kw">let </span>res = tx.create_record(<span class="kw-2">&amp;</span>q.model, q.args, trace_id).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>res = tx.create_record(<span class="kw-2">&amp;</span>q.model, q.args, q.selected_fields, trace_id).<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(QueryResult::Id(<span class="prelude-val">Some</span>(res)))
+    <span class="prelude-val">Ok</span>(QueryResult::RecordSelection(Box::new(RecordSelection {
+        name: q.name,
+        fields: q.selection_order,
+        aggregation_rows: <span class="prelude-val">None</span>,
+        model: q.model,
+        scalars: res.into(),
+        nested: <span class="macro">vec!</span>[],
+    })))
 }
 
 <span class="kw">async fn </span>create_many(

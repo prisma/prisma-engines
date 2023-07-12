@@ -433,7 +433,7 @@
         <span class="self">self</span>.preview_features.contains(feature)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_capability(<span class="kw-2">&amp;</span><span class="self">self</span>, capability: ConnectorCapability) -&gt; bool {
+    <span class="kw">pub fn </span>has_capability(<span class="kw-2">&amp;</span><span class="self">self</span>, capability: ConnectorCapability) -&gt; bool {
         <span class="self">self</span>.connector.has_capability(capability)
     }
 

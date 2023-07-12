@@ -168,6 +168,10 @@
 <a href="#168" id="168">168</a>
 <a href="#169" id="169">169</a>
 <a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{DomainError, FieldSelection, PrismaValue, ScalarFieldRef, SelectedField};
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>std::convert::TryFrom;
@@ -230,6 +234,10 @@
     <span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.len() == <span class="number">0
     </span>}
+
+    <span class="kw">pub fn </span>db_names(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>str&gt; + <span class="lifetime">&#39;_ </span>{
+        <span class="self">self</span>.pairs.iter().map(|(field, <span class="kw">_</span>)| field.db_name())
+    }
 
     <span class="doccomment">/// Consumes this `SelectionResult` and splits it into a set of `SelectionResult`s based on the passed
     /// `FieldSelection`s. Assumes that the transformation can be done.
