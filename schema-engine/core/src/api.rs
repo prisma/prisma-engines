@@ -6,7 +6,7 @@ use crate::{commands, json_rpc::types::*, CoreResult};
 #[async_trait::async_trait]
 pub trait GenericApi: Send + Sync + 'static {
     /// Return the database version as a string.
-    async fn version(&self) -> CoreResult<String>;
+    async fn version(&self, params: GetDatabaseVersionInput) -> CoreResult<String>;
 
     /// Apply all the unapplied migrations from the migrations folder.
     async fn apply_migrations(&self, input: ApplyMigrationsInput) -> CoreResult<ApplyMigrationsOutput>;

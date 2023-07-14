@@ -334,6 +334,30 @@ fn basic_jsonrpc_roundtrip_works(_api: TestApi) {
     });
 }
 
+#[test_connector(tags(Postgres))]
+fn basic_jsonrpc_roundtrip_works_with_dynamic_url(_api: TestApi) {
+    let url = std::env::var("TEST_DATABASE_URL").unwrap();
+    let command = Command::new(schema_engine_bin_path());
+
+    let params = format!(
+        r#"{{ "jsonrpc": "2.0", "method": "getDatabaseVersion", "params": {{ "datasource": {{ "tag": "ConnectionString", "url": "{url}" }} }}, "id": 1 }}"#
+    );
+
+    with_child_process(command, |process| {
+        let stdin = process.stdin.as_mut().unwrap();
+        let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
+
+        for _ in 0..2 {
+            writeln!(stdin, "{}", &params).unwrap();
+
+            let mut response = String::new();
+            stdout.read_line(&mut response).unwrap();
+
+            assert!(response.contains("PostgreSQL") || response.contains("CockroachDB"));
+        }
+    });
+}
+
 #[test]
 fn introspect_sqlite_empty_database() {
     let tmpdir = tempfile::tempdir().unwrap();
