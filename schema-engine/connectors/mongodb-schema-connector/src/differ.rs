@@ -45,7 +45,7 @@ impl<'a> DifferDatabase<'a> {
         }
 
         for collection in next.walk_collections() {
-            let mut entry = collections.entry(collection.name()).or_default();
+            let entry = collections.entry(collection.name()).or_default();
             entry.1 = Some(collection.id());
 
             if let Some(previous_collection_id) = entry.0 {
@@ -57,7 +57,7 @@ impl<'a> DifferDatabase<'a> {
                 }
 
                 for index in collection.indexes() {
-                    let mut entry = indexes
+                    let entry = indexes
                         .entry((previous_collection_id, collection.id(), index.name()))
                         .or_default();
                     entry.1 = Some(index.id());
