@@ -202,8 +202,7 @@ static METRIC_RECORDER: Once = Once::new();
 
 fn set_recorder() {
     METRIC_RECORDER.call_once(|| {
-        let recorder = MetricRecorder;
-        metrics::set_boxed_recorder(Box::new(recorder)).unwrap();
+        metrics::set_boxed_recorder(Box::new(MetricRecorder)).unwrap();
     });
 }
 
