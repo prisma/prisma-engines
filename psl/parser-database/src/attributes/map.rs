@@ -81,7 +81,7 @@ pub(super) fn composite_type_field(
     };
 
     {
-        let mut field = ctx.types.composite_type_fields.get_mut(&(ctid, field_id)).unwrap();
+        let field = ctx.types.composite_type_fields.get_mut(&(ctid, field_id)).unwrap();
         field.mapped_name = Some(mapped_name_id);
     }
 

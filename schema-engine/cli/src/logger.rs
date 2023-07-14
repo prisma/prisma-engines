@@ -12,7 +12,7 @@ pub(crate) fn init_logger() {
         .with_writer(std::io::stderr)
         .finish()
         .with(ErrorLayer::default())
-        .with(TimingsLayer::default());
+        .with(TimingsLayer);
 
     tracing::subscriber::set_global_default(subscriber)
         .map_err(|err| eprintln!("Error initializing the global logger: {err}"))

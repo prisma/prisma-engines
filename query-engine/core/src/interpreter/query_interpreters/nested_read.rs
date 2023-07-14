@@ -213,7 +213,7 @@ pub async fn one2m(
     if parent_field.is_inlined_on_enclosing_model() {
         let mut additional_records = vec![];
 
-        for mut record in scalars.records.iter_mut() {
+        for record in scalars.records.iter_mut() {
             let child_link: SelectionResult = record.extract_selection_result(&scalars.field_names, &child_link_id)?;
             let child_link_values: Vec<PrismaValue> = child_link.pairs.into_iter().map(|(_, v)| v).collect();
 
