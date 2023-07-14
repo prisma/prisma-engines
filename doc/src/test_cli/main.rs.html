@@ -910,7 +910,7 @@
         .with_writer(std::io::stderr)
         .finish()
         .with(ErrorLayer::default())
-        .with(schema_core::TimingsLayer::default());
+        .with(schema_core::TimingsLayer);
 
     tracing::subscriber::set_global_default(subscriber)
         .map_err(|err| <span class="macro">eprintln!</span>(<span class="string">&quot;Error initializing the global logger: {err}&quot;</span>))

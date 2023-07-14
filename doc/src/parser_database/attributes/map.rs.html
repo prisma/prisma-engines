@@ -209,7 +209,7 @@
     };
 
     {
-        <span class="kw">let </span><span class="kw-2">mut </span>field = ctx.types.composite_type_fields.get_mut(<span class="kw-2">&amp;</span>(ctid, field_id)).unwrap();
+        <span class="kw">let </span>field = ctx.types.composite_type_fields.get_mut(<span class="kw-2">&amp;</span>(ctid, field_id)).unwrap();
         field.mapped_name = <span class="prelude-val">Some</span>(mapped_name_id);
     }
 

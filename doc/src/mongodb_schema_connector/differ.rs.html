@@ -198,7 +198,7 @@
         }
 
         <span class="kw">for </span>collection <span class="kw">in </span>next.walk_collections() {
-            <span class="kw">let </span><span class="kw-2">mut </span>entry = collections.entry(collection.name()).or_default();
+            <span class="kw">let </span>entry = collections.entry(collection.name()).or_default();
             entry.<span class="number">1 </span>= <span class="prelude-val">Some</span>(collection.id());
 
             <span class="kw">if let </span><span class="prelude-val">Some</span>(previous_collection_id) = entry.<span class="number">0 </span>{
@@ -210,7 +210,7 @@
                 }
 
                 <span class="kw">for </span>index <span class="kw">in </span>collection.indexes() {
-                    <span class="kw">let </span><span class="kw-2">mut </span>entry = indexes
+                    <span class="kw">let </span>entry = indexes
                         .entry((previous_collection_id, collection.id(), index.name()))
                         .or_default();
                     entry.<span class="number">1 </span>= <span class="prelude-val">Some</span>(index.id());

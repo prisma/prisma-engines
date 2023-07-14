@@ -889,8 +889,6 @@
 <a href="#889" id="889">889</a>
 <a href="#890" id="890">890</a>
 <a href="#891" id="891">891</a>
-<a href="#892" id="892">892</a>
-<a href="#893" id="893">893</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>error;
 <span class="kw">mod </span>formatters;
 <span class="kw">mod </span>guard;
@@ -911,7 +909,7 @@
     <span class="kw-2">*</span>,
 };
 <span class="kw">use </span>prisma_models::{FieldSelection, Model, SelectionResult};
-<span class="kw">use </span>std::{borrow::Borrow, collections::HashSet, fmt};
+<span class="kw">use </span>std::{collections::HashSet, fmt};
 
 <span class="kw">pub type </span>QueryGraphResult&lt;T&gt; = std::result::Result&lt;T, QueryGraphError&gt;;
 
@@ -1163,12 +1161,10 @@
     <span class="doccomment">/// Returns all root nodes of the graph.
     /// A root node is defined by having no incoming edges.
     </span><span class="kw">pub fn </span>root_nodes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;NodeRef&gt; {
-        <span class="kw">let </span>graph = <span class="self">self</span>.graph.borrow();
-
-        graph
+        <span class="self">self</span>.graph
             .node_indices()
             .filter_map(|node_ix| {
-                <span class="kw">if </span>graph.edges_directed(node_ix, Direction::Incoming).next().is_some() {
+                <span class="kw">if </span><span class="self">self</span>.graph.edges_directed(node_ix, Direction::Incoming).next().is_some() {
                     <span class="prelude-val">None
                 </span>} <span class="kw">else </span>{
                     <span class="prelude-val">Some</span>(NodeRef { node_ix })

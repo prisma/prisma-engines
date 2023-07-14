@@ -475,7 +475,7 @@
     </span><span class="kw">if </span>parent_field.is_inlined_on_enclosing_model() {
         <span class="kw">let </span><span class="kw-2">mut </span>additional_records = <span class="macro">vec!</span>[];
 
-        <span class="kw">for </span><span class="kw-2">mut </span>record <span class="kw">in </span>scalars.records.iter_mut() {
+        <span class="kw">for </span>record <span class="kw">in </span>scalars.records.iter_mut() {
             <span class="kw">let </span>child_link: SelectionResult = record.extract_selection_result(<span class="kw-2">&amp;</span>scalars.field_names, <span class="kw-2">&amp;</span>child_link_id)<span class="question-mark">?</span>;
             <span class="kw">let </span>child_link_values: Vec&lt;PrismaValue&gt; = child_link.pairs.into_iter().map(|(<span class="kw">_</span>, v)| v).collect();
 
