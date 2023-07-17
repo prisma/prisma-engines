@@ -101,7 +101,7 @@
         DIAGNOSE_MIGRATION_HISTORY =&gt; render(executor.diagnose_migration_history(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
         ENSURE_CONNECTION_VALIDITY =&gt; render(executor.ensure_connection_validity(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
         EVALUATE_DATA_LOSS =&gt; render(executor.evaluate_data_loss(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
-        GET_DATABASE_VERSION =&gt; render(executor.version().<span class="kw">await</span>),
+        GET_DATABASE_VERSION =&gt; render(executor.version(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
         INTROSPECT =&gt; render(executor.introspect(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
         LIST_MIGRATION_DIRECTORIES =&gt; render(executor.list_migration_directories(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
         MARK_MIGRATION_APPLIED =&gt; render(executor.mark_migration_applied(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),

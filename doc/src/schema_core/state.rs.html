@@ -434,6 +434,10 @@
 <a href="#434" id="434">434</a>
 <a href="#435" id="435">435</a>
 <a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A container to manage 0 or more schema connectors, based on request contents.
 //!
 //! Why this rather than using connectors directly? We must be able to use the schema engine
@@ -619,10 +623,14 @@
 
 <span class="attr">#[async_trait::async_trait]
 </span><span class="kw">impl </span>GenericApi <span class="kw">for </span>EngineState {
-    <span class="kw">async fn </span>version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CoreResult&lt;String&gt; {
-        <span class="self">self</span>.with_default_connector(Box::new(|connector| connector.version()))
-            .<span class="kw">await
-    </span>}
+    <span class="kw">async fn </span>version(<span class="kw-2">&amp;</span><span class="self">self</span>, params: <span class="prelude-ty">Option</span>&lt;GetDatabaseVersionInput&gt;) -&gt; CoreResult&lt;String&gt; {
+        <span class="kw">let </span>f: ConnectorRequest&lt;String&gt; = Box::new(|connector| connector.version());
+
+        <span class="kw">match </span>params {
+            <span class="prelude-val">Some</span>(params) =&gt; <span class="self">self</span>.with_connector_from_datasource_param(<span class="kw-2">&amp;</span>params.datasource, f).<span class="kw">await</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.with_default_connector(f).<span class="kw">await</span>,
+        }
+    }
 
     <span class="kw">async fn </span>apply_migrations(<span class="kw-2">&amp;</span><span class="self">self</span>, input: ApplyMigrationsInput) -&gt; CoreResult&lt;ApplyMigrationsOutput&gt; {
         <span class="kw">let </span>namespaces = <span class="self">self</span>.namespaces();
