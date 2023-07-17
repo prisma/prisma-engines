@@ -317,7 +317,7 @@ mod singular_batch {
             }
 
             model TestModel {
-                id IdEnum @id
+                #id(id, IdEnum, @id)
             }
             "#
         };
