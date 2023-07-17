@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/h6c7vwhjn9wjyxg48fz7v2xjiyz8infg-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/openssl-0.10.48/src/dsa.rs`."><title>dsa.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="openssl" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/openssl-0.10.55/src/dsa.rs`."><title>dsa.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="openssl" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -645,6 +645,56 @@
 <a href="#645" id="645">645</a>
 <a href="#646" id="646">646</a>
 <a href="#647" id="647">647</a>
+<a href="#648" id="648">648</a>
+<a href="#649" id="649">649</a>
+<a href="#650" id="650">650</a>
+<a href="#651" id="651">651</a>
+<a href="#652" id="652">652</a>
+<a href="#653" id="653">653</a>
+<a href="#654" id="654">654</a>
+<a href="#655" id="655">655</a>
+<a href="#656" id="656">656</a>
+<a href="#657" id="657">657</a>
+<a href="#658" id="658">658</a>
+<a href="#659" id="659">659</a>
+<a href="#660" id="660">660</a>
+<a href="#661" id="661">661</a>
+<a href="#662" id="662">662</a>
+<a href="#663" id="663">663</a>
+<a href="#664" id="664">664</a>
+<a href="#665" id="665">665</a>
+<a href="#666" id="666">666</a>
+<a href="#667" id="667">667</a>
+<a href="#668" id="668">668</a>
+<a href="#669" id="669">669</a>
+<a href="#670" id="670">670</a>
+<a href="#671" id="671">671</a>
+<a href="#672" id="672">672</a>
+<a href="#673" id="673">673</a>
+<a href="#674" id="674">674</a>
+<a href="#675" id="675">675</a>
+<a href="#676" id="676">676</a>
+<a href="#677" id="677">677</a>
+<a href="#678" id="678">678</a>
+<a href="#679" id="679">679</a>
+<a href="#680" id="680">680</a>
+<a href="#681" id="681">681</a>
+<a href="#682" id="682">682</a>
+<a href="#683" id="683">683</a>
+<a href="#684" id="684">684</a>
+<a href="#685" id="685">685</a>
+<a href="#686" id="686">686</a>
+<a href="#687" id="687">687</a>
+<a href="#688" id="688">688</a>
+<a href="#689" id="689">689</a>
+<a href="#690" id="690">690</a>
+<a href="#691" id="691">691</a>
+<a href="#692" id="692">692</a>
+<a href="#693" id="693">693</a>
+<a href="#694" id="694">694</a>
+<a href="#695" id="695">695</a>
+<a href="#696" id="696">696</a>
+<a href="#697" id="697">697</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Digital Signatures
 //!
 //! DSA ensures a message originated from a known sender, and was not modified.
@@ -654,14 +704,15 @@
 
 </span><span class="kw">use </span>cfg_if::cfg_if;
 <span class="kw">use </span>foreign_types::{ForeignType, ForeignTypeRef};
-<span class="kw">use </span>libc::c_int;
+<span class="attr">#[cfg(not(boringssl))]
+</span><span class="kw">use </span>libc::c_int;
 <span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::mem;
 <span class="kw">use </span>std::ptr;
 
 <span class="kw">use </span><span class="kw">crate</span>::bn::{BigNum, BigNumRef};
 <span class="kw">use </span><span class="kw">crate</span>::error::ErrorStack;
-<span class="kw">use </span><span class="kw">crate</span>::pkey::{HasParams, HasPrivate, HasPublic, Private, Public};
+<span class="kw">use </span><span class="kw">crate</span>::pkey::{HasParams, HasPrivate, HasPublic, Params, Private, Public};
 <span class="kw">use </span><span class="kw">crate</span>::util::ForeignTypeRefExt;
 <span class="kw">use crate</span>::{cvt, cvt_p};
 <span class="kw">use </span>openssl_macros::corresponds;
@@ -774,6 +825,13 @@
         ffi::PEM_write_bio_DSAPrivateKey
     }
 
+    <span class="macro">to_der! </span>{
+        <span class="doccomment">/// Serializes the private_key to a DER-encoded `DSAPrivateKey` structure.
+        </span><span class="attr">#[corresponds(i2d_DSAPrivateKey)]
+        </span>private_key_to_der,
+        ffi::i2d_DSAPrivateKey
+    }
+
     <span class="doccomment">/// Returns a reference to the private key component of `self`.
     </span><span class="attr">#[corresponds(DSA_get0_key)]
     </span><span class="kw">pub fn </span>priv_key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>BigNumRef {
@@ -830,17 +888,21 @@
 <span class="attr">#[cfg(not(boringssl))]
 </span><span class="kw">type </span>BitType = c_int;
 
-<span class="kw">impl </span>Dsa&lt;Private&gt; {
-    <span class="doccomment">/// Generate a DSA key pair.
-    ///
-    /// Calls [`DSA_generate_parameters_ex`] to populate the `p`, `g`, and `q` values.
-    /// These values are used to generate the key pair with [`DSA_generate_key`].
-    ///
-    /// The `bits` parameter corresponds to the length of the prime `p`.
-    ///
-    /// [`DSA_generate_parameters_ex`]: https://www.openssl.org/docs/manmaster/crypto/DSA_generate_parameters_ex.html
-    /// [`DSA_generate_key`]: https://www.openssl.org/docs/manmaster/crypto/DSA_generate_key.html
-    </span><span class="kw">pub fn </span>generate(bits: u32) -&gt; <span class="prelude-ty">Result</span>&lt;Dsa&lt;Private&gt;, ErrorStack&gt; {
+<span class="kw">impl </span>Dsa&lt;Params&gt; {
+    <span class="doccomment">/// Creates a DSA params based upon the given parameters.
+    </span><span class="attr">#[corresponds(DSA_set0_pqg)]
+    </span><span class="kw">pub fn </span>from_pqg(p: BigNum, q: BigNum, g: BigNum) -&gt; <span class="prelude-ty">Result</span>&lt;Dsa&lt;Params&gt;, ErrorStack&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>dsa = Dsa::from_ptr(cvt_p(ffi::DSA_new())<span class="question-mark">?</span>);
+            cvt(DSA_set0_pqg(dsa.<span class="number">0</span>, p.as_ptr(), q.as_ptr(), g.as_ptr()))<span class="question-mark">?</span>;
+            mem::forget((p, q, g));
+            <span class="prelude-val">Ok</span>(dsa)
+        }
+    }
+
+    <span class="doccomment">/// Generates DSA params based on the given number of bits.
+    </span><span class="attr">#[corresponds(DSA_generate_parameters_ex)]
+    </span><span class="kw">pub fn </span>generate_params(bits: u32) -&gt; <span class="prelude-ty">Result</span>&lt;Dsa&lt;Params&gt;, ErrorStack&gt; {
         ffi::init();
         <span class="kw">unsafe </span>{
             <span class="kw">let </span>dsa = Dsa::from_ptr(cvt_p(ffi::DSA_new())<span class="question-mark">?</span>);
@@ -853,9 +915,29 @@
                 ptr::null_mut(),
                 ptr::null_mut(),
             ))<span class="question-mark">?</span>;
-            cvt(ffi::DSA_generate_key(dsa.<span class="number">0</span>))<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(dsa)
         }
+    }
+
+    <span class="doccomment">/// Generates a private key based on the DSA params.
+    </span><span class="attr">#[corresponds(DSA_generate_key)]
+    </span><span class="kw">pub fn </span>generate_key(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Dsa&lt;Private&gt;, ErrorStack&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>dsa_ptr = <span class="self">self</span>.<span class="number">0</span>;
+            cvt(ffi::DSA_generate_key(dsa_ptr))<span class="question-mark">?</span>;
+            mem::forget(<span class="self">self</span>);
+            <span class="prelude-val">Ok</span>(Dsa::from_ptr(dsa_ptr))
+        }
+    }
+}
+
+<span class="kw">impl </span>Dsa&lt;Private&gt; {
+    <span class="doccomment">/// Generate a DSA key pair.
+    ///
+    /// The `bits` parameter corresponds to the length of the prime `p`.
+    </span><span class="kw">pub fn </span>generate(bits: u32) -&gt; <span class="prelude-ty">Result</span>&lt;Dsa&lt;Private&gt;, ErrorStack&gt; {
+        <span class="kw">let </span>params = Dsa::generate_params(bits)<span class="question-mark">?</span>;
+        params.generate_key()
     }
 
     <span class="doccomment">/// Create a DSA key pair with the given parameters
@@ -930,7 +1012,7 @@
 }
 
 <span class="macro">cfg_if! </span>{
-    <span class="kw">if </span><span class="attr">#[cfg(any(ossl110, libressl273))] </span>{
+    <span class="kw">if </span><span class="attr">#[cfg(any(ossl110, libressl273, boringssl))] </span>{
         <span class="kw">use </span>ffi::{DSA_get0_key, DSA_get0_pqg, DSA_set0_key, DSA_set0_pqg};
     } <span class="kw">else </span>{
         <span class="attr">#[allow(bad_style)]
@@ -1109,7 +1191,7 @@
 }
 
 <span class="macro">cfg_if! </span>{
-    <span class="kw">if </span><span class="attr">#[cfg(any(ossl110, libressl273))] </span>{
+    <span class="kw">if </span><span class="attr">#[cfg(any(ossl110, libressl273, boringssl))] </span>{
         <span class="kw">use </span>ffi::{DSA_SIG_set0, DSA_SIG_get0};
     } <span class="kw">else </span>{
         <span class="attr">#[allow(bad_style)]
@@ -1201,6 +1283,24 @@
         <span class="macro">assert_eq!</span>(dsa.p(), <span class="kw-2">&amp;</span>BigNum::from_u32(<span class="number">283</span>).unwrap());
         <span class="macro">assert_eq!</span>(dsa.q(), <span class="kw-2">&amp;</span>BigNum::from_u32(<span class="number">47</span>).unwrap());
         <span class="macro">assert_eq!</span>(dsa.g(), <span class="kw-2">&amp;</span>BigNum::from_u32(<span class="number">60</span>).unwrap());
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_params() {
+        <span class="kw">let </span>params = Dsa::generate_params(<span class="number">1024</span>).unwrap();
+        <span class="kw">let </span>p = params.p().to_owned().unwrap();
+        <span class="kw">let </span>q = params.q().to_owned().unwrap();
+        <span class="kw">let </span>g = params.g().to_owned().unwrap();
+        <span class="kw">let </span>key = params.generate_key().unwrap();
+        <span class="kw">let </span>params2 = Dsa::from_pqg(
+            key.p().to_owned().unwrap(),
+            key.q().to_owned().unwrap(),
+            key.g().to_owned().unwrap(),
+        )
+        .unwrap();
+        <span class="macro">assert_eq!</span>(p, <span class="kw-2">*</span>params2.p());
+        <span class="macro">assert_eq!</span>(q, <span class="kw-2">*</span>params2.q());
+        <span class="macro">assert_eq!</span>(g, <span class="kw-2">*</span>params2.g());
     }
 
     <span class="attr">#[test]

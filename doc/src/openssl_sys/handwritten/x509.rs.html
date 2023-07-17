@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/h6c7vwhjn9wjyxg48fz7v2xjiyz8infg-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/openssl-sys-0.9.83/src/./handwritten/x509.rs`."><title>x509.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="openssl_sys" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../openssl_sys/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/openssl-sys-0.9.90/src/./handwritten/x509.rs`."><title>x509.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="openssl_sys" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../openssl_sys/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -671,6 +671,100 @@
 <a href="#671" id="671">671</a>
 <a href="#672" id="672">672</a>
 <a href="#673" id="673">673</a>
+<a href="#674" id="674">674</a>
+<a href="#675" id="675">675</a>
+<a href="#676" id="676">676</a>
+<a href="#677" id="677">677</a>
+<a href="#678" id="678">678</a>
+<a href="#679" id="679">679</a>
+<a href="#680" id="680">680</a>
+<a href="#681" id="681">681</a>
+<a href="#682" id="682">682</a>
+<a href="#683" id="683">683</a>
+<a href="#684" id="684">684</a>
+<a href="#685" id="685">685</a>
+<a href="#686" id="686">686</a>
+<a href="#687" id="687">687</a>
+<a href="#688" id="688">688</a>
+<a href="#689" id="689">689</a>
+<a href="#690" id="690">690</a>
+<a href="#691" id="691">691</a>
+<a href="#692" id="692">692</a>
+<a href="#693" id="693">693</a>
+<a href="#694" id="694">694</a>
+<a href="#695" id="695">695</a>
+<a href="#696" id="696">696</a>
+<a href="#697" id="697">697</a>
+<a href="#698" id="698">698</a>
+<a href="#699" id="699">699</a>
+<a href="#700" id="700">700</a>
+<a href="#701" id="701">701</a>
+<a href="#702" id="702">702</a>
+<a href="#703" id="703">703</a>
+<a href="#704" id="704">704</a>
+<a href="#705" id="705">705</a>
+<a href="#706" id="706">706</a>
+<a href="#707" id="707">707</a>
+<a href="#708" id="708">708</a>
+<a href="#709" id="709">709</a>
+<a href="#710" id="710">710</a>
+<a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
+<a href="#713" id="713">713</a>
+<a href="#714" id="714">714</a>
+<a href="#715" id="715">715</a>
+<a href="#716" id="716">716</a>
+<a href="#717" id="717">717</a>
+<a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
+<a href="#720" id="720">720</a>
+<a href="#721" id="721">721</a>
+<a href="#722" id="722">722</a>
+<a href="#723" id="723">723</a>
+<a href="#724" id="724">724</a>
+<a href="#725" id="725">725</a>
+<a href="#726" id="726">726</a>
+<a href="#727" id="727">727</a>
+<a href="#728" id="728">728</a>
+<a href="#729" id="729">729</a>
+<a href="#730" id="730">730</a>
+<a href="#731" id="731">731</a>
+<a href="#732" id="732">732</a>
+<a href="#733" id="733">733</a>
+<a href="#734" id="734">734</a>
+<a href="#735" id="735">735</a>
+<a href="#736" id="736">736</a>
+<a href="#737" id="737">737</a>
+<a href="#738" id="738">738</a>
+<a href="#739" id="739">739</a>
+<a href="#740" id="740">740</a>
+<a href="#741" id="741">741</a>
+<a href="#742" id="742">742</a>
+<a href="#743" id="743">743</a>
+<a href="#744" id="744">744</a>
+<a href="#745" id="745">745</a>
+<a href="#746" id="746">746</a>
+<a href="#747" id="747">747</a>
+<a href="#748" id="748">748</a>
+<a href="#749" id="749">749</a>
+<a href="#750" id="750">750</a>
+<a href="#751" id="751">751</a>
+<a href="#752" id="752">752</a>
+<a href="#753" id="753">753</a>
+<a href="#754" id="754">754</a>
+<a href="#755" id="755">755</a>
+<a href="#756" id="756">756</a>
+<a href="#757" id="757">757</a>
+<a href="#758" id="758">758</a>
+<a href="#759" id="759">759</a>
+<a href="#760" id="760">760</a>
+<a href="#761" id="761">761</a>
+<a href="#762" id="762">762</a>
+<a href="#763" id="763">763</a>
+<a href="#764" id="764">764</a>
+<a href="#765" id="765">765</a>
+<a href="#766" id="766">766</a>
+<a href="#767" id="767">767</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>libc::<span class="kw-2">*</span>;
 
@@ -682,11 +776,15 @@
 
 <span class="kw">pub enum </span>X509_NAME_ENTRY {}
 
+<span class="macro">stack!</span>(stack_st_X509_NAME_ENTRY);
+
 <span class="macro">stack!</span>(stack_st_X509_NAME);
 
 <span class="kw">pub enum </span>X509_EXTENSION {}
 
 <span class="macro">stack!</span>(stack_st_X509_EXTENSION);
+
+<span class="kw">pub enum </span>X509_ATTRIBUTE {}
 
 <span class="macro">stack!</span>(stack_st_X509_ATTRIBUTE);
 
@@ -947,6 +1045,7 @@
     <span class="kw">pub fn </span>X509_NAME_ENTRY_free(x: <span class="kw-2">*mut </span>X509_NAME_ENTRY);
 
     <span class="kw">pub fn </span>X509_NAME_new() -&gt; <span class="kw-2">*mut </span>X509_NAME;
+    <span class="kw">pub fn </span>X509_NAME_cmp(x: <span class="kw-2">*const </span>X509_NAME, y: <span class="kw-2">*const </span>X509_NAME) -&gt; c_int;
     <span class="kw">pub fn </span>X509_NAME_free(x: <span class="kw-2">*mut </span>X509_NAME);
 
     <span class="kw">pub fn </span>X509_new() -&gt; <span class="kw-2">*mut </span>X509;
@@ -1031,6 +1130,33 @@
         <span class="kw">pub fn </span>X509_REQ_add_extensions(req: <span class="kw-2">*mut </span>X509_REQ, exts: <span class="attr">#[const_ptr_if(ossl300)] </span>stack_st_X509_EXTENSION)
             -&gt; c_int;
     }
+}
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="kw">pub fn </span>X509_REQ_get_attr_count(req: <span class="kw-2">*const </span>X509_REQ) -&gt; c_int;
+    <span class="kw">pub fn </span>X509_REQ_get_attr_by_NID(req: <span class="kw-2">*const </span>X509_REQ, nid: c_int, lastpos: c_int) -&gt; c_int;
+    <span class="kw">pub fn </span>X509_REQ_get_attr(req: <span class="kw-2">*const </span>X509_REQ, loc: c_int) -&gt; <span class="kw-2">*mut </span>X509_ATTRIBUTE;
+    <span class="kw">pub fn </span>X509_REQ_delete_attr(req: <span class="kw-2">*mut </span>X509_REQ, loc: c_int) -&gt; <span class="kw-2">*mut </span>X509_ATTRIBUTE;
+    <span class="kw">pub fn </span>X509_REQ_add1_attr_by_txt(
+        req: <span class="kw-2">*mut </span>X509_REQ,
+        attrname: <span class="kw-2">*const </span>c_char,
+        chtype: c_int,
+        bytes: <span class="kw-2">*const </span>c_uchar,
+        len: c_int,
+    ) -&gt; c_int;
+    <span class="kw">pub fn </span>X509_REQ_add1_attr_by_NID(
+        req: <span class="kw-2">*mut </span>X509_REQ,
+        nid: c_int,
+        chtype: c_int,
+        bytes: <span class="kw-2">*const </span>c_uchar,
+        len: c_int,
+    ) -&gt; c_int;
+    <span class="kw">pub fn </span>X509_REQ_add1_attr_by_OBJ(
+        req: <span class="kw-2">*mut </span>X509_REQ,
+        obj: <span class="kw-2">*const </span>ASN1_OBJECT,
+        chtype: c_int,
+        bytes: <span class="kw-2">*const </span>c_uchar,
+        len: c_int,
+    ) -&gt; c_int;
 }
 <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
     <span class="kw">pub fn </span>X509_set_pubkey(x: <span class="kw-2">*mut </span>X509, pkey: <span class="kw-2">*mut </span>EVP_PKEY) -&gt; c_int;
@@ -1287,6 +1413,7 @@
         </span><span class="kw">pub fn </span>X509_STORE_get0_objects(ctx: <span class="attr">#[const_ptr_if(ossl300)] </span>X509_STORE) -&gt; <span class="kw-2">*mut </span>stack_st_X509_OBJECT;
     }
 }
+
 <span class="attr">#[cfg(any(ossl110, libressl270))]
 </span><span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
     <span class="kw">pub fn </span>X509_OBJECT_get0_X509(x: <span class="kw-2">*const </span>X509_OBJECT) -&gt; <span class="kw-2">*mut </span>X509;
@@ -1313,7 +1440,6 @@
 
 <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
     <span class="kw">pub fn </span>X509_cmp(a: <span class="kw-2">*const </span>X509, b: <span class="kw-2">*const </span>X509) -&gt; c_int;
-    <span class="kw">pub fn </span>X509_NAME_cmp(a: <span class="kw-2">*const </span>X509_NAME, b: <span class="kw-2">*const </span>X509_NAME) -&gt; c_int;
     <span class="kw">pub fn </span>X509_issuer_and_serial_cmp(a: <span class="kw-2">*const </span>X509, b: <span class="kw-2">*const </span>X509) -&gt; c_int;
     <span class="kw">pub fn </span>X509_issuer_name_cmp(a: <span class="kw-2">*const </span>X509, b: <span class="kw-2">*const </span>X509) -&gt; c_int;
     <span class="kw">pub fn </span>X509_subject_name_cmp(a: <span class="kw-2">*const </span>X509, b: <span class="kw-2">*const </span>X509) -&gt; c_int;
@@ -1341,7 +1467,69 @@
 <span class="macro">const_ptr_api! </span>{
     <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
         <span class="kw">pub fn </span>X509_PURPOSE_get_by_sname(sname: <span class="attr">#[const_ptr_if(any(ossl110, libressl280))] </span>c_char) -&gt; c_int;
-        <span class="kw">pub fn </span>X509_PURPOSE_get0(idx: c_int) -&gt; <span class="kw-2">*mut </span>X509_PURPOSE;
+    }
+}
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="kw">pub fn </span>X509_PURPOSE_get0(idx: c_int) -&gt; <span class="kw-2">*mut </span>X509_PURPOSE;
+}
+
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="kw">pub fn </span>X509_ATTRIBUTE_new() -&gt; <span class="kw-2">*mut </span>X509_ATTRIBUTE;
+    <span class="kw">pub fn </span>X509_ATTRIBUTE_free(attr: <span class="kw-2">*mut </span>X509_ATTRIBUTE);
+    <span class="kw">pub fn </span>X509_ATTRIBUTE_create(
+        nid: c_int,
+        atrtype: c_int,
+        value: <span class="kw-2">*mut </span>c_void,
+    ) -&gt; <span class="kw-2">*mut </span>X509_ATTRIBUTE;
+    <span class="kw">pub fn </span>X509_ATTRIBUTE_create_by_NID(
+        attr: <span class="kw-2">*mut *mut </span>X509_ATTRIBUTE,
+        nid: c_int,
+        atrtype: c_int,
+        data: <span class="kw-2">*const </span>c_void,
+        len: c_int,
+    ) -&gt; <span class="kw-2">*mut </span>X509_ATTRIBUTE;
+    <span class="kw">pub fn </span>X509_ATTRIBUTE_create_by_OBJ(
+        attr: <span class="kw-2">*mut *mut </span>X509_ATTRIBUTE,
+        obj: <span class="kw-2">*const </span>ASN1_OBJECT,
+        atrtype: c_int,
+        data: <span class="kw-2">*const </span>c_void,
+        len: c_int,
+    ) -&gt; <span class="kw-2">*mut </span>X509_ATTRIBUTE;
+    <span class="kw">pub fn </span>X509_ATTRIBUTE_create_by_txt(
+        attr: <span class="kw-2">*mut *mut </span>X509_ATTRIBUTE,
+        atrname: <span class="kw-2">*const </span>c_char,
+        atrtype: c_int,
+        bytes: <span class="kw-2">*const </span>c_uchar,
+        len: c_int,
+    ) -&gt; <span class="kw-2">*mut </span>X509_ATTRIBUTE;
+    <span class="kw">pub fn </span>X509_ATTRIBUTE_set1_object(attr: <span class="kw-2">*mut </span>X509_ATTRIBUTE, obj: <span class="kw-2">*const </span>ASN1_OBJECT) -&gt; c_int;
+    <span class="kw">pub fn </span>X509_ATTRIBUTE_set1_data(
+        attr: <span class="kw-2">*mut </span>X509_ATTRIBUTE,
+        attrtype: c_int,
+        data: <span class="kw-2">*const </span>c_void,
+        len: c_int,
+    ) -&gt; c_int;
+    <span class="kw">pub fn </span>X509_ATTRIBUTE_get0_data(
+        attr: <span class="kw-2">*mut </span>X509_ATTRIBUTE,
+        idx: c_int,
+        atrtype: c_int,
+        data: <span class="kw-2">*mut </span>c_void,
+    ) -&gt; <span class="kw-2">*mut </span>c_void;
+    <span class="kw">pub fn </span>X509_ATTRIBUTE_get0_object(attr: <span class="kw-2">*mut </span>X509_ATTRIBUTE) -&gt; <span class="kw-2">*mut </span>ASN1_OBJECT;
+    <span class="kw">pub fn </span>X509_ATTRIBUTE_get0_type(attr: <span class="kw-2">*mut </span>X509_ATTRIBUTE, idx: c_int) -&gt; <span class="kw-2">*mut </span>ASN1_TYPE;
+    <span class="kw">pub fn </span>d2i_X509_ATTRIBUTE(
+        a: <span class="kw-2">*mut *mut </span>X509_ATTRIBUTE,
+        pp: <span class="kw-2">*mut *const </span>c_uchar,
+        length: c_long,
+    ) -&gt; <span class="kw-2">*mut </span>X509_ATTRIBUTE;
+}
+<span class="macro">const_ptr_api! </span>{
+    <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+        <span class="kw">pub fn </span>X509_ATTRIBUTE_count(
+            attr: <span class="attr">#[const_ptr_if(any(ossl110, libressl280))] </span>X509_ATTRIBUTE <span class="comment">// const since OpenSSL v1.1.0
+        </span>) -&gt; c_int;
+        <span class="kw">pub fn </span>i2d_X509_ATTRIBUTE(x: <span class="attr">#[const_ptr_if(ossl300)] </span>X509_ATTRIBUTE, buf: <span class="kw-2">*mut *mut </span>u8) -&gt; c_int;
+        <span class="kw">pub fn </span>X509_ATTRIBUTE_dup(x: <span class="attr">#[const_ptr_if(ossl300)] </span>X509_ATTRIBUTE) -&gt; <span class="kw-2">*mut </span>X509_ATTRIBUTE;
     }
 }
 </code></pre></div></section></main></body></html>

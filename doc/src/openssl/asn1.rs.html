@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/h6c7vwhjn9wjyxg48fz7v2xjiyz8infg-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/openssl-0.10.48/src/asn1.rs`."><title>asn1.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="openssl" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/nix/store/jnqxxv1xi811ni996b002f4jnyz38xck-vendor-cargo-deps/c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0/openssl-0.10.55/src/asn1.rs`."><title>asn1.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="openssl" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -772,6 +772,143 @@
 <a href="#772" id="772">772</a>
 <a href="#773" id="773">773</a>
 <a href="#774" id="774">774</a>
+<a href="#775" id="775">775</a>
+<a href="#776" id="776">776</a>
+<a href="#777" id="777">777</a>
+<a href="#778" id="778">778</a>
+<a href="#779" id="779">779</a>
+<a href="#780" id="780">780</a>
+<a href="#781" id="781">781</a>
+<a href="#782" id="782">782</a>
+<a href="#783" id="783">783</a>
+<a href="#784" id="784">784</a>
+<a href="#785" id="785">785</a>
+<a href="#786" id="786">786</a>
+<a href="#787" id="787">787</a>
+<a href="#788" id="788">788</a>
+<a href="#789" id="789">789</a>
+<a href="#790" id="790">790</a>
+<a href="#791" id="791">791</a>
+<a href="#792" id="792">792</a>
+<a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
+<a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
+<a href="#797" id="797">797</a>
+<a href="#798" id="798">798</a>
+<a href="#799" id="799">799</a>
+<a href="#800" id="800">800</a>
+<a href="#801" id="801">801</a>
+<a href="#802" id="802">802</a>
+<a href="#803" id="803">803</a>
+<a href="#804" id="804">804</a>
+<a href="#805" id="805">805</a>
+<a href="#806" id="806">806</a>
+<a href="#807" id="807">807</a>
+<a href="#808" id="808">808</a>
+<a href="#809" id="809">809</a>
+<a href="#810" id="810">810</a>
+<a href="#811" id="811">811</a>
+<a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
+<a href="#818" id="818">818</a>
+<a href="#819" id="819">819</a>
+<a href="#820" id="820">820</a>
+<a href="#821" id="821">821</a>
+<a href="#822" id="822">822</a>
+<a href="#823" id="823">823</a>
+<a href="#824" id="824">824</a>
+<a href="#825" id="825">825</a>
+<a href="#826" id="826">826</a>
+<a href="#827" id="827">827</a>
+<a href="#828" id="828">828</a>
+<a href="#829" id="829">829</a>
+<a href="#830" id="830">830</a>
+<a href="#831" id="831">831</a>
+<a href="#832" id="832">832</a>
+<a href="#833" id="833">833</a>
+<a href="#834" id="834">834</a>
+<a href="#835" id="835">835</a>
+<a href="#836" id="836">836</a>
+<a href="#837" id="837">837</a>
+<a href="#838" id="838">838</a>
+<a href="#839" id="839">839</a>
+<a href="#840" id="840">840</a>
+<a href="#841" id="841">841</a>
+<a href="#842" id="842">842</a>
+<a href="#843" id="843">843</a>
+<a href="#844" id="844">844</a>
+<a href="#845" id="845">845</a>
+<a href="#846" id="846">846</a>
+<a href="#847" id="847">847</a>
+<a href="#848" id="848">848</a>
+<a href="#849" id="849">849</a>
+<a href="#850" id="850">850</a>
+<a href="#851" id="851">851</a>
+<a href="#852" id="852">852</a>
+<a href="#853" id="853">853</a>
+<a href="#854" id="854">854</a>
+<a href="#855" id="855">855</a>
+<a href="#856" id="856">856</a>
+<a href="#857" id="857">857</a>
+<a href="#858" id="858">858</a>
+<a href="#859" id="859">859</a>
+<a href="#860" id="860">860</a>
+<a href="#861" id="861">861</a>
+<a href="#862" id="862">862</a>
+<a href="#863" id="863">863</a>
+<a href="#864" id="864">864</a>
+<a href="#865" id="865">865</a>
+<a href="#866" id="866">866</a>
+<a href="#867" id="867">867</a>
+<a href="#868" id="868">868</a>
+<a href="#869" id="869">869</a>
+<a href="#870" id="870">870</a>
+<a href="#871" id="871">871</a>
+<a href="#872" id="872">872</a>
+<a href="#873" id="873">873</a>
+<a href="#874" id="874">874</a>
+<a href="#875" id="875">875</a>
+<a href="#876" id="876">876</a>
+<a href="#877" id="877">877</a>
+<a href="#878" id="878">878</a>
+<a href="#879" id="879">879</a>
+<a href="#880" id="880">880</a>
+<a href="#881" id="881">881</a>
+<a href="#882" id="882">882</a>
+<a href="#883" id="883">883</a>
+<a href="#884" id="884">884</a>
+<a href="#885" id="885">885</a>
+<a href="#886" id="886">886</a>
+<a href="#887" id="887">887</a>
+<a href="#888" id="888">888</a>
+<a href="#889" id="889">889</a>
+<a href="#890" id="890">890</a>
+<a href="#891" id="891">891</a>
+<a href="#892" id="892">892</a>
+<a href="#893" id="893">893</a>
+<a href="#894" id="894">894</a>
+<a href="#895" id="895">895</a>
+<a href="#896" id="896">896</a>
+<a href="#897" id="897">897</a>
+<a href="#898" id="898">898</a>
+<a href="#899" id="899">899</a>
+<a href="#900" id="900">900</a>
+<a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
+<a href="#904" id="904">904</a>
+<a href="#905" id="905">905</a>
+<a href="#906" id="906">906</a>
+<a href="#907" id="907">907</a>
+<a href="#908" id="908">908</a>
+<a href="#909" id="909">909</a>
+<a href="#910" id="910">910</a>
+<a href="#911" id="911">911</a>
 </pre></div><pre class="rust"><code><span class="attr">#![deny(missing_docs)]
 
 </span><span class="doccomment">//! Defines the format of certificates
@@ -801,8 +938,8 @@
 </span><span class="kw">use </span>cfg_if::cfg_if;
 <span class="kw">use </span>foreign_types::{ForeignType, ForeignTypeRef};
 <span class="kw">use </span>libc::{c_char, c_int, c_long, time_t};
-<span class="attr">#[cfg(ossl102)]
-</span><span class="kw">use </span>std::cmp::Ordering;
+<span class="kw">use </span>std::cmp::Ordering;
+<span class="kw">use </span>std::convert::TryInto;
 <span class="kw">use </span>std::ffi::CString;
 <span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::ptr;
@@ -1286,6 +1423,23 @@
     }
 }
 
+<span class="kw">impl </span>Ord <span class="kw">for </span>Asn1Integer {
+    <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Ordering {
+        Asn1IntegerRef::cmp(<span class="self">self</span>, other)
+    }
+}
+<span class="kw">impl </span>PartialOrd <span class="kw">for </span>Asn1Integer {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Asn1Integer) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.cmp(other))
+    }
+}
+<span class="kw">impl </span>Eq <span class="kw">for </span>Asn1Integer {}
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>Asn1Integer {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Asn1Integer) -&gt; bool {
+        Asn1IntegerRef::eq(<span class="self">self</span>, other)
+    }
+}
+
 <span class="kw">impl </span>Asn1IntegerRef {
     <span class="attr">#[allow(missing_docs, clippy::unnecessary_cast)]
     #[deprecated(since = <span class="string">&quot;0.10.6&quot;</span>, note = <span class="string">&quot;use to_bn instead&quot;</span>)]
@@ -1309,6 +1463,30 @@
     </span><span class="attr">#[corresponds(ASN1_INTEGER_set)]
     </span><span class="kw">pub fn </span>set(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: i32) -&gt; <span class="prelude-ty">Result</span>&lt;(), ErrorStack&gt; {
         <span class="kw">unsafe </span>{ cvt(ffi::ASN1_INTEGER_set(<span class="self">self</span>.as_ptr(), value <span class="kw">as </span>c_long)).map(|<span class="kw">_</span>| ()) }
+    }
+
+    <span class="doccomment">/// Creates a new Asn1Integer with the same value.
+    </span><span class="attr">#[corresponds(ASN1_INTEGER_dup)]
+    </span><span class="kw">pub fn </span>to_owned(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Asn1Integer, ErrorStack&gt; {
+        <span class="kw">unsafe </span>{ cvt_p(ffi::ASN1_INTEGER_dup(<span class="self">self</span>.as_ptr())).map(|p| Asn1Integer::from_ptr(p)) }
+    }
+}
+
+<span class="kw">impl </span>Ord <span class="kw">for </span>Asn1IntegerRef {
+    <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Ordering {
+        <span class="kw">let </span>res = <span class="kw">unsafe </span>{ ffi::ASN1_INTEGER_cmp(<span class="self">self</span>.as_ptr(), other.as_ptr()) };
+        res.cmp(<span class="kw-2">&amp;</span><span class="number">0</span>)
+    }
+}
+<span class="kw">impl </span>PartialOrd <span class="kw">for </span>Asn1IntegerRef {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Asn1IntegerRef) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.cmp(other))
+    }
+}
+<span class="kw">impl </span>Eq <span class="kw">for </span>Asn1IntegerRef {}
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>Asn1IntegerRef {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Asn1IntegerRef) -&gt; bool {
+        <span class="self">self</span>.cmp(other) == Ordering::Equal
     }
 }
 
@@ -1346,8 +1524,49 @@
 }
 
 <span class="macro">foreign_type_and_impl_send_sync! </span>{
+    <span class="kw">type </span>CType = ffi::ASN1_OCTET_STRING;
+    <span class="kw">fn </span>drop = ffi::ASN1_OCTET_STRING_free;
+    <span class="doccomment">/// ASN.1 OCTET STRING type
+    </span><span class="kw">pub struct </span>Asn1OctetString;
+    <span class="doccomment">/// A reference to an [`Asn1OctetString`].
+    </span><span class="kw">pub struct </span>Asn1OctetStringRef;
+}
+
+<span class="kw">impl </span>Asn1OctetString {
+    <span class="doccomment">/// Creates an Asn1OctetString from bytes
+    </span><span class="kw">pub fn </span>new_from_bytes(value: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, ErrorStack&gt; {
+        ffi::init();
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>s = cvt_p(ffi::ASN1_OCTET_STRING_new())<span class="question-mark">?</span>;
+            ffi::ASN1_OCTET_STRING_set(s, value.as_ptr(), value.len().try_into().unwrap());
+            <span class="prelude-val">Ok</span>(<span class="self">Self</span>::from_ptr(s))
+        }
+    }
+}
+
+<span class="kw">impl </span>Asn1OctetStringRef {
+    <span class="doccomment">/// Returns the octet string as an array of bytes.
+    </span><span class="attr">#[corresponds(ASN1_STRING_get0_data)]
+    </span><span class="kw">pub fn </span>as_slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw">unsafe </span>{ slice::from_raw_parts(ASN1_STRING_get0_data(<span class="self">self</span>.as_ptr().cast()), <span class="self">self</span>.len()) }
+    }
+
+    <span class="doccomment">/// Returns the number of bytes in the octet string.
+    </span><span class="attr">#[corresponds(ASN1_STRING_length)]
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">unsafe </span>{ ffi::ASN1_STRING_length(<span class="self">self</span>.as_ptr().cast()) <span class="kw">as </span>usize }
+    }
+
+    <span class="doccomment">/// Determines if the string is empty.
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len() == <span class="number">0
+    </span>}
+}
+
+<span class="macro">foreign_type_and_impl_send_sync! </span>{
     <span class="kw">type </span>CType = ffi::ASN1_OBJECT;
     <span class="kw">fn </span>drop = ffi::ASN1_OBJECT_free;
+    <span class="kw">fn </span>clone = ffi::OBJ_dup;
 
     <span class="doccomment">/// Object Identifier
     ///
@@ -1430,13 +1649,39 @@
 }
 
 <span class="macro">cfg_if! </span>{
-    <span class="kw">if </span><span class="attr">#[cfg(any(ossl110, libressl273))] </span>{
+    <span class="kw">if </span><span class="attr">#[cfg(any(ossl110, libressl273, boringssl))] </span>{
         <span class="kw">use </span>ffi::ASN1_STRING_get0_data;
     } <span class="kw">else </span>{
         <span class="attr">#[allow(bad_style)]
         </span><span class="kw">unsafe fn </span>ASN1_STRING_get0_data(s: <span class="kw-2">*mut </span>ffi::ASN1_STRING) -&gt; <span class="kw-2">*const </span>::libc::c_uchar {
             ffi::ASN1_STRING_data(s)
         }
+    }
+}
+
+<span class="macro">foreign_type_and_impl_send_sync! </span>{
+    <span class="kw">type </span>CType = ffi::ASN1_ENUMERATED;
+    <span class="kw">fn </span>drop = ffi::ASN1_ENUMERATED_free;
+
+    <span class="doccomment">/// An ASN.1 enumerated.
+    </span><span class="kw">pub struct </span>Asn1Enumerated;
+    <span class="doccomment">/// A reference to an [`Asn1Enumerated`].
+    </span><span class="kw">pub struct </span>Asn1EnumeratedRef;
+}
+
+<span class="kw">impl </span>Asn1EnumeratedRef {
+    <span class="doccomment">/// Get the value, if it fits in the required bounds.
+    </span><span class="attr">#[corresponds(ASN1_ENUMERATED_get_int64)]
+    #[cfg(ossl110)]
+    </span><span class="kw">pub fn </span>get_i64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;i64, ErrorStack&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>crl_reason = <span class="number">0</span>;
+        <span class="kw">unsafe </span>{
+            cvt(ffi::ASN1_ENUMERATED_get_int64(
+                <span class="kw-2">&amp;mut </span>crl_reason,
+                <span class="self">self</span>.as_ptr(),
+            ))<span class="question-mark">?</span>;
+        }
+        <span class="prelude-val">Ok</span>(crl_reason)
     }
 }
 
@@ -1524,6 +1769,28 @@
     }
 
     <span class="attr">#[test]
+    </span><span class="kw">fn </span>integer_to_owned() {
+        <span class="kw">let </span>a = Asn1Integer::from_bn(<span class="kw-2">&amp;</span>BigNum::from_dec_str(<span class="string">&quot;42&quot;</span>).unwrap()).unwrap();
+        <span class="kw">let </span>b = a.to_owned().unwrap();
+        <span class="macro">assert_eq!</span>(
+            a.to_bn().unwrap().to_dec_str().unwrap().to_string(),
+            b.to_bn().unwrap().to_dec_str().unwrap().to_string(),
+        );
+        <span class="macro">assert_ne!</span>(a.as_ptr(), b.as_ptr());
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>integer_cmp() {
+        <span class="kw">let </span>a = Asn1Integer::from_bn(<span class="kw-2">&amp;</span>BigNum::from_dec_str(<span class="string">&quot;42&quot;</span>).unwrap()).unwrap();
+        <span class="kw">let </span>b = Asn1Integer::from_bn(<span class="kw-2">&amp;</span>BigNum::from_dec_str(<span class="string">&quot;42&quot;</span>).unwrap()).unwrap();
+        <span class="kw">let </span>c = Asn1Integer::from_bn(<span class="kw-2">&amp;</span>BigNum::from_dec_str(<span class="string">&quot;43&quot;</span>).unwrap()).unwrap();
+        <span class="macro">assert!</span>(a == b);
+        <span class="macro">assert!</span>(a != c);
+        <span class="macro">assert!</span>(a &lt; c);
+        <span class="macro">assert!</span>(c &gt; b);
+    }
+
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>object_from_str() {
         <span class="kw">let </span>object = Asn1Object::from_str(<span class="string">&quot;2.16.840.1.101.3.4.2.1&quot;</span>).unwrap();
         <span class="macro">assert_eq!</span>(object.nid(), Nid::SHA256);
@@ -1544,6 +1811,13 @@
             object.as_slice(),
             <span class="kw-2">&amp;</span>[<span class="number">0x60</span>, <span class="number">0x86</span>, <span class="number">0x48</span>, <span class="number">0x01</span>, <span class="number">0x65</span>, <span class="number">0x03</span>, <span class="number">0x04</span>, <span class="number">0x02</span>, <span class="number">0x01</span>],
         );
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>asn1_octet_string() {
+        <span class="kw">let </span>octet_string = Asn1OctetString::new_from_bytes(<span class="string">b&quot;hello world&quot;</span>).unwrap();
+        <span class="macro">assert_eq!</span>(octet_string.as_slice(), <span class="string">b&quot;hello world&quot;</span>);
+        <span class="macro">assert_eq!</span>(octet_string.len(), <span class="number">11</span>);
     }
 }
 </code></pre></div></section></main></body></html>
