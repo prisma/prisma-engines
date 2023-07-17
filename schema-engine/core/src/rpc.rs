@@ -35,7 +35,7 @@ async fn run_command(
         DIAGNOSE_MIGRATION_HISTORY => render(executor.diagnose_migration_history(params.parse()?).await),
         ENSURE_CONNECTION_VALIDITY => render(executor.ensure_connection_validity(params.parse()?).await),
         EVALUATE_DATA_LOSS => render(executor.evaluate_data_loss(params.parse()?).await),
-        GET_DATABASE_VERSION => render(executor.version().await),
+        GET_DATABASE_VERSION => render(executor.version(params.parse()?).await),
         INTROSPECT => render(executor.introspect(params.parse()?).await),
         LIST_MIGRATION_DIRECTORIES => render(executor.list_migration_directories(params.parse()?).await),
         MARK_MIGRATION_APPLIED => render(executor.mark_migration_applied(params.parse()?).await),

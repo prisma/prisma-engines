@@ -298,7 +298,7 @@ fn tls_errors_must_be_mapped_in_the_cli(api: TestApi) {
 }
 
 #[test_connector(tags(Postgres))]
-fn basic_jsonrpc_roundtrip_works(_api: TestApi) {
+fn basic_jsonrpc_roundtrip_works_with_no_params(_api: TestApi) {
     let tmpdir = tempfile::tempdir().unwrap();
     let tmpfile = tmpdir.path().join("datamodel");
 
@@ -322,7 +322,7 @@ fn basic_jsonrpc_roundtrip_works(_api: TestApi) {
         for _ in 0..2 {
             writeln!(
                 stdin,
-                r#"{{ "jsonrpc": "2.0", "method": "getDatabaseVersion", "params": {{ }}, "id": 1 }}"#,
+                r#"{{ "jsonrpc": "2.0", "method": "getDatabaseVersion", "id": 1 }}"#,
             )
             .unwrap();
 
@@ -330,6 +330,49 @@ fn basic_jsonrpc_roundtrip_works(_api: TestApi) {
             stdout.read_line(&mut response).unwrap();
 
             assert!(response.contains("PostgreSQL") || response.contains("CockroachDB"));
+        }
+    });
+}
+
+#[test_connector(tags(Postgres))]
+fn basic_jsonrpc_roundtrip_works_with_params(_api: TestApi) {
+    let tmpdir = tempfile::tempdir().unwrap();
+    let tmpfile = tmpdir.path().join("datamodel");
+
+    let datamodel = r#"
+        datasource db {
+            provider = "postgres"
+            url = env("TEST_DATABASE_URL")
+        }
+    "#;
+
+    fs::create_dir_all(&tmpdir).unwrap();
+    fs::write(&tmpfile, datamodel).unwrap();
+
+    let command = Command::new(schema_engine_bin_path());
+
+    let path = tmpfile.to_str().unwrap();
+    let schema_path_params = format!(r#"{{ "datasource": {{ "tag": "SchemaPath", "path": "{path}" }} }}"#);
+
+    let url = std::env::var("TEST_DATABASE_URL").unwrap();
+    let connection_string_params = format!(r#"{{ "datasource": {{ "tag": "ConnectionString", "url": "{url}" }} }}"#);
+
+    with_child_process(command, |process| {
+        let stdin = process.stdin.as_mut().unwrap();
+        let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
+
+        for _ in 0..2 {
+            for params in [&schema_path_params, &connection_string_params] {
+                let params_template =
+                    format!(r#"{{ "jsonrpc": "2.0", "method": "getDatabaseVersion", "params": {params}, "id": 1 }}"#);
+
+                writeln!(stdin, "{}", &params_template).unwrap();
+
+                let mut response = String::new();
+                stdout.read_line(&mut response).unwrap();
+
+                assert!(response.contains("PostgreSQL") || response.contains("CockroachDB"));
+            }
         }
     });
 }

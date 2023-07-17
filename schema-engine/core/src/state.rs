@@ -183,9 +183,13 @@ impl EngineState {
 
 #[async_trait::async_trait]
 impl GenericApi for EngineState {
-    async fn version(&self) -> CoreResult<String> {
-        self.with_default_connector(Box::new(|connector| connector.version()))
-            .await
+    async fn version(&self, params: Option<GetDatabaseVersionInput>) -> CoreResult<String> {
+        let f: ConnectorRequest<String> = Box::new(|connector| connector.version());
+
+        match params {
+            Some(params) => self.with_connector_from_datasource_param(&params.datasource, f).await,
+            None => self.with_default_connector(f).await,
+        }
     }
 
     async fn apply_migrations(&self, input: ApplyMigrationsInput) -> CoreResult<ApplyMigrationsOutput> {
