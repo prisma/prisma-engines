@@ -269,6 +269,11 @@
 <a href="#269" id="269">269</a>
 <a href="#270" id="270">270</a>
 <a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::GQLResponse;
 <span class="kw">use crate</span>::{GQLError, PrismaResponse, RequestBody};
 <span class="kw">use </span>futures::FutureExt;
@@ -507,6 +512,7 @@
     /// - DateTime/String: User-input: DateTime / Response: String
     /// - Int/BigInt: User-input: Int / Response: BigInt
     /// - (JSON protocol only) Custom types (eg: { &quot;$type&quot;: &quot;BigInt&quot;, value: &quot;1&quot; }): User-input: Scalar / Response: Object
+    /// - (JSON protocol only) String/Enum: User-input: String / Response: Enum
     /// This should likely _not_ be used outside of this specific context.
     </span><span class="kw">fn </span>compare_values(left: <span class="kw-2">&amp;</span>ArgumentValue, right: <span class="kw-2">&amp;</span>ArgumentValue) -&gt; bool {
         <span class="kw">match </span>(left, right) {
@@ -519,6 +525,10 @@
             (ArgumentValue::Scalar(PrismaValue::Int(i1)), ArgumentValue::Scalar(PrismaValue::BigInt(i2)))
             | (ArgumentValue::Scalar(PrismaValue::BigInt(i2)), ArgumentValue::Scalar(PrismaValue::Int(i1))) =&gt; {
                 <span class="kw-2">*</span>i1 == <span class="kw-2">*</span>i2
+            }
+            (ArgumentValue::Scalar(PrismaValue::Enum(s1)), ArgumentValue::Scalar(PrismaValue::String(s2)))
+            | (ArgumentValue::Scalar(PrismaValue::String(s1)), ArgumentValue::Scalar(PrismaValue::Enum(s2))) =&gt; {
+                <span class="kw-2">*</span>s1 == <span class="kw-2">*</span>s2
             }
             (ArgumentValue::Object(t1), t2) | (t2, ArgumentValue::Object(t1)) =&gt; <span class="kw">match </span><span class="self">Self</span>::unwrap_value(t1) {
                 <span class="prelude-val">Some</span>(t1) =&gt; <span class="self">Self</span>::compare_values(t1, t2),
