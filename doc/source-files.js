@@ -33,7 +33,6 @@ var sourcesIndex = JSON.parse('{\
 "colored":["",[],["color.rs","control.rs","lib.rs","style.rs"]],\
 "combine":["",[["parser",[],["byte.rs","char.rs","choice.rs","combinator.rs","error.rs","function.rs","item.rs","mod.rs","range.rs","repeat.rs","sequence.rs"]],["stream",[],["buffered.rs","easy.rs","mod.rs","state.rs"]]],["error.rs","lib.rs"]],\
 "connection_string":["",[],["ado.rs","error.rs","jdbc.rs","lib.rs","utils.rs"]],\
-"context":["",[],["lib.rs"]],\
 "convert_case":["",[],["case.rs","converter.rs","lib.rs","pattern.rs","segmentation.rs"]],\
 "core_tests":["",[],["lib.rs"]],\
 "cpufeatures":["",[],["lib.rs","x86.rs"]],\
