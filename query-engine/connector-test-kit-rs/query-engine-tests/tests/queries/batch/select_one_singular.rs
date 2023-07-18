@@ -308,6 +308,46 @@ mod singular_batch {
         Ok(())
     }
 
+    fn enum_id() -> String {
+        let schema = indoc! {
+            r#"
+            enum IdEnum {
+                A
+                B
+            }
+
+            model TestModel {
+                #id(id, IdEnum, @id)
+            }
+            "#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(enum_id), capabilities(Enums))]
+    async fn batch_enum(runner: Runner) -> TestResult<()> {
+        run_query!(&runner, r#"mutation { createOneTestModel(data: { id: "A" }) { id } }"#);
+        run_query!(&runner, r#"mutation { createOneTestModel(data: { id: "B" }) { id } }"#);
+
+        let (res, compact_doc) = compact_batch(
+            &runner,
+            vec![
+                r#"{ findUniqueTestModel(where: { id: "A" }) { id } }"#.to_string(),
+                r#"{ findUniqueTestModel(where: { id: "B" }) { id } }"#.to_string(),
+            ],
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+          res.to_string(),
+          @r###"{"batchResult":[{"data":{"findUniqueTestModel":{"id":"A"}}},{"data":{"findUniqueTestModel":{"id":"B"}}}]}"###
+        );
+        assert!(compact_doc.is_compact());
+
+        Ok(())
+    }
+
     // Regression test for https://github.com/prisma/prisma/issues/16548
     #[connector_test(schema(schemas::generic))]
     async fn repro_16548(runner: Runner) -> TestResult<()> {
