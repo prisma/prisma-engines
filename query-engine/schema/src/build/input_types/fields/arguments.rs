@@ -67,9 +67,7 @@ pub(crate) fn many_records_output_field_arguments(ctx: &QuerySchema, field: Mode
         ModelField::Relation(rf) if rf.is_list() => relation_to_many_selection_arguments(ctx, rf.related_model(), true),
 
         // To-one optional relation.
-        ModelField::Relation(rf) if !rf.is_required() && ctx.has_feature(PreviewFeature::ExtendedWhereUnique) => {
-            relation_to_one_selection_arguments(ctx, rf.related_model())
-        }
+        ModelField::Relation(rf) if !rf.is_required() => relation_to_one_selection_arguments(ctx, rf.related_model()),
 
         // To-one required relation.
         ModelField::Relation(_) => vec![],

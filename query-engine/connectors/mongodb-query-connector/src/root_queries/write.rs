@@ -27,7 +27,7 @@ pub async fn create_record<'conn>(
     session: &mut ClientSession,
     model: &Model,
     mut args: WriteArgs,
-) -> crate::Result<SelectionResult> {
+) -> crate::Result<SingleRecord> {
     let coll = database.collection::<Document>(model.db_name());
 
     let span = info_span!(
@@ -72,7 +72,10 @@ pub async fn create_record<'conn>(
     .await?;
     let id_value = value_from_bson(insert_result.inserted_id, &id_meta)?;
 
-    Ok(SelectionResult::from((id_field, id_value)))
+    Ok(SingleRecord {
+        record: Record::new(vec![id_value]),
+        field_names: vec![id_field.db_name().to_owned()],
+    })
 }
 
 pub async fn create_records<'conn>(

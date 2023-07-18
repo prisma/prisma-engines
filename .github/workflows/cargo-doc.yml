@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v21
+      - uses: cachix/install-nix-action@v22
       - run: |
           git config user.email "prismabots@gmail.com"
           git config user.name "prisma-bot"

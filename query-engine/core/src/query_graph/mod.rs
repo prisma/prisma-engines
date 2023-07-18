@@ -18,7 +18,7 @@ use petgraph::{
     *,
 };
 use prisma_models::{FieldSelection, Model, SelectionResult};
-use std::{borrow::Borrow, collections::HashSet, fmt};
+use std::{collections::HashSet, fmt};
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
 
@@ -270,12 +270,10 @@ impl QueryGraph {
     /// Returns all root nodes of the graph.
     /// A root node is defined by having no incoming edges.
     pub fn root_nodes(&self) -> Vec<NodeRef> {
-        let graph = self.graph.borrow();
-
-        graph
+        self.graph
             .node_indices()
             .filter_map(|node_ix| {
-                if graph.edges_directed(node_ix, Direction::Incoming).next().is_some() {
+                if self.graph.edges_directed(node_ix, Direction::Incoming).next().is_some() {
                     None
                 } else {
                     Some(NodeRef { node_ix })

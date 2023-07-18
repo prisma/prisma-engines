@@ -773,9 +773,13 @@ fn dev_diagnostic_multi_schema_does_not_panic() {
     ))
     .unwrap();
 
+    let provider = test_setup::TestApiArgs::new("dev_diagnostic_multi_schema_does_not_panic", &[], &[])
+        .provider()
+        .to_owned();
+
     let schema = format! {r#"
         datasource db {{
-            provider = "postgresql"
+            provider = "{provider}"
             url = "{url}"
             schemas = ["prisma-tests", "auth"]
         }}

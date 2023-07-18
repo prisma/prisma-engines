@@ -3,3 +3,7 @@
 Cargo.lock
 .direnv/
 .vscode/
+
+docker-compose.override.yml
+db/
+!db/.gitkeep

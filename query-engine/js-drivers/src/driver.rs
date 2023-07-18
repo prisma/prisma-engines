@@ -73,6 +73,12 @@ pub struct JSResultSet {
     pub rows: Vec<Vec<serde_json::Value>>,
 }
 
+impl JSResultSet {
+    pub fn len(&self) -> usize {
+        self.rows.len()
+    }
+}
+
 #[napi]
 #[derive(Debug)]
 pub enum ColumnType {

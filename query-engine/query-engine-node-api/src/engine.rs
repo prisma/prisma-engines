@@ -153,7 +153,7 @@ impl QueryEngine {
 
         #[cfg(feature = "js-drivers")]
         if let Some(driver) = maybe_driver {
-            let queryable = js_drivers::Queryable::from(driver);
+            let queryable = js_drivers::JsQueryable::from(driver);
             sql_connector::register_driver(Arc::new(queryable));
         }
 
@@ -192,13 +192,7 @@ impl QueryEngine {
 
         let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics);
         let enable_tracing = config.preview_features().contains(PreviewFeature::Tracing);
-        let engine_protocol =
-            engine_protocol.unwrap_or_else(
-                || match config.preview_features().contains(PreviewFeature::JsonProtocol) {
-                    true => EngineProtocol::Json,
-                    false => EngineProtocol::Graphql,
-                },
-            );
+        let engine_protocol = engine_protocol.unwrap_or(EngineProtocol::Json);
 
         let builder = EngineBuilder {
             schema: Arc::new(schema),

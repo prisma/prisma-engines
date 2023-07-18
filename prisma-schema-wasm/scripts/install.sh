@@ -9,13 +9,13 @@ printf '%s\n' " -> Creating out dir..."
 mkdir -p "$out"/src
 
 printf '%s\n' " -> Copying package.json"
-cp ./prisma-fmt-wasm/package.json "$out"/
+cp ./prisma-schema-wasm/package.json "$out"/
 
 printf '%s\n' " -> Copying README.md"
-cp ./prisma-fmt-wasm/README.md "$out"/
+cp ./prisma-schema-wasm/README.md "$out"/
 
 printf '%s\n' " -> Generating node package"
 wasm-bindgen \
   --target nodejs \
   --out-dir "$out"/src \
-  target/wasm32-unknown-unknown/release/prisma_fmt_build.wasm
+  target/wasm32-unknown-unknown/release/prisma_schema_build.wasm

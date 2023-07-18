@@ -1,39 +1,39 @@
-use crate::driver::{self, Driver, Query};
+use crate::driver::{self, Driver, JSResultSet, Query};
 use async_trait::async_trait;
+use napi::JsObject;
 use quaint::{
     connector::IsolationLevel,
     prelude::{Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable},
     visitor::{self, Visitor},
     Value,
 };
-
-use napi::JsObject;
+use tracing::{info_span, Instrument};
 
 #[derive(Clone)]
-pub struct Queryable {
+pub struct JsQueryable {
     pub(crate) driver: Driver,
 }
 
-impl Queryable {
+impl JsQueryable {
     pub fn new(driver: Driver) -> Self {
         Self { driver }
     }
 }
 
-impl std::fmt::Display for Queryable {
+impl std::fmt::Display for JsQueryable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "JSQueryable(driver)")
     }
 }
 
-impl std::fmt::Debug for Queryable {
+impl std::fmt::Debug for JsQueryable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "JSQueryable(driver)")
     }
 }
 
 #[async_trait]
-impl QuaintQueryable for Queryable {
+impl QuaintQueryable for JsQueryable {
     /// Execute the given query.
     async fn query(&self, q: QuaintQuery<'_>) -> quaint::Result<ResultSet> {
         let (sql, params) = visitor::Mysql::build(q)?;
@@ -42,11 +42,8 @@ impl QuaintQueryable for Queryable {
 
     /// Execute a query given as SQL, interpolating the given parameters.
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
-        // Note: we ignore the parameters for now.
-        // Todo: convert napi::Error to quaint::error::Error.
-        let result_set = self.driver.query_raw(Query::from((sql, params))).await.unwrap();
-
-        Ok(result_set.into())
+        let span = info_span!("js:query", user_facing = true);
+        self.do_query_raw(sql, params).instrument(span).await
     }
 
     /// Execute a query given as SQL, interpolating the given parameters.
@@ -68,10 +65,8 @@ impl QuaintQueryable for Queryable {
     /// Execute a query given as SQL, interpolating the given parameters and
     /// returning the number of affected rows.
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
-        // Note: we ignore the parameters for now.
-        // Todo: convert napi::Error to quaint::error::Error.
-        let affected_rows = self.driver.execute_raw((sql, params).into()).await.unwrap();
-        Ok(affected_rows as u64)
+        let span = info_span!("js:query", user_facing = true);
+        self.do_execute_raw(sql, params).instrument(span).await
     }
 
     /// Execute a query given as SQL, interpolating the given parameters and
@@ -121,19 +116,51 @@ impl QuaintQueryable for Queryable {
     }
 }
 
-impl TransactionCapable for Queryable {}
+impl JsQueryable {
+    async fn build_query(sql: &str, values: &[quaint::Value<'_>]) -> Query {
+        let sql: String = sql.to_string();
+        let args = values.iter().map(|v| v.clone().into()).collect();
+        Query { sql, args }
+    }
 
-impl From<JsObject> for Queryable {
-    fn from(driver: JsObject) -> Self {
-        let driver = driver::reify(driver).unwrap();
-        Self { driver }
+    async fn transform_result_set(result_set: JSResultSet) -> quaint::Result<ResultSet> {
+        Ok(ResultSet::from(result_set))
+    }
+
+    async fn do_query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
+        let len = params.len();
+        let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
+        let query = Self::build_query(sql, params).instrument(serialization_span).await;
+
+        // Todo: convert napi::Error to quaint::error::Error.
+        let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);
+        let result_set = self.driver.query_raw(query).instrument(sql_span).await.unwrap();
+
+        let len = result_set.len();
+        let deserialization_span = info_span!("js:query:result", user_facing = true, "length" = %len);
+        Self::transform_result_set(result_set)
+            .instrument(deserialization_span)
+            .await
+    }
+
+    async fn do_execute_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
+        let len = params.len();
+        let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
+        let query = Self::build_query(sql, params).instrument(serialization_span).await;
+
+        // Todo: convert napi::Error to quaint::error::Error.
+        let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);
+        let affected_rows = self.driver.execute_raw(query).instrument(sql_span).await.unwrap();
+
+        Ok(affected_rows as u64)
     }
 }
 
-impl From<(&str, &[quaint::Value<'_>])> for Query {
-    fn from(value: (&str, &[quaint::Value])) -> Self {
-        let sql = value.0.to_string();
-        let args = value.1.iter().map(|v| v.clone().into()).collect();
-        Query { sql, args }
+impl TransactionCapable for JsQueryable {}
+
+impl From<JsObject> for JsQueryable {
+    fn from(driver: JsObject) -> Self {
+        let driver = driver::reify(driver).unwrap();
+        Self { driver }
     }
 }

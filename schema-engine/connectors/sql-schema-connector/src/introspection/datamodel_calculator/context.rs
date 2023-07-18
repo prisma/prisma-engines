@@ -1,11 +1,12 @@
 mod flavour;
 
 use crate::introspection::{
-    introspection_helpers::{is_new_migration_table, is_old_migration_table, is_prisma_join_table, is_relay_table},
+    introspection_helpers::{
+        is_new_migration_table, is_old_migration_table, is_prisma_m_to_n_relation, is_relay_table,
+    },
     introspection_map::{IntrospectionMap, RelationName},
     introspection_pair::{EnumPair, ModelPair, RelationFieldDirection, ViewPair},
     sanitize_datamodel_names::{EnumVariantName, IntrospectedName, ModelName},
-    version_checker,
 };
 use psl::{
     builtin_connectors::*,
@@ -14,7 +15,7 @@ use psl::{
     Configuration, PreviewFeature,
 };
 use quaint::prelude::SqlFamily;
-use schema_connector::{IntrospectionContext, Version};
+use schema_connector::IntrospectionContext;
 use sql_schema_describer as sql;
 use std::borrow::Cow;
 
@@ -25,7 +26,6 @@ pub(crate) struct DatamodelCalculatorContext<'a> {
     pub(crate) render_config: bool,
     pub(crate) sql_schema: &'a sql::SqlSchema,
     pub(crate) sql_family: SqlFamily,
-    pub(crate) version: Version,
     pub(crate) previous_schema: &'a psl::ValidatedSchema,
     pub(crate) introspection_map: IntrospectionMap<'a>,
     pub(crate) force_namespaces: Option<&'a [String]>,
@@ -43,7 +43,6 @@ impl<'a> DatamodelCalculatorContext<'a> {
         };
 
         let mut ctx = DatamodelCalculatorContext {
-            version: Version::NonPrisma,
             config: ctx.configuration(),
             render_config: ctx.render_config,
             sql_schema,
@@ -56,7 +55,6 @@ impl<'a> DatamodelCalculatorContext<'a> {
         };
 
         ctx.introspection_map = IntrospectionMap::new(&ctx);
-        ctx.version = version_checker::check_prisma_version(&ctx);
 
         ctx
     }
@@ -110,7 +108,7 @@ impl<'a> DatamodelCalculatorContext<'a> {
             .table_walkers()
             .filter(|table| !is_old_migration_table(*table))
             .filter(|table| !is_new_migration_table(*table))
-            .filter(|table| !is_prisma_join_table(*table))
+            .filter(|table| !is_prisma_m_to_n_relation(*table))
             .filter(|table| !is_relay_table(*table))
             .map(move |next| {
                 let previous = self.existing_model(next.id);

@@ -75,6 +75,12 @@ impl ConnectorError {
         self.0.user_facing_error.as_ref().map(|err| err.error_code.as_ref())
     }
 
+    /// The error message. Unlike the [`Display`] implementation, this does not include the source
+    /// and context.
+    pub fn message(&self) -> Option<&str> {
+        self.0.message.as_deref()
+    }
+
     /// Build a generic unknown error from just an error message.
     pub fn from_msg(msg: String) -> Self {
         ConnectorError(Box::new(ConnectorErrorImpl {

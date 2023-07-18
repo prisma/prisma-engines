@@ -6,7 +6,7 @@ pub(crate) use context::DatamodelCalculatorContext;
 
 use crate::introspection::{rendering, warnings};
 use psl::PreviewFeature;
-use schema_connector::{IntrospectionContext, IntrospectionResult, Version};
+use schema_connector::{IntrospectionContext, IntrospectionResult};
 use sql_schema_describer as sql;
 
 /// Calculate a data model from a database schema.
@@ -17,12 +17,6 @@ pub fn calculate(schema: &sql::SqlSchema, ctx: &IntrospectionContext, search_pat
     let warnings = warnings::generate(&ctx);
 
     let empty_warnings = warnings.is_empty();
-
-    let version = if !empty_warnings && !warnings.uses_prisma_1_defaults() {
-        Version::NonPrisma
-    } else {
-        ctx.version
-    };
 
     let views = if ctx.config.preview_features().contains(PreviewFeature::Views) {
         Some(views)
@@ -39,7 +33,6 @@ pub fn calculate(schema: &sql::SqlSchema, ctx: &IntrospectionContext, search_pat
     IntrospectionResult {
         data_model: schema_string,
         is_empty,
-        version,
         warnings,
         views,
     }

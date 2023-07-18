@@ -49,7 +49,7 @@ in
     installPhase = ''
       mkdir -p $out/bin $out/lib
       cp target/release/query-engine $out/bin/
-      cp target/release/migration-engine $out/bin/
+      cp target/release/schema-engine $out/bin/
       cp target/release/prisma-fmt $out/bin/
       cp target/release/libquery_engine${libSuffix} $out/lib/libquery_engine.node
     '';

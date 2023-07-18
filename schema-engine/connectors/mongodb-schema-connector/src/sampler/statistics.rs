@@ -569,7 +569,7 @@ impl<'a> Statistics<'a> {
 
     /// Track a collection as prisma model.
     pub(super) fn track_model(&mut self, model: &str, collection: CollectionWalker<'a>) {
-        let mut model = self.models.entry(Name::Model(model.to_string())).or_default();
+        let model = self.models.entry(Name::Model(model.to_string())).or_default();
         model.collection_walker = Some(collection);
     }
 

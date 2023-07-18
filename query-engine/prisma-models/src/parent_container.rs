@@ -48,7 +48,6 @@ impl ParentContainer {
     pub fn find_field(&self, prisma_name: &str) -> Option<Field> {
         match self {
             ParentContainer::Model(model) => model.fields().find_from_all(prisma_name).ok(),
-
             ParentContainer::CompositeType(ct) => ct.fields().find(|field| field.name() == prisma_name),
         }
     }

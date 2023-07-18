@@ -9,7 +9,7 @@ use crate::{
     IntrospectionResult, Migration, MigrationPersistence, Namespaces,
 };
 
-/// The top-level trait for connectors. This is the abstraction the migration engine core relies on to
+/// The top-level trait for connectors. This is the abstraction the schema engine core relies on to
 /// interface with different database backends.
 pub trait SchemaConnector: Send + Sync + 'static {
     // Setup methods

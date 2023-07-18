@@ -156,5 +156,3 @@ enum team_status {
 }
 
 
-// introspectionSchemaVersion: NonPrisma 
-

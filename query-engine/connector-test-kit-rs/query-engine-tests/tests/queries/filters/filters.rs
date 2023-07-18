@@ -146,16 +146,6 @@ mod filter_spec {
           @r###"{"data":{"findManyUser":[{"unique":1},{"unique":2}]}}"###
         );
 
-        insta::assert_snapshot!(
-          &user_uniques(&runner, r#"(where: { name: { in: "Bernd" }})"#).await?,
-          @r###"{"data":{"findManyUser":[{"unique":2}]}}"###
-        );
-
-        insta::assert_snapshot!(
-          &user_uniques(&runner, r#"(where: { NOT: { name: { in: "Bernd" } }})"#).await?,
-          @r###"{"data":{"findManyUser":[{"unique":1},{"unique":3},{"unique":4}]}}"###
-        );
-
         Ok(())
     }
 
@@ -166,17 +156,6 @@ mod filter_spec {
         insta::assert_snapshot!(
           &user_uniques(&runner, r#"(where: { name: { notIn: ["Bernd", "Paul"] }})"#).await?,
           @r###"{"data":{"findManyUser":[{"unique":3},{"unique":4}]}}"###
-        );
-
-        insta::assert_snapshot!(
-          &user_uniques(&runner, r#"(where: { name: { notIn: "Bernd" }})"#).await?,
-          @r###"{"data":{"findManyUser":[{"unique":1},{"unique":3},{"unique":4}]}}"###
-        );
-
-        // NOT notIn == in
-        insta::assert_snapshot!(
-          &user_uniques(&runner, r#"(where: { NOT: { name: { notIn: "Bernd" }}})"#).await?,
-          @r###"{"data":{"findManyUser":[{"unique":2}]}}"###
         );
 
         Ok(())

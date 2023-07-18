@@ -165,11 +165,20 @@ where
         &mut self,
         model: &Model,
         args: WriteArgs,
+        selected_fields: FieldSelection,
         trace_id: Option<String>,
-    ) -> connector::Result<SelectionResult> {
+    ) -> connector::Result<SingleRecord> {
         catch(self.connection_info.clone(), async move {
             let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            write::create_record(&self.inner, &self.connection_info.sql_family(), model, args, &ctx).await
+            write::create_record(
+                &self.inner,
+                &self.connection_info.sql_family(),
+                model,
+                args,
+                selected_fields,
+                &ctx,
+            )
+            .await
         })
         .await
     }

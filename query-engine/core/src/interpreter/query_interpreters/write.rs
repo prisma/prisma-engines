@@ -43,9 +43,16 @@ async fn create_one(
     q: CreateRecord,
     trace_id: Option<String>,
 ) -> InterpretationResult<QueryResult> {
-    let res = tx.create_record(&q.model, q.args, trace_id).await?;
+    let res = tx.create_record(&q.model, q.args, q.selected_fields, trace_id).await?;
 
-    Ok(QueryResult::Id(Some(res)))
+    Ok(QueryResult::RecordSelection(Box::new(RecordSelection {
+        name: q.name,
+        fields: q.selection_order,
+        aggregation_rows: None,
+        model: q.model,
+        scalars: res.into(),
+        nested: vec![],
+    })))
 }
 
 async fn create_many(

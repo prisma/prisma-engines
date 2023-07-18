@@ -37,7 +37,7 @@ impl SqlSchemaConnector {
     /// Initialize a PostgreSQL migration connector.
     pub fn new_postgres() -> Self {
         SqlSchemaConnector {
-            flavour: Box::<PostgresFlavour>::default(),
+            flavour: Box::new(PostgresFlavour::new_postgres()),
             host: Arc::new(EmptyHost),
         }
     }
@@ -46,6 +46,17 @@ impl SqlSchemaConnector {
     pub fn new_cockroach() -> Self {
         SqlSchemaConnector {
             flavour: Box::new(PostgresFlavour::new_cockroach()),
+            host: Arc::new(EmptyHost),
+        }
+    }
+
+    /// Initialize a PostgreSQL-like schema connector.
+    ///
+    /// Use [`Self::new_postgres()`] or [`Self::new_cockroach()`] instead when the provider is
+    /// explicitly specified by user or already known otherwise.
+    pub fn new_postgres_like() -> Self {
+        SqlSchemaConnector {
+            flavour: Box::<PostgresFlavour>::default(),
             host: Arc::new(EmptyHost),
         }
     }

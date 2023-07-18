@@ -1,6 +1,6 @@
-name: Build and publish @prisma/prisma-fmt-wasm
+name: Build and publish @prisma/prisma-schema-wasm
 
-concurrency: build-prisma-fmt-wasm
+concurrency: build-prisma-schema-wasm
 
 on:
   # usually triggered via GH Actions Workflow in prisma/engines-wrapper repo
@@ -12,29 +12,29 @@ on:
         required: true
       npmDistTag:
         required: true
-        default: 'latest'
+        default: "latest"
 
 jobs:
   build:
-    name: Build and publish @prisma/prisma-fmt-wasm
+    name: Build and publish @prisma/prisma-schema-wasm
     runs-on: ubuntu-latest
     steps:
       - name: Print input
         env:
-          THE_INPUT: '${{ toJson(github.event.inputs) }}'
+          THE_INPUT: "${{ toJson(github.event.inputs) }}"
         run: |
           echo $THE_INPUT
 
       - uses: actions/checkout@v3
         with:
           ref: ${{ github.event.inputs.enginesHash }}
-      - uses: cachix/install-nix-action@v21
+      - uses: cachix/install-nix-action@v22
 
       #
       # Build
       #
 
-      - run: nix build .#prisma-fmt-wasm
+      - run: nix build .#prisma-schema-wasm
 
       #
       # Publish
@@ -42,13 +42,13 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: '14.x'
+          node-version: "14.x"
 
       - name: Set up NPM token
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
       - run: |
-          PACKAGE_DIR=$( nix run .#renderPrismaFmtWasmPackage ${{ github.event.inputs.enginesWrapperVersion }})
+          PACKAGE_DIR=$( nix run .#renderPrismaSchemaWasmPackage ${{ github.event.inputs.enginesWrapperVersion }})
           npm publish "$PACKAGE_DIR" --access public --tag ${{ github.event.inputs.npmDistTag }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -65,6 +65,6 @@ jobs:
         if: ${{ failure() }}
         uses: rtCamp/action-slack-notify@v2.2.0
         env:
-          SLACK_TITLE: 'prisma-fmt-wasm publishing failed :x:'
-          SLACK_COLOR: '#FF0000'
+          SLACK_TITLE: "prisma-schema-wasm publishing failed :x:"
+          SLACK_COLOR: "#FF0000"
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_WASM_FAILING }}
