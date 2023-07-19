@@ -1,4 +1,4 @@
-use crate::driver::{self, Driver, JSResultSet, Query};
+use crate::proxy::{self, JSResultSet, Proxy, Query};
 use async_trait::async_trait;
 use napi::JsObject;
 use quaint::{
@@ -9,14 +9,28 @@ use quaint::{
 };
 use tracing::{info_span, Instrument};
 
+/// A JsQueryable adapts a Proxy to implement the Quaint interface. It has the responsibility
+/// of transforming inputs and outputs of `query` and `execute` from quaint types to types that
+/// can be translated into javascript and viceversa. This is to let the rest of the query engine
+/// work transparently as if it was using quaint itself. In particular the transformations are:
+///
+/// Transforming a `quaint::ast::Query` into SQL by visiting it for the specific flavor of SQL
+/// expected by the client connector. (eg. using the mysql visitor for the Planetscale client
+/// connector)
+///
+/// Transforming a `JSResultSet` (what client connectors implemented in javascript provide)
+/// into a `quaint::connector::result_set::ResultSet`. A quaint `ResultSet` is basically a vector
+/// of `quaint::Value` but said type is a tagged enum, with non-unit variants that cannot be converted to javascript as is.
+///
+///
 #[derive(Clone)]
 pub struct JsQueryable {
-    pub(crate) driver: Driver,
+    pub(crate) proxy: Proxy,
 }
 
 impl JsQueryable {
-    pub fn new(driver: Driver) -> Self {
-        Self { driver }
+    pub fn new(proxy: Proxy) -> Self {
+        Self { proxy }
     }
 }
 
@@ -94,7 +108,7 @@ impl QuaintQueryable for JsQueryable {
     /// parsing or normalization.
     async fn version(&self) -> quaint::Result<Option<String>> {
         // Todo: convert napi::Error to quaint::error::Error.
-        let version = self.driver.version().await.unwrap();
+        let version = self.proxy.version().await.unwrap();
         Ok(version)
     }
 
@@ -134,7 +148,7 @@ impl JsQueryable {
 
         // Todo: convert napi::Error to quaint::error::Error.
         let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);
-        let result_set = self.driver.query_raw(query).instrument(sql_span).await.unwrap();
+        let result_set = self.proxy.query_raw(query).instrument(sql_span).await.unwrap();
 
         let len = result_set.len();
         let deserialization_span = info_span!("js:query:result", user_facing = true, "length" = %len);
@@ -150,7 +164,7 @@ impl JsQueryable {
 
         // Todo: convert napi::Error to quaint::error::Error.
         let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);
-        let affected_rows = self.driver.execute_raw(query).instrument(sql_span).await.unwrap();
+        let affected_rows = self.proxy.execute_raw(query).instrument(sql_span).await.unwrap();
 
         Ok(affected_rows as u64)
     }
@@ -160,7 +174,7 @@ impl TransactionCapable for JsQueryable {}
 
 impl From<JsObject> for JsQueryable {
     fn from(driver: JsObject) -> Self {
-        let driver = driver::reify(driver).unwrap();
-        Self { driver }
+        let driver = proxy::reify(driver).unwrap();
+        Self { proxy: driver }
     }
 }

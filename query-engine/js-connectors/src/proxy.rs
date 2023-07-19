@@ -7,11 +7,11 @@ use napi_derive::napi;
 use quaint::connector::ResultSet as QuaintResultSet;
 use quaint::Value as QuaintValue;
 
-// Note: Every ThreadsafeFunction<T, ?> should have an explicit `ErrorStrategy::Fatal` set, as to avoid
-// "TypeError [ERR_INVALID_ARG_TYPE]: The first argument must be of type string or an instance of Buffer, ArrayBuffer, or Array or an Array-like Object. Received null".
-// See: https://github.com/napi-rs/napi-rs/issues/1521.
+/// Proxy is a struct wrapping a javascript object that exhibits basic primitives for
+/// querying and executing SQL (i.e. a client connector). The Proxy uses NAPI ThreadSafeFunction to
+/// invoke the code within the node runtime that implements the client connector.
 #[derive(Clone)]
-pub struct Driver {
+pub struct Proxy {
     /// Execute a query given as SQL, interpolating the given parameters.
     query_raw: ThreadsafeFunction<Query, ErrorStrategy::Fatal>,
 
@@ -32,15 +32,15 @@ pub struct Driver {
     is_healthy: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
 }
 
-// Reify creates a rust representation of the JS driver
-pub fn reify(js_driver: JsObject) -> napi::Result<Driver> {
+/// Reify creates a Rust proxy to access the JS driver passed in as a parameter.
+pub fn reify(js_driver: JsObject) -> napi::Result<Proxy> {
     let query_raw = js_driver.get_named_property("queryRaw")?;
     let execute_raw = js_driver.get_named_property("executeRaw")?;
     let version = js_driver.get_named_property("version")?;
     let close = js_driver.get_named_property("close")?;
     let is_healthy = js_driver.get_named_property("isHealthy")?;
 
-    let driver = Driver {
+    let driver = Proxy {
         query_raw,
         execute_raw,
         version,
@@ -50,20 +50,20 @@ pub fn reify(js_driver: JsObject) -> napi::Result<Driver> {
     Ok(driver)
 }
 
-// This result set is more convenient to be manipulated from both Rust and NodeJS.
-// Quaint's version of  ResultSet is:
-//
-// pub struct ResultSet {
-//     pub(crate) columns: Arc<Vec<String>>,
-//     pub(crate) rows: Vec<Vec<Value<'static>>>,
-//     pub(crate) last_insert_id: Option<u64>,
-// }
-//
-// If we used this ResultSet would we would have worse ergonomics as quaint::Value is a structured
-// enum and cannot be used directly with the #[napi(Object)] macro. Thus requiring us to implement
-// the FromNapiValue and ToNapiValue traits for quaint::Value, and use a different custom type
-// representing the Value in javascript.
-//
+/// This result set is more convenient to be manipulated from both Rust and NodeJS.
+/// Quaint's version of ResultSet is:
+///
+/// pub struct ResultSet {
+///     pub(crate) columns: Arc<Vec<String>>,
+///     pub(crate) rows: Vec<Vec<Value<'static>>>,
+///     pub(crate) last_insert_id: Option<u64>,
+/// }
+///
+/// If we used this ResultSet would we would have worse ergonomics as quaint::Value is a structured
+/// enum and cannot be used directly with the #[napi(Object)] macro. Thus requiring us to implement
+/// the FromNapiValue and ToNapiValue traits for quaint::Value, and use a different custom type
+/// representing the Value in javascript.
+///
 #[napi(object)]
 #[derive(Debug)]
 pub struct JSResultSet {
@@ -142,7 +142,7 @@ impl From<JSResultSet> for QuaintResultSet {
     }
 }
 
-impl Driver {
+impl Proxy {
     pub async fn query_raw(&self, params: Query) -> napi::Result<JSResultSet> {
         let promise = self.query_raw.call_async::<JsPromise<JSResultSet>>(params).await?;
         let value = promise.await?;

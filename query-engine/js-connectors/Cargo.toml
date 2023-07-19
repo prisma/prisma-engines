@@ -1,5 +1,5 @@
 [package]
-name = "js-drivers"
+name = "js-connectors"
 version = "0.1.0"
 edition = "2021"
 

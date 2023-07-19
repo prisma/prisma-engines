@@ -151,9 +151,9 @@ impl QueryEngine {
         let log_callback = LogCallback::new(napi_env, callback)?;
         log_callback.unref(&napi_env)?;
 
-        #[cfg(feature = "js-drivers")]
+        #[cfg(feature = "js-connectors")]
         if let Some(driver) = maybe_driver {
-            let queryable = js_drivers::JsQueryable::from(driver);
+            let queryable = js_connectors::JsQueryable::from(driver);
             sql_connector::register_driver(Arc::new(queryable));
         }
 
