@@ -24,7 +24,9 @@ pub use self::{
     relation_mode::RelationMode,
 };
 
-use crate::{configuration::DatasourceConnectorData, Configuration, Datasource, PreviewFeature};
+use crate::{
+    configuration::DatasourceConnectorData, js_connector::JsConnector, Configuration, Datasource, PreviewFeature,
+};
 use diagnostics::{DatamodelError, Diagnostics, NativeTypeErrorFactory, Span};
 use enumflags2::BitFlags;
 use lsp_types::CompletionList;
@@ -41,6 +43,11 @@ pub const EXTENSIONS_KEY: &str = "extensions";
 
 /// The datamodel connector API.
 pub trait Connector: Send + Sync {
+    // Provides safe downcasting to a JsConnector, in case it is one.
+    fn as_js_connector(&self) -> Option<JsConnector> {
+        None
+    }
+
     /// The name of the provider, for string comparisons determining which connector we are on.
     fn provider_name(&self) -> &'static str;
 
