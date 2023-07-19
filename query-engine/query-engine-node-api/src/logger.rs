@@ -50,6 +50,8 @@ impl Logger {
         let log_callback_arc = Arc::new(log_callback);
         let is_user_trace = filter_fn(telemetry::helpers::user_facing_span_only_filter);
         let tracer = crate::tracer::new_pipeline().install_simple(Arc::clone(&log_callback_arc));
+
+        #[cfg(not(target_arch = "wasm32"))]
         let telemetry = if enable_tracing {
             let telemetry = tracing_opentelemetry::layer()
                 .with_tracer(tracer)
@@ -59,14 +61,21 @@ impl Logger {
             None
         };
 
+        #[cfg(target_arch = "wasm32")]
+        let telemetry = None;
+
         let layer = CallbackLayer::new(log_callback_arc).with_filter(filters);
 
+        #[cfg(not(target_arch = "wasm32"))]
         let metrics = if enable_metrics {
             query_engine_metrics::setup();
             Some(MetricRegistry::new())
         } else {
             None
         };
+
+        #[cfg(target_arch = "wasm32")]
+        let metrics = None;
 
         Self {
             dispatcher: Dispatch::new(Registry::default().with(telemetry).with(layer).with(metrics.clone())),
