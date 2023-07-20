@@ -7,13 +7,13 @@ use quaint::{
     Value,
 };
 
-#[cfg(feature = "js-drivers")]
+#[cfg(feature = "js-connectors")]
 type QueryableRef = std::sync::Arc<dyn Queryable>;
 
 pub enum RuntimePool {
     Rust(Quaint),
 
-    #[cfg(feature = "js-drivers")]
+    #[cfg(feature = "js-connectors")]
     Js(QueryableRef),
 }
 
@@ -22,7 +22,7 @@ impl RuntimePool {
         match self {
             Self::Rust(_) => false,
 
-            #[cfg(feature = "js-drivers")]
+            #[cfg(feature = "js-connectors")]
             Self::Js(_) => true,
         }
     }
@@ -34,7 +34,7 @@ impl RuntimePool {
                 let conn: PooledConnection = pool.check_out().await.map_err(SqlError::from)?;
                 Ok(RuntimeConnection::Rust(conn))
             }
-            #[cfg(feature = "js-drivers")]
+            #[cfg(feature = "js-connectors")]
             Self::Js(queryable) => Ok(RuntimeConnection::Js(queryable.clone())),
         }
     }
@@ -43,7 +43,7 @@ impl RuntimePool {
 pub enum RuntimeConnection {
     Rust(PooledConnection),
 
-    #[cfg(feature = "js-drivers")]
+    #[cfg(feature = "js-connectors")]
     Js(QueryableRef),
 }
 
@@ -53,7 +53,7 @@ impl Queryable for RuntimeConnection {
         match self {
             Self::Rust(conn) => conn.query(q).await,
 
-            #[cfg(feature = "js-drivers")]
+            #[cfg(feature = "js-connectors")]
             Self::Js(conn) => conn.query(q).await,
         }
     }
@@ -62,7 +62,7 @@ impl Queryable for RuntimeConnection {
         match self {
             Self::Rust(conn) => conn.query_raw(sql, params).await,
 
-            #[cfg(feature = "js-drivers")]
+            #[cfg(feature = "js-connectors")]
             Self::Js(conn) => conn.query_raw(sql, params).await,
         }
     }
@@ -71,7 +71,7 @@ impl Queryable for RuntimeConnection {
         match self {
             Self::Rust(conn) => conn.query_raw_typed(sql, params).await,
 
-            #[cfg(feature = "js-drivers")]
+            #[cfg(feature = "js-connectors")]
             Self::Js(conn) => conn.query_raw_typed(sql, params).await,
         }
     }
@@ -80,7 +80,7 @@ impl Queryable for RuntimeConnection {
         match self {
             Self::Rust(conn) => conn.execute(q).await,
 
-            #[cfg(feature = "js-drivers")]
+            #[cfg(feature = "js-connectors")]
             Self::Js(conn) => conn.execute(q).await,
         }
     }
@@ -89,7 +89,7 @@ impl Queryable for RuntimeConnection {
         match self {
             Self::Rust(conn) => conn.execute_raw(sql, params).await,
 
-            #[cfg(feature = "js-drivers")]
+            #[cfg(feature = "js-connectors")]
             Self::Js(conn) => conn.execute_raw(sql, params).await,
         }
     }
@@ -98,7 +98,7 @@ impl Queryable for RuntimeConnection {
         match self {
             Self::Rust(conn) => conn.execute_raw_typed(sql, params).await,
 
-            #[cfg(feature = "js-drivers")]
+            #[cfg(feature = "js-connectors")]
             Self::Js(conn) => conn.execute_raw_typed(sql, params).await,
         }
     }
@@ -109,7 +109,7 @@ impl Queryable for RuntimeConnection {
         match self {
             Self::Rust(conn) => conn.raw_cmd(cmd).await,
 
-            #[cfg(feature = "js-drivers")]
+            #[cfg(feature = "js-connectors")]
             Self::Js(conn) => conn.raw_cmd(cmd).await,
         }
     }
@@ -118,7 +118,7 @@ impl Queryable for RuntimeConnection {
         match self {
             Self::Rust(conn) => conn.version().await,
 
-            #[cfg(feature = "js-drivers")]
+            #[cfg(feature = "js-connectors")]
             Self::Js(conn) => conn.version().await,
         }
     }
@@ -127,7 +127,7 @@ impl Queryable for RuntimeConnection {
         match self {
             Self::Rust(conn) => conn.is_healthy(),
 
-            #[cfg(feature = "js-drivers")]
+            #[cfg(feature = "js-connectors")]
             Self::Js(conn) => conn.is_healthy(),
         }
     }
@@ -138,7 +138,7 @@ impl Queryable for RuntimeConnection {
         match self {
             Self::Rust(conn) => conn.set_tx_isolation_level(isolation_level).await,
 
-            #[cfg(feature = "js-drivers")]
+            #[cfg(feature = "js-connectors")]
             Self::Js(conn) => conn.set_tx_isolation_level(isolation_level).await,
         }
     }
@@ -148,7 +148,7 @@ impl Queryable for RuntimeConnection {
         match self {
             Self::Rust(conn) => conn.requires_isolation_first(),
 
-            #[cfg(feature = "js-drivers")]
+            #[cfg(feature = "js-connectors")]
             Self::Js(conn) => conn.requires_isolation_first(),
         }
     }

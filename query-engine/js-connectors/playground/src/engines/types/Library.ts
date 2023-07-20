@@ -27,7 +27,7 @@ export interface Query {
   args: Array<any>
 }
 
-// Same order as in rust js-drivers' `ColumnType`
+// Same order as in rust js-connectors' `ColumnType`
 export const enum ColumnType {
   Int32 = 0,
   Int64 = 1,

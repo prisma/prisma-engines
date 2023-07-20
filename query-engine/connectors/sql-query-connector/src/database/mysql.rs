@@ -44,7 +44,7 @@ impl FromSource for Mysql {
         features: psl::PreviewFeatures,
     ) -> connector_interface::Result<Mysql> {
         if source.provider == "@prisma/mysql" {
-            #[cfg(feature = "js-drivers")]
+            #[cfg(feature = "js-connectors")]
             {
                 let driver = super::js::registered_driver();
                 let connection_info = get_connection_info(url)?;
@@ -56,10 +56,10 @@ impl FromSource for Mysql {
                 });
             }
 
-            #[cfg(not(feature = "js-drivers"))]
+            #[cfg(not(feature = "js-connectors"))]
             {
                 return Err(ConnectorError::from_kind(ErrorKind::UnsupportedConnector(
-                    "The @prisma/mysql connector requires the `nodeDrivers` preview feature to be enabled.".into(),
+                    "The @prisma/mysql connector requires the `jsConnectors` preview feature to be enabled.".into(),
                 )));
             }
         }
