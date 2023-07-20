@@ -156,7 +156,7 @@
         features: psl::PreviewFeatures,
     ) -&gt; connector_interface::Result&lt;Mysql&gt; {
         <span class="kw">if </span>source.provider == <span class="string">&quot;@prisma/mysql&quot; </span>{
-            <span class="attr">#[cfg(feature = <span class="string">&quot;js-drivers&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">&quot;js-connectors&quot;</span>)]
             </span>{
                 <span class="kw">let </span>driver = <span class="kw">super</span>::js::registered_driver();
                 <span class="kw">let </span>connection_info = get_connection_info(url)<span class="question-mark">?</span>;
@@ -168,10 +168,10 @@
                 });
             }
 
-            <span class="attr">#[cfg(not(feature = <span class="string">&quot;js-drivers&quot;</span>))]
+            <span class="attr">#[cfg(not(feature = <span class="string">&quot;js-connectors&quot;</span>))]
             </span>{
                 <span class="kw">return </span><span class="prelude-val">Err</span>(ConnectorError::from_kind(ErrorKind::UnsupportedConnector(
-                    <span class="string">&quot;The @prisma/mysql connector requires the `nodeDrivers` preview feature to be enabled.&quot;</span>.into(),
+                    <span class="string">&quot;The @prisma/mysql connector requires the `jsConnectors` preview feature to be enabled.&quot;</span>.into(),
                 )));
             }
         }
