@@ -635,7 +635,7 @@ mod tests {
         (String::from(sql), params.into_iter().map(|p| p.into()).collect())
     }
 
-    fn default_params<'a>(mut additional: Vec<Value<'a>>) -> Vec<Value<'a>> {
+    fn default_params(mut additional: Vec<Value<'_>>) -> Vec<Value<'_>> {
         let mut result = Vec::new();
 
         for param in additional.drain(0..) {

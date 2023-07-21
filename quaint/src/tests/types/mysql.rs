@@ -1,3 +1,5 @@
+#![allow(clippy::approx_constant)]
+
 use crate::tests::test_api::*;
 
 #[cfg(feature = "bigdecimal")]

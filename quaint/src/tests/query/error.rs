@@ -103,8 +103,8 @@ async fn unique_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()>
                 let fields = fields.iter().map(|s| s.as_str()).collect::<Vec<_>>();
                 assert_eq!(vec!["id1", "id2"], fields)
             }
-            DatabaseConstraint::ForeignKey => assert!(false, "Expecting index or field constraints."),
-            DatabaseConstraint::CannotParse => assert!(false, "Couldn't parse the error message."),
+            DatabaseConstraint::ForeignKey => panic!("Expecting index or field constraints."),
+            DatabaseConstraint::CannotParse => panic!("Couldn't parse the error message."),
         },
         _ => panic!("{}", err),
     }

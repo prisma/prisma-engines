@@ -56,7 +56,7 @@ pub fn uuid_to_bin_swapped() -> Expression<'static> {
 /// # Ok(())
 /// # }
 /// ```
-#[cfg(any(feature = "mysql"))]
+#[cfg(feature = "mysql")]
 pub fn native_uuid() -> Expression<'static> {
     let func = Function {
         typ_: FunctionType::Uuid,
