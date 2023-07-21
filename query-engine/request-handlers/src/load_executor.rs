@@ -24,6 +24,9 @@ pub async fn load(
         #[cfg(feature = "mongodb")]
         p if MONGODB.is_provider(p) => mongodb(source, url, features).await,
 
+        #[cfg(feature = "js-connectors")]
+        p if JsConnector::is_provider(p) => jsconnector(source, url, features).await,
+
         x => Err(query_core::CoreError::ConfigurationError(format!(
             "Unsupported connector type: {x}"
         ))),
@@ -38,7 +41,7 @@ async fn sqlite(
     trace!("Loading SQLite query connector...");
     let sqlite = Sqlite::from_source(source, url, features).await?;
     trace!("Loaded SQLite query connector.");
-    Ok(sql_executor(sqlite, false))
+    Ok(executor_for(sqlite, false))
 }
 
 async fn postgres(
@@ -47,7 +50,6 @@ async fn postgres(
     features: PreviewFeatures,
 ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync>> {
     trace!("Loading Postgres query connector...");
-
     let database_str = url;
     let psql = PostgreSql::from_source(source, url, features).await?;
 
@@ -59,9 +61,8 @@ async fn postgres(
         .get("pgbouncer")
         .and_then(|flag| flag.parse().ok())
         .unwrap_or(false);
-
     trace!("Loaded Postgres query connector.");
-    Ok(sql_executor(psql, force_transactions))
+    Ok(executor_for(psql, force_transactions))
 }
 
 async fn mysql(
@@ -71,7 +72,7 @@ async fn mysql(
 ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync>> {
     let mysql = Mysql::from_source(source, url, features).await?;
     trace!("Loaded MySQL query connector.");
-    Ok(sql_executor(mysql, false))
+    Ok(executor_for(mysql, false))
 }
 
 async fn mssql(
@@ -82,10 +83,10 @@ async fn mssql(
     trace!("Loading SQL Server query connector...");
     let mssql = Mssql::from_source(source, url, features).await?;
     trace!("Loaded SQL Server query connector.");
-    Ok(sql_executor(mssql, false))
+    Ok(executor_for(mssql, false))
 }
 
-fn sql_executor<T>(connector: T, force_transactions: bool) -> Box<dyn QueryExecutor + Send + Sync>
+fn executor_for<T>(connector: T, force_transactions: bool) -> Box<dyn QueryExecutor + Send + Sync>
 where
     T: Connector + Send + Sync + 'static,
 {
@@ -101,5 +102,17 @@ async fn mongodb(
     trace!("Loading MongoDB query connector...");
     let mongo = MongoDb::new(source, url).await?;
     trace!("Loaded MongoDB query connector.");
-    Ok(Box::new(InterpretingExecutor::new(mongo, false)))
+    Ok(executor_for(mongo, false))
+}
+
+#[cfg(feature = "js-connectors")]
+async fn jsconnector(
+    source: &Datasource,
+    url: &str,
+    features: PreviewFeatures,
+) -> Result<Box<dyn QueryExecutor + Send + Sync>, query_core::CoreError> {
+    trace!("Loading js connector ...");
+    let js = Js::from_source(source, url, features).await?;
+    trace!("Loaded js connector ...");
+    Ok(executor_for(js, false))
 }

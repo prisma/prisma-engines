@@ -1,5 +1,4 @@
 use super::connection::SqlConnection;
-use super::runtime::RuntimePool;
 use crate::{FromSource, SqlError};
 use async_trait::async_trait;
 use connector_interface::{
@@ -11,7 +10,7 @@ use quaint::{pooled::Quaint, prelude::ConnectionInfo};
 use std::time::Duration;
 
 pub struct Mysql {
-    pool: RuntimePool,
+    pool: Quaint,
     connection_info: ConnectionInfo,
     features: psl::PreviewFeatures,
 }
@@ -39,31 +38,10 @@ fn get_connection_info(url: &str) -> connector::Result<ConnectionInfo> {
 #[async_trait]
 impl FromSource for Mysql {
     async fn from_source(
-        source: &psl::Datasource,
+        _: &psl::Datasource,
         url: &str,
         features: psl::PreviewFeatures,
     ) -> connector_interface::Result<Mysql> {
-        if source.provider == "@prisma/mysql" {
-            #[cfg(feature = "js-connectors")]
-            {
-                let driver = super::js::registered_driver();
-                let connection_info = get_connection_info(url)?;
-
-                return Ok(Mysql {
-                    pool: RuntimePool::Js(driver.unwrap().clone()),
-                    connection_info,
-                    features: features.to_owned(),
-                });
-            }
-
-            #[cfg(not(feature = "js-connectors"))]
-            {
-                return Err(ConnectorError::from_kind(ErrorKind::UnsupportedConnector(
-                    "The @prisma/mysql connector requires the `jsConnectors` preview feature to be enabled.".into(),
-                )));
-            }
-        }
-
         let connection_info = get_connection_info(url)?;
 
         let mut builder = Quaint::builder(url)
@@ -77,7 +55,7 @@ impl FromSource for Mysql {
         let connection_info = pool.connection_info().to_owned();
 
         Ok(Mysql {
-            pool: RuntimePool::Rust(pool),
+            pool,
             connection_info,
             features: features.to_owned(),
         })
@@ -99,11 +77,7 @@ impl Connector for Mysql {
     }
 
     fn name(&self) -> &'static str {
-        if self.pool.is_nodejs() {
-            "@prisma/mysql"
-        } else {
-            "mysql"
-        }
+        "mysql"
     }
 
     fn should_retry_on_transient_error(&self) -> bool {
