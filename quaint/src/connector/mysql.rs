@@ -592,16 +592,16 @@ mod tests {
     fn should_parse_prefer_socket() {
         let url =
             MysqlUrl::new(Url::parse("mysql://root:root@localhost:3307/testdb?prefer_socket=false").unwrap()).unwrap();
-        assert_eq!(false, url.prefer_socket().unwrap());
+        assert!(!url.prefer_socket().unwrap());
     }
 
     #[test]
     fn should_parse_sslaccept() {
         let url =
             MysqlUrl::new(Url::parse("mysql://root:root@localhost:3307/testdb?sslaccept=strict").unwrap()).unwrap();
-        assert_eq!(true, url.query_params.use_ssl);
-        assert_eq!(false, url.query_params.ssl_opts.skip_domain_validation());
-        assert_eq!(false, url.query_params.ssl_opts.accept_invalid_certs());
+        assert!(url.query_params.use_ssl);
+        assert!(!url.query_params.ssl_opts.skip_domain_validation());
+        assert!(!url.query_params.ssl_opts.accept_invalid_certs());
     }
 
     #[test]

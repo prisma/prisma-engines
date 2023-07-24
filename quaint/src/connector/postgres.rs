@@ -1487,41 +1487,38 @@ mod tests {
     #[test]
     fn test_safe_ident() {
         // Safe
-        assert_eq!(is_safe_identifier("hello"), true);
-        assert_eq!(is_safe_identifier("_hello"), true);
-        assert_eq!(is_safe_identifier("àbracadabra"), true);
-        assert_eq!(is_safe_identifier("h3ll0"), true);
-        assert_eq!(is_safe_identifier("héllo"), true);
-        assert_eq!(is_safe_identifier("héll0$"), true);
-        assert_eq!(is_safe_identifier("héll_0$"), true);
-        assert_eq!(
-            is_safe_identifier("disconnect_security_must_honor_connect_scope_one2m"),
-            true
-        );
+        assert!(is_safe_identifier("hello"));
+        assert!(is_safe_identifier("_hello"));
+        assert!(is_safe_identifier("àbracadabra"));
+        assert!(is_safe_identifier("h3ll0"));
+        assert!(is_safe_identifier("héllo"));
+        assert!(is_safe_identifier("héll0$"));
+        assert!(is_safe_identifier("héll_0$"));
+        assert!(is_safe_identifier("disconnect_security_must_honor_connect_scope_one2m"));
 
         // Not safe
-        assert_eq!(is_safe_identifier(""), false);
-        assert_eq!(is_safe_identifier("Hello"), false);
-        assert_eq!(is_safe_identifier("hEllo"), false);
-        assert_eq!(is_safe_identifier("$hello"), false);
-        assert_eq!(is_safe_identifier("hello!"), false);
-        assert_eq!(is_safe_identifier("hello#"), false);
-        assert_eq!(is_safe_identifier("he llo"), false);
-        assert_eq!(is_safe_identifier(" hello"), false);
-        assert_eq!(is_safe_identifier("he-llo"), false);
-        assert_eq!(is_safe_identifier("hÉllo"), false);
-        assert_eq!(is_safe_identifier("1337"), false);
-        assert_eq!(is_safe_identifier("_HELLO"), false);
-        assert_eq!(is_safe_identifier("HELLO"), false);
-        assert_eq!(is_safe_identifier("HELLO$"), false);
-        assert_eq!(is_safe_identifier("ÀBRACADABRA"), false);
+        assert!(!is_safe_identifier(""));
+        assert!(!is_safe_identifier("Hello"));
+        assert!(!is_safe_identifier("hEllo"));
+        assert!(!is_safe_identifier("$hello"));
+        assert!(!is_safe_identifier("hello!"));
+        assert!(!is_safe_identifier("hello#"));
+        assert!(!is_safe_identifier("he llo"));
+        assert!(!is_safe_identifier(" hello"));
+        assert!(!is_safe_identifier("he-llo"));
+        assert!(!is_safe_identifier("hÉllo"));
+        assert!(!is_safe_identifier("1337"));
+        assert!(!is_safe_identifier("_HELLO"));
+        assert!(!is_safe_identifier("HELLO"));
+        assert!(!is_safe_identifier("HELLO$"));
+        assert!(!is_safe_identifier("ÀBRACADABRA"));
 
         for ident in RESERVED_KEYWORDS {
-            assert_eq!(is_safe_identifier(ident), false);
+            assert!(!is_safe_identifier(ident));
         }
 
         for ident in RESERVED_TYPE_FUNCTION_NAMES {
-            assert_eq!(is_safe_identifier(ident), false);
+            assert!(!is_safe_identifier(ident));
         }
     }
 

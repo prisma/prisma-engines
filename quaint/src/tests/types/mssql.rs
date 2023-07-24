@@ -1,3 +1,5 @@
+#![allow(clippy::approx_constant)]
+
 #[cfg(feature = "bigdecimal")]
 mod bigdecimal;
 

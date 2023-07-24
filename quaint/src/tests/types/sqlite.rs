@@ -1,3 +1,5 @@
+#![allow(clippy::approx_constant)]
+
 use crate::tests::test_api::sqlite_test_api;
 #[cfg(feature = "chrono")]
 use crate::tests::test_api::TestApi;
