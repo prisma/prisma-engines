@@ -3,14 +3,14 @@ import os from 'node:os'
 import fs from 'node:fs'
 import { setImmediate, setTimeout } from 'node:timers/promises'
 
-import { Closeable, Library, Queryable } from './engines/types/Library'
-import { createMySQLQueryable } from './queryable/mysql'
-import { createMockQueryable } from './queryable/mock'
+import type { Closeable, Library, Driver } from './engines/types/Library.js'
+import { createPlanetScaleDriver } from './driver/planetscale.js'
+import { createMockDriver } from './driver/mock.js'
 
 // *.bind(db) is required to preserve the `this` context.
 // There are surely other ways than this to use class methods defined in JS within a
 // napi.rs context, but this is the most straightforward.
-const binder = (queryable: Queryable & Closeable): Queryable & Closeable => ({
+const binder = (queryable: Driver & Closeable): Driver & Closeable => ({
   queryRaw: queryable.queryRaw.bind(queryable),
   executeRaw: queryable.executeRaw.bind(queryable),
   version: queryable.version.bind(queryable),
@@ -22,10 +22,12 @@ async function main() {
   const connectionString = `${process.env.TEST_DATABASE_URL as string}`
 
   /* Use `mock` if you want to test local promises with no database */
-  const mock = createMockQueryable(connectionString)
+  const mock = createMockDriver(connectionString)
 
-  /* Use `db` if you want to test the actual MySQL database */
-  const db = createMySQLQueryable(connectionString)
+  /* Use `db` if you want to test the actual PlanetScale database */
+  const db = createPlanetScaleDriver({
+    url: connectionString,
+  })
 
   // `binder` is required to preserve the `this` context to the group of functions passed to libquery.
   const nodejsFnCtx = binder(db)
@@ -35,9 +37,10 @@ async function main() {
 
   // I assume nobody will run this on Windows ¯\_(ツ)_/¯
   const libExt = os.platform() === 'darwin' ? 'dylib' : 'so'
-  const libQueryEnginePath = path.join(__dirname, `../../../../target/debug/libquery_engine.${libExt}`)
+  const dirname = path.dirname(new URL(import.meta.url).pathname)
 
-  const schemaPath = path.join(__dirname, `../prisma/schema.prisma`)
+  const libQueryEnginePath = path.join(dirname, `../../../../target/debug/libquery_engine.${libExt}`)
+  const schemaPath = path.join(dirname, `../prisma/schema.prisma`)
 
   const libqueryEngine = { exports: {} as unknown as Library }
   // @ts-ignore
@@ -64,33 +67,38 @@ async function main() {
   await engine.connect('trace')
   console.log('[nodejs] connected')
 
-  let resultSet = await engine.query(`{
-    "modelName": "some_user",
+  const resultSet = await engine.query(`{
+    "modelName": "type_test",
     "action": "findMany",
     "query": {
-        "selection": {
-          "id": true,
-          "firstname": true,
-          "company_id": true
-        }
-      } 
+      "selection": {
+        "tinyint_column": true,
+        "smallint_column": true,
+        "mediumint_column": true,
+        "int_column": true,
+        "bigint_column": true,
+        "float_column": true,
+        "double_column": true,
+        "decimal_column": true,
+        "boolean_column": true,
+        "char_column": true,
+        "varchar_column": true,
+        "text_column": true,
+        "date_column": true,
+        "time_column": true,
+        "datetime_column": true,
+        "timestamp_column": true,
+        "json_column": true,
+        "enum_column": true,
+        "binary_column": true,
+        "varbinary_column": true,
+        "blob_column": true,
+        "set_column": true
+      }
+    } 
     }`, 'trace', undefined)
 
-  console.log('[nodejs] findMany resultSet', resultSet)
-
-  resultSet = await engine.query(`{
-    "modelName": "some_user",
-    "action": "findFirst",
-    "query": {
-        "selection": {
-          "id": true,
-          "firstname": true,
-          "company_id": true
-        }
-      } 
-    }`, 'trace', undefined)
-
-  console.log('[nodejs] findFirst resultSet', resultSet)
+  console.log('[nodejs] findMany resultSet', JSON.stringify(JSON.parse(resultSet), null, 2))
 
   // Note: calling `engine.disconnect` won't actually close the database connection.
   console.log('[nodejs] disconnecting...')
