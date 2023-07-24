@@ -87,7 +87,7 @@ impl Connector for MySqlDatamodelConnector {
     }
 
     fn is_provider(&self, name: &str) -> bool {
-        name == "mysql" || name == "@prisma/mysql"
+        name == "mysql"
     }
 
     fn capabilities(&self) -> ConnectorCapabilities {
