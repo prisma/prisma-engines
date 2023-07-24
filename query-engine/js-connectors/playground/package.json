@@ -2,10 +2,11 @@
   "name": "@prisma/jsdrivers-playground",
   "version": "1.0.0",
   "description": "",
-  "type": "commonjs",
+  "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node ./src/index.ts"
+    "dev": "ts-node ./src/index.ts",
+    "db:pull": "prisma db pull"
   },
   "keywords": [],
   "author": "",
@@ -13,10 +14,12 @@
   "devDependencies": {
     "@napi-rs/cli": "^2.15.2",
     "@types/node": "^20.1.2",
+    "prisma": "^5.0.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
   },
   "dependencies": {
+    "@planetscale/database": "^1.8.0",
     "mysql2": "^3.3.1"
   }
 }
