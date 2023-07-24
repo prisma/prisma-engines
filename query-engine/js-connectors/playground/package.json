@@ -5,8 +5,8 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node ./src/index.ts",
-    "db:pull": "prisma db pull"
+    "planetscale": "ts-node ./src/planetscale.ts",
+    "migrate:reset": "prisma migrate reset"
   },
   "keywords": [],
   "author": "",
