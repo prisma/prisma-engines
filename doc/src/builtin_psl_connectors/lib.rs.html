@@ -27,6 +27,16 @@
 <a href="#27" id="27">27</a>
 <a href="#28" id="28">28</a>
 <a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
+<a href="#38" id="38">38</a>
+<a href="#39" id="39">39</a>
 </pre></div><pre class="rust"><code><span class="attr">#![deny(rust_2018_idioms, unsafe_code)]
 #![allow(clippy::derive_partial_eq_without_eq)]
 
@@ -43,6 +53,7 @@
 <span class="kw">mod </span>mssql_datamodel_connector;
 <span class="kw">mod </span>mysql_datamodel_connector;
 <span class="kw">mod </span>native_type_definition;
+<span class="kw">mod </span>planetscale;
 <span class="kw">mod </span>postgres_datamodel_connector;
 <span class="kw">mod </span>sqlite_datamodel_connector;
 
@@ -54,6 +65,15 @@
 <span class="kw">pub const </span>SQLITE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Connector = <span class="kw-2">&amp;</span>sqlite_datamodel_connector::SqliteDatamodelConnector;
 <span class="kw">pub const </span>MSSQL: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Connector = <span class="kw-2">&amp;</span>mssql_datamodel_connector::MsSqlDatamodelConnector;
 <span class="kw">pub const </span>MONGODB: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Connector = <span class="kw-2">&amp;</span>mongodb::MongoDbDatamodelConnector;
+<span class="kw">pub static </span>PLANETSCALE_SERVERLESS: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Connector = <span class="kw-2">&amp;</span>planetscale::PLANETSCALE_SERVERLESS;
 
-<span class="kw">pub const </span>BUILTIN_CONNECTORS: ConnectorRegistry = <span class="kw-2">&amp;</span>[POSTGRES, MYSQL, SQLITE, MSSQL, COCKROACH, MONGODB];
+<span class="kw">pub static </span>BUILTIN_CONNECTORS: ConnectorRegistry = <span class="kw-2">&amp;</span>[
+    POSTGRES,
+    MYSQL,
+    SQLITE,
+    MSSQL,
+    COCKROACH,
+    MONGODB,
+    PLANETSCALE_SERVERLESS,
+];
 </code></pre></div></section></main></body></html>
