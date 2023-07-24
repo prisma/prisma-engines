@@ -1581,6 +1581,20 @@
 <a href="#1581" id="1581">1581</a>
 <a href="#1582" id="1582">1582</a>
 <a href="#1583" id="1583">1583</a>
+<a href="#1584" id="1584">1584</a>
+<a href="#1585" id="1585">1585</a>
+<a href="#1586" id="1586">1586</a>
+<a href="#1587" id="1587">1587</a>
+<a href="#1588" id="1588">1588</a>
+<a href="#1589" id="1589">1589</a>
+<a href="#1590" id="1590">1590</a>
+<a href="#1591" id="1591">1591</a>
+<a href="#1592" id="1592">1592</a>
+<a href="#1593" id="1593">1593</a>
+<a href="#1594" id="1594">1594</a>
+<a href="#1595" id="1595">1595</a>
+<a href="#1596" id="1596">1596</a>
+<a href="#1597" id="1597">1597</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>conversion;
 <span class="kw">mod </span>error;
 
@@ -1608,7 +1622,7 @@
     config::{ChannelBinding, SslMode},
     Client, Config, Statement,
 };
-<span class="kw">use </span>url::Url;
+<span class="kw">use </span>url::{Host, Url};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>DEFAULT_SCHEMA: <span class="kw-2">&amp;</span>str = <span class="string">&quot;public&quot;</span>;
 
@@ -1806,11 +1820,19 @@
     ///
     /// If none of them are set, defaults to `localhost`.
     </span><span class="kw">pub fn </span>host(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
-        <span class="kw">match </span>(<span class="self">self</span>.query_params.host.as_ref(), <span class="self">self</span>.url.host_str()) {
-            (<span class="prelude-val">Some</span>(host), <span class="kw">_</span>) =&gt; host.as_str(),
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>)) =&gt; <span class="string">&quot;localhost&quot;</span>,
-            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="string">&quot;localhost&quot;</span>,
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(host)) =&gt; host,
+        <span class="kw">match </span>(<span class="self">self</span>.query_params.host.as_ref(), <span class="self">self</span>.url.host_str(), <span class="self">self</span>.url.host()) {
+            (<span class="prelude-val">Some</span>(host), <span class="kw">_</span>, <span class="kw">_</span>) =&gt; host.as_str(),
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>), <span class="kw">_</span>) =&gt; <span class="string">&quot;localhost&quot;</span>,
+            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; <span class="string">&quot;localhost&quot;</span>,
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(host), <span class="prelude-val">Some</span>(Host::Ipv6(<span class="kw">_</span>))) =&gt; {
+                <span class="comment">// The `url` crate may return an IPv6 address in brackets, which must be stripped.
+                </span><span class="kw">if </span>host.starts_with(<span class="string">&#39;[&#39;</span>) &amp;&amp; host.ends_with(<span class="string">&#39;]&#39;</span>) {
+                    <span class="kw-2">&amp;</span>host[<span class="number">1</span>..host.len() - <span class="number">1</span>]
+                } <span class="kw">else </span>{
+                    host
+                }
+            }
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(host), <span class="kw">_</span>) =&gt; host,
         }
     }
 
@@ -2723,6 +2745,12 @@
         <span class="kw">let </span>url = PostgresUrl::new(Url::parse(<span class="string">&quot;postgresql:///dbname&quot;</span>).unwrap()).unwrap();
         <span class="macro">assert_eq!</span>(<span class="string">&quot;dbname&quot;</span>, url.dbname());
         <span class="macro">assert_eq!</span>(<span class="string">&quot;localhost&quot;</span>, url.host());
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>should_parse_ipv6_host() {
+        <span class="kw">let </span>url = PostgresUrl::new(Url::parse(<span class="string">&quot;postgresql://[2001:db8:1234::ffff]:5432/dbname&quot;</span>).unwrap()).unwrap();
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;2001:db8:1234::ffff&quot;</span>, url.host());
     }
 
     <span class="attr">#[test]
