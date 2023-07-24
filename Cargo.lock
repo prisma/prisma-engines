@@ -1660,9 +1660,12 @@ name = "js-connectors"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "bigdecimal",
+ "chrono",
  "expect-test",
  "napi",
  "napi-derive",
+ "num-bigint",
  "once_cell",
  "quaint",
  "serde",

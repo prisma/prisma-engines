@@ -12,6 +12,12 @@ quaint.workspace = true
 tracing = "0.1"
 tracing-core = "0.1"
 
+# Note: these deps are temporarily specified here to avoid importing them from tiberius (the SQL server driver).
+# They will be imported from quaint-core instead in a future PR.
+num-bigint = "0.4.3"
+bigdecimal = "0.3.0"
+chrono = "0.4.20"
+
 napi.workspace = true
 napi-derive.workspace = true
 
