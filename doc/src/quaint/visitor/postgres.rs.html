@@ -1580,7 +1580,7 @@
         (String::from(sql), params.into_iter().map(|p| p.into()).collect())
     }
 
-    <span class="kw">fn </span>default_params&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">mut </span>additional: Vec&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) -&gt; Vec&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">fn </span>default_params(<span class="kw-2">mut </span>additional: Vec&lt;Value&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; Vec&lt;Value&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>result = Vec::new();
 
         <span class="kw">for </span>param <span class="kw">in </span>additional.drain(<span class="number">0</span>..) {

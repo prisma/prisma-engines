@@ -123,7 +123,7 @@
 /// # Ok(())
 /// # }
 /// ```
-</span><span class="attr">#[cfg(any(feature = <span class="string">&quot;mysql&quot;</span>))]
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
 </span><span class="kw">pub fn </span>native_uuid() -&gt; Expression&lt;<span class="lifetime">&#39;static</span>&gt; {
     <span class="kw">let </span>func = Function {
         typ_: FunctionType::Uuid,

@@ -1244,16 +1244,16 @@
     </span><span class="kw">fn </span>should_parse_prefer_socket() {
         <span class="kw">let </span>url =
             MysqlUrl::new(Url::parse(<span class="string">&quot;mysql://root:root@localhost:3307/testdb?prefer_socket=false&quot;</span>).unwrap()).unwrap();
-        <span class="macro">assert_eq!</span>(<span class="bool-val">false</span>, url.prefer_socket().unwrap());
+        <span class="macro">assert!</span>(!url.prefer_socket().unwrap());
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>should_parse_sslaccept() {
         <span class="kw">let </span>url =
             MysqlUrl::new(Url::parse(<span class="string">&quot;mysql://root:root@localhost:3307/testdb?sslaccept=strict&quot;</span>).unwrap()).unwrap();
-        <span class="macro">assert_eq!</span>(<span class="bool-val">true</span>, url.query_params.use_ssl);
-        <span class="macro">assert_eq!</span>(<span class="bool-val">false</span>, url.query_params.ssl_opts.skip_domain_validation());
-        <span class="macro">assert_eq!</span>(<span class="bool-val">false</span>, url.query_params.ssl_opts.accept_invalid_certs());
+        <span class="macro">assert!</span>(url.query_params.use_ssl);
+        <span class="macro">assert!</span>(!url.query_params.ssl_opts.skip_domain_validation());
+        <span class="macro">assert!</span>(!url.query_params.ssl_opts.accept_invalid_certs());
     }
 
     <span class="attr">#[test]
