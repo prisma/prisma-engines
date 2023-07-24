@@ -22,7 +22,7 @@ use std::{
     time::Duration,
 };
 use tokio::sync::Mutex;
-use url::Url;
+use url::{Host, Url};
 
 /// The underlying MySQL driver. Only available with the `expose-drivers`
 /// Cargo feature.
@@ -98,7 +98,18 @@ impl MysqlUrl {
 
     /// The database host. If `socket` and `host` are not set, defaults to `localhost`.
     pub fn host(&self) -> &str {
-        self.url.host_str().unwrap_or("localhost")
+        match (self.url.host(), self.url.host_str()) {
+            (Some(Host::Ipv6(_)), Some(host)) => {
+                // The `url` crate may return an IPv6 address in brackets, which must be stripped.
+                if host.starts_with('[') && host.ends_with(']') {
+                    &host[1..host.len() - 1]
+                } else {
+                    host
+                }
+            }
+            (_, Some(host)) => host,
+            _ => "localhost",
+        }
     }
 
     /// If set, connected to the database through a Unix socket.
@@ -602,6 +613,12 @@ mod tests {
         assert!(url.query_params.use_ssl);
         assert!(!url.query_params.ssl_opts.skip_domain_validation());
         assert!(!url.query_params.ssl_opts.accept_invalid_certs());
+    }
+
+    #[test]
+    fn should_parse_ipv6_host() {
+        let url = MysqlUrl::new(Url::parse("mysql://[2001:db8:1234::ffff]:5432/testdb").unwrap()).unwrap();
+        assert_eq!("2001:db8:1234::ffff", url.host());
     }
 
     #[test]
