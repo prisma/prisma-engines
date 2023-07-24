@@ -166,11 +166,15 @@ impl QueryEngine {
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
         let mut schema = psl::validate(datamodel.into());
         let config = &mut schema.configuration;
+        let provider_name = schema.connector.provider_name();
 
         #[cfg(feature = "js-connectors")]
         if let Some(driver) = maybe_driver {
             let queryable = js_connectors::JsQueryable::from(driver);
-            sql_connector::register_js_connector(Arc::new(queryable));
+            match sql_connector::register_js_connector(provider_name, Arc::new(queryable)) {
+                Ok(_) => tracing::info!("Registered js connector for {provider_name}"),
+                Err(err) => tracing::error!("Failed to registered js connector for {provider_name}. {err}"),
+            }
         }
 
         schema
