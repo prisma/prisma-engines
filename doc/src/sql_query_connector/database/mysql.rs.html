@@ -84,34 +84,7 @@
 <a href="#84" id="84">84</a>
 <a href="#85" id="85">85</a>
 <a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
-<a href="#90" id="90">90</a>
-<a href="#91" id="91">91</a>
-<a href="#92" id="92">92</a>
-<a href="#93" id="93">93</a>
-<a href="#94" id="94">94</a>
-<a href="#95" id="95">95</a>
-<a href="#96" id="96">96</a>
-<a href="#97" id="97">97</a>
-<a href="#98" id="98">98</a>
-<a href="#99" id="99">99</a>
-<a href="#100" id="100">100</a>
-<a href="#101" id="101">101</a>
-<a href="#102" id="102">102</a>
-<a href="#103" id="103">103</a>
-<a href="#104" id="104">104</a>
-<a href="#105" id="105">105</a>
-<a href="#106" id="106">106</a>
-<a href="#107" id="107">107</a>
-<a href="#108" id="108">108</a>
-<a href="#109" id="109">109</a>
-<a href="#110" id="110">110</a>
-<a href="#111" id="111">111</a>
-<a href="#112" id="112">112</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::connection::SqlConnection;
-<span class="kw">use </span><span class="kw">super</span>::runtime::RuntimePool;
 <span class="kw">use crate</span>::{FromSource, SqlError};
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>connector_interface::{
@@ -123,7 +96,7 @@
 <span class="kw">use </span>std::time::Duration;
 
 <span class="kw">pub struct </span>Mysql {
-    pool: RuntimePool,
+    pool: Quaint,
     connection_info: ConnectionInfo,
     features: psl::PreviewFeatures,
 }
@@ -151,31 +124,10 @@
 <span class="attr">#[async_trait]
 </span><span class="kw">impl </span>FromSource <span class="kw">for </span>Mysql {
     <span class="kw">async fn </span>from_source(
-        source: <span class="kw-2">&amp;</span>psl::Datasource,
+        <span class="kw">_</span>: <span class="kw-2">&amp;</span>psl::Datasource,
         url: <span class="kw-2">&amp;</span>str,
         features: psl::PreviewFeatures,
     ) -&gt; connector_interface::Result&lt;Mysql&gt; {
-        <span class="kw">if </span>source.provider == <span class="string">&quot;@prisma/mysql&quot; </span>{
-            <span class="attr">#[cfg(feature = <span class="string">&quot;js-connectors&quot;</span>)]
-            </span>{
-                <span class="kw">let </span>driver = <span class="kw">super</span>::js::registered_driver();
-                <span class="kw">let </span>connection_info = get_connection_info(url)<span class="question-mark">?</span>;
-
-                <span class="kw">return </span><span class="prelude-val">Ok</span>(Mysql {
-                    pool: RuntimePool::Js(driver.unwrap().clone()),
-                    connection_info,
-                    features: features.to_owned(),
-                });
-            }
-
-            <span class="attr">#[cfg(not(feature = <span class="string">&quot;js-connectors&quot;</span>))]
-            </span>{
-                <span class="kw">return </span><span class="prelude-val">Err</span>(ConnectorError::from_kind(ErrorKind::UnsupportedConnector(
-                    <span class="string">&quot;The @prisma/mysql connector requires the `jsConnectors` preview feature to be enabled.&quot;</span>.into(),
-                )));
-            }
-        }
-
         <span class="kw">let </span>connection_info = get_connection_info(url)<span class="question-mark">?</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>builder = Quaint::builder(url)
@@ -189,7 +141,7 @@
         <span class="kw">let </span>connection_info = pool.connection_info().to_owned();
 
         <span class="prelude-val">Ok</span>(Mysql {
-            pool: RuntimePool::Rust(pool),
+            pool,
             connection_info,
             features: features.to_owned(),
         })
@@ -211,12 +163,8 @@
     </span>}
 
     <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
-        <span class="kw">if </span><span class="self">self</span>.pool.is_nodejs() {
-            <span class="string">&quot;@prisma/mysql&quot;
-        </span>} <span class="kw">else </span>{
-            <span class="string">&quot;mysql&quot;
-        </span>}
-    }
+        <span class="string">&quot;mysql&quot;
+    </span>}
 
     <span class="kw">fn </span>should_retry_on_transient_error(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="bool-val">false

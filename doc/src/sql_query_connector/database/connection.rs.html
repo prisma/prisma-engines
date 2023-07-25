@@ -322,7 +322,7 @@
 
 <span class="kw">impl</span>&lt;C&gt; SqlConnection&lt;C&gt;
 <span class="kw">where
-    </span>C: Queryable + TransactionCapable + Send + Sync + <span class="lifetime">&#39;static</span>,
+    </span>C: TransactionCapable + Send + Sync + <span class="lifetime">&#39;static</span>,
 {
     <span class="kw">pub fn </span>new(inner: C, connection_info: <span class="kw-2">&amp;</span>ConnectionInfo, features: psl::PreviewFeatures) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>connection_info = connection_info.clone();
