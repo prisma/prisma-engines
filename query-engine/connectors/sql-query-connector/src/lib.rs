@@ -23,7 +23,7 @@ use self::{column_metadata::*, context::Context, filter_conversion::*, query_ext
 use quaint::prelude::Queryable;
 
 #[cfg(feature = "js-connectors")]
-pub use database::js::register_driver;
+pub use database::{register_js_connector, Js};
 pub use database::{FromSource, Mssql, Mysql, PostgreSql, Sqlite};
 pub use error::SqlError;
 

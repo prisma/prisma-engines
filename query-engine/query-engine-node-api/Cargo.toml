@@ -11,7 +11,7 @@ name = "query_engine"
 [features]
 default = ["js-connectors"]
 vendored-openssl = ["sql-connector/vendored-openssl"]
-js-connectors = ["sql-connector/js-connectors"]
+js-connectors = ["request-handlers/js-connectors", "sql-connector/js-connectors"]
 
 [dependencies]
 anyhow = "1"

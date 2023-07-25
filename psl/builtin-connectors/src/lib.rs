@@ -9,6 +9,7 @@ pub use mongodb::MongoDbType;
 pub use mssql_datamodel_connector::{MsSqlType, MsSqlTypeParameter};
 pub use mysql_datamodel_connector::MySqlType;
 pub use postgres_datamodel_connector::{PostgresDatasourceProperties, PostgresType};
+pub use psl_core::js_connector::JsConnector;
 
 mod mongodb;
 mod mssql_datamodel_connector;

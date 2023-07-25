@@ -22,7 +22,7 @@ pub(crate) struct SqlConnection<C> {
 
 impl<C> SqlConnection<C>
 where
-    C: Queryable + TransactionCapable + Send + Sync + 'static,
+    C: TransactionCapable + Send + Sync + 'static,
 {
     pub fn new(inner: C, connection_info: &ConnectionInfo, features: psl::PreviewFeatures) -> Self {
         let connection_info = connection_info.clone();
