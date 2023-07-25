@@ -135,9 +135,6 @@ pub enum ColumnType {
     /// The following PlanetScale type IDs are mapped into DateTime:
     /// - DATETIME (DATETIME) -> e.g. `"2023-01-01 23:59:59"` (String-encoded, yyyy-MM-dd HH:mm:ss)
     /// - TIMESTAMP (TIMESTAMP) -> e.g. `"2023-01-01 23:59:59"` (String-encoded, yyyy-MM-dd HH:mm:ss)
-    ///   Note(jkomyno): TIMESTAMP is distinguished by DATETIME as it implies database-level UTC
-    ///   conversions that don't happen with DATETIME values. Quaint does not support this distinction.
-    ///   Can this lead to bugs we're not yet aware of?
     DateTime,
 
     /// The following PlanetScale type IDs are mapped into Json:
