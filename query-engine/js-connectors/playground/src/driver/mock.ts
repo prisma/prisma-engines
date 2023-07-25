@@ -1,8 +1,8 @@
 import { setTimeout } from 'node:timers/promises'
 
-import { Closeable, ColumnType, Query, Driver, ResultSet } from '../engines/types/Library.js'
+import { Closeable, ColumnType, Query, Connector, ResultSet } from '../engines/types/Library.js'
 
-class MockSQL implements Driver, Closeable {
+class MockSQL implements Connector, Closeable {
   private maybeVersion?: string
   private isRunning: boolean = true
 
@@ -77,7 +77,7 @@ class MockSQL implements Driver, Closeable {
   }
 }
 
-export const createMockDriver = (connectionString: string): Driver & Closeable => {
+export const createMockConnector = (connectionString: string): Connector & Closeable => {
   const db = new MockSQL(connectionString)
   return db
 }
