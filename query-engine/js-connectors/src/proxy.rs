@@ -207,7 +207,7 @@ fn js_planetscale_value_to_quaint(json_value: serde_json::Value, column_type: Co
                 // E.g., if s = "1234.99", s_as_bigint = 123499, s_scale = 2.
                 let (s_as_bigint, s_scale) = if let Some(dot) = s.find('.') {
                     let scale = s.len() - dot - 1;
-                    let s = s.replace(".", "");
+                    let s = s.replace('.', "");
                     (
                         num_bigint::BigInt::parse_bytes(s.as_bytes(), 10)
                             .expect("string-encoded number must be a numeric"),
@@ -260,9 +260,9 @@ fn js_planetscale_value_to_quaint(json_value: serde_json::Value, column_type: Co
         ColumnType::DateTime => match json_value {
             serde_json::Value::String(s) => {
                 let datetime = chrono::NaiveDateTime::parse_from_str(&s, "%Y-%m-%d %H:%M:%S")
-                    .expect(format!("Expected a datetime string, found {:?}", &s).as_str());
+                    .unwrap_or_else(|_| panic!("Expected a datetime string, found {:?}", &s));
                 let datetime: DateTime<Utc> = DateTime::from_utc(datetime, Utc);
-                QuaintValue::datetime(datetime.into())
+                QuaintValue::datetime(datetime)
             }
             serde_json::Value::Null => QuaintValue::DateTime(None),
             mismatch => panic!("Expected a string, found {:?}", mismatch),
