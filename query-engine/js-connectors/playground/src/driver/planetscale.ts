@@ -1,5 +1,5 @@
 import * as planetScale from '@planetscale/database'
-import type { Closeable, Driver, ResultSet, Query } from '../engines/types/Library.js'
+import type { Closeable, Connector, ResultSet, Query } from '../engines/types/Library.js'
 import { ColumnType } from '../engines/types/Library.js'
 
 // See: https://github.com/planetscale/vitess-types/blob/06235e372d2050b4c0fff49972df8111e696c564/src/vitess/query/v16/query.proto#L108-L218
@@ -110,7 +110,7 @@ type PlanetScaleConfig =
     }
   )
 
-class PrismaPlanetScale implements Driver, Closeable {
+class PrismaPlanetScale implements Connector, Closeable {
   private client: planetScale.Connection
   private maybeVersion?: string
   private isRunning: boolean = true
@@ -178,7 +178,7 @@ class PrismaPlanetScale implements Driver, Closeable {
   }
 }
 
-export const createPlanetScaleDriver = (config: PlanetScaleConfig): Driver & Closeable => {
+export const createPlanetScaleConnector = (config: PlanetScaleConfig): Connector & Closeable => {
   const db = new PrismaPlanetScale(config)
   return db
 }

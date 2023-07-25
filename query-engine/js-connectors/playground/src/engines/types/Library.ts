@@ -48,7 +48,7 @@ export const enum ColumnType {
   // ...
 }
 
-export type Driver = {
+export type Connector = {
   queryRaw: (params: Query) => Promise<ResultSet>
   executeRaw: (params: Query) => Promise<number>
   version: () => Promise<string | undefined>
@@ -60,7 +60,7 @@ export type Closeable = {
 }
 
 export interface QueryEngineConstructor {
-  new(config: QueryEngineConfig, logger: (log: string) => void, nodejsFnCtx?: Driver): QueryEngineInstance
+  new(config: QueryEngineConfig, logger: (log: string) => void, nodejsFnCtx?: Connector): QueryEngineInstance
 }
 
 export interface LibraryLoader {

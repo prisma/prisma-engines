@@ -2,14 +2,14 @@
 import { setImmediate, setTimeout } from 'node:timers/promises'
 
 import { binder } from './driver/util.js'
-import { createPlanetScaleDriver } from './driver/planetscale.js'
+import { createPlanetScaleConnector } from './driver/planetscale.js'
 import { initQueryEngine } from './util.js'
 
 async function main() {
   const connectionString = `${process.env.JS_PLANETSCALE_DATABASE_URL as string}`
 
   /* Use `db` if you want to test the actual PlanetScale database */
-  const db = createPlanetScaleDriver({
+  const db = createPlanetScaleConnector({
     url: connectionString,
   })
 

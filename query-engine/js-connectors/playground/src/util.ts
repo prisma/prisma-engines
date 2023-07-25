@@ -2,9 +2,9 @@ import path from 'node:path'
 import os from 'node:os'
 import fs from 'node:fs'
 
-import { Driver, Library, QueryEngineInstance } from './engines/types/Library.js'
+import { Connector, Library, QueryEngineInstance } from './engines/types/Library.js'
 
-export function initQueryEngine(driver: Driver): QueryEngineInstance {
+export function initQueryEngine(driver: Connector): QueryEngineInstance {
   // I assume nobody will run this on Windows ¯\_(ツ)_/¯
   const libExt = os.platform() === 'darwin' ? 'dylib' : 'so'
   const dirname = path.dirname(new URL(import.meta.url).pathname)
