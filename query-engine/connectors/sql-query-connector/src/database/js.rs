@@ -6,25 +6,44 @@ use connector_interface::{
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
+use once_cell::sync::Lazy;
 use quaint::{
     connector::IsolationLevel,
     prelude::{Queryable as QuaintQueryable, *},
 };
-use std::sync::Arc;
+use std::{
+    collections::{hash_map::Entry, HashMap},
+    sync::{Arc, Mutex},
+};
 
-// TODO: https://github.com/prisma/team-orm/issues/245
-// implement registry for client drivers, rather than a global variable,
-// this would require the register_driver and registered_js_driver functions to
-// receive an identifier for the specific driver
-static QUERYABLE: once_cell::sync::OnceCell<Arc<dyn Queryable>> = once_cell::sync::OnceCell::new();
+/// Registry is the type for the global registry of Js connectors.
+type Registry = HashMap<String, JsConnector>;
 
-pub fn registered_js_connector() -> Option<&'static Arc<dyn Queryable>> {
-    QUERYABLE.get()
+/// REGISTRY is the global registry of JsConnectors
+static REGISTRY: Lazy<Mutex<Registry>> = Lazy::new(|| Mutex::new(HashMap::new()));
+
+fn registered_js_connector(provider: &str) -> connector::Result<JsConnector> {
+    let lock = REGISTRY.lock().unwrap();
+    lock.get(provider)
+        .ok_or(ConnectorError::from_kind(ErrorKind::UnsupportedConnector(format!(
+            "A Javascript connector proxy for {} was not registered",
+            provider
+        ))))
+        .map(|conn_ref| conn_ref.to_owned())
 }
 
-pub fn register_js_connector(driver: Arc<dyn Queryable>) {
-    if QUERYABLE.set(driver).is_err() {
-        panic!("Cannot register driver twice");
+pub fn register_js_connector(provider: &str, connector: Arc<dyn QuaintQueryable>) -> Result<(), String> {
+    let mut lock = REGISTRY.lock().unwrap();
+    let entry = lock.entry(provider.to_string());
+    match entry {
+        Entry::Occupied(_) => Err(format!(
+            "A Javascript connector proxy for {} was already registered, and cannot be overridden.",
+            provider
+        )),
+        Entry::Vacant(v) => {
+            v.insert(JsConnector { connector });
+            Ok(())
+        }
     }
 }
 
@@ -51,22 +70,23 @@ impl FromSource for Js {
         url: &str,
         features: psl::PreviewFeatures,
     ) -> connector_interface::Result<Js> {
-        let psl_connector = source.active_connector.as_js_connector().unwrap_or_else(|| {
-            panic!(
-                "Connector for {} is not a JsConnector",
+        match source.active_connector.as_js_connector() {
+            Some(psl_connector) => {
+                let connector = registered_js_connector(source.active_provider)?;
+                let connection_info = get_connection_info(url)?;
+
+                Ok(Js {
+                    connector,
+                    connection_info,
+                    features,
+                    psl_connector,
+                })
+            }
+            None => panic!(
+                "Connector for provider {} is not a JsConnector",
                 source.active_connector.provider_name()
-            )
-        });
-
-        let connector = registered_js_connector().unwrap().clone();
-        let connection_info = get_connection_info(url)?;
-
-        return Ok(Js {
-            connector: JsConnector { queryable: connector },
-            connection_info,
-            features: features.to_owned(),
-            psl_connector,
-        });
+            ),
+        }
     }
 }
 
@@ -108,53 +128,58 @@ impl Connector for Js {
 // in this object, and implementing TransactionCapable (and quaint::Queryable) explicitly for it.
 #[derive(Clone)]
 struct JsConnector {
-    queryable: Arc<dyn QuaintQueryable>,
+    connector: Arc<dyn QuaintQueryable>,
 }
 
 #[async_trait]
 impl QuaintQueryable for JsConnector {
     async fn query(&self, q: Query<'_>) -> quaint::Result<quaint::prelude::ResultSet> {
-        self.queryable.query(q).await
+        self.connector.query(q).await
     }
 
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<quaint::prelude::ResultSet> {
-        self.queryable.query_raw(sql, params).await
+        self.connector.query_raw(sql, params).await
     }
 
     async fn query_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<quaint::prelude::ResultSet> {
-        self.queryable.query_raw_typed(sql, params).await
+        self.connector.query_raw_typed(sql, params).await
     }
 
     async fn execute(&self, q: Query<'_>) -> quaint::Result<u64> {
-        self.queryable.execute(q).await
+        self.connector.execute(q).await
     }
 
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
-        self.queryable.execute_raw(sql, params).await
+        self.connector.execute_raw(sql, params).await
     }
 
     async fn execute_raw_typed(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
-        self.queryable.execute_raw_typed(sql, params).await
+        self.connector.execute_raw_typed(sql, params).await
     }
 
+    /// Run a command in the database, for queries that can't be run using
+    /// prepared statements.
     async fn raw_cmd(&self, cmd: &str) -> quaint::Result<()> {
-        self.queryable.raw_cmd(cmd).await
+        self.connector.raw_cmd(cmd).await
     }
 
     async fn version(&self) -> quaint::Result<Option<String>> {
-        self.queryable.version().await
+        self.connector.version().await
     }
 
     fn is_healthy(&self) -> bool {
-        self.queryable.is_healthy()
+        self.connector.is_healthy()
     }
 
+    /// Sets the transaction isolation level to given value.
+    /// Implementers have to make sure that the passed isolation level is valid for the underlying database.
     async fn set_tx_isolation_level(&self, isolation_level: IsolationLevel) -> quaint::Result<()> {
-        self.queryable.set_tx_isolation_level(isolation_level).await
+        self.connector.set_tx_isolation_level(isolation_level).await
     }
 
+    /// Signals if the isolation level SET needs to happen before or after the tx BEGIN.
     fn requires_isolation_first(&self) -> bool {
-        self.queryable.requires_isolation_first()
+        self.connector.requires_isolation_first()
     }
 }
 
