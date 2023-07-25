@@ -23,7 +23,7 @@ In the current directory:
 - Run `prisma migrate reset` to populate the remote PlanetScale database with the "smoke test" data.
 - Change the `provider` name in [./prisma/schema.prisma](./prisma/schema.prisma) from `mysql` to `@prisma/planetscale`.
 
-Note: you used to be able to run these Prisma commands without changing the provider name, but [#4074](https://github.com/prisma/prisma-engines/pull/4074) broke that (see https://github.com/prisma/prisma-engines/pull/4074/files#r1273323391).
+Note: you used to be able to run these Prisma commands without changing the provider name, but [#4074](https://github.com/prisma/prisma-engines/pull/4074) changed that (see https://github.com/prisma/prisma-engines/pull/4074#issuecomment-1649942475).
 
 ## How to use
 
