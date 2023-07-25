@@ -20,10 +20,7 @@ We assume Node.js `v18.16.1`+ is installed.
 - Create a new `shadow` database branch. Repeat the steps above (selecting the `shadow` branch instead of `main`), and paste the generated URL in the `JS_PLANETSCALE_SHADOW_DATABASE_URL` environment variable in `.envrc`.
 
 In the current directory:
-- Run `prisma migrate reset` to populate the remote PlanetScale database with the "smoke test" data.
-- Change the `provider` name in [./prisma/schema.prisma](./prisma/schema.prisma) from `mysql` to `@prisma/planetscale`.
-
-Note: you used to be able to run these Prisma commands without changing the provider name, but [#4074](https://github.com/prisma/prisma-engines/pull/4074) broke that (see https://github.com/prisma/prisma-engines/pull/4074/files#r1273323391).
+- Run `prisma migrate apply` to populate the remote PlanetScale database with the "smoke test" data
 
 ## How to use
 
