@@ -37,7 +37,7 @@ pub fn register_js_connector(provider: &str, connector: Arc<dyn QuaintQueryable>
     let entry = lock.entry(provider.to_string());
     match entry {
         Entry::Occupied(_) => Err(format!(
-            "A Javascript connector proxy for {} was already registered. Skipping",
+            "A Javascript connector proxy for {} was already registered, and cannot be overridden.",
             provider
         )),
         Entry::Vacant(v) => {
