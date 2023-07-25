@@ -1,8 +1,6 @@
-#[cfg(feature = "js-connectors")]
-pub mod js;
-mod runtime;
-
 mod connection;
+#[cfg(feature = "js-connectors")]
+mod js;
 mod mssql;
 mod mysql;
 mod postgresql;
@@ -14,6 +12,8 @@ pub(crate) mod operations;
 use async_trait::async_trait;
 use connector_interface::{error::ConnectorError, Connector};
 
+#[cfg(feature = "js-connectors")]
+pub use js::*;
 pub use mssql::*;
 pub use mysql::*;
 pub use postgresql::*;

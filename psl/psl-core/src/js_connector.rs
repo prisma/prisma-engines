@@ -23,6 +23,15 @@ pub struct JsConnector {
     pub allowed_protocols: Option<&'static [&'static str]>,
 }
 
+impl JsConnector {
+    /// Returns true if the given name is a valid provider name for a JsConnector.
+    /// We use the convention that if a provider starts with ´@prisma/´ (ex. ´@prisma/planetscale´)
+    /// then its a provider for a JS connector.
+    pub fn is_provider(name: &str) -> bool {
+        name.starts_with("@prisma/")
+    }
+}
+
 #[derive(Copy, Clone)]
 pub enum Flavor {
     MySQL,

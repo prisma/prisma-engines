@@ -151,12 +151,6 @@ impl QueryEngine {
         let log_callback = LogCallback::new(napi_env, callback)?;
         log_callback.unref(&napi_env)?;
 
-        #[cfg(feature = "js-connectors")]
-        if let Some(driver) = maybe_driver {
-            let queryable = js_connectors::JsQueryable::from(driver);
-            sql_connector::register_driver(Arc::new(queryable));
-        }
-
         let ConstructorOptions {
             datamodel,
             log_level,
@@ -172,6 +166,12 @@ impl QueryEngine {
         let overrides: Vec<(_, _)> = datasource_overrides.into_iter().collect();
         let mut schema = psl::validate(datamodel.into());
         let config = &mut schema.configuration;
+
+        #[cfg(feature = "js-connectors")]
+        if let Some(driver) = maybe_driver {
+            let queryable = js_connectors::JsQueryable::from(driver);
+            sql_connector::register_js_connector(Arc::new(queryable));
+        }
 
         schema
             .diagnostics
