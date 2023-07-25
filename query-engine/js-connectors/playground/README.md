@@ -3,30 +3,17 @@
 This is a playground for testing the `libquery` client with the experimental Node.js drivers.
 It contains a subset of `@prisma/client`, plus a handy [`index.ts`](./src/index.ts) file with a `main` function.
 
-## How to setup
-
-We assume Node.js `v18.16.1`+ is installed.
-
-- Create a `.envrc` starting from `.envrc.example`, and fill in the missing values following the given template
-- Install Node.js dependencies via
-  ```bash
-  npm i
-  ```
-
-### PlanetScale
-
-- Create a new database on [PlanetScale](https://planetscale.com/)
-- Go to `Settings` > `Passwords`, and create a new password for the `main` database branch. Select the `Prisma` template and copy the generated URL (comprising username, password, etc). Paste it in the `JS_PLANETSCALE_DATABASE_URL` environment variable in `.envrc`.
-- Create a new `shadow` database branch. Repeat the steps above (selecting the `shadow` branch instead of `main`), and paste the generated URL in the `JS_PLANETSCALE_SHADOW_DATABASE_URL` environment variable in `.envrc`.
-
-In the current directory:
-- Run `prisma migrate apply` to populate the remote PlanetScale database with the "smoke test" data
-
 ## How to use
 
-In the current directory:
-- Run `cargo build -p query-engine-node-api` to compile the `libquery` Query Engine
-- Run `npm run planetscale` to run smoke tests against the PlanetScale database
+In the root directory:
+  - Run `cargo build -p query-engine-node-api` to compile the `libquery` Query Engine
+  - Spawn a MySQL8 database via `make dev-mysql8`
+  - Store the `export TEST_DATABASE_URL="mysql://root:prisma@localhost:3307/test"` env var in `.envrc.local` and expose it via `direnv allow .`
+
+In the current directory
+  - Copy the content of [`./src/index.sql`](./src/index.sql) into the MySQL8 database available at `mysql://root:prisma@localhost:3307/test`
+  - Run `pnpm i` to install dependencies
+  - Run `pnpm dev` to run the playground
 
 ## How to test
 
@@ -34,7 +21,7 @@ There is no automatic test. However, [./src/index.ts](./src/index.ts) includes a
 
 In particular, the pipeline steps are currently the following:
 
-- Define `db`, a class instance wrapper around the `@planetscale/database` JS driver for PlanetScale
+- Define `db`, a class instance wrapper around the `mysql2/promise` Node.js driver for MySQL
 - Define `nodejsFnCtx`, an object exposing (a)sync "Queryable" functions that can be safely passed to Rust, so that it can interact with `db`'s class methods
 - Load the *debug* version of `libquery`, i.e., the compilation artifact of the `query-engine-node-api` crate
 - Define `engine` via the `QueryEngine` constructor exposed by Rust
@@ -44,84 +31,49 @@ In particular, the pipeline steps are currently the following:
 - Attempt a reconnection (useful to catch possible panics in the implementation)
 - Close the database connection via `nodejsFnCtx`
 
-In the future, we might add support for more JS drivers, such as `@neondatabase/serverless`.
-
 Example test output:
 
 ```
-❯ npm run planetscale
+❯ pnpm dev
 
-> @prisma/jsdrivers-playground@1.0.0 planetscale
-> ts-node ./src/planetscale.ts
+> @prisma/nodejs-playground@1.0.0 dev /Users/jkomyno/work/prisma/prisma-engines-2/query-engine/js-connectors/nodejs-examples
+> ts-node ./src/index.ts
 
+[nodejs] initializing mock connection pool: mysql://root:prisma@localhost:3307/test
+[nodejs] initializing mysql connection pool: mysql://root:prisma@localhost:3307/test
+fn_ctx: true
+QueryEngine {}
 [nodejs] connecting...
 [nodejs] connected
-[nodejs] isHealthy false
-[nodejs] findMany resultSet {
-  "data": {
-    "findManytype_test": [
-      {
-        "tinyint_column": 127,
-        "smallint_column": 32767,
-        "mediumint_column": 8388607,
-        "int_column": 2147483647,
-        "bigint_column": {
-          "$type": "BigInt",
-          "value": "9223372036854775807"
-        },
-        "float_column": 3.4,
-        "double_column": 1.7977,
-        "decimal_column": {
-          "$type": "Decimal",
-          "value": "99999999.99"
-        },
-        "boolean_column": true,
-        "char_column": "c",
-        "varchar_column": "Sample varchar",
-        "text_column": "This is a long text...",
-        "date_column": {
-          "$type": "DateTime",
-          "value": "2023-07-24T00:00:00.000Z"
-        },
-        "time_column": {
-          "$type": "DateTime",
-          "value": "1970-01-01T23:59:59.000Z"
-        },
-        "datetime_column": {
-          "$type": "DateTime",
-          "value": "2023-07-24T23:59:59.000Z"
-        },
-        "timestamp_column": {
-          "$type": "DateTime",
-          "value": "2023-07-24T23:59:59.000Z"
-        },
-        "json_column": {
-          "$type": "Json",
-          "value": "{\"key\":\"value\"}"
-        },
-        "enum_column": "value3",
-        "binary_column": {
-          "$type": "Bytes",
-          "value": "TXlTUUwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
-        },
-        "varbinary_column": {
-          "$type": "Bytes",
-          "value": "SGVsbG8g"
-        },
-        "blob_column": {
-          "$type": "Bytes",
-          "value": "YmluYXJ5"
-        }
-      }
-    ]
-  }
+NodeJSQueryable::query()
+NodeJSQueryable::query_raw(SELECT `test`.`some_user`.`id`, `test`.`some_user`.`firstname`, `test`.`some_user`.`company_id` FROM `test`.`some_user` WHERE 1=1, [])
+[rs] calling query_raw: SELECT `test`.`some_user`.`id`, `test`.`some_user`.`firstname`, `test`.`some_user`.`company_id` FROM `test`.`some_user` WHERE 1=1
+[nodejs] calling queryRaw SELECT `test`.`some_user`.`id`, `test`.`some_user`.`firstname`, `test`.`some_user`.`company_id` FROM `test`.`some_user` WHERE 1=1
+[rs] awaiting promise
+[nodejs] after query
+[nodejs] resultSet {
+  columns: [ 'id', 'firstname', 'company_id' ],
+  rows: [ [ '1', 'Alberto', '1' ], [ '2', 'Tom', '1' ] ]
 }
+[rs] awaited: ResultSet { columns: ["id", "firstname", "company_id"], rows: [["1", "Alberto", "1"], ["2", "Tom", "1"]] }
+[nodejs] resultSet {"data":{"findManysome_user":[{"id":1,"firstname":"Alberto","company_id":1},{"id":2,"firstname":"Tom","company_id":1}]}}
 [nodejs] disconnecting...
 [nodejs] disconnected
-[nodejs] re-connecting...
-[nodejs] re-connecting
-[nodejs] re-disconnecting...
-[nodejs] re-disconnected
+[nodejs] connecting...
+[nodejs] connecting
+[nodejs] disconnecting...
+[nodejs] disconnected
 [nodejs] closing database connection...
+[nodejs] calling close() on connection pool
+[nodejs] closed connection pool
 [nodejs] closed database connection
 ```
+
+Note how the `[nodejs]` prefixes in the logs arise from using `console.log()` in Node.js, whereas the `[rs]` prefixes arise from using `println!()` in Rust.
+
+Feel free to experiment with different types of queries.
+
+## Main known limitations
+
+- Query parameters are not supported
+- Row values from e.g. `findMany` are always cast to string

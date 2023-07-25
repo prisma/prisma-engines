@@ -87,7 +87,11 @@ CREATE TABLE type_test (
     --
     -- ColumnType::Set, PlanetScale::{SET}
     set_column SET('option1', 'option2', 'option3') NOT NULL,
-    set_column_null SET('option1', 'option2', 'option3')
+    set_column_null SET('option1', 'option2', 'option3'),
+    --
+    -- ColumnType::Geometry, PlanetScale::{GEOMETRY}
+    geometry_column GEOMETRY NOT NULL,
+    geometry_column_null GEOMETRY
 );
 
 INSERT INTO type_test (
@@ -114,7 +118,8 @@ INSERT INTO type_test (
     binary_column,
     varbinary_column,
     blob_column,
-    set_column
+    set_column,
+    geometry_column
 ) VALUES (
     127, -- tinyint
     32767, -- smallint
@@ -138,6 +143,7 @@ INSERT INTO type_test (
     'value3', -- enum
     0x4D7953514C, -- binary
     0x48656C6C6F20, -- varbinary
-    _binary 'binary', -- blob
-    'option1,option3' -- set
+    _binary 'binary', -- blob,
+    'option1,option3', -- set
+    ST_GeomFromText('POINT(1 1)') -- geometry
 );

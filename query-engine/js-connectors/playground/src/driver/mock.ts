@@ -7,6 +7,8 @@ class MockSQL implements Driver, Closeable {
   private isRunning: boolean = true
 
   constructor(connectionString: string) {
+    console.log(`[nodejs] initializing mock connection pool: ${connectionString}`)
+
     // lazily retrieve the version and store it into `maybeVersion`
     setTimeout(50)
       .then(() => {
