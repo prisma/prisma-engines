@@ -166,10 +166,9 @@ pub struct Query {
 }
 
 fn js_planetscale_value_to_quaint(json_value: serde_json::Value, column_type: ColumnType) -> QuaintValue<'static> {
-    // Note(jkomyno): I suggest we avoid so many different panic messages.
-    // They bloat the compiled code, making it heavier. I suggest we consider the type information
-    // received from the JS connector safe, and eventually just let the code panic without a custom message here.
-    // We can later infer which column type is not properly supported from the panic message's line and column anyway.
+  //  Note for the future: it may be worth revisiting how much bloat so many panics with different static strings add to the compiled artefact,
+  // and in case we should come up with a restricted set of panic messages,
+  // or even find a way of removing them altogether.
     match column_type {
         ColumnType::Int32 => match json_value {
             serde_json::Value::Number(n) => {
