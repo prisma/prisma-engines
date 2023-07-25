@@ -1,5 +1,5 @@
 {
-  "name": "@prisma/jsdrivers-playground",
+  "name": "@prisma/smoke-test-js",
   "version": "1.0.0",
   "description": "",
   "type": "module",
