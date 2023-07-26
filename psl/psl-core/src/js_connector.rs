@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use crate::datamodel_connector::*;
 use enumflags2::BitFlags;
 
@@ -35,6 +37,18 @@ impl JsConnector {
 #[derive(Copy, Clone)]
 pub enum Flavor {
     MySQL,
+    Postgres,
+}
+
+impl FromStr for Flavor {
+    type Err = String;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "mysql" => Ok(Self::MySQL),
+            "postgres" => Ok(Self::Postgres),
+            _ => Err(format!("Unknown flavor: {}", s)),
+        }
+    }
 }
 
 impl Connector for JsConnector {

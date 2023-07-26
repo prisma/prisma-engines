@@ -1,6 +1,7 @@
 use crate::proxy::{self, JSResultSet, Proxy, Query};
 use async_trait::async_trait;
 use napi::JsObject;
+use psl::JsConnectorFlavor;
 use quaint::{
     connector::IsolationLevel,
     prelude::{Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable},
@@ -25,11 +26,12 @@ use tracing::{info_span, Instrument};
 #[derive(Clone)]
 pub struct JsQueryable {
     pub(crate) proxy: Proxy,
+    pub(crate) flavor: JsConnectorFlavor,
 }
 
 impl JsQueryable {
-    pub fn new(proxy: Proxy) -> Self {
-        Self { proxy }
+    pub fn new(proxy: Proxy, flavor: JsConnectorFlavor) -> Self {
+        Self { proxy, flavor }
     }
 }
 
@@ -49,7 +51,10 @@ impl std::fmt::Debug for JsQueryable {
 impl QuaintQueryable for JsQueryable {
     /// Execute the given query.
     async fn query(&self, q: QuaintQuery<'_>) -> quaint::Result<ResultSet> {
-        let (sql, params) = visitor::Mysql::build(q)?;
+        let (sql, params) = match self.flavor {
+            JsConnectorFlavor::MySQL => visitor::Mysql::build(q)?,
+            JsConnectorFlavor::Postgres => visitor::Postgres::build(q)?,
+        };
         self.query_raw(&sql, &params).await
     }
 
@@ -71,7 +76,10 @@ impl QuaintQueryable for JsQueryable {
 
     /// Execute the given query, returning the number of affected rows.
     async fn execute(&self, q: QuaintQuery<'_>) -> quaint::Result<u64> {
-        let (sql, params) = visitor::Mysql::build(q)?;
+        let (sql, params) = match self.flavor {
+            JsConnectorFlavor::MySQL => visitor::Mysql::build(q)?,
+            JsConnectorFlavor::Postgres => visitor::Postgres::build(q)?,
+        };
         self.execute_raw(&sql, &params).await
     }
 
@@ -174,6 +182,9 @@ impl TransactionCapable for JsQueryable {}
 impl From<JsObject> for JsQueryable {
     fn from(driver: JsObject) -> Self {
         let driver = proxy::reify(driver).unwrap();
-        Self { proxy: driver }
+        Self {
+            flavor: driver.flavor.parse().unwrap(),
+            proxy: driver,
+        }
     }
 }

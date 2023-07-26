@@ -114,6 +114,7 @@ class PrismaPlanetScale implements Connector, Closeable {
   private client: planetScale.Connection
   private maybeVersion?: string
   private isRunning: boolean = true
+  flavor = "mysql"
 
   constructor(config: PlanetScaleConfig) {
     this.client = planetScale.connect(config)

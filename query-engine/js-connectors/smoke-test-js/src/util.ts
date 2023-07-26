@@ -28,7 +28,9 @@ export function initQueryEngine(driver: Connector): QueryEngineInstance {
     ignoreEnvVarErrors: false,
   }
 
-  const logCallback = (...args) => console.log(args)
+  const logCallback = (...args) => {
+    console.log(args)
+  }
   const engine = new QueryEngine(queryEngineOptions, logCallback, driver)
 
   return engine

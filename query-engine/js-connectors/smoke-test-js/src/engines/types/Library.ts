@@ -53,6 +53,7 @@ export type Connector = {
   executeRaw: (params: Query) => Promise<number>
   version: () => Promise<string | undefined>
   isHealthy: () => boolean
+  flavor: string,
 }
 
 export type Closeable = {
