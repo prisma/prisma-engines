@@ -139,7 +139,9 @@ fn push_inline_relations(ctx: &mut Context<'_>) {
             .forward_relation_field()
             .expect("Expecting a complete relation in sql_schmea_calculator");
 
-        if relation_field.ast_field().arity.is_optional() {
+        let mut fields = relation_field.fields().expect("TODO write a proper message here");
+
+        if fields.all(|field| field.ast_field().arity.is_required()) && relation_field.ast_field().arity.is_optional() {
             continue;
         }
 
