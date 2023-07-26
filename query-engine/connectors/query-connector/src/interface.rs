@@ -316,8 +316,9 @@ pub trait WriteOperations {
         model: &Model,
         record_filter: RecordFilter,
         args: WriteArgs,
+        selected_fields: Option<FieldSelection>,
         trace_id: Option<String>,
-    ) -> crate::Result<Option<SelectionResult>>;
+    ) -> crate::Result<Option<SingleRecord>>;
 
     /// Native upsert
     /// Use the connectors native upsert to upsert the `Model`

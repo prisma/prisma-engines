@@ -1,10 +1,13 @@
-use super::ScalarFieldExt;
-use prisma_models::{PrismaValue, SelectedField, SelectionResult};
-use quaint::Value;
+use crate::context::Context;
 
-pub trait SelectionResultExt {
+use super::{AsColumn, ScalarFieldExt};
+use prisma_models::{PrismaValue, SelectedField, SelectionResult};
+use quaint::{prelude::Column, Value};
+
+pub(crate) trait SelectionResultExt {
     fn misses_autogen_value(&self) -> bool;
     fn db_values<'a>(&self) -> Vec<Value<'a>>;
+    fn columns<'a>(&self, ctx: &Context<'_>) -> Vec<Column<'a>>;
 
     fn add_autogen_value<V>(&mut self, value: V) -> bool
     where
@@ -36,6 +39,16 @@ impl SelectionResultExt for SelectionResult {
             .map(|(selection, v)| match selection {
                 SelectedField::Scalar(sf) => sf.value(v.clone()),
                 SelectedField::Composite(_cf) => todo!(), // [Composites] todo
+            })
+            .collect()
+    }
+
+    fn columns<'a>(&self, ctx: &Context<'_>) -> Vec<Column<'a>> {
+        self.pairs
+            .iter()
+            .map(|(field, _)| match field {
+                SelectedField::Scalar(sf) => sf.as_column(ctx),
+                SelectedField::Composite(_) => todo!(), // [Composites] todo,
             })
             .collect()
     }

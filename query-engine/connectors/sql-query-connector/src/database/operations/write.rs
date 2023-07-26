@@ -1,6 +1,6 @@
+use super::update::*;
 use crate::column_metadata;
 use crate::filter_conversion::AliasedCondition;
-use crate::query_builder::write::{build_update_and_set_query, chunk_update_with_ids};
 use crate::row::ToSqlRow;
 use crate::{
     error::SqlError, model_extensions::*, query_builder::write, sql_trace::SqlTraceComment, Context, QueryExt,
@@ -318,72 +318,14 @@ pub(crate) async fn update_record(
     model: &Model,
     record_filter: RecordFilter,
     args: WriteArgs,
+    selected_fields: Option<FieldSelection>,
     ctx: &Context<'_>,
-) -> crate::Result<Vec<SelectionResult>> {
-    let id_args = pick_args(&model.primary_identifier().into(), &args);
-
-    // This is to match the behaviour expected but it seems a bit strange to me
-    // This comes across as if the update happened even if it didn't
-    if args.args.is_empty() {
-        let ids: Vec<SelectionResult> = conn.filter_selectors(model, record_filter.clone(), ctx).await?;
-
-        return Ok(ids);
+) -> crate::Result<Option<SingleRecord>> {
+    if let Some(selected_fields) = selected_fields {
+        update_one_with_selection(conn, model, record_filter, args, selected_fields, ctx).await
+    } else {
+        update_one_without_selection(conn, model, record_filter, args, ctx).await
     }
-
-    let (_, ids) = update_records_from_ids_and_filter(conn, model, record_filter, args, ctx).await?;
-
-    Ok(merge_write_args(ids, id_args))
-}
-
-// Generates a query like this:
-//  UPDATE "public"."User" SET "name" = $1 WHERE "public"."User"."id" IN ($2,$3,$4,$5,$6,$7,$8,$9,$10,$11) AND "public"."User"."age" > $1
-async fn update_records_from_ids_and_filter(
-    conn: &dyn Queryable,
-    model: &Model,
-    record_filter: RecordFilter,
-    args: WriteArgs,
-    ctx: &Context<'_>,
-) -> crate::Result<(usize, Vec<SelectionResult>)> {
-    let filter_condition = record_filter.clone().filter.aliased_condition_from(None, false, ctx);
-    let ids: Vec<SelectionResult> = conn.filter_selectors(model, record_filter, ctx).await?;
-
-    if ids.is_empty() {
-        return Ok((0, Vec::new()));
-    }
-
-    let update = build_update_and_set_query(model, args, ctx);
-
-    let updates = {
-        let ids: Vec<&SelectionResult> = ids.iter().collect();
-        chunk_update_with_ids(update, model, &ids, filter_condition, ctx)?
-    };
-
-    let mut count = 0;
-    for update in updates {
-        let update_count = conn.execute(update).await?;
-
-        count += update_count;
-    }
-
-    Ok((count as usize, ids))
-}
-
-// Generates a query like this:
-//  UPDATE "public"."User" SET "name" = $1 WHERE "public"."User"."age" > $1
-async fn update_records_from_filter(
-    conn: &dyn Queryable,
-    model: &Model,
-    record_filter: RecordFilter,
-    args: WriteArgs,
-    ctx: &Context<'_>,
-) -> crate::Result<usize> {
-    let update = build_update_and_set_query(model, args, ctx);
-    let filter_condition = record_filter.filter.aliased_condition_from(None, false, ctx);
-
-    let update = update.so_that(filter_condition);
-    let count = conn.execute(update.into()).await?;
-
-    Ok(count as usize)
 }
 
 /// Update multiple records in a database defined in `conn` and the records
@@ -402,10 +344,13 @@ pub(crate) async fn update_records(
     }
 
     if record_filter.has_selectors() {
-        let (count, _) = update_records_from_ids_and_filter(conn, model, record_filter, args, ctx).await?;
+        let (count, _) = update_many_from_ids_and_filter(conn, model, record_filter, args, ctx).await?;
+
         Ok(count)
     } else {
-        update_records_from_filter(conn, model, record_filter, args, ctx).await
+        let count = update_many_from_filter(conn, model, record_filter, args, ctx).await?;
+
+        Ok(count)
     }
 }
 
