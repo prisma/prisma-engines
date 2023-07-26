@@ -1,11 +1,12 @@
 {
-  "name": "@prisma/jsdrivers-playground",
+  "name": "@prisma/smoke-test-js",
   "version": "1.0.0",
   "description": "",
-  "type": "commonjs",
+  "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node ./src/index.ts"
+    "planetscale": "ts-node ./src/planetscale.ts",
+    "migrate:reset": "prisma migrate reset"
   },
   "keywords": [],
   "author": "",
@@ -13,10 +14,12 @@
   "devDependencies": {
     "@napi-rs/cli": "^2.15.2",
     "@types/node": "^20.1.2",
+    "prisma": "^5.0.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
   },
   "dependencies": {
+    "@planetscale/database": "^1.8.0",
     "mysql2": "^3.3.1"
   }
 }

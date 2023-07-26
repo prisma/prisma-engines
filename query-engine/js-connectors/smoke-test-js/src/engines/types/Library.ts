@@ -1,4 +1,4 @@
-import type { QueryEngineConfig } from './QueryEngine'
+import type { QueryEngineConfig } from './QueryEngine.js'
 
 export type QueryEngineInstance = {
   connect(headers: string): Promise<void>
@@ -29,27 +29,29 @@ export interface Query {
 
 // Same order as in rust js-connectors' `ColumnType`
 export const enum ColumnType {
-  Int32 = 0,
-  Int64 = 1,
-  Float = 2,
-  Double = 3,
-  Text = 4,
-  Enum = 5,
-  Bytes = 6,
-  Boolean = 7,
-  Char = 8,
-  Array = 9,
-  Numeric = 10,
-  Json = 11,
-  DateTime = 12,
-  Date = 13,
-  Time = 14
+  Int32,
+  Int64,
+  Float,
+  Double,
+  Numeric,
+  Boolean,
+  Char,
+  Text,
+  Date,
+  Time,
+  DateTime,
+  Json,
+  Enum,
+  Bytes,
+  // Set,
+  // Array,
+  // ...
 }
 
-export type Queryable = {
+export type Connector = {
   queryRaw: (params: Query) => Promise<ResultSet>
   executeRaw: (params: Query) => Promise<number>
-  version: () => string | undefined
+  version: () => Promise<string | undefined>
   isHealthy: () => boolean
 }
 
@@ -58,7 +60,7 @@ export type Closeable = {
 }
 
 export interface QueryEngineConstructor {
-  new(config: QueryEngineConfig, logger: (log: string) => void, nodejsFnCtx?: Queryable): QueryEngineInstance
+  new(config: QueryEngineConfig, logger: (log: string) => void, nodejsFnCtx?: Connector): QueryEngineInstance
 }
 
 export interface LibraryLoader {

@@ -1,14 +1,12 @@
 import { setTimeout } from 'node:timers/promises'
 
-import { Closeable, ColumnType, Query, Queryable, ResultSet } from '../engines/types/Library'
+import { Closeable, ColumnType, Query, Connector, ResultSet } from '../engines/types/Library.js'
 
-class MockSQL implements Queryable, Closeable {
+class MockSQL implements Connector, Closeable {
   private maybeVersion?: string
   private isRunning: boolean = true
 
   constructor(connectionString: string) {
-    console.log(`[nodejs] initializing mock connection pool: ${connectionString}`)
-
     // lazily retrieve the version and store it into `maybeVersion`
     setTimeout(50)
       .then(() => {
@@ -74,12 +72,12 @@ class MockSQL implements Queryable, Closeable {
    * example. The version string is returned directly without any form of
    * parsing or normalization.
    */
-  version(): string | undefined {
-    return this.maybeVersion
+  version(): Promise<string | undefined> {
+    return Promise.resolve(this.maybeVersion)
   }
 }
 
-export const createMockQueryable = (connectionString: string): Queryable & Closeable => {
+export const createMockConnector = (connectionString: string): Connector & Closeable => {
   const db = new MockSQL(connectionString)
   return db
 }
