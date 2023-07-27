@@ -20,10 +20,21 @@ We assume Node.js `v18.16.1`+ is installed.
 - Create a new `shadow` database branch. Repeat the steps above (selecting the `shadow` branch instead of `main`), and paste the generated URL in the `JS_PLANETSCALE_SHADOW_DATABASE_URL` environment variable in `.envrc`.
 
 In the current directory:
+- Run `cp prisma/mysql/schema.prisma prisma/` to use the MySQL schema. Change the provider to `mysql`.
 - Run `prisma migrate reset` to populate the remote PlanetScale database with the "smoke test" data.
 - Change the `provider` name in [./prisma/schema.prisma](./prisma/schema.prisma) from `mysql` to `@prisma/planetscale`.
 
 Note: you used to be able to run these Prisma commands without changing the provider name, but [#4074](https://github.com/prisma/prisma-engines/pull/4074) changed that (see https://github.com/prisma/prisma-engines/pull/4074#issuecomment-1649942475).
+
+### Neon
+
+- Create a new database with Neon CLI `npx neonctl projects create` or in [Neon Console](https://neon.tech).
+- Paste the connection string to `JS_NEON_DATABASE_URL`. Create a shadow branch and repeat the step above, paste the connection string to `JS_NEON_SHADOW_DATABASE_URL`.
+
+In the current directory:
+- Run `cp prisma/postgresql/schema.prisma prisma/` to use the PostgreSQL schema. Change the provider to `postgresql`.
+- Run `prisma migrate reset` to populate the remote PlanetScale database with the "smoke test" data.
+- Change the `provider` name in [./prisma/schema.prisma](./prisma/schema.prisma) from `postgresql` to `@prisma/neon`.
 
 ## How to use
 
@@ -46,8 +57,6 @@ In particular, the pipeline steps are currently the following:
 - Release the connector via `engine.disconnect()`
 - Attempt a reconnection (useful to catch possible panics in the implementation)
 - Close the database connection via `nodejsFnCtx`
-
-In the future, we might add support for more JS drivers, such as `@neondatabase/serverless`.
 
 Example test output:
 
