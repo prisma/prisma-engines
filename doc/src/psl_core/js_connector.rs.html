@@ -133,7 +133,23 @@
 <a href="#133" id="133">133</a>
 <a href="#134" id="134">134</a>
 <a href="#135" id="135">135</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::datamodel_connector::<span class="kw-2">*</span>;
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::str::FromStr;
+
+<span class="kw">use </span><span class="kw">crate</span>::datamodel_connector::<span class="kw-2">*</span>;
 <span class="kw">use </span>enumflags2::BitFlags;
 
 <span class="doccomment">/// JsConnector represents a type of connector that is implemented partially
@@ -170,6 +186,18 @@
 <span class="attr">#[derive(Copy, Clone)]
 </span><span class="kw">pub enum </span>Flavor {
     MySQL,
+    Postgres,
+}
+
+<span class="kw">impl </span>FromStr <span class="kw">for </span>Flavor {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= String;
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+        <span class="kw">match </span>s.to_lowercase().as_str() {
+            <span class="string">&quot;mysql&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::MySQL),
+            <span class="string">&quot;postgres&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Postgres),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;Unknown flavor: {}&quot;</span>, s)),
+        }
+    }
 }
 
 <span class="kw">impl </span>Connector <span class="kw">for </span>JsConnector {

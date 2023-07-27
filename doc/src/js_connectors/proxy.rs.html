@@ -600,11 +600,17 @@
 <a href="#600" id="600">600</a>
 <a href="#601" id="601">601</a>
 <a href="#602" id="602">602</a>
+<a href="#603" id="603">603</a>
+<a href="#604" id="604">604</a>
+<a href="#605" id="605">605</a>
+<a href="#606" id="606">606</a>
+<a href="#607" id="607">607</a>
+<a href="#608" id="608">608</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::panic;
 
 <span class="kw">use </span>napi::bindgen_prelude::{FromNapiValue, Promise <span class="kw">as </span>JsPromise, ToNapiValue};
 <span class="kw">use </span>napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction};
-<span class="kw">use </span>napi::JsObject;
+<span class="kw">use </span>napi::{JsObject, JsString};
 <span class="kw">use </span>napi_derive::napi;
 <span class="kw">use </span>quaint::connector::ResultSet <span class="kw">as </span>QuaintResultSet;
 <span class="kw">use </span>quaint::Value <span class="kw">as </span>QuaintValue;
@@ -637,6 +643,10 @@
     <span class="doccomment">/// Return true iff the underlying database connection is healthy.
     </span><span class="attr">#[allow(dead_code)]
     </span>is_healthy: ThreadsafeFunction&lt;(), ErrorStrategy::Fatal&gt;,
+
+    <span class="doccomment">/// Return the flavor for this driver.
+    </span><span class="attr">#[allow(dead_code)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) flavor: String,
 }
 
 <span class="doccomment">/// Reify creates a Rust proxy to access the JS driver passed in as a parameter.
@@ -646,6 +656,7 @@
     <span class="kw">let </span>version = js_driver.get_named_property(<span class="string">&quot;version&quot;</span>)<span class="question-mark">?</span>;
     <span class="kw">let </span>close = js_driver.get_named_property(<span class="string">&quot;close&quot;</span>)<span class="question-mark">?</span>;
     <span class="kw">let </span>is_healthy = js_driver.get_named_property(<span class="string">&quot;isHealthy&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>flavor: JsString = js_driver.get_named_property(<span class="string">&quot;flavor&quot;</span>)<span class="question-mark">?</span>;
 
     <span class="kw">let </span>driver = Proxy {
         query_raw,
@@ -653,6 +664,7 @@
         version,
         close,
         is_healthy,
+        flavor: flavor.into_utf8()<span class="question-mark">?</span>.as_str()<span class="question-mark">?</span>.to_owned(),
     };
     <span class="prelude-val">Ok</span>(driver)
 }
