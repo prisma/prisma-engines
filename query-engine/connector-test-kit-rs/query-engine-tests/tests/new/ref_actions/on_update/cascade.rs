@@ -398,11 +398,6 @@ mod one2many_opt {
             @r###"{"data":{"updateOneParent":{"uniq":"1u"}}}"###
         );
 
-        // insta::assert_snapshot!(
-        //     run_query!(&runner, "query { findManyParent { uniq children { parent_uniq } }}"),
-        //     @r###"{"data":{"findManyParent":[{"uniq":"1u","children":[{"parent_uniq":"1u"}]}]}}"###
-        // );
-
         Ok(())
     }
 
