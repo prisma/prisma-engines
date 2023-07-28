@@ -372,6 +372,7 @@
 <a href="#372" id="372">372</a>
 <a href="#373" id="373">373</a>
 <a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{coerce_null_to_zero_value, Filter, NativeUpsert, QueryArguments, WriteArgs};
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>prisma_models::{ast::FieldArity, <span class="kw-2">*</span>};
@@ -690,8 +691,9 @@
         model: <span class="kw-2">&amp;</span>Model,
         record_filter: RecordFilter,
         args: WriteArgs,
+        selected_fields: <span class="prelude-ty">Option</span>&lt;FieldSelection&gt;,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    ) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;SelectionResult&gt;&gt;;
+    ) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;SingleRecord&gt;&gt;;
 
     <span class="doccomment">/// Native upsert
     /// Use the connectors native upsert to upsert the `Model`

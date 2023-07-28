@@ -44,7 +44,7 @@
 <span class="kw">use </span>prisma_models::{PrismaValue, SelectedField, SelectionResult};
 <span class="kw">use </span>quaint::Value;
 
-<span class="kw">pub trait </span>SelectionResultExt {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>SelectionResultExt {
     <span class="kw">fn </span>misses_autogen_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
     <span class="kw">fn </span>db_values&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt;;
 

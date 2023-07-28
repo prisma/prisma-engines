@@ -163,6 +163,36 @@
 <a href="#163" id="163">163</a>
 <a href="#164" id="164">164</a>
 <a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     interpreter::{InterpretationResult, InterpreterError},
     query_ast::<span class="kw-2">*</span>,
@@ -210,14 +240,14 @@
 ) -&gt; InterpretationResult&lt;QueryResult&gt; {
     <span class="kw">let </span>res = tx.create_record(<span class="kw-2">&amp;</span>q.model, q.args, q.selected_fields, trace_id).<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(QueryResult::RecordSelection(Box::new(RecordSelection {
+    <span class="prelude-val">Ok</span>(QueryResult::RecordSelection(<span class="prelude-val">Some</span>(Box::new(RecordSelection {
         name: q.name,
         fields: q.selection_order,
         aggregation_rows: <span class="prelude-val">None</span>,
         model: q.model,
         scalars: res.into(),
         nested: <span class="macro">vec!</span>[],
-    })))
+    }))))
 }
 
 <span class="kw">async fn </span>create_many(
@@ -235,9 +265,39 @@
     q: UpdateRecord,
     trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
 ) -&gt; InterpretationResult&lt;QueryResult&gt; {
-    <span class="kw">let </span>res = tx.update_record(<span class="kw-2">&amp;</span>q.model, q.record_filter, q.args, trace_id).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>res = tx
+        .update_record(
+            q.model(),
+            q.record_filter().clone(),
+            q.args().clone(),
+            q.selected_fields(),
+            trace_id,
+        )
+        .<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(QueryResult::Id(res))
+    <span class="kw">match </span>q {
+        UpdateRecord::WithExplicitSelection(q) =&gt; {
+            <span class="kw">let </span>res = res
+                .map(|res| RecordSelection {
+                    name: q.name,
+                    fields: q.selection_order,
+                    scalars: res.into(),
+                    nested: <span class="macro">vec!</span>[],
+                    model: q.model,
+                    aggregation_rows: <span class="prelude-val">None</span>,
+                })
+                .map(Box::new);
+
+            <span class="prelude-val">Ok</span>(QueryResult::RecordSelection(res))
+        }
+        UpdateRecord::WithoutSelection(<span class="kw">_</span>) | UpdateRecord::WithImplicitSelection(<span class="kw">_</span>) =&gt; {
+            <span class="kw">let </span>res = res
+                .map(|record| record.extract_selection_result(<span class="kw-2">&amp;</span>q.model().primary_identifier()))
+                .transpose()<span class="question-mark">?</span>;
+
+            <span class="prelude-val">Ok</span>(QueryResult::Id(res))
+        }
+    }
 }
 
 <span class="kw">async fn </span>native_upsert(

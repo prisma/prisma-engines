@@ -294,6 +294,7 @@
 <a href="#294" id="294">294</a>
 <a href="#295" id="295">295</a>
 <a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::query_graph_builder::write::utils::coerce_vec;
 <span class="kw">use crate</span>::{
@@ -440,6 +441,7 @@
             filter.clone(),
             child_model.clone(),
             update_input.try_into()<span class="question-mark">?</span>,
+            <span class="prelude-val">None</span>,
         )<span class="question-mark">?</span>;
 
         graph.create_edge(

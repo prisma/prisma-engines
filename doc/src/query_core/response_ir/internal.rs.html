@@ -706,7 +706,7 @@
     query_schema: <span class="kw-2">&amp;</span>QuerySchema,
 ) -&gt; <span class="kw">crate</span>::Result&lt;CheckedItemsWithParents&gt; {
     <span class="kw">match </span>result {
-        QueryResult::RecordSelection(rs) =&gt; {
+        QueryResult::RecordSelection(<span class="prelude-val">Some</span>(rs)) =&gt; {
             serialize_record_selection(<span class="kw-2">*</span>rs, field, field.field_type(), is_list, query_schema)
         }
         QueryResult::RecordAggregations(ras) =&gt; serialize_aggregations(field, ras),
@@ -721,7 +721,7 @@
             <span class="prelude-val">Ok</span>(result)
         }
         QueryResult::Json(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
-        QueryResult::Id(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
+        QueryResult::Id(<span class="kw">_</span>) | QueryResult::RecordSelection(<span class="prelude-val">None</span>) =&gt; <span class="macro">unreachable!</span>(),
         QueryResult::Unit =&gt; <span class="macro">unimplemented!</span>(),
     }
 }
@@ -1096,7 +1096,7 @@
     // Unwraps are safe due to query validation.
     </span><span class="kw">for </span>nested_result <span class="kw">in </span>nested {
         <span class="comment">// todo Workaround, tb changed with flat reads.
-        </span><span class="kw">if let </span>QueryResult::RecordSelection(<span class="kw-2">ref </span>rs) = nested_result {
+        </span><span class="kw">if let </span>QueryResult::RecordSelection(<span class="prelude-val">Some</span>(<span class="kw-2">ref </span>rs)) = nested_result {
             <span class="kw">let </span>name = rs.name.clone();
             <span class="kw">let </span>field = enclosing_type.find_field(<span class="kw-2">&amp;</span>name).unwrap();
             <span class="kw">let </span>result = serialize_internal(nested_result, field, <span class="bool-val">false</span>, query_schema)<span class="question-mark">?</span>;

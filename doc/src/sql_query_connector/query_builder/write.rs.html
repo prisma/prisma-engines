@@ -245,6 +245,19 @@
 <a href="#245" id="245">245</a>
 <a href="#246" id="246">246</a>
 <a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{model_extensions::<span class="kw-2">*</span>, sql_trace::SqlTraceComment, Context};
 <span class="kw">use </span>connector_interface::{DatasourceFieldName, ScalarWriteOperation, WriteArgs};
 <span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
@@ -351,7 +364,12 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build_update_and_set_query(model: <span class="kw-2">&amp;</span>Model, args: WriteArgs, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Update&lt;<span class="lifetime">&#39;static</span>&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build_update_and_set_query(
+    model: <span class="kw-2">&amp;</span>Model,
+    args: WriteArgs,
+    selected_fields: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ModelProjection&gt;,
+    ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+) -&gt; Update&lt;<span class="lifetime">&#39;static</span>&gt; {
     <span class="kw">let </span>scalar_fields = model.fields().scalar();
     <span class="kw">let </span>table = model.as_table(ctx);
     <span class="kw">let </span>query = args
@@ -403,7 +421,15 @@
             acc.set(name, value)
         });
 
-    query.append_trace(<span class="kw-2">&amp;</span>Span::current()).add_trace_id(ctx.trace_id)
+    <span class="kw">let </span>query = query.append_trace(<span class="kw-2">&amp;</span>Span::current()).add_trace_id(ctx.trace_id);
+
+    <span class="kw">let </span>query = <span class="kw">if let </span><span class="prelude-val">Some</span>(selected_fields) = selected_fields {
+        query.returning(selected_fields.as_columns(ctx))
+    } <span class="kw">else </span>{
+        query
+    };
+
+    query
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>chunk_update_with_ids(
@@ -485,7 +511,7 @@
         parent_columns.pop().unwrap().equals(parent_id_values)
     };
 
-    <span class="kw">let </span>child_id_criteria = <span class="kw">super</span>::conditions(<span class="kw-2">&amp;</span>child_columns, child_ids);
+    <span class="kw">let </span>child_id_criteria = <span class="kw">super</span>::in_conditions(<span class="kw-2">&amp;</span>child_columns, child_ids);
 
     Delete::from_table(relation.as_table(ctx))
         .so_that(parent_id_criteria.and(child_id_criteria))

@@ -2173,7 +2173,7 @@
 <span class="kw">fn </span>extract_update_args(parent_node: <span class="kw-2">&amp;</span>Node) -&gt; <span class="kw-2">&amp;</span>WriteArgs {
     <span class="kw">if let </span>Node::Query(Query::Write(q)) = parent_node {
         <span class="kw">match </span>q {
-            WriteQuery::UpdateRecord(one) =&gt; <span class="kw-2">&amp;</span>one.args,
+            WriteQuery::UpdateRecord(one) =&gt; one.args(),
             WriteQuery::UpdateManyRecords(many) =&gt; <span class="kw-2">&amp;</span>many.args,
             <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Parent operation for update emulation is not an update.&quot;</span>),
         }

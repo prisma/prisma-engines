@@ -307,6 +307,7 @@
 <a href="#307" id="307">307</a>
 <a href="#308" id="308">308</a>
 <a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{
     expression::<span class="kw-2">*</span>,
     query_interpreters::{read, write},
@@ -374,13 +375,14 @@
                 },
 
                 <span class="comment">// We always select IDs, the unwraps are safe.
-                </span>QueryResult::RecordSelection(rs) =&gt; <span class="prelude-val">Some</span>(
+                </span>QueryResult::RecordSelection(<span class="prelude-val">Some</span>(rs)) =&gt; <span class="prelude-val">Some</span>(
                     rs.scalars
                         .extract_selection_results(field_selection)
                         .expect(<span class="string">&quot;Expected record selection to contain required model ID fields.&quot;</span>)
                         .into_iter()
                         .collect(),
                 ),
+                QueryResult::RecordSelection(<span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[]),
 
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             },

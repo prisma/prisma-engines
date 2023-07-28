@@ -298,6 +298,7 @@
 <a href="#298" id="298">298</a>
 <a href="#299" id="299">299</a>
 <a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{catch, transaction::SqlConnectorTransaction};
 <span class="kw">use crate</span>::{database::operations::<span class="kw-2">*</span>, Context, SqlError};
 <span class="kw">use </span>async_trait::async_trait;
@@ -516,13 +517,14 @@
         model: <span class="kw-2">&amp;</span>Model,
         record_filter: RecordFilter,
         args: WriteArgs,
+        selected_fields: <span class="prelude-ty">Option</span>&lt;FieldSelection&gt;,
         trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    ) -&gt; connector::Result&lt;<span class="prelude-ty">Option</span>&lt;SelectionResult&gt;&gt; {
+    ) -&gt; connector::Result&lt;<span class="prelude-ty">Option</span>&lt;SingleRecord&gt;&gt; {
         catch(<span class="self">self</span>.connection_info.clone(), <span class="kw">async move </span>{
             <span class="kw">let </span>ctx = Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.connection_info, trace_id.as_deref());
-            <span class="kw">let </span><span class="kw-2">mut </span>res = write::update_record(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, model, record_filter, args, <span class="kw-2">&amp;</span>ctx).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(res.pop())
-        })
+
+            write::update_record(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, model, record_filter, args, selected_fields, <span class="kw-2">&amp;</span>ctx).<span class="kw">await
+        </span>})
         .<span class="kw">await
     </span>}
 

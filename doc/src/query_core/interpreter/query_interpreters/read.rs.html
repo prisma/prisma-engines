@@ -360,14 +360,14 @@
 
             <span class="prelude-val">None </span><span class="kw">if </span>query.options.contains(QueryOption::ThrowOnEmpty) =&gt; record_not_found(),
 
-            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(QueryResult::RecordSelection(Box::new(RecordSelection {
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(QueryResult::RecordSelection(<span class="prelude-val">Some</span>(Box::new(RecordSelection {
                 name: query.name,
                 fields: query.selection_order,
                 scalars: ManyRecords::default(),
                 nested: <span class="macro">vec!</span>[],
                 model,
                 aggregation_rows: <span class="prelude-val">None</span>,
-            }))),
+            })))),
         }
     };
 

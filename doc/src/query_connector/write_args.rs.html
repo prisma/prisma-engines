@@ -490,7 +490,6 @@
 <a href="#490" id="490">490</a>
 <a href="#491" id="491">491</a>
 <a href="#492" id="492">492</a>
-<a href="#493" id="493">493</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     error::{ConnectorError, ErrorKind},
     Filter,
@@ -963,9 +962,8 @@
         .into_iter()
         .map(|<span class="kw-2">mut </span>id| {
             <span class="kw">for </span>(position, write_op) <span class="kw">in </span>positions.iter() {
-                <span class="kw">let </span>current_val = id.pairs[position.to_owned()].<span class="number">1</span>.clone();
-                id.pairs[position.to_owned()].<span class="number">1 </span>=
-                    apply_expression(current_val, (<span class="kw-2">*</span>write_op.as_scalar().unwrap()).clone());
+                <span class="kw">let </span>current_val = id.pairs[<span class="kw-2">*</span>position].<span class="number">1</span>.clone();
+                id.pairs[<span class="kw-2">*</span>position].<span class="number">1 </span>= apply_expression(current_val, (<span class="kw-2">*</span>write_op.as_scalar().unwrap()).clone());
             }
 
             id

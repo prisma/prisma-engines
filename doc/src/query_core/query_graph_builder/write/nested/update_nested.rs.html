@@ -160,6 +160,11 @@
 <a href="#160" id="160">160</a>
 <a href="#161" id="161">161</a>
 <a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
     query_ast::<span class="kw-2">*</span>,
@@ -240,12 +245,17 @@
             }
         };
 
+        <span class="kw">let </span>data_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = data.try_into()<span class="question-mark">?</span>;
+
+        <span class="comment">// If there&#39;s nothing to update, skip the update entirely.
+        </span><span class="kw">if </span>data_map.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
+        }
+
         <span class="kw">let </span>find_child_records_node =
             utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>update_node =
-            update::update_record_node(graph, query_schema, filter, child_model.clone(), data.try_into()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
-
+        <span class="kw">let </span>update_node = update::update_record_node(graph, query_schema, filter, child_model.clone(), data_map, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
         <span class="kw">let </span>relation_name = parent_relation_field.relation().name().to_owned();

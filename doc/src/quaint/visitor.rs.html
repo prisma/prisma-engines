@@ -1137,6 +1137,14 @@
 <a href="#1137" id="1137">1137</a>
 <a href="#1138" id="1138">1138</a>
 <a href="#1139" id="1139">1139</a>
+<a href="#1140" id="1140">1140</a>
+<a href="#1141" id="1141">1141</a>
+<a href="#1142" id="1142">1142</a>
+<a href="#1143" id="1143">1143</a>
+<a href="#1144" id="1144">1144</a>
+<a href="#1145" id="1145">1145</a>
+<a href="#1146" id="1146">1146</a>
+<a href="#1147" id="1147">1147</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Visitors for reading an abstract SQL syntax tree, generating the query and
 //! gathering parameters in the right order.
 //!
@@ -1471,6 +1479,14 @@
         <span class="kw">if let </span><span class="prelude-val">Some</span>(conditions) = update.conditions {
             <span class="self">self</span>.write(<span class="string">&quot; WHERE &quot;</span>)<span class="question-mark">?</span>;
             <span class="self">self</span>.visit_conditions(conditions)<span class="question-mark">?</span>;
+        }
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(returning) = update.returning {
+            <span class="kw">if </span>!returning.is_empty() {
+                <span class="kw">let </span>values = returning.into_iter().map(|r| r.into()).collect();
+                <span class="self">self</span>.write(<span class="string">&quot; RETURNING &quot;</span>)<span class="question-mark">?</span>;
+                <span class="self">self</span>.visit_columns(values)<span class="question-mark">?</span>;
+            }
         }
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(comment) = update.comment {

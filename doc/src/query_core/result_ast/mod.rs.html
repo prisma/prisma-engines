@@ -55,7 +55,7 @@
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>QueryResult {
     Id(<span class="prelude-ty">Option</span>&lt;SelectionResult&gt;),
     Count(usize),
-    RecordSelection(Box&lt;RecordSelection&gt;),
+    RecordSelection(<span class="prelude-ty">Option</span>&lt;Box&lt;RecordSelection&gt;&gt;),
     Json(serde_json::Value),
     RecordAggregations(RecordAggregations),
     Unit,
@@ -86,7 +86,7 @@
 
 <span class="kw">impl </span>From&lt;RecordSelection&gt; <span class="kw">for </span>QueryResult {
     <span class="kw">fn </span>from(selection: RecordSelection) -&gt; <span class="self">Self </span>{
-        QueryResult::RecordSelection(Box::new(selection))
+        QueryResult::RecordSelection(<span class="prelude-val">Some</span>(Box::new(selection)))
     }
 }
 

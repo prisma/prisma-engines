@@ -134,6 +134,35 @@
 <a href="#134" id="134">134</a>
 <a href="#135" id="135">135</a>
 <a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::borrow::Cow;
 
@@ -145,6 +174,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) values: Vec&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) conditions: <span class="prelude-ty">Option</span>&lt;ConditionTree&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) comment: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) returning: <span class="prelude-ty">Option</span>&lt;Vec&lt;Column&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;Update&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>Query&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -165,6 +195,7 @@
             values: Vec::new(),
             conditions: <span class="prelude-val">None</span>,
             comment: <span class="prelude-val">None</span>,
+            returning: <span class="prelude-val">None</span>,
         }
     }
 
@@ -267,6 +298,33 @@
         </span>T: Into&lt;ConditionTree&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
         <span class="self">self</span>.conditions = <span class="prelude-val">Some</span>(conditions.into());
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the returned columns.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Postgres}};
+    /// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {
+    /// let update = Update::table(&quot;users&quot;).set(&quot;foo&quot;, 10);
+    /// let update = update.returning(vec![&quot;id&quot;]);
+    /// let (sql, _) = Postgres::build(update)?;
+    ///
+    /// assert_eq!(&quot;UPDATE \&quot;users\&quot; SET \&quot;foo\&quot; = $1 RETURNING \&quot;id\&quot;&quot;, sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="attr">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;sqlite&quot;</span>))]
+    #[cfg_attr(
+        feature = <span class="string">&quot;docs&quot;</span>,
+        doc(cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;sqlite&quot;</span>)))
+    )]
+    </span><span class="kw">pub fn </span>returning&lt;K, I&gt;(<span class="kw-2">mut </span><span class="self">self</span>, columns: I) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>K: Into&lt;Column&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        I: IntoIterator&lt;Item = K&gt;,
+    {
+        <span class="self">self</span>.returning = <span class="prelude-val">Some</span>(columns.into_iter().map(|k| k.into()).collect());
         <span class="self">self
     </span>}
 }

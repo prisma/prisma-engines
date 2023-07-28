@@ -36,6 +36,7 @@
 <a href="#36" id="36">36</a>
 <a href="#37" id="37">37</a>
 <a href="#38" id="38">38</a>
+<a href="#39" id="39">39</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     column_metadata,
     filter_conversion::AliasedCondition,
@@ -60,7 +61,8 @@
     <span class="kw">let </span>meta = column_metadata::create(<span class="kw-2">&amp;</span>field_names, <span class="kw-2">&amp;</span>idents);
 
     <span class="kw">let </span>where_condition = upsert.filter().aliased_condition_from(<span class="prelude-val">None</span>, <span class="bool-val">false</span>, ctx);
-    <span class="kw">let </span>update = build_update_and_set_query(upsert.model(), upsert.update().clone(), ctx).so_that(where_condition);
+    <span class="kw">let </span>update =
+        build_update_and_set_query(upsert.model(), upsert.update().clone(), <span class="prelude-val">None</span>, ctx).so_that(where_condition);
 
     <span class="kw">let </span>insert = create_record(upsert.model(), upsert.create().clone(), <span class="kw-2">&amp;</span>selected_fields, ctx);
 

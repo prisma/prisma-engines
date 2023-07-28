@@ -339,6 +339,7 @@
 <a href="#339" id="339">339</a>
 <a href="#340" id="340">340</a>
 <a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>native_types;
 <span class="kw">mod </span>validations;
 
@@ -397,7 +398,8 @@
     NativeUpsert |
     MultiSchema |
     FilteredInlineChildNestedToOneDisconnect |
-    InsertReturning
+    InsertReturning |
+    UpdateReturning
 });
 
 <span class="kw">const </span>SCALAR_TYPE_DEFAULTS: <span class="kw-2">&amp;</span>[(ScalarType, CockroachType)] = <span class="kw-2">&amp;</span>[

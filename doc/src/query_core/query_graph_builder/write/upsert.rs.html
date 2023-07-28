@@ -274,6 +274,13 @@
 <a href="#274" id="274">274</a>
 <a href="#275" id="275">275</a>
 <a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{write_args_parser::WriteArgsParser, <span class="kw-2">*</span>};
 <span class="kw">use crate</span>::{
     query_ast::<span class="kw-2">*</span>,
@@ -379,7 +386,14 @@
 
     <span class="kw">let </span>create_node = create::create_record_node(graph, query_schema, model.clone(), create_argument)<span class="question-mark">?</span>;
 
-    <span class="kw">let </span>update_node = update::update_record_node(graph, query_schema, filter, model.clone(), update_argument)<span class="question-mark">?</span>;
+    <span class="kw">let </span>update_node = update::update_record_node(
+        graph,
+        query_schema,
+        filter,
+        model.clone(),
+        update_argument,
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>field),
+    )<span class="question-mark">?</span>;
 
     <span class="kw">let </span>read_node_create = graph.create_node(Query::Read(read_query.clone()));
     <span class="kw">let </span>read_node_update = graph.create_node(Query::Read(read_query));
