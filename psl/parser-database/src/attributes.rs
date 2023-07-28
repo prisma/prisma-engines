@@ -1091,3 +1091,21 @@ fn validate_clustering_setting(ctx: &mut Context<'_>) -> Option<bool> {
     ctx.visit_optional_arg("clustered")
         .and_then(|sort| coerce::boolean(sort, ctx.diagnostics))
 }
+
+/// Create the default values of [`ModelAttributes`] and [`EnumAttributes`] for each model and enum
+/// in the AST to ensure [`crate::walkers::ModelWalker`] and [`crate::walkers::EnumWalker`] can
+/// access their corresponding entries in the attributes map in the database even in the presence
+/// of name and type resolution errors. This is useful for the language tools.
+pub(super) fn create_default_attributes(ctx: &mut Context<'_>) {
+    for top in ctx.ast.iter_tops() {
+        match top {
+            (ast::TopId::Model(model_id), ast::Top::Model(_)) => {
+                ctx.types.model_attributes.insert(model_id, ModelAttributes::default());
+            }
+            (ast::TopId::Enum(enum_id), ast::Top::Enum(_)) => {
+                ctx.types.enum_attributes.insert(enum_id, EnumAttributes::default());
+            }
+            _ => (),
+        }
+    }
+}

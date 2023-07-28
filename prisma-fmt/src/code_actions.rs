@@ -52,7 +52,7 @@ pub(crate) fn available_actions(schema: String, params: CodeActionParams) -> Vec
         }
 
         if matches!(datasource, Some(ds) if ds.active_provider == "mongodb") {
-            mongodb::add_at_map_for_id(&mut actions, &params, validated_schema.db.source(), model)
+            mongodb::add_at_map_for_id(&mut actions, &params, validated_schema.db.source(), model);
         }
     }
 
