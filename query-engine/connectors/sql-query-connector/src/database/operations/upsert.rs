@@ -22,7 +22,8 @@ pub(crate) async fn native_upsert(
     let meta = column_metadata::create(&field_names, &idents);
 
     let where_condition = upsert.filter().aliased_condition_from(None, false, ctx);
-    let update = build_update_and_set_query(upsert.model(), upsert.update().clone(), ctx).so_that(where_condition);
+    let update =
+        build_update_and_set_query(upsert.model(), upsert.update().clone(), None, ctx).so_that(where_condition);
 
     let insert = create_record(upsert.model(), upsert.create().clone(), &selected_fields, ctx);
 

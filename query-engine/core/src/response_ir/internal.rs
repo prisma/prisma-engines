@@ -43,7 +43,7 @@ pub(crate) fn serialize_internal(
     query_schema: &QuerySchema,
 ) -> crate::Result<CheckedItemsWithParents> {
     match result {
-        QueryResult::RecordSelection(rs) => {
+        QueryResult::RecordSelection(Some(rs)) => {
             serialize_record_selection(*rs, field, field.field_type(), is_list, query_schema)
         }
         QueryResult::RecordAggregations(ras) => serialize_aggregations(field, ras),
@@ -58,7 +58,7 @@ pub(crate) fn serialize_internal(
             Ok(result)
         }
         QueryResult::Json(_) => unimplemented!(),
-        QueryResult::Id(_) => unimplemented!(),
+        QueryResult::Id(_) | QueryResult::RecordSelection(None) => unreachable!(),
         QueryResult::Unit => unimplemented!(),
     }
 }
@@ -433,7 +433,7 @@ fn process_nested_results(
     // Unwraps are safe due to query validation.
     for nested_result in nested {
         // todo Workaround, tb changed with flat reads.
-        if let QueryResult::RecordSelection(ref rs) = nested_result {
+        if let QueryResult::RecordSelection(Some(ref rs)) = nested_result {
             let name = rs.name.clone();
             let field = enclosing_type.find_field(&name).unwrap();
             let result = serialize_internal(nested_result, field, false, query_schema)?;

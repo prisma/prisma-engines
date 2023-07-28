@@ -103,7 +103,14 @@ pub(crate) fn upsert_record(
 
     let create_node = create::create_record_node(graph, query_schema, model.clone(), create_argument)?;
 
-    let update_node = update::update_record_node(graph, query_schema, filter, model.clone(), update_argument)?;
+    let update_node = update::update_record_node(
+        graph,
+        query_schema,
+        filter,
+        model.clone(),
+        update_argument,
+        Some(&field),
+    )?;
 
     let read_node_create = graph.create_node(Query::Read(read_query.clone()));
     let read_node_update = graph.create_node(Query::Read(read_query));

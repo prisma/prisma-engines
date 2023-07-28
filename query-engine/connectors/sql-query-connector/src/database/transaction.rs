@@ -196,12 +196,13 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         model: &Model,
         record_filter: RecordFilter,
         args: WriteArgs,
+        selected_fields: Option<FieldSelection>,
         trace_id: Option<String>,
-    ) -> connector::Result<Option<SelectionResult>> {
+    ) -> connector::Result<Option<SingleRecord>> {
         catch(self.connection_info.clone(), async move {
             let ctx = Context::new(&self.connection_info, trace_id.as_deref());
-            let mut res = write::update_record(&self.inner, model, record_filter, args, &ctx).await?;
-            Ok(res.pop())
+
+            write::update_record(&self.inner, model, record_filter, args, selected_fields, &ctx).await
         })
         .await
     }

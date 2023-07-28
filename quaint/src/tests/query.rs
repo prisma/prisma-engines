@@ -696,6 +696,48 @@ async fn returning_insert(api: &mut dyn TestApi) -> crate::Result<()> {
     Ok(())
 }
 
+#[cfg(any(feature = "postgresql", feature = "sqlite"))]
+#[test_each_connector(tags("postgresql", "sqlite"))]
+async fn returning_update(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.get_name();
+
+    api.conn()
+        .raw_cmd(&format!("CREATE TABLE {table} (id int primary key, name varchar(255))"))
+        .await?;
+
+    api.conn()
+        .insert(
+            Insert::single_into(&table)
+                .value("id", 1)
+                .value("name", "Naukio")
+                .into(),
+        )
+        .await?;
+
+    let res = api
+        .conn()
+        .query(
+            Update::table(&table)
+                .set("name", "Updated")
+                .returning(vec!["id", "name"])
+                .comment("this should be ignored")
+                .into(),
+        )
+        .await;
+
+    api.conn().raw_cmd(&format!("DROP TABLE {table}")).await?;
+
+    let res = res?;
+
+    assert_eq!(1, res.len());
+
+    let row = res.get(0).unwrap();
+    assert_eq!(Some(1), row["id"].as_i32());
+    assert_eq!(Some("Updated"), row["name"].as_str());
+
+    Ok(())
+}
+
 #[cfg(all(feature = "mssql", feature = "bigdecimal"))]
 #[test_each_connector(tags("mssql"))]
 async fn returning_decimal_insert_with_type_defs(api: &mut dyn TestApi) -> crate::Result<()> {

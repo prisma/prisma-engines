@@ -104,7 +104,12 @@ pub(crate) fn create_records_empty(model: &Model, skip_duplicates: bool, ctx: &C
     }
 }
 
-pub(crate) fn build_update_and_set_query(model: &Model, args: WriteArgs, ctx: &Context<'_>) -> Update<'static> {
+pub(crate) fn build_update_and_set_query(
+    model: &Model,
+    args: WriteArgs,
+    selected_fields: Option<&ModelProjection>,
+    ctx: &Context<'_>,
+) -> Update<'static> {
     let scalar_fields = model.fields().scalar();
     let table = model.as_table(ctx);
     let query = args
@@ -156,7 +161,15 @@ pub(crate) fn build_update_and_set_query(model: &Model, args: WriteArgs, ctx: &C
             acc.set(name, value)
         });
 
-    query.append_trace(&Span::current()).add_trace_id(ctx.trace_id)
+    let query = query.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
+
+    let query = if let Some(selected_fields) = selected_fields {
+        query.returning(selected_fields.as_columns(ctx))
+    } else {
+        query
+    };
+
+    query
 }
 
 pub(crate) fn chunk_update_with_ids(
@@ -238,7 +251,7 @@ pub(crate) fn delete_relation_table_records(
         parent_columns.pop().unwrap().equals(parent_id_values)
     };
 
-    let child_id_criteria = super::conditions(&child_columns, child_ids);
+    let child_id_criteria = super::in_conditions(&child_columns, child_ids);
 
     Delete::from_table(relation.as_table(ctx))
         .so_that(parent_id_criteria.and(child_id_criteria))
