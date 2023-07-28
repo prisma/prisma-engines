@@ -10,7 +10,7 @@ We assume Node.js `v18.16.1`+ is installed.
 - Create a `.envrc` starting from `.envrc.example`, and fill in the missing values following the given template
 - Install Node.js dependencies via
   ```bash
-  npm i
+  pnpm i
   ```
 
 ### PlanetScale
@@ -20,7 +20,6 @@ We assume Node.js `v18.16.1`+ is installed.
 - Create a new `shadow` database branch. Repeat the steps above (selecting the `shadow` branch instead of `main`), and paste the generated URL in the `JS_PLANETSCALE_SHADOW_DATABASE_URL` environment variable in `.envrc`.
 
 In the current directory:
-- Run `cp prisma/mysql/schema.prisma prisma/` to use the MySQL schema. Change the provider to `mysql`.
 - Run `prisma migrate reset` to populate the remote PlanetScale database with the "smoke test" data.
 - Change the `provider` name in [./prisma/schema.prisma](./prisma/schema.prisma) from `mysql` to `@prisma/planetscale`.
 
@@ -44,11 +43,11 @@ In the current directory:
 
 ## How to test
 
-There is no automatic test. However, [./src/index.ts](./src/index.ts) includes a pipeline you can use to interactively experiment with the new Query Engine.
+There is no automatic test. However, [./src/planetscale.ts](./src/planetscale.ts) includes a pipeline you can use to interactively experiment with the new Query Engine.
 
 In particular, the pipeline steps are currently the following:
 
-- Define `db`, a class instance wrapper around the `@planetscale/database` JS driver for PlanetScale
+- Define `db`, a class instance wrapper around the `@planetscale/database` serverless driver for PlanetScale
 - Define `nodejsFnCtx`, an object exposing (a)sync "Queryable" functions that can be safely passed to Rust, so that it can interact with `db`'s class methods
 - Load the *debug* version of `libquery`, i.e., the compilation artifact of the `query-engine-node-api` crate
 - Define `engine` via the `QueryEngine` constructor exposed by Rust

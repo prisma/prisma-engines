@@ -42,13 +42,13 @@ pub struct Proxy {
 }
 
 /// Reify creates a Rust proxy to access the JS driver passed in as a parameter.
-pub fn reify(js_driver: JsObject) -> napi::Result<Proxy> {
-    let query_raw = js_driver.get_named_property("queryRaw")?;
-    let execute_raw = js_driver.get_named_property("executeRaw")?;
-    let version = js_driver.get_named_property("version")?;
-    let close = js_driver.get_named_property("close")?;
-    let is_healthy = js_driver.get_named_property("isHealthy")?;
-    let flavor: JsString = js_driver.get_named_property("flavor")?;
+pub fn reify(js_connector: JsObject) -> napi::Result<Proxy> {
+    let query_raw = js_connector.get_named_property("queryRaw")?;
+    let execute_raw = js_connector.get_named_property("executeRaw")?;
+    let version = js_connector.get_named_property("version")?;
+    let close = js_connector.get_named_property("close")?;
+    let is_healthy = js_connector.get_named_property("isHealthy")?;
+    let flavor: JsString = js_connector.get_named_property("flavor")?;
 
     let driver = Proxy {
         query_raw,

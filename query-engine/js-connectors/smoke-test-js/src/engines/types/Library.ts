@@ -52,7 +52,7 @@ export type Connector = {
   queryRaw: (params: Query) => Promise<ResultSet>
   executeRaw: (params: Query) => Promise<number>
   version: () => Promise<string | undefined>
-  isHealthy: () => boolean
+  isHealthy: () => Promise<boolean>
   flavor: string,
 }
 
