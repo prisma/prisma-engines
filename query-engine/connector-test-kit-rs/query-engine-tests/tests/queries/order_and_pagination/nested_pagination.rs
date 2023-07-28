@@ -65,6 +65,13 @@ mod nested_pagination {
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[]},{"t":"T2","middles":[{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[]}]}}"###
         );
 
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyTop(skip: 1, take: 1){t, middles(cursor: { m: "M22" }, orderBy: { id: asc }){ m }}
+          }"#),
+          @r###"{"data":{"findManyTop":[{"t":"T2","middles":[{"m":"M22"},{"m":"M23"}]}]}}"###
+        );
+
         Ok(())
     }
 
@@ -84,6 +91,13 @@ mod nested_pagination {
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M12"},{"m":"M13"}]},{"t":"T2","middles":[{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[{"m":"M32"},{"m":"M33"}]}]}}"###
         );
 
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyTop(take: 1){t, middles(skip: 1){m}}
+          }"#),
+          @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M12"},{"m":"M13"}]}]}}"###
+        );
+
         Ok(())
     }
 
@@ -99,6 +113,13 @@ mod nested_pagination {
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[]},{"t":"T2","middles":[]},{"t":"T3","middles":[]}]}}"###
         );
 
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyTop(take: 1){t, middles(skip: 3){m}}
+          }"#),
+          @r###"{"data":{"findManyTop":[{"t":"T1","middles":[]}]}}"###
+        );
+
         Ok(())
     }
 
@@ -112,6 +133,13 @@ mod nested_pagination {
             findManyTop{t, middles(skip: 4){m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[]},{"t":"T2","middles":[]},{"t":"T3","middles":[]}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyTop(take: 1){t, middles(skip: 4){m}}
+          }"#),
+          @r###"{"data":{"findManyTop":[{"t":"T1","middles":[]}]}}"###
         );
 
         Ok(())
@@ -193,6 +221,13 @@ mod nested_pagination {
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[]},{"t":"T2","middles":[]},{"t":"T3","middles":[]}]}}"###
         );
 
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyTop(take: 1){t, middles(take: 0){m}}
+          }"#),
+          @r###"{"data":{"findManyTop":[{"t":"T1","middles":[]}]}}"###
+        );
+
         Ok(())
     }
 
@@ -208,6 +243,13 @@ mod nested_pagination {
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M11"}]},{"t":"T2","middles":[{"m":"M21"}]},{"t":"T3","middles":[{"m":"M31"}]}]}}"###
         );
 
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyTop(take: 1){t, middles(take: 1){m}}
+          }"#),
+          @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M11"}]}]}}"###
+        );
+
         Ok(())
     }
 
@@ -221,6 +263,13 @@ mod nested_pagination {
                 findManyTop{t, middles(take: 3){m}}
               }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M11"},{"m":"M12"},{"m":"M13"}]},{"t":"T2","middles":[{"m":"M21"},{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[{"m":"M31"},{"m":"M32"},{"m":"M33"}]}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+                findManyTop(take: 1){t, middles(take: 3){m}}
+              }"#),
+          @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M11"},{"m":"M12"},{"m":"M13"}]}]}}"###
         );
 
         Ok(())
