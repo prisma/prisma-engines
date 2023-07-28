@@ -93,7 +93,7 @@ impl ParserDatabase {
 
         // Return early on name resolution errors.
         if ctx.diagnostics.has_errors() {
-            attributes::populate_empty_attributes(&mut ctx);
+            attributes::create_default_attributes(&mut ctx);
 
             return ParserDatabase {
                 ast,
@@ -110,7 +110,7 @@ impl ParserDatabase {
 
         // Return early on type resolution errors.
         if ctx.diagnostics.has_errors() {
-            attributes::populate_empty_attributes(&mut ctx);
+            attributes::create_default_attributes(&mut ctx);
 
             return ParserDatabase {
                 ast,

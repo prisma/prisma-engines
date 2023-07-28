@@ -1096,7 +1096,7 @@ fn validate_clustering_setting(ctx: &mut Context<'_>) -> Option<bool> {
 /// in the AST to ensure [`crate::walkers::ModelWalker`] and [`crate::walkers::EnumWalker`] can
 /// access their corresponding entries in the attributes map in the database even in the presence
 /// of name and type resolution errors. This is useful for the language tools.
-pub(super) fn populate_empty_attributes(ctx: &mut Context<'_>) {
+pub(super) fn create_default_attributes(ctx: &mut Context<'_>) {
     for top in ctx.ast.iter_tops() {
         match top {
             (ast::TopId::Model(model_id), ast::Top::Model(_)) => {
