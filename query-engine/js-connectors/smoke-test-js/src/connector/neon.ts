@@ -49,16 +49,18 @@ type NeonConfig = PoolConfig;
 
 class PrismaNeon implements Connector, Closeable {
   private pool: Pool
-  private maybeVersion?: string
+  private versionPromise: Promise<string>
   private isRunning: boolean = true
   flavor = "postgres"
 
   constructor(config: NeonConfig) {
     this.pool = new Pool(config)
     // lazily retrieve the version and store it into `maybeVersion`
-    this.pool.query('SELECT VERSION()').then((results) => {
-      this.maybeVersion = results.rows[0]['version']
-    })
+    this.versionPromise = new Promise((resolve, reject) => {
+      this.pool.query('SELECT VERSION()')
+        .then((results) => resolve(results.rows[0]['version']))
+        .catch((error) => reject(error));
+    });
   }
 
   async close(): Promise<void> {
@@ -71,10 +73,12 @@ class PrismaNeon implements Connector, Closeable {
   /**
    * Returns false, if connection is considered to not be in a working state.
    */
-  isHealthy(): boolean {
-    const result = this.maybeVersion !== undefined
-      && this.isRunning
-    return result
+  async isHealthy(): Promise<boolean> {
+    try {
+      return await this.versionPromise !== undefined && this.isRunning
+    } catch {
+      return false
+    }
   }
 
   /**
@@ -111,7 +115,7 @@ class PrismaNeon implements Connector, Closeable {
    * parsing or normalization.
    */
   version(): Promise<string | undefined> {
-    return Promise.resolve(this.maybeVersion)
+    return this.versionPromise
   }
 }
 

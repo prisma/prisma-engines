@@ -112,17 +112,18 @@ type PlanetScaleConfig =
 
 class PrismaPlanetScale implements Connector, Closeable {
   private client: planetScale.Connection
-  private maybeVersion?: string
+  private versionPromise: Promise<string>
   private isRunning: boolean = true
   flavor = "mysql"
 
   constructor(config: PlanetScaleConfig) {
     this.client = planetScale.connect(config)
 
-    // lazily retrieve the version and store it into `maybeVersion`
-    this.client.execute('SELECT @@version, @@GLOBAL.version').then((results) => {
-      this.maybeVersion = results.rows[0]['@@version']
-    })
+    this.versionPromise = new Promise((resolve, reject) => {
+      this.client.execute('SELECT @@version')
+        .then((results) => resolve(results.rows[0]['@@version']))
+        .catch((error) => reject(error));
+    });
   }
 
   async close(): Promise<void> {
@@ -134,10 +135,12 @@ class PrismaPlanetScale implements Connector, Closeable {
   /**
    * Returns false, if connection is considered to not be in a working state.
    */
-  isHealthy(): boolean {
-    const result = this.maybeVersion !== undefined
-      && this.isRunning
-    return result
+  async isHealthy(): Promise<boolean> {
+    try {
+      return await this.versionPromise !== undefined && this.isRunning
+    } catch {
+      return false
+    }
   }
 
   /**
@@ -175,7 +178,7 @@ class PrismaPlanetScale implements Connector, Closeable {
    * parsing or normalization.
    */
   version(): Promise<string | undefined> {
-    return Promise.resolve(this.maybeVersion)
+    return this.versionPromise
   }
 }
 
