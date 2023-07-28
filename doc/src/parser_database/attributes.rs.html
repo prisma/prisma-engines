@@ -1091,6 +1091,24 @@
 <a href="#1091" id="1091">1091</a>
 <a href="#1092" id="1092">1092</a>
 <a href="#1093" id="1093">1093</a>
+<a href="#1094" id="1094">1094</a>
+<a href="#1095" id="1095">1095</a>
+<a href="#1096" id="1096">1096</a>
+<a href="#1097" id="1097">1097</a>
+<a href="#1098" id="1098">1098</a>
+<a href="#1099" id="1099">1099</a>
+<a href="#1100" id="1100">1100</a>
+<a href="#1101" id="1101">1101</a>
+<a href="#1102" id="1102">1102</a>
+<a href="#1103" id="1103">1103</a>
+<a href="#1104" id="1104">1104</a>
+<a href="#1105" id="1105">1105</a>
+<a href="#1106" id="1106">1106</a>
+<a href="#1107" id="1107">1107</a>
+<a href="#1108" id="1108">1108</a>
+<a href="#1109" id="1109">1109</a>
+<a href="#1110" id="1110">1110</a>
+<a href="#1111" id="1111">1111</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>default;
 <span class="kw">mod </span>id;
 <span class="kw">mod </span>map;
@@ -2183,5 +2201,23 @@
 <span class="kw">fn </span>validate_clustering_setting(ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
     ctx.visit_optional_arg(<span class="string">&quot;clustered&quot;</span>)
         .and_then(|sort| coerce::boolean(sort, ctx.diagnostics))
+}
+
+<span class="doccomment">/// Create the default values of [`ModelAttributes`] and [`EnumAttributes`] for each model and enum
+/// in the AST to ensure [`crate::walkers::ModelWalker`] and [`crate::walkers::EnumWalker`] can
+/// access their corresponding entries in the attributes map in the database even in the presence
+/// of name and type resolution errors. This is useful for the language tools.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>create_default_attributes(ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">for </span>top <span class="kw">in </span>ctx.ast.iter_tops() {
+        <span class="kw">match </span>top {
+            (ast::TopId::Model(model_id), ast::Top::Model(<span class="kw">_</span>)) =&gt; {
+                ctx.types.model_attributes.insert(model_id, ModelAttributes::default());
+            }
+            (ast::TopId::Enum(enum_id), ast::Top::Enum(<span class="kw">_</span>)) =&gt; {
+                ctx.types.enum_attributes.insert(enum_id, EnumAttributes::default());
+            }
+            <span class="kw">_ </span>=&gt; (),
+        }
+    }
 }
 </code></pre></div></section></main></body></html>

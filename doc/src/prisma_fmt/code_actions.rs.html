@@ -287,7 +287,7 @@
         }
 
         <span class="kw">if </span><span class="macro">matches!</span>(datasource, <span class="prelude-val">Some</span>(ds) <span class="kw">if </span>ds.active_provider == <span class="string">&quot;mongodb&quot;</span>) {
-            mongodb::add_at_map_for_id(<span class="kw-2">&amp;mut </span>actions, <span class="kw-2">&amp;</span>params, validated_schema.db.source(), model)
+            mongodb::add_at_map_for_id(<span class="kw-2">&amp;mut </span>actions, <span class="kw-2">&amp;</span>params, validated_schema.db.source(), model);
         }
     }
 

@@ -170,6 +170,10 @@
 <a href="#170" id="170">170</a>
 <a href="#171" id="171">171</a>
 <a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
 </pre></div><pre class="rust"><code><span class="attr">#![deny(unsafe_code, rust_2018_idioms, missing_docs)]
 #![allow(clippy::derive_partial_eq_without_eq)]
 
@@ -265,6 +269,8 @@
 
         <span class="comment">// Return early on name resolution errors.
         </span><span class="kw">if </span>ctx.diagnostics.has_errors() {
+            attributes::create_default_attributes(<span class="kw-2">&amp;mut </span>ctx);
+
             <span class="kw">return </span>ParserDatabase {
                 ast,
                 file,
@@ -280,6 +286,8 @@
 
         <span class="comment">// Return early on type resolution errors.
         </span><span class="kw">if </span>ctx.diagnostics.has_errors() {
+            attributes::create_default_attributes(<span class="kw-2">&amp;mut </span>ctx);
+
             <span class="kw">return </span>ParserDatabase {
                 ast,
                 file,
