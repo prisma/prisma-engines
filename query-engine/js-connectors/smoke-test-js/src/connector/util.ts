@@ -12,3 +12,13 @@ export const binder = (queryable: Connector & Closeable): Connector & Closeable 
   close: queryable.close.bind(queryable),
   flavor: queryable.flavor,
 })
+
+export type ConnectorConfig
+  = {
+    host: string,
+    username: string,
+    password: string,
+    url: never
+  } | {
+    url: string,
+  }

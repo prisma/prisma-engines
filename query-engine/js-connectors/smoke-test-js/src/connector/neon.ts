@@ -1,9 +1,13 @@
+import { Pool, neonConfig, types } from '@neondatabase/serverless'
+import type { NeonConfig } from '@neondatabase/serverless'
 import ws from 'ws'
-import { Pool, PoolConfig, neonConfig } from '@neondatabase/serverless'
 import type { Closeable, Connector, ResultSet, Query } from '../engines/types/Library.js'
 import { ColumnType } from '../engines/types/Library.js'
+import { ConnectorConfig } from './util.js'
 
 neonConfig.webSocketConstructor = ws
+
+const NeonColumnType = types.builtins
 
 /**
  * This is a simplification of quaint's value inference logic. Take a look at quaint's conversion.rs
@@ -12,29 +16,31 @@ neonConfig.webSocketConstructor = ws
  */
 function fieldToColumnType(fieldTypeId: number): ColumnType {
   switch (fieldTypeId) {
-    case 16: // BOOL
-    case 21: // INT2
-    case 23: // INT4
+    case NeonColumnType['INT2']:
+    case NeonColumnType['INT4']:
       return ColumnType.Int32
-    case 20: // INT8
-    case 1700: // numeric
+    case NeonColumnType['INT8']:
       return ColumnType.Int64
-    case 700: // FLOAT4
+    case NeonColumnType['FLOAT4']:
       return ColumnType.Float
-    case 701: // FLOAT8
+    case NeonColumnType['FLOAT8']:
       return ColumnType.Double
-    case 25: // TEXT
-    case 1043: // VARCHAR
-      return ColumnType.Text
-    case 1042: // BPCHAR
-      return ColumnType.Char
-    case 1082: // DATE
+    case NeonColumnType['BOOL']:
+      return ColumnType.Boolean
+    case NeonColumnType['DATE']:
       return ColumnType.Date
-    case 1083: // TIME
+    case NeonColumnType['TIME']:
       return ColumnType.Time
-    case 1114: // TIMESTAMP
+    case NeonColumnType['TIMESTAMP']:
       return ColumnType.DateTime
-    case 3802: // JSONB
+    case NeonColumnType['NUMERIC']:
+      return ColumnType.Numeric
+    case NeonColumnType['BPCHAR']:
+      return ColumnType.Char
+    case NeonColumnType['TEXT']:
+    case NeonColumnType['VARCHAR']:
+      return ColumnType.Text
+    case NeonColumnType['JSONB']:
       return ColumnType.Json
     default:
       if (fieldTypeId >= 10000) {
@@ -45,18 +51,24 @@ function fieldToColumnType(fieldTypeId: number): ColumnType {
   }
 }
 
-type NeonConfig = PoolConfig
+// return string instead of JavaScript Date object
+types.setTypeParser(NeonColumnType.DATE, date => date);
+types.setTypeParser(NeonColumnType.TIME, date => date);
+types.setTypeParser(NeonColumnType.TIMESTAMP, date => date);
+
+export type PrismaNeonConfig = ConnectorConfig & Partial<Omit<NeonConfig, 'connectionString'>>
 
 class PrismaNeon implements Connector, Closeable {
   readonly flavor = 'postgres'
-
+  
   private pool: Pool
   private isRunning: boolean = true
   private _isHealthy: boolean = true
   private _version: string | undefined = undefined
-
-  constructor(config: NeonConfig) {
-    this.pool = new Pool(config)
+  
+  constructor(config: PrismaNeonConfig) {
+    const { url: connectionString, ...rest } = config
+    this.pool = new Pool({ connectionString, ...rest })
   }
 
   async close(): Promise<void> {
@@ -137,7 +149,7 @@ class PrismaNeon implements Connector, Closeable {
   }
 }
 
-export const createNeonConnector = (config: NeonConfig): Connector & Closeable => {
+export const createNeonConnector = (config: PrismaNeonConfig): Connector & Closeable => {
   const db = new PrismaNeon(config)
   return db
 }

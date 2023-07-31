@@ -1,7 +1,9 @@
 # @prisma/smoke-test-js
 
 This is a playground for testing the `libquery` client with the experimental Node.js drivers.
-It contains a subset of `@prisma/client`, plus a handy [`index.ts`](./src/index.ts) file with a `main` function.
+It contains a subset of `@prisma/client`, plus some handy executable smoke tests:
+- [`./src/planetscale.ts`](./src/planetscale.ts)
+- [`./src/neon.ts`](./src/neon.ts)
 
 ## How to setup
 
@@ -20,8 +22,10 @@ We assume Node.js `v18.16.1`+ is installed.
 - Create a new `shadow` database branch. Repeat the steps above (selecting the `shadow` branch instead of `main`), and paste the generated URL in the `JS_PLANETSCALE_SHADOW_DATABASE_URL` environment variable in `.envrc`.
 
 In the current directory:
-- Run `prisma migrate reset` to populate the remote PlanetScale database with the "smoke test" data.
-- Change the `provider` name in [./prisma/schema.prisma](./prisma/schema.prisma) from `mysql` to `@prisma/planetscale`.
+- Set the provider in [./prisma/mysql-planetscale/schema.prisma](./prisma/mysql-planetscale/schema.prisma) to `mysql`.
+- Run `npx prisma db push --schema ./prisma/mysql-planetscale/schema.prisma`
+- Run `npx prisma migrate deploy --schema ./prisma/mysql-planetscale/schema.prisma`
+- Set the provider in [./prisma/mysql-planetscale/schema.prisma](./prisma/mysql-planetscale/schema.prisma) to `@prisma/planetscale`.
 
 Note: you used to be able to run these Prisma commands without changing the provider name, but [#4074](https://github.com/prisma/prisma-engines/pull/4074) changed that (see https://github.com/prisma/prisma-engines/pull/4074#issuecomment-1649942475).
 
@@ -31,28 +35,30 @@ Note: you used to be able to run these Prisma commands without changing the prov
 - Paste the connection string to `JS_NEON_DATABASE_URL`. Create a shadow branch and repeat the step above, paste the connection string to `JS_NEON_SHADOW_DATABASE_URL`.
 
 In the current directory:
-- Run `cp prisma/postgresql/schema.prisma prisma/` to use the PostgreSQL schema. Change the provider to `postgresql`.
-- Run `prisma migrate reset` to populate the remote PlanetScale database with the "smoke test" data.
-- Change the `provider` name in [./prisma/schema.prisma](./prisma/schema.prisma) from `postgresql` to `@prisma/neon`.
+- Set the provider in [./prisma/postgres-neon/schema.prisma](./prisma/postgres-neon/schema.prisma) to `postgres`.
+- Run `npx prisma db push --schema ./prisma/postgres-neon/schema.prisma`
+- Run `npx prisma migrate deploy --schema ./prisma/postgres-neon/schema.prisma`
+- Set the provider in [./prisma/postgres-neon/schema.prisma](./prisma/postgres-neon/schema.prisma) to `@prisma/neon`.
 
 ## How to use
 
 In the current directory:
 - Run `cargo build -p query-engine-node-api` to compile the `libquery` Query Engine
-- Run `npm run planetscale` to run smoke tests against the PlanetScale database
+- Run `pnpm planetscale` to run smoke tests against the PlanetScale database
+- Run `pnpm neon` to run smoke tests against the PlanetScale database
 
 ## How to test
 
 There is no automatic test. However, [./src/planetscale.ts](./src/planetscale.ts) includes a pipeline you can use to interactively experiment with the new Query Engine.
 
-In particular, the pipeline steps are currently the following:
+In particular, the pipeline steps are currently the following (in the case of PlanetScale):
 
 - Define `db`, a class instance wrapper around the `@planetscale/database` serverless driver for PlanetScale
 - Define `nodejsFnCtx`, an object exposing (a)sync "Queryable" functions that can be safely passed to Rust, so that it can interact with `db`'s class methods
 - Load the *debug* version of `libquery`, i.e., the compilation artifact of the `query-engine-node-api` crate
 - Define `engine` via the `QueryEngine` constructor exposed by Rust
 - Initialize the connector via `engine.connect()`
-- Run a Prisma `findMany` query via the JSON protocol, according to the Prisma schema in [./prisma/schema.prisma](./prisma/schema.prisma), storing the result in `resultSet`
+- Run a Prisma `findMany` query via the JSON protocol, according to the Prisma schema in [./prisma/mysql-planetscale/schema.prisma](./prisma/mysql-planetscale/schema.prisma), storing the result in `resultSet`
 - Release the connector via `engine.disconnect()`
 - Attempt a reconnection (useful to catch possible panics in the implementation)
 - Close the database connection via `nodejsFnCtx`
