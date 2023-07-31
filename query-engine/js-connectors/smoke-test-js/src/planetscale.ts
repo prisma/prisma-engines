@@ -1,8 +1,8 @@
 
 import { setImmediate, setTimeout } from 'node:timers/promises'
 
-import { binder } from './driver/util.js'
-import { createPlanetScaleConnector } from './driver/planetscale.js'
+import { binder } from './connector/util.js'
+import { createPlanetScaleConnector } from './connector/planetscale.js'
 import { initQueryEngine } from './util.js'
 import type { QueryEngineInstance } from './engines/types/Library.js'
 
@@ -15,18 +15,18 @@ async function main() {
   })
 
   // `binder` is required to preserve the `this` context to the group of functions passed to libquery.
-  const driver = binder(db)
+  const conn = binder(db)
 
   // wait for the database pool to be initialized
   await setImmediate(0)
 
-  const engine = initQueryEngine(driver)
+  const engine = initQueryEngine(conn)
 
   console.log('[nodejs] connecting...')
   await engine.connect('trace')
   console.log('[nodejs] connected')
 
-  console.log('[nodejs] isHealthy', await driver.isHealthy())
+  console.log('[nodejs] isHealthy', await conn.isHealthy())
 
   await testFindManyTypeTest(engine)
   await testCreateAndDeleteChildParent(engine)
@@ -48,7 +48,7 @@ async function main() {
 
   // Close the database connection. This is required to prevent the process from hanging.
   console.log('[nodejs] closing database connection...')
-  await driver.close()
+  await conn.close()
   console.log('[nodejs] closed database connection')
 
   process.exit(0)
