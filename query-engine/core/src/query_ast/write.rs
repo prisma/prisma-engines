@@ -64,7 +64,13 @@ impl WriteQuery {
         match self {
             Self::CreateRecord(_) => returns_id,
             Self::CreateManyRecords(_) => false,
-            Self::UpdateRecord(_) => returns_id,
+            Self::UpdateRecord(UpdateRecord::WithExplicitSelection(ur)) => {
+                ur.selected_fields.is_superset_of(field_selection)
+            }
+            Self::UpdateRecord(UpdateRecord::WithImplicitSelection(ur)) => {
+                ur.selected_fields().is_superset_of(field_selection)
+            }
+            Self::UpdateRecord(UpdateRecord::WithoutSelection(_)) => returns_id,
             Self::DeleteRecord(_) => returns_id,
             Self::UpdateManyRecords(_) => returns_id,
             Self::DeleteManyRecords(_) => false,
@@ -260,7 +266,7 @@ impl UpdateRecord {
     pub(crate) fn selected_fields(&self) -> Option<FieldSelection> {
         match self {
             UpdateRecord::WithExplicitSelection(u) => Some(u.selected_fields.clone()),
-            UpdateRecord::WithImplicitSelection(u) => Some(u.model.primary_identifier()),
+            UpdateRecord::WithImplicitSelection(u) => Some(u.selected_fields()),
             UpdateRecord::WithoutSelection(_) => None,
         }
     }
@@ -289,6 +295,12 @@ pub struct UpdateRecordWithoutSelection {
     pub model: Model,
     pub record_filter: RecordFilter,
     pub args: WriteArgs,
+}
+
+impl UpdateRecordWithoutSelection {
+    pub(crate) fn selected_fields(&self) -> FieldSelection {
+        self.model.primary_identifier()
+    }
 }
 
 #[derive(Debug, Clone)]

@@ -2,8 +2,6 @@ use super::read::get_single_record;
 
 use crate::column_metadata::{self, ColumnMetadata};
 use crate::filter_conversion::AliasedCondition;
-use crate::model_extensions::AsColumns;
-use crate::query_builder::in_conditions;
 use crate::query_builder::write::{build_update_and_set_query, chunk_update_with_ids};
 use crate::row::ToSqlRow;
 use crate::{Context, QueryExt, Queryable};
@@ -11,7 +9,6 @@ use crate::{Context, QueryExt, Queryable};
 use connector_interface::*;
 use itertools::Itertools;
 use prisma_models::*;
-use quaint::prelude::ConditionTree;
 use std::usize;
 
 /// Performs an update with an explicit selection set.
@@ -29,11 +26,13 @@ pub(crate) async fn update_one_with_selection(
     // If there's nothing to update, just read the record.
     // TODO(perf): Technically, if the selectors are fulfilling the field selection, there's no need to perform an additional read.
     if args.args.is_empty() {
-        return get_single_record(conn, model, &record_filter.filter, &selected_fields, &[], ctx).await;
+        let filter = build_update_one_filter(record_filter);
+
+        return get_single_record(conn, model, &filter, &selected_fields, &[], ctx).await;
     }
 
     let update = build_update_and_set_query(model, args, Some(&selected_fields), ctx)
-        .so_that(build_update_one_filter(record_filter, ctx));
+        .so_that(build_update_one_filter(record_filter).aliased_condition_from(None, false, ctx));
 
     let field_names: Vec<_> = selected_fields.db_names().collect();
     let idents = selected_fields.type_identifiers_with_arities();
@@ -162,18 +161,9 @@ fn process_result_row(
 ///
 /// Note: This function should only be called for update_one filters. It is not chunking the filters into multiple queries.
 /// Note: Using this function to render an update_many filter could exceed the maximum query parameters available for a connector.
-fn build_update_one_filter(record_filter: RecordFilter, ctx: &Context<'_>) -> ConditionTree<'static> {
-    let filter_condition = record_filter.filter.aliased_condition_from(None, false, ctx);
-
-    if let Some(selectors) = record_filter.selectors {
-        let columns = selectors
-            .iter()
-            .filter_map(|selection| selection.as_scalar_fields())
-            .flat_map(|f| f.as_columns(ctx))
-            .collect_vec();
-
-        filter_condition.and(in_conditions(&columns, selectors.iter()))
-    } else {
-        filter_condition
+fn build_update_one_filter(record_filter: RecordFilter) -> Filter {
+    match record_filter.selectors {
+        Some(selectors) => Filter::and(vec![selectors.filter(), record_filter.filter]),
+        None => record_filter.filter,
     }
 }
