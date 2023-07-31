@@ -46,20 +46,7 @@ pub(crate) fn update_record(
 
         utils::insert_emulated_on_update(graph, query_schema, &model, &read_parent_node, &update_node)?;
 
-        graph.create_edge(
-            &read_parent_node,
-            &update_node,
-            QueryGraphDependency::ProjectedDataDependency(
-                model.primary_identifier(),
-                Box::new(move |mut update_node, parent_ids| {
-                    if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = update_node {
-                        ur.set_record_filter(parent_ids.into());
-                    }
-
-                    Ok(update_node)
-                }),
-            ),
-        )?;
+        graph.create_edge(&read_parent_node, &update_node, QueryGraphDependency::ExecutionOrder)?;
     }
 
     // If the update can be done in a single operation (which includes getting the result back),

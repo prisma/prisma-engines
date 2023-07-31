@@ -270,14 +270,6 @@ impl UpdateRecord {
             UpdateRecord::WithoutSelection(_) => None,
         }
     }
-
-    pub(crate) fn set_record_filter(&mut self, record_filter: RecordFilter) {
-        match self {
-            UpdateRecord::WithExplicitSelection(u) => u.record_filter = record_filter,
-            UpdateRecord::WithImplicitSelection(u) => u.record_filter = record_filter,
-            UpdateRecord::WithoutSelection(u) => u.record_filter = record_filter,
-        }
-    }
 }
 
 #[derive(Debug, Clone)]
