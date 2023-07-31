@@ -1,6 +1,8 @@
 import * as planetScale from '@planetscale/database'
+import type { Config as PlanetScaleConfig } from '@planetscale/database'
 import type { Closeable, Connector, ResultSet, Query } from '../engines/types/Library.js'
 import { ColumnType } from '../engines/types/Library.js'
+import type { ConnectorConfig } from './util.js'
 
 // See: https://github.com/planetscale/vitess-types/blob/06235e372d2050b4c0fff49972df8111e696c564/src/vitess/query/v16/query.proto#L108-L218
 type PlanetScaleColumnType
@@ -96,19 +98,7 @@ function fieldToColumnType(field: PlanetScaleColumnType): ColumnType {
   }
 }
 
-type PlanetScaleConfig =
-  & {
-    fetch?: planetScale.Config['fetch'],
-  }
-  & (
-    {
-      host: string,
-      username: string,
-      password: string,
-    } | {
-      url: string,
-    }
-  )
+export type PrismaPlanetScaleConfig = ConnectorConfig & Partial<PlanetScaleConfig>
 
 class PrismaPlanetScale implements Connector, Closeable {
   private client: planetScale.Connection
@@ -116,7 +106,7 @@ class PrismaPlanetScale implements Connector, Closeable {
   private isRunning: boolean = true
   flavor = "mysql"
 
-  constructor(config: PlanetScaleConfig) {
+  constructor(config: PrismaPlanetScaleConfig) {
     this.client = planetScale.connect(config)
 
     // lazily retrieve the version and store it into `maybeVersion`
@@ -179,7 +169,7 @@ class PrismaPlanetScale implements Connector, Closeable {
   }
 }
 
-export const createPlanetScaleConnector = (config: PlanetScaleConfig): Connector & Closeable => {
+export const createPlanetScaleConnector = (config: PrismaPlanetScaleConfig): Connector & Closeable => {
   const db = new PrismaPlanetScale(config)
   return db
 }

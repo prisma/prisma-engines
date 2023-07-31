@@ -1,12 +1,17 @@
 import { setTimeout } from 'node:timers/promises'
 
 import { Closeable, ColumnType, Query, Connector, ResultSet } from '../engines/types/Library.js'
+import type { ConnectorConfig } from './util.js'
+
+type MockSQLConfig = ConnectorConfig
 
 class MockSQL implements Connector, Closeable {
+  readonly flavor = 'mysql'
+  
   private maybeVersion?: string
   private isRunning: boolean = true
 
-  constructor(connectionString: string) {
+  constructor(_config: MockSQLConfig) {
     // lazily retrieve the version and store it into `maybeVersion`
     setTimeout(50)
       .then(() => {
@@ -77,7 +82,7 @@ class MockSQL implements Connector, Closeable {
   }
 }
 
-export const createMockConnector = (connectionString: string): Connector & Closeable => {
-  const db = new MockSQL(connectionString)
+export const createMockConnector = (config: MockSQLConfig): Connector & Closeable => {
+  const db = new MockSQL(config)
   return db
 }
