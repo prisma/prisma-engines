@@ -290,7 +290,7 @@ pub struct UpdateRecordWithoutSelection {
 }
 
 impl UpdateRecordWithoutSelection {
-    pub fn selected_fields(&self) -> FieldSelection {
+    pub(crate) fn selected_fields(&self) -> FieldSelection {
         self.model.primary_identifier()
     }
 }
