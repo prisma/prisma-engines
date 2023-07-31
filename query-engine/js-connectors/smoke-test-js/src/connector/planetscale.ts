@@ -212,10 +212,19 @@ class PrismaPlanetScale implements Connector, Closeable {
 
     switch (sql) {
       case TRANSACTION_BEGIN: {
+        // check if a transaction is already in progress
+        if (this.driver.inTransaction) {
+          throw new Error('A transaction is already in progress')
+        }
+
         (this.driver.client as planetScale.Connection).transaction(async (tx) => {
           // tx holds the scope for executing queries in transaction mode
           this.driver.client = tx
   
+          // signal the transaction began
+          this.driver.inTransaction = true
+          console.log('[js] transaction began')
+
           await new Promise((resolve, reject) => {
             this.txEmitter.once(TRANSACTION_COMMIT, () => {
               this.driver.inTransaction = false
@@ -237,11 +246,8 @@ class PrismaPlanetScale implements Connector, Closeable {
         await setImmediate(0, {
           // we do not require the event loop to remain active
           ref: false,
-        });
+        })
   
-        // signal the transaction began
-        this.driver.inTransaction = true;
-        console.log('[js] transaction began')
         return Promise.resolve(-1)
       }
       case TRANSACTION_COMMIT: {
