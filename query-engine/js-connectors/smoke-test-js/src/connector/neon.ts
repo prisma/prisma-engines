@@ -111,8 +111,8 @@ class PrismaNeon implements Connector, Closeable {
     }
 
     const { rows } = await this.performIO({ sql: 'SELECT VERSION()', args: [] })
-    const version = rows[0]['version'] as string
-    return version
+    this._version = rows[0]['version'] as string
+    return this._version
   }
 
   /**
