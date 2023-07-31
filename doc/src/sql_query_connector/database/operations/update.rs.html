@@ -167,22 +167,10 @@
 <a href="#167" id="167">167</a>
 <a href="#168" id="168">168</a>
 <a href="#169" id="169">169</a>
-<a href="#170" id="170">170</a>
-<a href="#171" id="171">171</a>
-<a href="#172" id="172">172</a>
-<a href="#173" id="173">173</a>
-<a href="#174" id="174">174</a>
-<a href="#175" id="175">175</a>
-<a href="#176" id="176">176</a>
-<a href="#177" id="177">177</a>
-<a href="#178" id="178">178</a>
-<a href="#179" id="179">179</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::read::get_single_record;
 
 <span class="kw">use </span><span class="kw">crate</span>::column_metadata::{<span class="self">self</span>, ColumnMetadata};
 <span class="kw">use </span><span class="kw">crate</span>::filter_conversion::AliasedCondition;
-<span class="kw">use </span><span class="kw">crate</span>::model_extensions::AsColumns;
-<span class="kw">use </span><span class="kw">crate</span>::query_builder::in_conditions;
 <span class="kw">use </span><span class="kw">crate</span>::query_builder::write::{build_update_and_set_query, chunk_update_with_ids};
 <span class="kw">use </span><span class="kw">crate</span>::row::ToSqlRow;
 <span class="kw">use crate</span>::{Context, QueryExt, Queryable};
@@ -190,7 +178,6 @@
 <span class="kw">use </span>connector_interface::<span class="kw-2">*</span>;
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
-<span class="kw">use </span>quaint::prelude::ConditionTree;
 <span class="kw">use </span>std::usize;
 
 <span class="doccomment">/// Performs an update with an explicit selection set.
@@ -208,11 +195,13 @@
     <span class="comment">// If there&#39;s nothing to update, just read the record.
     // TODO(perf): Technically, if the selectors are fulfilling the field selection, there&#39;s no need to perform an additional read.
     </span><span class="kw">if </span>args.args.is_empty() {
-        <span class="kw">return </span>get_single_record(conn, model, <span class="kw-2">&amp;</span>record_filter.filter, <span class="kw-2">&amp;</span>selected_fields, <span class="kw-2">&amp;</span>[], ctx).<span class="kw">await</span>;
+        <span class="kw">let </span>filter = build_update_one_filter(record_filter);
+
+        <span class="kw">return </span>get_single_record(conn, model, <span class="kw-2">&amp;</span>filter, <span class="kw-2">&amp;</span>selected_fields, <span class="kw-2">&amp;</span>[], ctx).<span class="kw">await</span>;
     }
 
     <span class="kw">let </span>update = build_update_and_set_query(model, args, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>selected_fields), ctx)
-        .so_that(build_update_one_filter(record_filter, ctx));
+        .so_that(build_update_one_filter(record_filter).aliased_condition_from(<span class="prelude-val">None</span>, <span class="bool-val">false</span>, ctx));
 
     <span class="kw">let </span>field_names: Vec&lt;<span class="kw">_</span>&gt; = selected_fields.db_names().collect();
     <span class="kw">let </span>idents = selected_fields.type_identifiers_with_arities();
@@ -341,19 +330,10 @@
 ///
 /// Note: This function should only be called for update_one filters. It is not chunking the filters into multiple queries.
 /// Note: Using this function to render an update_many filter could exceed the maximum query parameters available for a connector.
-</span><span class="kw">fn </span>build_update_one_filter(record_filter: RecordFilter, ctx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; ConditionTree&lt;<span class="lifetime">&#39;static</span>&gt; {
-    <span class="kw">let </span>filter_condition = record_filter.filter.aliased_condition_from(<span class="prelude-val">None</span>, <span class="bool-val">false</span>, ctx);
-
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(selectors) = record_filter.selectors {
-        <span class="kw">let </span>columns = selectors
-            .iter()
-            .filter_map(|selection| selection.as_scalar_fields())
-            .flat_map(|f| f.as_columns(ctx))
-            .collect_vec();
-
-        filter_condition.and(in_conditions(<span class="kw-2">&amp;</span>columns, selectors.iter()))
-    } <span class="kw">else </span>{
-        filter_condition
+</span><span class="kw">fn </span>build_update_one_filter(record_filter: RecordFilter) -&gt; Filter {
+    <span class="kw">match </span>record_filter.selectors {
+        <span class="prelude-val">Some</span>(selectors) =&gt; Filter::and(<span class="macro">vec!</span>[selectors.filter(), record_filter.filter]),
+        <span class="prelude-val">None </span>=&gt; record_filter.filter,
     }
 }
 </code></pre></div></section></main></body></html>
