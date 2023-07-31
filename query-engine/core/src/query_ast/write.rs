@@ -266,7 +266,7 @@ impl UpdateRecord {
     pub(crate) fn selected_fields(&self) -> Option<FieldSelection> {
         match self {
             UpdateRecord::WithExplicitSelection(u) => Some(u.selected_fields.clone()),
-            UpdateRecord::WithImplicitSelection(u) => Some(u.model.primary_identifier()),
+            UpdateRecord::WithImplicitSelection(u) => Some(u.selected_fields()),
             UpdateRecord::WithoutSelection(_) => None,
         }
     }
