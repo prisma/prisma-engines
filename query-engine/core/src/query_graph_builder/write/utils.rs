@@ -1009,7 +1009,7 @@ pub fn insert_emulated_on_update(
 fn extract_update_args(parent_node: &Node) -> &WriteArgs {
     if let Node::Query(Query::Write(q)) = parent_node {
         match q {
-            WriteQuery::UpdateRecord(one) => &one.args,
+            WriteQuery::UpdateRecord(one) => one.args(),
             WriteQuery::UpdateManyRecords(many) => &many.args,
             _ => panic!("Parent operation for update emulation is not an update."),
         }

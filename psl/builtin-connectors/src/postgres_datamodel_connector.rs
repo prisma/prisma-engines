@@ -63,7 +63,8 @@ const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(Connector
     SupportsTxIsolationRepeatableRead |
     SupportsTxIsolationSerializable |
     NativeUpsert |
-    InsertReturning
+    InsertReturning |
+    UpdateReturning
 });
 
 pub struct PostgresDatamodelConnector;

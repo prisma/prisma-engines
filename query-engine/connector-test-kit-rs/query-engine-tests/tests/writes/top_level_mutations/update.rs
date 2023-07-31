@@ -186,6 +186,30 @@ mod update {
         Ok(())
     }
 
+    #[connector_test(schema(schema_1))]
+    async fn update_noop(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, optString: "hello" }"#).await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateOneTestModel(
+              where: { id: 1 }
+              data: {}
+            ) {
+              id
+              optString
+              optInt
+              optFloat
+              optBoolean
+              optDateTime
+            }
+          }"#),
+          @r###"{"data":{"updateOneTestModel":{"id":1,"optString":"hello","optInt":null,"optFloat":null,"optBoolean":null,"optDateTime":null}}}"###
+        );
+
+        Ok(())
+    }
+
     // "An updateOne mutation" should "update an item with shorthand notation"
     #[connector_test(schema(schema_1))]
     async fn update_with_shorthand_notation(runner: Runner) -> TestResult<()> {

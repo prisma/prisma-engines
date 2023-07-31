@@ -2,7 +2,7 @@ use core::panic;
 
 use napi::bindgen_prelude::{FromNapiValue, Promise as JsPromise, ToNapiValue};
 use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction};
-use napi::JsObject;
+use napi::{JsObject, JsString};
 use napi_derive::napi;
 use quaint::connector::ResultSet as QuaintResultSet;
 use quaint::Value as QuaintValue;
@@ -35,6 +35,10 @@ pub struct Proxy {
     /// Return true iff the underlying database connection is healthy.
     #[allow(dead_code)]
     is_healthy: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
+
+    /// Return the flavor for this driver.
+    #[allow(dead_code)]
+    pub(crate) flavor: String,
 }
 
 /// Reify creates a Rust proxy to access the JS driver passed in as a parameter.
@@ -44,6 +48,7 @@ pub fn reify(js_driver: JsObject) -> napi::Result<Proxy> {
     let version = js_driver.get_named_property("version")?;
     let close = js_driver.get_named_property("close")?;
     let is_healthy = js_driver.get_named_property("isHealthy")?;
+    let flavor: JsString = js_driver.get_named_property("flavor")?;
 
     let driver = Proxy {
         query_raw,
@@ -51,6 +56,7 @@ pub fn reify(js_driver: JsObject) -> napi::Result<Proxy> {
         version,
         close,
         is_healthy,
+        flavor: flavor.into_utf8()?.as_str()?.to_owned(),
     };
     Ok(driver)
 }
