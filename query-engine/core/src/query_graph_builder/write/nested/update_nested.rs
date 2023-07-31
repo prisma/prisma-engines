@@ -78,12 +78,17 @@ pub fn nested_update(
             }
         };
 
+        let data_map: ParsedInputMap<'_> = data.try_into()?;
+
+        // If there's nothing to update, skip the update entirely.
+        if data_map.is_empty() {
+            return Ok(());
+        }
+
         let find_child_records_node =
             utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())?;
 
-        let update_node =
-            update::update_record_node(graph, query_schema, filter, child_model.clone(), data.try_into()?)?;
-
+        let update_node = update::update_record_node(graph, query_schema, filter, child_model.clone(), data_map, None)?;
         let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
         let relation_name = parent_relation_field.relation().name().to_owned();

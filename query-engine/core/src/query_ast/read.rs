@@ -72,7 +72,7 @@ impl Display for ReadQuery {
             ),
             Self::RelatedRecordsQuery(q) => write!(
                 f,
-                "RelatedRecordsQuery(name: '{}', parent model: '{}', parent relation field: {}, selection: {})",
+                "RelatedRecordsQuery(name: '{}', parent model: '{}', parent relation field: '{}', selection: {})",
                 q.name,
                 q.parent_field.model().name(),
                 q.parent_field.name(),

@@ -144,6 +144,7 @@ pub fn nested_upsert(
             filter.clone(),
             child_model.clone(),
             update_input.try_into()?,
+            None,
         )?;
 
         graph.create_edge(

@@ -64,14 +64,14 @@ fn read_one(
 
             None if query.options.contains(QueryOption::ThrowOnEmpty) => record_not_found(),
 
-            None => Ok(QueryResult::RecordSelection(Box::new(RecordSelection {
+            None => Ok(QueryResult::RecordSelection(Some(Box::new(RecordSelection {
                 name: query.name,
                 fields: query.selection_order,
                 scalars: ManyRecords::default(),
                 nested: vec![],
                 model,
                 aggregation_rows: None,
-            }))),
+            })))),
         }
     };
 

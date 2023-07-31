@@ -19,13 +19,13 @@ where
     records
         .chunks(PARAMETER_LIMIT)
         .map(|chunk| {
-            let tree = conditions(columns, chunk.iter().copied());
+            let tree = in_conditions(columns, chunk.iter().copied());
             f(tree).into()
         })
         .collect()
 }
 
-pub(super) fn conditions<'a>(
+pub(super) fn in_conditions<'a>(
     columns: &'a [Column<'static>],
     results: impl IntoIterator<Item = &'a SelectionResult>,
 ) -> ConditionTree<'static> {

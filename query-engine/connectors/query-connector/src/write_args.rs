@@ -470,9 +470,8 @@ pub fn merge_write_args(loaded_ids: Vec<SelectionResult>, incoming_args: WriteAr
         .into_iter()
         .map(|mut id| {
             for (position, write_op) in positions.iter() {
-                let current_val = id.pairs[position.to_owned()].1.clone();
-                id.pairs[position.to_owned()].1 =
-                    apply_expression(current_val, (*write_op.as_scalar().unwrap()).clone());
+                let current_val = id.pairs[*position].1.clone();
+                id.pairs[*position].1 = apply_expression(current_val, (*write_op.as_scalar().unwrap()).clone());
             }
 
             id

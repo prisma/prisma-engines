@@ -130,10 +130,11 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         model: &Model,
         record_filter: connector_interface::RecordFilter,
         args: connector_interface::WriteArgs,
+        selected_fields: Option<FieldSelection>,
         _trace_id: Option<String>,
-    ) -> connector_interface::Result<Option<SelectionResult>> {
+    ) -> connector_interface::Result<Option<SingleRecord>> {
         catch(async move {
-            let mut res = write::update_records(
+            let result = write::update_records(
                 &self.connection.database,
                 &mut self.connection.session,
                 model,
@@ -142,7 +143,15 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
                 UpdateType::One,
             )
             .await?;
-            Ok(res.pop())
+            let record = result.into_iter().next().map(|id| SingleRecord {
+                record: Record::from(id),
+                field_names: selected_fields
+                    .unwrap_or_else(|| model.primary_identifier())
+                    .db_names()
+                    .collect(),
+            });
+
+            Ok(record)
         })
         .await
     }

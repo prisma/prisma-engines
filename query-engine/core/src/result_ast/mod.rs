@@ -5,7 +5,7 @@ use prisma_models::{ManyRecords, Model, SelectionResult};
 pub(crate) enum QueryResult {
     Id(Option<SelectionResult>),
     Count(usize),
-    RecordSelection(Box<RecordSelection>),
+    RecordSelection(Option<Box<RecordSelection>>),
     Json(serde_json::Value),
     RecordAggregations(RecordAggregations),
     Unit,
@@ -36,7 +36,7 @@ pub struct RecordSelection {
 
 impl From<RecordSelection> for QueryResult {
     fn from(selection: RecordSelection) -> Self {
-        QueryResult::RecordSelection(Box::new(selection))
+        QueryResult::RecordSelection(Some(Box::new(selection)))
     }
 }
 

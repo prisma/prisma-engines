@@ -45,14 +45,14 @@ async fn create_one(
 ) -> InterpretationResult<QueryResult> {
     let res = tx.create_record(&q.model, q.args, q.selected_fields, trace_id).await?;
 
-    Ok(QueryResult::RecordSelection(Box::new(RecordSelection {
+    Ok(QueryResult::RecordSelection(Some(Box::new(RecordSelection {
         name: q.name,
         fields: q.selection_order,
         aggregation_rows: None,
         model: q.model,
         scalars: res.into(),
         nested: vec![],
-    })))
+    }))))
 }
 
 async fn create_many(
@@ -70,9 +70,39 @@ async fn update_one(
     q: UpdateRecord,
     trace_id: Option<String>,
 ) -> InterpretationResult<QueryResult> {
-    let res = tx.update_record(&q.model, q.record_filter, q.args, trace_id).await?;
+    let res = tx
+        .update_record(
+            q.model(),
+            q.record_filter().clone(),
+            q.args().clone(),
+            q.selected_fields(),
+            trace_id,
+        )
+        .await?;
 
-    Ok(QueryResult::Id(res))
+    match q {
+        UpdateRecord::WithExplicitSelection(q) => {
+            let res = res
+                .map(|res| RecordSelection {
+                    name: q.name,
+                    fields: q.selection_order,
+                    scalars: res.into(),
+                    nested: vec![],
+                    model: q.model,
+                    aggregation_rows: None,
+                })
+                .map(Box::new);
+
+            Ok(QueryResult::RecordSelection(res))
+        }
+        UpdateRecord::WithoutSelection(_) | UpdateRecord::WithImplicitSelection(_) => {
+            let res = res
+                .map(|record| record.extract_selection_result(&q.model().primary_identifier()))
+                .transpose()?;
+
+            Ok(QueryResult::Id(res))
+        }
+    }
 }
 
 async fn native_upsert(
