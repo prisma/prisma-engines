@@ -205,57 +205,58 @@ class PrismaPlanetScale implements Connector, Closeable {
    */
   async executeRaw(query: Query): Promise<number> {
     const { sql, args: values } = query
-
     const connection = this.driver.client
 
     const tag = '[js::execute_raw]'
     console.log(tag, { sql, values })
 
-    if (sql === TRANSACTION_BEGIN) {
-      (this.driver.client as planetScale.Connection).transaction(async (tx) => {
-        // tx holds the scope for executing queries in transaction mode
-        this.driver.client = tx
-
-        await new Promise((resolve, reject) => {
-          this.txEmitter.once(TRANSACTION_COMMIT, () => {
-            this.driver.inTransaction = false
-            console.log('[js] transaction ended successfully')
-            this.driver.client = connection
-            resolve(undefined)
-          })
-
-          this.txEmitter.once(TRANSACTION_ROLLBACK, () => {
-            this.driver.inTransaction = false
-            console.log('[js] transaction ended with error')
-            this.driver.client = connection
-            reject('ROLLBACK')
+    switch (sql) {
+      case TRANSACTION_BEGIN: {
+        (this.driver.client as planetScale.Connection).transaction(async (tx) => {
+          // tx holds the scope for executing queries in transaction mode
+          this.driver.client = tx
+  
+          await new Promise((resolve, reject) => {
+            this.txEmitter.once(TRANSACTION_COMMIT, () => {
+              this.driver.inTransaction = false
+              console.log('[js] transaction ended successfully')
+              this.driver.client = connection
+              resolve(undefined)
+            })
+  
+            this.txEmitter.once(TRANSACTION_ROLLBACK, () => {
+              this.driver.inTransaction = false
+              console.log('[js] transaction ended with error')
+              this.driver.client = connection
+              reject('ROLLBACK')
+            })
           })
         })
-      })
-
-      // ensure that this.driver.client is set to `planetScale.Transaction`
-      await setImmediate(0, {
-        // we do not require the event loop to remain active
-        ref: false,
-      });
-
-      // signal the transaction began
-      this.driver.inTransaction = true;
-      console.log('[js] transaction began')
+  
+        // ensure that this.driver.client is set to `planetScale.Transaction`
+        await setImmediate(0, {
+          // we do not require the event loop to remain active
+          ref: false,
+        });
+  
+        // signal the transaction began
+        this.driver.inTransaction = true;
+        console.log('[js] transaction began')
+        return Promise.resolve(-1)
+      }
+      case TRANSACTION_COMMIT: {
+        this.txEmitter.emit(sql)
+        return Promise.resolve(-1)
+      }
+      case TRANSACTION_ROLLBACK: {
+        this.txEmitter.emit(sql)
+        return Promise.resolve(-2)
+      }
+      default: {
+        const { rowsAffected } = await this.driver.client.execute(sql, values)
+        return rowsAffected
+      }
     }
-
-    if (sql === TRANSACTION_COMMIT) {
-      this.txEmitter.emit(sql)
-      return Promise.resolve(-1);
-    }
-
-    if (sql === TRANSACTION_ROLLBACK) {
-      this.txEmitter.emit(sql)
-      return Promise.resolve(-2);
-    }
-
-    const { rowsAffected } = await this.driver.client.execute(sql, values)
-    return rowsAffected
   }
 
   /**
