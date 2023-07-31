@@ -4,6 +4,7 @@ use napi::bindgen_prelude::{FromNapiValue, Promise as JsPromise, ToNapiValue};
 use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction};
 use napi::{JsObject, JsString};
 use napi_derive::napi;
+use psl::JsConnectorFlavor;
 use quaint::connector::ResultSet as QuaintResultSet;
 use quaint::Value as QuaintValue;
 
@@ -289,8 +290,129 @@ fn js_planetscale_value_to_quaint(json_value: serde_json::Value, column_type: Co
     }
 }
 
-impl From<JSResultSet> for QuaintResultSet {
-    fn from(mut js_result_set: JSResultSet) -> Self {
+fn js_neon_value_to_quaint(json_value: serde_json::Value, column_type: ColumnType) -> QuaintValue<'static> {
+    //  Note for the future: it may be worth revisiting how much bloat so many panics with different static
+    // strings add to the compiled artefact, and in case we should come up with a restricted set of panic
+    // messages, or even find a way of removing them altogether.
+    match column_type {
+        ColumnType::Int32 => match json_value {
+            serde_json::Value::Number(n) => {
+                // n.as_i32() is not implemented, so we need to downcast from i64 instead
+                QuaintValue::int32(n.as_i64().expect("number must be an i32") as i32)
+            }
+            serde_json::Value::Null => QuaintValue::Int32(None),
+            mismatch => panic!("Expected an i32 number, found {:?}", mismatch),
+        },
+        ColumnType::Int64 => match json_value {
+            serde_json::Value::String(s) => {
+                let n = s.parse::<i64>().expect("string-encoded number must be an i64");
+                QuaintValue::int64(n)
+            }
+            serde_json::Value::Null => QuaintValue::Int64(None),
+            mismatch => panic!("Expected a string, found {:?}", mismatch),
+        },
+        ColumnType::Float => match json_value {
+            // n.as_f32() is not implemented, so we need to downcast from f64 instead
+            serde_json::Value::Number(n) => QuaintValue::float(n.as_f64().expect("number must be a f32") as f32),
+            serde_json::Value::Null => QuaintValue::Float(None),
+            mismatch => panic!("Expected a f32 number, found {:?}", mismatch),
+        },
+        ColumnType::Double => match json_value {
+            serde_json::Value::Number(n) => QuaintValue::double(n.as_f64().expect("number must be a f64")),
+            serde_json::Value::Null => QuaintValue::Double(None),
+            mismatch => panic!("Expected a f64 number, found {:?}", mismatch),
+        },
+        ColumnType::Numeric => match json_value {
+            serde_json::Value::String(s) => {
+                // Turn this into a BigInt value with an additional "scale" variable indicating the scale of 10.
+                // E.g., if s = "1234.99", s_as_bigint = 123499, s_scale = 2.
+                let (s_as_bigint, s_scale) = if let Some(dot) = s.find('.') {
+                    let scale = s.len() - dot - 1;
+                    let s = s.replace('.', "");
+                    (
+                        num_bigint::BigInt::parse_bytes(s.as_bytes(), 10)
+                            .expect("string-encoded number must be a numeric"),
+                        scale as i64,
+                    )
+                } else {
+                    (
+                        num_bigint::BigInt::parse_bytes(s.as_bytes(), 10)
+                            .expect("string-encoded number must be a numeric"),
+                        0,
+                    )
+                };
+                let decimal = BigDecimal::new(s_as_bigint, s_scale);
+                QuaintValue::numeric(decimal)
+            }
+            serde_json::Value::Null => QuaintValue::Numeric(None),
+            mismatch => panic!("Expected a string-encoded number, found {:?}", mismatch),
+        },
+        ColumnType::Boolean => match json_value {
+            serde_json::Value::Bool(b) => QuaintValue::boolean(b),
+            serde_json::Value::Null => QuaintValue::Boolean(None),
+            mismatch => panic!("Expected a boolean, found {:?}", mismatch),
+        },
+        ColumnType::Char => match json_value {
+            serde_json::Value::String(s) => QuaintValue::Char(s.chars().next()),
+            serde_json::Value::Null => QuaintValue::Char(None),
+            mismatch => panic!("Expected a string, found {:?}", mismatch),
+        },
+        ColumnType::Text => match json_value {
+            serde_json::Value::String(s) => QuaintValue::text(s),
+            serde_json::Value::Null => QuaintValue::Text(None),
+            mismatch => panic!("Expected a string, found {:?}", mismatch),
+        },
+        ColumnType::Date => match json_value {
+            serde_json::Value::String(s) => {
+                let date = NaiveDate::parse_from_str(&s, "%Y-%m-%d").expect("Expected a date string");
+                QuaintValue::date(date)
+            }
+            serde_json::Value::Null => QuaintValue::Date(None),
+            mismatch => panic!("Expected a string, found {:?}", mismatch),
+        },
+        ColumnType::Time => match json_value {
+            serde_json::Value::String(s) => {
+                let time = NaiveTime::parse_from_str(&s, "%H:%M:%S").expect("Expected a time string");
+                QuaintValue::time(time)
+            }
+            serde_json::Value::Null => QuaintValue::Time(None),
+            mismatch => panic!("Expected a string, found {:?}", mismatch),
+        },
+        ColumnType::DateTime => match json_value {
+            serde_json::Value::String(s) => {
+                let datetime = chrono::NaiveDateTime::parse_from_str(&s, "%Y-%m-%d %H:%M:%S")
+                    .unwrap_or_else(|_| panic!("Expected a datetime string, found {:?}", &s));
+                let datetime: DateTime<Utc> = DateTime::from_utc(datetime, Utc);
+                QuaintValue::datetime(datetime)
+            }
+            serde_json::Value::Null => QuaintValue::DateTime(None),
+            mismatch => panic!("Expected a string, found {:?}", mismatch),
+        },
+        ColumnType::Json => match json_value {
+            serde_json::Value::Null => QuaintValue::Json(None),
+            json => QuaintValue::json(json),
+        },
+        ColumnType::Enum => match json_value {
+            serde_json::Value::String(s) => QuaintValue::enum_variant(s),
+            serde_json::Value::Null => QuaintValue::Enum(None),
+            mismatch => panic!("Expected a string, found {:?}", mismatch),
+        },
+        ColumnType::Bytes => match json_value {
+            serde_json::Value::String(s) => QuaintValue::Bytes(Some(s.into_bytes().into())),
+            serde_json::Value::Null => QuaintValue::Bytes(None),
+            mismatch => panic!("Expected a string, found {:?}", mismatch),
+        },
+        unimplemented => {
+            todo!("support column type: Column: {:?}", unimplemented)
+        }
+    }
+}
+
+pub struct FlavoredJSResultSet(pub (JsConnectorFlavor, JSResultSet));
+
+impl From<FlavoredJSResultSet> for QuaintResultSet {
+    fn from(pair: FlavoredJSResultSet) -> Self {
+        let (flavor, mut js_result_set) = pair.0;
         // TODO: extract, todo: error rather than panic?
         let to_quaint_row = move |row: &mut Vec<serde_json::Value>| -> Vec<quaint::Value<'static>> {
             let mut res = Vec::with_capacity(row.len());
@@ -298,7 +420,13 @@ impl From<JSResultSet> for QuaintResultSet {
             for i in 0..row.len() {
                 let column_type = js_result_set.column_types[i];
                 let json_value = row.remove(0);
-                let quaint_value = js_planetscale_value_to_quaint(json_value, column_type);
+
+                // Note: here, we could consider using conditional compile-time variables to avoid the match.
+                let quaint_value = match flavor {
+                    JsConnectorFlavor::MySQL => js_planetscale_value_to_quaint(json_value, column_type),
+                    JsConnectorFlavor::Postgres => js_neon_value_to_quaint(json_value, column_type),
+                };
+
                 res.push(quaint_value);
             }
 
@@ -342,267 +470,535 @@ impl Proxy {
 
 #[cfg(test)]
 mod proxy_test {
-    use num_bigint::BigInt;
-    use serde_json::json;
+    mod planetscale {
+        use num_bigint::BigInt;
+        use serde_json::json;
 
-    use super::*;
+        use super::super::*;
 
-    #[track_caller]
-    fn test_null(quaint_none: QuaintValue, column_type: ColumnType) {
-        let json_value = serde_json::Value::Null;
-        let quaint_value = super::js_planetscale_value_to_quaint(json_value, column_type);
-        assert_eq!(quaint_value, quaint_none);
+        #[track_caller]
+        fn test_null(quaint_none: QuaintValue, column_type: ColumnType) {
+            let json_value = serde_json::Value::Null;
+            let quaint_value = js_planetscale_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, quaint_none);
+        }
+
+        #[test]
+        fn js_planetscale_value_int32_to_quaint() {
+            let column_type = ColumnType::Int32;
+
+            // null
+            test_null(QuaintValue::Int32(None), column_type);
+
+            // 0
+            let n: i32 = 0;
+            let json_value = serde_json::Value::Number(serde_json::Number::from(n));
+            let quaint_value = js_planetscale_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Int32(Some(n)));
+
+            // max
+            let n: i32 = i32::MAX;
+            let json_value = serde_json::Value::Number(serde_json::Number::from(n));
+            let quaint_value = js_planetscale_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Int32(Some(n)));
+
+            // min
+            let n: i32 = i32::MIN;
+            let json_value = serde_json::Value::Number(serde_json::Number::from(n));
+            let quaint_value = js_planetscale_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Int32(Some(n)));
+        }
+
+        #[test]
+        fn js_planetscale_value_int64_to_quaint() {
+            let column_type = ColumnType::Int64;
+
+            // null
+            test_null(QuaintValue::Int64(None), column_type);
+
+            // 0
+            let n: i64 = 0;
+            let json_value = serde_json::Value::String(n.to_string());
+            let quaint_value = js_planetscale_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Int64(Some(n)));
+
+            // max
+            let n: i64 = i64::MAX;
+            let json_value = serde_json::Value::String(n.to_string());
+            let quaint_value = js_planetscale_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Int64(Some(n)));
+
+            // min
+            let n: i64 = i64::MIN;
+            let json_value = serde_json::Value::String(n.to_string());
+            let quaint_value = js_planetscale_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Int64(Some(n)));
+        }
+
+        #[test]
+        fn js_planetscale_value_float_to_quaint() {
+            let column_type = ColumnType::Float;
+
+            // null
+            test_null(QuaintValue::Float(None), column_type);
+
+            // 0
+            let n: f32 = 0.0;
+            let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n.into()).unwrap());
+            let quaint_value = js_planetscale_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Float(Some(n)));
+
+            // max
+            let n: f32 = f32::MAX;
+            let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n.into()).unwrap());
+            let quaint_value = js_planetscale_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Float(Some(n)));
+
+            // min
+            let n: f32 = f32::MIN;
+            let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n.into()).unwrap());
+            let quaint_value = js_planetscale_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Float(Some(n)));
+        }
+
+        #[test]
+        fn js_planetscale_value_double_to_quaint() {
+            let column_type = ColumnType::Double;
+
+            // null
+            test_null(QuaintValue::Double(None), column_type);
+
+            // 0
+            let n: f64 = 0.0;
+            let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n).unwrap());
+            let quaint_value = js_planetscale_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Double(Some(n)));
+
+            // max
+            let n: f64 = f64::MAX;
+            let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n).unwrap());
+            let quaint_value = js_planetscale_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Double(Some(n)));
+
+            // min
+            let n: f64 = f64::MIN;
+            let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n).unwrap());
+            let quaint_value = js_planetscale_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Double(Some(n)));
+        }
+
+        #[test]
+        fn js_planetscale_value_numeric_to_quaint() {
+            let column_type = ColumnType::Numeric;
+
+            // null
+            test_null(QuaintValue::Numeric(None), column_type);
+
+            let n_as_string = "1234.99";
+            let decimal = BigDecimal::new(BigInt::parse_bytes(b"123499", 10).unwrap(), 2);
+
+            let json_value = serde_json::Value::String(n_as_string.into());
+            let quaint_value = js_planetscale_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Numeric(Some(decimal)));
+
+            let n_as_string = "1234.999999";
+            let decimal = BigDecimal::new(BigInt::parse_bytes(b"1234999999", 10).unwrap(), 6);
+
+            let json_value = serde_json::Value::String(n_as_string.into());
+            let quaint_value = js_planetscale_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Numeric(Some(decimal)));
+        }
+
+        #[test]
+        fn js_planetscale_value_boolean_to_quaint() {
+            let column_type = ColumnType::Boolean;
+
+            // null
+            test_null(QuaintValue::Boolean(None), column_type);
+
+            // true
+            let bool_as_n = 1;
+            let json_value = serde_json::Value::Number(serde_json::Number::from(bool_as_n));
+            let quaint_value = js_planetscale_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Boolean(Some(true)));
+
+            // false
+            let bool_as_n = 0;
+            let json_value = serde_json::Value::Number(serde_json::Number::from(bool_as_n));
+            let quaint_value = js_planetscale_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Boolean(Some(false)));
+        }
+
+        #[test]
+        fn js_planetscale_value_char_to_quaint() {
+            let column_type = ColumnType::Char;
+
+            // null
+            test_null(QuaintValue::Char(None), column_type);
+
+            let c = 'c';
+            let json_value = serde_json::Value::String(c.to_string());
+            let quaint_value = js_planetscale_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Char(Some(c)));
+        }
+
+        #[test]
+        fn js_planetscale_value_text_to_quaint() {
+            let column_type = ColumnType::Text;
+
+            // null
+            test_null(QuaintValue::Text(None), column_type);
+
+            let s = "some text";
+            let json_value = serde_json::Value::String(s.to_string());
+            let quaint_value = js_planetscale_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Text(Some(s.into())));
+        }
+
+        #[test]
+        fn js_planetscale_value_date_to_quaint() {
+            let column_type = ColumnType::Date;
+
+            // null
+            test_null(QuaintValue::Date(None), column_type);
+
+            let s = "2023-01-01";
+            let json_value = serde_json::Value::String(s.to_string());
+            let quaint_value = js_planetscale_value_to_quaint(json_value, column_type);
+
+            let date = NaiveDate::from_ymd(2023, 01, 01);
+            assert_eq!(quaint_value, QuaintValue::Date(Some(date)));
+        }
+
+        #[test]
+        fn js_planetscale_value_time_to_quaint() {
+            let column_type = ColumnType::Time;
+
+            // null
+            test_null(QuaintValue::Time(None), column_type);
+
+            let s = "23:59:59";
+            let json_value = serde_json::Value::String(s.to_string());
+            let quaint_value = js_planetscale_value_to_quaint(json_value, column_type);
+
+            let time: NaiveTime = NaiveTime::from_hms(23, 59, 59);
+            assert_eq!(quaint_value, QuaintValue::Time(Some(time)));
+        }
+
+        #[test]
+        fn js_planetscale_value_datetime_to_quaint() {
+            let column_type = ColumnType::DateTime;
+
+            // null
+            test_null(QuaintValue::DateTime(None), column_type);
+
+            let s = "2023-01-01 23:59:59";
+            let json_value = serde_json::Value::String(s.to_string());
+            let quaint_value = js_planetscale_value_to_quaint(json_value, column_type);
+
+            let datetime = NaiveDate::from_ymd(2023, 01, 01).and_hms(23, 59, 59);
+            let datetime = DateTime::from_utc(datetime, Utc);
+            assert_eq!(quaint_value, QuaintValue::DateTime(Some(datetime)));
+        }
+
+        #[test]
+        fn js_planetscale_value_json_to_quaint() {
+            let column_type = ColumnType::Json;
+
+            // null
+            test_null(QuaintValue::Json(None), column_type);
+
+            let json = json!({
+                "key": "value",
+                "nested": [
+                    true,
+                    false,
+                    1,
+                    null
+                ]
+            });
+            let json_value = serde_json::Value::from(json.clone());
+            let quaint_value = js_planetscale_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Json(Some(json.clone())));
+        }
+
+        #[test]
+        fn js_planetscale_value_enum_to_quaint() {
+            let column_type = ColumnType::Enum;
+
+            // null
+            test_null(QuaintValue::Enum(None), column_type);
+
+            let s = "some enum variant";
+            let json_value = serde_json::Value::String(s.to_string());
+            let quaint_value = js_planetscale_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Enum(Some(s.into())));
+        }
     }
 
-    #[test]
-    fn js_planetscale_value_int32_to_quaint() {
-        let column_type = ColumnType::Int32;
+    mod neon {
+        use num_bigint::BigInt;
+        use serde_json::json;
 
-        // null
-        test_null(QuaintValue::Int32(None), column_type);
+        use super::super::*;
 
-        // 0
-        let n: i32 = 0;
-        let json_value = serde_json::Value::Number(serde_json::Number::from(n));
-        let quaint_value = super::js_planetscale_value_to_quaint(json_value, column_type);
-        assert_eq!(quaint_value, QuaintValue::Int32(Some(n)));
+        #[track_caller]
+        fn test_null(quaint_none: QuaintValue, column_type: ColumnType) {
+            let json_value = serde_json::Value::Null;
+            let quaint_value = js_neon_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, quaint_none);
+        }
 
-        // max
-        let n: i32 = i32::MAX;
-        let json_value = serde_json::Value::Number(serde_json::Number::from(n));
-        let quaint_value = super::js_planetscale_value_to_quaint(json_value, column_type);
-        assert_eq!(quaint_value, QuaintValue::Int32(Some(n)));
+        #[test]
+        fn js_neon_value_int32_to_quaint() {
+            let column_type = ColumnType::Int32;
 
-        // min
-        let n: i32 = i32::MIN;
-        let json_value = serde_json::Value::Number(serde_json::Number::from(n));
-        let quaint_value = super::js_planetscale_value_to_quaint(json_value, column_type);
-        assert_eq!(quaint_value, QuaintValue::Int32(Some(n)));
-    }
+            // null
+            test_null(QuaintValue::Int32(None), column_type);
 
-    #[test]
-    fn js_planetscale_value_int64_to_quaint() {
-        let column_type = ColumnType::Int64;
+            // 0
+            let n: i32 = 0;
+            let json_value = serde_json::Value::Number(serde_json::Number::from(n));
+            let quaint_value = js_neon_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Int32(Some(n)));
 
-        // null
-        test_null(QuaintValue::Int64(None), column_type);
+            // max
+            let n: i32 = i32::MAX;
+            let json_value = serde_json::Value::Number(serde_json::Number::from(n));
+            let quaint_value = js_neon_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Int32(Some(n)));
 
-        // 0
-        let n: i64 = 0;
-        let json_value = serde_json::Value::String(n.to_string());
-        let quaint_value = super::js_planetscale_value_to_quaint(json_value, column_type);
-        assert_eq!(quaint_value, QuaintValue::Int64(Some(n)));
+            // min
+            let n: i32 = i32::MIN;
+            let json_value = serde_json::Value::Number(serde_json::Number::from(n));
+            let quaint_value = js_neon_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Int32(Some(n)));
+        }
 
-        // max
-        let n: i64 = i64::MAX;
-        let json_value = serde_json::Value::String(n.to_string());
-        let quaint_value = super::js_planetscale_value_to_quaint(json_value, column_type);
-        assert_eq!(quaint_value, QuaintValue::Int64(Some(n)));
+        #[test]
+        fn js_neon_value_int64_to_quaint() {
+            let column_type = ColumnType::Int64;
 
-        // min
-        let n: i64 = i64::MIN;
-        let json_value = serde_json::Value::String(n.to_string());
-        let quaint_value = super::js_planetscale_value_to_quaint(json_value, column_type);
-        assert_eq!(quaint_value, QuaintValue::Int64(Some(n)));
-    }
+            // null
+            test_null(QuaintValue::Int64(None), column_type);
 
-    #[test]
-    fn js_planetscale_value_float_to_quaint() {
-        let column_type = ColumnType::Float;
+            // 0
+            let n: i64 = 0;
+            let json_value = serde_json::Value::String(n.to_string());
+            let quaint_value = js_neon_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Int64(Some(n)));
 
-        // null
-        test_null(QuaintValue::Float(None), column_type);
+            // max
+            let n: i64 = i64::MAX;
+            let json_value = serde_json::Value::String(n.to_string());
+            let quaint_value = js_neon_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Int64(Some(n)));
 
-        // 0
-        let n: f32 = 0.0;
-        let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n.into()).unwrap());
-        let quaint_value = super::js_planetscale_value_to_quaint(json_value, column_type);
-        assert_eq!(quaint_value, QuaintValue::Float(Some(n)));
+            // min
+            let n: i64 = i64::MIN;
+            let json_value = serde_json::Value::String(n.to_string());
+            let quaint_value = js_neon_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Int64(Some(n)));
+        }
 
-        // max
-        let n: f32 = f32::MAX;
-        let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n.into()).unwrap());
-        let quaint_value = super::js_planetscale_value_to_quaint(json_value, column_type);
-        assert_eq!(quaint_value, QuaintValue::Float(Some(n)));
+        #[test]
+        fn js_neon_value_float_to_quaint() {
+            let column_type = ColumnType::Float;
 
-        // min
-        let n: f32 = f32::MIN;
-        let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n.into()).unwrap());
-        let quaint_value = super::js_planetscale_value_to_quaint(json_value, column_type);
-        assert_eq!(quaint_value, QuaintValue::Float(Some(n)));
-    }
+            // null
+            test_null(QuaintValue::Float(None), column_type);
 
-    #[test]
-    fn js_planetscale_value_double_to_quaint() {
-        let column_type = ColumnType::Double;
+            // 0
+            let n: f32 = 0.0;
+            let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n.into()).unwrap());
+            let quaint_value = js_neon_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Float(Some(n)));
 
-        // null
-        test_null(QuaintValue::Double(None), column_type);
+            // max
+            let n: f32 = f32::MAX;
+            let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n.into()).unwrap());
+            let quaint_value = js_neon_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Float(Some(n)));
 
-        // 0
-        let n: f64 = 0.0;
-        let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n).unwrap());
-        let quaint_value = super::js_planetscale_value_to_quaint(json_value, column_type);
-        assert_eq!(quaint_value, QuaintValue::Double(Some(n)));
+            // min
+            let n: f32 = f32::MIN;
+            let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n.into()).unwrap());
+            let quaint_value = js_neon_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Float(Some(n)));
+        }
 
-        // max
-        let n: f64 = f64::MAX;
-        let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n).unwrap());
-        let quaint_value = super::js_planetscale_value_to_quaint(json_value, column_type);
-        assert_eq!(quaint_value, QuaintValue::Double(Some(n)));
+        #[test]
+        fn js_neon_value_double_to_quaint() {
+            let column_type = ColumnType::Double;
 
-        // min
-        let n: f64 = f64::MIN;
-        let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n).unwrap());
-        let quaint_value = super::js_planetscale_value_to_quaint(json_value, column_type);
-        assert_eq!(quaint_value, QuaintValue::Double(Some(n)));
-    }
+            // null
+            test_null(QuaintValue::Double(None), column_type);
 
-    #[test]
-    fn js_planetscale_value_numeric_to_quaint() {
-        let column_type = ColumnType::Numeric;
+            // 0
+            let n: f64 = 0.0;
+            let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n).unwrap());
+            let quaint_value = js_neon_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Double(Some(n)));
 
-        // null
-        test_null(QuaintValue::Numeric(None), column_type);
+            // max
+            let n: f64 = f64::MAX;
+            let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n).unwrap());
+            let quaint_value = js_neon_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Double(Some(n)));
 
-        let n_as_string = "1234.99";
-        let decimal = BigDecimal::new(BigInt::parse_bytes(b"123499", 10).unwrap(), 2);
+            // min
+            let n: f64 = f64::MIN;
+            let json_value = serde_json::Value::Number(serde_json::Number::from_f64(n).unwrap());
+            let quaint_value = js_neon_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Double(Some(n)));
+        }
 
-        let json_value = serde_json::Value::String(n_as_string.into());
-        let quaint_value = super::js_planetscale_value_to_quaint(json_value, column_type);
-        assert_eq!(quaint_value, QuaintValue::Numeric(Some(decimal)));
+        #[test]
+        fn js_neon_value_numeric_to_quaint() {
+            let column_type = ColumnType::Numeric;
 
-        let n_as_string = "1234.999999";
-        let decimal = BigDecimal::new(BigInt::parse_bytes(b"1234999999", 10).unwrap(), 6);
+            // null
+            test_null(QuaintValue::Numeric(None), column_type);
 
-        let json_value = serde_json::Value::String(n_as_string.into());
-        let quaint_value = super::js_planetscale_value_to_quaint(json_value, column_type);
-        assert_eq!(quaint_value, QuaintValue::Numeric(Some(decimal)));
-    }
+            let n_as_string = "1234.99";
+            let decimal = BigDecimal::new(BigInt::parse_bytes(b"123499", 10).unwrap(), 2);
 
-    #[test]
-    fn js_planetscale_value_boolean_to_quaint() {
-        let column_type = ColumnType::Boolean;
+            let json_value = serde_json::Value::String(n_as_string.into());
+            let quaint_value = js_neon_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Numeric(Some(decimal)));
 
-        // null
-        test_null(QuaintValue::Boolean(None), column_type);
+            let n_as_string = "1234.999999";
+            let decimal = BigDecimal::new(BigInt::parse_bytes(b"1234999999", 10).unwrap(), 6);
 
-        // true
-        let bool_as_n = 1;
-        let json_value = serde_json::Value::Number(serde_json::Number::from(bool_as_n));
-        let quaint_value = super::js_planetscale_value_to_quaint(json_value, column_type);
-        assert_eq!(quaint_value, QuaintValue::Boolean(Some(true)));
+            let json_value = serde_json::Value::String(n_as_string.into());
+            let quaint_value = js_neon_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Numeric(Some(decimal)));
+        }
 
-        // false
-        let bool_as_n = 0;
-        let json_value = serde_json::Value::Number(serde_json::Number::from(bool_as_n));
-        let quaint_value = super::js_planetscale_value_to_quaint(json_value, column_type);
-        assert_eq!(quaint_value, QuaintValue::Boolean(Some(false)));
-    }
+        #[test]
+        fn js_neon_value_boolean_to_quaint() {
+            let column_type = ColumnType::Boolean;
 
-    #[test]
-    fn js_planetscale_value_char_to_quaint() {
-        let column_type = ColumnType::Char;
+            // null
+            test_null(QuaintValue::Boolean(None), column_type);
 
-        // null
-        test_null(QuaintValue::Char(None), column_type);
+            // true
+            let bool_val = true;
+            let json_value = serde_json::Value::Bool(bool_val);
+            let quaint_value = js_neon_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Boolean(Some(bool_val)));
 
-        let c = 'c';
-        let json_value = serde_json::Value::String(c.to_string());
-        let quaint_value = super::js_planetscale_value_to_quaint(json_value, column_type);
-        assert_eq!(quaint_value, QuaintValue::Char(Some(c)));
-    }
+            // false
+            let bool_val = false;
+            let json_value = serde_json::Value::Bool(bool_val);
+            let quaint_value = js_neon_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Boolean(Some(bool_val)));
+        }
 
-    #[test]
-    fn js_planetscale_value_text_to_quaint() {
-        let column_type = ColumnType::Text;
+        #[test]
+        fn js_neon_value_char_to_quaint() {
+            let column_type = ColumnType::Char;
 
-        // null
-        test_null(QuaintValue::Text(None), column_type);
+            // null
+            test_null(QuaintValue::Char(None), column_type);
 
-        let s = "some text";
-        let json_value = serde_json::Value::String(s.to_string());
-        let quaint_value = super::js_planetscale_value_to_quaint(json_value, column_type);
-        assert_eq!(quaint_value, QuaintValue::Text(Some(s.into())));
-    }
+            let c = 'c';
+            let json_value = serde_json::Value::String(c.to_string());
+            let quaint_value = js_neon_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Char(Some(c)));
+        }
 
-    #[test]
-    fn js_planetscale_value_date_to_quaint() {
-        let column_type = ColumnType::Date;
+        #[test]
+        fn js_neon_value_text_to_quaint() {
+            let column_type = ColumnType::Text;
 
-        // null
-        test_null(QuaintValue::Date(None), column_type);
+            // null
+            test_null(QuaintValue::Text(None), column_type);
 
-        let s = "2023-01-01";
-        let json_value = serde_json::Value::String(s.to_string());
-        let quaint_value = super::js_planetscale_value_to_quaint(json_value, column_type);
+            let s = "some text";
+            let json_value = serde_json::Value::String(s.to_string());
+            let quaint_value = js_neon_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Text(Some(s.into())));
+        }
 
-        let date = NaiveDate::from_ymd(2023, 01, 01);
-        assert_eq!(quaint_value, QuaintValue::Date(Some(date)));
-    }
+        #[test]
+        fn js_neon_value_date_to_quaint() {
+            let column_type = ColumnType::Date;
 
-    #[test]
-    fn js_planetscale_value_time_to_quaint() {
-        let column_type = ColumnType::Time;
+            // null
+            test_null(QuaintValue::Date(None), column_type);
 
-        // null
-        test_null(QuaintValue::Time(None), column_type);
+            let s = "2023-01-01";
+            let json_value = serde_json::Value::String(s.to_string());
+            let quaint_value = js_neon_value_to_quaint(json_value, column_type);
 
-        let s = "23:59:59";
-        let json_value = serde_json::Value::String(s.to_string());
-        let quaint_value = super::js_planetscale_value_to_quaint(json_value, column_type);
+            let date = NaiveDate::from_ymd(2023, 01, 01);
+            assert_eq!(quaint_value, QuaintValue::Date(Some(date)));
+        }
 
-        let time: NaiveTime = NaiveTime::from_hms(23, 59, 59);
-        assert_eq!(quaint_value, QuaintValue::Time(Some(time)));
-    }
+        #[test]
+        fn js_neon_value_time_to_quaint() {
+            let column_type = ColumnType::Time;
 
-    #[test]
-    fn js_planetscale_value_datetime_to_quaint() {
-        let column_type = ColumnType::DateTime;
+            // null
+            test_null(QuaintValue::Time(None), column_type);
 
-        // null
-        test_null(QuaintValue::DateTime(None), column_type);
+            let s = "23:59:59";
+            let json_value = serde_json::Value::String(s.to_string());
+            let quaint_value = js_neon_value_to_quaint(json_value, column_type);
 
-        let s = "2023-01-01 23:59:59";
-        let json_value = serde_json::Value::String(s.to_string());
-        let quaint_value = super::js_planetscale_value_to_quaint(json_value, column_type);
+            let time: NaiveTime = NaiveTime::from_hms(23, 59, 59);
+            assert_eq!(quaint_value, QuaintValue::Time(Some(time)));
+        }
 
-        let datetime = NaiveDate::from_ymd(2023, 01, 01).and_hms(23, 59, 59);
-        let datetime = DateTime::from_utc(datetime, Utc);
-        assert_eq!(quaint_value, QuaintValue::DateTime(Some(datetime)));
-    }
+        #[test]
+        fn js_neon_value_datetime_to_quaint() {
+            let column_type = ColumnType::DateTime;
 
-    #[test]
-    fn js_planetscale_value_json_to_quaint() {
-        let column_type = ColumnType::Json;
+            // null
+            test_null(QuaintValue::DateTime(None), column_type);
 
-        // null
-        test_null(QuaintValue::Json(None), column_type);
+            let s = "2023-01-01 23:59:59";
+            let json_value = serde_json::Value::String(s.to_string());
+            let quaint_value = js_neon_value_to_quaint(json_value, column_type);
 
-        let json = json!({
-            "key": "value",
-            "nested": [
-                true,
-                false,
-                1,
-                null
-            ]
-        });
-        let json_value = serde_json::Value::from(json.clone());
-        let quaint_value = super::js_planetscale_value_to_quaint(json_value, column_type);
-        assert_eq!(quaint_value, QuaintValue::Json(Some(json.clone())));
-    }
+            let datetime = NaiveDate::from_ymd(2023, 01, 01).and_hms(23, 59, 59);
+            let datetime = DateTime::from_utc(datetime, Utc);
+            assert_eq!(quaint_value, QuaintValue::DateTime(Some(datetime)));
+        }
 
-    #[test]
-    fn js_planetscale_value_enum_to_quaint() {
-        let column_type = ColumnType::Enum;
+        #[test]
+        fn js_neon_value_json_to_quaint() {
+            let column_type = ColumnType::Json;
 
-        // null
-        test_null(QuaintValue::Enum(None), column_type);
+            // null
+            test_null(QuaintValue::Json(None), column_type);
 
-        let s = "some enum variant";
-        let json_value = serde_json::Value::String(s.to_string());
-        let quaint_value = super::js_planetscale_value_to_quaint(json_value, column_type);
-        assert_eq!(quaint_value, QuaintValue::Enum(Some(s.into())));
+            let json = json!({
+                "key": "value",
+                "nested": [
+                    true,
+                    false,
+                    1,
+                    null
+                ]
+            });
+            let json_value = serde_json::Value::from(json.clone());
+            let quaint_value = js_neon_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Json(Some(json.clone())));
+        }
+
+        #[test]
+        fn js_neon_value_enum_to_quaint() {
+            let column_type = ColumnType::Enum;
+
+            // null
+            test_null(QuaintValue::Enum(None), column_type);
+
+            let s = "some enum variant";
+            let json_value = serde_json::Value::String(s.to_string());
+            let quaint_value = js_neon_value_to_quaint(json_value, column_type);
+            assert_eq!(quaint_value, QuaintValue::Enum(Some(s.into())));
+        }
     }
 }
