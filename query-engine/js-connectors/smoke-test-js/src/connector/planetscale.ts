@@ -111,19 +111,15 @@ type PlanetScaleConfig =
   )
 
 class PrismaPlanetScale implements Connector, Closeable {
-  private client: planetScale.Connection
-  private versionPromise: Promise<string>
+  readonly flavor = 'mysql'
+
   private isRunning: boolean = true
-  flavor = "mysql"
+  private _isHealthy: boolean = true
+  private _version: string | undefined = undefined
+  private client: planetScale.Connection
 
   constructor(config: PlanetScaleConfig) {
     this.client = planetScale.connect(config)
-
-    this.versionPromise = new Promise((resolve, reject) => {
-      this.client.execute('SELECT @@version')
-        .then((results) => resolve(results.rows[0]['@@version']))
-        .catch((error) => reject(error));
-    });
   }
 
   async close(): Promise<void> {
@@ -135,20 +131,15 @@ class PrismaPlanetScale implements Connector, Closeable {
   /**
    * Returns false, if connection is considered to not be in a working state.
    */
-  async isHealthy(): Promise<boolean> {
-    try {
-      return await this.versionPromise !== undefined && this.isRunning
-    } catch {
-      return false
-    }
+  isHealthy(): boolean {
+    return this.isRunning && this._isHealthy
   }
 
   /**
    * Execute a query given as SQL, interpolating the given parameters.
    */
   async queryRaw(query: Query): Promise<ResultSet> {
-    const { sql, args: values } = query
-    const { fields, rows: results } = await this.client.execute(sql, values, { as: 'object' })
+    const { fields, rows: results } = await this.performIO(query)
 
     const columns = fields.map(field => field.name)
     const resultSet: ResultSet = {
@@ -166,8 +157,7 @@ class PrismaPlanetScale implements Connector, Closeable {
    * Note: Queryable expects a u64, but napi.rs only supports u32.
    */
   async executeRaw(query: Query): Promise<number> {
-    const { sql, args: values } = query
-    const { rowsAffected } = await this.client.execute(sql, values)
+    const { rowsAffected } = await this.performIO(query)
     return rowsAffected
   }
 
@@ -177,8 +167,35 @@ class PrismaPlanetScale implements Connector, Closeable {
    * example. The version string is returned directly without any form of
    * parsing or normalization.
    */
-  version(): Promise<string | undefined> {
-    return this.versionPromise
+  async version(): Promise<string | undefined> {
+    if (this._version) {
+      return Promise.resolve(this._version)
+    }
+
+    const { rows } = await this.performIO({ sql: 'SELECT @@version', args: [] })
+    const version = rows[0]['@@version'] as string
+    return version
+  }
+
+  /**
+   * Run a query against the database, returning the result set.
+   * Should the query fail due to a connection error, the connection is
+   * marked as unhealthy.
+   */
+  private async performIO(query: Query) {
+    const { sql, args: values } = query
+
+    try {
+      return await this.client.execute(sql, values, { as: 'object' })
+    } catch (e) {
+      const error = e as Error & { code: string }
+      
+      if (['ENOTFOUND', 'EAI_AGAIN'].includes(error.code)) {
+        this._isHealthy = false
+      }
+
+      throw e
+    }
   }
 }
 

@@ -1,9 +1,9 @@
+import ws from 'ws'
 import { Pool, PoolConfig, neonConfig } from '@neondatabase/serverless'
 import type { Closeable, Connector, ResultSet, Query } from '../engines/types/Library.js'
 import { ColumnType } from '../engines/types/Library.js'
 
-import ws from 'ws';
-neonConfig.webSocketConstructor = ws;
+neonConfig.webSocketConstructor = ws
 
 /**
  * This is a simplification of quaint's value inference logic. Take a look at quaint's conversion.rs
@@ -45,22 +45,18 @@ function fieldToColumnType(fieldTypeId: number): ColumnType {
   }
 }
 
-type NeonConfig = PoolConfig;
+type NeonConfig = PoolConfig
 
 class PrismaNeon implements Connector, Closeable {
+  readonly flavor = 'postgres'
+
   private pool: Pool
-  private versionPromise: Promise<string>
   private isRunning: boolean = true
-  flavor = "postgres"
+  private _isHealthy: boolean = true
+  private _version: string | undefined = undefined
 
   constructor(config: NeonConfig) {
     this.pool = new Pool(config)
-    // lazily retrieve the version and store it into `maybeVersion`
-    this.versionPromise = new Promise((resolve, reject) => {
-      this.pool.query('SELECT VERSION()')
-        .then((results) => resolve(results.rows[0]['version']))
-        .catch((error) => reject(error));
-    });
   }
 
   async close(): Promise<void> {
@@ -73,27 +69,23 @@ class PrismaNeon implements Connector, Closeable {
   /**
    * Returns false, if connection is considered to not be in a working state.
    */
-  async isHealthy(): Promise<boolean> {
-    try {
-      return await this.versionPromise !== undefined && this.isRunning
-    } catch {
-      return false
-    }
+  isHealthy(): boolean {
+    return this.isRunning && this._isHealthy
   }
 
   /**
    * Execute a query given as SQL, interpolating the given parameters.
    */
   async queryRaw(query: Query): Promise<ResultSet> {
-    const { sql, args: values } = query
-    console.log(sql, values)
-    const { fields, rows: results } = await this.pool.query(sql, values)
+    const { fields, rows: results } = await this.performIO(query)
+
     const columns = fields.map(field => field.name)
     const resultSet: ResultSet = {
       columnNames: columns,
       columnTypes: fields.map(field => fieldToColumnType(field.dataTypeID)),
       rows: results.map(result => columns.map(column => result[column])),
     }
+    
     return resultSet
   }
 
@@ -103,9 +95,8 @@ class PrismaNeon implements Connector, Closeable {
    * Note: Queryable expects a u64, but napi.rs only supports u32.
    */
   async executeRaw(query: Query): Promise<number> {
-    const { sql, args: values } = query
-    const { rowCount } = await this.pool.query(sql, values)
-    return rowCount
+    const { rowCount: rowsAffected } = await this.performIO(query)
+    return rowsAffected
   }
 
   /**
@@ -114,8 +105,35 @@ class PrismaNeon implements Connector, Closeable {
    * example. The version string is returned directly without any form of
    * parsing or normalization.
    */
-  version(): Promise<string | undefined> {
-    return this.versionPromise
+  async version(): Promise<string | undefined> {
+    if (this._version) {
+      return Promise.resolve(this._version)
+    }
+
+    const { rows } = await this.performIO({ sql: 'SELECT VERSION()', args: [] })
+    const version = rows[0]['version'] as string
+    return version
+  }
+
+  /**
+   * Run a query against the database, returning the result set.
+   * Should the query fail due to a connection error, the connection is
+   * marked as unhealthy.
+   */
+  private async performIO(query: Query) {
+    const { sql, args: values } = query
+
+    try {
+      return await this.pool.query(sql, values)
+    } catch (e) {
+      const error = e as Error & { code: string }
+      
+      if (['ENOTFOUND', 'EAI_AGAIN'].includes(error.code)) {
+        this._isHealthy = false
+      }
+
+      throw e
+    }
   }
 }
 
