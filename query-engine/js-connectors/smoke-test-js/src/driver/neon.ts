@@ -69,6 +69,7 @@ class PrismaNeon implements Connector, Closeable {
         throw Error('connectionString is required for http mode')
       }
       this.sql = neon(config.connectionString, { fullResults: true })
+      // lazily retrieve the version and store it into `maybeVersion`
       this.sql('SELECT VERSION()').then((results) => {
         this.maybeVersion = results.rows[0]['version']
       })
