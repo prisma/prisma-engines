@@ -4,13 +4,15 @@ import fs from 'node:fs'
 
 import { Connector, Library, QueryEngineInstance } from './engines/types/Library.js'
 
-export function initQueryEngine(driver: Connector): QueryEngineInstance {
+export function initQueryEngine(driver: Connector, prismaSchemaRelativePath: string): QueryEngineInstance {
   // I assume nobody will run this on Windows ¯\_(ツ)_/¯
   const libExt = os.platform() === 'darwin' ? 'dylib' : 'so'
   const dirname = path.dirname(new URL(import.meta.url).pathname)
 
   const libQueryEnginePath = path.join(dirname, `../../../../target/debug/libquery_engine.${libExt}`)
-  const schemaPath = path.join(dirname, `../prisma/schema.prisma`)
+  const schemaPath = path.join(dirname, prismaSchemaRelativePath)
+
+  console.log('[js] read Prisma schema from', schemaPath)
 
   const libqueryEngine = { exports: {} as unknown as Library }
   // @ts-ignore
