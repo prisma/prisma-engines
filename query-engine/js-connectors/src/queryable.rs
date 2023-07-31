@@ -121,8 +121,7 @@ impl QuaintQueryable for JsQueryable {
 
     /// Returns false, if connection is considered to not be in a working state.
     fn is_healthy(&self) -> bool {
-        // TODO: use self.driver.is_healthy()
-        true
+        self.proxy.is_healthy().unwrap_or(false)
     }
 
     /// Sets the transaction isolation level to given value.

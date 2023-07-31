@@ -1,4 +1,5 @@
 use core::panic;
+use std::sync::{Arc, Condvar, Mutex};
 
 use napi::bindgen_prelude::{FromNapiValue, Promise as JsPromise, ToNapiValue};
 use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction};
@@ -33,7 +34,10 @@ pub struct Proxy {
     close: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
 
     /// Return true iff the underlying database connection is healthy.
-    #[allow(dead_code)]
+    /// Note: we already attempted turning `is_healthy` into just a `JsFunction`
+    /// (which would result in a simpler `call` API), but any call to it panics,
+    /// and `unsafe impl Send/Sync` for `Proxy` become necessary.
+    /// Moreover, `JsFunction` is not `Clone`.
     is_healthy: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
 
     /// Return the flavor for this driver.
@@ -42,13 +46,13 @@ pub struct Proxy {
 }
 
 /// Reify creates a Rust proxy to access the JS driver passed in as a parameter.
-pub fn reify(js_driver: JsObject) -> napi::Result<Proxy> {
-    let query_raw = js_driver.get_named_property("queryRaw")?;
-    let execute_raw = js_driver.get_named_property("executeRaw")?;
-    let version = js_driver.get_named_property("version")?;
-    let close = js_driver.get_named_property("close")?;
-    let is_healthy = js_driver.get_named_property("isHealthy")?;
-    let flavor: JsString = js_driver.get_named_property("flavor")?;
+pub fn reify(js_connector: JsObject) -> napi::Result<Proxy> {
+    let query_raw = js_connector.get_named_property("queryRaw")?;
+    let execute_raw = js_connector.get_named_property("executeRaw")?;
+    let version = js_connector.get_named_property("version")?;
+    let close: ThreadsafeFunction<(), ErrorStrategy::Fatal> = js_connector.get_named_property("close")?;
+    let is_healthy = js_connector.get_named_property("isHealthy")?;
+    let flavor: JsString = js_connector.get_named_property("flavor")?;
 
     let driver = Proxy {
         query_raw,
@@ -335,8 +339,34 @@ impl Proxy {
     }
 
     pub fn is_healthy(&self) -> napi::Result<bool> {
-        // TODO: call `is_healthy` in a blocking fashion, returning its result as a boolean.
-        unimplemented!();
+        let result_arc = Arc::new((Mutex::new(None), Condvar::new()));
+        let result_arc_clone: Arc<(Mutex<Option<bool>>, Condvar)> = result_arc.clone();
+
+        let set_value_callback = move |value: bool| {
+            let (lock, cvar) = &*result_arc_clone;
+            let mut result_guard = lock.lock().unwrap();
+            *result_guard = Some(value);
+            cvar.notify_one();
+
+            Ok(())
+        };
+
+        // Should anyone find a less mind-boggling way to retrieve the result of a synchronous JS
+        // function, please do so.
+        self.is_healthy.call_with_return_value(
+            (),
+            napi::threadsafe_function::ThreadsafeFunctionCallMode::Blocking,
+            set_value_callback,
+        );
+
+        // wait for `set_value_callback` to be called and to set the result
+        let (lock, cvar) = &*result_arc;
+        let mut result_guard = lock.lock().unwrap();
+        while result_guard.is_none() {
+            result_guard = cvar.wait(result_guard).unwrap();
+        }
+
+        Ok(result_guard.unwrap_or_default())
     }
 }
 

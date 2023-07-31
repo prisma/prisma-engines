@@ -142,10 +142,11 @@ const TRANSACTION_ROLLBACK = 'ROLLBACK'
 
 class PrismaPlanetScale implements Connector, Closeable {
   readonly flavor = 'mysql'
-  private driver: TransactionCapableDriver
-
-  private maybeVersion?: string
+  
   private isRunning: boolean = true
+  private _isHealthy: boolean = true
+  private _version: string | undefined = undefined
+  private driver: TransactionCapableDriver
   private txEmitter = new EventEmitter()
 
   constructor(config: PlanetScaleConfig) {
@@ -156,11 +157,6 @@ class PrismaPlanetScale implements Connector, Closeable {
       client,
       inTransaction: false,
     }
-
-    // lazily retrieve the version and store it into `maybeVersion`
-    client.execute('SELECT @@version, @@GLOBAL.version').then((results) => {
-      this.maybeVersion = results.rows[0]['@@version']
-    })
   }
 
   async close(): Promise<void> {
@@ -173,21 +169,17 @@ class PrismaPlanetScale implements Connector, Closeable {
    * Returns false, if connection is considered to not be in a working state.
    */
   isHealthy(): boolean {
-    const result = this.maybeVersion !== undefined
-      && this.isRunning
-    return result
+    return this.isRunning && this._isHealthy
   }
 
   /**
    * Execute a query given as SQL, interpolating the given parameters.
    */
   async queryRaw(query: Query): Promise<ResultSet> {
-    const { sql, args: values } = query
-
     const tag = '[js::query_raw]'
-    console.log(tag, { sql, values })
-
-    const { fields, rows: results } = await this.driver.client.execute(sql, values, { as: 'object' })
+    console.log(tag, query)
+    
+    const { fields, rows: results } = await this.performIO(query)
 
     const columns = fields.map(field => field.name)
     const resultSet: ResultSet = {
@@ -205,12 +197,12 @@ class PrismaPlanetScale implements Connector, Closeable {
    * Note: Queryable expects a u64, but napi.rs only supports u32.
    */
   async executeRaw(query: Query): Promise<number> {
-    const { sql, args: values } = query
-    const connection = this.driver.client
-
     const tag = '[js::execute_raw]'
-    console.log(tag, { sql, values })
+    console.log(tag, query)
 
+    const { sql } = query
+    const connection = this.driver.client
+    
     switch (sql) {
       case TRANSACTION_BEGIN: {
         // check if a transaction is already in progress
@@ -260,7 +252,7 @@ class PrismaPlanetScale implements Connector, Closeable {
         return Promise.resolve(-2)
       }
       default: {
-        const { rowsAffected } = await this.driver.client.execute(sql, values)
+        const { rowsAffected } = await this.performIO(query)
         return rowsAffected
       }
     }
@@ -272,8 +264,35 @@ class PrismaPlanetScale implements Connector, Closeable {
    * example. The version string is returned directly without any form of
    * parsing or normalization.
    */
-  version(): Promise<string | undefined> {
-    return Promise.resolve(this.maybeVersion)
+  async version(): Promise<string | undefined> {
+    if (this._version) {
+      return Promise.resolve(this._version)
+    }
+
+    const { rows } = await this.performIO({ sql: 'SELECT @@version', args: [] })
+    const version = rows[0]['@@version'] as string
+    return version
+  }
+
+  /**
+   * Run a query against the database, returning the result set.
+   * Should the query fail due to a connection error, the connection is
+   * marked as unhealthy.
+   */
+  private async performIO(query: Query) {
+    const { sql, args: values } = query
+
+    try {
+      return await this.driver.client.execute(sql, values, { as: 'object' })
+    } catch (e) {
+      const error = e as Error & { code: string }
+      
+      if (['ENOTFOUND', 'EAI_AGAIN'].includes(error.code)) {
+        this._isHealthy = false
+      }
+
+      throw e
+    }
   }
 }
 

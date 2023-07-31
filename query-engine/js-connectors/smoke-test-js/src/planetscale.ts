@@ -27,6 +27,8 @@ async function main() {
   console.log('[nodejs] connected')
 
   console.log('[nodejs] isHealthy', await conn.isHealthy())
+  console.log('[nodejs] version', await conn.version())
+  console.log('[nodejs] isHealthy', await conn.isHealthy())
 
   await testFindManyTypeTest(engine)
   await testCreateAndDeleteChildParent(engine)

@@ -49,11 +49,12 @@ export const enum ColumnType {
 }
 
 export type Connector = {
+  readonly flavor: 'mysql' | 'postgres',
+
   queryRaw: (params: Query) => Promise<ResultSet>
   executeRaw: (params: Query) => Promise<number>
   version: () => Promise<string | undefined>
   isHealthy: () => boolean
-  flavor: string,
 }
 
 export type Closeable = {
