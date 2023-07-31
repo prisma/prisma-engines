@@ -1,4 +1,7 @@
 //! Error module
+
+#![cfg_attr(target_arch = "wasm32", allow(dead_code))]
+
 use crate::connector::IsolationLevel;
 use std::{borrow::Cow, fmt, io, num};
 use thiserror::Error;
