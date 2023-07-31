@@ -1,3 +1,5 @@
+import { EventEmitter } from 'node:events'
+import { setImmediate } from 'node:timers/promises'
 import * as planetScale from '@planetscale/database'
 import type { Closeable, Connector, ResultSet, Query } from '../engines/types/Library.js'
 import { ColumnType } from '../engines/types/Library.js'
@@ -110,16 +112,52 @@ type PlanetScaleConfig =
     }
   )
 
+type TransactionCapableDriver
+  = {
+    /**
+     * Indicates a transaction is in progress in this connector's instance.
+     */
+    inTransaction: true
+
+    /**
+     * The standard PlanetScale client.
+     */
+    client: planetScale.Transaction
+  }
+  | {
+    /**
+     * Indicates that no transactions are in progress in this connector's instance.
+     */
+    inTransaction: false
+
+    /**
+     * The PlanetScale client, scoped in transaction mode.
+     */
+    client: planetScale.Connection
+  }
+
+const TRANSACTION_BEGIN = 'BEGIN'
+const TRANSACTION_COMMIT = 'COMMIT'
+const TRANSACTION_ROLLBACK = 'ROLLBACK'
+
 class PrismaPlanetScale implements Connector, Closeable {
-  private client: planetScale.Connection
+  private driver: TransactionCapableDriver
+
   private maybeVersion?: string
   private isRunning: boolean = true
+  private txEmitter = new EventEmitter()
 
   constructor(config: PlanetScaleConfig) {
-    this.client = planetScale.connect(config)
+    const client = planetScale.connect(config)
+
+    // initialize the driver as a non-transactional client
+    this.driver = {
+      client,
+      inTransaction: false,
+    }
 
     // lazily retrieve the version and store it into `maybeVersion`
-    this.client.execute('SELECT @@version, @@GLOBAL.version').then((results) => {
+    client.execute('SELECT @@version, @@GLOBAL.version').then((results) => {
       this.maybeVersion = results.rows[0]['@@version']
     })
   }
@@ -144,7 +182,11 @@ class PrismaPlanetScale implements Connector, Closeable {
    */
   async queryRaw(query: Query): Promise<ResultSet> {
     const { sql, args: values } = query
-    const { fields, rows: results } = await this.client.execute(sql, values, { as: 'object' })
+
+    const tag = '[js::query_raw]'
+    console.log(tag, { sql, values })
+
+    const { fields, rows: results } = await this.driver.client.execute(sql, values, { as: 'object' })
 
     const columns = fields.map(field => field.name)
     const resultSet: ResultSet = {
@@ -163,7 +205,56 @@ class PrismaPlanetScale implements Connector, Closeable {
    */
   async executeRaw(query: Query): Promise<number> {
     const { sql, args: values } = query
-    const { rowsAffected } = await this.client.execute(sql, values)
+
+    const connection = this.driver.client
+
+    const tag = '[js::execute_raw]'
+    console.log(tag, { sql, values })
+
+    if (sql === TRANSACTION_BEGIN) {
+      (this.driver.client as planetScale.Connection).transaction(async (tx) => {
+        // tx holds the scope for executing queries in transaction mode
+        this.driver.client = tx
+
+        await new Promise((resolve, reject) => {
+          this.txEmitter.once(TRANSACTION_COMMIT, () => {
+            this.driver.inTransaction = false
+            console.log('[js] transaction ended successfully')
+            this.driver.client = connection
+            resolve(undefined)
+          })
+
+          this.txEmitter.once(TRANSACTION_ROLLBACK, () => {
+            this.driver.inTransaction = false
+            console.log('[js] transaction ended with error')
+            this.driver.client = connection
+            reject('ROLLBACK')
+          })
+        })
+      })
+
+      // ensure that this.driver.client is set to `planetScale.Transaction`
+      await setImmediate(0, {
+        // we do not require the event loop to remain active
+        ref: false,
+      });
+
+      // signal the transaction began
+      this.driver.inTransaction = true;
+      console.log('[js] transaction began')
+    }
+
+    if (sql === TRANSACTION_COMMIT) {
+      this.txEmitter.emit(sql)
+      return Promise.resolve(-1);
+    }
+
+    if (sql === TRANSACTION_ROLLBACK) {
+      this.txEmitter.emit(sql)
+      return Promise.resolve(-2);
+    }
+
+    const { rowsAffected } = await this.driver.client.execute(sql, values)
     return rowsAffected
   }
 
@@ -178,7 +269,7 @@ class PrismaPlanetScale implements Connector, Closeable {
   }
 }
 
-export const createPlanetScaleConnector = (config: PlanetScaleConfig): Connector & Closeable => {
+export const createPlanetScaleConnector = (config: PlanetScaleConfig): PrismaPlanetScale => {
   const db = new PrismaPlanetScale(config)
   return db
 }
