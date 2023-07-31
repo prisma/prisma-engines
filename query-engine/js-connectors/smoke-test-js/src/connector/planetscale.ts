@@ -173,8 +173,8 @@ class PrismaPlanetScale implements Connector, Closeable {
     }
 
     const { rows } = await this.performIO({ sql: 'SELECT @@version', args: [] })
-    const version = rows[0]['@@version'] as string
-    return version
+    this._version = rows[0]['@@version'] as string
+    return this._version
   }
 
   /**
