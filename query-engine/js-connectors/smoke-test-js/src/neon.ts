@@ -11,6 +11,7 @@ async function main() {
   /* Use `db` if you want to test the actual Neon database */
   const db = createNeonConnector({
     connectionString,
+    httpMode: false,
   })
 
   // `binder` is required to preserve the `this` context to the group of functions passed to libquery.
@@ -45,7 +46,6 @@ async function main() {
         "text_column": true,
         "date_column": true,
         "time_column": true,
-        "datetime_column": true,
         "timestamp_column": true,
         "json_column": true,
         "enum_column": true

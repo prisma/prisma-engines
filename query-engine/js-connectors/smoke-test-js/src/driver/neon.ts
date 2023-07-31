@@ -1,4 +1,4 @@
-import { Pool, PoolConfig, neonConfig } from '@neondatabase/serverless'
+import { NeonQueryFunction, Pool, PoolConfig, neon, neonConfig, types } from '@neondatabase/serverless'
 import type { Closeable, Connector, ResultSet, Query } from '../engines/types/Library.js'
 import { ColumnType } from '../engines/types/Library.js'
 
@@ -13,12 +13,14 @@ neonConfig.webSocketConstructor = ws;
 function fieldToColumnType(fieldTypeId: number): ColumnType {
   switch (fieldTypeId) {
     case 16: // BOOL
+      return ColumnType.Boolean
     case 21: // INT2
     case 23: // INT4
       return ColumnType.Int32
     case 20: // INT8
-    case 1700: // numeric
       return ColumnType.Int64
+    case 1700: // Numeric
+      return ColumnType.Numeric
     case 700: // FLOAT4
       return ColumnType.Float
     case 701: // FLOAT8
@@ -27,7 +29,7 @@ function fieldToColumnType(fieldTypeId: number): ColumnType {
     case 1043: // VARCHAR
       return ColumnType.Text
     case 1042: // BPCHAR
-      return ColumnType.Char
+      return ColumnType.Text
     case 1082: // DATE
       return ColumnType.Date
     case 1083: // TIME
@@ -47,23 +49,44 @@ function fieldToColumnType(fieldTypeId: number): ColumnType {
 
 type NeonConfig = PoolConfig;
 
+// return string instead of JavaScript Date object
+types.setTypeParser(1082, date => date);
+types.setTypeParser(1083, date => date);
+types.setTypeParser(1114, date => date);
+
 class PrismaNeon implements Connector, Closeable {
-  private pool: Pool
+  private pool?: Pool
+  private sql?: NeonQueryFunction<false, true>
   private maybeVersion?: string
   private isRunning: boolean = true
   flavor = "postgres"
+  isHttp: boolean
 
-  constructor(config: NeonConfig) {
-    this.pool = new Pool(config)
-    // lazily retrieve the version and store it into `maybeVersion`
-    this.pool.query('SELECT VERSION()').then((results) => {
-      this.maybeVersion = results.rows[0]['version']
-    })
+  constructor(config: NeonConnectorConfig) {
+    if (config.httpMode) {
+      this.isHttp = true
+      if (!config.connectionString) {
+        throw Error('connectionString is required for http mode')
+      }
+      this.sql = neon(config.connectionString, { fullResults: true })
+      this.sql('SELECT VERSION()').then((results) => {
+        this.maybeVersion = results.rows[0]['version']
+      })
+    } else {
+      this.isHttp = false
+      this.pool = new Pool(config)
+      // lazily retrieve the version and store it into `maybeVersion`
+      this.pool.query('SELECT VERSION()').then((results) => {
+        this.maybeVersion = results.rows[0]['version']
+      })
+    }
   }
 
   async close(): Promise<void> {
     if (this.isRunning) {
-      await this.pool.end()
+      if (!this.isHttp) {
+        await this.pool!.end()
+      }
       this.isRunning = false
     }
   }
@@ -82,13 +105,29 @@ class PrismaNeon implements Connector, Closeable {
    */
   async queryRaw(query: Query): Promise<ResultSet> {
     const { sql, args: values } = query
-    console.log(sql, values)
-    const { fields, rows: results } = await this.pool.query(sql, values)
+    let fields;
+    let results;
+    if (this.isHttp) {
+      const { fields: fields_, rows: rows_ } = await this.sql!(sql, values)
+      results = rows_
+      fields = fields_
+    } else {
+      const { fields: fields_, rows: rows_ } = await this.pool!.query(sql, values)
+      results = rows_
+      fields = fields_
+    }
     const columns = fields.map(field => field.name)
+    const columnTypes = fields.map(field => fieldToColumnType(field.dataTypeID))
     const resultSet: ResultSet = {
       columnNames: columns,
-      columnTypes: fields.map(field => fieldToColumnType(field.dataTypeID)),
-      rows: results.map(result => columns.map(column => result[column])),
+      columnTypes,
+      rows: results.map(result => columns.map((column, i) => {
+        if (columnTypes[i] == ColumnType.Boolean) {
+          return result[column] ? 1 : 0
+        } else {
+          return result[column]
+        }
+      })),
     }
     return resultSet
   }
@@ -100,8 +139,13 @@ class PrismaNeon implements Connector, Closeable {
    */
   async executeRaw(query: Query): Promise<number> {
     const { sql, args: values } = query
-    const { rowCount } = await this.pool.query(sql, values)
-    return rowCount
+    if (this.isHttp) {
+      const { rowCount } = await this.sql!(sql, values)
+      return rowCount
+    } else {
+      const { rowCount } = await this.pool!.query(sql, values)
+      return rowCount
+    }
   }
 
   /**
@@ -115,7 +159,9 @@ class PrismaNeon implements Connector, Closeable {
   }
 }
 
-export const createNeonConnector = (config: NeonConfig): Connector & Closeable => {
+type NeonConnectorConfig = NeonConfig & { httpMode?: boolean }
+
+export const createNeonConnector = (config: NeonConnectorConfig): Connector & Closeable => {
   const db = new PrismaNeon(config)
   return db
 }
