@@ -44,7 +44,7 @@ const MINIMUM_TX_ID_LENGTH: usize = 24;
 
 impl Default for TxId {
     fn default() -> Self {
-        Self(cuid::cuid().unwrap())
+        Self(cuid2::cuid())
     }
 }
 
