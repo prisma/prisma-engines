@@ -29,9 +29,9 @@ docs = []
 # way to access database-specific methods when you need extra control.
 expose-drivers = []
 
-all = ["slim", "connector", "pooled"]
+all = ["slim", "connectors", "pooled"]
 
-connector = [
+connectors = [
   "postgresql-connector",
   "mysql-connector",
   "mssql-connector",

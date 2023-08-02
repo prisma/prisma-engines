@@ -44,7 +44,7 @@ exclude = [
 psl = { path = "./psl/psl" }
 serde_json = { version = "1", features = ["float_roundtrip", "preserve_order"] }
 serde = { version = "1", features = ["derive"] }
-tokio = { version = "1.25", features = ["rt-multi-thread", "macros", "sync", "io-std", "io-util", "parking_lot", "time"] }
+tokio = { version = "1.25", features = ["macros", "sync", "io-util", "time"] }
 user-facing-errors = { path = "./libs/user-facing-errors" }
 uuid = { version = "1", features = ["serde"] }
 indoc = "2.0.1"
@@ -62,11 +62,9 @@ features = [
   "json",
   "mssql",
   "mysql",
-  "pooled",
   "postgresql",
   "sqlite",
-  "uuid",
-  "connector",
+  "uuid"
 ]
 
 [profile.dev.package.backtrace]

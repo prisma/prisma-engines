@@ -3,6 +3,10 @@ edition = "2021"
 name = "query-core"
 version = "0.1.0"
 
+[features]
+default = ["metrics"]
+metrics = ["query-engine-metrics"]
+
 [dependencies]
 async-trait = "0.1"
 bigdecimal = "0.3"
@@ -18,7 +22,7 @@ once_cell = "1"
 petgraph = "0.4"
 prisma-models = { path = "../prisma-models", features = ["default_generators"] }
 opentelemetry = { version = "0.17.0", features = ["rt-tokio", "serialize"] }
-query-engine-metrics = {path = "../metrics"}
+query-engine-metrics = { path = "../metrics", optional = true }
 serde.workspace = true
 serde_json.workspace = true
 thiserror = "1.0"
@@ -29,8 +33,8 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tracing-opentelemetry = "0.17.4"
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 uuid = "1"
-cuid = "1.2"
+cuid2 = "0.1.1"
 schema = { path = "../schema" }
 lru = "0.7.7"
 enumflags2 = "0.7"
-
+getrandom = { version = "0.2", features = ["js"] }
