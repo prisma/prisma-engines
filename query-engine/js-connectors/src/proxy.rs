@@ -178,46 +178,7 @@ pub struct Query {
 }
 
 fn js_planetscale_value_to_quaint(json_value: serde_json::Value, column_type: ColumnType) -> QuaintValue<'static> {
-    //  Note for the future: it may be worth revisiting how much bloat so many panics with different static
-    // strings add to the compiled artefact, and in case we should come up with a restricted set of panic
-    // messages, or even find a way of removing them altogether.
     match column_type {
-        ColumnType::Int32 => match json_value {
-            serde_json::Value::Number(n) => {
-                // n.as_i32() is not implemented, so we need to downcast from i64 instead
-                QuaintValue::int32(n.as_i64().expect("number must be an i32") as i32)
-            }
-            serde_json::Value::Null => QuaintValue::Int32(None),
-            mismatch => panic!("Expected an i32 number, found {:?}", mismatch),
-        },
-        ColumnType::Int64 => match json_value {
-            serde_json::Value::String(s) => {
-                let n = s.parse::<i64>().expect("string-encoded number must be an i64");
-                QuaintValue::int64(n)
-            }
-            serde_json::Value::Null => QuaintValue::Int64(None),
-            mismatch => panic!("Expected a string, found {:?}", mismatch),
-        },
-        ColumnType::Float => match json_value {
-            // n.as_f32() is not implemented, so we need to downcast from f64 instead.
-            // We assume that the JSON value is a valid f32 number, but we check for overflows anyway.
-            serde_json::Value::Number(n) => QuaintValue::float(f64_to_f32(n.as_f64().expect("number must be a f64"))),
-            serde_json::Value::Null => QuaintValue::Float(None),
-            mismatch => panic!("Expected a f32 number, found {:?}", mismatch),
-        },
-        ColumnType::Double => match json_value {
-            serde_json::Value::Number(n) => QuaintValue::double(n.as_f64().expect("number must be a f64")),
-            serde_json::Value::Null => QuaintValue::Double(None),
-            mismatch => panic!("Expected a f64 number, found {:?}", mismatch),
-        },
-        ColumnType::Numeric => match json_value {
-            serde_json::Value::String(s) => {
-                let decimal = BigDecimal::from_str(&s).expect("invalid numeric value");
-                QuaintValue::numeric(decimal)
-            }
-            serde_json::Value::Null => QuaintValue::Numeric(None),
-            mismatch => panic!("Expected a string-encoded number, found {:?}", mismatch),
-        },
         ColumnType::Boolean => match json_value {
             serde_json::Value::Number(b) => QuaintValue::Boolean(b.as_u64().or(None).map(|b| b != 0)),
             serde_json::Value::Null => QuaintValue::Boolean(None),
@@ -228,58 +189,31 @@ fn js_planetscale_value_to_quaint(json_value: serde_json::Value, column_type: Co
             serde_json::Value::Null => QuaintValue::Char(None),
             mismatch => panic!("Expected a string, found {:?}", mismatch),
         },
-        ColumnType::Text => match json_value {
-            serde_json::Value::String(s) => QuaintValue::text(s),
-            serde_json::Value::Null => QuaintValue::Text(None),
-            mismatch => panic!("Expected a string, found {:?}", mismatch),
-        },
-        ColumnType::Date => match json_value {
-            serde_json::Value::String(s) => {
-                let date = NaiveDate::parse_from_str(&s, "%Y-%m-%d").expect("Expected a date string");
-                QuaintValue::date(date)
-            }
-            serde_json::Value::Null => QuaintValue::Date(None),
-            mismatch => panic!("Expected a string, found {:?}", mismatch),
-        },
-        ColumnType::Time => match json_value {
-            serde_json::Value::String(s) => {
-                let time = NaiveTime::parse_from_str(&s, "%H:%M:%S").expect("Expected a time string");
-                QuaintValue::time(time)
-            }
-            serde_json::Value::Null => QuaintValue::Time(None),
-            mismatch => panic!("Expected a string, found {:?}", mismatch),
-        },
-        ColumnType::DateTime => match json_value {
-            serde_json::Value::String(s) => {
-                let datetime = chrono::NaiveDateTime::parse_from_str(&s, "%Y-%m-%d %H:%M:%S")
-                    .unwrap_or_else(|_| panic!("Expected a datetime string, found {:?}", &s));
-                let datetime: DateTime<Utc> = DateTime::from_utc(datetime, Utc);
-                QuaintValue::datetime(datetime)
-            }
-            serde_json::Value::Null => QuaintValue::DateTime(None),
-            mismatch => panic!("Expected a string, found {:?}", mismatch),
-        },
-        ColumnType::Json => match json_value {
-            serde_json::Value::Null => QuaintValue::Json(None),
-            json => QuaintValue::json(json),
-        },
-        ColumnType::Enum => match json_value {
-            serde_json::Value::String(s) => QuaintValue::enum_variant(s),
-            serde_json::Value::Null => QuaintValue::Enum(None),
-            mismatch => panic!("Expected a string, found {:?}", mismatch),
-        },
-        ColumnType::Bytes => match json_value {
-            serde_json::Value::String(s) => QuaintValue::Bytes(Some(s.into_bytes().into())),
-            serde_json::Value::Null => QuaintValue::Bytes(None),
-            mismatch => panic!("Expected a string, found {:?}", mismatch),
-        },
-        unimplemented => {
-            todo!("support column type: Column: {:?}", unimplemented)
-        }
+        _ => js_base_value_to_quaint(json_value, column_type),
     }
 }
 
 fn js_neon_value_to_quaint(json_value: serde_json::Value, column_type: ColumnType) -> QuaintValue<'static> {
+    match column_type {
+        ColumnType::Boolean => match json_value {
+            serde_json::Value::Bool(b) => QuaintValue::boolean(b),
+            serde_json::Value::Null => QuaintValue::Boolean(None),
+            mismatch => panic!("Expected a boolean, found {:?}", mismatch),
+        },
+        ColumnType::Char => match json_value {
+            serde_json::Value::String(s) => QuaintValue::Char(s.chars().next()),
+            serde_json::Value::Null => QuaintValue::Char(None),
+            mismatch => panic!("Expected a string, found {:?}", mismatch),
+        },
+        _ => js_base_value_to_quaint(json_value, column_type),
+    }
+}
+
+/// Handle data-type conversion from a JSON value to a Quaint value.
+/// This is used for most data types, except those that require connector-specific handling, e.g., `ColumnType::Boolean`.
+/// In the future, after https://github.com/prisma/team-orm/issues/257, every connector-specific handling should be moved
+/// out of Rust and into TypeScript.
+fn js_base_value_to_quaint(json_value: serde_json::Value, column_type: ColumnType) -> QuaintValue<'static> {
     //  Note for the future: it may be worth revisiting how much bloat so many panics with different static
     // strings add to the compiled artefact, and in case we should come up with a restricted set of panic
     // messages, or even find a way of removing them altogether.
