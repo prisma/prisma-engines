@@ -1,0 +1,33 @@
+[package]
+name = "wasm-connectors"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-trait = "0.1"
+once_cell = "1.15"
+serde.workspace = true
+serde_json.workspace = true
+psl.workspace = true
+tracing = "0.1"
+tracing-core = "0.1"
+
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+serde-wasm-bindgen = "0.5"
+serde_repr = "0.1"
+js-sys = "0.3"
+
+# Note: these deps are temporarily specified here to avoid importing them from tiberius (the SQL server driver).
+# They will be imported from quaint-core instead in a future PR.
+num-bigint = "0.4.3"
+bigdecimal = "0.3.0"
+chrono = "0.4.20"
+
+[dependencies.quaint]
+workspace = true
+features = ["slim"]
+
+[dev-dependencies]
+expect-test = "1"
+tokio.workspace = true

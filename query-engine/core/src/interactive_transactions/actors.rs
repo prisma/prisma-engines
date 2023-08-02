@@ -1,7 +1,7 @@
 use super::{CachedTx, TransactionError, TxOpRequest, TxOpRequestMsg, TxOpResponse};
 use crate::{
-    execute_many_operations, execute_single_operation, protocol::EngineProtocol,
-     ClosedTx, Operation, ResponseData, TxId,
+    execute_many_operations, execute_single_operation, protocol::EngineProtocol, ClosedTx, Operation, ResponseData,
+    TxId,
 };
 use connector::Connection;
 use schema::QuerySchemaRef;
@@ -388,14 +388,23 @@ pub(crate) fn spawn_client_list_clear_actor(
     tokio::task::spawn(async move {
         loop {
             if let Some((id, closed_tx)) = rx.recv().await {
-                trace!("removing {} from client list", id);
-
-                let mut clients_guard = clients.write().await;
-                clients_guard.remove(&id);
-                drop(clients_guard);
-
-                closed_txs.write().await.put(id, closed_tx);
+                clear_actor(&clients, &closed_txs, id, closed_tx).await
             }
         }
     })
+}
+
+pub(crate) async fn clear_actor(
+    clients: &RwLock<HashMap<TxId, ITXClient>>,
+    closed_txs: &RwLock<lru::LruCache<TxId, Option<ClosedTx>>>,
+    id: TxId,
+    closed_tx: Option<ClosedTx>,
+) {
+    trace!("removing {} from client list", id);
+
+    let mut clients_guard = clients.write().await;
+    clients_guard.remove(&id);
+    drop(clients_guard);
+
+    closed_txs.write().await.put(id, closed_tx);
 }

@@ -1,0 +1,54 @@
+[package]
+name = "query-engine-wasm-api"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+doc = false
+crate-type = ["cdylib"]
+name = "query_engine"
+
+[features]
+default = ["js-connectors"]
+vendored-openssl = ["sql-connector/vendored-openssl"]
+js-connectors = ["request-handlers/js-connectors", "sql-connector/js-connectors"]
+
+[dependencies]
+anyhow = "1"
+async-trait = "0.1"
+query-core = { path = "../core", default-features = false }
+request-handlers = { path = "../request-handlers", default-features = false, features = ["js-connectors", "sql"] }
+query-connector = { path = "../connectors/query-connector" }
+user-facing-errors = { path = "../../libs/user-facing-errors", features = ["quaint"]}
+psl.workspace = true
+sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector", default-features = false, features = [
+    "js-connectors",
+] }
+prisma-models = { path = "../prisma-models" }
+wasm-connectors = { path = "../wasm-connectors" }
+
+tracing = "0.1"
+tracing-subscriber = { version = "0.3" }
+tracing-futures = "0.2"
+
+thiserror = "1"
+connection-string.workspace = true
+url = "2"
+serde_json.workspace = true
+serde.workspace = true
+tokio.workspace = true
+futures = "0.3"
+console_error_panic_hook = "*"
+
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+serde-wasm-bindgen = "0.5"
+serde_repr = "0.1"
+js-sys = "0.3"
+
+[dependencies.quaint]
+workspace = true
+features = ["slim"]
+
+[build-dependencies]
+napi-build = "1"

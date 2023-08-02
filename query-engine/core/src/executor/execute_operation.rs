@@ -11,8 +11,9 @@ use query_engine_metrics::{
     histogram, increment_counter, metrics, PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, PRISMA_CLIENT_QUERIES_TOTAL,
 };
 
+use instant::Instant;
 use schema::{QuerySchema, QuerySchemaRef};
-use std::time::{Duration, Instant};
+use std::time::Duration;
 use tracing::Instrument;
 use tracing_futures::WithSubscriber;
 

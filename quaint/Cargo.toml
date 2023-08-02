@@ -44,7 +44,6 @@ slim = [
   "mssql",
   "mysql",
   "postgresql",
-  "serde-support",
   "sqlite",
   "uuid",
   "bigdecimal",
