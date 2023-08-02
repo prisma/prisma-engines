@@ -42,9 +42,17 @@ pub struct TxId(String);
 
 const MINIMUM_TX_ID_LENGTH: usize = 24;
 
+#[cfg(feature = "native")]
 impl Default for TxId {
     fn default() -> Self {
-        Self(cuid::cuid().unwrap())
+        Self(cuid::cuid())
+    }
+}
+
+#[cfg(not(feature = "native"))]
+impl Default for TxId {
+    fn default() -> Self {
+        Self(uuid::Uuid::new_v4().to_string())
     }
 }
 
