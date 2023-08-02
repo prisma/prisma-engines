@@ -301,6 +301,7 @@
 <a href="#301" id="301">301</a>
 <a href="#302" id="302">302</a>
 <a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::query_graph_builder::write::write_args_parser::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
@@ -329,7 +330,7 @@
     </span><span class="kw">let </span>data_argument = field.arguments.lookup(args::DATA).unwrap();
     <span class="kw">let </span>data_map: ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt; = data_argument.value.try_into()<span class="question-mark">?</span>;
 
-    <span class="kw">let </span>can_use_atomic_update = can_use_atomic_update(query_schema, <span class="kw-2">&amp;</span>field);
+    <span class="kw">let </span>can_use_atomic_update = can_use_atomic_update(query_schema, <span class="kw-2">&amp;</span>model, <span class="kw-2">&amp;</span>data_map, <span class="kw-2">&amp;</span>field);
 
     <span class="kw">let </span>update_node = update_record_node(
         graph,
@@ -390,6 +391,8 @@
         )<span class="question-mark">?</span>;
     <span class="comment">// Otherwise, perform the update, and then do an additional read.
     </span>} <span class="kw">else </span>{
+        graph.flag_transactional();
+
         <span class="kw">let </span>read_query = read::find_unique(field, model.clone())<span class="question-mark">?</span>;
         <span class="kw">let </span>read_node = graph.create_node(Query::Read(read_query));
 
@@ -494,14 +497,6 @@
     // 1. Save a SELECT statement
     // 2. Avoid from computing the ids in memory if they are updated. See `update_one_without_selection` function.
     </span><span class="kw">let </span>update_parent = <span class="kw">if </span>query_schema.has_capability(ConnectorCapability::UpdateReturning) {
-        <span class="kw">let </span>has_nested_selection = field.map(|f| f.has_nested_selection()).unwrap_or(<span class="bool-val">false</span>);
-
-        <span class="comment">// If there are nested operations or nested selections, then make the graph transactional.
-        // Otherwise, it means the operation can be done in a single, atomic update.
-        </span><span class="kw">if </span>!update_args.nested.is_empty() || has_nested_selection {
-            graph.flag_transactional();
-        }
-
         <span class="comment">// If there&#39;s a selected field, fulfill the scalar selection set.
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(field) = field.cloned() {
             <span class="kw">let </span>nested_fields = field.nested_fields.unwrap().fields;
@@ -529,9 +524,6 @@
             )))
         }
     } <span class="kw">else </span>{
-        <span class="comment">// If the connector does not support returning the updated values, it&#39;s always transactional as we need another read after the update.
-        </span>graph.flag_transactional();
-
         Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithoutSelection(
             UpdateRecordWithoutSelection {
                 model: model.clone(),
@@ -591,7 +583,12 @@
 /// We only perform such update when:
 /// 1. The connector supports returning updated values
 /// 2. The selection set contains no relation
-</span><span class="kw">fn </span>can_use_atomic_update(query_schema: <span class="kw-2">&amp;</span>QuerySchema, field: <span class="kw-2">&amp;</span>ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+</span><span class="kw">fn </span>can_use_atomic_update(
+    query_schema: <span class="kw-2">&amp;</span>QuerySchema,
+    model: <span class="kw-2">&amp;</span>Model,
+    data_map: <span class="kw-2">&amp;</span>ParsedInputMap&lt;<span class="lifetime">&#39;_</span>&gt;,
+    field: <span class="kw-2">&amp;</span>ParsedField&lt;<span class="lifetime">&#39;_</span>&gt;,
+) -&gt; bool {
     <span class="comment">// If the connector does not support RETURNING at all
     </span><span class="kw">if </span>!query_schema.has_capability(ConnectorCapability::UpdateReturning) {
         <span class="kw">return </span><span class="bool-val">false</span>;
@@ -599,6 +596,11 @@
 
     <span class="comment">// If the operation has nested selection sets
     </span><span class="kw">if </span>field.has_nested_selection() {
+        <span class="kw">return </span><span class="bool-val">false</span>;
+    }
+
+    <span class="comment">// If the operation has nested operations
+    </span><span class="kw">if </span>WriteArgsParser::has_nested_operation(model, data_map) {
         <span class="kw">return </span><span class="bool-val">false</span>;
     }
 
