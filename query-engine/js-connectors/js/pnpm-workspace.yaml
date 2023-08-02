@@ -1,4 +1,4 @@
 packages:
-  - './js-connectors-utils'
+  - './js-connector-utils'
   - './planetscale-js-connector'
   - './neon-js-connector'

@@ -18,7 +18,7 @@ importers:
         specifier: ^5.1.6
         version: 5.1.6
 
-  js-connectors-utils:
+  js-connector-utils:
     dependencies:
       debug:
         specifier: ^4.3.4
@@ -30,9 +30,9 @@ importers:
 
   neon-js-connector:
     dependencies:
-      '@jkomyno/prisma-js-connectors-utils':
+      '@jkomyno/prisma-js-connector-utils':
         specifier: workspace:*
-        version: link:../js-connectors-utils
+        version: link:../js-connector-utils
       '@neondatabase/serverless':
         specifier: ^0.5.6
         version: 0.5.6
@@ -42,9 +42,9 @@ importers:
 
   planetscale-js-connector:
     dependencies:
-      '@jkomyno/prisma-js-connectors-utils':
+      '@jkomyno/prisma-js-connector-utils':
         specifier: workspace:*
-        version: link:../js-connectors-utils
+        version: link:../js-connector-utils
       '@planetscale/database':
         specifier: ^1.10.0
         version: 1.10.0
