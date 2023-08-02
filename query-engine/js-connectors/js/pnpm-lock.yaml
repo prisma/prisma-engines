@@ -28,6 +28,15 @@ importers:
         specifier: ^4.1.8
         version: 4.1.8
 
+  planetscale-js-connector:
+    dependencies:
+      '@jkomyno/prisma-js-connectors-utils':
+        specifier: workspace:*
+        version: link:../js-connectors-utils
+      '@planetscale/database':
+        specifier: ^1.10.0
+        version: 1.10.0
+
 packages:
 
   /@esbuild/android-arm64@0.18.17:
@@ -282,6 +291,11 @@ packages:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.15.0
     dev: true
+
+  /@planetscale/database@1.10.0:
+    resolution: {integrity: sha512-XMfNRjIPgGTga6g1YpGr7E21CcnHZcHZdyhRUIiZ/AlpD+ts65UF2B3wKjcu7MKMynmmcOGs6R9kAT6D1OTlZQ==}
+    engines: {node: '>=16'}
+    dev: false
 
   /@types/debug@4.1.8:
     resolution: {integrity: sha512-/vPO1EPOs306Cvhwv7KfVfYvOJqA/S/AXjaHQiJboCZzcNDb+TIJFN9/2C9DZ//ijSKWioNyUxD792QmDJ+HKQ==}
