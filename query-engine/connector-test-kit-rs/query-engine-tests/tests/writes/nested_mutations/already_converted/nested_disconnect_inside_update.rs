@@ -735,4 +735,64 @@ mod disconnect_inside_update {
 
         Ok(())
     }
+
+    fn one2m() -> String {
+        let schema = indoc! {
+            r#"model Parent {
+              #id(id, Int, @id)
+              unique Int @unique
+            
+              children Child[]
+            }
+            
+            model Child {
+              #id(id, Int, @id)
+            
+              parentId Int?
+              parent   Parent?  @relation(fields: [parentId], references: [unique])
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    // When disconnecting a to-one relation, the foreign key should be updated in the result.
+    #[connector_test(schema(one2m))]
+    async fn fks_should_be_resolved(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation { createOneParent(data: { id: 1, unique: 1, children: { create: { id: 1 } } }) { id } }"#
+        );
+
+        // Ensure that after disconnecting the child, parentId is returned as null
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateOneChild(where: { id: 1 }, data: { parent: { disconnect: true } }) { id, parentId }
+          }"#),
+          @r###"{"data":{"updateOneChild":{"id":1,"parentId":null}}}"###
+        );
+
+        // Reconnect the child for another test
+        run_query!(
+            &runner,
+            r#"mutation { updateOneParent(where: { id: 1 }, data: { children: { connect: { id: 1 } } }) { id } }"#
+        );
+
+        // Ensure that after updating the Parent's foreign key, User.parentId is returned as its updated value
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateOneChild(
+              where: { id: 1 }
+              data: { parent: { update: { data: { unique: 1337 } } } }
+            ) {
+              id
+              parentId
+            }
+          }
+          "#),
+          @r###"{"data":{"updateOneChild":{"id":1,"parentId":1337}}}"###
+        );
+
+        Ok(())
+    }
 }
