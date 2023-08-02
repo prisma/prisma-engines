@@ -142,7 +142,10 @@ pub use tx_ext::TxTraceExt;
 use self::capturer::Processor;
 use once_cell::sync::Lazy;
 use opentelemetry::{global, sdk, trace};
+
+#[cfg(feature = "metrics")]
 use query_engine_metrics::MetricRegistry;
+
 use tracing::subscriber;
 use tracing_subscriber::{
     filter::filter_fn, layer::Layered, prelude::__tracing_subscriber_SubscriberExt, Layer, Registry,

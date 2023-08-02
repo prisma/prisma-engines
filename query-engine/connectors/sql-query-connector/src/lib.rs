@@ -22,9 +22,11 @@ mod value_ext;
 use self::{column_metadata::*, context::Context, filter_conversion::*, query_ext::QueryExt, row::*};
 use quaint::prelude::Queryable;
 
+pub use database::FromSource;
 #[cfg(feature = "js-connectors")]
 pub use database::{register_js_connector, Js};
-pub use database::{FromSource, Mssql, Mysql, PostgreSql, Sqlite};
+#[cfg(feature = "native-connectors")]
+pub use database::{Mssql, Mysql, PostgreSql, Sqlite};
 pub use error::SqlError;
 
 type Result<T> = std::result::Result<T, error::SqlError>;
