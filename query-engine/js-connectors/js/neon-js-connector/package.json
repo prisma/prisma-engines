@@ -1,5 +1,7 @@
 {
   "name": "@jkomyno/prisma-neon-js-connector",
+  "version": "0.0.1",
+  "private": "false",
   "description": "Prisma's JS Connector for \"@neondatabase/serverless\"",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -17,7 +19,7 @@
   "license": "Apache-2.0",
   "sideEffects": false,
   "dependencies": {
-    "@jkomyno/prisma-js-connectors-utils": "workspace:*",
+    "@jkomyno/prisma-js-connector-utils": "workspace:*",
     "@neondatabase/serverless": "^0.5.6",
     "ws": "^8.13.0"
   }

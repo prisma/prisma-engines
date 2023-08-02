@@ -1,8 +1,8 @@
 import { Pool, neonConfig } from '@neondatabase/serverless'
 import type { NeonConfig } from '@neondatabase/serverless'
 import ws from 'ws'
-import { binder, Debug } from '@jkomyno/prisma-js-connectors-utils'
-import type { Closeable, Connector, ResultSet, Query, ConnectorConfig } from '@jkomyno/prisma-js-connectors-utils'
+import { binder, Debug } from '@jkomyno/prisma-js-connector-utils'
+import type { Closeable, Connector, ResultSet, Query, ConnectorConfig } from '@jkomyno/prisma-js-connector-utils'
 import { fieldToColumnType } from './conversion'
 
 neonConfig.webSocketConstructor = ws

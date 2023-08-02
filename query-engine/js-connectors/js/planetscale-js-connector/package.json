@@ -1,5 +1,7 @@
 {
   "name": "@jkomyno/prisma-planetscale-js-connector",
+  "version": "0.0.1",
+  "private": "false",
   "description": "Prisma's JS Connector for \"@planetscale/database\"",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -18,6 +20,6 @@
   "sideEffects": false,
   "dependencies": {
     "@planetscale/database": "^1.10.0",
-    "@jkomyno/prisma-js-connectors-utils": "workspace:*"
+    "@jkomyno/prisma-js-connector-utils": "workspace:*"
   }
 }
