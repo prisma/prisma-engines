@@ -8,6 +8,7 @@ use napi_derive::napi;
 use psl::JsConnectorFlavor;
 use quaint::connector::ResultSet as QuaintResultSet;
 use quaint::Value as QuaintValue;
+use std::str::FromStr;
 
 // TODO(jkomyno): import these 3rd-party crates from the `quaint-core` crate.
 use bigdecimal::BigDecimal;
@@ -198,8 +199,9 @@ fn js_planetscale_value_to_quaint(json_value: serde_json::Value, column_type: Co
             mismatch => panic!("Expected a string, found {:?}", mismatch),
         },
         ColumnType::Float => match json_value {
-            // n.as_f32() is not implemented, so we need to downcast from f64 instead
-            serde_json::Value::Number(n) => QuaintValue::float(n.as_f64().expect("number must be a f32") as f32),
+            // n.as_f32() is not implemented, so we need to downcast from f64 instead.
+            // We assume that the JSON value is a valid f32 number, but we check for overflows anyway.
+            serde_json::Value::Number(n) => QuaintValue::float(f64_to_f32(n.as_f64().expect("number must be a f64"))),
             serde_json::Value::Null => QuaintValue::Float(None),
             mismatch => panic!("Expected a f32 number, found {:?}", mismatch),
         },
@@ -210,24 +212,7 @@ fn js_planetscale_value_to_quaint(json_value: serde_json::Value, column_type: Co
         },
         ColumnType::Numeric => match json_value {
             serde_json::Value::String(s) => {
-                // Turn this into a BigInt value with an additional "scale" variable indicating the scale of 10.
-                // E.g., if s = "1234.99", s_as_bigint = 123499, s_scale = 2.
-                let (s_as_bigint, s_scale) = if let Some(dot) = s.find('.') {
-                    let scale = s.len() - dot - 1;
-                    let s = s.replace('.', "");
-                    (
-                        num_bigint::BigInt::parse_bytes(s.as_bytes(), 10)
-                            .expect("string-encoded number must be a numeric"),
-                        scale as i64,
-                    )
-                } else {
-                    (
-                        num_bigint::BigInt::parse_bytes(s.as_bytes(), 10)
-                            .expect("string-encoded number must be a numeric"),
-                        0,
-                    )
-                };
-                let decimal = BigDecimal::new(s_as_bigint, s_scale);
+                let decimal = BigDecimal::from_str(&s).expect("invalid numeric value");
                 QuaintValue::numeric(decimal)
             }
             serde_json::Value::Null => QuaintValue::Numeric(None),
@@ -316,8 +301,9 @@ fn js_neon_value_to_quaint(json_value: serde_json::Value, column_type: ColumnTyp
             mismatch => panic!("Expected a string, found {:?}", mismatch),
         },
         ColumnType::Float => match json_value {
-            // n.as_f32() is not implemented, so we need to downcast from f64 instead
-            serde_json::Value::Number(n) => QuaintValue::float(n.as_f64().expect("number must be a f32") as f32),
+            // n.as_f32() is not implemented, so we need to downcast from f64 instead.
+            // We assume that the JSON value is a valid f32 number, but we check for overflows anyway.
+            serde_json::Value::Number(n) => QuaintValue::float(f64_to_f32(n.as_f64().expect("number must be a f64"))),
             serde_json::Value::Null => QuaintValue::Float(None),
             mismatch => panic!("Expected a f32 number, found {:?}", mismatch),
         },
@@ -328,24 +314,7 @@ fn js_neon_value_to_quaint(json_value: serde_json::Value, column_type: ColumnTyp
         },
         ColumnType::Numeric => match json_value {
             serde_json::Value::String(s) => {
-                // Turn this into a BigInt value with an additional "scale" variable indicating the scale of 10.
-                // E.g., if s = "1234.99", s_as_bigint = 123499, s_scale = 2.
-                let (s_as_bigint, s_scale) = if let Some(dot) = s.find('.') {
-                    let scale = s.len() - dot - 1;
-                    let s = s.replace('.', "");
-                    (
-                        num_bigint::BigInt::parse_bytes(s.as_bytes(), 10)
-                            .expect("string-encoded number must be a numeric"),
-                        scale as i64,
-                    )
-                } else {
-                    (
-                        num_bigint::BigInt::parse_bytes(s.as_bytes(), 10)
-                            .expect("string-encoded number must be a numeric"),
-                        0,
-                    )
-                };
-                let decimal = BigDecimal::new(s_as_bigint, s_scale);
+                let decimal = BigDecimal::from_str(&s).expect("invalid numeric value");
                 QuaintValue::numeric(decimal)
             }
             serde_json::Value::Null => QuaintValue::Numeric(None),
@@ -496,6 +465,16 @@ impl Proxy {
 
         Ok(result_guard.unwrap_or_default())
     }
+}
+
+/// Coerce a `f64` to a `f32`, asserting that the conversion is lossless.
+/// Note that, when overflow occurs during conversion, the result is `infinity`.
+fn f64_to_f32(x: f64) -> f32 {
+    let y = x as f32;
+
+    assert_eq!(x.is_finite(), y.is_finite(), "f32 overflow during conversion");
+
+    y
 }
 
 #[cfg(test)]
