@@ -11,11 +11,16 @@ const debug = Debug('prisma:js-connector:neon')
 
 export type PrismaNeonConfig = ConnectorConfig & Partial<Omit<NeonConfig, 'connectionString'>>
 
+const TRANSACTION_BEGIN = 'BEGIN'
+const TRANSACTION_COMMIT = 'COMMIT'
+const TRANSACTION_ROLLBACK = 'ROLLBACK'
+
 class PrismaNeon implements Connector, Closeable {
   readonly flavor = 'postgres'
   
   private pool: Pool
   private isRunning: boolean = true
+  private inTransaction: boolean = false
   private _isHealthy: boolean = true
   private _version: string | undefined = undefined
 
@@ -66,8 +71,33 @@ class PrismaNeon implements Connector, Closeable {
     const tag = '[js::execute_raw]'
     debug(`${tag} %O`, query)
 
-    const { rowCount: rowsAffected } = await this.performIO(query)
-    return rowsAffected
+    switch (query.sql) {
+      case TRANSACTION_BEGIN: {
+        // check if a transaction is already in progress
+        if (this.inTransaction) {
+          throw new Error('A transaction is already in progress')
+        }
+
+        this.inTransaction = true
+        debug(`${tag} transaction began`)
+
+        return Promise.resolve(-1)
+      }
+      case TRANSACTION_COMMIT: {
+        this.inTransaction = false
+        debug(`${tag} transaction ended successfully`)
+        return Promise.resolve(-1)
+      }
+      case TRANSACTION_ROLLBACK: {
+        this.inTransaction = false
+        debug(`${tag} transaction ended with error`)
+        return Promise.resolve(-2)
+      }
+      default: {
+        const { rowCount: rowsAffected } = await this.performIO(query)
+        return rowsAffected
+      }
+    }
   }
 
   /**
