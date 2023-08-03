@@ -4,6 +4,7 @@ mod guard;
 mod transformers;
 
 pub(crate) use error::*;
+use psl::datamodel_connector::{ConnectorCapabilities, ConnectorCapability};
 
 use crate::{
     interpreter::ExpressionResult, FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderResult, QueryOptions,
@@ -219,10 +220,11 @@ impl QueryGraph {
         Ok(graph)
     }
 
-    pub fn finalize(&mut self) -> QueryGraphResult<()> {
+    pub fn finalize(&mut self, capabilities: ConnectorCapabilities) -> QueryGraphResult<()> {
         if !self.finalized {
             self.swap_marked()?;
             self.ensure_return_nodes_have_parent_dependency()?;
+            self.normalize_data_dependencies(capabilities)?;
             self.insert_reloads()?;
             self.normalize_if_nodes()?;
             self.finalized = true;
@@ -322,6 +324,11 @@ impl QueryGraph {
     /// Returns a reference to the content of `node`, if the content is still present.
     pub(crate) fn node_content(&self, node: &NodeRef) -> Option<&Node> {
         self.graph.node_weight(node.node_ix).unwrap().borrow()
+    }
+
+    /// Returns a reference to the content of `node`, if the content is still present.
+    pub(crate) fn node_content_mut(&mut self, node: &NodeRef) -> Option<&mut Node> {
+        self.graph.node_weight_mut(node.node_ix).unwrap().borrow_mut()
     }
 
     /// Returns a reference to the content of `edge`, if the content is still present.
@@ -761,7 +768,7 @@ impl QueryGraph {
                         .into_iter()
                         .filter_map(|edge| match self.edge_content(&edge).unwrap() {
                             QueryGraphDependency::ProjectedDataDependency(ref requested_selection, _)
-                                if !q.returns(requested_selection) =>
+                                if !q.satisfies(requested_selection) =>
                             {
                                 trace!(
                                     "Query {:?} does not return requested selection {:?} and will be reloaded.",
@@ -826,6 +833,108 @@ impl QueryGraph {
                 let content = self.remove_edge(edge).unwrap();
 
                 self.create_edge(&reload_node, &target, content)?;
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Traverses the query graph and finds the nodes that need their selection set to be updated so that they fulfill the data dependencies of their children.
+    /// We determine that based on incoming `ProjectedDataDependency` edge transformers, as those hold the `FieldSelection`s
+    /// that all records of the source result need to contain in order to satisfy dependencies.
+    ///
+    /// ## Example
+    /// Given a query graph, where 3 children require different set of fields ((A, B), (B, C), (A, D))
+    /// to execute their dependent operations:
+    /// ```text
+    /// ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─
+    ///     Parent (A, B)  │─────────┬───────────────┐
+    /// └ ─ ─ ─ ─ ─ ─  ─ ─           │               │
+    ///        │                     │               │
+    ///     (A, B)                (B, C)           (A, D)
+    ///        │                    │               │
+    ///        ▼                    ▼               ▼
+    /// ┌ ─ ─ ─ ─ ─ ─          ┌ ─ ─ ─ ─ ─ ─   ┌ ─ ─ ─ ─ ─ ─
+    ///    Child A   │         |  Child B   │  |  Child C   │
+    /// └ ─ ─ ─ ─ ─ ─          └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─
+    /// ```
+    /// However, `Parent` only returns `(A, B)`, for example, because that's the primary ID of the parent model.
+    ///
+    /// In order to satisfy children B and C, the graph is altered by this post-processing call:
+    /// ```text
+    /// ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+    ///     Parent (A, B, C, D)  │─────────┬───────────────┐
+    /// └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─          │               │
+    ///        │                           │               │
+    ///     (A, B)                       (B, C)           (A, D)
+    ///        │                           │               │
+    ///        ▼                           ▼               ▼
+    /// ┌ ─ ─ ─ ─ ─ ─               ┌ ─ ─ ─ ─ ─ ┐   ┌ ─ ─ ─ ─ ─ ┐
+    ///    Child A   │              |  Child B  │   |  Child C  │
+    /// └ ─ ─ ─ ─ ─ ─               └ ─ ─ ─ ── -    └ ─ ─ ─ ── ─
+    /// ```
+    /// Note that not all connectors can have their nodes' field selection updated.
+    /// This is only possible when the parent node _can_ fulfill the selection set.
+    /// In the case of updates and inserts, for instance, only connectors supporting `InsertReturning` and `UpdateReturning` can do it,
+    /// or else they're only able to return the primary identifier of the model inserted or updated.
+    fn normalize_data_dependencies(&mut self, capabilities: ConnectorCapabilities) -> QueryGraphResult<()> {
+        let unsatisfied_deps: Vec<(NodeRef, Vec<FieldSelection>)> = self
+            .graph
+            .node_indices()
+            .filter_map(|ix| -> Option<(NodeRef, Vec<FieldSelection>)> {
+                let node = NodeRef { node_ix: ix };
+
+                if let Node::Query(q) = self.node_content(&node).unwrap() {
+                    // If the connector does not support returning more than the primary identifier for an update,
+                    // do not update the selection set.
+                    if q.is_update_one() && !capabilities.contains(ConnectorCapability::UpdateReturning) {
+                        return None;
+                    }
+
+                    // If the connector does not support returning more than the primary identifier for a create,
+                    // do not update the selection set.
+                    if q.is_create_one() && !capabilities.contains(ConnectorCapability::InsertReturning) {
+                        return None;
+                    }
+
+                    // No connector supports returning more than the primary identifier for a delete just yet.
+                    if q.is_delete_one() {
+                        return None;
+                    }
+
+                    let edges = self.outgoing_edges(&node);
+
+                    let unsatisfied_dependencies: Vec<FieldSelection> = edges
+                        .into_iter()
+                        .filter_map(|edge| match self.edge_content(&edge).unwrap() {
+                            QueryGraphDependency::ProjectedDataDependency(ref requested_selection, _)
+                                if !q.satisfies(requested_selection) =>
+                            {
+                                trace!(
+                                    "Query {:?} does not return requested selection {:?} and will be updated.",
+                                    q,
+                                    requested_selection.prisma_names().collect::<Vec<_>>()
+                                );
+                                Some(requested_selection.clone())
+                            }
+                            _ => None,
+                        })
+                        .collect();
+
+                    if unsatisfied_dependencies.is_empty() {
+                        return None;
+                    }
+
+                    Some((node, unsatisfied_dependencies))
+                } else {
+                    None
+                }
+            })
+            .collect();
+
+        for (node, identifiers) in unsatisfied_deps {
+            if let Node::Query(ref mut q) = self.node_content_mut(&node).unwrap() {
+                q.satisfy_dependency(FieldSelection::union(identifiers));
             }
         }
 

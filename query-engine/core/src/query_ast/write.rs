@@ -28,8 +28,7 @@ impl WriteQuery {
         let args = match self {
             Self::CreateRecord(ref mut x) => &mut x.args,
             Self::UpdateRecord(ref mut x) => match x {
-                UpdateRecord::WithExplicitSelection(u) => &mut u.args,
-                UpdateRecord::WithImplicitSelection(u) => &mut u.args,
+                UpdateRecord::WithSelection(u) => &mut u.args,
                 UpdateRecord::WithoutSelection(u) => &mut u.args,
             },
             Self::UpdateManyRecords(x) => &mut x.args,
@@ -55,30 +54,54 @@ impl WriteQuery {
         }
     }
 
-    pub fn returns(&self, field_selection: &FieldSelection) -> bool {
-        let returns_id = &self.model().primary_identifier() == field_selection;
+    /// Checks whether or not the field selection of this query satisfies the inputted field selection.
+    pub fn satisfies(&self, field_selection: &FieldSelection) -> bool {
+        self.returns()
+            .map(|fs| fs.is_superset_of(field_selection))
+            .unwrap_or(false)
+    }
 
-        // Write operations only return IDs at the moment, so anything different
-        // from the primary ID is automatically not returned.
-        // DeleteMany, Connect and Disconnect do not return anything.
+    /// Returns the field selection of a write query.
+    /// 
+    /// Most write operations only return IDs at the moment, so anything different
+    /// from the primary ID is automatically not returned.
+    /// DeleteMany, Connect and Disconnect do not return anything.
+    fn returns(&self) -> Option<FieldSelection> {
+        let returns_id = Some(self.model().primary_identifier());
+
         match self {
-            Self::CreateRecord(_) => returns_id,
-            Self::CreateManyRecords(_) => false,
-            Self::UpdateRecord(UpdateRecord::WithExplicitSelection(ur)) => {
-                ur.selected_fields.is_superset_of(field_selection)
-            }
-            Self::UpdateRecord(UpdateRecord::WithImplicitSelection(ur)) => {
-                ur.selected_fields().is_superset_of(field_selection)
-            }
+            Self::CreateRecord(cr) => Some(cr.selected_fields.clone()),
+            Self::CreateManyRecords(_) => None,
+            Self::UpdateRecord(UpdateRecord::WithSelection(ur)) => Some(ur.selected_fields.clone()),
             Self::UpdateRecord(UpdateRecord::WithoutSelection(_)) => returns_id,
             Self::DeleteRecord(_) => returns_id,
             Self::UpdateManyRecords(_) => returns_id,
-            Self::DeleteManyRecords(_) => false,
-            Self::ConnectRecords(_) => false,
-            Self::DisconnectRecords(_) => false,
-            Self::ExecuteRaw(_) => false,
-            Self::QueryRaw(_) => false,
+            Self::DeleteManyRecords(_) => None,
+            Self::ConnectRecords(_) => None,
+            Self::DisconnectRecords(_) => None,
+            Self::ExecuteRaw(_) => None,
+            Self::QueryRaw(_) => None,
             Self::Upsert(_) => returns_id,
+        }
+    }
+
+    /// Updates the field selection of the query to satisfy the inputted FieldSelection.
+    pub fn satisfy_dependency(&mut self, fields: FieldSelection) {
+        match self {
+            Self::CreateRecord(cr) => cr.selected_fields = cr.selected_fields.clone().merge(fields),
+            Self::UpdateRecord(UpdateRecord::WithSelection(ur)) => {
+                ur.selected_fields = ur.selected_fields.clone().merge(fields)
+            }
+            Self::UpdateRecord(UpdateRecord::WithoutSelection(_)) => (),
+            Self::CreateManyRecords(_) => (),
+            Self::DeleteRecord(_) => (),
+            Self::UpdateManyRecords(_) => (),
+            Self::DeleteManyRecords(_) => (),
+            Self::ConnectRecords(_) => (),
+            Self::DisconnectRecords(_) => (),
+            Self::ExecuteRaw(_) => (),
+            Self::QueryRaw(_) => (),
+            Self::Upsert(_) => (),
         }
     }
 
@@ -143,7 +166,13 @@ impl FilteredQuery for WriteQuery {
 impl std::fmt::Display for WriteQuery {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::CreateRecord(q) => write!(f, "CreateRecord(model: {}, args: {:?})", q.model.name(), q.args),
+            Self::CreateRecord(q) => write!(
+                f,
+                "CreateRecord(model: {}, args: {:?}, selected_fields: {:?})",
+                q.model.name(),
+                q.args,
+                q.selected_fields.to_string()
+            ),
             Self::CreateManyRecords(q) => write!(f, "CreateManyRecord(model: {})", q.model.name()),
             Self::UpdateRecord(q) => write!(
                 f,
@@ -222,10 +251,8 @@ impl CreateManyRecords {
 #[derive(Debug, Clone)]
 #[allow(clippy::enum_variant_names)]
 pub enum UpdateRecord {
-    /// Update with explicitly selected fields that will eventually be serialized as results.
-    WithExplicitSelection(UpdateRecordWithSelection),
-    /// Update with implicit selection set (primary_identifier) that will only be used to fulfill other nodes requirements.
-    WithImplicitSelection(UpdateRecordWithoutSelection),
+    /// Update with explicitly selected fields.
+    WithSelection(UpdateRecordWithSelection),
     /// Update without any selection set. A subsequent read is required to fulfill other nodes requirements.
     WithoutSelection(UpdateRecordWithoutSelection),
 }
@@ -233,48 +260,42 @@ pub enum UpdateRecord {
 impl UpdateRecord {
     pub(crate) fn args(&self) -> &WriteArgs {
         match self {
-            UpdateRecord::WithExplicitSelection(u) => &u.args,
-            UpdateRecord::WithImplicitSelection(u) => &u.args,
+            UpdateRecord::WithSelection(u) => &u.args,
             UpdateRecord::WithoutSelection(u) => &u.args,
         }
     }
 
     pub(crate) fn model(&self) -> &Model {
         match self {
-            UpdateRecord::WithExplicitSelection(u) => &u.model,
-            UpdateRecord::WithImplicitSelection(u) => &u.model,
+            UpdateRecord::WithSelection(u) => &u.model,
             UpdateRecord::WithoutSelection(u) => &u.model,
         }
     }
 
     pub(crate) fn record_filter(&self) -> &RecordFilter {
         match self {
-            UpdateRecord::WithExplicitSelection(u) => &u.record_filter,
-            UpdateRecord::WithImplicitSelection(u) => &u.record_filter,
+            UpdateRecord::WithSelection(u) => &u.record_filter,
             UpdateRecord::WithoutSelection(u) => &u.record_filter,
         }
     }
 
     pub(crate) fn record_filter_mut(&mut self) -> &mut RecordFilter {
         match self {
-            UpdateRecord::WithExplicitSelection(u) => &mut u.record_filter,
-            UpdateRecord::WithImplicitSelection(u) => &mut u.record_filter,
+            UpdateRecord::WithSelection(u) => &mut u.record_filter,
             UpdateRecord::WithoutSelection(u) => &mut u.record_filter,
         }
     }
 
     pub(crate) fn selected_fields(&self) -> Option<FieldSelection> {
         match self {
-            UpdateRecord::WithExplicitSelection(u) => Some(u.selected_fields.clone()),
-            UpdateRecord::WithImplicitSelection(u) => Some(u.selected_fields()),
+            UpdateRecord::WithSelection(u) => Some(u.selected_fields.clone()),
             UpdateRecord::WithoutSelection(_) => None,
         }
     }
 
     pub(crate) fn set_record_filter(&mut self, record_filter: RecordFilter) {
         match self {
-            UpdateRecord::WithExplicitSelection(u) => u.record_filter = record_filter,
-            UpdateRecord::WithImplicitSelection(u) => u.record_filter = record_filter,
+            UpdateRecord::WithSelection(u) => u.record_filter = record_filter,
             UpdateRecord::WithoutSelection(u) => u.record_filter = record_filter,
         }
     }
@@ -282,7 +303,8 @@ impl UpdateRecord {
 
 #[derive(Debug, Clone)]
 pub struct UpdateRecordWithSelection {
-    pub name: String,
+    // Used for serialization. When `None`, the result will only be used to fulfill other nodes requirement.
+    pub name: Option<String>,
     pub model: Model,
     pub record_filter: RecordFilter,
     pub args: WriteArgs,
@@ -295,12 +317,6 @@ pub struct UpdateRecordWithoutSelection {
     pub model: Model,
     pub record_filter: RecordFilter,
     pub args: WriteArgs,
-}
-
-impl UpdateRecordWithoutSelection {
-    pub(crate) fn selected_fields(&self) -> FieldSelection {
-        self.model.primary_identifier()
-    }
 }
 
 #[derive(Debug, Clone)]
@@ -349,8 +365,7 @@ pub struct RawQuery {
 impl FilteredQuery for UpdateRecord {
     fn get_filter(&mut self) -> Option<&mut Filter> {
         match self {
-            UpdateRecord::WithExplicitSelection(u) => Some(&mut u.record_filter.filter),
-            UpdateRecord::WithImplicitSelection(u) => Some(&mut u.record_filter.filter),
+            UpdateRecord::WithSelection(u) => Some(&mut u.record_filter.filter),
             UpdateRecord::WithoutSelection(u) => Some(&mut u.record_filter.filter),
         }
     }
