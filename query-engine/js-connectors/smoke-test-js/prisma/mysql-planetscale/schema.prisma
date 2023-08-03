@@ -80,6 +80,7 @@ model Child {
   parentId   String? @unique
   non_unique String?
   id         String  @id
+
   @@unique([c_1, c_2])
 }
 
@@ -89,5 +90,6 @@ model Parent {
   p_2        String
   non_unique String?
   id         String  @id
+
   @@unique([p_1, p_2])
 }

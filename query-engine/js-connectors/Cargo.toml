@@ -18,6 +18,7 @@ tracing-core = "0.1"
 num-bigint = "0.4.3"
 bigdecimal = "0.3.0"
 chrono = "0.4.20"
+futures = "0.3"
 
 napi.workspace = true
 napi-derive.workspace = true
