@@ -1,17 +1,10 @@
 generator client {
-<<<<<<< HEAD:query-engine/js-connectors/js/smoke-test-js/prisma/mysql-planetscale/schema.prisma
   provider        = "prisma-client-js"
-  output          = "../../node_modules/.prisma/client"
-  previewFeatures = []
-=======
-  provider = "prisma-client-js"
->>>>>>> main:query-engine/js-connectors/smoke-test-js/prisma/mysql-planetscale/schema.prisma
 }
 
 datasource db {
-  // provider          = "mysql"
-  provider          = "@prisma/planetscale"
-  // provider          = "mysql"
+  provider          = "mysql"
+  // provider          = "@prisma/planetscale"
   url               = env("JS_PLANETSCALE_DATABASE_URL")
   shadowDatabaseUrl = env("JS_PLANETSCALE_SHADOW_DATABASE_URL")
 }
