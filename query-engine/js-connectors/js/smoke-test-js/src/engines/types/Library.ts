@@ -1,4 +1,5 @@
-import type { QueryEngineConfig } from './QueryEngine.js'
+import type { Connector } from '@jkomyno/prisma-js-connector-utils'
+import type { QueryEngineConfig } from './QueryEngine'
 
 export type QueryEngineInstance = {
   connect(headers: string): Promise<void>
@@ -14,50 +15,6 @@ export type QueryEngineInstance = {
   commitTransaction(id: string, traceHeaders: string): Promise<string>
   rollbackTransaction(id: string, traceHeaders: string): Promise<string>
   metrics(options: string): Promise<string>
-}
-
-export interface ResultSet {
-  columnTypes: Array<ColumnType>
-  columnNames: Array<string>
-  rows: Array<Array<any>>
-}
-
-export interface Query {
-  sql: string
-  args: Array<any>
-}
-
-// Same order as in rust js-connectors' `ColumnType`
-export const enum ColumnType {
-  Int32,
-  Int64,
-  Float,
-  Double,
-  Numeric,
-  Boolean,
-  Char,
-  Text,
-  Date,
-  Time,
-  DateTime,
-  Json,
-  Enum,
-  Bytes,
-  // Set,
-  // Array,
-  // ...
-}
-
-export type Connector = {
-  queryRaw: (params: Query) => Promise<ResultSet>
-  executeRaw: (params: Query) => Promise<number>
-  version: () => Promise<string | undefined>
-  isHealthy: () => boolean
-  flavor: string,
-}
-
-export type Closeable = {
-  close: () => Promise<void>
 }
 
 export interface QueryEngineConstructor {

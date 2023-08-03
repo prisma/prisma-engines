@@ -1,18 +1,14 @@
 generator client {
-  provider = "prisma-client-js"
-  // previewFeatures = ["jsConnectors"]
+  provider        = "prisma-client-js"
+  output          = "../../node_modules/.prisma/client"
+  previewFeatures = []
 }
 
 datasource db {
+  // provider          = "mysql"
   provider          = "@prisma/planetscale"
   url               = env("JS_PLANETSCALE_DATABASE_URL")
   shadowDatabaseUrl = env("JS_PLANETSCALE_SHADOW_DATABASE_URL")
-}
-
-model some_users {
-  id        Int    @id @default(autoincrement())
-  firstname String @db.VarChar(32)
-  lastname  String @db.VarChar(32)
 }
 
 model type_test {
@@ -77,4 +73,23 @@ enum type_test_enum_column_null {
   value1
   value2
   value3
+}
+
+model Child {
+  c          String  @unique
+  c_1        String
+  c_2        String
+  parentId   String? @unique
+  non_unique String?
+  id         String  @id
+  @@unique([c_1, c_2])
+}
+
+model Parent {
+  p          String  @unique
+  p_1        String
+  p_2        String
+  non_unique String?
+  id         String  @id
+  @@unique([p_1, p_2])
 }
