@@ -1,4 +1,4 @@
-import { Closeable, Connector } from './types';
+import type { Closeable, Connector } from './types';
 
 // *.bind(db) is required to preserve the `this` context.
 // There are surely other ways than this to use class methods defined in JS within a
