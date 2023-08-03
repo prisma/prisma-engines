@@ -42,6 +42,26 @@ const TYPES: &[(&str, &str)] = &[
     ("timestampWithPrecision", "Timestamp(3)"),
     ("year", "Year"),
     ("json", "Json"),
+    ("geom", "Geometry"),
+    ("point", "Point"),
+    ("line", "LineString"),
+    ("polygon", "Polygon"),
+    ("multipoint", "MultiPoint"),
+    ("multiline", "MultiLineString"),
+    ("multipolygon", "MultiPolygon"),
+    ("geometrycollection", "GeometryCollection"),
+];
+
+const GEOMETRY_SRID_TYPES: &[(&str, &str)] = &[
+    ("id", "BigInt Auto_Increment Primary Key"),
+    ("geom", "Geometry SRID 4326"),
+    ("point", "Point SRID 4326"),
+    ("line", "LineString SRID 4326"),
+    ("polygon", "Polygon SRID 4326"),
+    ("multipoint", "MultiPoint SRID 4326"),
+    ("multiline", "MultiLineString SRID 4326"),
+    ("multipolygon", "MultiPolygon SRID 4326"),
+    ("geometrycollection", "GeometryCollection SRID 4326"),
 ];
 
 // NOTE: The MariaDB expectations broke with 10.11.2
@@ -109,6 +129,56 @@ async fn native_type_columns_feature_on(api: &mut TestApi) -> TestResult {
             timestampWithPrecision         DateTime @db.Timestamp(3)
             year                           Int      @db.Year
             json                           {json}
+            geom                           Geometry
+            point                          Geometry @db.Point
+            line                           Geometry @db.LineString
+            polygon                        Geometry @db.Polygon
+            multipoint                     Geometry @db.MultiPoint
+            multiline                      Geometry @db.MultiLineString
+            multipolygon                   Geometry @db.MultiPolygon
+            geometrycollection             Geometry @db.GeometryCollection
+        }}
+    "#,
+    };
+
+    let result = api.introspect().await?;
+
+    println!("EXPECTATION: \n {types:#}");
+    println!("RESULT: \n {result:#}");
+
+    api.assert_eq_datamodels(&types, &result);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mysql8))]
+async fn native_type_geometry_columns_srid_feature_on(api: &mut TestApi) -> TestResult {
+    let columns: Vec<String> = GEOMETRY_SRID_TYPES
+        .iter()
+        .map(|(name, db_type)| format!("`{name}` {db_type} Not Null"))
+        .collect();
+
+    api.barrel()
+        .execute(move |migration| {
+            migration.create_table("Spatial", move |t| {
+                for column in &columns {
+                    t.inject_custom(column);
+                }
+            });
+        })
+        .await?;
+
+    let types = formatdoc! {r#"
+        model Spatial {{
+            id                 BigInt   @id  @default(autoincrement())
+            geom               Geometry @db.Geometry(4326)
+            point              Geometry @db.Point(4326)
+            line               Geometry @db.LineString(4326)
+            polygon            Geometry @db.Polygon(4326)
+            multipoint         Geometry @db.MultiPoint(4326)
+            multiline          Geometry @db.MultiLineString(4326)
+            multipolygon       Geometry @db.MultiPolygon(4326)
+            geometrycollection Geometry @db.GeometryCollection(4326)
         }}
     "#,
     };

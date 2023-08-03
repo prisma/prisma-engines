@@ -9,6 +9,8 @@ use crate::{
     error::{Error, ErrorKind},
 };
 
+#[cfg(feature = "geometry")]
+use geozero::{wkb::SpatiaLiteWkb, ToWkt};
 use rusqlite::{
     types::{Null, ToSql, ToSqlOutput, ValueRef},
     Column, Error as RusqlError, Row as SqliteRow, Rows as SqliteRows,
@@ -119,6 +121,20 @@ impl TypeIdentifier for Column<'_> {
         matches!(self.decl_type(), Some("BOOLEAN") | Some("boolean"))
     }
 
+    fn is_geometry(&self) -> bool {
+        match self.decl_type() {
+            Some(n) if n.eq_ignore_ascii_case("GEOMETRY") => true,
+            Some(n) if n.eq_ignore_ascii_case("POINT") => true,
+            Some(n) if n.eq_ignore_ascii_case("LINESTRING") => true,
+            Some(n) if n.eq_ignore_ascii_case("POLYGON") => true,
+            Some(n) if n.eq_ignore_ascii_case("MULTIPOINT") => true,
+            Some(n) if n.eq_ignore_ascii_case("MULTILINESTRING") => true,
+            Some(n) if n.eq_ignore_ascii_case("MULTIPOLYGON") => true,
+            Some(n) if n.eq_ignore_ascii_case("GEOMETRYCOLLECTION") => true,
+            _ => false,
+        }
+    }
+
     fn is_json(&self) -> bool {
         false
     }
@@ -152,6 +168,8 @@ impl<'a> GetRow for SqliteRow<'a> {
                     #[cfg(feature = "chrono")]
                     c if c.is_date() => Value::Date(None),
                     c if c.is_bool() => Value::Boolean(None),
+                    #[cfg(feature = "geometry")]
+                    c if c.is_geometry() => Value::Geometry(None),
                     c => match c.decl_type() {
                         Some(n) => {
                             let msg = format!("Value {n} not supported");
@@ -229,6 +247,16 @@ impl<'a> GetRow for SqliteRow<'a> {
                             })
                     })?
                 }
+                #[cfg(feature = "geometry")]
+                ValueRef::Blob(bytes) if column.is_geometry() => SpatiaLiteWkb(bytes.to_vec())
+                    .to_ewkt(None)
+                    .map(Value::text)
+                    .map_err(|_| {
+                        let builder = Error::builder(ErrorKind::ConversionError(
+                            "Failed to read contents of SQLite geometry column as WKT".into(),
+                        ));
+                        builder.build()
+                    })?,
                 ValueRef::Text(bytes) => Value::text(String::from_utf8(bytes.to_vec())?),
                 ValueRef::Blob(bytes) => Value::bytes(bytes.to_owned()),
             };
@@ -299,6 +327,10 @@ impl<'a> ToSql for Value<'a> {
                     date.and_hms_opt(time.hour(), time.minute(), time.second())
                 })
                 .map(|dt| ToSqlOutput::from(dt.timestamp_millis())),
+            #[cfg(feature = "geometry")]
+            Value::Geometry(_) => panic!("Cannot handle raw Geometry"),
+            #[cfg(feature = "geometry")]
+            Value::Geography(_) => panic!("Cannot handle raw Geography"),
         };
 
         match value {

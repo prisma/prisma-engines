@@ -86,6 +86,7 @@ fn parse_literal(s: &str, tpe: &ColumnType) -> Option<PrismaValue> {
         ColumnTypeFamily::DateTime
         | ColumnTypeFamily::Binary
         | ColumnTypeFamily::Uuid
+        | ColumnTypeFamily::Geometry
         | ColumnTypeFamily::Unsupported(_) => None,
     }
 }

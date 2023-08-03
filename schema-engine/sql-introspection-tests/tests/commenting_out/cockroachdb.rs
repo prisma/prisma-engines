@@ -85,8 +85,7 @@ async fn unsupported_type_keeps_its_usages_cockroach(api: &mut TestApi) -> TestR
                 t.add_column("id", types::primary());
                 // Geometry/Geography is the only type that is not supported by Prisma, but is also not
                 // indexable (only inverted-indexable).
-                t.add_column("broken", types::custom("geometry"));
-                t.add_column("broken2", types::custom("geography"));
+                t.add_column("broken", types::custom("interval"));
             });
         })
         .await?;
@@ -95,17 +94,15 @@ async fn unsupported_type_keeps_its_usages_cockroach(api: &mut TestApi) -> TestR
         *** WARNING ***
 
         These fields are not supported by Prisma Client, because Prisma currently does not support their types:
-          - Model: "Test", field: "broken", original data type: "geometry"
-          - Model: "Test", field: "broken2", original data type: "geography"
+          - Model: "Test", field: "broken", original data type: "interval"
     "#]];
 
     api.expect_warnings(&expected).await;
 
     let dm = expect![[r#"
         model Test {
-          id      BigInt                   @id @default(autoincrement())
-          broken  Unsupported("geometry")
-          broken2 Unsupported("geography")
+          id     BigInt                  @id @default(autoincrement())
+          broken Unsupported("interval")
         }
     "#]];
 

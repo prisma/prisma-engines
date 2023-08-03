@@ -161,6 +161,10 @@ impl<'a> Visitor<'a> for Mysql<'a> {
                 }
                 None => None,
             },
+            #[cfg(feature = "geometry")]
+            Value::Geometry(g) => g.map(|g| self.visit_function(geom_from_text(g.wkt.raw(), g.srid.raw(), false))),
+            #[cfg(feature = "geometry")]
+            Value::Geography(g) => g.map(|g| self.visit_function(geom_from_text(g.wkt.raw(), g.srid.raw(), true))),
             #[cfg(feature = "uuid")]
             Value::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.hyphenated()))),
             #[cfg(feature = "chrono")]
@@ -469,6 +473,33 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         self.write(")")
     }
 
+    #[cfg(feature = "geometry")]
+    fn visit_geometry_type_equals(
+        &mut self,
+        left: Expression<'a>,
+        geom_type: GeometryType<'a>,
+        not: bool,
+    ) -> visitor::Result {
+        self.write("ST_GeometryType")?;
+        self.surround_with("(", ")", |s| s.visit_expression(left.clone()))?;
+
+        if not {
+            self.write(" != ")?;
+        } else {
+            self.write(" = ")?;
+        }
+
+        match geom_type {
+            GeometryType::ColumnRef(column) => {
+                self.write("ST_GeometryType")?;
+                self.surround_with("(", ")", |s| s.visit_column(*column))
+            }
+            _ => self.visit_expression(Value::text(geom_type.to_string().to_uppercase()).into()),
+        }?;
+
+        Ok(())
+    }
+
     fn visit_greater_than(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
         self.visit_numeric_comparison(left, right, ">")?;
 
@@ -614,6 +645,29 @@ impl<'a> Visitor<'a> for Mysql<'a> {
 
         Ok(())
     }
+
+    #[cfg(feature = "geometry")]
+    fn visit_geom_as_text(&mut self, geom: GeomAsText<'a>) -> visitor::Result {
+        self.surround_with("CONCAT(", ")", |ref mut s| {
+            s.write("'SRID=',")?;
+            s.surround_with("ST_SRID(", ")", |ref mut s| {
+                s.visit_expression(*geom.expression.clone())
+            })?;
+            s.write(",';',")?;
+            s.surround_with("ST_AsText(", ")", |ref mut s| s.visit_expression(*geom.expression))?;
+            Ok(())
+        })
+    }
+
+    #[cfg(feature = "geometry")]
+    fn visit_geom_from_text(&mut self, geom: GeomFromText<'a>) -> visitor::Result {
+        self.surround_with("ST_GeomFromText(", ")", |ref mut s| {
+            s.visit_expression(*geom.wkt_expression)?;
+            s.write(",")?;
+            s.visit_expression(*geom.srid_expression)?;
+            Ok(())
+        })
+    }
 }
 
 fn get_target_table(query: Query<'_>) -> Option<Table<'_>> {
@@ -627,6 +681,7 @@ fn get_target_table(query: Query<'_>) -> Option<Table<'_>> {
 #[cfg(test)]
 mod tests {
     use crate::visitor::*;
+    use std::str::FromStr;
 
     fn expected_values<'a, T>(sql: &'static str, params: Vec<T>) -> (String, Vec<Value<'a>>)
     where
@@ -808,6 +863,28 @@ mod tests {
     fn test_raw_char() {
         let (sql, params) = Mysql::build(Select::default().value(Value::character('a').raw())).unwrap();
         assert_eq!("SELECT 'a'", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    #[cfg(feature = "geometry")]
+    fn test_raw_geometry() {
+        let (sql, params) = Mysql::build(
+            Select::default().value(Value::geometry(GeometryValue::from_str("SRID=4326;POINT(0 0)").unwrap()).raw()),
+        )
+        .unwrap();
+        assert_eq!("SELECT ST_GeomFromText('POINT(0 0)',4326)", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    #[cfg(feature = "geometry")]
+    fn test_raw_geography() {
+        let (sql, params) = Mysql::build(
+            Select::default().value(Value::geography(GeometryValue::from_str("SRID=4326;POINT(0 0)").unwrap()).raw()),
+        )
+        .unwrap();
+        assert_eq!("SELECT ST_GeomFromText('POINT(0 0)',4326)", sql);
         assert!(params.is_empty());
     }
 

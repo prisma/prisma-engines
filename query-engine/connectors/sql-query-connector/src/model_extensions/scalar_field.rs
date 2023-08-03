@@ -1,7 +1,11 @@
+use std::str::FromStr;
+
 use chrono::Utc;
+use geozero::{geojson::GeoJson, ToWkt};
 use prisma_models::{ScalarField, TypeIdentifier};
 use prisma_value::PrismaValue;
 use quaint::{
+    ast::GeometryValue,
     ast::Value,
     prelude::{TypeDataLength, TypeFamily},
 };
@@ -24,6 +28,23 @@ impl ScalarFieldExt for ScalarField {
             (PrismaValue::Uuid(u), _) => u.to_string().into(),
             (PrismaValue::List(l), _) => Value::Array(Some(l.into_iter().map(|x| self.value(x)).collect())),
             (PrismaValue::Json(s), _) => Value::Json(Some(serde_json::from_str::<serde_json::Value>(&s).unwrap())),
+            (PrismaValue::GeoJson(s), _) => {
+                let geometry = GeometryValue {
+                    wkt: GeoJson(&s).to_wkt().unwrap(),
+                    srid: 4326,
+                };
+                match self.type_family() {
+                    TypeFamily::Geography(_) => Value::Geography(Some(geometry)),
+                    _ => Value::Geometry(Some(geometry)),
+                }
+            }
+            (PrismaValue::Geometry(s), _) => {
+                let geometry = GeometryValue::from_str(&s).unwrap();
+                match self.type_family() {
+                    TypeFamily::Geography(_) => Value::Geography(Some(geometry)),
+                    _ => Value::Geometry(Some(geometry)),
+                }
+            }
             (PrismaValue::Bytes(b), _) => Value::Bytes(Some(b.into())),
             (PrismaValue::Object(_), _) => unimplemented!(),
             (PrismaValue::Null, ident) => match ident {
@@ -38,6 +59,10 @@ impl ScalarFieldExt for ScalarField {
                 TypeIdentifier::Int => Value::Int32(None),
                 TypeIdentifier::BigInt => Value::Int64(None),
                 TypeIdentifier::Bytes => Value::Bytes(None),
+                TypeIdentifier::Geometry(_) => match self.type_family() {
+                    TypeFamily::Geography(_) => Value::Geography(None),
+                    _ => Value::Geometry(None),
+                },
                 TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
             },
         }
@@ -64,6 +89,22 @@ impl ScalarFieldExt for ScalarField {
             TypeIdentifier::Json => TypeFamily::Text(Some(TypeDataLength::Maximum)),
             TypeIdentifier::DateTime => TypeFamily::DateTime,
             TypeIdentifier::Bytes => TypeFamily::Text(parse_scalar_length(self)),
+            TypeIdentifier::Geometry(_) => {
+                let type_info = self.native_type().map(|nt| {
+                    let name = nt.name();
+                    let srid = match nt.args().as_slice() {
+                        [srid] => srid.parse::<i32>().ok(),
+                        [_, srid] => srid.parse::<i32>().ok(),
+                        _ => None,
+                    };
+                    (name, srid)
+                });
+                match type_info {
+                    Some(("Geography", srid)) => TypeFamily::Geography(srid),
+                    Some((_, srid)) => TypeFamily::Geometry(srid),
+                    _ => TypeFamily::Geometry(None),
+                }
+            }
             TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
         }
     }
@@ -84,6 +125,9 @@ pub fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
         PrismaValue::List(l) => Value::Array(Some(l.into_iter().map(convert_lossy).collect())),
         PrismaValue::Json(s) => Value::Json(serde_json::from_str(&s).unwrap()),
         PrismaValue::Bytes(b) => Value::Bytes(Some(b.into())),
+        // TODO@geom: Fix this when we know how to cast GeoJSON to an appropriate DB value
+        PrismaValue::GeoJson(s) => Value::Json(serde_json::from_str(&s).unwrap()),
+        PrismaValue::Geometry(s) => Value::Geometry(Some(GeometryValue::from_str(&s).unwrap())),
         PrismaValue::Null => Value::Int32(None), // Can't tell which type the null is supposed to be.
         PrismaValue::Object(_) => unimplemented!(),
     }

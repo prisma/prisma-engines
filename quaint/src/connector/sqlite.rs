@@ -1,6 +1,7 @@
 mod conversion;
 mod error;
 
+use rusqlite::LoadExtensionGuard;
 pub use rusqlite::{params_from_iter, version as sqlite_version};
 
 use super::IsolationLevel;
@@ -39,6 +40,18 @@ pub struct SqliteParams {
     pub socket_timeout: Option<Duration>,
     pub max_connection_lifetime: Option<Duration>,
     pub max_idle_connection_lifetime: Option<Duration>,
+}
+
+fn load_spatialite(conn: &rusqlite::Connection) -> crate::Result<()> {
+    // Loading Spatialite here isn't ideal, but needed because it has to be
+    // done for every new pooled connection..?
+    if let Ok(spatialite_path) = std::env::var("SPATIALITE_PATH") {
+        unsafe {
+            let _guard = LoadExtensionGuard::new(conn)?;
+            conn.load_extension(spatialite_path, None)?;
+        }
+    }
+    Ok(())
 }
 
 impl TryFrom<&str> for SqliteParams {
@@ -134,7 +147,7 @@ impl TryFrom<&str> for Sqlite {
         let file_path = params.file_path;
 
         let conn = rusqlite::Connection::open(file_path.as_str())?;
-
+        load_spatialite(&conn)?;
         if let Some(timeout) = params.socket_timeout {
             conn.busy_timeout(timeout)?;
         };
@@ -153,7 +166,7 @@ impl Sqlite {
     /// Open a new SQLite database in memory.
     pub fn new_in_memory() -> crate::Result<Sqlite> {
         let client = rusqlite::Connection::open_in_memory()?;
-
+        load_spatialite(&client)?;
         Ok(Sqlite {
             client: Mutex::new(client),
         })

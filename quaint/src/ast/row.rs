@@ -1,3 +1,5 @@
+#[cfg(feature = "geometry")]
+use super::compare::GeometryType;
 #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
 use super::compare::JsonType;
 use crate::ast::{Comparable, Compare, Expression};
@@ -361,6 +363,90 @@ impl<'a> Comparable<'a> for Row<'a> {
         let value: Expression<'a> = self.into();
 
         value.json_type_not_equals(json_type)
+    }
+
+    #[cfg(feature = "geometry")]
+    #[allow(clippy::wrong_self_convention)]
+    fn geometry_is_empty(self) -> Compare<'a> {
+        let value: Expression<'a> = self.into();
+        value.geometry_is_empty()
+    }
+
+    #[cfg(feature = "geometry")]
+    #[allow(clippy::wrong_self_convention)]
+    fn geometry_is_not_empty(self) -> Compare<'a> {
+        let value: Expression<'a> = self.into();
+        value.geometry_is_not_empty()
+    }
+
+    #[cfg(feature = "geometry")]
+    #[allow(clippy::wrong_self_convention)]
+    fn geometry_is_valid(self) -> Compare<'a> {
+        let value: Expression<'a> = self.into();
+        value.geometry_is_valid()
+    }
+
+    #[cfg(feature = "geometry")]
+    #[allow(clippy::wrong_self_convention)]
+    fn geometry_is_not_valid(self) -> Compare<'a> {
+        let value: Expression<'a> = self.into();
+        value.geometry_is_not_valid()
+    }
+
+    #[cfg(feature = "geometry")]
+    fn geometry_within<T>(self, geom: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        let value: Expression<'a> = self.into();
+        value.geometry_within(geom)
+    }
+
+    #[cfg(feature = "geometry")]
+    fn geometry_not_within<T>(self, geom: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        let value: Expression<'a> = self.into();
+        value.geometry_not_within(geom)
+    }
+
+    #[cfg(feature = "geometry")]
+    fn geometry_intersects<T>(self, geom: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        let value: Expression<'a> = self.into();
+        value.geometry_intersects(geom)
+    }
+
+    #[cfg(feature = "geometry")]
+    fn geometry_not_intersects<T>(self, geom: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        let value: Expression<'a> = self.into();
+        value.geometry_not_intersects(geom)
+    }
+
+    #[cfg(feature = "geometry")]
+    fn geometry_type_equals<T>(self, geometry_type: T) -> Compare<'a>
+    where
+        T: Into<GeometryType<'a>>,
+    {
+        let value: Expression<'a> = self.into();
+
+        value.geometry_type_equals(geometry_type)
+    }
+
+    #[cfg(feature = "geometry")]
+    fn geometry_type_not_equals<T>(self, geometry_type: T) -> Compare<'a>
+    where
+        T: Into<GeometryType<'a>>,
+    {
+        let value: Expression<'a> = self.into();
+
+        value.geometry_type_not_equals(geometry_type)
     }
 
     #[cfg(feature = "postgresql")]

@@ -2,7 +2,9 @@ use crate::{column_metadata::ColumnMetadata, error::SqlError, value::to_prisma_v
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
 use connector_interface::{coerce_null_to_zero_value, AggregationResult, AggregationSelection};
-use prisma_models::{ConversionFailure, FieldArity, PrismaValue, Record, TypeIdentifier};
+use geozero::wkt::WktStr;
+use geozero::ToJson;
+use prisma_models::{ConversionFailure, FieldArity, GeometryFormat, PrismaValue, Record, TypeIdentifier};
 use quaint::{ast::Value, connector::ResultRow};
 use std::{io, str::FromStr};
 use uuid::Uuid;
@@ -160,6 +162,29 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
             value if value.is_null() => PrismaValue::Null,
             Value::Text(Some(json)) => PrismaValue::Json(json.into()),
             Value::Json(Some(json)) => PrismaValue::Json(json.to_string()),
+            _ => return Err(create_error(&p_value)),
+        },
+        TypeIdentifier::Geometry(GeometryFormat::EWKT) => match p_value {
+            value if value.is_null() => PrismaValue::Null,
+            Value::Text(Some(ewkt)) => match ewkt.starts_with("SRID=0;") {
+                true => PrismaValue::Geometry(ewkt[7..].into()),
+                false => PrismaValue::Geometry(ewkt.into()),
+            },
+            _ => return Err(create_error(&p_value)),
+        },
+        TypeIdentifier::Geometry(GeometryFormat::GeoJSON) => match p_value {
+            value if value.is_null() => PrismaValue::Null,
+            // MySQL @<=5.7 and MSSQL cannot return geometry as GeoJSON, so we must serialize
+            // the ewkt string back to geojson. However, per specification, GeoJSON geometries
+            // can only be represented with EPSG:4326 projection. Plus WKT can represent more
+            // spatial types than GeoJSON can, so this operation may fail.
+            Value::Text(Some(ref ewkt)) => match ewkt.starts_with("SRID=4326;") {
+                true => WktStr(&ewkt[10..])
+                    .to_json()
+                    .map(PrismaValue::GeoJson)
+                    .map_err(|_| create_error(&p_value))?,
+                false => return Err(create_error(&p_value)),
+            },
             _ => return Err(create_error(&p_value)),
         },
         TypeIdentifier::UUID => match p_value {

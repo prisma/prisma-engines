@@ -26,6 +26,10 @@ impl<'a> IntoSql<'a> for &'a Value<'a> {
             Value::Numeric(val) => (*val).to_sql(),
             #[cfg(feature = "json")]
             Value::Json(val) => val.as_ref().map(|val| serde_json::to_string(&val).unwrap()).into_sql(),
+            #[cfg(feature = "geometry")]
+            Value::Geometry(_) => panic!("Cannot handle raw Geometry"),
+            #[cfg(feature = "geometry")]
+            Value::Geography(_) => panic!("Cannot handle raw Geography"),
             #[cfg(feature = "uuid")]
             Value::Uuid(val) => val.into_sql(),
             #[cfg(feature = "chrono")]

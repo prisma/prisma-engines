@@ -121,6 +121,8 @@ fn all_mssql_column_types_must_work(api: TestApi) {
             [varbinary_max_col] varbinary(max),
             [image_col] image,
             [xml_col] xml,
+            [geometry_col] geometry,
+            [geography_col] geography,
             CONSTRAINT "thepk" PRIMARY KEY (primary_col)
         );
     "#;
@@ -658,6 +660,42 @@ fn all_mssql_column_types_must_work(api: TestApi) {
                         tpe: ColumnType {
                             full_data_type: "xml",
                             family: String,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "geometry_col",
+                        tpe: ColumnType {
+                            full_data_type: "geometry",
+                            family: Geometry,
+                            arity: Nullable,
+                            native_type: Some(
+                                NativeTypeInstance(..),
+                            ),
+                        },
+                        auto_increment: false,
+                        description: None,
+                    },
+                ),
+                (
+                    TableId(
+                        0,
+                    ),
+                    Column {
+                        name: "geography_col",
+                        tpe: ColumnType {
+                            full_data_type: "geography",
+                            family: Geometry,
                             arity: Nullable,
                             native_type: Some(
                                 NativeTypeInstance(..),

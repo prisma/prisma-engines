@@ -20,6 +20,11 @@ mod search;
 mod sum;
 mod upper;
 
+#[cfg(feature = "geometry")]
+mod geom_as_text;
+#[cfg(feature = "geometry")]
+mod geom_from_text;
+
 #[cfg(feature = "mysql")]
 mod uuid;
 
@@ -45,6 +50,11 @@ pub use search::*;
 pub use sum::*;
 pub use upper::*;
 
+#[cfg(feature = "geometry")]
+pub use geom_as_text::*;
+#[cfg(feature = "geometry")]
+pub use geom_from_text::*;
+
 #[cfg(feature = "mysql")]
 pub use self::uuid::*;
 
@@ -69,6 +79,13 @@ impl<'a> Function<'a> {
             FunctionType::JsonExtractLastArrayElem(_) => true,
             #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
             FunctionType::JsonExtractFirstArrayElem(_) => true,
+            _ => false,
+        }
+    }
+    pub fn returns_geometry(&self) -> bool {
+        match self.typ_ {
+            #[cfg(feature = "geometry")]
+            FunctionType::GeomFromText(_) => true,
             _ => false,
         }
     }
@@ -108,6 +125,10 @@ pub(crate) enum FunctionType<'a> {
     UuidToBinSwapped,
     #[cfg(feature = "mysql")]
     Uuid,
+    #[cfg(feature = "geometry")]
+    GeomAsText(GeomAsText<'a>),
+    #[cfg(feature = "geometry")]
+    GeomFromText(GeomFromText<'a>),
 }
 
 impl<'a> Aliasable<'a> for Function<'a> {
@@ -156,3 +177,6 @@ function!(
     Coalesce,
     Concat
 );
+
+#[cfg(feature = "geometry")]
+function!(GeomAsText, GeomFromText);

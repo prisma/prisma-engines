@@ -32,6 +32,7 @@ expose-drivers = []
 all = [
   "chrono",
   "json",
+  "geometry",
   "mssql",
   "mysql",
   "pooled",
@@ -60,6 +61,7 @@ postgresql = [
 ]
 
 json = ["serde_json", "base64"]
+geometry = ["geozero", "regex", "once_cell"]
 mssql = ["tiberius", "uuid", "chrono", "tokio-util", "tokio/time", "tokio/net", "either"]
 mysql = ["mysql_async", "tokio/time", "lru-cache"]
 pooled = ["mobc"]
@@ -88,10 +90,13 @@ lru-cache = { version = "0.1", optional = true }
 serde_json = { version = "1.0.48", optional = true, features = ["float_roundtrip"] }
 native-tls = { version = "0.2", optional = true }
 bit-vec = { version = "0.6.1", optional = true }
-bytes = { version = "1.0", optional = true }
 mobc = { version = "0.8", optional = true }
 serde = { version = "1.0", optional = true }
 sqlformat = { version = "0.2.0", optional = true }
+bytes = { version = "1.0", optional = true }
+regex = { version = "1", optional = true }
+once_cell = { version = "1.3", optional = true }
+geozero = { version = "0.11.0", optional = true, default-features = false, features = ["with-wkb", "with-geojson"] }
 
 [dev-dependencies]
 once_cell = "1.3"
@@ -115,8 +120,10 @@ optional = true
 branch = "vendored-openssl"
 
 [dependencies.rusqlite]
+# git = "https://github.com/rusqlite/rusqlite"
+# rev = "714ce2e17117b2d46485aa12479f8e1802b78ba0"
 version = "0.29"
-features = ["chrono", "bundled", "column_decltype"]
+features = ["chrono", "bundled", "load_extension", "column_decltype"]
 optional = true
 
 [target.'cfg(not(any(target_os = "macos", target_os = "ios")))'.dependencies.tiberius]

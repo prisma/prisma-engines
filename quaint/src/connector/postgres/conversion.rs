@@ -14,6 +14,8 @@ use bytes::BytesMut;
 use chrono::{DateTime, NaiveDateTime, Utc};
 #[cfg(feature = "bigdecimal")]
 pub(crate) use decimal::DecimalWrapper;
+#[cfg(feature = "geometry")]
+use geozero::{wkb::Ewkb, ToWkt};
 use postgres_types::{FromSql, ToSql, WrongType};
 use std::{convert::TryFrom, error::Error as StdError};
 use tokio_postgres::{
@@ -63,6 +65,10 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
                 Value::Date(_) => PostgresType::TIMESTAMP,
                 #[cfg(feature = "chrono")]
                 Value::Time(_) => PostgresType::TIME,
+                #[cfg(feature = "geometry")]
+                Value::Geometry(_) => PostgresType::BYTEA,
+                #[cfg(feature = "geometry")]
+                Value::Geography(_) => PostgresType::BYTEA,
                 Value::Array(ref arr) => {
                     let arr = arr.as_ref().unwrap();
 
@@ -105,6 +111,10 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
                         Value::Date(_) => PostgresType::TIMESTAMP_ARRAY,
                         #[cfg(feature = "chrono")]
                         Value::Time(_) => PostgresType::TIME_ARRAY,
+                        #[cfg(feature = "geometry")]
+                        Value::Geometry(_) => PostgresType::BYTEA,
+                        #[cfg(feature = "geometry")]
+                        Value::Geography(_) => PostgresType::BYTEA,
                         // In the case of nested arrays, we let PG infer the type
                         Value::Array(_) => PostgresType::UNKNOWN,
                     }
@@ -112,6 +122,20 @@ pub(crate) fn params_to_types(params: &[Value<'_>]) -> Vec<PostgresType> {
             }
         })
         .collect()
+}
+
+#[cfg(feature = "geometry")]
+struct EwktString(pub String);
+
+#[cfg(feature = "geometry")]
+impl<'a> FromSql<'a> for EwktString {
+    fn from_sql(_ty: &PostgresType, raw: &'a [u8]) -> Result<EwktString, Box<dyn std::error::Error + Sync + Send>> {
+        Ok(Ewkb(raw.to_owned()).to_ewkt(None).map(EwktString)?)
+    }
+
+    fn accepts(ty: &PostgresType) -> bool {
+        matches!(ty.name(), "geometry" | "geography")
+    }
 }
 
 struct XmlString(pub String);
@@ -542,6 +566,13 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
+                #[cfg(feature = "geometry")]
+                ref x if matches!(x.name(), "geometry" | "geography") => {
+                    match row.try_get::<_, Option<EwktString>>(i)? {
+                        Some(ewkt) => Value::text(ewkt.0),
+                        None => Value::Text(None),
+                    }
+                }
                 ref x => match x.kind() {
                     Kind::Enum(_) => match row.try_get(i)? {
                         Some(val) => {
@@ -841,6 +872,10 @@ impl<'a> ToSql for Value<'a> {
                     parsed_ip_addr.to_sql(ty, out)
                 })
             }
+            #[cfg(feature = "geometry")]
+            (Value::Geometry(_), _) => panic!("Cannot handle raw Geometry"),
+            #[cfg(feature = "geometry")]
+            (Value::Geography(_), _) => panic!("Cannot handle raw Geography"),
             #[cfg(feature = "json")]
             (Value::Text(string), &PostgresType::JSON) | (Value::Text(string), &PostgresType::JSONB) => string
                 .as_ref()

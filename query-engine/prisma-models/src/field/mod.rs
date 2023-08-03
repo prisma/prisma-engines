@@ -135,6 +135,12 @@ impl Field {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Copy)]
+pub enum GeometryFormat {
+    EWKT,
+    GeoJSON,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Copy)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum TypeIdentifier {
     String,
@@ -148,6 +154,7 @@ pub enum TypeIdentifier {
     Json,
     DateTime,
     Bytes,
+    Geometry(GeometryFormat),
     Unsupported,
 }
 
@@ -175,6 +182,8 @@ impl TypeIdentifier {
             TypeIdentifier::Json => "Json".into(),
             TypeIdentifier::DateTime => "DateTime".into(),
             TypeIdentifier::Bytes => "Bytes".into(),
+            TypeIdentifier::Geometry(GeometryFormat::GeoJSON) => "GeoJson".into(),
+            TypeIdentifier::Geometry(GeometryFormat::EWKT) => "Geometry".into(),
             TypeIdentifier::Unsupported => "Unsupported".into(),
         }
     }
@@ -243,6 +252,8 @@ impl From<ScalarType> for TypeIdentifier {
             ScalarType::Json => Self::Json,
             ScalarType::Decimal => Self::Decimal,
             ScalarType::Bytes => Self::Bytes,
+            ScalarType::Geometry => Self::Geometry(GeometryFormat::EWKT),
+            ScalarType::GeoJson => Self::Geometry(GeometryFormat::GeoJSON),
         }
     }
 }

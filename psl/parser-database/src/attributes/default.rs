@@ -157,6 +157,8 @@ fn validate_scalar_default_literal(
     match (scalar_type, value) {
         (ScalarType::String, ast::Expression::StringValue(_, _))
         | (ScalarType::Json, ast::Expression::StringValue(_, _))
+        | (ScalarType::Geometry, ast::Expression::StringValue(_, _))
+        | (ScalarType::GeoJson, ast::Expression::StringValue(_, _))
         | (ScalarType::Bytes, ast::Expression::StringValue(_, _))
         | (ScalarType::Int, ast::Expression::NumericValue(_, _))
         | (ScalarType::BigInt, ast::Expression::NumericValue(_, _))

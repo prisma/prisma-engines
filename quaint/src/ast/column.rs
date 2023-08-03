@@ -20,6 +20,8 @@ pub enum TypeFamily {
     Boolean,
     Uuid,
     DateTime,
+    Geometry(Option<i32>),
+    Geography(Option<i32>),
     Decimal(Option<(u8, u8)>),
     Bytes(Option<TypeDataLength>),
 }
@@ -29,9 +31,9 @@ pub enum TypeFamily {
 pub struct Column<'a> {
     pub name: Cow<'a, str>,
     pub(crate) table: Option<Table<'a>>,
-    pub(crate) alias: Option<Cow<'a, str>>,
+    pub alias: Option<Cow<'a, str>>,
     pub(crate) default: Option<DefaultValue<'a>>,
-    pub(crate) type_family: Option<TypeFamily>,
+    pub type_family: Option<TypeFamily>,
 }
 
 /// Defines a default value for a `Column`.

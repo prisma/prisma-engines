@@ -104,6 +104,9 @@ pub(crate) fn connection_string(
                 Some(PostgresVersion::V15) if is_ci => {
                     format!("postgresql://postgres:prisma@test-db-postgres-15:5432/{database}")
                 }
+                Some(PostgresVersion::V15PostGIS) if is_ci => {
+                    format!("postgresql://postgres:prisma@test-db-postgres-15:5432/{database}")
+                }
                 Some(PostgresVersion::PgBouncer) if is_ci => {
                     format!("postgresql://postgres:prisma@test-db-pgbouncer:6432/{database}&pgbouncer=true")
                 }
@@ -115,6 +118,7 @@ pub(crate) fn connection_string(
                 Some(PostgresVersion::V13) => format!("postgresql://postgres:prisma@127.0.0.1:5435/{database}"),
                 Some(PostgresVersion::V14) => format!("postgresql://postgres:prisma@127.0.0.1:5437/{database}"),
                 Some(PostgresVersion::V15) => format!("postgresql://postgres:prisma@127.0.0.1:5438/{database}"),
+                Some(PostgresVersion::V15PostGIS) => format!("postgresql://postgres:prisma@127.0.0.1:5439/{database}"),
                 Some(PostgresVersion::PgBouncer) => {
                     format!("postgresql://postgres:prisma@127.0.0.1:6432/db?{database}&pgbouncer=true")
                 }

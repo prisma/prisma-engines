@@ -5,6 +5,7 @@ use crate::{
 use connector_interface::{filter::Filter, AggregationSelection, QueryArguments, RelAggregationSelection};
 use itertools::Itertools;
 use prisma_models::*;
+use psl::datamodel_connector::Connector;
 use quaint::ast::*;
 use tracing::Span;
 
@@ -105,6 +106,14 @@ impl SelectDefinition for QueryArguments {
     }
 }
 
+fn get_column_read_expression<'a>(col: Column<'a>, connector: &'a dyn Connector) -> Expression<'a> {
+    let supports_raw_geom_io = connector.supports_raw_geometry_read();
+    match col.type_family {
+        Some(TypeFamily::Geometry(_) | TypeFamily::Geography(_)) if !supports_raw_geom_io => geom_as_text(col).into(),
+        _ => col.into(),
+    }
+}
+
 pub(crate) fn get_records<T>(
     model: &Model,
     columns: impl Iterator<Item = Column<'static>>,
@@ -116,10 +125,13 @@ where
     T: SelectDefinition,
 {
     let (select, additional_selection_set) = query.into_select(model, aggr_selections, ctx);
-    let select = columns.fold(select, |acc, col| acc.column(col));
+    let select = columns
+        .map(|c| get_column_read_expression(c, model.dm.schema.connector))
+        .fold(select, |acc, col| acc.value(col));
 
     let select = select.append_trace(&Span::current()).add_trace_id(ctx.trace_id);
 
+    // TODO@geometry: Should we call get_column_read_expression in "additional_selection_set" too ?
     additional_selection_set
         .into_iter()
         .fold(select, |acc, col| acc.value(col))

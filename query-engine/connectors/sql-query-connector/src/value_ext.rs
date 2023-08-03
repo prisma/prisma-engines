@@ -29,6 +29,8 @@ impl<'a> IntoTypedJsonExtension for quaint::Value<'a> {
             quaint::Value::Date(_) => "date",
             quaint::Value::Time(_) => "time",
             quaint::Value::Array(_) => "array",
+            quaint::Value::Geometry(_) => "geometry",
+            quaint::Value::Geography(_) => "geography",
         };
 
         type_name.to_owned()

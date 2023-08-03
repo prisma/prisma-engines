@@ -749,6 +749,18 @@ fn default_scalar_filter(
 
             comparable.not_matches(query)
         }
+        ScalarCondition::GeometryWithin(value) => {
+            comparable.geometry_within(convert_first_value(fields, value, alias, ctx))
+        }
+        ScalarCondition::GeometryNotWithin(value) => {
+            comparable.geometry_not_within(convert_first_value(fields, value, alias, ctx))
+        }
+        ScalarCondition::GeometryIntersects(value) => {
+            comparable.geometry_intersects(convert_first_value(fields, value, alias, ctx))
+        }
+        ScalarCondition::GeometryNotIntersects(value) => {
+            comparable.geometry_not_intersects(convert_first_value(fields, value, alias, ctx))
+        }
         ScalarCondition::JsonCompare(_) => unreachable!(),
         ScalarCondition::IsSet(_) => unreachable!(),
     };
@@ -929,6 +941,10 @@ fn insensitive_scalar_filter(
 
             comparable.not_matches(query)
         }
+        ScalarCondition::GeometryWithin(_) => unreachable!(),
+        ScalarCondition::GeometryNotWithin(_) => unreachable!(),
+        ScalarCondition::GeometryIntersects(_) => unreachable!(),
+        ScalarCondition::GeometryNotIntersects(_) => unreachable!(),
         ScalarCondition::JsonCompare(_) => unreachable!(),
         ScalarCondition::IsSet(_) => unreachable!(),
     };

@@ -70,8 +70,8 @@ fn gin_jsonb_ops(api: TestApi) {
 fn gin_raw_ops(api: TestApi) {
     let dm = r#"
         model A {
-          id   Int                      @id
-          data Unsupported("geometry")?
+          id   Int       @id
+          data Geometry?
 
           @@index([data], type: Gin)
         }

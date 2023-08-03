@@ -87,6 +87,10 @@ pub fn to_prisma_value(quaint_value: Value<'_>) -> crate::Result<PrismaValue> {
         Value::Xml(s) => s
             .map(|s| PrismaValue::String(s.into_owned()))
             .unwrap_or(PrismaValue::Null),
+
+        Value::Geometry(s) | Value::Geography(s) => s
+            .map(|s| PrismaValue::Geometry(s.to_string()))
+            .unwrap_or(PrismaValue::Null),
     };
 
     Ok(val)

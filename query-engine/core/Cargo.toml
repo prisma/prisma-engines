@@ -33,4 +33,5 @@ cuid = "1.2"
 schema = { path = "../schema" }
 lru = "0.7.7"
 enumflags2 = "0.7"
+geojson = { version = "0.24.1", default-features = false }
 

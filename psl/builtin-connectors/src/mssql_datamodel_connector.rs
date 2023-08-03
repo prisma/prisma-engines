@@ -28,6 +28,9 @@ const CONSTRAINT_SCOPES: &[ConstraintScope] = &[
 ];
 
 const CAPABILITIES: ConnectorCapabilities = enumflags2::make_bitflags!(ConnectorCapability::{
+    EwktGeometry |
+    GeoJsonGeometry |
+    GeometryFiltering |
     AnyId |
     AutoIncrement |
     AutoIncrementAllowedOnNonId |
@@ -73,6 +76,8 @@ const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MsSqlType)] = &[
         ScalarType::Json,
         MsSqlType::NVarChar(Some(MsSqlTypeParameter::Number(1000))),
     ),
+    (ScalarType::Geometry, MsSqlType::Geometry),
+    (ScalarType::GeoJson, MsSqlType::Geometry),
 ];
 
 impl Connector for MsSqlDatamodelConnector {
@@ -138,6 +143,9 @@ impl Connector for MsSqlDatamodelConnector {
             VarBinary(_) => ScalarType::Bytes,
             Image => ScalarType::Bytes,
             Bit => ScalarType::Bytes,
+            //Geometry
+            Geometry => ScalarType::Geometry,
+            Geography => ScalarType::Geometry,
         }
     }
 
@@ -327,5 +335,7 @@ pub(crate) fn heap_allocated_types() -> &'static [MsSqlType] {
         VarBinary(Some(Max)),
         VarChar(Some(Max)),
         NVarChar(Some(Max)),
+        Geometry,
+        Geography,
     ]
 }

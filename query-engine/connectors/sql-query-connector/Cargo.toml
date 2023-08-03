@@ -25,6 +25,8 @@ uuid.workspace = true
 opentelemetry = { version = "0.17", features = ["tokio"] }
 tracing-opentelemetry = "0.17.3"
 quaint.workspace = true
+regex = "1.9.3"
+geozero = "0.10.0"
 
 [dependencies.connector-interface]
 package = "query-connector"

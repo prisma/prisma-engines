@@ -55,6 +55,12 @@ capabilities!(
     TwoWayEmbeddedManyToManyRelation,
     ImplicitManyToManyRelation,
     MultiSchema,
+    EwktGeometry,
+    GeoJsonGeometry,
+    GeometryRawRead,
+    GeometryFiltering,
+    GeometryExtraDims,
+    GeometryExtraTypes,
     //Start of ME/IE only capabilities
     AutoIncrementAllowedOnNonId,
     AutoIncrementMultipleAllowed,

@@ -122,6 +122,10 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             #[cfg(feature = "chrono")]
             Value::Time(time) => time.map(|time| self.write(format!("'{time}'"))),
             Value::Xml(cow) => cow.map(|cow| self.write(format!("'{cow}'"))),
+            #[cfg(feature = "geometry")]
+            Value::Geometry(g) => g.map(|g| self.visit_function(geom_from_text(g.wkt.raw(), g.srid.raw(), false))),
+            #[cfg(feature = "geometry")]
+            Value::Geography(g) => g.map(|g| self.visit_function(geom_from_text(g.wkt.raw(), g.srid.raw(), true))),
         };
 
         match res {
@@ -228,12 +232,12 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         Ok(())
     }
 
-    fn parameter_substitution(&mut self) -> visitor::Result {
-        self.write("?")
-    }
-
     fn add_parameter(&mut self, value: Value<'a>) {
         self.parameters.push(value);
+    }
+
+    fn parameter_substitution(&mut self) -> visitor::Result {
+        self.write("?")
     }
 
     fn visit_limit_and_offset(&mut self, limit: Option<Value<'a>>, offset: Option<Value<'a>>) -> visitor::Result {
@@ -277,6 +281,31 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             }
             Ok(())
         })
+    }
+
+    #[cfg(feature = "geometry")]
+    fn visit_geometry_type_equals(
+        &mut self,
+        left: Expression<'a>,
+        geom_type: GeometryType<'a>,
+        not: bool,
+    ) -> visitor::Result {
+        self.write("ST_GeometryType")?;
+        self.surround_with("(", ")", |s| s.visit_expression(left.clone()))?;
+
+        if not {
+            self.write(" != ")?;
+        } else {
+            self.write(" = ")?;
+        }
+
+        match geom_type {
+            GeometryType::ColumnRef(column) => {
+                self.write("ST_GeometryType")?;
+                self.surround_with("(", ")", |s| s.visit_column(*column))
+            }
+            _ => self.visit_expression(Value::text(geom_type.to_string().to_uppercase()).into()),
+        }
     }
 
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
@@ -387,11 +416,27 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
 
         Ok(())
     }
+
+    #[cfg(feature = "geometry")]
+    fn visit_geom_as_text(&mut self, geom: GeomAsText<'a>) -> visitor::Result {
+        self.surround_with("AsEWKT(", ")", |s| s.visit_expression(*geom.expression))
+    }
+
+    #[cfg(feature = "geometry")]
+    fn visit_geom_from_text(&mut self, geom: GeomFromText<'a>) -> visitor::Result {
+        self.surround_with("ST_GeomFromText(", ")", |ref mut s| {
+            s.visit_expression(*geom.wkt_expression)?;
+            s.write(",")?;
+            s.visit_expression(*geom.srid_expression)?;
+            Ok(())
+        })
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use crate::{val, visitor::*};
+    use std::str::FromStr;
 
     fn expected_values<'a, T>(sql: &'static str, params: Vec<T>) -> (String, Vec<Value<'a>>)
     where
@@ -941,6 +986,24 @@ mod tests {
         let (sql, params) = Sqlite::build(Select::default().value(dt.raw())).unwrap();
 
         assert_eq!(format!("SELECT '{}'", dt.to_rfc3339(),), sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    #[cfg(feature = "geometry")]
+    fn test_raw_geometry() {
+        let geom = GeometryValue::from_str("SRID=4326;POINT(0 0)").unwrap();
+        let (sql, params) = Postgres::build(Select::default().value(Value::geometry(geom).raw())).unwrap();
+        assert_eq!("SELECT ST_GeomFromText('POINT(0 0)',4326)", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    #[cfg(feature = "geometry")]
+    fn test_raw_geography() {
+        let geom = GeometryValue::from_str("SRID=4326;POINT(0 0)").unwrap();
+        let (sql, params) = Postgres::build(Select::default().value(Value::geography(geom).raw())).unwrap();
+        assert_eq!("SELECT ST_GeomFromText('POINT(0 0)',4326)", sql);
         assert!(params.is_empty());
     }
 

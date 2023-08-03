@@ -2,7 +2,7 @@
 
 pub(crate) use quaint::connector::rusqlite;
 
-use quaint::connector::{GetRow, ToColumnNames};
+use quaint::connector::{rusqlite::LoadExtensionGuard, GetRow, ToColumnNames};
 use schema_connector::{ConnectorError, ConnectorResult};
 use sql_schema_describer::{sqlite as describer, DescriberErrorKind, SqlSchema};
 use std::sync::Mutex;
@@ -10,15 +10,27 @@ use user_facing_errors::schema_engine::ApplyMigrationError;
 
 pub(super) struct Connection(Mutex<rusqlite::Connection>);
 
+fn load_spatialite(conn: &rusqlite::Connection) {
+    // TODO@geometry: raise an appropriate error when spatialite cannot be loaded instead
+    if let Ok(spatialite_path) = std::env::var("SPATIALITE_PATH") {
+        unsafe {
+            let _guard = LoadExtensionGuard::new(conn).unwrap();
+            conn.load_extension(spatialite_path, None).unwrap();
+        }
+    }
+}
+
 impl Connection {
     pub(super) fn new(params: &super::Params) -> ConnectorResult<Self> {
-        Ok(Connection(Mutex::new(
-            rusqlite::Connection::open(&params.file_path).map_err(convert_error)?,
-        )))
+        let conn = rusqlite::Connection::open(&params.file_path).map_err(convert_error)?;
+        load_spatialite(&conn);
+        Ok(Connection(Mutex::new(conn)))
     }
 
     pub(super) fn new_in_memory() -> Self {
-        Connection(Mutex::new(rusqlite::Connection::open_in_memory().unwrap()))
+        let conn = rusqlite::Connection::open_in_memory().unwrap();
+        load_spatialite(&conn);
+        Connection(Mutex::new(conn))
     }
 
     pub(super) async fn describe_schema(&mut self) -> ConnectorResult<SqlSchema> {

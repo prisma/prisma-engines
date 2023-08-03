@@ -33,7 +33,7 @@ mod metrics {
             CockroachDb(_) => (), // not deterministic
             MySql(_) => assert_eq!(total_queries, 12),
             Vitess(_) => assert_eq!(total_queries, 11),
-            Postgres(_) => assert_eq!(total_queries, 7),
+            Postgres(_) => assert_eq!(total_queries, 9),
         }
 
         assert_eq!(total_operations, 2);

@@ -33,6 +33,14 @@ crate::native_type_definition! {
     Timestamp(Option<u32>) -> DateTime,
     Year -> Int,
     Json -> Json,
+    Geometry(Option<u32>) -> Geometry | GeoJson,
+    Point(Option<u32>) -> Geometry | GeoJson,
+    LineString(Option<u32>) -> Geometry | GeoJson,
+    Polygon(Option<u32>) -> Geometry | GeoJson,
+    MultiPoint(Option<u32>) -> Geometry | GeoJson,
+    MultiLineString(Option<u32>) -> Geometry | GeoJson,
+    MultiPolygon(Option<u32>) -> Geometry | GeoJson,
+    GeometryCollection(Option<u32>) -> Geometry | GeoJson,
 }
 
 impl MySqlType {

@@ -9,6 +9,7 @@ pub mod field_reference;
 pub mod filter_regression;
 pub mod filter_unwrap;
 pub mod filters;
+pub mod geometry_filter;
 pub mod insensitive_filters;
 pub mod json;
 pub mod json_filters;

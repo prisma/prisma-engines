@@ -16,6 +16,13 @@ use std::{
 #[cfg(feature = "uuid")]
 use uuid::Uuid;
 
+#[cfg(feature = "geometry")]
+use once_cell::sync::Lazy;
+#[cfg(feature = "geometry")]
+use regex::Regex;
+#[cfg(feature = "geometry")]
+use std::fmt::{Display, Formatter};
+
 /// A value written to the query as-is without parameterization.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Raw<'a>(pub(crate) Value<'a>);
@@ -33,6 +40,46 @@ where
 {
     fn raw(self) -> Raw<'a> {
         Raw(self.into())
+    }
+}
+
+#[cfg(feature = "geometry")]
+#[derive(Debug, Clone, Eq, PartialEq, Hash, PartialOrd, Ord)]
+pub struct GeometryValue {
+    pub wkt: String,
+    pub srid: i32,
+}
+
+#[cfg(feature = "geometry")]
+impl Display for GeometryValue {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self.srid {
+            0 => (),
+            srid => write!(f, "SRID={};", srid)?,
+        }
+        f.write_str(&self.wkt)
+    }
+}
+
+#[cfg(feature = "geometry")]
+impl FromStr for GeometryValue {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        static EWKT_REGEX: Lazy<Regex> =
+            Lazy::new(|| Regex::new(r#"^(SRID=(?P<srid>\d+);)?(?P<geometry>.+)$"#).unwrap());
+        EWKT_REGEX
+            .captures(s)
+            .map(|capture| {
+                let srid = match capture.name("srid").map(|v| v.as_str().parse::<i32>()) {
+                    None => Ok(0),
+                    Some(Ok(srid)) => Ok(srid),
+                    Some(Err(_)) => Err("Invalid SRID"),
+                }?;
+                let wkt = capture.name("geometry").map(|v| v.as_str()).unwrap().to_string();
+                Ok(GeometryValue { srid, wkt })
+            })
+            .ok_or("Invalid EWKT".to_string())?
     }
 }
 
@@ -61,14 +108,22 @@ pub enum Value<'a> {
     Char(Option<char>),
     /// An array value (PostgreSQL).
     Array(Option<Vec<Value<'a>>>),
-    /// A numeric value.
     #[cfg(feature = "bigdecimal")]
     #[cfg_attr(feature = "docs", doc(cfg(feature = "bigdecimal")))]
+    /// A numeric value.
     Numeric(Option<BigDecimal>),
     #[cfg(feature = "json")]
     #[cfg_attr(feature = "docs", doc(cfg(feature = "json")))]
     /// A JSON value.
     Json(Option<serde_json::Value>),
+    #[cfg(feature = "geometry")]
+    #[cfg_attr(feature = "docs", doc(cfg(feature = "geometry")))]
+    /// A Geometry value.
+    Geometry(Option<GeometryValue>),
+    #[cfg(feature = "geometry")]
+    #[cfg_attr(feature = "docs", doc(cfg(feature = "geometry")))]
+    /// A Geography value.
+    Geography(Option<GeometryValue>),
     /// A XML value.
     Xml(Option<Cow<'a, str>>),
     #[cfg(feature = "uuid")]
@@ -145,6 +200,10 @@ impl<'a> fmt::Display for Value<'a> {
             Value::Date(val) => val.map(|v| write!(f, "\"{v}\"")),
             #[cfg(feature = "chrono")]
             Value::Time(val) => val.map(|v| write!(f, "\"{v}\"")),
+            #[cfg(feature = "geometry")]
+            Value::Geometry(val) => val.as_ref().map(|v| write!(f, "\"{v}\"")),
+            #[cfg(feature = "geometry")]
+            Value::Geography(val) => val.as_ref().map(|v| write!(f, "\"{v}\"")),
         };
 
         match res {
@@ -188,6 +247,10 @@ impl<'a> From<Value<'a>> for serde_json::Value {
             Value::Numeric(d) => d.map(|d| serde_json::to_value(d.to_f64().unwrap()).unwrap()),
             #[cfg(feature = "json")]
             Value::Json(v) => v,
+            #[cfg(feature = "geometry")]
+            Value::Geometry(g) => g.map(|g| serde_json::Value::String(g.to_string())),
+            #[cfg(feature = "geometry")]
+            Value::Geography(g) => g.map(|g| serde_json::Value::String(g.to_string())),
             #[cfg(feature = "uuid")]
             Value::Uuid(u) => u.map(|u| serde_json::Value::String(u.hyphenated().to_string())),
             #[cfg(feature = "chrono")]
@@ -331,6 +394,26 @@ impl<'a> Value<'a> {
         Value::Json(Some(value))
     }
 
+    /// Creates a new geometry value.
+    #[cfg(feature = "geometry")]
+    #[cfg_attr(feature = "docs", doc(cfg(feature = "geometry")))]
+    pub fn geometry<T>(value: T) -> Self
+    where
+        T: Into<GeometryValue>,
+    {
+        Value::Geometry(Some(value.into()))
+    }
+
+    /// Creates a new geometry value.
+    #[cfg(feature = "geometry")]
+    #[cfg_attr(feature = "docs", doc(cfg(feature = "geometry")))]
+    pub fn geography<T>(value: T) -> Self
+    where
+        T: Into<GeometryValue>,
+    {
+        Value::Geography(Some(value.into()))
+    }
+
     /// Creates a new XML value.
     pub fn xml<T>(value: T) -> Self
     where
@@ -365,6 +448,10 @@ impl<'a> Value<'a> {
             Value::Time(t) => t.is_none(),
             #[cfg(feature = "json")]
             Value::Json(json) => json.is_none(),
+            #[cfg(feature = "geometry")]
+            Value::Geometry(s) => s.is_none(),
+            #[cfg(feature = "geometry")]
+            Value::Geography(s) => s.is_none(),
         }
     }
 

@@ -35,6 +35,7 @@ pub enum PostgresVersion {
     V13,
     V14,
     V15,
+    V15PostGIS,
     PgBouncer,
 }
 
@@ -50,6 +51,7 @@ impl TryFrom<&str> for PostgresVersion {
             "13" => Self::V13,
             "14" => Self::V14,
             "15" => Self::V15,
+            "15-postgis" => Self::V15PostGIS,
             "pgbouncer" => Self::PgBouncer,
             _ => return Err(TestError::parse_error(format!("Unknown Postgres version `{s}`"))),
         };
@@ -68,6 +70,7 @@ impl ToString for PostgresVersion {
             PostgresVersion::V13 => "13",
             PostgresVersion::V14 => "14",
             PostgresVersion::V15 => "15",
+            PostgresVersion::V15PostGIS => "15-postgis",
             PostgresVersion::PgBouncer => "pgbouncer",
         }
         .to_owned()
