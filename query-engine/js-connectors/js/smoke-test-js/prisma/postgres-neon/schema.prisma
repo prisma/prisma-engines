@@ -7,6 +7,7 @@ generator client {
 datasource db {
   // provider          = "postgres"
   provider          = "@prisma/neon"
+  // provider          = "postgres"
   url               = env("JS_NEON_DATABASE_URL")
   shadowDatabaseUrl = env("JS_NEON_SHADOW_DATABASE_URL")
 }
@@ -78,4 +79,23 @@ enum type_test_enum_column_null {
   value1
   value2
   value3
+}
+
+model Child {
+  c          String  @unique
+  c_1        String
+  c_2        String
+  parentId   String? @unique
+  non_unique String?
+  id         String  @id
+  @@unique([c_1, c_2])
+}
+
+model Parent {
+  p          String  @unique
+  p_1        String
+  p_2        String
+  non_unique String?
+  id         String  @id
+  @@unique([p_1, p_2])
 }

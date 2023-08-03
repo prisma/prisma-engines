@@ -1,4 +1,4 @@
-use crate::proxy::{self, JSResultSet, Proxy, Query};
+use crate::proxy::{self, FlavoredJSResultSet, JSResultSet, Proxy, Query};
 use async_trait::async_trait;
 use napi::JsObject;
 use psl::JsConnectorFlavor;
@@ -121,8 +121,7 @@ impl QuaintQueryable for JsQueryable {
 
     /// Returns false, if connection is considered to not be in a working state.
     fn is_healthy(&self) -> bool {
-        // TODO: use self.driver.is_healthy()
-        true
+        self.proxy.is_healthy().unwrap_or(false)
     }
 
     /// Sets the transaction isolation level to given value.
@@ -144,8 +143,9 @@ impl JsQueryable {
         Query { sql, args }
     }
 
-    async fn transform_result_set(result_set: JSResultSet) -> quaint::Result<ResultSet> {
-        Ok(ResultSet::from(result_set))
+    async fn transform_result_set(flavor: JsConnectorFlavor, result_set: JSResultSet) -> quaint::Result<ResultSet> {
+        let flavored_js_result_set = FlavoredJSResultSet((flavor, result_set));
+        Ok(ResultSet::from(flavored_js_result_set))
     }
 
     async fn do_query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
@@ -159,7 +159,7 @@ impl JsQueryable {
 
         let len = result_set.len();
         let deserialization_span = info_span!("js:query:result", user_facing = true, "length" = %len);
-        Self::transform_result_set(result_set)
+        Self::transform_result_set(self.flavor, result_set)
             .instrument(deserialization_span)
             .await
     }
