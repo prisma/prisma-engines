@@ -79,9 +79,10 @@ strip = "symbols"
 strip = "symbols"
 
 [profile.release]
-lto = "fat"
+lto = true
 codegen-units = 1
 opt-level = 's' # Optimize for size.
+panic = "abort"
 
 [profile.profiling]
 inherits = "release"

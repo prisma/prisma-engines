@@ -38,4 +38,4 @@ schema = { path = "../schema" }
 lru = "0.7.7"
 enumflags2 = "0.7"
 getrandom = { version = "0.2", features = ["js"] }
-instant = { version = "0.1",  features = ["stdweb", "wasm-bindgen"] }
+instant = { version = "0.1",  features = ["stdweb", "wasm-bindgen", "inaccurate"] } # Vercel Edge Function does not have performance API

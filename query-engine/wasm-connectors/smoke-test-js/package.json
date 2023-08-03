@@ -7,7 +7,8 @@
   "scripts": {
     "planetscale": "ts-node ./src/planetscale.ts",
     "neon": "ts-node ./src/neon.ts",
-    "migrate:reset": "prisma migrate reset"
+    "migrate:reset": "prisma migrate reset",
+    "build": "node ./build.mjs"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +24,7 @@
     "@neondatabase/serverless": "^0.5.6",
     "@planetscale/database": "^1.8.0",
     "@prisma/client": "5.0.0",
+    "esbuild": "0.18.17",
     "mysql2": "^3.3.1",
     "ws": "^8.13.0"
   }

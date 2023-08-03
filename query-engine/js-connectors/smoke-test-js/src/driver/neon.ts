@@ -1,4 +1,4 @@
-import { Pool, PoolConfig, neonConfig } from '@neondatabase/serverless'
+import { Client, Pool, PoolConfig, neonConfig } from '@neondatabase/serverless'
 import type { Closeable, Connector, ResultSet, Query } from '../engines/types/Library.js'
 import { ColumnType } from '../engines/types/Library.js'
 
@@ -48,22 +48,25 @@ function fieldToColumnType(fieldTypeId: number): ColumnType {
 type NeonConfig = PoolConfig;
 
 class PrismaNeon implements Connector, Closeable {
-  private pool: Pool
+  private client: Client
   private maybeVersion?: string
   private isRunning: boolean = true
   flavor = "postgres"
 
   constructor(config: NeonConfig) {
-    this.pool = new Pool(config)
+    this.client = new Client(config)
+
+    this.client.connect() // connect in the background, do not await, all queries will be queued until connection is established
+
     // lazily retrieve the version and store it into `maybeVersion`
-    this.pool.query('SELECT VERSION()').then((results) => {
+    this.client.query('SELECT VERSION()').then((results) => {
       this.maybeVersion = results.rows[0]['version']
     })
   }
 
   async close(): Promise<void> {
     if (this.isRunning) {
-      await this.pool.end()
+      await this.client.end()
       this.isRunning = false
     }
   }
@@ -83,7 +86,7 @@ class PrismaNeon implements Connector, Closeable {
   async queryRaw(query: Query): Promise<ResultSet> {
     const { sql, args: values } = query
     console.log(sql, values)
-    const { fields, rows: results } = await this.pool.query(sql, values)
+    const { fields, rows: results } = await this.client.query(sql, values)
     const columns = fields.map(field => field.name)
     const resultSet: ResultSet = {
       columnNames: columns,
@@ -100,7 +103,7 @@ class PrismaNeon implements Connector, Closeable {
    */
   async executeRaw(query: Query): Promise<number> {
     const { sql, args: values } = query
-    const { rowCount } = await this.pool.query(sql, values)
+    const { rowCount } = await this.client.query(sql, values)
     return rowCount
   }
 

@@ -2,18 +2,18 @@ import path from 'node:path'
 import fs from 'node:fs'
 
 import { Connector, QueryEngineInstance } from './engines/types/Library.js'
-import * as libqueryEngine from './pkg/query_engine.js'
+import init, * as libqueryEngine from './pkg/query_engine.js'
+import wasm from './pkg/query_engine_bg.wasm?module'
+import datamodel from '../prisma/schema.prisma'
 
-export function initQueryEngine(driver: Connector): QueryEngineInstance {
+export async function initQueryEngine(driver: Connector): QueryEngineInstance {
+  await init(wasm)
   libqueryEngine.initPanicHook()
-  const dirname = path.dirname(new URL(import.meta.url).pathname)
-
-  const schemaPath = path.join(dirname, `../prisma/schema.prisma`)
 
   const QueryEngine = libqueryEngine.QueryEngine
 
   const queryEngineOptions = {
-    datamodel: fs.readFileSync(schemaPath, 'utf-8'),
+    datamodel,
     configDir: '.',
     engineProtocol: 'json' as const,
     logLevel: 'info' as const,

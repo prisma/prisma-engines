@@ -2,9 +2,6 @@ import { NeonQueryFunction, Pool, PoolConfig, neon, neonConfig, types } from '@n
 import type { Closeable, Connector, ResultSet, Query } from '../engines/types/Library.js'
 import { ColumnType } from '../engines/types/Library.js'
 
-import ws from 'ws';
-neonConfig.webSocketConstructor = ws;
-
 /**
  * This is a simplification of quaint's value inference logic. Take a look at quaint's conversion.rs
  * module to see how other attributes of the field packet such as the field length are used to infer
@@ -53,6 +50,9 @@ type NeonConfig = PoolConfig;
 types.setTypeParser(1082, date => date);
 types.setTypeParser(1083, date => date);
 types.setTypeParser(1114, date => date);
+
+export let lastQuery: any;
+export let lastResult: any;
 
 class PrismaNeon implements Connector, Closeable {
   private pool?: Pool
@@ -105,6 +105,7 @@ class PrismaNeon implements Connector, Closeable {
    * Execute a query given as SQL, interpolating the given parameters.
    */
   async queryRaw(query: Query): Promise<ResultSet> {
+    lastQuery = query;
     const { sql, args: values } = query
     let fields;
     let results;
@@ -130,6 +131,7 @@ class PrismaNeon implements Connector, Closeable {
         }
       })),
     }
+    lastResult = resultSet;
     return resultSet
   }
 
