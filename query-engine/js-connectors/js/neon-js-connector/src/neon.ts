@@ -1,7 +1,7 @@
 import { Pool, neonConfig } from '@neondatabase/serverless'
 import type { NeonConfig } from '@neondatabase/serverless'
 import ws from 'ws'
-import { binder, Debug } from '@jkomyno/prisma-js-connector-utils'
+import { binder, isConnectionUnhealthy, Debug } from '@jkomyno/prisma-js-connector-utils'
 import type { Closeable, Connector, ResultSet, Query, ConnectorConfig } from '@jkomyno/prisma-js-connector-utils'
 import { fieldToColumnType } from './conversion'
 
@@ -99,7 +99,7 @@ class PrismaNeon implements Connector, Closeable {
     } catch (e) {
       const error = e as Error & { code: string }
       
-      if (['ENOTFOUND', 'EAI_AGAIN'].includes(error.code)) {
+      if (isConnectionUnhealthy(error.code)) {
         this._isHealthy = false
       }
 

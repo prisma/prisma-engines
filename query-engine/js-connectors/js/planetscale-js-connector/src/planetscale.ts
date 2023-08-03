@@ -2,7 +2,7 @@ import * as planetScale from '@planetscale/database'
 import type { Config as PlanetScaleConfig } from '@planetscale/database'
 import { EventEmitter } from 'node:events'
 import { setImmediate } from 'node:timers/promises'
-import { binder, Debug } from '@jkomyno/prisma-js-connector-utils'
+import { binder, isConnectionUnhealthy, Debug } from '@jkomyno/prisma-js-connector-utils'
 import type { Closeable, Connector, ResultSet, Query, ConnectorConfig } from '@jkomyno/prisma-js-connector-utils'
 import { type PlanetScaleColumnType, fieldToColumnType } from './conversion'
 
@@ -185,7 +185,7 @@ class PrismaPlanetScale implements Connector, Closeable {
     } catch (e) {
       const error = e as Error & { code: string }
       
-      if (['ENOTFOUND', 'EAI_AGAIN'].includes(error.code)) {
+      if (isConnectionUnhealthy(error.code)) {
         this._isHealthy = false
       }
 

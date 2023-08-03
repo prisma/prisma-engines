@@ -1,7 +1,6 @@
 {
   "name": "@jkomyno/prisma-neon-js-connector",
   "version": "0.0.1",
-  "private": "false",
   "description": "Prisma's JS Connector for \"@neondatabase/serverless\"",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
