@@ -188,7 +188,7 @@
 <a href="#188" id="188">188</a>
 <a href="#189" id="189">189</a>
 <a href="#190" id="190">190</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::proxy::{<span class="self">self</span>, JSResultSet, Proxy, Query};
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::proxy::{<span class="self">self</span>, FlavoredJSResultSet, JSResultSet, Proxy, Query};
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>napi::JsObject;
 <span class="kw">use </span>psl::JsConnectorFlavor;
@@ -311,9 +311,8 @@
 
     <span class="doccomment">/// Returns false, if connection is considered to not be in a working state.
     </span><span class="kw">fn </span>is_healthy(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="comment">// TODO: use self.driver.is_healthy()
-        </span><span class="bool-val">true
-    </span>}
+        <span class="self">self</span>.proxy.is_healthy().unwrap_or(<span class="bool-val">false</span>)
+    }
 
     <span class="doccomment">/// Sets the transaction isolation level to given value.
     /// Implementers have to make sure that the passed isolation level is valid for the underlying database.
@@ -334,8 +333,9 @@
         Query { sql, args }
     }
 
-    <span class="kw">async fn </span>transform_result_set(result_set: JSResultSet) -&gt; quaint::Result&lt;ResultSet&gt; {
-        <span class="prelude-val">Ok</span>(ResultSet::from(result_set))
+    <span class="kw">async fn </span>transform_result_set(flavor: JsConnectorFlavor, result_set: JSResultSet) -&gt; quaint::Result&lt;ResultSet&gt; {
+        <span class="kw">let </span>flavored_js_result_set = FlavoredJSResultSet((flavor, result_set));
+        <span class="prelude-val">Ok</span>(ResultSet::from(flavored_js_result_set))
     }
 
     <span class="kw">async fn </span>do_query_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;ResultSet&gt; {
@@ -349,7 +349,7 @@
 
         <span class="kw">let </span>len = result_set.len();
         <span class="kw">let </span>deserialization_span = <span class="macro">info_span!</span>(<span class="string">&quot;js:query:result&quot;</span>, user_facing = <span class="bool-val">true</span>, <span class="string">&quot;length&quot; </span>= %len);
-        <span class="self">Self</span>::transform_result_set(result_set)
+        <span class="self">Self</span>::transform_result_set(<span class="self">self</span>.flavor, result_set)
             .instrument(deserialization_span)
             .<span class="kw">await
     </span>}
