@@ -1,4 +1,4 @@
-import { Pool, neonConfig } from '@neondatabase/serverless'
+import { Client, neonConfig } from '@neondatabase/serverless'
 import type { NeonConfig } from '@neondatabase/serverless'
 import ws from 'ws'
 import { binder, isConnectionUnhealthy, Debug } from '@jkomyno/prisma-js-connector-utils'
@@ -11,22 +11,29 @@ const debug = Debug('prisma:js-connector:neon')
 
 export type PrismaNeonConfig = ConnectorConfig & Partial<Omit<NeonConfig, 'connectionString'>>
 
+const TRANSACTION_BEGIN = 'BEGIN'
+const TRANSACTION_COMMIT = 'COMMIT'
+const TRANSACTION_ROLLBACK = 'ROLLBACK'
+
 class PrismaNeon implements Connector, Closeable {
   readonly flavor = 'postgres'
-  
-  private pool: Pool
+
+  private client: Client
   private isRunning: boolean = true
+  private inTransaction: boolean = false
   private _isHealthy: boolean = true
   private _version: string | undefined = undefined
 
   constructor(config: PrismaNeonConfig) {
     const { url: connectionString, ...rest } = config
-    this.pool = new Pool({ connectionString, ...rest })
+    this.client = new Client({ connectionString, ...rest })
+    // connect the client in the background, all requests will be queued until connection established
+    this.client.connect()
   }
 
   async close(): Promise<void> {
     if (this.isRunning) {
-      await this.pool.end()
+      await this.client.end()
       this.isRunning = false
     }
   }
@@ -66,8 +73,33 @@ class PrismaNeon implements Connector, Closeable {
     const tag = '[js::execute_raw]'
     debug(`${tag} %O`, query)
 
-    const { rowCount: rowsAffected } = await this.performIO(query)
-    return rowsAffected
+    switch (query.sql) {
+      case TRANSACTION_BEGIN: {
+        // check if a transaction is already in progress
+        if (this.inTransaction) {
+          throw new Error('A transaction is already in progress')
+        }
+
+        this.inTransaction = true
+        debug(`${tag} transaction began`)
+
+        return Promise.resolve(-1)
+      }
+      case TRANSACTION_COMMIT: {
+        this.inTransaction = false
+        debug(`${tag} transaction ended successfully`)
+        return Promise.resolve(-1)
+      }
+      case TRANSACTION_ROLLBACK: {
+        this.inTransaction = false
+        debug(`${tag} transaction ended with error`)
+        return Promise.resolve(-2)
+      }
+      default: {
+        const { rowCount: rowsAffected } = await this.performIO(query)
+        return rowsAffected
+      }
+    }
   }
 
   /**
@@ -86,7 +118,7 @@ class PrismaNeon implements Connector, Closeable {
     return this._version
   }
 
-    /**
+  /**
    * Run a query against the database, returning the result set.
    * Should the query fail due to a connection error, the connection is
    * marked as unhealthy.
@@ -95,10 +127,10 @@ class PrismaNeon implements Connector, Closeable {
     const { sql, args: values } = query
 
     try {
-      return await this.pool.query(sql, values)
+      return await this.client.query(sql, values)
     } catch (e) {
       const error = e as Error & { code: string }
-      
+
       if (isConnectionUnhealthy(error.code)) {
         this._isHealthy = false
       }
