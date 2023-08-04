@@ -1,5 +1,5 @@
-import { Client, neonConfig } from '@neondatabase/serverless'
-import type { NeonConfig } from '@neondatabase/serverless'
+import { Client, neon, neonConfig } from '@neondatabase/serverless'
+import type { NeonConfig, NeonQueryFunction } from '@neondatabase/serverless'
 import ws from 'ws'
 import { binder, isConnectionUnhealthy, Debug } from '@jkomyno/prisma-js-connector-utils'
 import type { Closeable, Connector, ResultSet, Query, ConnectorConfig } from '@jkomyno/prisma-js-connector-utils'
@@ -9,7 +9,7 @@ neonConfig.webSocketConstructor = ws
 
 const debug = Debug('prisma:js-connector:neon')
 
-export type PrismaNeonConfig = ConnectorConfig & Partial<Omit<NeonConfig, 'connectionString'>>
+export type PrismaNeonConfig = ConnectorConfig & Partial<Omit<NeonConfig, 'connectionString'>> & { httpMode?: boolean }
 
 const TRANSACTION_BEGIN = 'BEGIN'
 const TRANSACTION_COMMIT = 'COMMIT'
@@ -18,22 +18,31 @@ const TRANSACTION_ROLLBACK = 'ROLLBACK'
 class PrismaNeon implements Connector, Closeable {
   readonly flavor = 'postgres'
 
-  private client: Client
+  private client?: Client
+  private httpClient?: NeonQueryFunction<false, true>
   private isRunning: boolean = true
   private inTransaction: boolean = false
   private _isHealthy: boolean = true
   private _version: string | undefined = undefined
+  private _httpMode: boolean
 
   constructor(config: PrismaNeonConfig) {
-    const { url: connectionString, ...rest } = config
-    this.client = new Client({ connectionString, ...rest })
-    // connect the client in the background, all requests will be queued until connection established
-    this.client.connect()
+    const { url: connectionString, httpMode, ...rest } = config
+    this._httpMode = httpMode ?? false
+    if (!this._httpMode) {
+      this.client = new Client({ connectionString, ...rest })
+      // connect the client in the background, all requests will be queued until connection established
+      this.client.connect()
+    } else {
+      this.httpClient = neon(connectionString, { fullResults: true, ...rest })
+    }
   }
 
   async close(): Promise<void> {
     if (this.isRunning) {
-      await this.client.end()
+      if (!this._httpMode) {
+        await this.client!.end()
+      }
       this.isRunning = false
     }
   }
@@ -75,6 +84,10 @@ class PrismaNeon implements Connector, Closeable {
 
     switch (query.sql) {
       case TRANSACTION_BEGIN: {
+        if (this._httpMode) {
+          throw new Error('Transactions are not supported in HTTP mode')
+        }
+
         // check if a transaction is already in progress
         if (this.inTransaction) {
           throw new Error('A transaction is already in progress')
@@ -127,7 +140,11 @@ class PrismaNeon implements Connector, Closeable {
     const { sql, args: values } = query
 
     try {
-      return await this.client.query(sql, values)
+      if (this._httpMode) {
+        return await this.client!.query(sql, values)
+      } else {
+        return await this.httpClient!(sql, values)
+      }
     } catch (e) {
       const error = e as Error & { code: string }
 
