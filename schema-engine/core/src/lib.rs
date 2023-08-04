@@ -155,6 +155,8 @@ fn connector_for_provider(provider: &str) -> CoreResult<Box<dyn schema_connector
             preview_features: Default::default(),
             shadow_database_connection_string: None,
         }))),
+        p if PLANETSCALE_SERVERLESS.is_provider(p) => Ok(Box::new(SqlSchemaConnector::new_mysql())),
+        p if NEON_SERVERLESS.is_provider(p) => Ok(Box::new(SqlSchemaConnector::new_postgres())),
         provider => Err(CoreError::from_msg(format!(
             "`{provider}` is not a supported connector."
         ))),
