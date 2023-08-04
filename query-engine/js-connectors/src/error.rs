@@ -18,10 +18,10 @@ pub(crate) async fn async_unwinding_panic<F, R>(fut: F) -> napi::Result<R>
 where
     F: Future<Output = napi::Result<R>>,
 {
-    match AssertUnwindSafe(fut).catch_unwind().await {
-        Ok(result) => result,
-        Err(panic_payload) => panic_to_napi_err(panic_payload),
-    }
+    AssertUnwindSafe(fut)
+        .catch_unwind()
+        .await
+        .unwrap_or_else(panic_to_napi_err)
 }
 
 /// catches a panic thrown during the execution of a closure and transforms it into a the Error

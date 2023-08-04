@@ -157,16 +157,18 @@ impl JsQueryable {
         let query = Self::build_query(sql, params).instrument(serialization_span).await;
 
         let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);
-        match self.proxy.query_raw(query).instrument(sql_span).await {
-            Ok(result_set) => {
-                let len = result_set.len();
-                let deserialization_span = info_span!("js:query:result", user_facing = true, "length" = %len);
-                Self::transform_result_set(self.flavor, result_set)
-                    .instrument(deserialization_span)
-                    .await
-            }
-            Err(napi_err) => Err(into_quaint_error(napi_err)),
-        }
+        let result_set = self
+            .proxy
+            .query_raw(query)
+            .instrument(sql_span)
+            .await
+            .map_err(into_quaint_error)?;
+
+        let len = result_set.len();
+        let deserialization_span = info_span!("js:query:result", user_facing = true, "length" = %len);
+        Self::transform_result_set(self.flavor, result_set)
+            .instrument(deserialization_span)
+            .await
     }
 
     async fn do_execute_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {
