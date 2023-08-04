@@ -18,7 +18,7 @@ type TransactionCapableDriver
     inTransaction: true
 
     /**
-     * The standard PlanetScale client.
+     * The PlanetScale client, scoped in transaction mode.
      */
     client: planetScale.Transaction
   }
@@ -29,7 +29,7 @@ type TransactionCapableDriver
     inTransaction: false
 
     /**
-     * The PlanetScale client, scoped in transaction mode.
+     * The standard PlanetScale client.
      */
     client: planetScale.Connection
   }

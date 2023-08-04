@@ -93,7 +93,7 @@ class PrismaNeon implements Connector, Closeable {
       case TRANSACTION_ROLLBACK: {
         this.inTransaction = false
         debug(`${tag} transaction ended with error`)
-        return Promise.resolve(-2)
+        return Promise.reject(query.sql)
       }
       default: {
         const { rowCount: rowsAffected } = await this.performIO(query)
