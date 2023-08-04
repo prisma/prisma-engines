@@ -267,6 +267,10 @@ impl From<prisma_models::ConversionFailure> for SqlError {
 impl From<quaint::error::Error> for SqlError {
     fn from(e: quaint::error::Error) -> Self {
         match QuaintKind::from(e) {
+            QuaintKind::RawConnectorError { status, reason } => Self::RawError {
+                code: status,
+                message: reason,
+            },
             QuaintKind::QueryError(qe) => Self::QueryError(qe),
             QuaintKind::QueryInvalidInput(qe) => Self::QueryInvalidInput(qe),
             e @ QuaintKind::IoError(_) => Self::ConnectionError(e),
