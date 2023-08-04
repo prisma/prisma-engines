@@ -133,6 +133,11 @@ impl Error {
     pub fn is_closed(&self) -> bool {
         matches!(self.kind, ErrorKind::ConnectionClosed)
     }
+
+    // Builds an error from a raw error coming from the connector
+    pub fn raw_connector_error(status: String, reason: String) -> Error {
+        Error::builder(ErrorKind::RawConnectorError { status, reason }).build()
+    }
 }
 
 impl fmt::Display for Error {
@@ -143,6 +148,9 @@ impl fmt::Display for Error {
 
 #[derive(Debug, Error)]
 pub enum ErrorKind {
+    #[error("Error in the underlying connector ({}): {}", status, reason)]
+    RawConnectorError { status: String, reason: String },
+
     #[error("Error querying the database: {}", _0)]
     QueryError(Box<dyn std::error::Error + Send + Sync + 'static>),
 

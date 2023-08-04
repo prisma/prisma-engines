@@ -1,4 +1,7 @@
-use crate::proxy::{self, FlavoredJSResultSet, JSResultSet, Proxy, Query};
+use crate::{
+    error::into_quaint_error,
+    proxy::{self, FlavoredJSResultSet, JSResultSet, Proxy, Query},
+};
 use async_trait::async_trait;
 use napi::JsObject;
 use psl::JsConnectorFlavor;
@@ -164,9 +167,13 @@ impl JsQueryable {
         let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
         let query = Self::build_query(sql, params).instrument(serialization_span).await;
 
-        // Todo: convert napi::Error to quaint::error::Error.
         let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);
-        let result_set = self.proxy.query_raw(query).instrument(sql_span).await.unwrap();
+        let result_set = self
+            .proxy
+            .query_raw(query)
+            .instrument(sql_span)
+            .await
+            .map_err(into_quaint_error)?;
 
         let len = result_set.len();
         let deserialization_span = info_span!("js:query:result", user_facing = true, "length" = %len);
