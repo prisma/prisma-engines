@@ -1,4 +1,4 @@
-import { Pool, neonConfig } from '@neondatabase/serverless'
+import { Client, neonConfig } from '@neondatabase/serverless'
 import type { NeonConfig } from '@neondatabase/serverless'
 import ws from 'ws'
 import { binder, isConnectionUnhealthy, Debug } from '@jkomyno/prisma-js-connector-utils'
@@ -17,8 +17,8 @@ const TRANSACTION_ROLLBACK = 'ROLLBACK'
 
 class PrismaNeon implements Connector, Closeable {
   readonly flavor = 'postgres'
-  
-  private pool: Pool
+
+  private client: Client
   private isRunning: boolean = true
   private inTransaction: boolean = false
   private _isHealthy: boolean = true
@@ -26,12 +26,14 @@ class PrismaNeon implements Connector, Closeable {
 
   constructor(config: PrismaNeonConfig) {
     const { url: connectionString, ...rest } = config
-    this.pool = new Pool({ connectionString, ...rest })
+    this.client = new Client({ connectionString, ...rest })
+    // connect the client in the background, all requests will be queued until connection established
+    this.client.connect()
   }
 
   async close(): Promise<void> {
     if (this.isRunning) {
-      await this.pool.end()
+      await this.client.end()
       this.isRunning = false
     }
   }
@@ -116,19 +118,19 @@ class PrismaNeon implements Connector, Closeable {
     return this._version
   }
 
-    /**
-   * Run a query against the database, returning the result set.
-   * Should the query fail due to a connection error, the connection is
-   * marked as unhealthy.
-   */
+  /**
+ * Run a query against the database, returning the result set.
+ * Should the query fail due to a connection error, the connection is
+ * marked as unhealthy.
+ */
   private async performIO(query: Query) {
     const { sql, args: values } = query
 
     try {
-      return await this.pool.query(sql, values)
+      return await this.client.query(sql, values)
     } catch (e) {
       const error = e as Error & { code: string }
-      
+
       if (isConnectionUnhealthy(error.code)) {
         this._isHealthy = false
       }
