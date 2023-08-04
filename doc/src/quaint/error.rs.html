@@ -385,6 +385,14 @@
 <a href="#385" id="385">385</a>
 <a href="#386" id="386">386</a>
 <a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Error module
 </span><span class="kw">use </span><span class="kw">crate</span>::connector::IsolationLevel;
 <span class="kw">use </span>std::{borrow::Cow, fmt, io, num};
@@ -520,6 +528,11 @@
     </span><span class="kw">pub fn </span>is_closed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(<span class="self">self</span>.kind, ErrorKind::ConnectionClosed)
     }
+
+    <span class="comment">// Builds an error from a raw error coming from the connector
+    </span><span class="kw">pub fn </span>raw_connector_error(status: String, reason: String) -&gt; Error {
+        Error::builder(ErrorKind::RawConnectorError { status, reason }).build()
+    }
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Error {
@@ -530,6 +543,9 @@
 
 <span class="attr">#[derive(Debug, Error)]
 </span><span class="kw">pub enum </span>ErrorKind {
+    <span class="attr">#[error(<span class="string">&quot;Error in the underlying connector ({}): {}&quot;</span>, status, reason)]
+    </span>RawConnectorError { status: String, reason: String },
+
     <span class="attr">#[error(<span class="string">&quot;Error querying the database: {}&quot;</span>, _0)]
     </span>QueryError(Box&lt;<span class="kw">dyn </span>std::error::Error + Send + Sync + <span class="lifetime">&#39;static</span>&gt;),
 

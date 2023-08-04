@@ -945,17 +945,32 @@
 <a href="#945" id="945">945</a>
 <a href="#946" id="946">946</a>
 <a href="#947" id="947">947</a>
+<a href="#948" id="948">948</a>
+<a href="#949" id="949">949</a>
+<a href="#950" id="950">950</a>
+<a href="#951" id="951">951</a>
+<a href="#952" id="952">952</a>
+<a href="#953" id="953">953</a>
+<a href="#954" id="954">954</a>
+<a href="#955" id="955">955</a>
+<a href="#956" id="956">956</a>
+<a href="#957" id="957">957</a>
+<a href="#958" id="958">958</a>
+<a href="#959" id="959">959</a>
+<a href="#960" id="960">960</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::panic;
+<span class="kw">use </span>std::str::FromStr;
 <span class="kw">use </span>std::sync::{Arc, Condvar, Mutex};
 
 <span class="kw">use </span>napi::bindgen_prelude::{FromNapiValue, Promise <span class="kw">as </span>JsPromise, ToNapiValue};
 <span class="kw">use </span>napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction};
 <span class="kw">use </span>napi::{JsObject, JsString};
 <span class="kw">use </span>napi_derive::napi;
+
+<span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
 <span class="kw">use </span>psl::JsConnectorFlavor;
 <span class="kw">use </span>quaint::connector::ResultSet <span class="kw">as </span>QuaintResultSet;
 <span class="kw">use </span>quaint::Value <span class="kw">as </span>QuaintValue;
-<span class="kw">use </span>std::str::FromStr;
 
 <span class="comment">// TODO(jkomyno): import these 3rd-party crates from the `quaint-core` crate.
 </span><span class="kw">use </span>bigdecimal::BigDecimal;
@@ -1296,55 +1311,66 @@
 
 <span class="kw">impl </span>Proxy {
     <span class="kw">pub async fn </span>query_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, params: Query) -&gt; napi::Result&lt;JSResultSet&gt; {
-        <span class="kw">let </span>promise = <span class="self">self</span>.query_raw.call_async::&lt;JsPromise&lt;JSResultSet&gt;&gt;(params).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let </span>value = promise.<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(value)
-    }
+        async_unwinding_panic(<span class="kw">async </span>{
+            <span class="kw">let </span>promise = <span class="self">self</span>.query_raw.call_async::&lt;JsPromise&lt;JSResultSet&gt;&gt;(params).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">let </span>value = promise.<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(value)
+        })
+        .<span class="kw">await
+    </span>}
 
     <span class="kw">pub async fn </span>execute_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, params: Query) -&gt; napi::Result&lt;u32&gt; {
-        <span class="kw">let </span>promise = <span class="self">self</span>.execute_raw.call_async::&lt;JsPromise&lt;u32&gt;&gt;(params).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let </span>value = promise.<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(value)
-    }
+        async_unwinding_panic(<span class="kw">async </span>{
+            <span class="kw">let </span>promise = <span class="self">self</span>.execute_raw.call_async::&lt;JsPromise&lt;u32&gt;&gt;(params).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">let </span>value = promise.<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(value)
+        })
+        .<span class="kw">await
+    </span>}
 
     <span class="kw">pub async fn </span>version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; napi::Result&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt; {
-        <span class="kw">let </span>version = <span class="self">self</span>.version.call_async::&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt;(()).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(version)
-    }
+        async_unwinding_panic(<span class="kw">async </span>{
+            <span class="kw">let </span>version = <span class="self">self</span>.version.call_async::&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt;(()).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(version)
+        })
+        .<span class="kw">await
+    </span>}
 
     <span class="kw">pub async fn </span>close(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; napi::Result&lt;()&gt; {
-        <span class="self">self</span>.close.call_async::&lt;()&gt;(()).<span class="kw">await
+        async_unwinding_panic(<span class="kw">async </span>{ <span class="self">self</span>.close.call_async::&lt;()&gt;(()).<span class="kw">await </span>}).<span class="kw">await
     </span>}
 
     <span class="kw">pub fn </span>is_healthy(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; napi::Result&lt;bool&gt; {
-        <span class="kw">let </span>result_arc = Arc::new((Mutex::new(<span class="prelude-val">None</span>), Condvar::new()));
-        <span class="kw">let </span>result_arc_clone: Arc&lt;(Mutex&lt;<span class="prelude-ty">Option</span>&lt;bool&gt;&gt;, Condvar)&gt; = result_arc.clone();
+        unwinding_panic(|| {
+            <span class="kw">let </span>result_arc = Arc::new((Mutex::new(<span class="prelude-val">None</span>), Condvar::new()));
+            <span class="kw">let </span>result_arc_clone: Arc&lt;(Mutex&lt;<span class="prelude-ty">Option</span>&lt;bool&gt;&gt;, Condvar)&gt; = result_arc.clone();
 
-        <span class="kw">let </span>set_value_callback = <span class="kw">move </span>|value: bool| {
-            <span class="kw">let </span>(lock, cvar) = <span class="kw-2">&amp;*</span>result_arc_clone;
+            <span class="kw">let </span>set_value_callback = <span class="kw">move </span>|value: bool| {
+                <span class="kw">let </span>(lock, cvar) = <span class="kw-2">&amp;*</span>result_arc_clone;
+                <span class="kw">let </span><span class="kw-2">mut </span>result_guard = lock.lock().unwrap();
+                <span class="kw-2">*</span>result_guard = <span class="prelude-val">Some</span>(value);
+                cvar.notify_one();
+
+                <span class="prelude-val">Ok</span>(())
+            };
+
+            <span class="comment">// Should anyone find a less mind-boggling way to retrieve the result of a synchronous JS
+            // function, please do so.
+            </span><span class="self">self</span>.is_healthy.call_with_return_value(
+                (),
+                napi::threadsafe_function::ThreadsafeFunctionCallMode::Blocking,
+                set_value_callback,
+            );
+
+            <span class="comment">// wait for `set_value_callback` to be called and to set the result
+            </span><span class="kw">let </span>(lock, cvar) = <span class="kw-2">&amp;*</span>result_arc;
             <span class="kw">let </span><span class="kw-2">mut </span>result_guard = lock.lock().unwrap();
-            <span class="kw-2">*</span>result_guard = <span class="prelude-val">Some</span>(value);
-            cvar.notify_one();
+            <span class="kw">while </span>result_guard.is_none() {
+                result_guard = cvar.wait(result_guard).unwrap();
+            }
 
-            <span class="prelude-val">Ok</span>(())
-        };
-
-        <span class="comment">// Should anyone find a less mind-boggling way to retrieve the result of a synchronous JS
-        // function, please do so.
-        </span><span class="self">self</span>.is_healthy.call_with_return_value(
-            (),
-            napi::threadsafe_function::ThreadsafeFunctionCallMode::Blocking,
-            set_value_callback,
-        );
-
-        <span class="comment">// wait for `set_value_callback` to be called and to set the result
-        </span><span class="kw">let </span>(lock, cvar) = <span class="kw-2">&amp;*</span>result_arc;
-        <span class="kw">let </span><span class="kw-2">mut </span>result_guard = lock.lock().unwrap();
-        <span class="kw">while </span>result_guard.is_none() {
-            result_guard = cvar.wait(result_guard).unwrap();
-        }
-
-        <span class="prelude-val">Ok</span>(result_guard.unwrap_or_default())
+            <span class="prelude-val">Ok</span>(result_guard.unwrap_or_default())
+        })
     }
 }
 
