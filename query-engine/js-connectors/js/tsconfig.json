@@ -4,7 +4,7 @@
     "module": "commonjs",
     "lib": ["ES2020", "ES2021.WeakRef"],
     "esModuleInterop": true,
-    "isolatedModules": false,
+    "isolatedModules": true,
     "sourceMap": true,
     "declaration": true,
     "strict": true,
