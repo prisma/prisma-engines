@@ -1,14 +1,16 @@
 use core::panic;
+use std::str::FromStr;
 use std::sync::{Arc, Condvar, Mutex};
 
 use napi::bindgen_prelude::{FromNapiValue, Promise as JsPromise, ToNapiValue};
 use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction};
 use napi::{JsObject, JsString};
 use napi_derive::napi;
+
+use crate::error::*;
 use psl::JsConnectorFlavor;
 use quaint::connector::ResultSet as QuaintResultSet;
 use quaint::Value as QuaintValue;
-use std::str::FromStr;
 
 // TODO(jkomyno): import these 3rd-party crates from the `quaint-core` crate.
 use bigdecimal::BigDecimal;
@@ -349,55 +351,66 @@ impl From<FlavoredJSResultSet> for QuaintResultSet {
 
 impl Proxy {
     pub async fn query_raw(&self, params: Query) -> napi::Result<JSResultSet> {
-        let promise = self.query_raw.call_async::<JsPromise<JSResultSet>>(params).await?;
-        let value = promise.await?;
-        Ok(value)
+        async_unwinding_panic(async {
+            let promise = self.query_raw.call_async::<JsPromise<JSResultSet>>(params).await?;
+            let value = promise.await?;
+            Ok(value)
+        })
+        .await
     }
 
     pub async fn execute_raw(&self, params: Query) -> napi::Result<u32> {
-        let promise = self.execute_raw.call_async::<JsPromise<u32>>(params).await?;
-        let value = promise.await?;
-        Ok(value)
+        async_unwinding_panic(async {
+            let promise = self.execute_raw.call_async::<JsPromise<u32>>(params).await?;
+            let value = promise.await?;
+            Ok(value)
+        })
+        .await
     }
 
     pub async fn version(&self) -> napi::Result<Option<String>> {
-        let version = self.version.call_async::<Option<String>>(()).await?;
-        Ok(version)
+        async_unwinding_panic(async {
+            let version = self.version.call_async::<Option<String>>(()).await?;
+            Ok(version)
+        })
+        .await
     }
 
     pub async fn close(&self) -> napi::Result<()> {
-        self.close.call_async::<()>(()).await
+        async_unwinding_panic(async { self.close.call_async::<()>(()).await }).await
     }
 
     pub fn is_healthy(&self) -> napi::Result<bool> {
-        let result_arc = Arc::new((Mutex::new(None), Condvar::new()));
-        let result_arc_clone: Arc<(Mutex<Option<bool>>, Condvar)> = result_arc.clone();
+        unwinding_panic(|| {
+            let result_arc = Arc::new((Mutex::new(None), Condvar::new()));
+            let result_arc_clone: Arc<(Mutex<Option<bool>>, Condvar)> = result_arc.clone();
 
-        let set_value_callback = move |value: bool| {
-            let (lock, cvar) = &*result_arc_clone;
+            let set_value_callback = move |value: bool| {
+                let (lock, cvar) = &*result_arc_clone;
+                let mut result_guard = lock.lock().unwrap();
+                *result_guard = Some(value);
+                cvar.notify_one();
+
+                Ok(())
+            };
+
+            // Should anyone find a less mind-boggling way to retrieve the result of a synchronous JS
+            // function, please do so.
+            self.is_healthy.call_with_return_value(
+                (),
+                napi::threadsafe_function::ThreadsafeFunctionCallMode::Blocking,
+                set_value_callback,
+            );
+
+            // wait for `set_value_callback` to be called and to set the result
+            let (lock, cvar) = &*result_arc;
             let mut result_guard = lock.lock().unwrap();
-            *result_guard = Some(value);
-            cvar.notify_one();
+            while result_guard.is_none() {
+                result_guard = cvar.wait(result_guard).unwrap();
+            }
 
-            Ok(())
-        };
-
-        // Should anyone find a less mind-boggling way to retrieve the result of a synchronous JS
-        // function, please do so.
-        self.is_healthy.call_with_return_value(
-            (),
-            napi::threadsafe_function::ThreadsafeFunctionCallMode::Blocking,
-            set_value_callback,
-        );
-
-        // wait for `set_value_callback` to be called and to set the result
-        let (lock, cvar) = &*result_arc;
-        let mut result_guard = lock.lock().unwrap();
-        while result_guard.is_none() {
-            result_guard = cvar.wait(result_guard).unwrap();
-        }
-
-        Ok(result_guard.unwrap_or_default())
+            Ok(result_guard.unwrap_or_default())
+        })
     }
 }
 
