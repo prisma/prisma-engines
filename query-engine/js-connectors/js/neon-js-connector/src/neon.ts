@@ -119,10 +119,10 @@ class PrismaNeon implements Connector, Closeable {
   }
 
   /**
- * Run a query against the database, returning the result set.
- * Should the query fail due to a connection error, the connection is
- * marked as unhealthy.
- */
+   * Run a query against the database, returning the result set.
+   * Should the query fail due to a connection error, the connection is
+   * marked as unhealthy.
+   */
   private async performIO(query: Query) {
     const { sql, args: values } = query
 
