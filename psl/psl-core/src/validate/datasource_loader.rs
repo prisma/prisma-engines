@@ -245,6 +245,7 @@ fn get_relation_mode(
             let relation_mode = match coerce::string(rm, diagnostics)? {
                 "prisma" => RelationMode::Prisma,
                 "foreignKeys" => RelationMode::ForeignKeys,
+                "prismaSkipIntegrity" => RelationMode::PrismaSkipIntegrity,
                 other => {
                     let message = format!(
                         "Invalid relation mode setting: \"{other}\". Supported values: \"prisma\", \"foreignKeys\"",
