@@ -199,9 +199,9 @@ where
             let selection_order: Vec<String> = read::utils::collect_selection_order(&nested_fields);
             let selected_fields = read::utils::collect_selected_scalars(&nested_fields, &model);
 
-            Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithExplicitSelection(
+            Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithSelection(
                 UpdateRecordWithSelection {
-                    name: field.name.to_owned(),
+                    name: Some(field.name.to_owned()),
                     model: model.clone(),
                     record_filter: filter.into(),
                     args,
@@ -211,11 +211,17 @@ where
             )))
         // Otherwise, fallback to the primary identifier, that will be used to fulfill other nested operations requirements
         } else {
-            Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithImplicitSelection(
-                UpdateRecordWithoutSelection {
+            let selected_fields = model.primary_identifier();
+            let selection_order = selected_fields.db_names().collect();
+
+            Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithSelection(
+                UpdateRecordWithSelection {
+                    name: None,
                     model: model.clone(),
                     record_filter: filter.into(),
                     args,
+                    selected_fields,
+                    selection_order,
                 },
             )))
         }

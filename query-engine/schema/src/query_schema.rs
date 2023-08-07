@@ -1,7 +1,7 @@
 use crate::{IdentifierType, ObjectType, OutputField};
 use prisma_models::{ast, InternalDataModel};
 use psl::{
-    datamodel_connector::{Connector, ConnectorCapability, RelationMode},
+    datamodel_connector::{Connector, ConnectorCapabilities, ConnectorCapability, RelationMode},
     PreviewFeature, PreviewFeatures,
 };
 use std::{collections::HashMap, fmt};
@@ -102,6 +102,10 @@ impl QuerySchema {
 
     pub fn has_capability(&self, capability: ConnectorCapability) -> bool {
         self.connector.has_capability(capability)
+    }
+
+    pub fn capabilities(&self) -> ConnectorCapabilities {
+        self.connector.capabilities()
     }
 
     pub fn find_mutation_field(&self, name: &str) -> Option<OutputField<'_>> {
