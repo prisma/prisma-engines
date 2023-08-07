@@ -8,7 +8,7 @@ use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList, InsertTextFormat};
 use psl_core::{
     datamodel_connector::{
-        Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, NativeTypeConstructor,
+        Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
         NativeTypeInstance, RelationMode, StringFilter,
     },
     diagnostics::Diagnostics,
@@ -559,6 +559,10 @@ impl Connector for PostgresDatamodelConnector {
         let properties = PostgresDatasourceProperties { extensions };
 
         DatasourceConnectorData::new(Box::new(properties))
+    }
+
+    fn flavour(&self) -> Flavour {
+        Flavour::Postgres
     }
 }
 

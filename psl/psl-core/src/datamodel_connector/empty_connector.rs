@@ -1,4 +1,4 @@
-use crate::datamodel_connector::*;
+pub(crate) use crate::datamodel_connector::*;
 use diagnostics::{DatamodelError, Span};
 use enumflags2::BitFlags;
 
@@ -70,6 +70,10 @@ impl Connector for EmptyDatamodelConnector {
 
     fn validate_url(&self, _url: &str) -> Result<(), String> {
         Ok(())
+    }
+
+    fn flavour(&self) -> Flavour {
+        unreachable!()
     }
 }
 
