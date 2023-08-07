@@ -414,6 +414,21 @@
 <a href="#414" id="414">414</a>
 <a href="#415" id="415">415</a>
 <a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Write query AST
 </span><span class="kw">use super</span>::{FilteredNestedMutation, FilteredQuery};
 <span class="kw">use crate</span>::{RecordQuery, ToGraphviz};
@@ -444,8 +459,7 @@
         <span class="kw">let </span>args = <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::CreateRecord(<span class="kw-2">ref mut </span>x) =&gt; <span class="kw-2">&amp;mut </span>x.args,
             <span class="self">Self</span>::UpdateRecord(<span class="kw-2">ref mut </span>x) =&gt; <span class="kw">match </span>x {
-                UpdateRecord::WithExplicitSelection(u) =&gt; <span class="kw-2">&amp;mut </span>u.args,
-                UpdateRecord::WithImplicitSelection(u) =&gt; <span class="kw-2">&amp;mut </span>u.args,
+                UpdateRecord::WithSelection(u) =&gt; <span class="kw-2">&amp;mut </span>u.args,
                 UpdateRecord::WithoutSelection(u) =&gt; <span class="kw-2">&amp;mut </span>u.args,
             },
             <span class="self">Self</span>::UpdateManyRecords(x) =&gt; <span class="kw-2">&amp;mut </span>x.args,
@@ -471,30 +485,54 @@
         }
     }
 
-    <span class="kw">pub fn </span>returns(<span class="kw-2">&amp;</span><span class="self">self</span>, field_selection: <span class="kw-2">&amp;</span>FieldSelection) -&gt; bool {
-        <span class="kw">let </span>returns_id = <span class="kw-2">&amp;</span><span class="self">self</span>.model().primary_identifier() == field_selection;
+    <span class="doccomment">/// Checks whether or not the field selection of this query satisfies the inputted field selection.
+    </span><span class="kw">pub fn </span>satisfies(<span class="kw-2">&amp;</span><span class="self">self</span>, field_selection: <span class="kw-2">&amp;</span>FieldSelection) -&gt; bool {
+        <span class="self">self</span>.returns()
+            .map(|fs| fs.is_superset_of(field_selection))
+            .unwrap_or(<span class="bool-val">false</span>)
+    }
 
-        <span class="comment">// Write operations only return IDs at the moment, so anything different
-        // from the primary ID is automatically not returned.
-        // DeleteMany, Connect and Disconnect do not return anything.
-        </span><span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::CreateRecord(<span class="kw">_</span>) =&gt; returns_id,
-            <span class="self">Self</span>::CreateManyRecords(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-            <span class="self">Self</span>::UpdateRecord(UpdateRecord::WithExplicitSelection(ur)) =&gt; {
-                ur.selected_fields.is_superset_of(field_selection)
-            }
-            <span class="self">Self</span>::UpdateRecord(UpdateRecord::WithImplicitSelection(ur)) =&gt; {
-                ur.selected_fields().is_superset_of(field_selection)
-            }
+    <span class="doccomment">/// Returns the field selection of a write query.
+    ///
+    /// Most write operations only return IDs at the moment, so anything different
+    /// from the primary ID is automatically not returned.
+    /// DeleteMany, Connect and Disconnect do not return anything.
+    </span><span class="kw">fn </span>returns(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;FieldSelection&gt; {
+        <span class="kw">let </span>returns_id = <span class="prelude-val">Some</span>(<span class="self">self</span>.model().primary_identifier());
+
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::CreateRecord(cr) =&gt; <span class="prelude-val">Some</span>(cr.selected_fields.clone()),
+            <span class="self">Self</span>::CreateManyRecords(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            <span class="self">Self</span>::UpdateRecord(UpdateRecord::WithSelection(ur)) =&gt; <span class="prelude-val">Some</span>(ur.selected_fields.clone()),
             <span class="self">Self</span>::UpdateRecord(UpdateRecord::WithoutSelection(<span class="kw">_</span>)) =&gt; returns_id,
             <span class="self">Self</span>::DeleteRecord(<span class="kw">_</span>) =&gt; returns_id,
             <span class="self">Self</span>::UpdateManyRecords(<span class="kw">_</span>) =&gt; returns_id,
-            <span class="self">Self</span>::DeleteManyRecords(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-            <span class="self">Self</span>::ConnectRecords(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-            <span class="self">Self</span>::DisconnectRecords(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-            <span class="self">Self</span>::ExecuteRaw(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-            <span class="self">Self</span>::QueryRaw(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+            <span class="self">Self</span>::DeleteManyRecords(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            <span class="self">Self</span>::ConnectRecords(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            <span class="self">Self</span>::DisconnectRecords(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            <span class="self">Self</span>::ExecuteRaw(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            <span class="self">Self</span>::QueryRaw(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
             <span class="self">Self</span>::Upsert(<span class="kw">_</span>) =&gt; returns_id,
+        }
+    }
+
+    <span class="doccomment">/// Updates the field selection of the query to satisfy the inputted FieldSelection.
+    </span><span class="kw">pub fn </span>satisfy_dependency(<span class="kw-2">&amp;mut </span><span class="self">self</span>, fields: FieldSelection) {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::CreateRecord(cr) =&gt; cr.selected_fields = cr.selected_fields.clone().merge(fields),
+            <span class="self">Self</span>::UpdateRecord(UpdateRecord::WithSelection(ur)) =&gt; {
+                ur.selected_fields = ur.selected_fields.clone().merge(fields)
+            }
+            <span class="self">Self</span>::UpdateRecord(UpdateRecord::WithoutSelection(<span class="kw">_</span>)) =&gt; (),
+            <span class="self">Self</span>::CreateManyRecords(<span class="kw">_</span>) =&gt; (),
+            <span class="self">Self</span>::DeleteRecord(<span class="kw">_</span>) =&gt; (),
+            <span class="self">Self</span>::UpdateManyRecords(<span class="kw">_</span>) =&gt; (),
+            <span class="self">Self</span>::DeleteManyRecords(<span class="kw">_</span>) =&gt; (),
+            <span class="self">Self</span>::ConnectRecords(<span class="kw">_</span>) =&gt; (),
+            <span class="self">Self</span>::DisconnectRecords(<span class="kw">_</span>) =&gt; (),
+            <span class="self">Self</span>::ExecuteRaw(<span class="kw">_</span>) =&gt; (),
+            <span class="self">Self</span>::QueryRaw(<span class="kw">_</span>) =&gt; (),
+            <span class="self">Self</span>::Upsert(<span class="kw">_</span>) =&gt; (),
         }
     }
 
@@ -559,7 +597,13 @@
 <span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>WriteQuery {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::CreateRecord(q) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;CreateRecord(model: {}, args: {:?})&quot;</span>, q.model.name(), q.args),
+            <span class="self">Self</span>::CreateRecord(q) =&gt; <span class="macro">write!</span>(
+                f,
+                <span class="string">&quot;CreateRecord(model: {}, args: {:?}, selected_fields: {:?})&quot;</span>,
+                q.model.name(),
+                q.args,
+                q.selected_fields.to_string()
+            ),
             <span class="self">Self</span>::CreateManyRecords(q) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;CreateManyRecord(model: {})&quot;</span>, q.model.name()),
             <span class="self">Self</span>::UpdateRecord(q) =&gt; <span class="macro">write!</span>(
                 f,
@@ -638,10 +682,8 @@
 <span class="attr">#[derive(Debug, Clone)]
 #[allow(clippy::enum_variant_names)]
 </span><span class="kw">pub enum </span>UpdateRecord {
-    <span class="doccomment">/// Update with explicitly selected fields that will eventually be serialized as results.
-    </span>WithExplicitSelection(UpdateRecordWithSelection),
-    <span class="doccomment">/// Update with implicit selection set (primary_identifier) that will only be used to fulfill other nodes requirements.
-    </span>WithImplicitSelection(UpdateRecordWithoutSelection),
+    <span class="doccomment">/// Update with explicitly selected fields.
+    </span>WithSelection(UpdateRecordWithSelection),
     <span class="doccomment">/// Update without any selection set. A subsequent read is required to fulfill other nodes requirements.
     </span>WithoutSelection(UpdateRecordWithoutSelection),
 }
@@ -649,48 +691,42 @@
 <span class="kw">impl </span>UpdateRecord {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>args(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>WriteArgs {
         <span class="kw">match </span><span class="self">self </span>{
-            UpdateRecord::WithExplicitSelection(u) =&gt; <span class="kw-2">&amp;</span>u.args,
-            UpdateRecord::WithImplicitSelection(u) =&gt; <span class="kw-2">&amp;</span>u.args,
+            UpdateRecord::WithSelection(u) =&gt; <span class="kw-2">&amp;</span>u.args,
             UpdateRecord::WithoutSelection(u) =&gt; <span class="kw-2">&amp;</span>u.args,
         }
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Model {
         <span class="kw">match </span><span class="self">self </span>{
-            UpdateRecord::WithExplicitSelection(u) =&gt; <span class="kw-2">&amp;</span>u.model,
-            UpdateRecord::WithImplicitSelection(u) =&gt; <span class="kw-2">&amp;</span>u.model,
+            UpdateRecord::WithSelection(u) =&gt; <span class="kw-2">&amp;</span>u.model,
             UpdateRecord::WithoutSelection(u) =&gt; <span class="kw-2">&amp;</span>u.model,
         }
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>record_filter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>RecordFilter {
         <span class="kw">match </span><span class="self">self </span>{
-            UpdateRecord::WithExplicitSelection(u) =&gt; <span class="kw-2">&amp;</span>u.record_filter,
-            UpdateRecord::WithImplicitSelection(u) =&gt; <span class="kw-2">&amp;</span>u.record_filter,
+            UpdateRecord::WithSelection(u) =&gt; <span class="kw-2">&amp;</span>u.record_filter,
             UpdateRecord::WithoutSelection(u) =&gt; <span class="kw-2">&amp;</span>u.record_filter,
         }
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>record_filter_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>RecordFilter {
         <span class="kw">match </span><span class="self">self </span>{
-            UpdateRecord::WithExplicitSelection(u) =&gt; <span class="kw-2">&amp;mut </span>u.record_filter,
-            UpdateRecord::WithImplicitSelection(u) =&gt; <span class="kw-2">&amp;mut </span>u.record_filter,
+            UpdateRecord::WithSelection(u) =&gt; <span class="kw-2">&amp;mut </span>u.record_filter,
             UpdateRecord::WithoutSelection(u) =&gt; <span class="kw-2">&amp;mut </span>u.record_filter,
         }
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>selected_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;FieldSelection&gt; {
         <span class="kw">match </span><span class="self">self </span>{
-            UpdateRecord::WithExplicitSelection(u) =&gt; <span class="prelude-val">Some</span>(u.selected_fields.clone()),
-            UpdateRecord::WithImplicitSelection(u) =&gt; <span class="prelude-val">Some</span>(u.selected_fields()),
+            UpdateRecord::WithSelection(u) =&gt; <span class="prelude-val">Some</span>(u.selected_fields.clone()),
             UpdateRecord::WithoutSelection(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_record_filter(<span class="kw-2">&amp;mut </span><span class="self">self</span>, record_filter: RecordFilter) {
         <span class="kw">match </span><span class="self">self </span>{
-            UpdateRecord::WithExplicitSelection(u) =&gt; u.record_filter = record_filter,
-            UpdateRecord::WithImplicitSelection(u) =&gt; u.record_filter = record_filter,
+            UpdateRecord::WithSelection(u) =&gt; u.record_filter = record_filter,
             UpdateRecord::WithoutSelection(u) =&gt; u.record_filter = record_filter,
         }
     }
@@ -698,7 +734,8 @@
 
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>UpdateRecordWithSelection {
-    <span class="kw">pub </span>name: String,
+    <span class="comment">// Used for serialization. When `None`, the result will only be used to fulfill other nodes requirement.
+    </span><span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>model: Model,
     <span class="kw">pub </span>record_filter: RecordFilter,
     <span class="kw">pub </span>args: WriteArgs,
@@ -711,12 +748,6 @@
     <span class="kw">pub </span>model: Model,
     <span class="kw">pub </span>record_filter: RecordFilter,
     <span class="kw">pub </span>args: WriteArgs,
-}
-
-<span class="kw">impl </span>UpdateRecordWithoutSelection {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>selected_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FieldSelection {
-        <span class="self">self</span>.model.primary_identifier()
-    }
 }
 
 <span class="attr">#[derive(Debug, Clone)]
@@ -765,8 +796,7 @@
 <span class="kw">impl </span>FilteredQuery <span class="kw">for </span>UpdateRecord {
     <span class="kw">fn </span>get_filter(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>Filter&gt; {
         <span class="kw">match </span><span class="self">self </span>{
-            UpdateRecord::WithExplicitSelection(u) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>u.record_filter.filter),
-            UpdateRecord::WithImplicitSelection(u) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>u.record_filter.filter),
+            UpdateRecord::WithSelection(u) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>u.record_filter.filter),
             UpdateRecord::WithoutSelection(u) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>u.record_filter.filter),
         }
     }

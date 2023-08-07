@@ -331,10 +331,14 @@
 <a href="#331" id="331">331</a>
 <a href="#332" id="332">332</a>
 <a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{IdentifierType, ObjectType, OutputField};
 <span class="kw">use </span>prisma_models::{ast, InternalDataModel};
 <span class="kw">use </span>psl::{
-    datamodel_connector::{Connector, ConnectorCapability, RelationMode},
+    datamodel_connector::{Connector, ConnectorCapabilities, ConnectorCapability, RelationMode},
     PreviewFeature, PreviewFeatures,
 };
 <span class="kw">use </span>std::{collections::HashMap, fmt};
@@ -435,6 +439,10 @@
 
     <span class="kw">pub fn </span>has_capability(<span class="kw-2">&amp;</span><span class="self">self</span>, capability: ConnectorCapability) -&gt; bool {
         <span class="self">self</span>.connector.has_capability(capability)
+    }
+
+    <span class="kw">pub fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectorCapabilities {
+        <span class="self">self</span>.connector.capabilities()
     }
 
     <span class="kw">pub fn </span>find_mutation_field(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;OutputField&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {

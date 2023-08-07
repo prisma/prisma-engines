@@ -193,6 +193,13 @@
 <a href="#193" id="193">193</a>
 <a href="#194" id="194">194</a>
 <a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     interpreter::{InterpretationResult, InterpreterError},
     query_ast::<span class="kw-2">*</span>,
@@ -276,10 +283,10 @@
         .<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="kw">match </span>q {
-        UpdateRecord::WithExplicitSelection(q) =&gt; {
+        UpdateRecord::WithSelection(q) <span class="kw">if </span>q.name.is_some() =&gt; {
             <span class="kw">let </span>res = res
                 .map(|res| RecordSelection {
-                    name: q.name,
+                    name: q.name.unwrap(),
                     fields: q.selection_order,
                     scalars: res.into(),
                     nested: <span class="macro">vec!</span>[],
@@ -290,7 +297,14 @@
 
             <span class="prelude-val">Ok</span>(QueryResult::RecordSelection(res))
         }
-        UpdateRecord::WithoutSelection(<span class="kw">_</span>) | UpdateRecord::WithImplicitSelection(<span class="kw">_</span>) =&gt; {
+        UpdateRecord::WithSelection(q) =&gt; {
+            <span class="kw">let </span>res = res
+                .map(|record| record.extract_selection_result(<span class="kw-2">&amp;</span>q.selected_fields))
+                .transpose()<span class="question-mark">?</span>;
+
+            <span class="prelude-val">Ok</span>(QueryResult::Id(res))
+        }
+        UpdateRecord::WithoutSelection(<span class="kw">_</span>) =&gt; {
             <span class="kw">let </span>res = res
                 .map(|record| record.extract_selection_result(<span class="kw-2">&amp;</span>q.model().primary_identifier()))
                 .transpose()<span class="question-mark">?</span>;

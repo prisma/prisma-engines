@@ -213,6 +213,27 @@
 <a href="#213" id="213">213</a>
 <a href="#214" id="214">214</a>
 <a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Prisma read query AST
 </span><span class="kw">use </span><span class="kw">super</span>::FilteredQuery;
 <span class="kw">use </span><span class="kw">crate</span>::ToGraphviz;
@@ -231,13 +252,34 @@
 }
 
 <span class="kw">impl </span>ReadQuery {
-    <span class="doccomment">/// Checks whether or not this query returns a specific set of fields from the underlying data source model.
-    </span><span class="kw">pub fn </span>returns(<span class="kw-2">&amp;</span><span class="self">self</span>, field_selection: <span class="kw-2">&amp;</span>FieldSelection) -&gt; bool {
+    <span class="doccomment">/// Checks whether or not the field selection of this query satisfies the inputted field selection.
+    </span><span class="kw">pub fn </span>satisfies(<span class="kw-2">&amp;</span><span class="self">self</span>, expected: <span class="kw-2">&amp;</span>FieldSelection) -&gt; bool {
+        <span class="self">self</span>.returns().map(|sel| sel.is_superset_of(expected)).unwrap_or(<span class="bool-val">false</span>)
+    }
+
+    <span class="doccomment">/// Returns the field selection of a read query.
+    </span><span class="kw">fn </span>returns(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>FieldSelection&gt; {
         <span class="kw">match </span><span class="self">self </span>{
-            ReadQuery::RecordQuery(x) =&gt; x.selected_fields.is_superset_of(field_selection),
-            ReadQuery::ManyRecordsQuery(x) =&gt; x.selected_fields.is_superset_of(field_selection),
-            ReadQuery::RelatedRecordsQuery(x) =&gt; x.selected_fields.is_superset_of(field_selection),
-            ReadQuery::AggregateRecordsQuery(_x) =&gt; <span class="bool-val">false</span>,
+            ReadQuery::RecordQuery(x) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>x.selected_fields),
+            ReadQuery::ManyRecordsQuery(x) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>x.selected_fields),
+            ReadQuery::RelatedRecordsQuery(x) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>x.selected_fields),
+            ReadQuery::AggregateRecordsQuery(_x) =&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="doccomment">/// Updates the field selection of the query to satisfy the inputted FieldSelection.
+    </span><span class="kw">pub fn </span>satisfy_dependency(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field_selection: FieldSelection) {
+        <span class="kw">match </span><span class="self">self </span>{
+            ReadQuery::RecordQuery(x) =&gt; {
+                x.selected_fields = x.selected_fields.clone().merge(field_selection);
+            }
+            ReadQuery::ManyRecordsQuery(x) =&gt; {
+                x.selected_fields = x.selected_fields.clone().merge(field_selection);
+            }
+            ReadQuery::RelatedRecordsQuery(x) =&gt; {
+                x.selected_fields = x.selected_fields.clone().merge(field_selection);
+            }
+            ReadQuery::AggregateRecordsQuery(<span class="kw">_</span>) =&gt; (),
         }
     }
 

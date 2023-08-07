@@ -222,7 +222,7 @@
         }<span class="question-mark">?</span>;
 
         <span class="comment">// Run final transformations.
-        </span>graph.finalize()<span class="question-mark">?</span>;
+        </span>graph.finalize(<span class="self">self</span>.query_schema.capabilities())<span class="question-mark">?</span>;
         <span class="macro">trace!</span>(<span class="string">&quot;{}&quot;</span>, graph);
 
         <span class="comment">// Used to debug generated graph.

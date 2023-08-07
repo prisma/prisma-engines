@@ -302,6 +302,12 @@
 <a href="#302" id="302">302</a>
 <a href="#303" id="303">303</a>
 <a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::query_graph_builder::write::write_args_parser::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{
@@ -503,9 +509,9 @@
             <span class="kw">let </span>selection_order: Vec&lt;String&gt; = read::utils::collect_selection_order(<span class="kw-2">&amp;</span>nested_fields);
             <span class="kw">let </span>selected_fields = read::utils::collect_selected_scalars(<span class="kw-2">&amp;</span>nested_fields, <span class="kw-2">&amp;</span>model);
 
-            Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithExplicitSelection(
+            Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithSelection(
                 UpdateRecordWithSelection {
-                    name: field.name.to_owned(),
+                    name: <span class="prelude-val">Some</span>(field.name.to_owned()),
                     model: model.clone(),
                     record_filter: filter.into(),
                     args,
@@ -515,11 +521,17 @@
             )))
         <span class="comment">// Otherwise, fallback to the primary identifier, that will be used to fulfill other nested operations requirements
         </span>} <span class="kw">else </span>{
-            Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithImplicitSelection(
-                UpdateRecordWithoutSelection {
+            <span class="kw">let </span>selected_fields = model.primary_identifier();
+            <span class="kw">let </span>selection_order = selected_fields.db_names().collect();
+
+            Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithSelection(
+                UpdateRecordWithSelection {
+                    name: <span class="prelude-val">None</span>,
                     model: model.clone(),
                     record_filter: filter.into(),
                     args,
+                    selected_fields,
+                    selection_order,
                 },
             )))
         }
