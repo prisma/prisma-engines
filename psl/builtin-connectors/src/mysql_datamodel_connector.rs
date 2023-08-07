@@ -8,7 +8,7 @@ use enumflags2::BitFlags;
 use lsp_types::CompletionList;
 use psl_core::{
     datamodel_connector::{
-        Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, NativeTypeConstructor,
+        Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
         NativeTypeInstance, RelationMode,
     },
     diagnostics::{DatamodelError, Diagnostics, Span},
@@ -278,5 +278,9 @@ impl Connector for MySqlDatamodelConnector {
         if config.preview_features().contains(PreviewFeature::MultiSchema) && !ds.schemas_defined() {
             completions::schemas_completion(completion_list);
         }
+    }
+
+    fn flavour(&self) -> Flavour {
+        Flavour::Mysql
     }
 }
