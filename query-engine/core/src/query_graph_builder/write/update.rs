@@ -26,7 +26,7 @@ pub(crate) fn update_record(
     let data_argument = field.arguments.lookup(args::DATA).unwrap();
     let data_map: ParsedInputMap<'_> = data_argument.value.try_into()?;
 
-    let can_use_atomic_update = can_use_atomic_update(query_schema, &field);
+    let can_use_atomic_update = can_use_atomic_update(query_schema, &model, &data_map, &field);
 
     let update_node = update_record_node(
         graph,
@@ -87,6 +87,8 @@ pub(crate) fn update_record(
         )?;
     // Otherwise, perform the update, and then do an additional read.
     } else {
+        graph.flag_transactional();
+
         let read_query = read::find_unique(field, model.clone())?;
         let read_node = graph.create_node(Query::Read(read_query));
 
@@ -191,23 +193,15 @@ where
     // 1. Save a SELECT statement
     // 2. Avoid from computing the ids in memory if they are updated. See `update_one_without_selection` function.
     let update_parent = if query_schema.has_capability(ConnectorCapability::UpdateReturning) {
-        let has_nested_selection = field.map(|f| f.has_nested_selection()).unwrap_or(false);
-
-        // If there are nested operations or nested selections, then make the graph transactional.
-        // Otherwise, it means the operation can be done in a single, atomic update.
-        if !update_args.nested.is_empty() || has_nested_selection {
-            graph.flag_transactional();
-        }
-
         // If there's a selected field, fulfill the scalar selection set.
         if let Some(field) = field.cloned() {
             let nested_fields = field.nested_fields.unwrap().fields;
             let selection_order: Vec<String> = read::utils::collect_selection_order(&nested_fields);
             let selected_fields = read::utils::collect_selected_scalars(&nested_fields, &model);
 
-            Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithExplicitSelection(
+            Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithSelection(
                 UpdateRecordWithSelection {
-                    name: field.name.to_owned(),
+                    name: Some(field.name.to_owned()),
                     model: model.clone(),
                     record_filter: filter.into(),
                     args,
@@ -217,18 +211,21 @@ where
             )))
         // Otherwise, fallback to the primary identifier, that will be used to fulfill other nested operations requirements
         } else {
-            Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithImplicitSelection(
-                UpdateRecordWithoutSelection {
+            let selected_fields = model.primary_identifier();
+            let selection_order = selected_fields.db_names().collect();
+
+            Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithSelection(
+                UpdateRecordWithSelection {
+                    name: None,
                     model: model.clone(),
                     record_filter: filter.into(),
                     args,
+                    selected_fields,
+                    selection_order,
                 },
             )))
         }
     } else {
-        // If the connector does not support returning the updated values, it's always transactional as we need another read after the update.
-        graph.flag_transactional();
-
         Query::Write(WriteQuery::UpdateRecord(UpdateRecord::WithoutSelection(
             UpdateRecordWithoutSelection {
                 model: model.clone(),
@@ -288,7 +285,12 @@ where
 /// We only perform such update when:
 /// 1. The connector supports returning updated values
 /// 2. The selection set contains no relation
-fn can_use_atomic_update(query_schema: &QuerySchema, field: &ParsedField<'_>) -> bool {
+fn can_use_atomic_update(
+    query_schema: &QuerySchema,
+    model: &Model,
+    data_map: &ParsedInputMap<'_>,
+    field: &ParsedField<'_>,
+) -> bool {
     // If the connector does not support RETURNING at all
     if !query_schema.has_capability(ConnectorCapability::UpdateReturning) {
         return false;
@@ -296,6 +298,11 @@ fn can_use_atomic_update(query_schema: &QuerySchema, field: &ParsedField<'_>) ->
 
     // If the operation has nested selection sets
     if field.has_nested_selection() {
+        return false;
+    }
+
+    // If the operation has nested operations
+    if WriteArgsParser::has_nested_operation(model, data_map) {
         return false;
     }
 

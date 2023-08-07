@@ -66,7 +66,8 @@ features = [
   "mysql",
   "postgresql",
   "sqlite",
-  "uuid"
+  "uuid",
+  "connector",
 ]
 
 [profile.dev.package.backtrace]

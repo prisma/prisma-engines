@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use crate::datamodel_connector::*;
 use enumflags2::BitFlags;
 
@@ -9,14 +7,14 @@ use enumflags2::BitFlags;
 /// Rather than a unit struct per individual connector, like we have for the rest
 /// of the builtin connectors, we have a single struct which state represents the
 /// features that vary in this connector with respect to a cannonical connector
-/// for the flavor of SQL the particular JsConnector speaks.
+/// for the flavour of SQL the particular JsConnector speaks.
 ///
 /// For example, the _planetscale serverless_ connector is compatible with MySQL,
-/// so it reuses the builtin MySQL connector (the cannonical for the MySQL flavor)
+/// so it reuses the builtin MySQL connector (the cannonical for the MySQL flavour)
 /// for most of its features.
 #[derive(Copy, Clone)]
 pub struct JsConnector {
-    pub flavor: Flavor,
+    pub flavour: Flavour,
     pub canonical_connector: &'static dyn Connector,
 
     pub provider_name: &'static str,
@@ -31,23 +29,6 @@ impl JsConnector {
     /// then its a provider for a JS connector.
     pub fn is_provider(name: &str) -> bool {
         name.starts_with("@prisma/")
-    }
-}
-
-#[derive(Copy, Clone)]
-pub enum Flavor {
-    MySQL,
-    Postgres,
-}
-
-impl FromStr for Flavor {
-    type Err = String;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_lowercase().as_str() {
-            "mysql" => Ok(Self::MySQL),
-            "postgres" => Ok(Self::Postgres),
-            _ => Err(format!("Unknown flavor: {}", s)),
-        }
     }
 }
 
@@ -145,5 +126,9 @@ impl Connector for JsConnector {
         } else {
             self.canonical_connector.allowed_relation_mode_settings()
         }
+    }
+
+    fn flavour(&self) -> Flavour {
+        self.flavour
     }
 }

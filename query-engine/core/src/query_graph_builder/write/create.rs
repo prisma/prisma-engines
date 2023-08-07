@@ -151,7 +151,7 @@ fn can_use_atomic_create(
         return false;
     }
 
-    // If the operation has nested creates
+    // If the operation has nested operations
     if WriteArgsParser::has_nested_operation(model, data_map) {
         return false;
     }

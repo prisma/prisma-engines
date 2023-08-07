@@ -7,6 +7,7 @@
 //! plus some transformation of types to adhere to what a quaint::Value expresses.
 //!
 
+mod error;
 mod proxy;
 mod queryable;
 pub use queryable::JsQueryable;

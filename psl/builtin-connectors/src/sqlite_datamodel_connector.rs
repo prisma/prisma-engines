@@ -1,7 +1,7 @@
 use enumflags2::BitFlags;
 use psl_core::{
     datamodel_connector::{
-        Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, NativeTypeConstructor,
+        Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
         NativeTypeInstance,
     },
     diagnostics::{DatamodelError, Diagnostics, Span},
@@ -127,5 +127,9 @@ impl Connector for SqliteDatamodelConnector {
         }
 
         Ok(())
+    }
+
+    fn flavour(&self) -> Flavour {
+        Flavour::Sqlite
     }
 }

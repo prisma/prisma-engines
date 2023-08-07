@@ -1,7 +1,10 @@
-use crate::proxy::{self, JSResultSet, Proxy, Query};
+use crate::{
+    error::into_quaint_error,
+    proxy::{self, FlavourSpecificResultSet, JSResultSet, Proxy, Query},
+};
 use async_trait::async_trait;
 use napi::JsObject;
-use psl::JsConnectorFlavor;
+use psl::datamodel_connector::Flavour;
 use quaint::{
     connector::IsolationLevel,
     prelude::{Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable},
@@ -15,7 +18,7 @@ use tracing::{info_span, Instrument};
 /// types to types that can be translated into javascript and viceversa. This is to let the rest of
 /// the query engine work as if it was using quaint itself. The aforementioned transformations are:
 ///
-/// Transforming a `quaint::ast::Query` into SQL by visiting it for the specific flavor of SQL
+/// Transforming a `quaint::ast::Query` into SQL by visiting it for the specific flavour of SQL
 /// expected by the client connector. (eg. using the mysql visitor for the Planetscale client
 /// connector)
 ///
@@ -26,12 +29,21 @@ use tracing::{info_span, Instrument};
 #[derive(Clone)]
 pub struct JsQueryable {
     pub(crate) proxy: Proxy,
-    pub(crate) flavor: JsConnectorFlavor,
+    pub(crate) flavour: Flavour,
 }
 
 impl JsQueryable {
-    pub fn new(proxy: Proxy, flavor: JsConnectorFlavor) -> Self {
-        Self { proxy, flavor }
+    pub fn new(proxy: Proxy, flavour: Flavour) -> Self {
+        Self { proxy, flavour }
+    }
+
+    /// visit a query according to the flavour of the JS connector
+    pub fn visit_query<'a>(&self, q: QuaintQuery<'a>) -> quaint::Result<(String, Vec<Value<'a>>)> {
+        match self.flavour {
+            Flavour::Mysql => visitor::Mysql::build(q),
+            Flavour::Postgres => visitor::Postgres::build(q),
+            _ => unimplemented!("Unsupported flavour for JS connector {:?}", self.flavour),
+        }
     }
 }
 
@@ -51,10 +63,7 @@ impl std::fmt::Debug for JsQueryable {
 impl QuaintQueryable for JsQueryable {
     /// Execute the given query.
     async fn query(&self, q: QuaintQuery<'_>) -> quaint::Result<ResultSet> {
-        let (sql, params) = match self.flavor {
-            JsConnectorFlavor::MySQL => visitor::Mysql::build(q)?,
-            JsConnectorFlavor::Postgres => visitor::Postgres::build(q)?,
-        };
+        let (sql, params) = self.visit_query(q)?;
         self.query_raw(&sql, &params).await
     }
 
@@ -76,10 +85,7 @@ impl QuaintQueryable for JsQueryable {
 
     /// Execute the given query, returning the number of affected rows.
     async fn execute(&self, q: QuaintQuery<'_>) -> quaint::Result<u64> {
-        let (sql, params) = match self.flavor {
-            JsConnectorFlavor::MySQL => visitor::Mysql::build(q)?,
-            JsConnectorFlavor::Postgres => visitor::Postgres::build(q)?,
-        };
+        let (sql, params) = self.visit_query(q)?;
         self.execute_raw(&sql, &params).await
     }
 
@@ -105,7 +111,6 @@ impl QuaintQueryable for JsQueryable {
     /// prepared statements.
     async fn raw_cmd(&self, cmd: &str) -> quaint::Result<()> {
         self.execute_raw(cmd, &[]).await?;
-
         Ok(())
     }
 
@@ -121,8 +126,7 @@ impl QuaintQueryable for JsQueryable {
 
     /// Returns false, if connection is considered to not be in a working state.
     fn is_healthy(&self) -> bool {
-        // TODO: use self.driver.is_healthy()
-        true
+        self.proxy.is_healthy().unwrap_or(false)
     }
 
     /// Sets the transaction isolation level to given value.
@@ -144,8 +148,9 @@ impl JsQueryable {
         Query { sql, args }
     }
 
-    async fn transform_result_set(result_set: JSResultSet) -> quaint::Result<ResultSet> {
-        Ok(ResultSet::from(result_set))
+    async fn transform_result_set(flavour: Flavour, result_set: JSResultSet) -> quaint::Result<ResultSet> {
+        let flavoured_js_result_set = FlavourSpecificResultSet((flavour, result_set));
+        Ok(ResultSet::from(flavoured_js_result_set))
     }
 
     async fn do_query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
@@ -153,13 +158,17 @@ impl JsQueryable {
         let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
         let query = Self::build_query(sql, params).instrument(serialization_span).await;
 
-        // Todo: convert napi::Error to quaint::error::Error.
         let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);
-        let result_set = self.proxy.query_raw(query).instrument(sql_span).await.unwrap();
+        let result_set = self
+            .proxy
+            .query_raw(query)
+            .instrument(sql_span)
+            .await
+            .map_err(into_quaint_error)?;
 
         let len = result_set.len();
         let deserialization_span = info_span!("js:query:result", user_facing = true, "length" = %len);
-        Self::transform_result_set(result_set)
+        Self::transform_result_set(self.flavour, result_set)
             .instrument(deserialization_span)
             .await
     }
@@ -183,7 +192,7 @@ impl From<JsObject> for JsQueryable {
     fn from(driver: JsObject) -> Self {
         let driver = proxy::reify(driver).unwrap();
         Self {
-            flavor: driver.flavor.parse().unwrap(),
+            flavour: driver.flavour.parse().unwrap(),
             proxy: driver,
         }
     }
