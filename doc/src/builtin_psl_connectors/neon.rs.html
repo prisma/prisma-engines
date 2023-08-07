@@ -15,12 +15,12 @@
 <a href="#15" id="15">15</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::postgres_datamodel_connector;
 <span class="kw">use </span>psl_core::{
-    datamodel_connector::RelationMode,
-    js_connector::{Flavor, JsConnector},
+    datamodel_connector::{Flavour, RelationMode},
+    js_connector::JsConnector,
 };
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">static </span>NEON_SERVERLESS: JsConnector = JsConnector {
-    flavor: Flavor::Postgres,
+    flavour: Flavour::Postgres,
     canonical_connector: <span class="kw-2">&amp;</span>postgres_datamodel_connector::PostgresDatamodelConnector,
 
     provider_name: <span class="string">&quot;@prisma/neon&quot;</span>,

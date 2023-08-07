@@ -82,7 +82,11 @@
 <a href="#82" id="82">82</a>
 <a href="#83" id="83">83</a>
 <a href="#84" id="84">84</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::datamodel_connector::<span class="kw-2">*</span>;
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+</pre></div><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="kw">crate</span>::datamodel_connector::<span class="kw-2">*</span>;
 <span class="kw">use </span>diagnostics::{DatamodelError, Span};
 <span class="kw">use </span>enumflags2::BitFlags;
 
@@ -154,6 +158,10 @@
 
     <span class="kw">fn </span>validate_url(<span class="kw-2">&amp;</span><span class="self">self</span>, _url: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
         <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">fn </span>flavour(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Flavour {
+        <span class="macro">unreachable!</span>()
     }
 }
 

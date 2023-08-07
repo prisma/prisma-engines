@@ -197,6 +197,11 @@
 <a href="#197" id="197">197</a>
 <a href="#198" id="198">198</a>
 <a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
 </pre></div><pre class="rust"><code><span class="attr">#![deny(rust_2018_idioms, unsafe_code, missing_docs)]
 #![allow(clippy::needless_collect)] </span><span class="comment">// the implementation of that rule is way too eager, it rejects necessary collects
 </span><span class="attr">#![allow(clippy::derive_partial_eq_without_eq)]
@@ -220,7 +225,10 @@
 
 <span class="kw">use </span>enumflags2::BitFlags;
 <span class="kw">use </span>mongodb_schema_connector::MongoDbSchemaConnector;
-<span class="kw">use </span>psl::{builtin_connectors::<span class="kw-2">*</span>, parser_database::SourceFile, Datasource, PreviewFeature, ValidatedSchema};
+<span class="kw">use </span>psl::{
+    builtin_connectors::<span class="kw-2">*</span>, datamodel_connector::Flavour, parser_database::SourceFile, Datasource, PreviewFeature,
+    ValidatedSchema,
+};
 <span class="kw">use </span>schema_connector::ConnectorParams;
 <span class="kw">use </span>sql_schema_connector::SqlSchemaConnector;
 <span class="kw">use </span>std::{env, path::Path};
@@ -342,21 +350,23 @@
 }
 
 <span class="kw">fn </span>connector_for_provider(provider: <span class="kw-2">&amp;</span>str) -&gt; CoreResult&lt;Box&lt;<span class="kw">dyn </span>schema_connector::SchemaConnector&gt;&gt; {
-    <span class="kw">match </span>provider {
-        p <span class="kw">if </span>POSTGRES.is_provider(p) =&gt; <span class="prelude-val">Ok</span>(Box::new(SqlSchemaConnector::new_postgres())),
-        p <span class="kw">if </span>COCKROACH.is_provider(p) =&gt; <span class="prelude-val">Ok</span>(Box::new(SqlSchemaConnector::new_cockroach())),
-        p <span class="kw">if </span>MYSQL.is_provider(p) =&gt; <span class="prelude-val">Ok</span>(Box::new(SqlSchemaConnector::new_mysql())),
-        p <span class="kw">if </span>SQLITE.is_provider(p) =&gt; <span class="prelude-val">Ok</span>(Box::new(SqlSchemaConnector::new_sqlite())),
-        p <span class="kw">if </span>MSSQL.is_provider(p) =&gt; <span class="prelude-val">Ok</span>(Box::new(SqlSchemaConnector::new_mssql())),
-        <span class="comment">// TODO: adopt a state machine pattern in the mongo connector too
-        </span>p <span class="kw">if </span>MONGODB.is_provider(p) =&gt; <span class="prelude-val">Ok</span>(Box::new(MongoDbSchemaConnector::new(ConnectorParams {
-            connection_string: String::new(),
-            preview_features: Default::default(),
-            shadow_database_connection_string: <span class="prelude-val">None</span>,
-        }))),
-        provider =&gt; <span class="prelude-val">Err</span>(CoreError::from_msg(<span class="macro">format!</span>(
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(connector) = BUILTIN_CONNECTORS.iter().find(|c| c.is_provider(provider)) {
+        <span class="kw">match </span>connector.flavour() {
+            Flavour::Cockroach =&gt; <span class="prelude-val">Ok</span>(Box::new(SqlSchemaConnector::new_cockroach())),
+            Flavour::Mongo =&gt; <span class="prelude-val">Ok</span>(Box::new(MongoDbSchemaConnector::new(ConnectorParams {
+                connection_string: String::new(),
+                preview_features: Default::default(),
+                shadow_database_connection_string: <span class="prelude-val">None</span>,
+            }))),
+            Flavour::Sqlserver =&gt; <span class="prelude-val">Ok</span>(Box::new(SqlSchemaConnector::new_mssql())),
+            Flavour::Mysql =&gt; <span class="prelude-val">Ok</span>(Box::new(SqlSchemaConnector::new_mysql())),
+            Flavour::Postgres =&gt; <span class="prelude-val">Ok</span>(Box::new(SqlSchemaConnector::new_postgres())),
+            Flavour::Sqlite =&gt; <span class="prelude-val">Ok</span>(Box::new(SqlSchemaConnector::new_sqlite())),
+        }
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Err</span>(CoreError::from_msg(<span class="macro">format!</span>(
             <span class="string">&quot;`{provider}` is not a supported connector.&quot;
-        </span>))),
+        </span>)))
     }
 }
 
