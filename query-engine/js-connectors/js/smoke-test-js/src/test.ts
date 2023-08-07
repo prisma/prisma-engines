@@ -3,7 +3,7 @@ import type { Connector, Closeable } from '@jkomyno/prisma-js-connector-utils'
 import type { QueryEngineInstance } from './engines/types/Library'
 import { initQueryEngine } from './util'
 
-type Flavor = Connector['flavor']
+type Flavor = Connector['flavour']
 
 export async function smokeTest(db: Connector & Closeable, prismaSchemaRelativePath: string) {
   // wait for the database pool to be initialized
@@ -17,7 +17,7 @@ export async function smokeTest(db: Connector & Closeable, prismaSchemaRelativeP
 
   // console.log('[nodejs] isHealthy', await conn.isHealthy())
 
-  const test = new SmokeTest(engine, db.flavor)
+  const test = new SmokeTest(engine, db.flavour)
 
   await test.testFindManyTypeTest()
   await test.testCreateAndDeleteChildParent()
@@ -46,7 +46,7 @@ export async function smokeTest(db: Connector & Closeable, prismaSchemaRelativeP
 }
 
 class SmokeTest {
-  constructor(private readonly engine: QueryEngineInstance, readonly flavor: Connector['flavor']) {}
+  constructor(private readonly engine: QueryEngineInstance, readonly flavour: Connector['flavour']) {}
 
   async testFindManyTypeTest() {
     await this.testFindManyTypeTestMySQL()
@@ -243,13 +243,13 @@ type WithFlavorInput
 function withFlavor({ only, exclude }: WithFlavorInput) {
   return function decorator(originalMethod: () => any, _ctx: ClassMethodDecoratorContext<SmokeTest, () => unknown>) {
     return function replacement(this: SmokeTest) {
-      if ((exclude || []).includes(this.flavor)) {
-        console.log(`[nodejs::exclude] Skipping test "${originalMethod.name}" with flavor: ${this.flavor}`)
+      if ((exclude || []).includes(this.flavour)) {
+        console.log(`[nodejs::exclude] Skipping test "${originalMethod.name}" with flavour: ${this.flavour}`)
         return
       }
 
-      if ((only || []).length > 0 && !(only || []).includes(this.flavor)) {
-        console.log(`[nodejs::only] Skipping test "${originalMethod.name}" with flavor: ${this.flavor}`)
+      if ((only || []).length > 0 && !(only || []).includes(this.flavour)) {
+        console.log(`[nodejs::only] Skipping test "${originalMethod.name}" with flavour: ${this.flavour}`)
         return
       }
 

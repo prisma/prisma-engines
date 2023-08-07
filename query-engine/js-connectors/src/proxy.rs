@@ -55,14 +55,7 @@ pub fn reify(js_connector: JsObject) -> napi::Result<Proxy> {
     let version = js_connector.get_named_property("version")?;
     let close: ThreadsafeFunction<(), ErrorStrategy::Fatal> = js_connector.get_named_property("close")?;
     let is_healthy = js_connector.get_named_property("isHealthy")?;
-
-    // TODO: we adjusted the property name from flavor to flavour to be consistent with schema
-    // introspection terms already existing in the codebase. Getting the value from `flavor`
-    // needs to be removed after we have adjusted terms in the drivers's code, which
-    // exists in a different repository.
-    let flavour: JsString = js_connector
-        .get_named_property("flavor")
-        .or(js_connector.get_named_property("flavour"))?;
+    let flavour: JsString = js_connector.get_named_property("flavour")?;
 
     let driver = Proxy {
         query_raw,
