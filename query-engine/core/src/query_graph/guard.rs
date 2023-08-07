@@ -22,6 +22,10 @@ impl<T> Guard<T> {
         self.content.as_ref()
     }
 
+    pub fn borrow_mut(&mut self) -> Option<&mut T> {
+        self.content.as_mut()
+    }
+
     pub fn into_inner(self) -> Option<T> {
         self.content
     }
