@@ -1,0 +1,1053 @@
+quaint v0.2.0-alpha.13 (/Users/skyzh/Work/prisma-engines/quaint)
+├── async-trait v0.1.71 (proc-macro)
+│   ├── proc-macro2 v1.0.66
+│   │   └── unicode-ident v1.0.11
+│   ├── quote v1.0.31
+│   │   └── proc-macro2 v1.0.66 (*)
+│   └── syn v2.0.26
+│       ├── proc-macro2 v1.0.66 (*)
+│       ├── quote v1.0.31 (*)
+│       └── unicode-ident v1.0.11
+├── base64 v0.12.3
+├── bigdecimal v0.3.1
+│   ├── num-bigint v0.4.3
+│   │   ├── num-integer v0.1.45
+│   │   │   └── num-traits v0.2.15
+│   │   │       [build-dependencies]
+│   │   │       └── autocfg v1.1.0
+│   │   │   [build-dependencies]
+│   │   │   └── autocfg v1.1.0
+│   │   └── num-traits v0.2.15 (*)
+│   │   [build-dependencies]
+│   │   └── autocfg v1.1.0
+│   ├── num-integer v0.1.45 (*)
+│   └── num-traits v0.2.15 (*)
+├── bit-vec v0.6.3
+├── byteorder v1.4.3
+├── bytes v1.4.0
+├── chrono v0.4.26
+│   ├── iana-time-zone v0.1.57
+│   │   └── core-foundation-sys v0.8.4
+│   ├── num-traits v0.2.15 (*)
+│   ├── serde v1.0.171
+│   │   └── serde_derive v1.0.171 (proc-macro)
+│   │       ├── proc-macro2 v1.0.66 (*)
+│   │       ├── quote v1.0.31 (*)
+│   │       └── syn v2.0.26 (*)
+│   └── time v0.1.45
+│       └── libc v0.2.147
+├── connection-string v0.2.0
+├── either v1.8.1
+├── futures v0.3.28
+│   ├── futures-channel v0.3.28
+│   │   ├── futures-core v0.3.28
+│   │   └── futures-sink v0.3.28
+│   ├── futures-core v0.3.28
+│   ├── futures-executor v0.3.28
+│   │   ├── futures-core v0.3.28
+│   │   ├── futures-task v0.3.28
+│   │   └── futures-util v0.3.28
+│   │       ├── futures-channel v0.3.28 (*)
+│   │       ├── futures-core v0.3.28
+│   │       ├── futures-io v0.3.28
+│   │       ├── futures-macro v0.3.28 (proc-macro)
+│   │       │   ├── proc-macro2 v1.0.66 (*)
+│   │       │   ├── quote v1.0.31 (*)
+│   │       │   └── syn v2.0.26 (*)
+│   │       ├── futures-sink v0.3.28
+│   │       ├── futures-task v0.3.28
+│   │       ├── memchr v2.5.0
+│   │       ├── pin-project-lite v0.2.10
+│   │       ├── pin-utils v0.1.0
+│   │       └── slab v0.4.8
+│   │           [build-dependencies]
+│   │           └── autocfg v1.1.0
+│   ├── futures-io v0.3.28
+│   ├── futures-sink v0.3.28
+│   ├── futures-task v0.3.28
+│   └── futures-util v0.3.28 (*)
+├── hex v0.4.3
+├── lru-cache v0.1.2
+│   └── linked-hash-map v0.5.6
+├── metrics v0.18.1
+│   ├── ahash v0.7.6
+│   │   ├── getrandom v0.2.10
+│   │   │   ├── cfg-if v1.0.0
+│   │   │   └── libc v0.2.147
+│   │   └── once_cell v1.18.0
+│   │   [build-dependencies]
+│   │   └── version_check v0.9.4
+│   └── metrics-macros v0.5.1 (proc-macro)
+│       ├── proc-macro2 v1.0.66 (*)
+│       ├── quote v1.0.31 (*)
+│       └── syn v1.0.109
+│           ├── proc-macro2 v1.0.66 (*)
+│           ├── quote v1.0.31 (*)
+│           └── unicode-ident v1.0.11
+├── mobc v0.8.1
+│   ├── async-trait v0.1.71 (proc-macro) (*)
+│   ├── futures-channel v0.3.28 (*)
+│   ├── futures-core v0.3.28
+│   ├── futures-timer v3.0.2
+│   ├── futures-util v0.3.28 (*)
+│   ├── log v0.4.19
+│   ├── metrics v0.18.1 (*)
+│   ├── thiserror v1.0.43
+│   │   └── thiserror-impl v1.0.43 (proc-macro)
+│   │       ├── proc-macro2 v1.0.66 (*)
+│   │       ├── quote v1.0.31 (*)
+│   │       └── syn v2.0.26 (*)
+│   ├── tokio v1.29.1
+│   │   ├── bytes v1.4.0
+│   │   ├── libc v0.2.147
+│   │   ├── mio v0.8.8
+│   │   │   ├── libc v0.2.147
+│   │   │   └── log v0.4.19
+│   │   ├── num_cpus v1.16.0
+│   │   │   └── libc v0.2.147
+│   │   ├── pin-project-lite v0.2.10
+│   │   ├── socket2 v0.4.9
+│   │   │   └── libc v0.2.147
+│   │   └── tokio-macros v2.1.0 (proc-macro)
+│   │       ├── proc-macro2 v1.0.66 (*)
+│   │       ├── quote v1.0.31 (*)
+│   │       └── syn v2.0.26 (*)
+│   │   [build-dependencies]
+│   │   └── autocfg v1.1.0
+│   ├── tracing v0.1.37
+│   │   ├── cfg-if v1.0.0
+│   │   ├── log v0.4.19
+│   │   ├── pin-project-lite v0.2.10
+│   │   ├── tracing-attributes v0.1.26 (proc-macro)
+│   │   │   ├── proc-macro2 v1.0.66 (*)
+│   │   │   ├── quote v1.0.31 (*)
+│   │   │   └── syn v2.0.26 (*)
+│   │   └── tracing-core v0.1.31
+│   │       └── once_cell v1.18.0
+│   └── tracing-subscriber v0.3.17
+│       ├── nu-ansi-term v0.46.0
+│       │   └── overload v0.1.1
+│       ├── sharded-slab v0.1.4
+│       │   └── lazy_static v1.4.0
+│       ├── smallvec v1.11.0
+│       ├── thread_local v1.1.7
+│       │   ├── cfg-if v1.0.0
+│       │   └── once_cell v1.18.0
+│       ├── tracing-core v0.1.31 (*)
+│       └── tracing-log v0.1.3
+│           ├── lazy_static v1.4.0
+│           ├── log v0.4.19
+│           └── tracing-core v0.1.31 (*)
+├── mysql_async v0.31.3 (https://github.com/prisma/mysql_async?branch=vendored-openssl#dad187b5)
+│   ├── bytes v1.4.0
+│   ├── crossbeam v0.8.2
+│   │   ├── cfg-if v1.0.0
+│   │   ├── crossbeam-channel v0.5.8
+│   │   │   ├── cfg-if v1.0.0
+│   │   │   └── crossbeam-utils v0.8.16
+│   │   │       └── cfg-if v1.0.0
+│   │   ├── crossbeam-deque v0.8.3
+│   │   │   ├── cfg-if v1.0.0
+│   │   │   ├── crossbeam-epoch v0.9.15
+│   │   │   │   ├── cfg-if v1.0.0
+│   │   │   │   ├── crossbeam-utils v0.8.16 (*)
+│   │   │   │   ├── memoffset v0.9.0
+│   │   │   │   │   [build-dependencies]
+│   │   │   │   │   └── autocfg v1.1.0
+│   │   │   │   └── scopeguard v1.2.0
+│   │   │   │   [build-dependencies]
+│   │   │   │   └── autocfg v1.1.0
+│   │   │   └── crossbeam-utils v0.8.16 (*)
+│   │   ├── crossbeam-epoch v0.9.15 (*)
+│   │   ├── crossbeam-queue v0.3.8
+│   │   │   ├── cfg-if v1.0.0
+│   │   │   └── crossbeam-utils v0.8.16 (*)
+│   │   └── crossbeam-utils v0.8.16 (*)
+│   ├── flate2 v1.0.26
+│   │   ├── crc32fast v1.3.2
+│   │   │   └── cfg-if v1.0.0
+│   │   └── libz-sys v1.1.9
+│   │       [build-dependencies]
+│   │       ├── cc v1.0.79
+│   │       └── pkg-config v0.3.27
+│   ├── futures-core v0.3.28
+│   ├── futures-sink v0.3.28
+│   ├── futures-util v0.3.28 (*)
+│   ├── lazy_static v1.4.0
+│   ├── lru v0.8.1
+│   │   └── hashbrown v0.12.3
+│   │       └── ahash v0.7.6 (*)
+│   ├── mio v0.8.8 (*)
+│   ├── mysql_common v0.29.2
+│   │   ├── base64 v0.13.1
+│   │   ├── bigdecimal v0.3.1 (*)
+│   │   ├── bitflags v1.3.2
+│   │   ├── bitvec v1.0.1
+│   │   │   ├── funty v2.0.0
+│   │   │   ├── radium v0.7.0
+│   │   │   ├── tap v1.0.1
+│   │   │   └── wyz v0.5.1
+│   │   │       └── tap v1.0.1
+│   │   ├── byteorder v1.4.3
+│   │   ├── bytes v1.4.0
+│   │   ├── crc32fast v1.3.2 (*)
+│   │   ├── flate2 v1.0.26 (*)
+│   │   ├── frunk v0.4.2
+│   │   │   ├── frunk_core v0.4.2
+│   │   │   ├── frunk_derives v0.4.2 (proc-macro)
+│   │   │   │   ├── frunk_proc_macro_helpers v0.1.2
+│   │   │   │   │   ├── frunk_core v0.4.2
+│   │   │   │   │   ├── proc-macro2 v1.0.66 (*)
+│   │   │   │   │   ├── quote v1.0.31 (*)
+│   │   │   │   │   └── syn v2.0.26 (*)
+│   │   │   │   ├── quote v1.0.31 (*)
+│   │   │   │   └── syn v2.0.26 (*)
+│   │   │   └── frunk_proc_macros v0.1.2 (proc-macro)
+│   │   │       ├── frunk_core v0.4.2
+│   │   │       ├── frunk_proc_macro_helpers v0.1.2 (*)
+│   │   │       ├── quote v1.0.31 (*)
+│   │   │       └── syn v2.0.26 (*)
+│   │   ├── lazy_static v1.4.0
+│   │   ├── lexical v6.1.1
+│   │   │   └── lexical-core v0.8.5
+│   │   │       ├── lexical-parse-float v0.8.5
+│   │   │       │   ├── lexical-parse-integer v0.8.6
+│   │   │       │   │   ├── lexical-util v0.8.5
+│   │   │       │   │   │   └── static_assertions v1.1.0
+│   │   │       │   │   └── static_assertions v1.1.0
+│   │   │       │   ├── lexical-util v0.8.5 (*)
+│   │   │       │   └── static_assertions v1.1.0
+│   │   │       ├── lexical-parse-integer v0.8.6 (*)
+│   │   │       ├── lexical-util v0.8.5 (*)
+│   │   │       ├── lexical-write-float v0.8.5
+│   │   │       │   ├── lexical-util v0.8.5 (*)
+│   │   │       │   ├── lexical-write-integer v0.8.5
+│   │   │       │   │   ├── lexical-util v0.8.5 (*)
+│   │   │       │   │   └── static_assertions v1.1.0
+│   │   │       │   └── static_assertions v1.1.0
+│   │   │       └── lexical-write-integer v0.8.5 (*)
+│   │   ├── num-bigint v0.4.3 (*)
+│   │   ├── num-traits v0.2.15 (*)
+│   │   ├── rand v0.8.5
+│   │   │   ├── libc v0.2.147
+│   │   │   ├── rand_chacha v0.3.1
+│   │   │   │   ├── ppv-lite86 v0.2.17
+│   │   │   │   └── rand_core v0.6.4
+│   │   │   │       └── getrandom v0.2.10 (*)
+│   │   │   └── rand_core v0.6.4 (*)
+│   │   ├── regex v1.9.1
+│   │   │   ├── aho-corasick v1.0.2
+│   │   │   │   └── memchr v2.5.0
+│   │   │   ├── memchr v2.5.0
+│   │   │   ├── regex-automata v0.3.3
+│   │   │   │   ├── aho-corasick v1.0.2 (*)
+│   │   │   │   ├── memchr v2.5.0
+│   │   │   │   └── regex-syntax v0.7.4
+│   │   │   └── regex-syntax v0.7.4
+│   │   ├── rust_decimal v1.30.0
+│   │   │   ├── arrayvec v0.7.4
+│   │   │   ├── num-traits v0.2.15 (*)
+│   │   │   └── serde v1.0.171 (*)
+│   │   ├── saturating v0.1.0
+│   │   ├── serde v1.0.171 (*)
+│   │   ├── serde_json v1.0.103
+│   │   │   ├── itoa v1.0.9
+│   │   │   ├── ryu v1.0.15
+│   │   │   └── serde v1.0.171 (*)
+│   │   ├── sha1 v0.10.5
+│   │   │   ├── cfg-if v1.0.0
+│   │   │   ├── cpufeatures v0.2.9
+│   │   │   │   └── libc v0.2.147
+│   │   │   └── digest v0.10.7
+│   │   │       ├── block-buffer v0.10.4
+│   │   │       │   └── generic-array v0.14.7
+│   │   │       │       └── typenum v1.16.0
+│   │   │       │       [build-dependencies]
+│   │   │       │       └── version_check v0.9.4
+│   │   │       ├── crypto-common v0.1.6
+│   │   │       │   ├── generic-array v0.14.7 (*)
+│   │   │       │   └── typenum v1.16.0
+│   │   │       └── subtle v2.5.0
+│   │   ├── sha2 v0.10.7
+│   │   │   ├── cfg-if v1.0.0
+│   │   │   ├── cpufeatures v0.2.9 (*)
+│   │   │   └── digest v0.10.7 (*)
+│   │   ├── smallvec v1.11.0
+│   │   ├── thiserror v1.0.43 (*)
+│   │   ├── time v0.3.23
+│   │   │   └── time-core v0.1.1
+│   │   └── uuid v1.4.1
+│   │       └── getrandom v0.2.10 (*)
+│   │   [build-dependencies]
+│   │   ├── bindgen v0.59.2
+│   │   │   ├── bitflags v1.3.2
+│   │   │   ├── cexpr v0.6.0
+│   │   │   │   └── nom v7.1.3
+│   │   │   │       ├── memchr v2.5.0
+│   │   │   │       └── minimal-lexical v0.2.1
+│   │   │   ├── clang-sys v1.6.1
+│   │   │   │   ├── glob v0.3.1
+│   │   │   │   ├── libc v0.2.147
+│   │   │   │   └── libloading v0.7.4
+│   │   │   │       └── cfg-if v1.0.0
+│   │   │   │   [build-dependencies]
+│   │   │   │   └── glob v0.3.1
+│   │   │   ├── lazy_static v1.4.0
+│   │   │   ├── lazycell v1.3.0
+│   │   │   ├── peeking_take_while v0.1.2
+│   │   │   ├── proc-macro2 v1.0.66 (*)
+│   │   │   ├── quote v1.0.31 (*)
+│   │   │   ├── regex v1.9.1 (*)
+│   │   │   ├── rustc-hash v1.1.0
+│   │   │   └── shlex v1.1.0
+│   │   ├── cc v1.0.79
+│   │   ├── cmake v0.1.50
+│   │   │   └── cc v1.0.79
+│   │   └── subprocess v0.2.9
+│   │       └── libc v0.2.147
+│   ├── native-tls v0.2.11
+│   │   ├── lazy_static v1.4.0
+│   │   ├── libc v0.2.147
+│   │   ├── security-framework v2.9.1
+│   │   │   ├── bitflags v1.3.2
+│   │   │   ├── core-foundation v0.9.3
+│   │   │   │   ├── core-foundation-sys v0.8.4
+│   │   │   │   └── libc v0.2.147
+│   │   │   ├── core-foundation-sys v0.8.4
+│   │   │   ├── libc v0.2.147
+│   │   │   └── security-framework-sys v2.9.0
+│   │   │       ├── core-foundation-sys v0.8.4
+│   │   │       └── libc v0.2.147
+│   │   ├── security-framework-sys v2.9.0 (*)
+│   │   └── tempfile v3.6.0
+│   │       ├── cfg-if v1.0.0
+│   │       ├── fastrand v1.9.0
+│   │       └── rustix v0.37.23
+│   │           ├── bitflags v1.3.2
+│   │           ├── errno v0.3.1
+│   │           │   └── libc v0.2.147
+│   │           ├── io-lifetimes v1.0.11
+│   │           │   └── libc v0.2.147
+│   │           └── libc v0.2.147
+│   │       [build-dependencies]
+│   │       └── autocfg v1.1.0
+│   ├── once_cell v1.18.0
+│   ├── pem v1.1.1
+│   │   └── base64 v0.13.1
+│   ├── percent-encoding v2.3.0
+│   ├── pin-project v1.1.2
+│   │   └── pin-project-internal v1.1.2 (proc-macro)
+│   │       ├── proc-macro2 v1.0.66 (*)
+│   │       ├── quote v1.0.31 (*)
+│   │       └── syn v2.0.26 (*)
+│   ├── priority-queue v1.3.2
+│   │   └── indexmap v1.9.3
+│   │       └── hashbrown v0.12.3 (*)
+│   │       [build-dependencies]
+│   │       └── autocfg v1.1.0
+│   │   [build-dependencies]
+│   │   └── autocfg v1.1.0
+│   ├── serde v1.0.171 (*)
+│   ├── serde_json v1.0.103 (*)
+│   ├── socket2 v0.4.9 (*)
+│   ├── thiserror v1.0.43 (*)
+│   ├── tokio v1.29.1 (*)
+│   ├── tokio-native-tls v0.3.1
+│   │   ├── native-tls v0.2.11 (*)
+│   │   └── tokio v1.29.1 (*)
+│   ├── tokio-util v0.7.8
+│   │   ├── bytes v1.4.0
+│   │   ├── futures-core v0.3.28
+│   │   ├── futures-io v0.3.28
+│   │   ├── futures-sink v0.3.28
+│   │   ├── pin-project-lite v0.2.10
+│   │   ├── tokio v1.29.1 (*)
+│   │   └── tracing v0.1.37 (*)
+│   ├── twox-hash v1.6.3
+│   │   ├── cfg-if v1.0.0
+│   │   ├── rand v0.8.5 (*)
+│   │   └── static_assertions v1.1.0
+│   └── url v2.4.0
+│       ├── form_urlencoded v1.2.0
+│       │   └── percent-encoding v2.3.0
+│       ├── idna v0.4.0
+│       │   ├── unicode-bidi v0.3.13
+│       │   └── unicode-normalization v0.1.22
+│       │       └── tinyvec v1.6.0
+│       │           └── tinyvec_macros v0.1.1
+│       └── percent-encoding v2.3.0
+├── native-tls v0.2.11 (*)
+├── num_cpus v1.16.0 (*)
+├── percent-encoding v2.3.0
+├── postgres-native-tls v0.5.0 (https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#00d4815e)
+│   ├── native-tls v0.2.11 (*)
+│   ├── tokio v1.29.1 (*)
+│   ├── tokio-native-tls v0.3.1 (*)
+│   └── tokio-postgres v0.7.7 (https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#00d4815e)
+│       ├── async-trait v0.1.71 (proc-macro) (*)
+│       ├── byteorder v1.4.3
+│       ├── bytes v1.4.0
+│       ├── fallible-iterator v0.2.0
+│       ├── futures-channel v0.3.28 (*)
+│       ├── futures-util v0.3.28 (*)
+│       ├── log v0.4.19
+│       ├── parking_lot v0.12.1
+│       │   ├── lock_api v0.4.10
+│       │   │   └── scopeguard v1.2.0
+│       │   │   [build-dependencies]
+│       │   │   └── autocfg v1.1.0
+│       │   └── parking_lot_core v0.9.8
+│       │       ├── cfg-if v1.0.0
+│       │       ├── libc v0.2.147
+│       │       └── smallvec v1.11.0
+│       ├── percent-encoding v2.3.0
+│       ├── phf v0.11.2
+│       │   └── phf_shared v0.11.2
+│       │       └── siphasher v0.3.10
+│       ├── pin-project-lite v0.2.10
+│       ├── postgres-protocol v0.6.4 (https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#00d4815e)
+│       │   ├── base64 v0.13.1
+│       │   ├── byteorder v1.4.3
+│       │   ├── bytes v1.4.0
+│       │   ├── fallible-iterator v0.2.0
+│       │   ├── hmac v0.12.1
+│       │   │   └── digest v0.10.7 (*)
+│       │   ├── md-5 v0.10.5
+│       │   │   └── digest v0.10.7 (*)
+│       │   ├── memchr v2.5.0
+│       │   ├── rand v0.8.5 (*)
+│       │   ├── sha2 v0.10.7 (*)
+│       │   └── stringprep v0.1.3
+│       │       ├── unicode-bidi v0.3.13
+│       │       └── unicode-normalization v0.1.22 (*)
+│       ├── postgres-types v0.2.4 (https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#00d4815e)
+│       │   ├── bit-vec v0.6.3
+│       │   ├── bytes v1.4.0
+│       │   ├── chrono v0.4.26 (*)
+│       │   ├── fallible-iterator v0.2.0
+│       │   ├── postgres-protocol v0.6.4 (https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#00d4815e) (*)
+│       │   ├── serde v1.0.171 (*)
+│       │   ├── serde_json v1.0.103 (*)
+│       │   └── uuid v1.4.1 (*)
+│       ├── socket2 v0.4.9 (*)
+│       ├── tokio v1.29.1 (*)
+│       └── tokio-util v0.7.8 (*)
+├── postgres-types v0.2.4 (https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#00d4815e) (*)
+├── rusqlite v0.29.0
+│   ├── bitflags v2.3.3
+│   ├── chrono v0.4.26 (*)
+│   ├── fallible-iterator v0.2.0
+│   ├── fallible-streaming-iterator v0.1.9
+│   ├── hashlink v0.8.3
+│   │   └── hashbrown v0.14.0
+│   │       ├── ahash v0.8.3
+│   │       │   ├── cfg-if v1.0.0
+│   │       │   └── once_cell v1.18.0
+│   │       │   [build-dependencies]
+│   │       │   └── version_check v0.9.4
+│   │       └── allocator-api2 v0.2.16
+│   ├── libsqlite3-sys v0.26.0
+│   │   [build-dependencies]
+│   │   ├── cc v1.0.79
+│   │   ├── pkg-config v0.3.27
+│   │   └── vcpkg v0.2.15
+│   └── smallvec v1.11.0
+├── serde v1.0.171 (*)
+├── serde_json v1.0.103 (*)
+├── thiserror v1.0.43 (*)
+├── tiberius v0.11.7
+│   ├── async-trait v0.1.71 (proc-macro) (*)
+│   ├── asynchronous-codec v0.6.1
+│   │   ├── bytes v1.4.0
+│   │   ├── futures-sink v0.3.28
+│   │   ├── futures-util v0.3.28 (*)
+│   │   ├── memchr v2.5.0
+│   │   └── pin-project-lite v0.2.10
+│   ├── bigdecimal v0.3.1 (*)
+│   ├── byteorder v1.4.3
+│   ├── bytes v1.4.0
+│   ├── chrono v0.4.26 (*)
+│   ├── connection-string v0.2.0
+│   ├── encoding v0.2.33
+│   │   ├── encoding-index-japanese v1.20141219.5
+│   │   │   └── encoding_index_tests v0.1.4
+│   │   ├── encoding-index-korean v1.20141219.5
+│   │   │   └── encoding_index_tests v0.1.4
+│   │   ├── encoding-index-simpchinese v1.20141219.5
+│   │   │   └── encoding_index_tests v0.1.4
+│   │   ├── encoding-index-singlebyte v1.20141219.5
+│   │   │   └── encoding_index_tests v0.1.4
+│   │   └── encoding-index-tradchinese v1.20141219.5
+│   │       └── encoding_index_tests v0.1.4
+│   ├── enumflags2 v0.7.7
+│   │   └── enumflags2_derive v0.7.7 (proc-macro)
+│   │       ├── proc-macro2 v1.0.66 (*)
+│   │       ├── quote v1.0.31 (*)
+│   │       └── syn v2.0.26 (*)
+│   ├── futures v0.3.28 (*)
+│   ├── futures-sink v0.3.28
+│   ├── futures-util v0.3.28 (*)
+│   ├── num-traits v0.2.15 (*)
+│   ├── once_cell v1.18.0
+│   ├── opentls v0.2.1
+│   │   ├── futures-util v0.3.28 (*)
+│   │   ├── log v0.4.19
+│   │   ├── openssl v0.10.55
+│   │   │   ├── bitflags v1.3.2
+│   │   │   ├── cfg-if v1.0.0
+│   │   │   ├── foreign-types v0.3.2
+│   │   │   │   └── foreign-types-shared v0.1.1
+│   │   │   ├── libc v0.2.147
+│   │   │   ├── once_cell v1.18.0
+│   │   │   ├── openssl-macros v0.1.1 (proc-macro)
+│   │   │   │   ├── proc-macro2 v1.0.66 (*)
+│   │   │   │   ├── quote v1.0.31 (*)
+│   │   │   │   └── syn v2.0.26 (*)
+│   │   │   └── openssl-sys v0.9.90
+│   │   │       └── libc v0.2.147
+│   │   │       [build-dependencies]
+│   │   │       ├── cc v1.0.79
+│   │   │       ├── openssl-src v111.26.0+1.1.1u
+│   │   │       │   └── cc v1.0.79
+│   │   │       └── pkg-config v0.3.27
+│   │   ├── openssl-probe v0.1.5
+│   │   ├── openssl-sys v0.9.90 (*)
+│   │   └── url v2.4.0 (*)
+│   ├── pin-project-lite v0.2.10
+│   ├── pretty-hex v0.3.0
+│   ├── thiserror v1.0.43 (*)
+│   ├── tokio v1.29.1 (*)
+│   ├── tokio-util v0.7.8 (*)
+│   ├── tracing v0.1.37 (*)
+│   └── uuid v1.4.1 (*)
+├── tokio v1.29.1 (*)
+├── tokio-postgres v0.7.7 (https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#00d4815e) (*)
+├── tokio-util v0.6.10
+│   ├── bytes v1.4.0
+│   ├── futures-core v0.3.28
+│   ├── futures-io v0.3.28
+│   ├── futures-sink v0.3.28
+│   ├── log v0.4.19
+│   ├── pin-project-lite v0.2.10
+│   └── tokio v1.29.1 (*)
+├── tracing v0.1.37 (*)
+├── tracing-core v0.1.31 (*)
+├── url v2.4.0 (*)
+└── uuid v1.4.1 (*)
+[dev-dependencies]
+├── indoc v0.3.6
+│   ├── indoc-impl v0.3.6 (proc-macro)
+│   │   ├── proc-macro-hack v0.5.20+deprecated (proc-macro)
+│   │   ├── proc-macro2 v1.0.66 (*)
+│   │   ├── quote v1.0.31 (*)
+│   │   ├── syn v1.0.109 (*)
+│   │   └── unindent v0.1.11
+│   └── proc-macro-hack v0.5.20+deprecated (proc-macro)
+├── names v0.11.0
+│   └── rand v0.3.23
+│       ├── libc v0.2.147
+│       └── rand v0.4.6
+│           └── libc v0.2.147
+├── once_cell v1.18.0
+├── paste v1.0.14 (proc-macro)
+├── serde v1.0.171 (*)
+├── test-macros v0.1.0 (proc-macro) (/Users/skyzh/Work/prisma-engines/quaint/test-macros)
+│   ├── darling v0.10.2
+│   │   ├── darling_core v0.10.2
+│   │   │   ├── fnv v1.0.7
+│   │   │   ├── ident_case v1.0.1
+│   │   │   ├── proc-macro2 v1.0.66 (*)
+│   │   │   ├── quote v1.0.31 (*)
+│   │   │   ├── strsim v0.9.3
+│   │   │   └── syn v1.0.109 (*)
+│   │   └── darling_macro v0.10.2 (proc-macro)
+│   │       ├── darling_core v0.10.2 (*)
+│   │       ├── quote v1.0.31 (*)
+│   │       └── syn v1.0.109 (*)
+│   ├── once_cell v1.18.0
+│   ├── proc-macro2 v1.0.66 (*)
+│   ├── quote v1.0.31 (*)
+│   ├── syn v1.0.109 (*)
+│   └── test-setup v0.1.0 (/Users/skyzh/Work/prisma-engines/quaint/test-setup)
+│       ├── async-trait v0.1.71 (proc-macro) (*)
+│       ├── bitflags v1.3.2
+│       ├── names v0.11.0 (*)
+│       ├── once_cell v1.18.0
+│       ├── quaint v0.2.0-alpha.13 (/Users/skyzh/Work/prisma-engines/quaint) (*)
+│       └── tokio v1.29.1 (*)
+├── test-setup v0.1.0 (/Users/skyzh/Work/prisma-engines/quaint/test-setup) (*)
+├── tokio v1.29.1 (*)
+└── uuid v1.4.1 (*)
+
+quaint v0.2.0-alpha.13 (/Users/skyzh/Work/prisma-engines/quaint)
+├── async-trait v0.1.71 (proc-macro) (*)
+├── base64 v0.12.3
+├── bigdecimal v0.3.1
+│   ├── num-bigint v0.4.3
+│   │   ├── num-integer v0.1.45
+│   │   │   └── num-traits v0.2.15
+│   │   │       [build-dependencies]
+│   │   │       └── autocfg v1.1.0
+│   │   │   [build-dependencies]
+│   │   │   └── autocfg v1.1.0
+│   │   └── num-traits v0.2.15 (*)
+│   │   [build-dependencies]
+│   │   └── autocfg v1.1.0
+│   ├── num-integer v0.1.45 (*)
+│   └── num-traits v0.2.15 (*)
+├── bit-vec v0.6.3
+├── byteorder v1.4.3
+├── bytes v1.4.0
+├── chrono v0.4.26
+│   ├── js-sys v0.3.64
+│   │   └── wasm-bindgen v0.2.87
+│   │       ├── cfg-if v1.0.0
+│   │       └── wasm-bindgen-macro v0.2.87 (proc-macro)
+│   │           ├── quote v1.0.31 (*)
+│   │           └── wasm-bindgen-macro-support v0.2.87
+│   │               ├── proc-macro2 v1.0.66 (*)
+│   │               ├── quote v1.0.31 (*)
+│   │               ├── syn v2.0.26 (*)
+│   │               ├── wasm-bindgen-backend v0.2.87
+│   │               │   ├── bumpalo v3.13.0
+│   │               │   ├── log v0.4.19
+│   │               │   ├── once_cell v1.18.0
+│   │               │   ├── proc-macro2 v1.0.66 (*)
+│   │               │   ├── quote v1.0.31 (*)
+│   │               │   ├── syn v2.0.26 (*)
+│   │               │   └── wasm-bindgen-shared v0.2.87
+│   │               └── wasm-bindgen-shared v0.2.87
+│   ├── num-traits v0.2.15 (*)
+│   ├── serde v1.0.171
+│   │   └── serde_derive v1.0.171 (proc-macro) (*)
+│   ├── time v0.1.45
+│   │   └── libc v0.2.147
+│   └── wasm-bindgen v0.2.87 (*)
+├── connection-string v0.2.0
+├── either v1.8.1
+├── futures v0.3.28
+│   ├── futures-channel v0.3.28
+│   │   ├── futures-core v0.3.28
+│   │   └── futures-sink v0.3.28
+│   ├── futures-core v0.3.28
+│   ├── futures-executor v0.3.28
+│   │   ├── futures-core v0.3.28
+│   │   ├── futures-task v0.3.28
+│   │   └── futures-util v0.3.28
+│   │       ├── futures-channel v0.3.28 (*)
+│   │       ├── futures-core v0.3.28
+│   │       ├── futures-io v0.3.28
+│   │       ├── futures-macro v0.3.28 (proc-macro) (*)
+│   │       ├── futures-sink v0.3.28
+│   │       ├── futures-task v0.3.28
+│   │       ├── memchr v2.5.0
+│   │       ├── pin-project-lite v0.2.10
+│   │       ├── pin-utils v0.1.0
+│   │       └── slab v0.4.8
+│   │           [build-dependencies]
+│   │           └── autocfg v1.1.0
+│   ├── futures-io v0.3.28
+│   ├── futures-sink v0.3.28
+│   ├── futures-task v0.3.28
+│   └── futures-util v0.3.28 (*)
+├── getrandom v0.2.10
+│   ├── cfg-if v1.0.0
+│   ├── js-sys v0.3.64 (*)
+│   └── wasm-bindgen v0.2.87 (*)
+├── hex v0.4.3
+├── lru-cache v0.1.2
+│   └── linked-hash-map v0.5.6
+├── metrics v0.18.1
+│   ├── ahash v0.7.6
+│   │   └── once_cell v1.18.0
+│   │   [build-dependencies]
+│   │   └── version_check v0.9.4
+│   └── metrics-macros v0.5.1 (proc-macro) (*)
+├── mobc v0.8.1
+│   ├── async-trait v0.1.71 (proc-macro) (*)
+│   ├── futures-channel v0.3.28 (*)
+│   ├── futures-core v0.3.28
+│   ├── futures-timer v3.0.2
+│   ├── futures-util v0.3.28 (*)
+│   ├── log v0.4.19
+│   ├── metrics v0.18.1 (*)
+│   ├── thiserror v1.0.43
+│   │   └── thiserror-impl v1.0.43 (proc-macro) (*)
+│   ├── tokio v1.29.1
+│   │   ├── bytes v1.4.0
+│   │   ├── mio v0.8.8
+│   │   │   └── log v0.4.19
+│   │   ├── num_cpus v1.16.0
+│   │   │   └── libc v0.2.147
+│   │   ├── pin-project-lite v0.2.10
+│   │   └── tokio-macros v2.1.0 (proc-macro) (*)
+│   │   [build-dependencies]
+│   │   └── autocfg v1.1.0
+│   ├── tracing v0.1.37
+│   │   ├── cfg-if v1.0.0
+│   │   ├── log v0.4.19
+│   │   ├── pin-project-lite v0.2.10
+│   │   ├── tracing-attributes v0.1.26 (proc-macro) (*)
+│   │   └── tracing-core v0.1.31
+│   │       └── once_cell v1.18.0
+│   └── tracing-subscriber v0.3.17
+│       ├── nu-ansi-term v0.46.0
+│       │   └── overload v0.1.1
+│       ├── sharded-slab v0.1.4
+│       │   └── lazy_static v1.4.0
+│       ├── smallvec v1.11.0
+│       ├── thread_local v1.1.7
+│       │   ├── cfg-if v1.0.0
+│       │   └── once_cell v1.18.0
+│       ├── tracing-core v0.1.31 (*)
+│       └── tracing-log v0.1.3
+│           ├── lazy_static v1.4.0
+│           ├── log v0.4.19
+│           └── tracing-core v0.1.31 (*)
+├── mysql_async v0.31.3 (https://github.com/prisma/mysql_async?branch=vendored-openssl#dad187b5)
+│   ├── bytes v1.4.0
+│   ├── crossbeam v0.8.2
+│   │   ├── cfg-if v1.0.0
+│   │   ├── crossbeam-channel v0.5.8
+│   │   │   ├── cfg-if v1.0.0
+│   │   │   └── crossbeam-utils v0.8.16
+│   │   │       └── cfg-if v1.0.0
+│   │   ├── crossbeam-deque v0.8.3
+│   │   │   ├── cfg-if v1.0.0
+│   │   │   ├── crossbeam-epoch v0.9.15
+│   │   │   │   ├── cfg-if v1.0.0
+│   │   │   │   ├── crossbeam-utils v0.8.16 (*)
+│   │   │   │   ├── memoffset v0.9.0
+│   │   │   │   │   [build-dependencies]
+│   │   │   │   │   └── autocfg v1.1.0
+│   │   │   │   └── scopeguard v1.2.0
+│   │   │   │   [build-dependencies]
+│   │   │   │   └── autocfg v1.1.0
+│   │   │   └── crossbeam-utils v0.8.16 (*)
+│   │   ├── crossbeam-epoch v0.9.15 (*)
+│   │   ├── crossbeam-queue v0.3.8
+│   │   │   ├── cfg-if v1.0.0
+│   │   │   └── crossbeam-utils v0.8.16 (*)
+│   │   └── crossbeam-utils v0.8.16 (*)
+│   ├── flate2 v1.0.26
+│   │   ├── crc32fast v1.3.2
+│   │   │   └── cfg-if v1.0.0
+│   │   ├── libz-sys v1.1.9
+│   │   │   [build-dependencies]
+│   │   │   ├── cc v1.0.79
+│   │   │   └── pkg-config v0.3.27
+│   │   └── miniz_oxide v0.7.1
+│   │       └── adler v1.0.2
+│   ├── futures-core v0.3.28
+│   ├── futures-sink v0.3.28
+│   ├── futures-util v0.3.28 (*)
+│   ├── lazy_static v1.4.0
+│   ├── lru v0.8.1
+│   │   └── hashbrown v0.12.3
+│   │       └── ahash v0.7.6 (*)
+│   ├── mio v0.8.8 (*)
+│   ├── mysql_common v0.29.2
+│   │   ├── base64 v0.13.1
+│   │   ├── bigdecimal v0.3.1 (*)
+│   │   ├── bitflags v1.3.2
+│   │   ├── bitvec v1.0.1
+│   │   │   ├── funty v2.0.0
+│   │   │   ├── radium v0.7.0
+│   │   │   ├── tap v1.0.1
+│   │   │   └── wyz v0.5.1
+│   │   │       └── tap v1.0.1
+│   │   ├── byteorder v1.4.3
+│   │   ├── bytes v1.4.0
+│   │   ├── crc32fast v1.3.2 (*)
+│   │   ├── flate2 v1.0.26 (*)
+│   │   ├── frunk v0.4.2
+│   │   │   ├── frunk_core v0.4.2
+│   │   │   ├── frunk_derives v0.4.2 (proc-macro) (*)
+│   │   │   └── frunk_proc_macros v0.1.2 (proc-macro) (*)
+│   │   ├── lazy_static v1.4.0
+│   │   ├── lexical v6.1.1
+│   │   │   └── lexical-core v0.8.5
+│   │   │       ├── lexical-parse-float v0.8.5
+│   │   │       │   ├── lexical-parse-integer v0.8.6
+│   │   │       │   │   ├── lexical-util v0.8.5
+│   │   │       │   │   │   └── static_assertions v1.1.0
+│   │   │       │   │   └── static_assertions v1.1.0
+│   │   │       │   ├── lexical-util v0.8.5 (*)
+│   │   │       │   └── static_assertions v1.1.0
+│   │   │       ├── lexical-parse-integer v0.8.6 (*)
+│   │   │       ├── lexical-util v0.8.5 (*)
+│   │   │       ├── lexical-write-float v0.8.5
+│   │   │       │   ├── lexical-util v0.8.5 (*)
+│   │   │       │   ├── lexical-write-integer v0.8.5
+│   │   │       │   │   ├── lexical-util v0.8.5 (*)
+│   │   │       │   │   └── static_assertions v1.1.0
+│   │   │       │   └── static_assertions v1.1.0
+│   │   │       └── lexical-write-integer v0.8.5 (*)
+│   │   ├── num-bigint v0.4.3 (*)
+│   │   ├── num-traits v0.2.15 (*)
+│   │   ├── rand v0.8.5
+│   │   │   ├── rand_chacha v0.3.1
+│   │   │   │   ├── ppv-lite86 v0.2.17
+│   │   │   │   └── rand_core v0.6.4
+│   │   │   │       └── getrandom v0.2.10 (*)
+│   │   │   └── rand_core v0.6.4 (*)
+│   │   ├── regex v1.9.1
+│   │   │   ├── aho-corasick v1.0.2
+│   │   │   │   └── memchr v2.5.0
+│   │   │   ├── memchr v2.5.0
+│   │   │   ├── regex-automata v0.3.3
+│   │   │   │   ├── aho-corasick v1.0.2 (*)
+│   │   │   │   ├── memchr v2.5.0
+│   │   │   │   └── regex-syntax v0.7.4
+│   │   │   └── regex-syntax v0.7.4
+│   │   ├── rust_decimal v1.30.0
+│   │   │   ├── arrayvec v0.7.4
+│   │   │   ├── num-traits v0.2.15 (*)
+│   │   │   └── serde v1.0.171 (*)
+│   │   ├── saturating v0.1.0
+│   │   ├── serde v1.0.171 (*)
+│   │   ├── serde_json v1.0.103
+│   │   │   ├── itoa v1.0.9
+│   │   │   ├── ryu v1.0.15
+│   │   │   └── serde v1.0.171 (*)
+│   │   ├── sha1 v0.10.5
+│   │   │   ├── cfg-if v1.0.0
+│   │   │   └── digest v0.10.7
+│   │   │       ├── block-buffer v0.10.4
+│   │   │       │   └── generic-array v0.14.7
+│   │   │       │       └── typenum v1.16.0
+│   │   │       │       [build-dependencies]
+│   │   │       │       └── version_check v0.9.4
+│   │   │       ├── crypto-common v0.1.6
+│   │   │       │   ├── generic-array v0.14.7 (*)
+│   │   │       │   └── typenum v1.16.0
+│   │   │       └── subtle v2.5.0
+│   │   ├── sha2 v0.10.7
+│   │   │   ├── cfg-if v1.0.0
+│   │   │   └── digest v0.10.7 (*)
+│   │   ├── smallvec v1.11.0
+│   │   ├── thiserror v1.0.43 (*)
+│   │   ├── time v0.3.23
+│   │   │   └── time-core v0.1.1
+│   │   └── uuid v1.4.1
+│   │       └── getrandom v0.2.10 (*)
+│   │   [build-dependencies]
+│   │   ├── bindgen v0.59.2 (*)
+│   │   ├── cc v1.0.79
+│   │   ├── cmake v0.1.50 (*)
+│   │   └── subprocess v0.2.9 (*)
+│   ├── native-tls v0.2.11
+│   │   ├── log v0.4.19
+│   │   ├── openssl v0.10.55
+│   │   │   ├── bitflags v1.3.2
+│   │   │   ├── cfg-if v1.0.0
+│   │   │   ├── foreign-types v0.3.2
+│   │   │   │   └── foreign-types-shared v0.1.1
+│   │   │   ├── libc v0.2.147
+│   │   │   ├── once_cell v1.18.0
+│   │   │   ├── openssl-macros v0.1.1 (proc-macro) (*)
+│   │   │   └── openssl-sys v0.9.90
+│   │   │       └── libc v0.2.147
+│   │   │       [build-dependencies]
+│   │   │       ├── cc v1.0.79
+│   │   │       └── pkg-config v0.3.27
+│   │   ├── openssl-probe v0.1.5
+│   │   └── openssl-sys v0.9.90 (*)
+│   ├── once_cell v1.18.0
+│   ├── pem v1.1.1
+│   │   └── base64 v0.13.1
+│   ├── percent-encoding v2.3.0
+│   ├── pin-project v1.1.2
+│   │   └── pin-project-internal v1.1.2 (proc-macro) (*)
+│   ├── priority-queue v1.3.2
+│   │   └── indexmap v1.9.3
+│   │       └── hashbrown v0.12.3 (*)
+│   │       [build-dependencies]
+│   │       └── autocfg v1.1.0
+│   │   [build-dependencies]
+│   │   └── autocfg v1.1.0
+│   ├── serde v1.0.171 (*)
+│   ├── serde_json v1.0.103 (*)
+│   ├── socket2 v0.4.9
+│   ├── thiserror v1.0.43 (*)
+│   ├── tokio v1.29.1 (*)
+│   ├── tokio-native-tls v0.3.1
+│   │   ├── native-tls v0.2.11 (*)
+│   │   └── tokio v1.29.1 (*)
+│   ├── tokio-util v0.7.8
+│   │   ├── bytes v1.4.0
+│   │   ├── futures-core v0.3.28
+│   │   ├── futures-io v0.3.28
+│   │   ├── futures-sink v0.3.28
+│   │   ├── pin-project-lite v0.2.10
+│   │   ├── tokio v1.29.1 (*)
+│   │   └── tracing v0.1.37 (*)
+│   ├── twox-hash v1.6.3
+│   │   ├── cfg-if v1.0.0
+│   │   ├── rand v0.8.5 (*)
+│   │   └── static_assertions v1.1.0
+│   └── url v2.4.0
+│       ├── form_urlencoded v1.2.0
+│       │   └── percent-encoding v2.3.0
+│       ├── idna v0.4.0
+│       │   ├── unicode-bidi v0.3.13
+│       │   └── unicode-normalization v0.1.22
+│       │       └── tinyvec v1.6.0
+│       │           └── tinyvec_macros v0.1.1
+│       └── percent-encoding v2.3.0
+├── native-tls v0.2.11 (*)
+├── num_cpus v1.16.0 (*)
+├── percent-encoding v2.3.0
+├── postgres-native-tls v0.5.0 (https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#00d4815e)
+│   ├── native-tls v0.2.11 (*)
+│   ├── tokio v1.29.1 (*)
+│   ├── tokio-native-tls v0.3.1 (*)
+│   └── tokio-postgres v0.7.7 (https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#00d4815e)
+│       ├── async-trait v0.1.71 (proc-macro) (*)
+│       ├── byteorder v1.4.3
+│       ├── bytes v1.4.0
+│       ├── fallible-iterator v0.2.0
+│       ├── futures-channel v0.3.28 (*)
+│       ├── futures-util v0.3.28 (*)
+│       ├── log v0.4.19
+│       ├── parking_lot v0.12.1
+│       │   ├── lock_api v0.4.10
+│       │   │   └── scopeguard v1.2.0
+│       │   │   [build-dependencies]
+│       │   │   └── autocfg v1.1.0
+│       │   └── parking_lot_core v0.9.8
+│       │       ├── cfg-if v1.0.0
+│       │       └── smallvec v1.11.0
+│       ├── percent-encoding v2.3.0
+│       ├── phf v0.11.2
+│       │   └── phf_shared v0.11.2
+│       │       └── siphasher v0.3.10
+│       ├── pin-project-lite v0.2.10
+│       ├── postgres-protocol v0.6.4 (https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#00d4815e)
+│       │   ├── base64 v0.13.1
+│       │   ├── byteorder v1.4.3
+│       │   ├── bytes v1.4.0
+│       │   ├── fallible-iterator v0.2.0
+│       │   ├── hmac v0.12.1
+│       │   │   └── digest v0.10.7 (*)
+│       │   ├── md-5 v0.10.5
+│       │   │   └── digest v0.10.7 (*)
+│       │   ├── memchr v2.5.0
+│       │   ├── rand v0.8.5 (*)
+│       │   ├── sha2 v0.10.7 (*)
+│       │   └── stringprep v0.1.3
+│       │       ├── unicode-bidi v0.3.13
+│       │       └── unicode-normalization v0.1.22 (*)
+│       ├── postgres-types v0.2.4 (https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#00d4815e)
+│       │   ├── bit-vec v0.6.3
+│       │   ├── bytes v1.4.0
+│       │   ├── chrono v0.4.26 (*)
+│       │   ├── fallible-iterator v0.2.0
+│       │   ├── postgres-protocol v0.6.4 (https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#00d4815e) (*)
+│       │   ├── serde v1.0.171 (*)
+│       │   ├── serde_json v1.0.103 (*)
+│       │   └── uuid v1.4.1 (*)
+│       ├── socket2 v0.4.9
+│       ├── tokio v1.29.1 (*)
+│       └── tokio-util v0.7.8 (*)
+├── postgres-types v0.2.4 (https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#00d4815e) (*)
+├── rusqlite v0.29.0
+│   ├── bitflags v2.3.3
+│   ├── chrono v0.4.26 (*)
+│   ├── fallible-iterator v0.2.0
+│   ├── fallible-streaming-iterator v0.1.9
+│   ├── hashlink v0.8.3
+│   │   └── hashbrown v0.14.0
+│   │       ├── ahash v0.8.3
+│   │       │   ├── cfg-if v1.0.0
+│   │       │   └── once_cell v1.18.0
+│   │       │   [build-dependencies]
+│   │       │   └── version_check v0.9.4
+│   │       └── allocator-api2 v0.2.16
+│   ├── libsqlite3-sys v0.26.0
+│   │   [build-dependencies]
+│   │   ├── cc v1.0.79
+│   │   ├── pkg-config v0.3.27
+│   │   └── vcpkg v0.2.15
+│   └── smallvec v1.11.0
+├── serde v1.0.171 (*)
+├── serde_json v1.0.103 (*)
+├── thiserror v1.0.43 (*)
+├── tiberius v0.11.7
+│   ├── async-native-tls v0.4.0
+│   │   ├── futures-util v0.3.28 (*)
+│   │   ├── native-tls v0.2.11 (*)
+│   │   ├── thiserror v1.0.43 (*)
+│   │   └── url v2.4.0 (*)
+│   ├── async-trait v0.1.71 (proc-macro) (*)
+│   ├── asynchronous-codec v0.6.1
+│   │   ├── bytes v1.4.0
+│   │   ├── futures-sink v0.3.28
+│   │   ├── futures-util v0.3.28 (*)
+│   │   ├── memchr v2.5.0
+│   │   └── pin-project-lite v0.2.10
+│   ├── bigdecimal v0.3.1 (*)
+│   ├── byteorder v1.4.3
+│   ├── bytes v1.4.0
+│   ├── chrono v0.4.26 (*)
+│   ├── connection-string v0.2.0
+│   ├── encoding v0.2.33
+│   │   ├── encoding-index-japanese v1.20141219.5
+│   │   │   └── encoding_index_tests v0.1.4
+│   │   ├── encoding-index-korean v1.20141219.5
+│   │   │   └── encoding_index_tests v0.1.4
+│   │   ├── encoding-index-simpchinese v1.20141219.5
+│   │   │   └── encoding_index_tests v0.1.4
+│   │   ├── encoding-index-singlebyte v1.20141219.5
+│   │   │   └── encoding_index_tests v0.1.4
+│   │   └── encoding-index-tradchinese v1.20141219.5
+│   │       └── encoding_index_tests v0.1.4
+│   ├── enumflags2 v0.7.7
+│   │   └── enumflags2_derive v0.7.7 (proc-macro) (*)
+│   ├── futures v0.3.28 (*)
+│   ├── futures-sink v0.3.28
+│   ├── futures-util v0.3.28 (*)
+│   ├── num-traits v0.2.15 (*)
+│   ├── once_cell v1.18.0
+│   ├── pin-project-lite v0.2.10
+│   ├── pretty-hex v0.3.0
+│   ├── thiserror v1.0.43 (*)
+│   ├── tokio v1.29.1 (*)
+│   ├── tokio-util v0.7.8 (*)
+│   ├── tracing v0.1.37 (*)
+│   └── uuid v1.4.1 (*)
+├── tokio v1.29.1 (*)
+├── tokio-postgres v0.7.7 (https://github.com/prisma/rust-postgres?branch=pgbouncer-mode#00d4815e) (*)
+├── tokio-util v0.6.10
+│   ├── bytes v1.4.0
+│   ├── futures-core v0.3.28
+│   ├── futures-io v0.3.28
+│   ├── futures-sink v0.3.28
+│   ├── log v0.4.19
+│   ├── pin-project-lite v0.2.10
+│   └── tokio v1.29.1 (*)
+├── tracing v0.1.37 (*)
+├── tracing-core v0.1.31 (*)
+├── url v2.4.0 (*)
+└── uuid v1.4.1 (*)
+[dev-dependencies]
+├── indoc v0.3.6
+│   ├── indoc-impl v0.3.6 (proc-macro) (*)
+│   └── proc-macro-hack v0.5.20+deprecated (proc-macro)
+├── names v0.11.0
+│   └── rand v0.3.23
+│       ├── libc v0.2.147
+│       └── rand v0.4.6
+├── once_cell v1.18.0
+├── paste v1.0.14 (proc-macro)
+├── serde v1.0.171 (*)
+├── test-macros v0.1.0 (proc-macro) (/Users/skyzh/Work/prisma-engines/quaint/test-macros) (*)
+├── test-setup v0.1.0 (/Users/skyzh/Work/prisma-engines/quaint/test-setup)
+│   ├── async-trait v0.1.71 (proc-macro) (*)
+│   ├── bitflags v1.3.2
+│   ├── names v0.11.0 (*)
+│   ├── once_cell v1.18.0
+│   ├── quaint v0.2.0-alpha.13 (/Users/skyzh/Work/prisma-engines/quaint) (*)
+│   └── tokio v1.29.1 (*)
+├── tokio v1.29.1 (*)
+└── uuid v1.4.1 (*)

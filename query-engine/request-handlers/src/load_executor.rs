@@ -15,10 +15,15 @@ pub async fn load(
     url: &str,
 ) -> query_core::Result<Box<dyn QueryExecutor + Send + Sync + 'static>> {
     match source.active_provider {
+        #[cfg(feature = "native-connectors")]
         p if SQLITE.is_provider(p) => sqlite(source, url, features).await,
+        #[cfg(feature = "native-connectors")]
         p if MYSQL.is_provider(p) => mysql(source, url, features).await,
+        #[cfg(feature = "native-connectors")]
         p if POSTGRES.is_provider(p) => postgres(source, url, features).await,
+        #[cfg(feature = "native-connectors")]
         p if MSSQL.is_provider(p) => mssql(source, url, features).await,
+        #[cfg(feature = "native-connectors")]
         p if COCKROACH.is_provider(p) => postgres(source, url, features).await,
 
         #[cfg(feature = "mongodb")]
@@ -33,6 +38,7 @@ pub async fn load(
     }
 }
 
+#[cfg(feature = "native-connectors")]
 async fn sqlite(
     source: &Datasource,
     url: &str,
@@ -44,6 +50,7 @@ async fn sqlite(
     Ok(executor_for(sqlite, false))
 }
 
+#[cfg(feature = "native-connectors")]
 async fn postgres(
     source: &Datasource,
     url: &str,
@@ -65,6 +72,7 @@ async fn postgres(
     Ok(executor_for(psql, force_transactions))
 }
 
+#[cfg(feature = "native-connectors")]
 async fn mysql(
     source: &Datasource,
     url: &str,
@@ -75,6 +83,7 @@ async fn mysql(
     Ok(executor_for(mysql, false))
 }
 
+#[cfg(feature = "native-connectors")]
 async fn mssql(
     source: &Datasource,
     url: &str,
@@ -93,6 +102,7 @@ where
     Box::new(InterpretingExecutor::new(connector, force_transactions))
 }
 
+#[cfg(feature = "native-connectors")]
 #[cfg(feature = "mongodb")]
 async fn mongodb(
     source: &Datasource,

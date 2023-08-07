@@ -25,7 +25,8 @@ This is very important to double-check if you have multiple versions installed, 
 
 In the current directory:
 - Run `pnpm prisma:planetscale` to push the Prisma schema and insert the test data.
-- Run `pnpm planetscale` to run smoke tests against the PlanetScale database.
+- Run `pnpm planetscale` to run smoke tests against the PlanetScale database using the napi.rs Query Engine.
+- Run `pnpm planetscale:wasm` to run smoke tests against the PlanetScale database using the WebAssembly Query Engine.
 
 Note: you used to be able to run these Prisma commands without changing the provider name, but [#4074](https://github.com/prisma/prisma-engines/pull/4074) changed that (see https://github.com/prisma/prisma-engines/pull/4074#issuecomment-1649942475).
 
@@ -36,4 +37,5 @@ Note: you used to be able to run these Prisma commands without changing the prov
 
 In the current directory:
 - Run `pnpm prisma:neon` to push the Prisma schema and insert the test data.
-- Run `pnpm neon` to run smoke tests against the Neon database.
+- Run `pnpm neon` to run smoke tests against the Neon database using the napi.rs Query Engine.
+- Run `pnpm neon:wasm` to run smoke tests against the PlanetScale database using the WebAssembly Query Engine.

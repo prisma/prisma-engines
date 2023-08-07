@@ -1,4 +1,4 @@
-import * as Transaction from './Transaction'
+import * as Transaction from './Transaction.js'
 
 export type JsonQuery = {
   modelName?: string

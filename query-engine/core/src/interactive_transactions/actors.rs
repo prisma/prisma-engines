@@ -1,7 +1,7 @@
 use super::{CachedTx, TransactionError, TxOpRequest, TxOpRequestMsg, TxOpResponse};
 use crate::{
-    execute_many_operations, execute_single_operation, protocol::EngineProtocol,
-    telemetry::helpers::set_span_link_from_traceparent, ClosedTx, Operation, ResponseData, TxId,
+    execute_many_operations, execute_single_operation, protocol::EngineProtocol, ClosedTx, Operation, ResponseData,
+    TxId,
 };
 use connector::Connection;
 use schema::QuerySchemaRef;
@@ -17,6 +17,9 @@ use tokio::{
 use tracing::Span;
 use tracing_futures::Instrument;
 use tracing_futures::WithSubscriber;
+
+#[cfg(feature = "metrics")]
+use crate::telemetry::helpers::set_span_link_from_traceparent;
 
 #[derive(PartialEq)]
 enum RunState {
@@ -81,6 +84,8 @@ impl<'a> ITXServer<'a> {
         traceparent: Option<String>,
     ) -> crate::Result<ResponseData> {
         let span = info_span!("prisma:engine:itx_query_builder", user_facing = true);
+
+        #[cfg(feature = "metrics")]
         set_span_link_from_traceparent(&span, traceparent.clone());
 
         let conn = self.cached_tx.as_open()?;
@@ -383,14 +388,23 @@ pub(crate) fn spawn_client_list_clear_actor(
     tokio::task::spawn(async move {
         loop {
             if let Some((id, closed_tx)) = rx.recv().await {
-                trace!("removing {} from client list", id);
-
-                let mut clients_guard = clients.write().await;
-                clients_guard.remove(&id);
-                drop(clients_guard);
-
-                closed_txs.write().await.put(id, closed_tx);
+                clear_actor(&clients, &closed_txs, id, closed_tx).await
             }
         }
     })
+}
+
+pub(crate) async fn clear_actor(
+    clients: &RwLock<HashMap<TxId, ITXClient>>,
+    closed_txs: &RwLock<lru::LruCache<TxId, Option<ClosedTx>>>,
+    id: TxId,
+    closed_tx: Option<ClosedTx>,
+) {
+    trace!("removing {} from client list", id);
+
+    let mut clients_guard = clients.write().await;
+    clients_guard.remove(&id);
+    drop(clients_guard);
+
+    closed_txs.write().await.put(id, closed_tx);
 }

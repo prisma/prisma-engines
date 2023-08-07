@@ -39,7 +39,7 @@ tracing-futures = "0.2"
 tracing-opentelemetry = "0.17.3"
 opentelemetry = { version = "0.17"}
 
-quaint.workspace = true
+quaint = { workspace = true, features = ["connectors"] }
 tokio.workspace = true
 futures = "0.3"
 query-engine-metrics = {path = "../metrics"}

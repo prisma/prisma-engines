@@ -29,16 +29,18 @@ pub struct TransactionActorManager {
     /// return better error messages if operations are performed on closed transactions.
     pub(crate) closed_txs: Arc<RwLock<LruCache<TxId, Option<ClosedTx>>>>,
     /// Channel used to signal an ITx is closed and can be moved to the list of closed transactions.
-    send_done: Sender<(TxId, Option<ClosedTx>)>,
+    send_done: Option<Sender<(TxId, Option<ClosedTx>)>>,
     /// Handle to the task in charge of clearing actors.
     /// Used to abort the task when the TransactionActorManager is dropped.
-    bg_reader_clear: JoinHandle<()>,
+    bg_reader_clear: Option<JoinHandle<()>>,
 }
 
 impl Drop for TransactionActorManager {
     fn drop(&mut self) {
         debug!("DROPPING TPM");
-        self.bg_reader_clear.abort();
+        if let Some(bg_reader_clear) = self.bg_reader_clear.take() {
+            bg_reader_clear.abort();
+        }
     }
 }
 
@@ -53,8 +55,15 @@ impl TransactionActorManager {
         let clients = Arc::new(RwLock::new(HashMap::new()));
         let closed_txs = Arc::new(RwLock::new(LruCache::new(*CLOSED_TX_CACHE_SIZE)));
 
-        let (send_done, rx) = channel(CHANNEL_SIZE);
-        let handle = spawn_client_list_clear_actor(clients.clone(), closed_txs.clone(), rx);
+        let (send_done, handle) = if cfg!(target_arch = "wasm32") {
+            (None, None)
+        } else {
+            let (send_done, rx) = channel(CHANNEL_SIZE);
+            (
+                Some(send_done),
+                Some(spawn_client_list_clear_actor(clients.clone(), closed_txs.clone(), rx)),
+            )
+        };
 
         Self {
             clients,
@@ -80,7 +89,7 @@ impl TransactionActorManager {
             isolation_level,
             timeout,
             CHANNEL_SIZE,
-            self.send_done.clone(),
+            self.send_done.clone().expect("not supported in WASM"),
             engine_protocol,
         )
         .await?;
