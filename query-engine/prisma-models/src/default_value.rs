@@ -66,7 +66,7 @@ impl DefaultKind {
 
     /// Returns either a copy of the contained single value or produces a new
     /// value as defined by the expression.
-    #[cfg(any(feature = "wasm_generators"))]
+    #[cfg(feature = "wasm_generators")]
     pub fn get(&self) -> Option<PrismaValue> {
         match self {
             DefaultKind::Single(ref v) => Some(v.clone()),
@@ -220,7 +220,7 @@ impl ValueGenerator {
         self.args.get(0).and_then(|v| v.1.as_string())
     }
 
-    #[cfg(any(feature = "wasm_generators"))]
+    #[cfg(feature = "wasm_generators")]
     pub fn generate(&self) -> Option<PrismaValue> {
         self.generator.invoke()
     }
