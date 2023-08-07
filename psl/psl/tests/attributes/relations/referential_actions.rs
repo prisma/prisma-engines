@@ -912,3 +912,36 @@ fn on_update_cannot_be_defined_on_the_wrong_side_1_1() {
 
     expect.assert_eq(&parse_unwrap_err(dml));
 }
+
+#[test]
+fn mongo_prisma_skip_integrity_relation_mode_parses_correctly() {
+    let dml = indoc! {r#"
+        datasource db {
+          provider = "mongodb"
+          relationMode = "prismaSkipIntegrity"
+          url = "mongodb://"
+        }
+
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        model A {
+          id String @id @map("_id") @db.ObjectId
+          bs B[]
+        }
+
+        model B {
+          id String @id @map("_id") @db.ObjectId
+          aId String @db.ObjectId
+          a A @relation(fields: [aId], references: [id])
+        }
+    "#};
+
+    let schema = parse_schema(&dml);
+
+    schema.assert_has_model("A");
+    schema.assert_has_model("B").assert_has_relation_field("a");
+
+    assert_eq!(schema.relation_mode(), RelationMode::PrismaSkipIntegrity)
+}
