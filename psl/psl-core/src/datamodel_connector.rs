@@ -37,6 +37,7 @@ use parser_database::{
 use std::{
     borrow::Cow,
     collections::{BTreeMap, HashMap},
+    str::FromStr,
 };
 
 pub const EXTENSIONS_KEY: &str = "extensions";
@@ -55,6 +56,12 @@ pub trait Connector: Send + Sync {
     fn is_provider(&self, name: &str) -> bool {
         name == self.provider_name()
     }
+
+    /// The database flavour, divergences in database backends capabilities might consider
+    /// us to use a different flavour, like in the case of CockroachDB. However other databases
+    /// are less divergent as to consider sharing a flavour with others, like Planetscale and MySQL
+    /// or Neon and Postgres, which respectively have the Mysql and Postgres flavours.
+    fn flavour(&self) -> Flavour;
 
     /// The name of the connector. Can be used in error messages.
     fn name(&self) -> &str;
@@ -358,6 +365,30 @@ pub trait Connector: Send + Sync {
         _diagnostics: &mut Diagnostics,
     ) -> DatasourceConnectorData {
         Default::default()
+    }
+}
+
+#[derive(Copy, Clone, Debug)]
+pub enum Flavour {
+    Cockroach,
+    Mongo,
+    Sqlserver,
+    Mysql,
+    Postgres,
+    Sqlite,
+}
+
+impl FromStr for Flavour {
+    type Err = String;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "mysql" => Ok(Self::Mysql),
+            "postgres" => Ok(Self::Postgres),
+            "cockroachdb" => Ok(Self::Cockroach),
+            "mssql" => Ok(Self::Sqlserver),
+            "sqlite" => Ok(Self::Sqlite),
+            _ => Err(format!("Unknown flavour: {}", s)),
+        }
     }
 }
 

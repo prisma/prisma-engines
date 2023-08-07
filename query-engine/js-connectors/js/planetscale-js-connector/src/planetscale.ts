@@ -39,7 +39,7 @@ const TRANSACTION_COMMIT = 'COMMIT'
 const TRANSACTION_ROLLBACK = 'ROLLBACK'
 
 class PrismaPlanetScale implements Connector, Closeable {
-  readonly flavor = 'mysql'
+  readonly flavour = 'mysql'
   
   private driver: TransactionCapableDriver
   private isRunning: boolean = true

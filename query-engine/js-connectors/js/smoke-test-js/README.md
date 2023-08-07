@@ -24,10 +24,7 @@ This is very important to double-check if you have multiple versions installed, 
 - Create a new `shadow` database branch. Repeat the steps above (selecting the `shadow` branch instead of `main`), and paste the generated URL in the `JS_PLANETSCALE_SHADOW_DATABASE_URL` environment variable in `.envrc`.
 
 In the current directory:
-
-- Set the provider in [./prisma/mysql-planetscale/schema.prisma](./prisma/mysql-planetscale/schema.prisma) to `mysql`.
 - Run `pnpm prisma:planetscale` to push the Prisma schema and insert the test data.
-- Set the provider in [./prisma/mysql-planetscale/schema.prisma](./prisma/mysql-planetscale/schema.prisma) to `@prisma/planetscale`.
 - Run `pnpm planetscale` to run smoke tests against the PlanetScale database.
 
 Note: you used to be able to run these Prisma commands without changing the provider name, but [#4074](https://github.com/prisma/prisma-engines/pull/4074) changed that (see https://github.com/prisma/prisma-engines/pull/4074#issuecomment-1649942475).
@@ -38,8 +35,5 @@ Note: you used to be able to run these Prisma commands without changing the prov
 - Paste the connection string to `JS_NEON_DATABASE_URL`. Create a shadow branch and repeat the step above, paste the connection string to `JS_NEON_SHADOW_DATABASE_URL`.
 
 In the current directory:
-
-- Set the provider in [./prisma/postgres-neon/schema.prisma](./prisma/postgres-neon/schema.prisma) to `mysql`.
 - Run `pnpm prisma:neon` to push the Prisma schema and insert the test data.
-- Set the provider in [./prisma/postgres-neon/schema.prisma](./prisma/postgres-neon/schema.prisma) to `@prisma/neon`.
 - Run `pnpm neon` to run smoke tests against the Neon database.

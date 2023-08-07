@@ -9,7 +9,7 @@ export const binder = (queryable: Connector & Closeable): Connector & Closeable 
   version: queryable.version.bind(queryable),
   isHealthy: queryable.isHealthy.bind(queryable),
   close: queryable.close.bind(queryable),
-  flavor: queryable.flavor,
+  flavour: queryable.flavour,
 })
 
 export type ConnectorConfig

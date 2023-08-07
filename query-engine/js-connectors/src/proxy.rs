@@ -2,13 +2,12 @@ use core::panic;
 use std::str::FromStr;
 use std::sync::{Arc, Condvar, Mutex};
 
+use crate::error::*;
 use napi::bindgen_prelude::{FromNapiValue, Promise as JsPromise, ToNapiValue};
 use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction};
 use napi::{JsObject, JsString};
 use napi_derive::napi;
-
-use crate::error::*;
-use psl::JsConnectorFlavor;
+use psl::datamodel_connector::Flavour;
 use quaint::connector::ResultSet as QuaintResultSet;
 use quaint::Value as QuaintValue;
 
@@ -44,9 +43,9 @@ pub struct Proxy {
     /// Moreover, `JsFunction` is not `Clone`.
     is_healthy: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
 
-    /// Return the flavor for this driver.
+    /// Return the flavour for this driver.
     #[allow(dead_code)]
-    pub(crate) flavor: String,
+    pub(crate) flavour: String,
 }
 
 /// Reify creates a Rust proxy to access the JS driver passed in as a parameter.
@@ -56,7 +55,7 @@ pub fn reify(js_connector: JsObject) -> napi::Result<Proxy> {
     let version = js_connector.get_named_property("version")?;
     let close: ThreadsafeFunction<(), ErrorStrategy::Fatal> = js_connector.get_named_property("close")?;
     let is_healthy = js_connector.get_named_property("isHealthy")?;
-    let flavor: JsString = js_connector.get_named_property("flavor")?;
+    let flavour: JsString = js_connector.get_named_property("flavour")?;
 
     let driver = Proxy {
         query_raw,
@@ -64,7 +63,7 @@ pub fn reify(js_connector: JsObject) -> napi::Result<Proxy> {
         version,
         close,
         is_healthy,
-        flavor: flavor.into_utf8()?.as_str()?.to_owned(),
+        flavour: flavour.into_utf8()?.as_str()?.to_owned(),
     };
     Ok(driver)
 }
@@ -317,11 +316,12 @@ fn js_base_value_to_quaint(json_value: serde_json::Value, column_type: ColumnTyp
     }
 }
 
-pub struct FlavoredJSResultSet(pub (JsConnectorFlavor, JSResultSet));
+// TODO: this flavour-specific deserialization logic needs to be moved to the JS part of the connector
+pub struct FlavourSpecificResultSet(pub (Flavour, JSResultSet));
 
-impl From<FlavoredJSResultSet> for QuaintResultSet {
-    fn from(pair: FlavoredJSResultSet) -> Self {
-        let (flavor, mut js_result_set) = pair.0;
+impl From<FlavourSpecificResultSet> for QuaintResultSet {
+    fn from(pair: FlavourSpecificResultSet) -> Self {
+        let (flavour, mut js_result_set) = pair.0;
         // TODO: extract, todo: error rather than panic?
         let to_quaint_row = move |row: &mut Vec<serde_json::Value>| -> Vec<quaint::Value<'static>> {
             let mut res = Vec::with_capacity(row.len());
@@ -331,9 +331,13 @@ impl From<FlavoredJSResultSet> for QuaintResultSet {
                 let json_value = row.remove(0);
 
                 // Note: here, we could consider using conditional compile-time variables to avoid the match.
-                let quaint_value = match flavor {
-                    JsConnectorFlavor::MySQL => js_planetscale_value_to_quaint(json_value, column_type),
-                    JsConnectorFlavor::Postgres => js_neon_value_to_quaint(json_value, column_type),
+                let quaint_value = match flavour {
+                    Flavour::Mysql => js_planetscale_value_to_quaint(json_value, column_type),
+                    Flavour::Postgres => js_neon_value_to_quaint(json_value, column_type),
+                    _ => unreachable!(
+                        "Unsupported flavour {:?} in result set transformation from javascript",
+                        flavour
+                    ),
                 };
 
                 res.push(quaint_value);

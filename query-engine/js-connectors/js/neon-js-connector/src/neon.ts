@@ -16,7 +16,7 @@ const TRANSACTION_COMMIT = 'COMMIT'
 const TRANSACTION_ROLLBACK = 'ROLLBACK'
 
 class PrismaNeon implements Connector, Closeable {
-  readonly flavor = 'postgres'
+  readonly flavour = 'postgres'
 
   private client?: Client
   private httpClient?: NeonQueryFunction<false, true>
