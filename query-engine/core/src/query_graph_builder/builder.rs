@@ -98,7 +98,7 @@ impl<'a> QueryGraphBuilder<'a> {
         }?;
 
         // Run final transformations.
-        graph.finalize()?;
+        graph.finalize(self.query_schema.capabilities())?;
         trace!("{}", graph);
 
         // Used to debug generated graph.
