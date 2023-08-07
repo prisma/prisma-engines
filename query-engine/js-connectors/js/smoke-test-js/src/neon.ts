@@ -6,6 +6,7 @@ async function neon() {
 
   const db = createNeonConnector({
     url: connectionString,
+    httpMode: false,
   })
 
   await smokeTest(db, '../prisma/postgres-neon/schema.prisma')
