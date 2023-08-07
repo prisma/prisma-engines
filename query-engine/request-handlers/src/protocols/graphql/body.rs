@@ -1,8 +1,10 @@
-use super::GraphQLProtocolAdapter;
 use query_core::{BatchDocument, BatchDocumentTransaction, Operation, QueryDocument};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use tracing::info_span;
+
+#[cfg(feature = "graphql")]
+use super::GraphQLProtocolAdapter;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", untagged)]
@@ -53,6 +55,7 @@ impl From<&str> for SingleQuery {
     }
 }
 
+#[cfg(feature = "graphql")]
 impl GraphqlBody {
     /// Convert a `GraphQlBody` into a `QueryDocument`.
     pub fn into_doc(self) -> crate::Result<QueryDocument> {

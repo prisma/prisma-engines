@@ -1,9 +1,11 @@
 use crate::HandlerError;
 use bigdecimal::{BigDecimal, FromPrimitive};
+use query_core::query_document::*;
+
+#[cfg(feature = "graphql")]
 use graphql_parser::query::{
     Definition, Document, OperationDefinition, Selection as GqlSelection, SelectionSet, Value,
 };
-use query_core::query_document::*;
 
 /// Protocol adapter for GraphQL -> Query Document.
 ///
@@ -19,8 +21,10 @@ use query_core::query_document::*;
 /// - Variables.
 /// - Subscription queries.
 /// - Query names are ignored
+#[cfg(feature = "graphql")]
 pub struct GraphQLProtocolAdapter;
 
+#[cfg(feature = "graphql")]
 impl GraphQLProtocolAdapter {
     pub fn convert_query_to_operation(query: &str, operation_name: Option<String>) -> crate::Result<Operation> {
         let gql_doc = match graphql_parser::parse_query(query) {
