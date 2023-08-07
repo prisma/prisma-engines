@@ -1,5 +1,5 @@
 import type { Connector } from '@jkomyno/prisma-js-connector-utils'
-import type { QueryEngineConfig } from './QueryEngine'
+import type { QueryEngineConfig } from './QueryEngine.js'
 
 export type QueryEngineInstance = {
   connect(headers: string): Promise<void>
@@ -14,7 +14,7 @@ export type QueryEngineInstance = {
   startTransaction(options: string, traceHeaders: string): Promise<string>
   commitTransaction(id: string, traceHeaders: string): Promise<string>
   rollbackTransaction(id: string, traceHeaders: string): Promise<string>
-  metrics(options: string): Promise<string>
+  // metrics(options: string): Promise<string>
 }
 
 export interface QueryEngineConstructor {

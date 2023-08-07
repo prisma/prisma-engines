@@ -1,16 +1,20 @@
 import { setImmediate, setTimeout } from 'node:timers/promises'
 import type { Connector, Closeable } from '@jkomyno/prisma-js-connector-utils'
-import type { QueryEngineInstance } from './engines/types/Library'
-import { initQueryEngine } from './util'
+import type { QueryEngineInstance } from './engines/types/Library.js'
+import { initQueryEngine, initQueryEngineWasm } from './util.js'
 
 type Flavor = Connector['flavour']
 
 export async function smokeTest(db: Connector & Closeable, prismaSchemaRelativePath: string) {
   // wait for the database pool to be initialized
   await setImmediate(0)
-  
-  const engine = initQueryEngine(db, prismaSchemaRelativePath)
 
+  const useWasm = process.env.USE_WASM === '1'
+
+  const engine = useWasm
+    ? initQueryEngineWasm(db, prismaSchemaRelativePath)
+    : initQueryEngine(db, prismaSchemaRelativePath)
+  
   console.log('[nodejs] connecting...')
   await engine.connect('trace')
   console.log('[nodejs] connected')
@@ -45,8 +49,8 @@ export async function smokeTest(db: Connector & Closeable, prismaSchemaRelativeP
   process.exit(0)
 }
 
-class SmokeTest {
-  constructor(private readonly engine: QueryEngineInstance, readonly flavour: Connector['flavour']) {}
+class SmokeTest<QE extends QueryEngineInstance> {
+  constructor(private readonly engine: QE, readonly flavour: Connector['flavour']) {}
 
   async testFindManyTypeTest() {
     await this.testFindManyTypeTestMySQL()
@@ -241,8 +245,8 @@ type WithFlavorInput
   | { exclude: Array<Flavor>, only?: never }
 
 function withFlavor({ only, exclude }: WithFlavorInput) {
-  return function decorator(originalMethod: () => any, _ctx: ClassMethodDecoratorContext<SmokeTest, () => unknown>) {
-    return function replacement(this: SmokeTest) {
+  return function decorator(originalMethod: () => any, _ctx: ClassMethodDecoratorContext<SmokeTest<any>, () => unknown>) {
+    return function replacement(this: SmokeTest<any>) {
       if ((exclude || []).includes(this.flavour)) {
         console.log(`[nodejs::exclude] Skipping test "${originalMethod.name}" with flavour: ${this.flavour}`)
         return

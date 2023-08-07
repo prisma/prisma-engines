@@ -1,5 +1,5 @@
 import { createNeonConnector } from '@jkomyno/prisma-neon-js-connector'
-import { smokeTest } from './test'
+import { smokeTest } from './test.js'
 
 async function neon() {
   const connectionString = `${process.env.JS_NEON_DATABASE_URL as string}`

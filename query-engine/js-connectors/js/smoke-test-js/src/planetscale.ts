@@ -1,5 +1,5 @@
 import { createPlanetScaleConnector } from '@jkomyno/prisma-planetscale-js-connector'
-import { smokeTest } from './test' 
+import { smokeTest } from './test.js' 
 
 async function planetscale() {
   const connectionString = `${process.env.JS_PLANETSCALE_DATABASE_URL as string}`

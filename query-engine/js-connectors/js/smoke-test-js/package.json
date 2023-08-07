@@ -1,6 +1,7 @@
 {
   "name": "@jkomyno/smoke-test-js",
   "private": true,
+  "type": "module",
   "version": "0.0.0",
   "description": "",
   "scripts": {
@@ -11,7 +12,9 @@
     "prisma:db:execute:neon": "prisma db execute --schema ./prisma/postgres-neon/schema.prisma --file ./prisma/postgres-neon/commands/type_test/insert.sql",
     "prisma:neon": "pnpm prisma:db:push:neon && pnpm prisma:db:execute:neon",
     "neon": "tsx ./src/neon.ts",
-    "planetscale": "tsx ./src/planetscale.ts"
+    "planetscale": "tsx ./src/planetscale.ts",
+    "neon:wasm": "USE_WASM=1 node --experimental-wasm-modules --loader ts-node/esm ./src/neon.ts",
+    "planetscale:wasm": "USE_WASM=1 node --experimental-wasm-modules --loader ts-node/esm ./src/planetscale.ts"
   },
   "keywords": [],
   "author": "Alberto Schiabel <schiabel@prisma.io>",
@@ -25,6 +28,7 @@
   },
   "devDependencies": {
     "prisma": "^5.1.0",
+    "ts-node": "^10.9.1",
     "tsx": "^3.12.7"
   }
 }

@@ -3,3 +3,5 @@ export JS_PLANETSCALE_SHADOW_DATABASE_URL="mysql://USER:PASSWORD@aws.connect.psd
 
 export JS_NEON_DATABASE_URL="postgres://USER:PASSWORD@DATABASE-pooler.eu-central-1.aws.neon.tech/neondb?pgbouncer=true&connect_timeout=10"
 export JS_NEON_SHADOW_DATABASE_URL="postgres://USER:PASSWORD@DATABASE-pooler.eu-central-1.aws.neon.tech/neondb?pgbouncer=true&connect_timeout=10"
+
+export NODE_NO_WARNINGS=1
