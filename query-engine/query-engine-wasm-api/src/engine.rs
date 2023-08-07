@@ -1,7 +1,6 @@
 use crate::error::ApiError;
 use futures::FutureExt;
-use js_sys::{Function as JsFunction, Object as JsObject};
-use psl::PreviewFeature;
+use js_sys::Function as JsFunction;
 use query_core::{
     protocol::EngineProtocol,
     schema::{self, QuerySchema},
@@ -26,6 +25,7 @@ use wasm_bindgen::JsValue;
 /// The main query engine used by JS
 #[wasm_bindgen]
 pub struct QueryEngine {
+    // TODO: is Arc needed here?
     inner: Arc<RwLock<Inner>>,
 }
 
@@ -121,22 +121,19 @@ impl Inner {
 #[wasm_bindgen]
 impl QueryEngine {
     /// Parse a validated datamodel and configuration to allow connecting later on.
-    /// Note: any new method added to this struct should be added to
-    /// `query_engine_node_api::node_drivers::engine::QueryEngineNodeDrivers` as well.
-    /// Unfortunately the `#[napi]` macro does not support deriving traits.
     #[wasm_bindgen(constructor)]
     pub fn new(
         options: JsValue,
         callback: JsFunction,
-        maybe_driver: Option<wasm_connectors::JsQueryable>,
+        maybe_driver: Option<wasm_connectors::Proxy>,
     ) -> Result<QueryEngine, wasm_bindgen::JsError> {
         let ConstructorOptions {
             datamodel,
-            log_level,
-            log_queries,
+            log_level,   // TODO: log via `console_log!` macro?
+            log_queries, // TODO: log via `console_log!` macro?
             datasource_overrides,
-            env,
-            config_dir,
+            env,        // TODO: still needed? Can we access `process.env` equivalents on Edge JS runtimes?
+            config_dir, // TODO: exclude, we can't open files in Wasm
             ignore_env_var_errors,
             engine_protocol,
         } = serde_wasm_bindgen::from_value(options)?;
@@ -149,7 +146,7 @@ impl QueryEngine {
 
         #[cfg(feature = "js-connectors")]
         if let Some(driver) = maybe_driver {
-            let queryable = driver;
+            let queryable = wasm_connectors::JsQueryable::from(driver);
             match sql_connector::register_js_connector(provider_name, Arc::new(queryable)) {
                 Ok(_) => tracing::info!("Registered js connector for {provider_name}"),
                 Err(err) => tracing::error!("Failed to registered js connector for {provider_name}. {err}"),
@@ -173,8 +170,8 @@ impl QueryEngine {
             .validate_that_one_datasource_is_provided()
             .map_err(|errors| ApiError::conversion(errors, schema.db.source()))?;
 
-        let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics);
-        let enable_tracing = config.preview_features().contains(PreviewFeature::Tracing);
+        // let enable_metrics = config.preview_features().contains(PreviewFeature::Metrics);
+        // let enable_tracing = config.preview_features().contains(PreviewFeature::Tracing);
         let engine_protocol = engine_protocol.unwrap_or(EngineProtocol::Json);
 
         let builder = EngineBuilder {
@@ -234,7 +231,8 @@ impl QueryEngine {
                     connector.get_connection().instrument(conn_span).await?;
 
                     crate::Result::<_>::Ok(executor)
-                }.await;
+                }
+                .await;
 
                 let query_schema = {
                     let enable_raw_queries = true;

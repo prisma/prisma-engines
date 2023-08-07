@@ -6,7 +6,7 @@ edition = "2021"
 [lib]
 doc = false
 crate-type = ["cdylib"]
-name = "query_engine"
+name = "libquery_wasm"
 
 [features]
 default = ["js-connectors"]
@@ -21,9 +21,7 @@ request-handlers = { path = "../request-handlers", default-features = false, fea
 query-connector = { path = "../connectors/query-connector" }
 user-facing-errors = { path = "../../libs/user-facing-errors", features = ["quaint"]}
 psl.workspace = true
-sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector", default-features = false, features = [
-    "js-connectors",
-] }
+sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector", default-features = false, features = ["js-connectors"] }
 prisma-models = { path = "../prisma-models" }
 wasm-connectors = { path = "../wasm-connectors" }
 
@@ -40,7 +38,7 @@ tokio.workspace = true
 futures = "0.3"
 console_error_panic_hook = "*"
 
-wasm-bindgen = "0.2"
+wasm-bindgen = "=0.2.84"
 wasm-bindgen-futures = "0.4"
 serde-wasm-bindgen = "0.5"
 serde_repr = "0.1"
@@ -50,5 +48,11 @@ js-sys = "0.3"
 workspace = true
 features = ["slim"]
 
-[build-dependencies]
-napi-build = "1"
+[profile.release]
+# Default release settings for all targets
+
+[profile.release.target.'cfg(target_arch = "wasm32")']
+# Custom release settings for wasm32-unknown-unknown
+opt-level = "z"
+lto = "fat"
+panic = "abort"

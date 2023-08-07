@@ -67,7 +67,6 @@ features = [
   "postgresql",
   "sqlite",
   "uuid",
-  "connector",
 ]
 
 [profile.dev.package.backtrace]
@@ -80,10 +79,9 @@ strip = "symbols"
 strip = "symbols"
 
 [profile.release]
-lto = true
+lto = "fat"
 codegen-units = 1
 opt-level = 's' # Optimize for size.
-panic = "abort"
 
 [profile.profiling]
 inherits = "release"

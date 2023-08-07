@@ -1,8 +1,8 @@
 use std::future::Future;
 
-use crate::proxy::{JSResultSet, Proxy, Query};
+use crate::proxy::{FlavourSpecificResultSet, JSResultSet, Proxy, Query};
 use async_trait::async_trait;
-use psl::JsConnectorFlavor;
+use psl::datamodel_connector::Flavour;
 use quaint::{
     connector::IsolationLevel,
     prelude::{Query as QuaintQuery, Queryable as QuaintQueryable, ResultSet, TransactionCapable},
@@ -26,23 +26,33 @@ use wasm_bindgen::prelude::wasm_bindgen;
 /// of `quaint::Value` but said type is a tagged enum, with non-unit variants that cannot be converted to javascript as is.
 ///
 #[derive(Clone)]
-#[wasm_bindgen]
 pub struct JsQueryable {
     pub(crate) proxy: Proxy,
-    pub(crate) flavor: JsConnectorFlavor,
+    pub(crate) flavour: Flavour,
+}
+
+impl From<Proxy> for JsQueryable {
+    fn from(proxy: Proxy) -> Self {
+        Self::new(proxy)
+    }
 }
 
 // Assume the proxy object will not be sent to service workers, we can unsafe impl Send + Sync.
 unsafe impl Send for Proxy {}
 unsafe impl Sync for Proxy {}
 
-#[wasm_bindgen]
 impl JsQueryable {
-    #[wasm_bindgen(constructor)]
-    pub fn new(proxy: Proxy, flavor: String) -> JsQueryable {
-        Self {
-            proxy,
-            flavor: flavor.parse().unwrap(),
+    pub fn new(proxy: Proxy) -> JsQueryable {
+        let flavour = proxy.flavour.parse().unwrap();
+        Self { proxy, flavour }
+    }
+
+    /// visit a query according to the flavour of the JS connector
+    pub fn visit_query<'a>(&self, q: QuaintQuery<'a>) -> quaint::Result<(String, Vec<Value<'a>>)> {
+        match self.flavour {
+            Flavour::Mysql => visitor::Mysql::build(q),
+            Flavour::Postgres => visitor::Postgres::build(q),
+            _ => unimplemented!("Unsupported flavour for JS connector {:?}", self.flavour),
         }
     }
 }
@@ -63,10 +73,7 @@ impl std::fmt::Debug for JsQueryable {
 impl QuaintQueryable for JsQueryable {
     /// Execute the given query.
     async fn query(&self, q: QuaintQuery<'_>) -> quaint::Result<ResultSet> {
-        let (sql, params) = match self.flavor {
-            JsConnectorFlavor::MySQL => visitor::Mysql::build(q)?,
-            JsConnectorFlavor::Postgres => visitor::Postgres::build(q)?,
-        };
+        let (sql, params) = self.visit_query(q)?;
         self.query_raw(&sql, &params).await
     }
 
@@ -88,10 +95,7 @@ impl QuaintQueryable for JsQueryable {
 
     /// Execute the given query, returning the number of affected rows.
     async fn execute(&self, q: QuaintQuery<'_>) -> quaint::Result<u64> {
-        let (sql, params) = match self.flavor {
-            JsConnectorFlavor::MySQL => visitor::Mysql::build(q)?,
-            JsConnectorFlavor::Postgres => visitor::Postgres::build(q)?,
-        };
+        let (sql, params) = self.visit_query(q)?;
         self.execute_raw(&sql, &params).await
     }
 
@@ -117,7 +121,6 @@ impl QuaintQueryable for JsQueryable {
     /// prepared statements.
     async fn raw_cmd(&self, cmd: &str) -> quaint::Result<()> {
         self.execute_raw(cmd, &[]).await?;
-
         Ok(())
     }
 
@@ -133,8 +136,7 @@ impl QuaintQueryable for JsQueryable {
 
     /// Returns false, if connection is considered to not be in a working state.
     fn is_healthy(&self) -> bool {
-        // TODO: use self.driver.is_healthy()
-        true
+        self.proxy.is_healthy().unwrap_or(false)
     }
 
     /// Sets the transaction isolation level to given value.
@@ -155,9 +157,9 @@ impl JsQueryable {
         let args = values.iter().map(|v| v.clone().into()).collect();
         Query { sql, args }
     }
-
-    async fn transform_result_set(result_set: JSResultSet) -> quaint::Result<ResultSet> {
-        Ok(ResultSet::from(result_set))
+    async fn transform_result_set(flavour: Flavour, result_set: JSResultSet) -> quaint::Result<ResultSet> {
+        let flavoured_js_result_set = FlavourSpecificResultSet((flavour, result_set));
+        Ok(ResultSet::from(flavoured_js_result_set))
     }
 
     async fn do_query_raw_inner(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
@@ -165,13 +167,13 @@ impl JsQueryable {
         let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
         let query = Self::build_query(sql, params).instrument(serialization_span).await;
 
-        // Todo: convert napi::Error to quaint::error::Error.
+        // TODO: convert js_sys::Error to quaint::error::Error.
         let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);
         let result_set = self.proxy.query_raw(query).instrument(sql_span).await.unwrap();
 
         let len = result_set.len();
         let deserialization_span = info_span!("js:query:result", user_facing = true, "length" = %len);
-        Self::transform_result_set(result_set)
+        Self::transform_result_set(self.flavour, result_set)
             .instrument(deserialization_span)
             .await
     }
@@ -189,7 +191,7 @@ impl JsQueryable {
         let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
         let query = Self::build_query(sql, params).instrument(serialization_span).await;
 
-        // Todo: convert napi::Error to quaint::error::Error.
+        // TODO: convert js_sys::Error to quaint::error::Error.
         let sql_span = info_span!("js:query:sql", user_facing = true, "db.statement" = %sql);
         let affected_rows = self.proxy.execute_raw(query).instrument(sql_span).await.unwrap();
 
@@ -205,6 +207,11 @@ impl JsQueryable {
     }
 }
 
+// Allow asynchronous futures to be sent safely across threads, solving the following error:
+// ```text
+// future cannot be sent between threads safely
+// the trait `Send` is not implemented for `dyn Future<Output = std::result::Result<u32, js_sys::Error>>`
+// ```
 struct SendFuture<F: Future>(F);
 
 unsafe impl<F: Future> Send for SendFuture<F> {}
@@ -213,6 +220,12 @@ impl<F: Future> Future for SendFuture<F> {
     type Output = F::Output;
 
     fn poll(self: std::pin::Pin<&mut Self>, cx: &mut std::task::Context<'_>) -> std::task::Poll<Self::Output> {
+        // Cast the pinned self to a mutable reference of the inner future.
+        //
+        // This is safe as we guarantee that:
+        // - the data we return will not move so long as the argument value does not move
+        //   (for example, because it is one of the fields of that value)
+        // - we do not move out of the argument we receive to the interior function.
         unsafe { std::pin::Pin::map_unchecked_mut(self, |f| &mut f.0) }.poll(cx)
     }
 }

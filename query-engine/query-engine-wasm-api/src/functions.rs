@@ -1,9 +1,9 @@
 use crate::error::ApiError;
 use request_handlers::dmmf;
+use serde::Serialize;
 use std::sync::Arc;
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
-use serde::Serialize;
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -39,7 +39,7 @@ pub fn dmmf(datamodel_string: String) -> Result<String, wasm_bindgen::JsError> {
 #[wasm_bindgen]
 pub fn debug_panic(panic_message: Option<String>) -> Result<(), wasm_bindgen::JsError> {
     let user_facing = user_facing_errors::Error::from_panic_payload(Box::new(
-        panic_message.unwrap_or_else(|| "query-engine-node-api debug panic".to_string()),
+        panic_message.unwrap_or_else(|| "query-engine-wasm-api debug panic".to_string()),
     ));
     let message = serde_json::to_string(&user_facing).unwrap();
 

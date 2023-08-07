@@ -9,4 +9,5 @@
 
 mod proxy;
 mod queryable;
+pub use proxy::Proxy;
 pub use queryable::JsQueryable;
