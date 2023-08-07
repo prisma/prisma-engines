@@ -32,7 +32,7 @@ Note: you used to be able to run these Prisma commands without changing the prov
 ### Neon
 
 - Create a new database with Neon CLI `npx neonctl projects create` or in [Neon Console](https://neon.tech).
-- Paste the connection string to `JS_NEON_DATABASE_URL`. Create a shadow branch and repeat the step above, paste the connection string to `JS_NEON_SHADOW_DATABASE_URL`.
+- Paste the connection string to `JS_NEON_DATABASE_URL`. 
 
 In the current directory:
 - Run `pnpm prisma:neon` to push the Prisma schema and insert the test data.
