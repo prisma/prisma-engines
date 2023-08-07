@@ -8,7 +8,7 @@ use enumflags2::BitFlags;
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
 use psl_core::{
     datamodel_connector::{
-        Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, NativeTypeConstructor,
+        Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
         NativeTypeInstance, RelationMode,
     },
     diagnostics::{Diagnostics, Span},
@@ -309,6 +309,10 @@ impl Connector for MsSqlDatamodelConnector {
         if config.preview_features().contains(PreviewFeature::MultiSchema) && !ds.schemas_defined() {
             completions::schemas_completion(completion_list);
         }
+    }
+
+    fn flavour(&self) -> Flavour {
+        Flavour::Sqlserver
     }
 }
 

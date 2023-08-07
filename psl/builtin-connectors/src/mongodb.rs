@@ -7,7 +7,7 @@ use enumflags2::BitFlags;
 use mongodb_types::*;
 use psl_core::{
     datamodel_connector::{
-        Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, NativeTypeConstructor,
+        Connector, ConnectorCapabilities, ConnectorCapability, ConstraintScope, Flavour, NativeTypeConstructor,
         NativeTypeInstance, RelationMode,
     },
     diagnostics::{Diagnostics, Span},
@@ -145,5 +145,9 @@ impl Connector for MongoDbDatamodelConnector {
     /// Avoid checking whether the fields appearing in a `@relation` attribute are included in an index.
     fn should_suggest_missing_referencing_fields_indexes(&self) -> bool {
         false
+    }
+
+    fn flavour(&self) -> Flavour {
+        Flavour::Mongo
     }
 }
