@@ -23,6 +23,7 @@ pub async fn execute_single_operation(
     operation: &Operation,
     trace_id: Option<String>,
 ) -> crate::Result<ResponseData> {
+    #[cfg(feature = "metrics")]
     let operation_timer = Instant::now();
 
     let (graph, serializer) = build_graph(&query_schema, operation.clone())?;
@@ -48,7 +49,9 @@ pub async fn execute_many_operations(
     let mut results = Vec::with_capacity(queries.len());
 
     for (i, (graph, serializer)) in queries.into_iter().enumerate() {
+        #[cfg(feature = "metrics")]
         let operation_timer = Instant::now();
+
         let result = execute_on(conn, graph, serializer, query_schema.as_ref(), trace_id.clone()).await;
 
         #[cfg(feature = "metrics")]
@@ -149,7 +152,9 @@ async fn execute_self_contained(
     retry_on_transient_error: bool,
     trace_id: Option<String>,
 ) -> crate::Result<ResponseData> {
+    #[cfg(feature = "metrics")]
     let operation_timer = Instant::now();
+
     let result = if retry_on_transient_error {
         execute_self_contained_with_retry(
             &mut conn,

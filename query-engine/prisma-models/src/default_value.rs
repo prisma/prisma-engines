@@ -66,7 +66,7 @@ impl DefaultKind {
 
     /// Returns either a copy of the contained single value or produces a new
     /// value as defined by the expression.
-    #[cfg(feature = "default_generators")]
+    #[cfg(feature = "wasm_generators")]
     pub fn get(&self) -> Option<PrismaValue> {
         match self {
             DefaultKind::Single(ref v) => Some(v.clone()),
@@ -220,7 +220,7 @@ impl ValueGenerator {
         self.args.get(0).and_then(|v| v.1.as_string())
     }
 
-    #[cfg(feature = "default_generators")]
+    #[cfg(feature = "wasm_generators")]
     pub fn generate(&self) -> Option<PrismaValue> {
         self.generator.invoke()
     }
@@ -260,11 +260,20 @@ impl ValueGeneratorFn {
         }
     }
 
-    #[cfg(feature = "default_generators")]
+    #[cfg(feature = "wasm_generators")]
     fn invoke(&self) -> Option<PrismaValue> {
         match self {
             Self::Uuid => Some(Self::generate_uuid()),
-            Self::Cuid => Some(Self::generate_cuid()),
+            Self::Cuid => {
+                #[cfg(feature = "default_generators")]
+                {
+                    Some(Self::generate_cuid())
+                }
+                #[cfg(not(feature = "default_generators"))]
+                {
+                    panic!("cuid not supported in wasm mode")
+                }
+            }
             Self::Nanoid(length) => Some(Self::generate_nanoid(length)),
             Self::Now => Some(Self::generate_now()),
             Self::Autoincrement => None,
@@ -275,15 +284,15 @@ impl ValueGeneratorFn {
 
     #[cfg(feature = "default_generators")]
     fn generate_cuid() -> PrismaValue {
-        PrismaValue::String(cuid2::cuid())
+        PrismaValue::String(cuid::cuid().unwrap())
     }
 
-    #[cfg(feature = "default_generators")]
+    #[cfg(feature = "wasm_generators")]
     fn generate_uuid() -> PrismaValue {
         PrismaValue::Uuid(uuid::Uuid::new_v4())
     }
 
-    #[cfg(feature = "default_generators")]
+    #[cfg(feature = "wasm_generators")]
     fn generate_nanoid(length: &Option<u8>) -> PrismaValue {
         if length.is_some() {
             let value: usize = usize::from(length.unwrap());
@@ -293,7 +302,7 @@ impl ValueGeneratorFn {
         }
     }
 
-    #[cfg(feature = "default_generators")]
+    #[cfg(feature = "wasm_generators")]
     fn generate_now() -> PrismaValue {
         PrismaValue::DateTime(chrono::Utc::now().into())
     }

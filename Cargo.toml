@@ -56,18 +56,7 @@ napi-derive = "2.12.4"
 
 [workspace.dependencies.quaint]
 path = "quaint"
-features = [
-  "bigdecimal",
-  "chrono",
-  "expose-drivers",
-  "fmt-sql",
-  "json",
-  "mssql",
-  "mysql",
-  "postgresql",
-  "sqlite",
-  "uuid",
-]
+features = ["workspace-default"]
 
 [profile.dev.package.backtrace]
 opt-level = 3

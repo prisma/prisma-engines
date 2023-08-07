@@ -3,13 +3,17 @@ edition = "2021"
 name = "query-connector"
 version = "0.1.0"
 
+[features]
+default = ["native"]
+native = ["prisma-models/default_generators"]
+
 [dependencies]
 anyhow = "1.0"
 async-trait = "0.1.31"
 chrono = {version = "0.4", features = ["serde"]}
 futures = "0.3"
 itertools = "0.10"
-prisma-models = {path = "../../prisma-models"}
+prisma-models = {path = "../../prisma-models", features = ["wasm_generators"] }
 prisma-value = {path = "../../../libs/prisma-value"}
 serde.workspace = true
 serde_json.workspace = true
@@ -17,3 +21,6 @@ thiserror = "1.0"
 user-facing-errors = { path = "../../../libs/user-facing-errors", features = ["sql"] }
 uuid = "1"
 indexmap = "1.7"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+getrandom = { version = "0.2", features = ["js"] }

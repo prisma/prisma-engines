@@ -29,7 +29,14 @@ docs = []
 # way to access database-specific methods when you need extra control.
 expose-drivers = []
 
-all = ["slim", "connectors", "pooled"]
+all = ["slim", "connectors", "pooled", "serde-support"]
+
+workspace-default = [
+  "slim",
+  "expose-drivers",
+  "fmt-sql",
+  "connectors"
+]
 
 connectors = [
   "postgresql-connector",
@@ -122,7 +129,7 @@ serde = { version = "1.0", features = ["derive"] }
 test-macros = { path = "test-macros" }
 test-setup = { path = "test-setup" }
 uuid = { version = "1", features = ["v4"] }
-tokio = { version = "1.0", features = ["rt-multi-thread", "macros", "time"] }
+tokio = { version = "1.25", features = ["macros", "time"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies.getrandom]
 version = "0.2"
