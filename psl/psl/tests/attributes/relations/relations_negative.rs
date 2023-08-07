@@ -1133,3 +1133,33 @@ fn mongo_prisma_skip_integrity_relation_mode_shouldnt_allow_any_referential_acti
 
     assert!(parse_unwrap_err(dml).contains("Invalid referential action: `Restrict`. When using `relationMode = \"prismaSkipIntegrity\"`, you cannot specify any referential action."));
 }
+
+#[test]
+fn sql_should_fail_with_prisma_skip_integrity_relation_mode() {
+    let dml = indoc! {r#"
+        datasource db {
+          provider = "mysql"
+          relationMode = "prismaSkipIntegrity"
+          url = env("PLACEHOLDER")
+        }
+
+        generator client {
+          provider = "prisma-client-js"
+        }
+
+        model A {
+          id Int @id
+          bs B[]
+        }
+
+        model B {
+          id Int @id
+          aId Int
+          a A @relation(fields: [aId], references: [id], onUpdate: Restrict, onDelete: Restrict)
+        }
+    "#};
+
+    assert!(parse_unwrap_err(dml).contains(
+        "Error validating datasource `relationMode`: Invalid relation mode setting: \"prismaSkipIntegrity\"."
+    ));
+}
