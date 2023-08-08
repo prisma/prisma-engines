@@ -20,7 +20,7 @@ thiserror = "1"
 tracing = "0.1"
 url = "2"
 connection-string.workspace = true 
-quaint = { path = "../../quaint", features = ["slim"] }
+quaint = { path = "../../quaint", features = ["slim"], default-features = false }
 once_cell = "1.15"
 
 mongodb-query-connector = { path = "../connectors/mongodb-query-connector", optional = true }

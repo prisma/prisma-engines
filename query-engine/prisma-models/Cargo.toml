@@ -14,10 +14,11 @@ uuid = { workspace = true, optional = true }
 cuid = { version = "1.2", optional = true }
 nanoid = { version = "0.4.0", optional = true }
 chrono = { version = "0.4.6", features = ["serde"] }
+getrandom = { version = "0.2" }
 
 [features]
 # Support for generating default UUID, CUID, nanoid and datetime values. This
 # implies random number generation works, so it won't compile on targets like
 # wasm32.
 default_generators = ["cuid", "wasm_generators"]
-wasm_generators = ["uuid/v4", "nanoid"]
+wasm_generators = ["uuid/v4", "nanoid", "getrandom/js"]
