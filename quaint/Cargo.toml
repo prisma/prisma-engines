@@ -35,7 +35,6 @@ workspace-default = [
   "slim",
   "expose-drivers",
   "fmt-sql",
-  "connectors"
 ]
 
 connectors = [
