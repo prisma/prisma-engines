@@ -24,7 +24,7 @@ quaint = { path = "../../quaint", features = ["slim"] }
 once_cell = "1.15"
 
 mongodb-query-connector = { path = "../connectors/mongodb-query-connector", optional = true }
-sql-query-connector = { path = "../connectors/sql-query-connector", optional = true, default-features = false }
+sql-query-connector = { path = "../connectors/sql-query-connector", default-features = false }
 
 [dev-dependencies]
 insta = "1.7.1"
@@ -34,9 +34,9 @@ codspeed-criterion-compat = "1.1.0"
 [features]
 default = ["mongodb", "sql", "metrics", "native-connectors", "graphql"]
 mongodb = ["mongodb-query-connector"]
-sql = ["sql-query-connector"]
+sql = []
 native-connectors = ["sql-query-connector/native-connectors"]
-js-connectors = ["sql-query-connector"]
+js-connectors = ["sql-query-connector/js-connectors"]
 metrics = ["query-core/metrics"]
 graphql = ["graphql-parser"]
 
