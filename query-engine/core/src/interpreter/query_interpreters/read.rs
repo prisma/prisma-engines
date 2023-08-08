@@ -142,10 +142,9 @@ fn read_related<'conn>(
 ) -> BoxFuture<'conn, InterpretationResult<QueryResult>> {
     let fut = async move {
         let relation = query.parent_field.relation();
-        let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
 
         let (scalars, aggregation_rows) = if relation.is_many_to_many() {
-            nested_read::m2m(tx, &query, parent_result, processor, trace_id).await?
+            nested_read::m2m(tx, &mut query, parent_result, trace_id).await?
         } else {
             nested_read::one2m(
                 tx,
@@ -155,7 +154,6 @@ fn read_related<'conn>(
                 query.args.clone(),
                 &query.selected_fields,
                 query.aggregation_selections,
-                processor,
                 trace_id,
             )
             .await?

@@ -1,11 +1,5 @@
 use crate::filter::Filter;
-use prisma_models::{ast::FieldArity, *};
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct SkipAndLimit {
-    pub skip: usize,
-    pub limit: Option<usize>,
-}
+use prisma_models::*;
 
 /// `QueryArguments` define various constraints queried data should fulfill:
 /// - `cursor`, `take`, `skip` page through the data.
@@ -159,12 +153,12 @@ impl QueryArguments {
 
         let has_optional_hop = on_relation.iter().any(|o| {
             o.path.iter().any(|hop| match hop {
-                OrderByHop::Relation(rf) => rf.arity() == FieldArity::Optional,
+                OrderByHop::Relation(rf) => rf.arity().is_optional(),
                 OrderByHop::Composite(cf) => !cf.is_required(),
             })
         });
 
-        // [Dom] I'm not entirely sure why we're doing this, but I assume that optionals introduce NULLs that make the ordering inherently unstable?
+        // Optional hops introduce NULLs that make the ordering inherently unstable.
         if has_optional_hop {
             return false;
         }
