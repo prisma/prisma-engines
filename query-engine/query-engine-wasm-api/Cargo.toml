@@ -47,12 +47,3 @@ js-sys = "0.3"
 [dependencies.quaint]
 workspace = true
 features = ["slim"]
-
-[profile.release]
-# Default release settings for all targets
-
-[profile.release.target.'cfg(target_arch = "wasm32")']
-# Custom release settings for wasm32-unknown-unknown
-opt-level = "z"
-lto = "fat"
-panic = "abort"

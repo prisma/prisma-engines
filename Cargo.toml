@@ -67,6 +67,10 @@ strip = "symbols"
 [profile.release.package.query-engine]
 strip = "symbols"
 
+[profile.release.package.query-engine-wasm-api]
+opt-level = 's'
+debug = false
+
 [profile.release]
 lto = "fat"
 codegen-units = 1
