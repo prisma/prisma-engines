@@ -26,7 +26,6 @@ chrono = "0.4.20"
 
 [dependencies.quaint]
 workspace = true
-default-features = false
 features = ["slim"]
 
 [dev-dependencies]

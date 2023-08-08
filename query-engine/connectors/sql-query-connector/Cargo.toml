@@ -5,7 +5,7 @@ version = "0.1.0"
 
 [features]
 vendored-openssl = ["quaint/vendored-openssl"]
-js-connectors = []
+js-connectors = ["prisma-models/wasm_generators"]
 native-connectors = ["cuid", "connector-interface/native", "quaint/pooled", "quaint/connectors"]
 default = ["native-connectors"]
 
@@ -35,6 +35,7 @@ default-features = false
 
 [dependencies.prisma-models]
 path = "../../prisma-models"
+default-features = false
 
 [dependencies.prisma-value]
 path = "../../../libs/prisma-value"
