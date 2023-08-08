@@ -260,6 +260,19 @@
 <a href="#260" id="260">260</a>
 <a href="#261" id="261">261</a>
 <a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{inmemory_record_processor::InMemoryRecordProcessor, read};
 <span class="kw">use crate</span>::{interpreter::InterpretationResult, query_ast::<span class="kw-2">*</span>};
 <span class="kw">use </span>connector::{
@@ -271,11 +284,11 @@
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>m2m(
     tx: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>ConnectionLike,
-    query: <span class="kw-2">&amp;</span>RelatedRecordsQuery,
+    query: <span class="kw-2">&amp;mut </span>RelatedRecordsQuery,
     parent_result: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ManyRecords&gt;,
-    processor: InMemoryRecordProcessor,
     trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
 ) -&gt; InterpretationResult&lt;(ManyRecords, <span class="prelude-ty">Option</span>&lt;Vec&lt;RelAggregationRow&gt;&gt;)&gt; {
+    <span class="kw">let </span>processor = InMemoryRecordProcessor::new_from_query_args(<span class="kw-2">&amp;mut </span>query.args);
     <span class="kw">let </span>parent_field = <span class="kw-2">&amp;</span>query.parent_field;
     <span class="kw">let </span>child_link_id = parent_field.related_field().linking_fields();
 
@@ -400,10 +413,9 @@
     parent_field: <span class="kw-2">&amp;</span>RelationFieldRef,
     parent_selections: <span class="prelude-ty">Option</span>&lt;Vec&lt;SelectionResult&gt;&gt;,
     parent_result: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ManyRecords&gt;,
-    query_args: QueryArguments,
+    <span class="kw-2">mut </span>query_args: QueryArguments,
     selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
     aggr_selections: Vec&lt;RelAggregationSelection&gt;,
-    processor: InMemoryRecordProcessor,
     trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
 ) -&gt; InterpretationResult&lt;(ManyRecords, <span class="prelude-ty">Option</span>&lt;Vec&lt;RelAggregationRow&gt;&gt;)&gt; {
     <span class="kw">let </span>parent_model_id = parent_field.model().primary_identifier();
@@ -452,6 +464,15 @@
         <span class="kw">return </span><span class="prelude-val">Ok</span>((ManyRecords::empty(selected_fields), <span class="prelude-val">None</span>));
     }
 
+    <span class="comment">// If we&#39;re fetching related records from a single parent, then we can apply normal pagination instead of in-memory processing.
+    // However, we can&#39;t just apply a LIMIT/OFFSET for multiple parents as we need N related records PER parent.
+    // We could use ROW_NUMBER() but it requires further refactoring so we&#39;re still using in-memory processing for now.
+    </span><span class="kw">let </span>processor = <span class="kw">if </span>uniq_selections.len() == <span class="number">1 </span>&amp;&amp; !query_args.requires_inmemory_processing() {
+        <span class="prelude-val">None
+    </span>} <span class="kw">else </span>{
+        <span class="prelude-val">Some</span>(InMemoryRecordProcessor::new_from_query_args(<span class="kw-2">&amp;mut </span>query_args))
+    };
+
     <span class="kw">let </span><span class="kw-2">mut </span>scalars = {
         <span class="kw">let </span>filter = child_link_id.is_in(ConditionListValue::list(uniq_selections));
         <span class="kw">let </span><span class="kw-2">mut </span>args = query_args;
@@ -460,6 +481,7 @@
             <span class="prelude-val">Some</span>(existing_filter) =&gt; <span class="prelude-val">Some</span>(Filter::and(<span class="macro">vec!</span>[existing_filter, filter])),
             <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Some</span>(filter),
         };
+
         tx.get_many_records(
             <span class="kw-2">&amp;</span>parent_field.related_model(),
             args,
@@ -517,7 +539,11 @@
         );
     }
 
-    <span class="kw">let </span>scalars = processor.apply(scalars);
+    <span class="kw">let </span>scalars = <span class="kw">if let </span><span class="prelude-val">Some</span>(processor) = processor {
+        processor.apply(scalars)
+    } <span class="kw">else </span>{
+        scalars
+    };
     <span class="kw">let </span>(scalars, aggregation_rows) = read::extract_aggregation_rows_from_scalars(scalars, aggr_selections);
 
     <span class="prelude-val">Ok</span>((scalars, aggregation_rows))

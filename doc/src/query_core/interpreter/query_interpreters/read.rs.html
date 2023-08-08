@@ -292,8 +292,6 @@
 <a href="#292" id="292">292</a>
 <a href="#293" id="293">293</a>
 <a href="#294" id="294">294</a>
-<a href="#295" id="295">295</a>
-<a href="#296" id="296">296</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use crate</span>::{interpreter::InterpretationResult, query_ast::<span class="kw-2">*</span>, result_ast::<span class="kw-2">*</span>};
 <span class="kw">use </span>connector::{<span class="self">self</span>, error::ConnectorError, ConnectionLike, RelAggregationRow, RelAggregationSelection};
@@ -438,10 +436,9 @@
 ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;conn</span>, InterpretationResult&lt;QueryResult&gt;&gt; {
     <span class="kw">let </span>fut = <span class="kw">async move </span>{
         <span class="kw">let </span>relation = query.parent_field.relation();
-        <span class="kw">let </span>processor = InMemoryRecordProcessor::new_from_query_args(<span class="kw-2">&amp;mut </span>query.args);
 
         <span class="kw">let </span>(scalars, aggregation_rows) = <span class="kw">if </span>relation.is_many_to_many() {
-            nested_read::m2m(tx, <span class="kw-2">&amp;</span>query, parent_result, processor, trace_id).<span class="kw">await</span><span class="question-mark">?
+            nested_read::m2m(tx, <span class="kw-2">&amp;mut </span>query, parent_result, trace_id).<span class="kw">await</span><span class="question-mark">?
         </span>} <span class="kw">else </span>{
             nested_read::one2m(
                 tx,
@@ -451,7 +448,6 @@
                 query.args.clone(),
                 <span class="kw-2">&amp;</span>query.selected_fields,
                 query.aggregation_selections,
-                processor,
                 trace_id,
             )
             .<span class="kw">await</span><span class="question-mark">?

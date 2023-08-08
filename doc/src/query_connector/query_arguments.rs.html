@@ -236,20 +236,8 @@
 <a href="#236" id="236">236</a>
 <a href="#237" id="237">237</a>
 <a href="#238" id="238">238</a>
-<a href="#239" id="239">239</a>
-<a href="#240" id="240">240</a>
-<a href="#241" id="241">241</a>
-<a href="#242" id="242">242</a>
-<a href="#243" id="243">243</a>
-<a href="#244" id="244">244</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::filter::Filter;
-<span class="kw">use </span>prisma_models::{ast::FieldArity, <span class="kw-2">*</span>};
-
-<span class="attr">#[derive(Debug, Clone, Copy, PartialEq)]
-</span><span class="kw">pub struct </span>SkipAndLimit {
-    <span class="kw">pub </span>skip: usize,
-    <span class="kw">pub </span>limit: <span class="prelude-ty">Option</span>&lt;usize&gt;,
-}
+<span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// `QueryArguments` define various constraints queried data should fulfill:
 /// - `cursor`, `take`, `skip` page through the data.
@@ -403,12 +391,12 @@
 
         <span class="kw">let </span>has_optional_hop = on_relation.iter().any(|o| {
             o.path.iter().any(|hop| <span class="kw">match </span>hop {
-                OrderByHop::Relation(rf) =&gt; rf.arity() == FieldArity::Optional,
+                OrderByHop::Relation(rf) =&gt; rf.arity().is_optional(),
                 OrderByHop::Composite(cf) =&gt; !cf.is_required(),
             })
         });
 
-        <span class="comment">// [Dom] I&#39;m not entirely sure why we&#39;re doing this, but I assume that optionals introduce NULLs that make the ordering inherently unstable?
+        <span class="comment">// Optional hops introduce NULLs that make the ordering inherently unstable.
         </span><span class="kw">if </span>has_optional_hop {
             <span class="kw">return </span><span class="bool-val">false</span>;
         }
