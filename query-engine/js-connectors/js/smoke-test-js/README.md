@@ -21,7 +21,6 @@ This is very important to double-check if you have multiple versions installed, 
 
 - Create a new database on [PlanetScale](https://planetscale.com/)
 - Go to `Settings` > `Passwords`, and create a new password for the `main` database branch. Select the `Prisma` template and copy the generated URL (comprising username, password, etc). Paste it in the `JS_PLANETSCALE_DATABASE_URL` environment variable in `.envrc`.
-- Create a new `shadow` database branch. Repeat the steps above (selecting the `shadow` branch instead of `main`), and paste the generated URL in the `JS_PLANETSCALE_SHADOW_DATABASE_URL` environment variable in `.envrc`.
 
 In the current directory:
 - Run `pnpm prisma:planetscale` to push the Prisma schema and insert the test data.
