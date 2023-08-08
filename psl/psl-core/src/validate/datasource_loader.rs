@@ -248,7 +248,7 @@ fn get_relation_mode(
                 "prismaSkipIntegrity" => RelationMode::PrismaSkipIntegrity,
                 other => {
                     let message = format!(
-                        "Invalid relation mode setting: \"{other}\". Supported values: \"prisma\", \"foreignKeys\"",
+                        "Invalid relation mode setting: \"{other}\". Supported values: \"prisma\", \"foreignKeys\", \"prismaSkipIntegrity\"",
                     );
                     let error = DatamodelError::new_source_validation_error(&message, "relationMode", source.span);
                     diagnostics.push_error(error);
