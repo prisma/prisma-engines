@@ -380,7 +380,7 @@ fn foreign_keys_not_allowed_on_mongo() {
     "#};
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError validating datasource `relationMode`: Invalid relation mode setting: "foreignKeys". Supported values: "prisma"[0m
+        [1;91merror[0m: [1mError validating datasource `relationMode`: Invalid relation mode setting: "foreignKeys". Supported values: "prisma", "prismaSkipIntegrity"[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  provider = "mongodb"
