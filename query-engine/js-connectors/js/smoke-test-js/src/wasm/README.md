@@ -19,6 +19,12 @@ To optimize the Wasm binary, run:
 # --minify-imports: Minify import names
 # --remove-non-js-ops: Remove non-JS operations
 # --duplicate-function-elimination: Eliminate duplicate functions
+# --vacuum: Removes obviously unneded code
+# --disable-threads: Disable atomic operations
+# --enable-reference-types: Enable reference types
+# --directize: turns indirect calls into direct ones
+# --cfp: propagate constant structure field values
+# --local-cse: local common subexpression elimination inside basic blocks
 WASM_FILE="./target/wasm32-unknown-unknown/release/libquery_wasm.wasm" \
   wasm-opt $WASM_FILE \
   -Os \
@@ -30,6 +36,12 @@ WASM_FILE="./target/wasm32-unknown-unknown/release/libquery_wasm.wasm" \
   --minify-imports \
   --remove-non-js-ops \
   --duplicate-function-elimination \
+  --vacuum \
+  --disable-threads \
+  --enable-reference-types \
+  --directize \
+  --cfp \
+  --local-cse \
   -o $WASM_FILE
 ```
 
@@ -38,7 +50,7 @@ The resulting Wasm binary should be around 4.1MB.
 Then, run
 
 ```bash
-wasm-bindgen --target bundler --out-dir ./query-engine/js-connectors/js/smoke-test-js/src/wasm ./target/wasm32-unknown-unknown/release/libquery_wasm.wasm
+wasm-bindgen --target bundler --reference-types --out-dir ./query-engine/js-connectors/js/smoke-test-js/src/wasm ./target/wasm32-unknown-unknown/release/libquery_wasm.wasm
 ```
 
 TODO: evaluate using `wasm-pack`.
