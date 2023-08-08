@@ -18,11 +18,11 @@ anyhow = "1"
 async-trait = "0.1"
 query-core = { path = "../core", default-features = false }
 request-handlers = { path = "../request-handlers", default-features = false, features = ["js-connectors", "sql"] }
-query-connector = { path = "../connectors/query-connector" }
+query-connector = { path = "../connectors/query-connector", default-features = false }
 user-facing-errors = { path = "../../libs/user-facing-errors", features = ["quaint"]}
 psl.workspace = true
 sql-connector = { path = "../connectors/sql-query-connector", package = "sql-query-connector", default-features = false, features = ["js-connectors"] }
-prisma-models = { path = "../prisma-models", features = ["wasm_generators"] }
+prisma-models = { path = "../prisma-models", default-features = false, features = ["wasm_generators"] }
 wasm-connectors = { path = "../wasm-connectors" }
 
 tracing = "0.1"
