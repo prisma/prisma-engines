@@ -1,11 +1,11 @@
 import { setImmediate, setTimeout } from 'node:timers/promises'
-import type { Connector, Closeable } from '@jkomyno/prisma-js-connector-utils'
+import type { Connector } from '@jkomyno/prisma-js-connector-utils'
 import type { QueryEngineInstance } from './engines/types/Library'
 import { initQueryEngine } from './util'
 
 type Flavor = Connector['flavour']
 
-export async function smokeTest(db: Connector & Closeable, prismaSchemaRelativePath: string) {
+export async function smokeTest(db: Connector, prismaSchemaRelativePath: string) {
   // wait for the database pool to be initialized
   await setImmediate(0)
   
