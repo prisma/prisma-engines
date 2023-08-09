@@ -77,13 +77,14 @@ class PrismaPlanetScale implements Connector, Closeable {
     const tag = '[js::query_raw]'
     debug(`${tag} %O`, query)
 
-    const { fields, rows: results } = await this.performIO(query)
+    const { fields, insertId: lastInsertId, rows: results } = await this.performIO(query)
 
     const columns = fields.map(field => field.name)
     const resultSet: ResultSet = {
       columnNames: columns,
       columnTypes: fields.map(field => fieldToColumnType(field.type as PlanetScaleColumnType)),
       rows: results.map(result => columns.map(column => result[column])),
+      lastInsertId,
     }
 
     return resultSet
