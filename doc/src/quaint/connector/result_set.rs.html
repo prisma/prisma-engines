@@ -129,7 +129,6 @@
 <a href="#129" id="129">129</a>
 <a href="#130" id="130">130</a>
 <a href="#131" id="131">131</a>
-<a href="#132" id="132">132</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>index;
 <span class="kw">mod </span>result_row;
 
@@ -160,8 +159,7 @@
         }
     }
 
-    <span class="attr">#[cfg(any(feature = <span class="string">&quot;sqlite&quot;</span>, feature = <span class="string">&quot;mysql&quot;</span>))]
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_last_insert_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: u64) {
+    <span class="kw">pub fn </span>set_last_insert_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: u64) {
         <span class="self">self</span>.last_insert_id = <span class="prelude-val">Some</span>(id);
     }
 

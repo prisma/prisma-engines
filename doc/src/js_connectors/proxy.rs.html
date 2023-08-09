@@ -646,6 +646,18 @@
 <a href="#646" id="646">646</a>
 <a href="#647" id="647">647</a>
 <a href="#648" id="648">648</a>
+<a href="#649" id="649">649</a>
+<a href="#650" id="650">650</a>
+<a href="#651" id="651">651</a>
+<a href="#652" id="652">652</a>
+<a href="#653" id="653">653</a>
+<a href="#654" id="654">654</a>
+<a href="#655" id="655">655</a>
+<a href="#656" id="656">656</a>
+<a href="#657" id="657">657</a>
+<a href="#658" id="658">658</a>
+<a href="#659" id="659">659</a>
+<a href="#660" id="660">660</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::panic;
 <span class="kw">use </span>std::str::FromStr;
 <span class="kw">use </span>std::sync::{Arc, Condvar, Mutex};
@@ -736,6 +748,7 @@
     <span class="kw">pub </span>column_names: Vec&lt;String&gt;,
     <span class="comment">// Note this might be encoded differently for performance reasons
     </span><span class="kw">pub </span>rows: Vec&lt;Vec&lt;serde_json::Value&gt;&gt;,
+    <span class="kw">pub </span>last_insert_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
 <span class="kw">impl </span>JSResultSet {
@@ -936,6 +949,7 @@
             rows,
             column_names,
             column_types,
+            last_insert_id,
         } = js_result_set;
 
         <span class="kw">let </span>quaint_rows = rows
@@ -949,7 +963,17 @@
             })
             .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-        QuaintResultSet::new(column_names, quaint_rows)
+        <span class="kw">let </span>last_insert_id = last_insert_id.and_then(|id| id.parse::&lt;u64&gt;().ok());
+        <span class="kw">let </span><span class="kw-2">mut </span>quaint_result_set = QuaintResultSet::new(column_names, quaint_rows);
+
+        <span class="comment">// Not a fan of this (extracting the `Some` value from an `Option` and pass it to a method that creates a new `Some` value),
+        // but that&#39;s Quaint&#39;s ResultSet API and that&#39;s how the MySQL connector does it.
+        // Sqlite, on the other hand, uses a `last_insert_id.unwrap_or(0)` approach.
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(last_insert_id) = last_insert_id {
+            quaint_result_set.set_last_insert_id(last_insert_id);
+        }
+
+        quaint_result_set
     }
 }
 
