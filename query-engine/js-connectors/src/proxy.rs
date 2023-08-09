@@ -89,6 +89,7 @@ pub struct JSResultSet {
     pub column_names: Vec<String>,
     // Note this might be encoded differently for performance reasons
     pub rows: Vec<Vec<serde_json::Value>>,
+    pub last_insert_id: Option<String>,
 }
 
 impl JSResultSet {
@@ -349,7 +350,17 @@ impl From<FlavourSpecificResultSet> for QuaintResultSet {
         let names = js_result_set.column_names;
         let rows = js_result_set.rows.iter_mut().map(to_quaint_row).collect();
 
-        QuaintResultSet::new(names, rows)
+        let last_insert_id = js_result_set.last_insert_id.and_then(|id| id.parse::<u64>().ok());
+        let mut quaint_result_set = QuaintResultSet::new(names, rows);
+
+        // Not a fan of this (extracting the `Some` value from an `Option` and pass it to a method that creates a new `Some` value),
+        // but that's Quaint's ResultSet API and that's how the MySQL connector does it.
+        // Sqlite, on the other hand, uses a `last_insert_id.unwrap_or(0)` approach.
+        if let Some(last_insert_id) = last_insert_id {
+            quaint_result_set.set_last_insert_id(last_insert_id);
+        }
+
+        quaint_result_set
     }
 }
 
