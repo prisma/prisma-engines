@@ -38,6 +38,9 @@ cuid = { version = "1.2", optional = true }
 schema = { path = "../schema" }
 lru = "0.7.7"
 enumflags2 = "0.7"
+instant = { version = "0.1",  features = ["stdweb", "wasm-bindgen", "inaccurate"] } # Vercel Edge Function does not have performance API
+pin-project = "1"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 getrandom = { version = "0.2", features = ["js"] }
+wasm-bindgen-futures = "0.4"
