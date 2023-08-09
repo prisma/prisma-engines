@@ -1,11 +1,11 @@
 import { setImmediate, setTimeout } from 'node:timers/promises'
-import type { Connector, Closeable } from '@jkomyno/prisma-js-connector-utils'
+import type { Connector } from '@jkomyno/prisma-js-connector-utils'
 import type { QueryEngineInstance } from './engines/types/Library'
 import { initQueryEngine } from './util'
 
 type Flavor = Connector['flavour']
 
-export async function smokeTest(db: Connector & Closeable, prismaSchemaRelativePath: string) {
+export async function smokeTest(db: Connector, prismaSchemaRelativePath: string) {
   // wait for the database pool to be initialized
   await setImmediate(0)
   
@@ -20,6 +20,7 @@ export async function smokeTest(db: Connector & Closeable, prismaSchemaRelativeP
   const test = new SmokeTest(engine, db.flavour)
 
   await test.testFindManyTypeTest()
+  await test.createAutoIncrement()
   await test.testCreateAndDeleteChildParent()
 
   // Note: calling `engine.disconnect` won't actually close the database connection.
@@ -122,6 +123,45 @@ class SmokeTest {
     console.log('[nodejs] findMany resultSet', JSON.stringify(JSON.parse(resultSet), null, 2))
   
     return resultSet
+  }
+
+  async createAutoIncrement() {
+    await this.engine.query(`
+      {
+        "modelName": "Author",
+        "action": "deleteMany",
+        "query": {
+          "arguments": {
+            "where": {}
+          },
+          "selection": {
+            "count": true
+          }
+        }
+      }
+    `, 'trace', undefined)
+
+    const author = await this.engine.query(`
+      {
+        "modelName": "Author",
+        "action": "createOne",
+        "query": {
+          "arguments": {
+            "data": {
+              "firstName": "Firstname from autoincrement",
+              "lastName": "Lastname from autoincrement",
+              "age": 99
+            }
+          },
+          "selection": {
+            "id": true,
+            "firstName": true,
+            "lastName": true
+          }
+        }
+      }
+    `, 'trace', undefined)
+    console.log('[nodejs] author', JSON.stringify(JSON.parse(author), null, 2))
   }
 
   async testCreateAndDeleteChildParent() {

@@ -81,10 +81,10 @@ async fn update_one(
         .await?;
 
     match q {
-        UpdateRecord::WithExplicitSelection(q) => {
+        UpdateRecord::WithSelection(q) if q.name.is_some() => {
             let res = res
                 .map(|res| RecordSelection {
-                    name: q.name,
+                    name: q.name.unwrap(),
                     fields: q.selection_order,
                     scalars: res.into(),
                     nested: vec![],
@@ -95,7 +95,14 @@ async fn update_one(
 
             Ok(QueryResult::RecordSelection(res))
         }
-        UpdateRecord::WithoutSelection(_) | UpdateRecord::WithImplicitSelection(_) => {
+        UpdateRecord::WithSelection(q) => {
+            let res = res
+                .map(|record| record.extract_selection_result(&q.selected_fields))
+                .transpose()?;
+
+            Ok(QueryResult::Id(res))
+        }
+        UpdateRecord::WithoutSelection(_) => {
             let res = res
                 .map(|record| record.extract_selection_result(&q.model().primary_identifier()))
                 .transpose()?;

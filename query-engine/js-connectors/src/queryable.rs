@@ -1,6 +1,6 @@
 use crate::{
     error::into_quaint_error,
-    proxy::{self, FlavourSpecificResultSet, JSResultSet, Proxy, Query},
+    proxy::{self, Proxy, Query},
 };
 use async_trait::async_trait;
 use napi::JsObject;
@@ -159,11 +159,6 @@ impl JsQueryable {
         Query { sql, args }
     }
 
-    async fn transform_result_set(flavour: Flavour, result_set: JSResultSet) -> quaint::Result<ResultSet> {
-        let flavoured_js_result_set = FlavourSpecificResultSet((flavour, result_set));
-        Ok(ResultSet::from(flavoured_js_result_set))
-    }
-
     async fn do_query_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<ResultSet> {
         let len = params.len();
         let serialization_span = info_span!("js:query:args", user_facing = true, "length" = %len);
@@ -178,10 +173,8 @@ impl JsQueryable {
             .map_err(into_quaint_error)?;
 
         let len = result_set.len();
-        let deserialization_span = info_span!("js:query:result", user_facing = true, "length" = %len);
-        Self::transform_result_set(self.flavour, result_set)
-            .instrument(deserialization_span)
-            .await
+        let _deserialization_span = info_span!("js:query:result", user_facing = true, "length" = %len).entered();
+        Ok(ResultSet::from(result_set))
     }
 
     async fn do_execute_raw(&self, sql: &str, params: &[Value<'_>]) -> quaint::Result<u64> {

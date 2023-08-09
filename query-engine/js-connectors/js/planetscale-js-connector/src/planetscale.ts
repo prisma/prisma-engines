@@ -3,7 +3,7 @@ import type { Config as PlanetScaleConfig } from '@planetscale/database'
 import { EventEmitter } from 'node:events'
 import { setImmediate } from 'node:timers/promises'
 import { binder, isConnectionUnhealthy, Debug } from '@jkomyno/prisma-js-connector-utils'
-import type { Closeable, Connector, ResultSet, Query, ConnectorConfig } from '@jkomyno/prisma-js-connector-utils'
+import type { Connector, ResultSet, Query, ConnectorConfig } from '@jkomyno/prisma-js-connector-utils'
 import { type PlanetScaleColumnType, fieldToColumnType } from './conversion'
 
 const debug = Debug('prisma:js-connector:planetscale')
@@ -38,7 +38,7 @@ const TRANSACTION_BEGIN = 'BEGIN'
 const TRANSACTION_COMMIT = 'COMMIT'
 const TRANSACTION_ROLLBACK = 'ROLLBACK'
 
-class PrismaPlanetScale implements Connector, Closeable {
+class PrismaPlanetScale implements Connector {
   readonly flavour = 'mysql'
   
   private driver: TransactionCapableDriver
@@ -64,7 +64,7 @@ class PrismaPlanetScale implements Connector, Closeable {
   }
 
   /**
-   * Returns false, if connection is considered to not be in a working state.
+   * Returns true, if connection is considered to be in a working state.
    */
   isHealthy(): boolean {
     return this.isRunning && this._isHealthy
@@ -77,13 +77,14 @@ class PrismaPlanetScale implements Connector, Closeable {
     const tag = '[js::query_raw]'
     debug(`${tag} %O`, query)
 
-    const { fields, rows: results } = await this.performIO(query)
+    const { fields, insertId: lastInsertId, rows: results } = await this.performIO(query)
 
     const columns = fields.map(field => field.name)
     const resultSet: ResultSet = {
       columnNames: columns,
       columnTypes: fields.map(field => fieldToColumnType(field.type as PlanetScaleColumnType)),
       rows: results.map(result => columns.map(column => result[column])),
+      lastInsertId,
     }
 
     return resultSet
@@ -172,7 +173,7 @@ class PrismaPlanetScale implements Connector, Closeable {
     return this._version
   }
 
-    /**
+  /**
    * Run a query against the database, returning the result set.
    * Should the query fail due to a connection error, the connection is
    * marked as unhealthy.
@@ -194,7 +195,7 @@ class PrismaPlanetScale implements Connector, Closeable {
   }
 }
 
-export const createPlanetScaleConnector = (config: PrismaPlanetScaleConfig): Connector & Closeable => {
+export const createPlanetScaleConnector = (config: PrismaPlanetScaleConfig): Connector => {
   const db = new PrismaPlanetScale(config)
   return binder(db)
 }
