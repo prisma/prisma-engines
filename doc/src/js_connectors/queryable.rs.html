@@ -190,16 +190,9 @@
 <a href="#190" id="190">190</a>
 <a href="#191" id="191">191</a>
 <a href="#192" id="192">192</a>
-<a href="#193" id="193">193</a>
-<a href="#194" id="194">194</a>
-<a href="#195" id="195">195</a>
-<a href="#196" id="196">196</a>
-<a href="#197" id="197">197</a>
-<a href="#198" id="198">198</a>
-<a href="#199" id="199">199</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     error::into_quaint_error,
-    proxy::{<span class="self">self</span>, FlavourSpecificResultSet, JSResultSet, Proxy, Query},
+    proxy::{<span class="self">self</span>, Proxy, Query},
 };
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>napi::JsObject;
@@ -347,11 +340,6 @@
         Query { sql, args }
     }
 
-    <span class="kw">async fn </span>transform_result_set(flavour: Flavour, result_set: JSResultSet) -&gt; quaint::Result&lt;ResultSet&gt; {
-        <span class="kw">let </span>flavoured_js_result_set = FlavourSpecificResultSet((flavour, result_set));
-        <span class="prelude-val">Ok</span>(ResultSet::from(flavoured_js_result_set))
-    }
-
     <span class="kw">async fn </span>do_query_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;ResultSet&gt; {
         <span class="kw">let </span>len = params.len();
         <span class="kw">let </span>serialization_span = <span class="macro">info_span!</span>(<span class="string">&quot;js:query:args&quot;</span>, user_facing = <span class="bool-val">true</span>, <span class="string">&quot;length&quot; </span>= %len);
@@ -366,11 +354,9 @@
             </span>.map_err(into_quaint_error)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>len = result_set.len();
-        <span class="kw">let </span>deserialization_span = <span class="macro">info_span!</span>(<span class="string">&quot;js:query:result&quot;</span>, user_facing = <span class="bool-val">true</span>, <span class="string">&quot;length&quot; </span>= %len);
-        <span class="self">Self</span>::transform_result_set(<span class="self">self</span>.flavour, result_set)
-            .instrument(deserialization_span)
-            .<span class="kw">await
-    </span>}
+        <span class="kw">let </span>_deserialization_span = <span class="macro">info_span!</span>(<span class="string">&quot;js:query:result&quot;</span>, user_facing = <span class="bool-val">true</span>, <span class="string">&quot;length&quot; </span>= %len).entered();
+        <span class="prelude-val">Ok</span>(ResultSet::from(result_set))
+    }
 
     <span class="kw">async fn </span>do_execute_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;u64&gt; {
         <span class="kw">let </span>len = params.len();
