@@ -1,4 +1,5 @@
 use super::{CachedTx, TransactionError, TxOpRequest, TxOpRequestMsg, TxOpResponse};
+use crate::executor::{spawn, JoinHandle};
 use crate::{
     execute_many_operations, execute_single_operation, protocol::EngineProtocol, ClosedTx, Operation, ResponseData,
     TxId,
@@ -11,7 +12,6 @@ use tokio::{
         mpsc::{channel, Receiver, Sender},
         oneshot, RwLock,
     },
-    task::JoinHandle,
     time::{self, Duration, Instant},
 };
 use tracing::Span;
@@ -272,7 +272,7 @@ pub(crate) async fn spawn_itx_actor(
     };
     let (open_transaction_send, open_transaction_rcv) = oneshot::channel();
 
-    tokio::task::spawn(
+    spawn(
         crate::executor::with_request_context(engine_protocol, async move {
             // We match on the result in order to send the error to the parent task and abort this
             // task, on error. This is a separate task (actor), not a function where we can just bubble up the
@@ -385,7 +385,7 @@ pub(crate) fn spawn_client_list_clear_actor(
     closed_txs: Arc<RwLock<lru::LruCache<TxId, Option<ClosedTx>>>>,
     mut rx: Receiver<(TxId, Option<ClosedTx>)>,
 ) -> JoinHandle<()> {
-    tokio::task::spawn(async move {
+    spawn(async move {
         loop {
             if let Some((id, closed_tx)) = rx.recv().await {
                 trace!("removing {} from client list", id);

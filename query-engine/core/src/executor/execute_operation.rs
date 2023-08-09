@@ -11,8 +11,9 @@ use query_engine_metrics::{
     histogram, increment_counter, metrics, PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, PRISMA_CLIENT_QUERIES_TOTAL,
 };
 
+use instant::Instant;
 use schema::{QuerySchema, QuerySchemaRef};
-use std::time::{Duration, Instant};
+use std::time::Duration;
 use tracing::Instrument;
 use tracing_futures::WithSubscriber;
 
@@ -117,7 +118,7 @@ pub async fn execute_many_self_contained<C: Connector + Send + Sync>(
         );
         let conn = connector.get_connection().instrument(conn_span).await?;
 
-        futures.push(tokio::spawn(
+        futures.push(super::spawn(
             request_context::with_request_context(
                 engine_protocol,
                 execute_self_contained(
