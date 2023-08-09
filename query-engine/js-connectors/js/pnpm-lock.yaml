@@ -61,8 +61,8 @@ importers:
         specifier: workspace:*
         version: link:../planetscale-js-connector
       '@prisma/client':
-        specifier: 5.1.0
-        version: 5.1.0(prisma@5.1.0)
+        specifier: 5.1.1
+        version: 5.1.1(prisma@5.1.0)
     devDependencies:
       prisma:
         specifier: ^5.1.0
@@ -556,8 +556,8 @@ packages:
     engines: {node: '>=16'}
     dev: false
 
-  /@prisma/client@5.1.0(prisma@5.1.0):
-    resolution: {integrity: sha512-aIxuXlH3p3Vy91buodQhYgAD9m0yuxJzpXMhc1ejQ/WN3pNNWzBA0iDcBObLq8DMdszcXmoLAk3hiRq/ZwBsOw==}
+  /@prisma/client@5.1.1(prisma@5.1.0):
+    resolution: {integrity: sha512-fxcCeK5pMQGcgCqCrWsi+I2rpIbk0rAhdrN+ke7f34tIrgPwA68ensrpin+9+fZvuV2OtzHmuipwduSY6HswdA==}
     engines: {node: '>=16.13'}
     requiresBuild: true
     peerDependencies:
@@ -566,12 +566,12 @@ packages:
       prisma:
         optional: true
     dependencies:
-      '@prisma/engines-version': 5.1.0-28.a9b7003df90aa623086e4d6f4e43c72468e6339b
+      '@prisma/engines-version': 5.1.1-1.6a3747c37ff169c90047725a05a6ef02e32ac97e
       prisma: 5.1.0
     dev: false
 
-  /@prisma/engines-version@5.1.0-28.a9b7003df90aa623086e4d6f4e43c72468e6339b:
-    resolution: {integrity: sha512-jTwE2oy1yjICmTfnCR0ASIpuMZXZ18sUzQXB7V0RMbrM9OlcmbUwXPuYhnxXuWN8XwRmujeIhsXs/Zeh+fjPOQ==}
+  /@prisma/engines-version@5.1.1-1.6a3747c37ff169c90047725a05a6ef02e32ac97e:
+    resolution: {integrity: sha512-owZqbY/wucbr65bXJ/ljrHPgQU5xXTSkmcE/JcbqE1kusuAXV/TLN3/exmz21SZ5rJ7WDkyk70J2G/n68iogbQ==}
     dev: false
 
   /@prisma/engines@5.1.0:
