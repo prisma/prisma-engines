@@ -53,7 +53,7 @@ impl ManyRecords {
         }
     }
 
-    pub fn order_by(&mut self, order_bys: &[OrderBy]) {
+    pub fn order_by(&mut self, order_bys: &[OrderBy], reversed: bool) {
         let field_indices: HashMap<&str, usize> = self
             .field_names
             .iter()
@@ -66,9 +66,13 @@ impl ManyRecords {
                 OrderBy::Scalar(by_scalar) => {
                     let index = field_indices[by_scalar.field.db_name()];
 
-                    match by_scalar.sort_order {
-                        SortOrder::Ascending => a.values[index].cmp(&b.values[index]),
-                        SortOrder::Descending => b.values[index].cmp(&a.values[index]),
+                    match (by_scalar.sort_order, reversed) {
+                        (SortOrder::Ascending, false) | (SortOrder::Descending, true) => {
+                            a.values[index].cmp(&b.values[index])
+                        }
+                        (SortOrder::Descending, false) | (SortOrder::Ascending, true) => {
+                            b.values[index].cmp(&a.values[index])
+                        }
                     }
                 }
                 OrderBy::ScalarAggregation(_) => unimplemented!(),
