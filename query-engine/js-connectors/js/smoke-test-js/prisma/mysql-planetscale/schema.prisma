@@ -91,3 +91,12 @@ model Parent {
 
   @@unique([p_1, p_2])
 }
+
+model Author {
+  id        Int             @id @default(autoincrement())
+  firstName String
+  lastName  String
+  age       Int
+
+  @@map("authors")
+}
