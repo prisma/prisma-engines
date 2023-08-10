@@ -1,6 +1,10 @@
 //! A single connection abstraction to a SQL database.
 
-#[cfg(feature = "sqlite")]
+#![cfg_attr(target_arch = "wasm32", allow(unused_imports))]
+#![cfg_attr(target_arch = "wasm32", allow(unused_variables))]
+#![cfg_attr(target_arch = "wasm32", allow(dead_code))]
+
+#[cfg(feature = "sqlite-connector")]
 use crate::connector::DEFAULT_SQLITE_SCHEMA_NAME;
 use crate::{
     ast,
@@ -130,27 +134,27 @@ impl Quaint {
     #[allow(unreachable_code)]
     pub async fn new(url_str: &str) -> crate::Result<Self> {
         let inner = match url_str {
-            #[cfg(feature = "sqlite")]
+            #[cfg(feature = "sqlite-connector")]
             s if s.starts_with("file") => {
                 let params = connector::SqliteParams::try_from(s)?;
                 let sqlite = connector::Sqlite::new(&params.file_path)?;
 
                 Arc::new(sqlite) as Arc<dyn Queryable>
             }
-            #[cfg(feature = "mysql")]
+            #[cfg(feature = "mysql-connector")]
             s if s.starts_with("mysql") => {
                 let url = connector::MysqlUrl::new(url::Url::parse(s)?)?;
                 let mysql = connector::Mysql::new(url).await?;
 
                 Arc::new(mysql) as Arc<dyn Queryable>
             }
-            #[cfg(feature = "postgresql")]
+            #[cfg(feature = "postgresql-connector")]
             s if s.starts_with("postgres") || s.starts_with("postgresql") => {
                 let url = connector::PostgresUrl::new(url::Url::parse(s)?)?;
                 let psql = connector::PostgreSql::new(url).await?;
                 Arc::new(psql) as Arc<dyn Queryable>
             }
-            #[cfg(feature = "mssql")]
+            #[cfg(feature = "mssql-connector")]
             s if s.starts_with("jdbc:sqlserver") | s.starts_with("sqlserver") => {
                 let url = connector::MssqlUrl::new(s)?;
                 let psql = connector::Mssql::new(url).await?;
@@ -166,7 +170,7 @@ impl Quaint {
         Ok(Self { inner, connection_info })
     }
 
-    #[cfg(feature = "sqlite")]
+    #[cfg(feature = "sqlite-connector")]
     #[cfg_attr(feature = "docs", doc(cfg(sqlite)))]
     /// Open a new SQLite database in memory.
     pub fn new_in_memory() -> crate::Result<Quaint> {

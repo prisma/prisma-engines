@@ -112,6 +112,7 @@ compile_error!("one of 'sqlite', 'postgresql', 'mysql' or 'mssql' features must 
 #[macro_use]
 mod macros;
 
+#[cfg(not(target_arch = "wasm32"))]
 #[macro_use]
 extern crate metrics;
 

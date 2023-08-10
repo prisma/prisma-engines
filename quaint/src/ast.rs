@@ -51,5 +51,7 @@ pub use select::Select;
 pub use table::*;
 pub use union::Union;
 pub use update::*;
-pub(crate) use values::Params;
 pub use values::{IntoRaw, Raw, Value, Values};
+
+#[allow(unused_imports)]
+pub(crate) use values::Params;
