@@ -104,16 +104,16 @@ impl SqlFlavour for MysqlFlavour {
     fn table_names(&mut self, _namespaces: Option<Namespaces>) -> BoxFuture<'_, ConnectorResult<Vec<String>>> {
         Box::pin(async move {
             let select = r#"
-                SELECT DISTINCT BINARY table_info.table_name AS table_name
+                SELECT DISTINCT table_info.table_name AS table_name
                 FROM information_schema.tables AS table_info
                 JOIN information_schema.columns AS column_info
-                    ON BINARY column_info.table_name = BINARY table_info.table_name
+                    ON column_info.table_name = table_info.table_name
                 WHERE
                     table_info.table_schema = ?
                     AND column_info.table_schema = ?
                     -- Exclude views.
                     AND table_info.table_type = 'BASE TABLE'
-                ORDER BY BINARY table_info.table_name
+                ORDER BY table_info.table_name
             "#;
 
             let database_name = self.database_name();
