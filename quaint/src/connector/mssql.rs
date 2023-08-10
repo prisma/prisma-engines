@@ -1,10 +1,10 @@
 mod conversion;
 mod error;
 
-use super::{IsolationLevel, TransactionOptions};
+use super::{IsolationLevel, Transaction, TransactionOptions};
 use crate::{
     ast::{Query, Value},
-    connector::{metrics, queryable::*, ResultSet, Transaction},
+    connector::{metrics, queryable::*, DefaultTransaction, ResultSet},
     error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };
@@ -96,7 +96,10 @@ static SQL_SERVER_DEFAULT_ISOLATION: IsolationLevel = IsolationLevel::ReadCommit
 
 #[async_trait]
 impl TransactionCapable for Mssql {
-    async fn start_transaction(&self, isolation: Option<IsolationLevel>) -> crate::Result<Transaction<'_>> {
+    async fn start_transaction<'a>(
+        &'a self,
+        isolation: Option<IsolationLevel>,
+    ) -> crate::Result<Box<dyn Transaction + 'a>> {
         // Isolation levels in SQL Server are set on the connection and live until they're changed.
         // Always explicitly setting the isolation level each time a tx is started (either to the given value
         // or by using the default/connection string value) prevents transactions started on connections from
@@ -107,7 +110,9 @@ impl TransactionCapable for Mssql {
 
         let opts = TransactionOptions::new(isolation, self.requires_isolation_first());
 
-        Transaction::new(self, self.begin_statement(), opts).await
+        Ok(Box::new(
+            DefaultTransaction::new(self, self.begin_statement(), opts).await?,
+        ))
     }
 }
 

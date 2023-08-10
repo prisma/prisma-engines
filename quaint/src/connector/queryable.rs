@@ -1,4 +1,4 @@
-use super::{IsolationLevel, ResultSet, Transaction, TransactionOptions};
+use super::{DefaultTransaction, IsolationLevel, ResultSet, Transaction, TransactionOptions};
 use crate::ast::*;
 use async_trait::async_trait;
 
@@ -82,7 +82,7 @@ pub trait Queryable: Send + Sync {
     }
 
     /// Execute an arbitrary function in the beginning of each transaction.
-    async fn server_reset_query(&self, _: &Transaction<'_>) -> crate::Result<()> {
+    async fn server_reset_query(&self, _: &DefaultTransaction<'_>) -> crate::Result<()> {
         Ok(())
     }
 
@@ -106,8 +106,14 @@ where
     Self: Sized,
 {
     /// Starts a new transaction
-    async fn start_transaction(&self, isolation: Option<IsolationLevel>) -> crate::Result<Transaction<'_>> {
+    async fn start_transaction<'a>(
+        &'a self,
+        isolation: Option<IsolationLevel>,
+    ) -> crate::Result<Box<dyn Transaction + 'a>> {
         let opts = TransactionOptions::new(isolation, self.requires_isolation_first());
-        Transaction::new(self, self.begin_statement(), opts).await
+
+        Ok(Box::new(
+            DefaultTransaction::new(self, self.begin_statement(), opts).await?,
+        ))
     }
 }
