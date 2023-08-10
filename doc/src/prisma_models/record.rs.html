@@ -210,6 +210,10 @@
 <a href="#210" id="210">210</a>
 <a href="#211" id="211">211</a>
 <a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{DomainError, FieldSelection, ModelProjection, OrderBy, PrismaValue, SelectionResult, SortOrder};
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>std::collections::HashMap;
@@ -265,7 +269,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>order_by(<span class="kw-2">&amp;mut </span><span class="self">self</span>, order_bys: <span class="kw-2">&amp;</span>[OrderBy]) {
+    <span class="kw">pub fn </span>order_by(<span class="kw-2">&amp;mut </span><span class="self">self</span>, order_bys: <span class="kw-2">&amp;</span>[OrderBy], reversed: bool) {
         <span class="kw">let </span>field_indices: HashMap&lt;<span class="kw-2">&amp;</span>str, usize&gt; = <span class="self">self
             </span>.field_names
             .iter()
@@ -278,9 +282,13 @@
                 OrderBy::Scalar(by_scalar) =&gt; {
                     <span class="kw">let </span>index = field_indices[by_scalar.field.db_name()];
 
-                    <span class="kw">match </span>by_scalar.sort_order {
-                        SortOrder::Ascending =&gt; a.values[index].cmp(<span class="kw-2">&amp;</span>b.values[index]),
-                        SortOrder::Descending =&gt; b.values[index].cmp(<span class="kw-2">&amp;</span>a.values[index]),
+                    <span class="kw">match </span>(by_scalar.sort_order, reversed) {
+                        (SortOrder::Ascending, <span class="bool-val">false</span>) | (SortOrder::Descending, <span class="bool-val">true</span>) =&gt; {
+                            a.values[index].cmp(<span class="kw-2">&amp;</span>b.values[index])
+                        }
+                        (SortOrder::Descending, <span class="bool-val">false</span>) | (SortOrder::Ascending, <span class="bool-val">true</span>) =&gt; {
+                            b.values[index].cmp(<span class="kw-2">&amp;</span>a.values[index])
+                        }
                     }
                 }
                 OrderBy::ScalarAggregation(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),

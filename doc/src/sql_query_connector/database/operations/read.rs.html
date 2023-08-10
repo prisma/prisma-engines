@@ -396,7 +396,7 @@
             }
 
             <span class="kw">if </span>!order.is_empty() {
-                records.order_by(<span class="kw-2">&amp;</span>order)
+                records.order_by(<span class="kw-2">&amp;</span>order, reversed)
             }
         }
         <span class="kw">_ </span>=&gt; {
