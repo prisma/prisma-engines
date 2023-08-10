@@ -145,9 +145,10 @@ impl QuaintQueryable for JsQueryable {
 
     /// Signals if the isolation level SET needs to happen before or after the tx BEGIN.
     fn requires_isolation_first(&self) -> bool {
-        match self.flavor {
-            JsConnectorFlavor::MySQL => true,
-            JsConnectorFlavor::Postgres => false,
+        match self.flavour {
+            Flavour::Mysql => true,
+            Flavour::Postgres | Flavour::Sqlite => false,
+            _ => unreachable!(),
         }
     }
 }
