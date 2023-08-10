@@ -61,12 +61,12 @@ importers:
         specifier: workspace:*
         version: link:../planetscale-js-connector
       '@prisma/client':
-        specifier: 5.2.0-dev.30
-        version: 5.2.0-dev.30(prisma@5.2.0-dev.30)
+        specifier: 5.2.0-integration-remove-binary-sql.1
+        version: 5.2.0-integration-remove-binary-sql.1(prisma@5.2.0-integration-remove-binary-sql.1)
     devDependencies:
       prisma:
-        specifier: 5.2.0-dev.30
-        version: 5.2.0-dev.30
+        specifier: 5.2.0-integration-remove-binary-sql.1
+        version: 5.2.0-integration-remove-binary-sql.1
       tsx:
         specifier: ^3.12.7
         version: 3.12.7
@@ -556,8 +556,8 @@ packages:
     engines: {node: '>=16'}
     dev: false
 
-  /@prisma/client@5.2.0-dev.30(prisma@5.2.0-dev.30):
-    resolution: {integrity: sha512-tkeZIzm6JwjO7DYbCB4MuCVqud69DoT8Wr1GZM3Mvzla7zuBVGVKthO86c8O/yTmnRSyWK0/ImTr5Cjzl2wIqg==}
+  /@prisma/client@5.2.0-integration-remove-binary-sql.1(prisma@5.2.0-integration-remove-binary-sql.1):
+    resolution: {integrity: sha512-tXcHhenOLynwESTTr/xarNYFCrnnis1PaCkVc6zmJs0JTt3NfNEYR++u2Lu9klZristnNVgIiqo8biYsl5jKuw==}
     engines: {node: '>=16.13'}
     requiresBuild: true
     peerDependencies:
@@ -566,16 +566,16 @@ packages:
       prisma:
         optional: true
     dependencies:
-      '@prisma/engines-version': 5.2.0-9.72e483371c97d235868eb0cffe89118c47c96bb4
-      prisma: 5.2.0-dev.30
+      '@prisma/engines-version': 5.2.0-14.joel-basedon-vitess-docker-image-version-update-5a2d26a26c5f7f7ca0deb9908246abfafd259a65
+      prisma: 5.2.0-integration-remove-binary-sql.1
     dev: false
 
-  /@prisma/engines-version@5.2.0-9.72e483371c97d235868eb0cffe89118c47c96bb4:
-    resolution: {integrity: sha512-DC6tJkSCMV1XxaRaJJEZVKZf3SxB4kzmtjTeeVlx1+XoSVkNR9sBWZ0YtesmSGE+He/Fh82SKo6cUsZaZ8KJ5g==}
+  /@prisma/engines-version@5.2.0-14.joel-basedon-vitess-docker-image-version-update-5a2d26a26c5f7f7ca0deb9908246abfafd259a65:
+    resolution: {integrity: sha512-3SlUCm6Ul4iNFqmHMeU9EZebjE35CREOUzUMJ4M0EuZ2NzI6D9Non2UWLWRbGf8/4eV35G036cXBaGsRiDt9Bw==}
     dev: false
 
-  /@prisma/engines@5.2.0-dev.30:
-    resolution: {integrity: sha512-tOTF4oELwgywI+mUK1VvoiVC9gu8sg/TvcjjR7PyP94mgXG+Va+/rV5lTjHwmI0ZN2jTSFbgM/2VZC+SsmUoAQ==}
+  /@prisma/engines@5.2.0-integration-remove-binary-sql.1:
+    resolution: {integrity: sha512-mJbtTntZjRnu5kn+D2Bj2YongmFLNUG7tRco+6Po593Ii2yPEqQzlIhqXdlJ/JIKYHGRDjn676Fedx6E3K+ttg==}
     requiresBuild: true
 
   /@types/debug@4.1.8:
@@ -1090,13 +1090,13 @@ packages:
       xtend: 4.0.2
     dev: false
 
-  /prisma@5.2.0-dev.30:
-    resolution: {integrity: sha512-waGqIxagLaOuOdQEKjnWtIUJVgWoc7Fz9rxEPmDt9DLxX8gZXR2/F+JRwyrfysxtggajGxHMEq4yqVsn/Z2Gug==}
+  /prisma@5.2.0-integration-remove-binary-sql.1:
+    resolution: {integrity: sha512-7Vh6m1DXdF+Vr9XNsS6MAybiny8bP3AFnRkpGRGKD1cNtIrgsfP2/dIBgkhaXJn3uI5YNohdCFG5SznZNom09g==}
     engines: {node: '>=16.13'}
     hasBin: true
     requiresBuild: true
     dependencies:
-      '@prisma/engines': 5.2.0-dev.30
+      '@prisma/engines': 5.2.0-integration-remove-binary-sql.1
 
   /punycode@2.3.0:
     resolution: {integrity: sha512-rRV+zQD8tVFys26lAGR9WUuS4iUAngJScM+ZRSKtvl5tKeZ2t5bvdNFdNHBW9FWR4guGHlgmsZ1G7BSm2wTbuA==}
