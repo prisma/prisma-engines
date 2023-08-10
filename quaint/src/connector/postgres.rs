@@ -3,7 +3,7 @@ mod error;
 
 use crate::{
     ast::{Query, Value},
-    connector::{metrics, queryable::*, ResultSet, Transaction},
+    connector::{metrics, queryable::*, DefaultTransaction, ResultSet},
     error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };
@@ -912,7 +912,7 @@ impl Queryable for PostgreSql {
         self.is_healthy.load(Ordering::SeqCst)
     }
 
-    async fn server_reset_query(&self, tx: &Transaction<'_>) -> crate::Result<()> {
+    async fn server_reset_query(&self, tx: &DefaultTransaction<'_>) -> crate::Result<()> {
         if self.pg_bouncer {
             tx.raw_cmd("DEALLOCATE ALL").await
         } else {

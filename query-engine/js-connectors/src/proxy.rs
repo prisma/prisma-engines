@@ -3,11 +3,12 @@ use std::str::FromStr;
 use std::sync::{Arc, Condvar, Mutex};
 
 use crate::error::*;
+use crate::transaction::JsTransaction;
 use napi::bindgen_prelude::{FromNapiValue, Promise as JsPromise, ToNapiValue};
 use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction};
 use napi::{JsObject, JsString};
 use napi_derive::napi;
-use quaint::connector::ResultSet as QuaintResultSet;
+use quaint::connector::{IsolationLevel, ResultSet as QuaintResultSet};
 use quaint::Value as QuaintValue;
 
 // TODO(jkomyno): import these 3rd-party crates from the `quaint-core` crate.
@@ -18,8 +19,9 @@ use chrono::{NaiveDate, NaiveTime};
 /// Proxy is a struct wrapping a javascript object that exhibits basic primitives for
 /// querying and executing SQL (i.e. a client connector). The Proxy uses NAPI ThreadSafeFunction to
 /// invoke the code within the node runtime that implements the client connector.
+/// This a proxy for accessing the methods common between Transactions and top level drivers
 #[derive(Clone)]
-pub struct Proxy {
+pub struct CommonProxy {
     /// Execute a query given as SQL, interpolating the given parameters.
     query_raw: ThreadsafeFunction<Query, ErrorStrategy::Fatal>,
 
@@ -43,28 +45,25 @@ pub struct Proxy {
     is_healthy: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
 
     /// Return the flavour for this driver.
-    #[allow(dead_code)]
     pub(crate) flavour: String,
 }
 
-/// Reify creates a Rust proxy to access the JS driver passed in as a parameter.
-pub fn reify(js_connector: JsObject) -> napi::Result<Proxy> {
-    let query_raw = js_connector.get_named_property("queryRaw")?;
-    let execute_raw = js_connector.get_named_property("executeRaw")?;
-    let version = js_connector.get_named_property("version")?;
-    let close: ThreadsafeFunction<(), ErrorStrategy::Fatal> = js_connector.get_named_property("close")?;
-    let is_healthy = js_connector.get_named_property("isHealthy")?;
-    let flavour: JsString = js_connector.get_named_property("flavour")?;
+/// This is a JS proxy for accessing the methods specific to top level
+/// JS driver objects
+#[derive(Clone)]
+pub struct DriverProxy {
+    start_transaction: ThreadsafeFunction<Option<String>, ErrorStrategy::Fatal>,
+}
 
-    let driver = Proxy {
-        query_raw,
-        execute_raw,
-        version,
-        close,
-        is_healthy,
-        flavour: flavour.into_utf8()?.as_str()?.to_owned(),
-    };
-    Ok(driver)
+/// This a JS proxy for accessing the methods, specific
+/// to JS transaction objects
+#[derive(Clone)]
+pub struct TransactionProxy {
+    /// commit transaction
+    commit: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
+
+    /// rollback transcation
+    rollback: ThreadsafeFunction<(), ErrorStrategy::Fatal>,
 }
 
 /// This result set is more convenient to be manipulated from both Rust and NodeJS.
@@ -317,7 +316,25 @@ impl From<JSResultSet> for QuaintResultSet {
     }
 }
 
-impl Proxy {
+impl CommonProxy {
+    pub fn new(object: &JsObject) -> napi::Result<Self> {
+        let query_raw = object.get_named_property("queryRaw")?;
+        let execute_raw = object.get_named_property("executeRaw")?;
+        let version = object.get_named_property("version")?;
+        let close: ThreadsafeFunction<(), ErrorStrategy::Fatal> = object.get_named_property("close")?;
+        let is_healthy = object.get_named_property("isHealthy")?;
+        let flavour: JsString = object.get_named_property("flavour")?;
+
+        Ok(Self {
+            query_raw,
+            execute_raw,
+            version,
+            close,
+            is_healthy,
+            flavour: flavour.into_utf8()?.as_str()?.to_owned(),
+        })
+    }
+
     pub async fn query_raw(&self, params: Query) -> napi::Result<JSResultSet> {
         async_unwinding_panic(async {
             let promise = self.query_raw.call_async::<JsPromise<JSResultSet>>(params).await?;
@@ -344,6 +361,7 @@ impl Proxy {
         .await
     }
 
+    #[allow(dead_code)]
     pub async fn close(&self) -> napi::Result<()> {
         async_unwinding_panic(async { self.close.call_async::<()>(()).await }).await
     }
@@ -379,6 +397,42 @@ impl Proxy {
 
             Ok(result_guard.unwrap_or_default())
         })
+    }
+}
+
+impl DriverProxy {
+    pub fn new(js_connector: &JsObject) -> napi::Result<Self> {
+        let start_transaction = js_connector.get_named_property("starTransaction")?;
+        Ok(Self { start_transaction })
+    }
+
+    pub async fn start_transaction(&self, isolation_level: Option<IsolationLevel>) -> napi::Result<Box<JsTransaction>> {
+        async_unwinding_panic(async move {
+            let promise = self
+                .start_transaction
+                .call_async::<JsPromise<JsTransaction>>(isolation_level.map(|l| l.to_string()))
+                .await?;
+
+            let tx = promise.await?;
+            Ok(Box::new(tx))
+        })
+        .await
+    }
+}
+
+impl TransactionProxy {
+    pub fn new(js_transaction: &JsObject) -> napi::Result<Self> {
+        let commit = js_transaction.get_named_property("commit")?;
+        let rollback = js_transaction.get_named_property("rollback")?;
+
+        Ok(Self { commit, rollback })
+    }
+
+    pub async fn commit(&self) -> napi::Result<()> {
+        async_unwinding_panic(self.commit.call_async(())).await
+    }
+    pub async fn rollback(&self) -> napi::Result<()> {
+        async_unwinding_panic(self.rollback.call_async(())).await
     }
 }
 

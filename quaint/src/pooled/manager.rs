@@ -6,7 +6,7 @@ use crate::connector::MysqlUrl;
 use crate::connector::PostgresUrl;
 use crate::{
     ast,
-    connector::{self, IsolationLevel, Queryable, Transaction, TransactionCapable},
+    connector::{self, DefaultTransaction, IsolationLevel, Queryable, TransactionCapable},
     error::Error,
 };
 use async_trait::async_trait;
@@ -58,7 +58,7 @@ impl Queryable for PooledConnection {
         self.inner.is_healthy()
     }
 
-    async fn server_reset_query(&self, tx: &Transaction<'_>) -> crate::Result<()> {
+    async fn server_reset_query(&self, tx: &DefaultTransaction<'_>) -> crate::Result<()> {
         self.inner.server_reset_query(tx).await
     }
 
