@@ -878,7 +878,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 info.is_nullable,
                 info.is_identity,
                 info.character_maximum_length,
-                description.description
+                col_description(att.attrelid, ordinal_position) AS description
             FROM information_schema.columns info
             JOIN pg_attribute att ON att.attname = info.column_name
             JOIN (
@@ -890,7 +890,6 @@ impl<'a> SqlSchemaDescriber<'a> {
                   AND relname = info.table_name
                   AND namespace = info.table_schema
             LEFT OUTER JOIN pg_attrdef attdef ON attdef.adrelid = att.attrelid AND attdef.adnum = att.attnum AND table_schema = namespace
-            LEFT OUTER JOIN pg_description description ON description.objoid = att.attrelid AND description.objsubid = ordinal_position
             WHERE table_schema = ANY ( $1 ) {is_visible_clause}
             ORDER BY namespace, table_name, ordinal_position;
         "#
@@ -1403,11 +1402,14 @@ impl<'a> SqlSchemaDescriber<'a> {
         let namespaces = &sql_schema.namespaces;
 
         let sql = "
-            SELECT t.typname as name, e.enumlabel as value, n.nspname as namespace, d.description
+            SELECT
+                t.typname AS name,
+                e.enumlabel AS value,
+                n.nspname AS namespace,
+                obj_description(t.oid, 'pg_type') AS description
             FROM pg_type t
             JOIN pg_enum e ON t.oid = e.enumtypid
             JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
-            LEFT OUTER JOIN pg_description d ON d.objoid = t.oid
             WHERE n.nspname = ANY ( $1 )
             ORDER BY e.enumsortorder";
 
