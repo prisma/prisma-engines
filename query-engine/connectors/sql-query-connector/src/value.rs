@@ -59,7 +59,6 @@ pub fn to_prisma_value(quaint_value: Value<'_>) -> crate::Result<PrismaValue> {
 
         Value::Date(d) => d
             .map(|d| {
-                #[allow(deprecated)]
                 let dt = DateTime::<Utc>::from_utc(d.and_hms(0, 0, 0), Utc);
                 PrismaValue::DateTime(dt.into())
             })
@@ -67,7 +66,6 @@ pub fn to_prisma_value(quaint_value: Value<'_>) -> crate::Result<PrismaValue> {
 
         Value::Time(t) => t
             .map(|t| {
-                #[allow(deprecated)]
                 let d = NaiveDate::from_ymd(1970, 1, 1);
                 let dt = DateTime::<Utc>::from_utc(d.and_time(t), Utc);
                 PrismaValue::DateTime(dt.into())

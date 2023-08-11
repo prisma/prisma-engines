@@ -10,7 +10,6 @@ pub fn datetime_iso_string(
     sec: Option<u32>,
     millis: Option<u32>,
 ) -> String {
-    #[allow(deprecated)]
     Utc.ymd(year, month, day)
         .and_hms_milli(or_zero(hour), or_zero(min), or_zero(sec), or_zero(millis))
         .to_rfc3339()
@@ -18,7 +17,6 @@ pub fn datetime_iso_string(
 
 /// Convenience date string (UTC, RFC 3339) constructor so you don't have to remember the format.
 pub fn date_iso_string(year: i32, month: u32, day: u32) -> String {
-    #[allow(deprecated)]
     Utc.ymd(year, month, day).and_hms_milli(0, 0, 0, 0).to_rfc3339()
 }
 
