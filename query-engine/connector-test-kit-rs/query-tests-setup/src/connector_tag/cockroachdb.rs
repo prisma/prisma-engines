@@ -18,6 +18,7 @@ impl PartialEq for CockroachDbConnectorTag {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum CockroachDbVersion {
+    V231,
     V222,
     V221,
 }
@@ -29,6 +30,7 @@ impl TryFrom<&str> for CockroachDbVersion {
         let version = match s {
             "22.1" => Self::V221,
             "22.2" => Self::V222,
+            "23.1" => Self::V231,
             _ => return Err(TestError::parse_error(format!("Unknown CockroachDB version `{s}`"))),
         };
 
@@ -39,6 +41,7 @@ impl TryFrom<&str> for CockroachDbVersion {
 impl fmt::Display for CockroachDbVersion {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            CockroachDbVersion::V231 => f.write_str("23.1"),
             CockroachDbVersion::V222 => f.write_str("22.2"),
             CockroachDbVersion::V221 => f.write_str("22.1"),
         }
@@ -76,11 +79,17 @@ impl ConnectorTagInterface for CockroachDbConnectorTag {
             Some(CockroachDbVersion::V222) if is_ci => {
                 format!("postgresql://prisma@test-db-cockroachdb-22-2:26259/{database}?schema={database}")
             }
+            Some(CockroachDbVersion::V231) if is_ci => {
+                format!("postgresql://prisma@test-db-cockroachdb-22-2:26260/{database}?schema={database}")
+            }
             Some(CockroachDbVersion::V221) => {
                 format!("postgresql://prisma@127.0.0.1:26257/{database}?schema={database}")
             }
             Some(CockroachDbVersion::V222) => {
                 format!("postgresql://prisma@127.0.0.1:26259/{database}?schema={database}")
+            }
+            Some(CockroachDbVersion::V231) => {
+                format!("postgresql://prisma@127.0.0.1:26260/{database}?schema={database}")
             }
 
             None => unreachable!("A versioned connector must have a concrete version to run."),
@@ -120,6 +129,9 @@ impl CockroachDbConnectorTag {
             },
             Self {
                 version: Some(CockroachDbVersion::V222),
+            },
+            Self {
+                version: Some(CockroachDbVersion::V231),
             },
         ]
     }
