@@ -174,6 +174,7 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
                 let ts = value.as_integer().unwrap();
                 let nsecs = ((ts % 1000) * 1_000_000) as u32;
                 let secs = ts / 1000;
+                #[allow(deprecated)]
                 let naive = chrono::NaiveDateTime::from_timestamp(secs, nsecs);
                 let datetime: DateTime<Utc> = DateTime::from_utc(naive, Utc);
 
@@ -188,10 +189,12 @@ fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result
                 PrismaValue::DateTime(dt.with_timezone(&Utc).into())
             }
             Value::Date(Some(d)) => {
+                #[allow(deprecated)]
                 let dt = DateTime::<Utc>::from_utc(d.and_hms(0, 0, 0), Utc);
                 PrismaValue::DateTime(dt.into())
             }
             Value::Time(Some(t)) => {
+                #[allow(deprecated)]
                 let d = NaiveDate::from_ymd(1970, 1, 1);
                 let dt = DateTime::<Utc>::from_utc(d.and_time(t), Utc);
                 PrismaValue::DateTime(dt.into())

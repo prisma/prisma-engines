@@ -363,7 +363,9 @@ fn read_scalar_value(bson: Bson, meta: &ScalarOutputMeta) -> crate::Result<Prism
 
         // DateTime
         (TypeIdentifier::DateTime, Bson::DateTime(dt)) => PrismaValue::DateTime(dt.to_chrono().into()),
-        (TypeIdentifier::DateTime, Bson::Timestamp(ts)) => {
+        (TypeIdentifier::DateTime, Bson::Timestamp(ts)) =>
+        {
+            #[allow(deprecated)]
             PrismaValue::DateTime(Utc.timestamp(ts.time as i64, 0).into())
         }
 
