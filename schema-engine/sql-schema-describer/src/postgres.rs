@@ -819,11 +819,10 @@ impl<'a> SqlSchemaDescriber<'a> {
                 views.viewname AS view_name,
                 views.definition AS view_sql,
                 views.schemaname AS namespace,
-                description.description AS description
+                obj_description(class.oid, 'pg_class') AS description
             FROM pg_catalog.pg_views views
             INNER JOIN pg_catalog.pg_namespace ns ON views.schemaname = ns.nspname
             INNER JOIN pg_catalog.pg_class class ON class.relnamespace = ns.oid AND class.relname = views.viewname
-            LEFT JOIN pg_catalog.pg_description description ON description.objoid = class.oid AND description.objsubid = 0
             WHERE schemaname = ANY ( $1 )
         "#};
 
