@@ -1,7 +1,6 @@
-name: Generate cargo docs
+name: Generate cargo docs & engines size
 on:
   workflow_dispatch:
-    inputs: # null
   push:
     branches:
       - main
@@ -9,10 +8,9 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-      
+
 jobs:
-  generate-cargo-docs:
-    name: "Generate cargo docs for the workspace"
+  publish-to-gh-pages:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
@@ -23,4 +21,9 @@ jobs:
       - run: |
           git config user.email "prismabots@gmail.com"
           git config user.name "prisma-bot"
-      - run: nix run .#publish-cargo-docs
+
+      - name: Generate cargo docs for the workspace to gh-pages branch
+        run: nix run .#publish-cargo-docs
+
+      - name: Publish engines size to gh-pages branch
+        run: nix run .#publish-engine-size
