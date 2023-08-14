@@ -5,10 +5,9 @@ SELECT
   (tbl.relhassubclass and tbl.relkind = 'r') as has_subclass,
   tbl.relrowsecurity as has_row_level_security,
   reloptions,
-  pd.description as description
+  obj_description(tbl.oid, 'pg_class') as description
 FROM pg_class AS tbl
 INNER JOIN pg_namespace AS namespace ON namespace.oid = tbl.relnamespace
-LEFT JOIN pg_description pd ON pd.objoid = tbl.oid AND pd.objsubid = 0 AND pd.classoid = 'pg_catalog.pg_class'::regclass::oid
 WHERE
   ( -- (relkind = 'r' and relispartition = 't') matches partition table "duplicates"
     (tbl.relkind = 'r' AND tbl.relispartition = 'f')

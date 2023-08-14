@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider          = "@prisma/neon"
-  url               = env("JS_NEON_DATABASE_URL")
-  shadowDatabaseUrl = env("JS_NEON_SHADOW_DATABASE_URL")
+  provider = "@prisma/neon"
+  url      = env("JS_NEON_DATABASE_URL")
 }
 
 model type_test {
@@ -75,4 +74,13 @@ enum type_test_enum_column_null {
   value1
   value2
   value3
+}
+
+model Author {
+  id        Int             @id @default(autoincrement())
+  firstName String
+  lastName  String
+  age       Int
+
+  @@map("authors")
 }

@@ -9,11 +9,11 @@ use std::collections::HashMap;
 
 pub(crate) async fn m2m(
     tx: &mut dyn ConnectionLike,
-    query: &RelatedRecordsQuery,
+    query: &mut RelatedRecordsQuery,
     parent_result: Option<&ManyRecords>,
-    processor: InMemoryRecordProcessor,
     trace_id: Option<String>,
 ) -> InterpretationResult<(ManyRecords, Option<Vec<RelAggregationRow>>)> {
+    let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
     let parent_field = &query.parent_field;
     let child_link_id = parent_field.related_field().linking_fields();
 
@@ -138,10 +138,9 @@ pub async fn one2m(
     parent_field: &RelationFieldRef,
     parent_selections: Option<Vec<SelectionResult>>,
     parent_result: Option<&ManyRecords>,
-    query_args: QueryArguments,
+    mut query_args: QueryArguments,
     selected_fields: &FieldSelection,
     aggr_selections: Vec<RelAggregationSelection>,
-    processor: InMemoryRecordProcessor,
     trace_id: Option<String>,
 ) -> InterpretationResult<(ManyRecords, Option<Vec<RelAggregationRow>>)> {
     let parent_model_id = parent_field.model().primary_identifier();
@@ -190,6 +189,15 @@ pub async fn one2m(
         return Ok((ManyRecords::empty(selected_fields), None));
     }
 
+    // If we're fetching related records from a single parent, then we can apply normal pagination instead of in-memory processing.
+    // However, we can't just apply a LIMIT/OFFSET for multiple parents as we need N related records PER parent.
+    // We could use ROW_NUMBER() but it requires further refactoring so we're still using in-memory processing for now.
+    let processor = if uniq_selections.len() == 1 && !query_args.requires_inmemory_processing() {
+        None
+    } else {
+        Some(InMemoryRecordProcessor::new_from_query_args(&mut query_args))
+    };
+
     let mut scalars = {
         let filter = child_link_id.is_in(ConditionListValue::list(uniq_selections));
         let mut args = query_args;
@@ -198,6 +206,7 @@ pub async fn one2m(
             Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
             None => Some(filter),
         };
+
         tx.get_many_records(
             &parent_field.related_model(),
             args,
@@ -255,7 +264,11 @@ pub async fn one2m(
         );
     }
 
-    let scalars = processor.apply(scalars);
+    let scalars = if let Some(processor) = processor {
+        processor.apply(scalars)
+    } else {
+        scalars
+    };
     let (scalars, aggregation_rows) = read::extract_aggregation_rows_from_scalars(scalars, aggr_selections);
 
     Ok((scalars, aggregation_rows))
