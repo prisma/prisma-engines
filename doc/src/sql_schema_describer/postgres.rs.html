@@ -1773,6 +1773,7 @@
 <a href="#1773" id="1773">1773</a>
 <a href="#1774" id="1774">1774</a>
 <a href="#1775" id="1775">1775</a>
+<a href="#1776" id="1776">1776</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Postgres schema description.
 
 </span><span class="kw">mod </span>default;
@@ -2594,11 +2595,10 @@
                 views.viewname AS view_name,
                 views.definition AS view_sql,
                 views.schemaname AS namespace,
-                description.description AS description
+                obj_description(class.oid, &#39;pg_class&#39;) AS description
             FROM pg_catalog.pg_views views
             INNER JOIN pg_catalog.pg_namespace ns ON views.schemaname = ns.nspname
             INNER JOIN pg_catalog.pg_class class ON class.relnamespace = ns.oid AND class.relname = views.viewname
-            LEFT JOIN pg_catalog.pg_description description ON description.objoid = class.oid AND description.objsubid = 0
             WHERE schemaname = ANY ( $1 )
         &quot;#</span>};
 
@@ -2654,7 +2654,7 @@
                 info.is_nullable,
                 info.is_identity,
                 info.character_maximum_length,
-                description.description
+                col_description(att.attrelid, ordinal_position) AS description
             FROM information_schema.columns info
             JOIN pg_attribute att ON att.attname = info.column_name
             JOIN (
@@ -2666,7 +2666,6 @@
                   AND relname = info.table_name
                   AND namespace = info.table_schema
             LEFT OUTER JOIN pg_attrdef attdef ON attdef.adrelid = att.attrelid AND attdef.adnum = att.attnum AND table_schema = namespace
-            LEFT OUTER JOIN pg_description description ON description.objoid = att.attrelid AND description.objsubid = ordinal_position
             WHERE table_schema = ANY ( $1 ) {is_visible_clause}
             ORDER BY namespace, table_name, ordinal_position;
         &quot;#
@@ -3179,11 +3178,14 @@
         <span class="kw">let </span>namespaces = <span class="kw-2">&amp;</span>sql_schema.namespaces;
 
         <span class="kw">let </span>sql = <span class="string">&quot;
-            SELECT t.typname as name, e.enumlabel as value, n.nspname as namespace, d.description
+            SELECT
+                t.typname AS name,
+                e.enumlabel AS value,
+                n.nspname AS namespace,
+                obj_description(t.oid, &#39;pg_type&#39;) AS description
             FROM pg_type t
             JOIN pg_enum e ON t.oid = e.enumtypid
             JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
-            LEFT OUTER JOIN pg_description d ON d.objoid = t.oid
             WHERE n.nspname = ANY ( $1 )
             ORDER BY e.enumsortorder&quot;</span>;
 
